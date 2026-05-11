@@ -2,6 +2,7 @@
 
 const fs = require("fs");
 const path = require("path");
+const childProcess = require("child_process");
 
 const VERSION = "0.1.0";
 
@@ -10,12 +11,14 @@ function usage() {
 
 Usage:
   vibit --help
+  vibit check all
   vibit check architecture
   vibit check module <module>
   vibit check change <change-id>
   vibit generate module <module>
 
 Commands:
+  check all                Run all current repository checks.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -146,6 +149,96 @@ function checkTextIncludes(root, file, requiredText) {
   } else {
     fail(`${file} does not reference ${requiredText}`);
   }
+}
+
+function discoverChangeIds(root) {
+  const changesDir = path.join(root, "changes");
+  if (!fs.existsSync(changesDir)) {
+    return [];
+  }
+  return fs.readdirSync(changesDir)
+    .filter((name) => name !== "_template")
+    .filter((name) => fs.statSync(path.join(changesDir, name)).isDirectory())
+    .filter((name) => fs.existsSync(path.join(changesDir, name, "spec.yaml")))
+    .map((name) => name.replace(/^\d{4}-\d{2}-\d{2}-/, ""))
+    .sort();
+}
+
+function sectionBody(text, sectionName) {
+  const lines = text.split(/\r?\n/);
+  const startIndex = lines.findIndex((line) => line.trim() === `${sectionName}:`);
+  if (startIndex === -1) {
+    return [];
+  }
+  const body = [];
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (/^[a-zA-Z0-9_]+:/.test(line)) {
+      break;
+    }
+    body.push(line);
+  }
+  return body;
+}
+
+function discoverRegisteredModules(root) {
+  const manifestPath = path.join(root, ".arch", "modules.yaml");
+  if (!fs.existsSync(manifestPath)) {
+    return [];
+  }
+  const body = sectionBody(readText(manifestPath), "modules");
+  return body
+    .map((line) => line.match(/^\s+- name:\s+([a-z][a-z0-9_]*)\s*$/))
+    .filter(Boolean)
+    .map((match) => match[1])
+    .sort();
+}
+
+function runSubcheck(root, args) {
+  console.log(`\n==> vibit ${args.join(" ")}\n`);
+  const result = childProcess.spawnSync(process.execPath, [__filename, ...args], {
+    cwd: root,
+    stdio: "inherit",
+  });
+  if (result.error) {
+    console.log(`FAIL could not run subcheck: ${result.error.message}`);
+    return 1;
+  }
+  return result.status || 0;
+}
+
+function checkAll(root) {
+  console.log(`Checking all vibit standards in ${root}`);
+
+  const checks = [["check", "architecture"]];
+
+  for (const changeId of discoverChangeIds(root)) {
+    checks.push(["check", "change", changeId]);
+  }
+
+  const modules = discoverRegisteredModules(root);
+  for (const moduleName of modules) {
+    checks.push(["check", "module", moduleName]);
+  }
+
+  if (modules.length === 0) {
+    console.log("WARN no registered modules found in .arch/modules.yaml");
+  }
+
+  let failed = 0;
+  for (const args of checks) {
+    const status = runSubcheck(root, args);
+    if (status !== 0) {
+      failed += 1;
+    }
+  }
+
+  if (failed > 0) {
+    console.log(`\nResult: failed (${failed} subcheck${failed === 1 ? "" : "s"} failed)`);
+    process.exit(1);
+  }
+
+  console.log(`\nResult: passed (${checks.length} subcheck${checks.length === 1 ? "" : "s"})`);
 }
 
 function checkArchitecture(root) {
@@ -503,6 +596,11 @@ function main() {
 
   if (group === "check" && command === "architecture" && !value) {
     checkArchitecture(root);
+    return;
+  }
+
+  if (group === "check" && command === "all" && !value) {
+    checkAll(root);
     return;
   }
 

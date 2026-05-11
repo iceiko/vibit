@@ -73,11 +73,14 @@ vibit is an open-source agent-native server framework for building backends that
 
 ```bash
 node tools/vibit --help
+node tools/vibit check all
 node tools/vibit check architecture
 node tools/vibit check change <change-id>
 node tools/vibit check module <module>
 node tools/vibit generate module <module>
 ```
+
+当 CLI tooling 可用时，默认使用 `node tools/vibit check all` 作为仓库验证命令。
 
 ## 4. 文档规则
 

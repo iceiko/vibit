@@ -80,6 +80,7 @@ tools/vibit
 
 ```bash
 node tools/vibit --help
+node tools/vibit check all
 node tools/vibit check architecture
 node tools/vibit check change bootstrap-vibit-cli
 node tools/vibit check module inventory
@@ -87,6 +88,8 @@ node tools/vibit generate module <module>
 ```
 
 当前 CLI 只使用 Node.js standard-library APIs。它是 architecture checks 和 module skeleton generation 的 prototype，不是 server runtime。
+
+服务器实现语言和整体服务器实例架构目前有意保持开放。它们应在仓库标准和工具链足够强、可以评估 tradeoffs 后，通过 change specs 决定。
 
 ## 早期参考领域
 

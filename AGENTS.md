@@ -72,11 +72,14 @@ Current executable tooling:
 
 ```bash
 node tools/vibit --help
+node tools/vibit check all
 node tools/vibit check architecture
 node tools/vibit check change <change-id>
 node tools/vibit check module <module>
 node tools/vibit generate module <module>
 ```
+
+Use `node tools/vibit check all` as the default repository verification command when CLI tooling is available.
 
 ## 4. Documentation Rules
 
