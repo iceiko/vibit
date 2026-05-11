@@ -1,0 +1,258 @@
+# Agent 操作指南
+
+状态：Draft v0.1  
+最后更新：2026-05-12  
+范围：仓库级 coding agent 操作指令  
+权威来源：`CONSTITUTION.md`  
+说明：本文件是 `AGENTS.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
+
+这份指南把宪法转化为 agent 的工作规则。它不取代宪法。如果本指南与 `CONSTITUTION.md` 冲突，应遵循 `CONSTITUTION.md`，并更新本指南。
+
+配套英文源文档是 `AGENTS.md`。英文文件是权威版本。
+
+## 1. 项目身份
+
+工作名：
+
+```text
+vibit
+```
+
+类别：
+
+```text
+Agent-Native Server Framework
+```
+
+定位：
+
+```text
+vibit is an open-source agent-native server framework for building backends that AI coding agents can understand, extend, verify, and maintain from first principles.
+```
+
+在本仓库中，“AI-native” 首先指 agent-native maintainability。它主要不是指添加 AI gameplay features 或 AI product features。
+
+## 2. 必读内容
+
+在进行非平凡变更前，先阅读：
+
+- `CONSTITUTION.md`
+- 本文件
+- `.arch/` 下相关 architecture manifests，如果它们已经存在
+- `modules/<module>/module.yaml` 中的相关 module manifest，如果它已经存在
+- `modules/<module>/AGENTS.md` 中的相关 module guide，如果它已经存在
+- `changes/` 下相关 change spec，如果该变更已有 spec
+
+如果预期产物尚不存在，不要发明隐藏假设。要么把缺失产物作为本次变更的一部分创建出来，要么记录它目前尚不可用。
+
+## 3. 当前仓库状态
+
+本仓库当前处于宪法和标准设计阶段。
+
+现有基础：
+
+- `CONSTITUTION.md`
+- `CONSTITUTION.zh-CN.md`
+- `AGENTS.md`
+- `AGENTS.zh-CN.md`
+
+框架实现代码、generators、manifests、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
+
+## 4. 文档规则
+
+英文是项目权威文档语言。
+
+每个面向公众的文档都应该有：
+
+- 英文源文档
+- 简体中文可读译本
+
+命名示例：
+
+```text
+CONSTITUTION.md
+CONSTITUTION.zh-CN.md
+AGENTS.md
+AGENTS.zh-CN.md
+docs/<name>.md
+docs/<name>.zh-CN.md
+```
+
+规则：
+
+- 英文源文档发生实质变更时，应在同一次变更中更新中文译本。
+- 如果同一次变更无法更新译本，必须明确标记译本已过期。
+- 机器可读标识符保持英文。
+- 代码标识符、模块名、命令、事件、权限、错误码应使用英文，除非存在强领域理由。
+- 翻译应保留意义。不要为了逐字翻译牺牲清晰度。
+
+## 5. 标准变更工作流
+
+每个非平凡 feature、bug fix、migration、refactor 或 standard change 都应遵循：
+
+1. 澄清 requirement。
+2. 识别 affected modules 和 contracts。
+3. 当变更足够大、需要持久上下文时，编写或更新 change spec。
+4. 当 public behavior 改变时，先更新 schemas、manifests 或 contracts，再实现。
+5. 当 generators 存在时，用它们生成重复结构。
+6. 只在声明过的边界内实现。
+7. 新增或更新聚焦的 tests。
+8. 运行相关 verification commands。
+9. 更新文档和译本。
+10. 记录已验证和未验证的内容。
+
+对于早期纯设计变更，涉及代码、测试、生成器和验证的步骤可以不适用，但必须明确说明。
+
+## 6. 架构规则
+
+优先选择这样的设计：
+
+- 给 agents 更少歧义上下文
+- 创建更强 module boundaries
+- 让 behavior 更容易验证
+- 让 contracts 显式
+- 减少 hidden coupling
+- 支持 code generation
+- 对人类开发者仍然实用
+
+不要让架构规则只存在于维护者记忆里。如果一条规则重要，它最终应体现为文档、schema、manifest、test、generator 或 architecture check。
+
+## 7. 模块规则
+
+当 modules 存在时，每个 module 应声明：
+
+- 它拥有什么
+- 它不拥有什么
+- Public commands
+- Public queries
+- Published events
+- Subscribed events
+- Allowed dependencies
+- Forbidden dependencies
+- Invariants
+- Required tests
+- Generated files
+- Handwritten extension points
+
+其他 modules 不能直接访问某个 module 的内部实现。跨模块通信应通过 commands、queries、events、public module APIs 或 generated clients 完成。
+
+## 8. 契约规则
+
+公共行为应先定义，再实现。
+
+带有 contract 属性的产物可以包括：
+
+- API schemas
+- Command schemas
+- Query schemas
+- Event schemas
+- Error catalogs
+- Permission catalogs
+- Database migration schemas
+- Generated clients
+
+规则：
+
+- Public contracts 必须先声明再使用。
+- 对兼容性敏感的 contracts 必须 versioned。
+- Breaking changes 必须显式说明。
+- Generated output 必须能追踪到 source schema。
+- 不要手工编辑 generated contract output，除非本次变更的目标就是 generator 本身。
+
+## 9. 测试与验证
+
+测试是架构的一部分，不是收尾步骤。
+
+当实现代码存在时，相关验证可以包括：
+
+- Unit tests
+- Contract tests
+- Invariant tests
+- Integration tests
+- Migration tests
+- Replay tests
+- Architecture checks
+- Generator checks
+- Documentation consistency checks
+
+本仓库尚未定义最终 verification commands。在此之前，按以下方式记录验证：
+
+```text
+Verified: <commands or checks run>
+Not verified: <reason>
+Not applicable: <reason>
+```
+
+没有运行验证时，绝不能声称变更已经验证。
+
+## 10. 先询问
+
+以下情况应先询问人类维护者：
+
+- 修改宪法原则
+- 正式确定或替换项目名
+- 重新定义 module ownership
+- 引入新的架构模式
+- 做 breaking API、command、query 或 event changes
+- 修改 generated file conventions
+- 删除 tests
+- 削弱 validation 或 permission checks
+- 在 modules 之间迁移 data ownership
+- 添加重大的外部框架依赖
+
+## 11. 禁止事项
+
+禁止：
+
+- 把 AI gameplay features 当作本项目基础
+- 为方便绕过 module boundaries
+- 把业务逻辑藏在 transport handlers
+- 添加未登记 public events
+- 添加未登记 permissions
+- 添加无类型 cross-module payloads
+- 在没有声明边界的情况下做大范围仓库编辑
+- 无记录地手工编辑 generated files
+- 英文公共文档发生实质变更后，让中文译本静默落后
+- 没有运行验证却声称已验证
+
+## 12. 新增标准时
+
+新增标准应说明：
+
+- 要解决的问题
+- 引入的规则
+- 该规则为什么帮助 agents
+- 对人类的影响
+- 预期产物
+- 验证路径
+- 从现有工作的迁移路径
+
+优先选择可以被执行和检查的小标准，而不是无法检查的宏大表述。
+
+## 13. 新增实现代码时
+
+不要一开始就把框架代码分散到整个仓库。
+
+从能证明核心命题的最小完整切片开始：
+
+```text
+requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
+```
+
+一个好的第一版实现目标，应包含一个小而完整的后端领域，例如 player accounts、inventory、currency、rewards、quests 或 match sessions。
+
+## 14. 交接要求
+
+每次变更结束时，都要给下一个 agent 或 human 留下足够上下文。
+
+记录：
+
+- 改了什么
+- 为什么改
+- 哪些文件变更
+- 哪些 contracts 或 standards 变更
+- 已验证什么
+- 未验证什么
+- 还有哪些开放问题
+
+如果工作未完成，说明下一个具体动作。
