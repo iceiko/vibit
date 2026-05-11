@@ -186,6 +186,16 @@ The framework should generate repeatable structure.
 
 Agents and humans should focus on behavior, invariants, edge cases, and tests, not on guessing where files go or how boilerplate should look.
 
+Generated parts are immutable to non-system agents.
+
+Rules:
+
+- Generated files must be declared in manifests.
+- Ordinary agents must not hand-edit generated files.
+- If generated output is wrong, change the source schema, template, or generator.
+- A generated file override requires an explicit change spec or Agent Decision Record.
+- The initial standards-level permission concept for overrides is `generated_file_override`.
+
 ### 3.6 Strong Module Boundaries
 
 Modules are bounded contexts.
@@ -442,6 +452,26 @@ Conversation logs are not a replacement for change specs. A conversation log exp
 
 Maintainer statements may be preserved in their original language because original wording can be part of product intent.
 
+### 4.8 Agent Decision Records
+
+Expected directory:
+
+```text
+decisions/
+```
+
+Purpose:
+
+- Preserves durable decision rationale
+- Explains why long-term architecture choices were made
+- Records alternatives considered and rejected
+- Gives later agents concise public reasoning without storing hidden chain-of-thought
+- Links decisions to change specs, conversations, modules, and generated-file overrides
+
+Decision records are not a replacement for conversation logs. Conversation logs preserve discussion history. Decision records preserve the stable rationale that future agents must respect.
+
+Long reasoning should not be embedded into `module.yaml`. Module manifests should link to decision IDs when a decision affects the module.
+
 ## 5. Standard Server Shape
 
 The framework should converge toward a predictable structure.
@@ -475,6 +505,7 @@ schema/
 .arch/
 changes/
 conversations/
+decisions/
 tools/
 docs/
 ```

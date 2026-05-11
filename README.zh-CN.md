@@ -48,6 +48,9 @@ vibit 从另一个前提出发：
 - `docs/conversation-log.md`：conversation log 标准
 - `docs/conversation-log.zh-CN.md`：简体中文译本
 - `conversations/`：maintainer-agent project memory
+- `docs/agent-decision-record.md`：Agent Decision Record 标准
+- `docs/agent-decision-record.zh-CN.md`：简体中文译本
+- `decisions/`：持久 decision rationale
 
 英文文档是权威版本。简体中文译本服务于人类阅读和早期项目讨论。
 
@@ -63,6 +66,7 @@ vibit 应逐步演进出：
 - 能验证 dependency、contract、event 和 generated-file rules 的 architecture checks
 - `changes/<date>-<change-id>/` 下遵循 `docs/change-spec.md` 的 change specs
 - `conversations/` 下遵循 `docs/conversation-log.md` 的 conversation logs
+- `decisions/` 下遵循 `docs/agent-decision-record.md` 的 Agent Decision Records
 
 第一个严肃 prototype 应证明一个命题：
 
@@ -81,6 +85,8 @@ tools/vibit
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit inspect module inventory
+node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit check architecture
 node tools/vibit check change bootstrap-vibit-cli
 node tools/vibit check module inventory

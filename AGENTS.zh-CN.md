@@ -66,6 +66,9 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/conversation-log.md`
 - `docs/conversation-log.zh-CN.md`
 - `conversations/`
+- `docs/agent-decision-record.md`
+- `docs/agent-decision-record.zh-CN.md`
+- `decisions/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
@@ -74,6 +77,8 @@ vibit is an open-source agent-native server framework for building backends that
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit inspect module <module>
+node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
 node tools/vibit check change <change-id>
 node tools/vibit check module <module>
@@ -169,6 +174,12 @@ docs/<name>.zh-CN.md
 `conversations/` 应以 `docs/conversation-log.md` 作为源标准。
 
 当 maintainer 引入 product intent、拒绝一种解释、命名一个概念或做出架构决策时，应在 conversation log 中保留该上下文。提交前必须脱敏 secrets。
+
+`decisions/` 应以 `docs/agent-decision-record.md` 作为源标准。
+
+当某个 decision 影响长期 architecture、generated file conventions、module ownership 或拒绝了一个合理替代方案时，应创建或更新 Agent Decision Record。Rationale 应简洁、公开；不要存储隐藏 chain-of-thought。
+
+Generated files 对 non-system agents 不可变。如果 generated output 错了，应修改 source schema、template 或 generator，除非 change spec 或 decision record 显式授予 `generated_file_override`。
 
 ## 8. 契约规则
 

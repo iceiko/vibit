@@ -48,6 +48,9 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/conversation-log.md`: conversation log standard
 - `docs/conversation-log.zh-CN.md`: Simplified Chinese translation
 - `conversations/`: maintainer-agent project memory
+- `docs/agent-decision-record.md`: Agent Decision Record standard
+- `docs/agent-decision-record.zh-CN.md`: Simplified Chinese translation
+- `decisions/`: durable decision rationale
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -63,6 +66,7 @@ vibit should evolve toward:
 - Architecture checks that verify dependency, contract, event, and generated-file rules
 - Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
 - Conversation logs under `conversations/`, following `docs/conversation-log.md`
+- Agent Decision Records under `decisions/`, following `docs/agent-decision-record.md`
 
 The first serious prototype should prove one claim:
 
@@ -81,6 +85,8 @@ Initial commands:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit inspect module inventory
+node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit check architecture
 node tools/vibit check change bootstrap-vibit-cli
 node tools/vibit check module inventory

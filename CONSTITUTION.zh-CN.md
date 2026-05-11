@@ -187,6 +187,16 @@ Agent 不应在没有更新相关 schema 或 manifest 的情况下，临时发�
 
 Agents 和人类应该专注于 behavior、invariants、edge cases 和 tests，而不是猜文件该放哪、样板代码该怎么写。
 
+Generated parts 对 non-system agents 不可变。
+
+规则：
+
+- Generated files 必须在 manifests 中声明。
+- Ordinary agents 不得手工编辑 generated files。
+- 如果 generated output 错了，应修改 source schema、template 或 generator。
+- 覆盖 generated file 需要显式 change spec 或 Agent Decision Record。
+- 初始 standards-level override permission concept 是 `generated_file_override`。
+
 ### 3.6 强模块边界
 
 模块是 bounded contexts。
@@ -443,6 +453,26 @@ Conversation logs 不取代 change specs。Conversation log 解释项目为什�
 
 Maintainer statements 可以保留原始语言，因为原始表述本身可能就是 product intent 的一部分。
 
+### 4.8 Agent Decision Records
+
+预期目录：
+
+```text
+decisions/
+```
+
+目的：
+
+- 保存持久 decision rationale
+- 解释长期 architecture choices 为什么被做出
+- 记录考虑过和拒绝过的 alternatives
+- 给后续 agents 简洁公开的 reasoning，而不是存储隐藏 chain-of-thought
+- 将 decisions 链接到 change specs、conversations、modules 和 generated-file overrides
+
+Decision records 不取代 conversation logs。Conversation logs 保存讨论历史。Decision records 保存未来 agents 必须尊重的稳定 rationale。
+
+不应把长篇 reasoning 嵌入 `module.yaml`。当某个 decision 影响 module 时，module manifest 应链接 decision IDs。
+
 ## 5. 标准服务器形态
 
 框架应逐步收敛到可预测结构。
@@ -476,6 +506,7 @@ schema/
 .arch/
 changes/
 conversations/
+decisions/
 tools/
 docs/
 ```

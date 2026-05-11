@@ -54,12 +54,19 @@ documentation_pairs:
   conversations_readme:
     canonical: conversations/README.md
     zh-CN: conversations/README.zh-CN.md
+  agent_decision_record_standard:
+    canonical: docs/agent-decision-record.md
+    zh-CN: docs/agent-decision-record.zh-CN.md
+  decisions_readme:
+    canonical: decisions/README.md
+    zh-CN: decisions/README.zh-CN.md
 
 standard_directories:
   architecture: .arch
   documentation: docs
   changes: changes
   conversations: conversations
+  decisions: decisions
   modules: modules
   schemas: schema
   tools: tools
@@ -67,6 +74,14 @@ standard_directories:
 templates:
   change_spec: changes/_template
   conversation_log: conversations/_template/session.md
+  agent_decision_record: decisions/_template/adr-agent.md
+
+generated_file_policy:
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+  override_requires:
+    - change_spec
+    - agent_decision_record
 
 change_workflow:
   required_steps:

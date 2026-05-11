@@ -1,0 +1,71 @@
+schema_version: 0.1
+change_id: add-agent-decision-records-and-inspect
+date: 2026-05-12
+type: standard
+status: draft
+
+summary: Add Agent Decision Records, generated immutability rules, and first JSON inspect commands.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added:
+      - vibit inspect boundary --from <module> --to <module>
+      - vibit inspect module <module>
+    changed:
+      - vibit check all
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - generated_file_override
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  added:
+    - docs/agent-decision-record.md
+    - docs/agent-decision-record.zh-CN.md
+    - decisions/README.md
+    - decisions/README.zh-CN.md
+    - decisions/_template/adr-agent.md
+    - decisions/ADR-0001-agent-native-maintainability.md
+  changed:
+    - CONSTITUTION.md
+    - CONSTITUTION.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - .arch/conventions.yaml
+    - tools/vibit
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_all
+    - inspect_boundary
+    - inspect_module
+    - secret_scan
+  status: Verified

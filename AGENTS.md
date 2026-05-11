@@ -65,6 +65,9 @@ Existing foundation:
 - `docs/conversation-log.md`
 - `docs/conversation-log.zh-CN.md`
 - `conversations/`
+- `docs/agent-decision-record.md`
+- `docs/agent-decision-record.zh-CN.md`
+- `decisions/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
@@ -73,6 +76,8 @@ Current executable tooling:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit inspect module <module>
+node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
 node tools/vibit check change <change-id>
 node tools/vibit check module <module>
@@ -168,6 +173,12 @@ Use `docs/change-spec.md` as the source standard for `changes/<date>-<change-id>
 Use `docs/conversation-log.md` as the source standard for `conversations/`.
 
 When the maintainer introduces product intent, rejects an interpretation, names a concept, or makes an architectural decision, preserve that context in a conversation log. Redact secrets before committing.
+
+Use `docs/agent-decision-record.md` as the source standard for `decisions/`.
+
+When a decision affects long-term architecture, generated file conventions, module ownership, or a rejected plausible alternative, create or update an Agent Decision Record. Keep rationale concise and public; do not store hidden chain-of-thought.
+
+Generated files are immutable to non-system agents. If generated output is wrong, change the source schema, template, or generator unless a change spec or decision record explicitly grants a `generated_file_override`.
 
 ## 8. Contract Rules
 

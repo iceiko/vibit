@@ -15,6 +15,8 @@ Usage:
   vibit check architecture
   vibit check module <module>
   vibit check change <change-id>
+  vibit inspect module <module>
+  vibit inspect boundary --from <module> --to <module>
   vibit generate module <module>
 
 Commands:
@@ -22,6 +24,8 @@ Commands:
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
+  inspect module <module>  Print module metadata as JSON.
+  inspect boundary         Print boundary metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
 `;
 }
@@ -70,6 +74,10 @@ function isDirectory(root, relativePath) {
 
 function readText(filePath) {
   return fs.readFileSync(filePath, "utf8");
+}
+
+function printJson(value) {
+  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
 }
 
 function writeFileIfMissing(filePath, content) {
@@ -194,6 +202,214 @@ function discoverRegisteredModules(root) {
     .sort();
 }
 
+function firstScalar(text, key) {
+  const match = text.match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m"));
+  if (!match) {
+    return null;
+  }
+  return match[1].replace(/^["']|["']$/g, "");
+}
+
+function listAfterKey(text, key) {
+  const lines = text.split(/\r?\n/);
+  const startIndex = lines.findIndex((line) => line.trim() === `${key}:`);
+  if (startIndex === -1) {
+    return [];
+  }
+  const values = [];
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (/^\S/.test(line) && !line.trim().startsWith("- ")) {
+      break;
+    }
+    const match = line.match(/^\s+-\s+(.+?)\s*$/);
+    if (match) {
+      values.push(match[1].replace(/^["']|["']$/g, ""));
+    }
+  }
+  return values;
+}
+
+function listAfterPath(text, pathKeys) {
+  const lines = text.split(/\r?\n/);
+  let startIndex = -1;
+  let currentIndent = -1;
+
+  for (const key of pathKeys) {
+    let found = false;
+    for (let i = startIndex + 1; i < lines.length; i += 1) {
+      const line = lines[i];
+      const match = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*$/);
+      if (!match) {
+        continue;
+      }
+      const indent = match[1].length;
+      const name = match[2];
+      if (indent <= currentIndent && startIndex !== -1) {
+        break;
+      }
+      if (name === key) {
+        startIndex = i;
+        currentIndent = indent;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return [];
+    }
+  }
+
+  const values = [];
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (/^\S/.test(line)) {
+      break;
+    }
+    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):/);
+    if (keyMatch && keyMatch[1].length <= currentIndent) {
+      break;
+    }
+    const itemMatch = line.match(/^\s+-\s+(.+?)\s*$/);
+    if (itemMatch) {
+      values.push(itemMatch[1].replace(/^["']|["']$/g, ""));
+    }
+  }
+  return values;
+}
+
+function loadModuleInfo(root, moduleName) {
+  const moduleDir = path.join(root, "modules", moduleName);
+  const manifestPath = path.join(moduleDir, "module.yaml");
+  const existsOnDisk = fs.existsSync(manifestPath);
+  const info = {
+    module: moduleName,
+    exists: existsOnDisk,
+    path: rel(root, moduleDir),
+    manifest: rel(root, manifestPath),
+    category: null,
+    status: null,
+    summary: null,
+    decisions: [],
+    owns: {
+      entities: [],
+      data: [],
+      permissions: [],
+    },
+    public_api: {
+      commands: [],
+      queries: [],
+    },
+    events: {
+      publishes: [],
+      subscribes: [],
+    },
+    dependencies: {
+      allowed: [],
+      forbidden: [],
+    },
+    invariants: [],
+    generated: {
+      files: [],
+      directories: [],
+      immutable_to_non_system_agents: true,
+      override_permission: "generated_file_override",
+    },
+    tests: {
+      required: [],
+    },
+  };
+
+  if (!existsOnDisk) {
+    return info;
+  }
+
+  const manifest = readText(manifestPath);
+  info.category = firstScalar(manifest, "category");
+  info.status = firstScalar(manifest, "status");
+  info.summary = firstScalar(manifest, "summary");
+  info.decisions = listAfterKey(manifest, "decisions");
+  info.owns.entities = listAfterPath(manifest, ["owns", "entities"]);
+  info.owns.data = listAfterPath(manifest, ["owns", "data"]);
+  info.owns.permissions = listAfterPath(manifest, ["owns", "permissions"]);
+  info.public_api.commands = listAfterPath(manifest, ["public_api", "commands"]);
+  info.public_api.queries = listAfterPath(manifest, ["public_api", "queries"]);
+  info.events.publishes = listAfterPath(manifest, ["events", "publishes"]);
+  info.events.subscribes = listAfterPath(manifest, ["events", "subscribes"]);
+  info.dependencies.allowed = listAfterPath(manifest, ["dependencies", "allowed"]);
+  info.dependencies.forbidden = listAfterPath(manifest, ["dependencies", "forbidden"]);
+  info.invariants = listAfterKey(manifest, "invariants");
+  info.generated.files = listAfterPath(manifest, ["generated", "files"]);
+  info.generated.directories = listAfterPath(manifest, ["generated", "directories"]);
+  info.tests.required = listAfterPath(manifest, ["tests", "required"]);
+
+  return info;
+}
+
+function inspectModule(root, moduleName) {
+  checkName(moduleName, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
+  printJson({
+    schema_version: "0.1",
+    kind: "module_inspection",
+    project: "vibit",
+    module: loadModuleInfo(root, moduleName),
+  });
+}
+
+function parseBoundaryArgs(args) {
+  const parsed = { from: null, to: null };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === "--from") {
+      parsed.from = args[i + 1] || null;
+      i += 1;
+    } else if (arg === "--to") {
+      parsed.to = args[i + 1] || null;
+      i += 1;
+    } else {
+      return null;
+    }
+  }
+  return parsed.from && parsed.to ? parsed : null;
+}
+
+function inspectBoundary(root, fromModule, toModule) {
+  checkName(fromModule, "from module", /^[a-z][a-z0-9_]*$/, "snake_case");
+  checkName(toModule, "to module", /^[a-z][a-z0-9_]*$/, "snake_case");
+
+  const fromInfo = loadModuleInfo(root, fromModule);
+  const toInfo = loadModuleInfo(root, toModule);
+  const allowed = fromInfo.dependencies.allowed.includes(toModule);
+  const forbidden = fromInfo.dependencies.forbidden.includes(toModule);
+
+  printJson({
+    schema_version: "0.1",
+    kind: "boundary_inspection",
+    project: "vibit",
+    from: {
+      module: fromModule,
+      exists: fromInfo.exists,
+      manifest: fromInfo.manifest,
+    },
+    to: {
+      module: toModule,
+      exists: toInfo.exists,
+      manifest: toInfo.manifest,
+    },
+    dependency: {
+      allowed,
+      forbidden,
+      declared: allowed || forbidden,
+      status: forbidden ? "forbidden" : allowed ? "allowed" : "undeclared",
+    },
+    guidance: forbidden
+      ? "Do not depend on the target module."
+      : allowed
+        ? "Dependency is declared as allowed."
+        : "Dependency is undeclared; update manifests or ask before coupling modules.",
+  });
+}
+
 function runSubcheck(root, args) {
   console.log(`\n==> vibit ${args.join(" ")}\n`);
   const result = childProcess.spawnSync(process.execPath, [__filename, ...args], {
@@ -263,10 +479,14 @@ function checkArchitecture(root) {
     "docs/change-spec.zh-CN.md",
     "docs/conversation-log.md",
     "docs/conversation-log.zh-CN.md",
+    "docs/agent-decision-record.md",
+    "docs/agent-decision-record.zh-CN.md",
     "changes/README.md",
     "changes/README.zh-CN.md",
     "conversations/README.md",
     "conversations/README.zh-CN.md",
+    "decisions/README.md",
+    "decisions/README.zh-CN.md",
   ]);
 
   requireDirectories(root, [
@@ -275,6 +495,8 @@ function checkArchitecture(root) {
     "changes/_template",
     "conversations",
     "conversations/_template",
+    "decisions",
+    "decisions/_template",
     "docs",
     "tools",
   ]);
@@ -287,11 +509,15 @@ function checkArchitecture(root) {
     "changes/_template/checklist.md",
     "changes/_template/verification.md",
     "conversations/_template/session.md",
+    "decisions/_template/adr-agent.md",
+    "decisions/ADR-0001-agent-native-maintainability.md",
   ]);
 
   checkTextIncludes(root, ".arch/conventions.yaml", "project_name: vibit");
   checkTextIncludes(root, ".arch/conventions.yaml", "change_spec: changes/_template");
   checkTextIncludes(root, ".arch/conventions.yaml", "conversation_log: conversations/_template/session.md");
+  checkTextIncludes(root, ".arch/conventions.yaml", "agent_decision_record: decisions/_template/adr-agent.md");
+  checkTextIncludes(root, ".arch/conventions.yaml", "immutable_to_non_system_agents: true");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
 
   finish();
@@ -588,11 +814,6 @@ function main() {
   }
 
   const [group, command, value, extra] = args;
-  if (extra) {
-    console.error("Too many arguments.\n");
-    process.stderr.write(usage());
-    process.exit(2);
-  }
 
   if (group === "check" && command === "architecture" && !value) {
     checkArchitecture(root);
@@ -615,8 +836,34 @@ function main() {
   }
 
   if (group === "generate" && command === "module" && value) {
+    if (extra) {
+      console.error("Too many arguments.\n");
+      process.stderr.write(usage());
+      process.exit(2);
+    }
     generateModule(root, value);
     return;
+  }
+
+  if (group === "inspect" && command === "module" && value && !extra) {
+    inspectModule(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "boundary") {
+    const parsed = parseBoundaryArgs(args.slice(2));
+    if (!parsed) {
+      console.error("Usage: vibit inspect boundary --from <module> --to <module>");
+      process.exit(2);
+    }
+    inspectBoundary(root, parsed.from, parsed.to);
+    return;
+  }
+
+  if (extra) {
+    console.error("Too many arguments.\n");
+    process.stderr.write(usage());
+    process.exit(2);
   }
 
   console.error("Unknown command.\n");
