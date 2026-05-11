@@ -37,6 +37,11 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `CONSTITUTION.zh-CN.md`: Simplified Chinese translation
 - `AGENTS.md`: repository-level operating guide for coding agents
 - `AGENTS.zh-CN.md`: Simplified Chinese translation
+- `.arch/README.md`: machine-readable architecture manifest entry point
+- `.arch/modules.yaml`: first draft module registry manifest
+- `.arch/conventions.yaml`: first draft repository convention manifest
+- `docs/module-manifest.md`: module manifest standard
+- `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -45,7 +50,7 @@ English documents are canonical. Simplified Chinese translations are maintained 
 vibit should evolve toward:
 
 - Architecture manifests under `.arch/`
-- Module manifests at `modules/<module>/module.yaml`
+- Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
 - Generated scaffolds for repeatable framework structure

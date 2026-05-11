@@ -37,6 +37,11 @@ vibit 从另一个前提出发：
 - `CONSTITUTION.zh-CN.md`：简体中文译本
 - `AGENTS.md`：仓库级 coding agent 操作指南
 - `AGENTS.zh-CN.md`：简体中文译本
+- `.arch/README.md`：机器可读 architecture manifest 入口
+- `.arch/modules.yaml`：第一版 module registry manifest 草案
+- `.arch/conventions.yaml`：第一版 repository convention manifest 草案
+- `docs/module-manifest.md`：module manifest 标准
+- `docs/module-manifest.zh-CN.md`：简体中文译本
 
 英文文档是权威版本。简体中文译本服务于人类阅读和早期项目讨论。
 
@@ -45,7 +50,7 @@ vibit 从另一个前提出发：
 vibit 应逐步演进出：
 
 - `.arch/` 下的 architecture manifests
-- `modules/<module>/module.yaml` 中的 module manifests
+- `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
 - Contract-first 的 commands、queries、events、errors、permissions 和 migrations
 - 为重复框架结构生成 scaffolds 的 generators

@@ -1,0 +1,73 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Registry of first-class modules known to the architecture.
+  Implementation modules are not created yet; this file defines the expected
+  module registry shape for future prototypes.
+
+module_manifest_standard: docs/module-manifest.md
+
+module_categories:
+  domain:
+    description: Owns business state, invariants, commands, queries, events, and policies.
+  platform:
+    description: Provides shared infrastructure behind stable interfaces.
+  integration:
+    description: Connects external systems through explicit contracts.
+  application:
+    description: Orchestrates use cases without owning core domain data.
+
+required_module_files:
+  - module.yaml
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+
+expected_module_directories:
+  - commands
+  - queries
+  - events
+  - models
+  - repositories
+  - policies
+  - services
+  - tests
+
+modules: []
+
+prototype_candidate_modules:
+  - name: player
+    category: domain
+    reason: Owns player identity and account lifecycle.
+  - name: inventory
+    category: domain
+    reason: Proves item ownership, capacity invariants, and event-driven changes.
+  - name: currency
+    category: domain
+    reason: Proves transactional balance changes and anti-duplication rules.
+  - name: reward
+    category: domain
+    reason: Proves claim flows, eligibility checks, and cross-module events.
+  - name: quest
+    category: domain
+    reason: Proves progress tracking and event subscriptions.
+  - name: match
+    category: domain
+    reason: Proves session lifecycle and real-time coordination boundaries.
+
+rules:
+  - id: module_manifest_required
+    level: required
+    description: Every implementation module must have modules/<module>/module.yaml.
+  - id: module_agent_guide_required
+    level: required
+    description: Every implementation module must have module-level AGENTS.md and AGENTS.zh-CN.md.
+  - id: no_implicit_module_ownership
+    level: required
+    description: Data, commands, queries, events, and permissions must have explicit owning modules.
+  - id: no_unregistered_public_contracts
+    level: required
+    description: Public commands, queries, events, errors, and permissions must be registered in manifests or schemas.
+  - id: generated_files_declared
+    level: required
+    description: Generated files must be declared so agents know not to hand-edit them.

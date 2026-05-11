@@ -54,8 +54,13 @@ Existing foundation:
 - `CONSTITUTION.zh-CN.md`
 - `AGENTS.md`
 - `AGENTS.zh-CN.md`
+- `.arch/README.md`
+- `.arch/modules.yaml`
+- `.arch/conventions.yaml`
+- `docs/module-manifest.md`
+- `docs/module-manifest.zh-CN.md`
 
-Framework implementation code, generators, manifests, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
+Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
 ## 4. Documentation Rules
 
@@ -75,6 +80,8 @@ AGENTS.md
 AGENTS.zh-CN.md
 docs/<name>.md
 docs/<name>.zh-CN.md
+.arch/README.md
+.arch/README.zh-CN.md
 ```
 
 Rules:
@@ -134,6 +141,8 @@ When modules exist, each module should declare:
 - Handwritten extension points
 
 Other modules must not reach into a module's internals directly. Cross-module communication should happen through commands, queries, events, public module APIs, or generated clients.
+
+Use `docs/module-manifest.md` as the source standard for `modules/<module>/module.yaml`.
 
 ## 8. Contract Rules
 

@@ -1,0 +1,85 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Repository-level conventions for agent-native server architecture.
+
+language:
+  canonical_documentation: en
+  translations:
+    required:
+      - zh-CN
+    rule: Public-facing English documents should have Simplified Chinese human-readable translations.
+
+naming:
+  project_name: vibit
+  category_name: Agent-Native Server Framework
+  repository_description: An agent-native server framework for AI-maintainable backends.
+  identifiers:
+    default_language: en
+    case_rules:
+      modules: snake_case
+      commands: PascalCase
+      queries: PascalCase
+      events: PascalCase
+      permissions: snake_case
+      errors: SCREAMING_SNAKE_CASE
+      invariants: snake_case
+
+documentation_pairs:
+  constitution:
+    canonical: CONSTITUTION.md
+    zh-CN: CONSTITUTION.zh-CN.md
+  repository_agent_guide:
+    canonical: AGENTS.md
+    zh-CN: AGENTS.zh-CN.md
+  readme:
+    canonical: README.md
+    zh-CN: README.zh-CN.md
+  architecture_readme:
+    canonical: .arch/README.md
+    zh-CN: .arch/README.zh-CN.md
+  module_manifest_standard:
+    canonical: docs/module-manifest.md
+    zh-CN: docs/module-manifest.zh-CN.md
+
+standard_directories:
+  architecture: .arch
+  documentation: docs
+  changes: changes
+  modules: modules
+  schemas: schema
+  tools: tools
+
+change_workflow:
+  required_steps:
+    - requirement
+    - impact_analysis
+    - plan
+    - contract_update
+    - generation
+    - implementation
+    - verification
+    - documentation_update
+  verification_record_values:
+    - Verified
+    - Not verified
+    - Not applicable
+
+agent_rules:
+  always:
+    - Read the constitution and repository AGENTS.md before non-trivial changes.
+    - Keep edits bounded to the declared change.
+    - Update English and Simplified Chinese public docs together.
+    - Record verification status.
+  ask_first:
+    - Change constitutional principles.
+    - Ratify or replace the project name.
+    - Introduce a major architecture pattern.
+    - Make breaking public contract changes.
+    - Move data ownership between modules.
+  never:
+    - Claim verification was run when it was not.
+    - Bypass module boundaries for convenience.
+    - Add unregistered public events or permissions.
+    - Hand-edit generated files without documenting why.

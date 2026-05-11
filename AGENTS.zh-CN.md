@@ -55,8 +55,13 @@ vibit is an open-source agent-native server framework for building backends that
 - `CONSTITUTION.zh-CN.md`
 - `AGENTS.md`
 - `AGENTS.zh-CN.md`
+- `.arch/README.md`
+- `.arch/modules.yaml`
+- `.arch/conventions.yaml`
+- `docs/module-manifest.md`
+- `docs/module-manifest.zh-CN.md`
 
-框架实现代码、generators、manifests、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
+框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
 ## 4. 文档规则
 
@@ -76,6 +81,8 @@ AGENTS.md
 AGENTS.zh-CN.md
 docs/<name>.md
 docs/<name>.zh-CN.md
+.arch/README.md
+.arch/README.zh-CN.md
 ```
 
 规则：
@@ -135,6 +142,8 @@ docs/<name>.zh-CN.md
 - Handwritten extension points
 
 其他 modules 不能直接访问某个 module 的内部实现。跨模块通信应通过 commands、queries、events、public module APIs 或 generated clients 完成。
+
+`modules/<module>/module.yaml` 应以 `docs/module-manifest.md` 作为源标准。
 
 ## 8. 契约规则
 
