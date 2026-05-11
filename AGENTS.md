@@ -68,6 +68,16 @@ Existing foundation:
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
+Current executable tooling:
+
+```bash
+node tools/vibit --help
+node tools/vibit check architecture
+node tools/vibit check change <change-id>
+node tools/vibit check module <module>
+node tools/vibit generate module <module>
+```
+
 ## 4. Documentation Rules
 
 English is the canonical documentation language.

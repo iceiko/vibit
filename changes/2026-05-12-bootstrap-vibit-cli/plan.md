@@ -1,15 +1,20 @@
 # Plan
 
+## Implementation Language Decision
+
+Use Node.js with only standard-library APIs for the first CLI prototype.
+
+Reasoning:
+
+- Node.js is available in the current Termux environment.
+- Python is not currently installed.
+- The first CLI only needs filesystem checks, deterministic reporting, and template generation.
+- Avoiding npm dependencies keeps the first executable standard small and easy for agents to inspect.
+- A future packaging layer can expose the same CLI through npm without changing the command contract.
+
 ## Files To Create
 
-Pending implementation language decision.
-
-Likely candidates:
-
 - `tools/vibit`
-- `tools/vibit.py`
-- `package.json`
-- `src/`
 
 ## Files To Edit
 
@@ -29,13 +34,11 @@ Potentially generated module skeletons under `modules/<module>/`.
 - CLI argument parsing
 - Repository root discovery
 - Required file checks
-- YAML manifest loading if supported by selected language/tooling
+- Lightweight manifest text checks without external YAML dependencies
 - Deterministic reporting
 - Module skeleton generation
 
 ## Tests
-
-Depends on implementation language. At minimum:
 
 - CLI help command
 - Architecture check command
@@ -44,7 +47,10 @@ Depends on implementation language. At minimum:
 
 ## Verification Commands
 
-Pending implementation language decision.
+- `node tools/vibit --help`
+- `node tools/vibit check architecture`
+- `node tools/vibit check change bootstrap-vibit-cli`
+- `node tools/vibit check module inventory`
 
 ## Rollback Or Migration Notes
 

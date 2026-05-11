@@ -38,10 +38,10 @@ A developer or agent can run a local CLI command to inspect the repository and r
 
 ## Acceptance Criteria
 
-- [ ] Implementation language selected and recorded.
-- [ ] CLI can print help.
-- [ ] `vibit check architecture` checks required root docs and manifests.
-- [ ] `vibit check change <change-id>` checks required change spec files.
-- [ ] `vibit check module <module>` reports missing module manifests clearly.
-- [ ] `vibit generate module <module>` creates a minimal module skeleton or explicitly remains a documented stub.
-- [ ] Verification commands are documented.
+- [x] Implementation language selected and recorded.
+- [x] CLI can print help.
+- [x] `vibit check architecture` checks required root docs and manifests.
+- [x] `vibit check change <change-id>` checks required change spec files.
+- [x] `vibit check module <module>` reports missing module manifests clearly.
+- [x] `vibit generate module <module>` creates a minimal module skeleton or explicitly remains a documented stub.
+- [x] Verification commands are documented.

@@ -1,0 +1,529 @@
+#!/usr/bin/env node
+
+const fs = require("fs");
+const path = require("path");
+
+const VERSION = "0.1.0";
+
+function usage() {
+  return `vibit ${VERSION}
+
+Usage:
+  vibit --help
+  vibit check architecture
+  vibit check module <module>
+  vibit check change <change-id>
+  vibit generate module <module>
+
+Commands:
+  check architecture       Check required root architecture artifacts.
+  check module <module>    Check a module skeleton and manifest files.
+  check change <change-id> Check a change spec directory.
+  generate module <module> Generate a minimal module skeleton.
+`;
+}
+
+function findRepoRoot(startDir) {
+  let current = path.resolve(startDir);
+  while (true) {
+    if (
+      fs.existsSync(path.join(current, "CONSTITUTION.md")) &&
+      fs.existsSync(path.join(current, "AGENTS.md")) &&
+      fs.existsSync(path.join(current, ".arch"))
+    ) {
+      return current;
+    }
+    const parent = path.dirname(current);
+    if (parent === current) {
+      return null;
+    }
+    current = parent;
+  }
+}
+
+function rel(root, target) {
+  return path.relative(root, target) || ".";
+}
+
+function exists(root, relativePath) {
+  return fs.existsSync(path.join(root, relativePath));
+}
+
+function isFile(root, relativePath) {
+  try {
+    return fs.statSync(path.join(root, relativePath)).isFile();
+  } catch (_) {
+    return false;
+  }
+}
+
+function isDirectory(root, relativePath) {
+  try {
+    return fs.statSync(path.join(root, relativePath)).isDirectory();
+  } catch (_) {
+    return false;
+  }
+}
+
+function readText(filePath) {
+  return fs.readFileSync(filePath, "utf8");
+}
+
+function writeFileIfMissing(filePath, content) {
+  if (fs.existsSync(filePath)) {
+    return false;
+  }
+  fs.mkdirSync(path.dirname(filePath), { recursive: true });
+  fs.writeFileSync(filePath, content, "utf8");
+  return true;
+}
+
+function checkName(value, label, pattern, example) {
+  if (!value || !pattern.test(value)) {
+    fail(`${label} must match ${example}.`);
+  }
+}
+
+let failures = 0;
+let warnings = 0;
+
+function ok(message) {
+  console.log(`OK   ${message}`);
+}
+
+function warn(message) {
+  warnings += 1;
+  console.log(`WARN ${message}`);
+}
+
+function fail(message) {
+  failures += 1;
+  console.log(`FAIL ${message}`);
+}
+
+function resetResults() {
+  failures = 0;
+  warnings = 0;
+}
+
+function finish() {
+  if (failures > 0) {
+    console.log(`\nResult: failed (${failures} failure${failures === 1 ? "" : "s"}, ${warnings} warning${warnings === 1 ? "" : "s"})`);
+    process.exit(1);
+  }
+  console.log(`\nResult: passed (${warnings} warning${warnings === 1 ? "" : "s"})`);
+}
+
+function requireFiles(root, files) {
+  for (const file of files) {
+    if (isFile(root, file)) {
+      ok(`${file} exists`);
+    } else {
+      fail(`${file} is missing`);
+    }
+  }
+}
+
+function requireDirectories(root, dirs) {
+  for (const dir of dirs) {
+    if (isDirectory(root, dir)) {
+      ok(`${dir}/ exists`);
+    } else {
+      fail(`${dir}/ is missing`);
+    }
+  }
+}
+
+function checkTextIncludes(root, file, requiredText) {
+  const filePath = path.join(root, file);
+  if (!isFile(root, file)) {
+    fail(`${file} is missing`);
+    return;
+  }
+  const content = readText(filePath);
+  if (content.includes(requiredText)) {
+    ok(`${file} references ${requiredText}`);
+  } else {
+    fail(`${file} does not reference ${requiredText}`);
+  }
+}
+
+function checkArchitecture(root) {
+  resetResults();
+  console.log(`Checking architecture in ${root}\n`);
+
+  requireFiles(root, [
+    "README.md",
+    "README.zh-CN.md",
+    "CONSTITUTION.md",
+    "CONSTITUTION.zh-CN.md",
+    "AGENTS.md",
+    "AGENTS.zh-CN.md",
+    "LICENSE",
+    ".arch/README.md",
+    ".arch/README.zh-CN.md",
+    ".arch/modules.yaml",
+    ".arch/conventions.yaml",
+    "docs/module-manifest.md",
+    "docs/module-manifest.zh-CN.md",
+    "docs/change-spec.md",
+    "docs/change-spec.zh-CN.md",
+    "docs/conversation-log.md",
+    "docs/conversation-log.zh-CN.md",
+    "changes/README.md",
+    "changes/README.zh-CN.md",
+    "conversations/README.md",
+    "conversations/README.zh-CN.md",
+  ]);
+
+  requireDirectories(root, [
+    ".arch",
+    "changes",
+    "changes/_template",
+    "conversations",
+    "conversations/_template",
+    "docs",
+    "tools",
+  ]);
+
+  requireFiles(root, [
+    "changes/_template/request.md",
+    "changes/_template/spec.yaml",
+    "changes/_template/impact.md",
+    "changes/_template/plan.md",
+    "changes/_template/checklist.md",
+    "changes/_template/verification.md",
+    "conversations/_template/session.md",
+  ]);
+
+  checkTextIncludes(root, ".arch/conventions.yaml", "project_name: vibit");
+  checkTextIncludes(root, ".arch/conventions.yaml", "change_spec: changes/_template");
+  checkTextIncludes(root, ".arch/conventions.yaml", "conversation_log: conversations/_template/session.md");
+  checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
+
+  finish();
+}
+
+function changeDirectory(root, changeId) {
+  const direct = path.join(root, "changes", changeId);
+  if (fs.existsSync(direct)) {
+    return direct;
+  }
+  const changesDir = path.join(root, "changes");
+  if (!fs.existsSync(changesDir)) {
+    return direct;
+  }
+  const matches = fs.readdirSync(changesDir)
+    .filter((name) => name.endsWith(`-${changeId}`))
+    .map((name) => path.join(changesDir, name));
+  if (matches.length === 1) {
+    return matches[0];
+  }
+  return direct;
+}
+
+function checkChange(root, changeId) {
+  resetResults();
+  checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
+
+  const dir = changeDirectory(root, changeId);
+  console.log(`Checking change ${changeId} at ${rel(root, dir)}\n`);
+
+  if (!fs.existsSync(dir)) {
+    fail(`change directory does not exist: ${rel(root, dir)}`);
+    finish();
+    return;
+  }
+
+  const required = [
+    "request.md",
+    "spec.yaml",
+    "impact.md",
+    "plan.md",
+    "checklist.md",
+    "verification.md",
+  ];
+
+  for (const file of required) {
+    const target = path.join(dir, file);
+    if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+      ok(`${rel(root, target)} exists`);
+    } else {
+      fail(`${rel(root, target)} is missing`);
+    }
+  }
+
+  const specPath = path.join(dir, "spec.yaml");
+  if (fs.existsSync(specPath)) {
+    const spec = readText(specPath);
+    if (spec.includes(`change_id: ${changeId}`)) {
+      ok("spec.yaml change_id matches requested id");
+    } else if (/change_id:\s+[a-z0-9-]+/.test(spec)) {
+      warn("spec.yaml has a change_id, but it does not exactly match requested id");
+    } else {
+      fail("spec.yaml does not declare change_id");
+    }
+    for (const key of ["schema_version:", "date:", "type:", "status:", "summary:", "verification:"]) {
+      if (spec.includes(key)) {
+        ok(`spec.yaml declares ${key}`);
+      } else {
+        fail(`spec.yaml is missing ${key}`);
+      }
+    }
+  }
+
+  finish();
+}
+
+function checkModule(root, moduleName) {
+  resetResults();
+  checkName(moduleName, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
+
+  const moduleDir = path.join(root, "modules", moduleName);
+  console.log(`Checking module ${moduleName} at ${rel(root, moduleDir)}\n`);
+
+  if (!fs.existsSync(moduleDir)) {
+    fail(`module directory does not exist: ${rel(root, moduleDir)}`);
+    warn(`run: vibit generate module ${moduleName}`);
+    finish();
+    return;
+  }
+
+  const requiredFiles = [
+    "module.yaml",
+    "AGENTS.md",
+    "AGENTS.zh-CN.md",
+  ];
+  for (const file of requiredFiles) {
+    const target = path.join(moduleDir, file);
+    if (fs.existsSync(target) && fs.statSync(target).isFile()) {
+      ok(`${rel(root, target)} exists`);
+    } else {
+      fail(`${rel(root, target)} is missing`);
+    }
+  }
+
+  for (const dir of ["commands", "queries", "events", "models", "repositories", "policies", "services", "tests"]) {
+    const target = path.join(moduleDir, dir);
+    if (fs.existsSync(target) && fs.statSync(target).isDirectory()) {
+      ok(`${rel(root, target)}/ exists`);
+    } else {
+      fail(`${rel(root, target)}/ is missing`);
+    }
+  }
+
+  const manifestPath = path.join(moduleDir, "module.yaml");
+  if (fs.existsSync(manifestPath)) {
+    const manifest = readText(manifestPath);
+    if (manifest.includes(`module: ${moduleName}`)) {
+      ok("module.yaml module name matches directory");
+    } else {
+      fail("module.yaml module name does not match directory");
+    }
+    for (const key of ["schema_version:", "category:", "status:", "summary:", "owns:", "public_api:", "events:", "dependencies:", "invariants:", "generated:", "tests:"]) {
+      if (manifest.includes(key)) {
+        ok(`module.yaml declares ${key}`);
+      } else {
+        fail(`module.yaml is missing ${key}`);
+      }
+    }
+  }
+
+  finish();
+}
+
+function moduleManifest(moduleName) {
+  return `schema_version: 0.1
+module: ${moduleName}
+category: domain
+status: draft
+summary: Replace with this module's responsibility.
+
+owns:
+  entities: []
+  data: []
+  permissions: []
+
+public_api:
+  commands: []
+  queries: []
+
+events:
+  publishes: []
+  subscribes: []
+
+dependencies:
+  allowed: []
+  forbidden: []
+
+invariants: []
+
+generated:
+  files: []
+  directories: []
+
+tests:
+  required:
+    - unit_tests
+    - command_tests
+    - query_tests
+    - event_tests
+    - invariant_tests
+    - architecture_tests
+`;
+}
+
+function moduleAgents(moduleName, zhCN) {
+  if (zhCN) {
+    return `# ${moduleName} Module Agent Guide 中文版
+
+状态：Draft v0.1
+说明：本文件是 \`modules/${moduleName}/AGENTS.md\` 的简体中文译本。英文版本是权威版本。
+
+## 何时使用本模块
+
+填写本模块负责的需求范围。
+
+## 何时不要使用本模块
+
+填写不应放入本模块的需求。
+
+## Extension Points
+
+- Commands
+- Queries
+- Events
+- Policies
+- Tests
+
+## Forbidden Shortcuts
+
+- 不要绕过 \`module.yaml\` 中声明的边界。
+- 不要直接修改其他模块拥有的数据。
+- 不要添加未登记的 public commands、queries、events 或 permissions。
+
+## Required Tests
+
+参见 \`module.yaml\` 中的 \`tests.required\`。
+`;
+  }
+
+  return `# ${moduleName} Module Agent Guide
+
+Status: Draft v0.1
+
+## When To Use This Module
+
+Describe the requirements that belong in this module.
+
+## When Not To Use This Module
+
+Describe requirements that should not be implemented in this module.
+
+## Extension Points
+
+- Commands
+- Queries
+- Events
+- Policies
+- Tests
+
+## Forbidden Shortcuts
+
+- Do not bypass boundaries declared in \`module.yaml\`.
+- Do not directly modify data owned by another module.
+- Do not add unregistered public commands, queries, events, or permissions.
+
+## Required Tests
+
+See \`tests.required\` in \`module.yaml\`.
+`;
+}
+
+function generateModule(root, moduleName) {
+  resetResults();
+  checkName(moduleName, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
+
+  const moduleDir = path.join(root, "modules", moduleName);
+  console.log(`Generating module ${moduleName} at ${rel(root, moduleDir)}\n`);
+
+  const dirs = ["commands", "queries", "events", "models", "repositories", "policies", "services", "tests"];
+  for (const dir of dirs) {
+    const target = path.join(moduleDir, dir);
+    if (!fs.existsSync(target)) {
+      fs.mkdirSync(target, { recursive: true });
+      ok(`created ${rel(root, target)}/`);
+    } else {
+      warn(`${rel(root, target)}/ already exists`);
+    }
+    const keepFile = path.join(target, ".gitkeep");
+    if (writeFileIfMissing(keepFile, "")) {
+      ok(`created ${rel(root, keepFile)}`);
+    }
+  }
+
+  const files = [
+    ["module.yaml", moduleManifest(moduleName)],
+    ["AGENTS.md", moduleAgents(moduleName, false)],
+    ["AGENTS.zh-CN.md", moduleAgents(moduleName, true)],
+  ];
+
+  for (const [file, content] of files) {
+    const target = path.join(moduleDir, file);
+    if (writeFileIfMissing(target, content)) {
+      ok(`created ${rel(root, target)}`);
+    } else {
+      warn(`${rel(root, target)} already exists`);
+    }
+  }
+
+  finish();
+}
+
+function main() {
+  const args = process.argv.slice(2);
+
+  if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
+    process.stdout.write(usage());
+    return;
+  }
+
+  const root = findRepoRoot(process.cwd());
+  if (!root) {
+    console.error("Could not find vibit repository root.");
+    process.exit(2);
+  }
+
+  const [group, command, value, extra] = args;
+  if (extra) {
+    console.error("Too many arguments.\n");
+    process.stderr.write(usage());
+    process.exit(2);
+  }
+
+  if (group === "check" && command === "architecture" && !value) {
+    checkArchitecture(root);
+    return;
+  }
+
+  if (group === "check" && command === "change" && value) {
+    checkChange(root, value);
+    return;
+  }
+
+  if (group === "check" && command === "module" && value) {
+    checkModule(root, value);
+    return;
+  }
+
+  if (group === "generate" && command === "module" && value) {
+    generateModule(root, value);
+    return;
+  }
+
+  console.error("Unknown command.\n");
+  process.stderr.write(usage());
+  process.exit(2);
+}
+
+main();

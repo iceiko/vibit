@@ -68,6 +68,26 @@ vibit 应逐步演进出：
 
 > 给定一个新的后端需求，AI coding agent 能识别 affected module，更新正确 contracts，生成正确结构，实现行为，添加测试，运行验证，并更新文档，同时不破坏无关架构。
 
+## CLI Prototype
+
+第一版可执行标准位于：
+
+```bash
+tools/vibit
+```
+
+初始命令：
+
+```bash
+node tools/vibit --help
+node tools/vibit check architecture
+node tools/vibit check change bootstrap-vibit-cli
+node tools/vibit check module inventory
+node tools/vibit generate module <module>
+```
+
+当前 CLI 只使用 Node.js standard-library APIs。它是 architecture checks 和 module skeleton generation 的 prototype，不是 server runtime。
+
 ## 早期参考领域
 
 小型游戏后端适合作为第一版演示领域，因为它天然包含状态、权限、事件、一致性规则和长期存在的模块。

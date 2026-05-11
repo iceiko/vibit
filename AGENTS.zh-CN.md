@@ -69,6 +69,16 @@ vibit is an open-source agent-native server framework for building backends that
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
+当前可执行工具：
+
+```bash
+node tools/vibit --help
+node tools/vibit check architecture
+node tools/vibit check change <change-id>
+node tools/vibit check module <module>
+node tools/vibit generate module <module>
+```
+
 ## 4. 文档规则
 
 英文是项目权威文档语言。

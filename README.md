@@ -68,6 +68,26 @@ The first serious prototype should prove one claim:
 
 > Given a new backend requirement, an AI coding agent can identify the affected module, update the correct contracts, generate the correct structure, implement the behavior, add tests, run verification, and update documentation without damaging unrelated architecture.
 
+## CLI Prototype
+
+The first executable standard lives at:
+
+```bash
+tools/vibit
+```
+
+Initial commands:
+
+```bash
+node tools/vibit --help
+node tools/vibit check architecture
+node tools/vibit check change bootstrap-vibit-cli
+node tools/vibit check module inventory
+node tools/vibit generate module <module>
+```
+
+The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks and module skeleton generation, not a server runtime.
+
 ## Early Reference Domain
 
 A small game backend is the recommended first demonstration domain because it naturally contains state, permissions, events, consistency rules, and long-lived modules.

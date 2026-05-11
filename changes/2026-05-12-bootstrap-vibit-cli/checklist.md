@@ -15,25 +15,25 @@
 
 ## Implementation
 
-- [ ] Implementation language selected
-- [ ] CLI files created
-- [ ] Architecture check implemented
-- [ ] Change check implemented
-- [ ] Module check implemented
-- [ ] Module generation implemented or explicitly stubbed
+- [x] Implementation language selected
+- [x] CLI files created
+- [x] Architecture check implemented
+- [x] Change check implemented
+- [x] Module check implemented
+- [x] Module generation implemented or explicitly stubbed
 
 ## Tests
 
-- [ ] Required checks added or updated
-- [ ] Test gaps recorded
+- [x] Required checks added or updated
+- [x] Test gaps recorded
 
 ## Documentation
 
-- [ ] English docs updated
-- [ ] Simplified Chinese translations updated
-- [ ] Conversation log updated
+- [x] English docs updated
+- [x] Simplified Chinese translations updated
+- [x] Conversation log updated
 
 ## Verification
 
-- [ ] Verification run or explicitly recorded as not available
-- [ ] Results recorded in `verification.md`
+- [x] Verification run or explicitly recorded as not available
+- [x] Results recorded in `verification.md`
