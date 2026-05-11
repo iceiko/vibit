@@ -60,6 +60,9 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/conventions.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
+- `docs/change-spec.md`
+- `docs/change-spec.zh-CN.md`
+- `changes/_template/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
@@ -144,6 +147,8 @@ docs/<name>.zh-CN.md
 其他 modules 不能直接访问某个 module 的内部实现。跨模块通信应通过 commands、queries、events、public module APIs 或 generated clients 完成。
 
 `modules/<module>/module.yaml` 应以 `docs/module-manifest.md` 作为源标准。
+
+`changes/<date>-<change-id>/` 应以 `docs/change-spec.md` 作为源标准。
 
 ## 8. 契约规则
 

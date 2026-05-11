@@ -42,6 +42,9 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/conventions.yaml`: first draft repository convention manifest
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
+- `docs/change-spec.md`: change spec standard
+- `docs/change-spec.zh-CN.md`: Simplified Chinese translation
+- `changes/_template/`: reusable change spec template
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -55,7 +58,7 @@ vibit should evolve toward:
 - Contract-first commands, queries, events, errors, permissions, and migrations
 - Generated scaffolds for repeatable framework structure
 - Architecture checks that verify dependency, contract, event, and generated-file rules
-- Change specs under `changes/<date>-<change-id>/`
+- Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
 
 The first serious prototype should prove one claim:
 

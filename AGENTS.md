@@ -59,6 +59,9 @@ Existing foundation:
 - `.arch/conventions.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
+- `docs/change-spec.md`
+- `docs/change-spec.zh-CN.md`
+- `changes/_template/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
@@ -143,6 +146,8 @@ When modules exist, each module should declare:
 Other modules must not reach into a module's internals directly. Cross-module communication should happen through commands, queries, events, public module APIs, or generated clients.
 
 Use `docs/module-manifest.md` as the source standard for `modules/<module>/module.yaml`.
+
+Use `docs/change-spec.md` as the source standard for `changes/<date>-<change-id>/`.
 
 ## 8. Contract Rules
 
