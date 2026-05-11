@@ -51,6 +51,9 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/agent-decision-record.md`: Agent Decision Record standard
 - `docs/agent-decision-record.zh-CN.md`: Simplified Chinese translation
 - `decisions/`: durable decision rationale
+- `docs/schema-validation.md`: schema validation standard
+- `docs/schema-validation.zh-CN.md`: Simplified Chinese translation
+- `schema/`: JSON Schema files for machine-checkable standards
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -67,6 +70,7 @@ vibit should evolve toward:
 - Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
 - Conversation logs under `conversations/`, following `docs/conversation-log.md`
 - Agent Decision Records under `decisions/`, following `docs/agent-decision-record.md`
+- Schema validation under `schema/`, following `docs/schema-validation.md`
 
 The first serious prototype should prove one claim:
 
@@ -85,6 +89,7 @@ Initial commands:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check schemas
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit check architecture

@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibit.dev/schema/change-spec.schema.json",
+  "title": "vibit Change Spec",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "change_id",
+    "date",
+    "type",
+    "status",
+    "summary",
+    "affected_modules",
+    "contracts",
+    "data",
+    "compatibility",
+    "verification"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 0.1
+    },
+    "change_id": {
+      "type": "string",
+      "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+    },
+    "type": {
+      "enum": ["feature", "bugfix", "migration", "refactor", "standard", "docs", "tooling"]
+    },
+    "status": {
+      "enum": ["draft", "active", "verified", "accepted", "deprecated"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "verification": {
+      "type": "object",
+      "required": ["required", "status"],
+      "properties": {
+        "status": {
+          "enum": ["Verified", "Not verified", "Not applicable"]
+        }
+      }
+    }
+  },
+  "additionalProperties": true
+}

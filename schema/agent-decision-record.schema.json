@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibit.dev/schema/agent-decision-record.schema.json",
+  "title": "vibit Agent Decision Record",
+  "type": "object",
+  "required": [
+    "id",
+    "title",
+    "status",
+    "date",
+    "decision_makers",
+    "context",
+    "decision",
+    "alternatives_considered",
+    "rationale",
+    "agent_reasoning_summary",
+    "decision_weights",
+    "consequences",
+    "reversal_conditions",
+    "follow_up"
+  ],
+  "properties": {
+    "id": {
+      "type": "string",
+      "pattern": "^ADR-[0-9]{4}$"
+    },
+    "status": {
+      "enum": ["Proposed", "Accepted", "Deprecated", "Superseded"]
+    },
+    "confidence": {
+      "enum": ["low", "medium", "high"]
+    }
+  },
+  "additionalProperties": true
+}

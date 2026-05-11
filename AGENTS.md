@@ -68,6 +68,9 @@ Existing foundation:
 - `docs/agent-decision-record.md`
 - `docs/agent-decision-record.zh-CN.md`
 - `decisions/`
+- `docs/schema-validation.md`
+- `docs/schema-validation.zh-CN.md`
+- `schema/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
@@ -76,6 +79,7 @@ Current executable tooling:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check schemas
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
@@ -179,6 +183,10 @@ Use `docs/agent-decision-record.md` as the source standard for `decisions/`.
 When a decision affects long-term architecture, generated file conventions, module ownership, or a rejected plausible alternative, create or update an Agent Decision Record. Keep rationale concise and public; do not store hidden chain-of-thought.
 
 Generated files are immutable to non-system agents. If generated output is wrong, change the source schema, template, or generator unless a change spec or decision record explicitly grants a `generated_file_override`.
+
+Use `docs/schema-validation.md` as the source standard for `schema/`.
+
+When changing the shape of module manifests, change specs, Agent Decision Records, or inspect output, update the paired schema file and run `node tools/vibit check schemas`.
 
 ## 8. Contract Rules
 

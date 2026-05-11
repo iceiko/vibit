@@ -69,6 +69,9 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/agent-decision-record.md`
 - `docs/agent-decision-record.zh-CN.md`
 - `decisions/`
+- `docs/schema-validation.md`
+- `docs/schema-validation.zh-CN.md`
+- `schema/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
@@ -77,6 +80,7 @@ vibit is an open-source agent-native server framework for building backends that
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check schemas
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
@@ -180,6 +184,10 @@ docs/<name>.zh-CN.md
 当某个 decision 影响长期 architecture、generated file conventions、module ownership 或拒绝了一个合理替代方案时，应创建或更新 Agent Decision Record。Rationale 应简洁、公开；不要存储隐藏 chain-of-thought。
 
 Generated files 对 non-system agents 不可变。如果 generated output 错了，应修改 source schema、template 或 generator，除非 change spec 或 decision record 显式授予 `generated_file_override`。
+
+`schema/` 应以 `docs/schema-validation.md` 作为源标准。
+
+当修改 module manifests、change specs、Agent Decision Records 或 inspect output 的结构时，必须更新对应 schema file，并运行 `node tools/vibit check schemas`。
 
 ## 8. 契约规则
 

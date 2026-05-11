@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibit.dev/schema/module-manifest.schema.json",
+  "title": "vibit Module Manifest",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "module",
+    "category",
+    "status",
+    "summary",
+    "owns",
+    "public_api",
+    "events",
+    "dependencies",
+    "invariants",
+    "generated",
+    "tests"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": 0.1
+    },
+    "module": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_]*$"
+    },
+    "category": {
+      "enum": ["domain", "platform", "integration", "application"]
+    },
+    "status": {
+      "enum": ["draft", "active", "deprecated", "removed"]
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "pattern": "^ADR-[0-9]{4}$"
+      }
+    }
+  },
+  "additionalProperties": true
+}

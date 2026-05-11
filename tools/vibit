@@ -12,6 +12,7 @@ function usage() {
 Usage:
   vibit --help
   vibit check all
+  vibit check schemas
   vibit check architecture
   vibit check module <module>
   vibit check change <change-id>
@@ -21,6 +22,7 @@ Usage:
 
 Commands:
   check all                Run all current repository checks.
+  check schemas            Check schema files and critical artifact fields.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -159,6 +161,73 @@ function checkTextIncludes(root, file, requiredText) {
   }
 }
 
+function requireJsonFile(root, relativePath) {
+  const filePath = path.join(root, relativePath);
+  if (!isFile(root, relativePath)) {
+    fail(`${relativePath} is missing`);
+    return null;
+  }
+  try {
+    const parsed = JSON.parse(readText(filePath));
+    ok(`${relativePath} parses as JSON`);
+    return parsed;
+  } catch (error) {
+    fail(`${relativePath} is invalid JSON: ${error.message}`);
+    return null;
+  }
+}
+
+function requireSchemaShape(root, relativePath, title) {
+  const schema = requireJsonFile(root, relativePath);
+  if (!schema) {
+    return;
+  }
+  if (schema.$schema) {
+    ok(`${relativePath} declares $schema`);
+  } else {
+    fail(`${relativePath} is missing $schema`);
+  }
+  if (schema.$id) {
+    ok(`${relativePath} declares $id`);
+  } else {
+    fail(`${relativePath} is missing $id`);
+  }
+  if (schema.title === title) {
+    ok(`${relativePath} title is ${title}`);
+  } else {
+    fail(`${relativePath} title does not match ${title}`);
+  }
+}
+
+function requireScalarValue(text, file, key, allowedValues) {
+  const value = firstScalar(text, key);
+  if (value === null) {
+    fail(`${file} is missing ${key}`);
+    return null;
+  }
+  if (allowedValues && !allowedValues.includes(value)) {
+    fail(`${file} ${key} has invalid value ${value}`);
+  } else {
+    ok(`${file} declares ${key}: ${value}`);
+  }
+  return value;
+}
+
+function requireMarkdownSections(root, relativePath, sections) {
+  if (!isFile(root, relativePath)) {
+    fail(`${relativePath} is missing`);
+    return;
+  }
+  const text = readText(path.join(root, relativePath));
+  for (const section of sections) {
+    if (text.includes(`## ${section}`)) {
+      ok(`${relativePath} has section ${section}`);
+    } else {
+      fail(`${relativePath} is missing section ${section}`);
+    }
+  }
+}
+
 function discoverChangeIds(root) {
   const changesDir = path.join(root, "changes");
   if (!fs.existsSync(changesDir)) {
@@ -203,7 +272,7 @@ function discoverRegisteredModules(root) {
 }
 
 function firstScalar(text, key) {
-  const match = text.match(new RegExp(`^${key}:\\s*(.+?)\\s*$`, "m"));
+  const match = text.match(new RegExp(`^\\s*${key}:\\s*(.+?)\\s*$`, "m"));
   if (!match) {
     return null;
   }
@@ -426,7 +495,7 @@ function runSubcheck(root, args) {
 function checkAll(root) {
   console.log(`Checking all vibit standards in ${root}`);
 
-  const checks = [["check", "architecture"]];
+  const checks = [["check", "architecture"], ["check", "schemas"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -481,12 +550,18 @@ function checkArchitecture(root) {
     "docs/conversation-log.zh-CN.md",
     "docs/agent-decision-record.md",
     "docs/agent-decision-record.zh-CN.md",
+    "docs/schema-validation.md",
+    "docs/schema-validation.zh-CN.md",
     "changes/README.md",
     "changes/README.zh-CN.md",
     "conversations/README.md",
     "conversations/README.zh-CN.md",
     "decisions/README.md",
     "decisions/README.zh-CN.md",
+    "schema/module-manifest.schema.json",
+    "schema/change-spec.schema.json",
+    "schema/agent-decision-record.schema.json",
+    "schema/inspect-output.schema.json",
   ]);
 
   requireDirectories(root, [
@@ -498,6 +573,7 @@ function checkArchitecture(root) {
     "decisions",
     "decisions/_template",
     "docs",
+    "schema",
     "tools",
   ]);
 
@@ -518,7 +594,95 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/conventions.yaml", "conversation_log: conversations/_template/session.md");
   checkTextIncludes(root, ".arch/conventions.yaml", "agent_decision_record: decisions/_template/adr-agent.md");
   checkTextIncludes(root, ".arch/conventions.yaml", "immutable_to_non_system_agents: true");
+  checkTextIncludes(root, ".arch/conventions.yaml", "module_manifest: schema/module-manifest.schema.json");
+  checkTextIncludes(root, ".arch/conventions.yaml", "inspect_output: schema/inspect-output.schema.json");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
+
+  finish();
+}
+
+function checkSchemas(root) {
+  resetResults();
+  console.log(`Checking schemas in ${root}\n`);
+
+  requireSchemaShape(root, "schema/module-manifest.schema.json", "vibit Module Manifest");
+  requireSchemaShape(root, "schema/change-spec.schema.json", "vibit Change Spec");
+  requireSchemaShape(root, "schema/agent-decision-record.schema.json", "vibit Agent Decision Record");
+  requireSchemaShape(root, "schema/inspect-output.schema.json", "vibit Inspect Output");
+
+  checkTextIncludes(root, ".arch/conventions.yaml", "schema_validation_standard:");
+  checkTextIncludes(root, ".arch/conventions.yaml", "schemas:");
+
+  for (const moduleName of discoverRegisteredModules(root)) {
+    const manifestPath = `modules/${moduleName}/module.yaml`;
+    if (!isFile(root, manifestPath)) {
+      fail(`${manifestPath} is missing`);
+      continue;
+    }
+    const text = readText(path.join(root, manifestPath));
+    requireScalarValue(text, manifestPath, "schema_version", ["0.1"]);
+    const declaredModule = requireScalarValue(text, manifestPath, "module", null);
+    if (declaredModule === moduleName) {
+      ok(`${manifestPath} module matches registry`);
+    } else {
+      fail(`${manifestPath} module does not match registry name ${moduleName}`);
+    }
+    requireScalarValue(text, manifestPath, "category", ["domain", "platform", "integration", "application"]);
+    requireScalarValue(text, manifestPath, "status", ["draft", "active", "deprecated", "removed"]);
+    for (const key of ["summary:", "owns:", "public_api:", "events:", "dependencies:", "generated:", "tests:"]) {
+      if (text.includes(key)) {
+        ok(`${manifestPath} contains ${key}`);
+      } else {
+        fail(`${manifestPath} is missing ${key}`);
+      }
+    }
+  }
+
+  for (const changeId of discoverChangeIds(root)) {
+    const dir = changeDirectory(root, changeId);
+    const specPath = path.join(dir, "spec.yaml");
+    const relativeSpec = rel(root, specPath);
+    if (!fs.existsSync(specPath)) {
+      fail(`${relativeSpec} is missing`);
+      continue;
+    }
+    const text = readText(specPath);
+    requireScalarValue(text, relativeSpec, "schema_version", ["0.1"]);
+    const declaredChange = requireScalarValue(text, relativeSpec, "change_id", null);
+    if (declaredChange === changeId) {
+      ok(`${relativeSpec} change_id matches directory`);
+    } else {
+      fail(`${relativeSpec} change_id does not match ${changeId}`);
+    }
+    requireScalarValue(text, relativeSpec, "type", ["feature", "bugfix", "migration", "refactor", "standard", "docs", "tooling"]);
+    requireScalarValue(text, relativeSpec, "status", ["draft", "active", "verified", "accepted", "deprecated"]);
+    const verificationStatus = firstScalar(sectionBody(text, "verification").join("\n"), "status");
+    if (verificationStatus && ["Verified", "Not verified", "Not applicable"].includes(verificationStatus)) {
+      ok(`${relativeSpec} verification status is ${verificationStatus}`);
+    } else {
+      fail(`${relativeSpec} verification status is invalid or missing`);
+    }
+  }
+
+  const decisionDir = path.join(root, "decisions");
+  if (fs.existsSync(decisionDir)) {
+    const decisions = fs.readdirSync(decisionDir)
+      .filter((name) => /^ADR-\d{4}-.*\.md$/.test(name))
+      .sort();
+    for (const decision of decisions) {
+      requireMarkdownSections(root, `decisions/${decision}`, [
+        "Context",
+        "Decision",
+        "Alternatives Considered",
+        "Rationale",
+        "Agent Reasoning Summary",
+        "Decision Weights",
+        "Consequences",
+        "Reversal Conditions",
+        "Follow-Up",
+      ]);
+    }
+  }
 
   finish();
 }
@@ -817,6 +981,11 @@ function main() {
 
   if (group === "check" && command === "architecture" && !value) {
     checkArchitecture(root);
+    return;
+  }
+
+  if (group === "check" && command === "schemas" && !value) {
+    checkSchemas(root);
     return;
   }
 

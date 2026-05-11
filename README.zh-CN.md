@@ -51,6 +51,9 @@ vibit 从另一个前提出发：
 - `docs/agent-decision-record.md`：Agent Decision Record 标准
 - `docs/agent-decision-record.zh-CN.md`：简体中文译本
 - `decisions/`：持久 decision rationale
+- `docs/schema-validation.md`：schema validation 标准
+- `docs/schema-validation.zh-CN.md`：简体中文译本
+- `schema/`：用于机器可检查 standards 的 JSON Schema files
 
 英文文档是权威版本。简体中文译本服务于人类阅读和早期项目讨论。
 
@@ -67,6 +70,7 @@ vibit 应逐步演进出：
 - `changes/<date>-<change-id>/` 下遵循 `docs/change-spec.md` 的 change specs
 - `conversations/` 下遵循 `docs/conversation-log.md` 的 conversation logs
 - `decisions/` 下遵循 `docs/agent-decision-record.md` 的 Agent Decision Records
+- `schema/` 下遵循 `docs/schema-validation.md` 的 schema validation
 
 第一个严肃 prototype 应证明一个命题：
 
@@ -85,6 +89,7 @@ tools/vibit
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check schemas
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit check architecture
