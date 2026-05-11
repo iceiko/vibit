@@ -12,10 +12,15 @@ function usage() {
 Usage:
   vibit --help
   vibit check all
+  vibit check all --json
   vibit check schemas
+  vibit check schemas --json
   vibit check architecture
+  vibit check architecture --json
   vibit check module <module>
+  vibit check module <module> --json
   vibit check change <change-id>
+  vibit check change <change-id> --json
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
   vibit generate module <module>
@@ -99,27 +104,77 @@ function checkName(value, label, pattern, example) {
 
 let failures = 0;
 let warnings = 0;
+let passes = 0;
+let jsonOutput = false;
+let currentCheck = null;
+let currentResults = [];
 
 function ok(message) {
-  console.log(`OK   ${message}`);
+  passes += 1;
+  currentResults.push({
+    status: "passed",
+    severity: "info",
+    message,
+  });
+  if (!jsonOutput) {
+    console.log(`OK   ${message}`);
+  }
 }
 
 function warn(message) {
   warnings += 1;
-  console.log(`WARN ${message}`);
+  currentResults.push({
+    status: "warning",
+    severity: "warning",
+    message,
+  });
+  if (!jsonOutput) {
+    console.log(`WARN ${message}`);
+  }
 }
 
 function fail(message) {
   failures += 1;
-  console.log(`FAIL ${message}`);
+  currentResults.push({
+    status: "failed",
+    severity: "error",
+    message,
+  });
+  if (!jsonOutput) {
+    console.log(`FAIL ${message}`);
+  }
 }
 
-function resetResults() {
+function resetResults(checkName) {
   failures = 0;
   warnings = 0;
+  passes = 0;
+  currentCheck = checkName;
+  currentResults = [];
 }
 
-function finish() {
+function buildCheckResult(extra = {}) {
+  return {
+    schema_version: "0.1",
+    kind: "check_result",
+    project: "vibit",
+    check: currentCheck,
+    status: failures > 0 ? "failed" : "passed",
+    summary: {
+      passed: passes,
+      warnings,
+      failures,
+    },
+    results: currentResults,
+    ...extra,
+  };
+}
+
+function finish(extra = {}) {
+  if (jsonOutput) {
+    printJson(buildCheckResult(extra));
+    process.exit(failures > 0 ? 1 : 0);
+  }
   if (failures > 0) {
     console.log(`\nResult: failed (${failures} failure${failures === 1 ? "" : "s"}, ${warnings} warning${warnings === 1 ? "" : "s"})`);
     process.exit(1);
@@ -480,20 +535,65 @@ function inspectBoundary(root, fromModule, toModule) {
 }
 
 function runSubcheck(root, args) {
-  console.log(`\n==> vibit ${args.join(" ")}\n`);
-  const result = childProcess.spawnSync(process.execPath, [__filename, ...args], {
+  if (!jsonOutput) {
+    console.log(`\n==> vibit ${args.join(" ")}\n`);
+  }
+  const subcheckArgs = jsonOutput ? [...args, "--json"] : args;
+  const result = childProcess.spawnSync(process.execPath, [__filename, ...subcheckArgs], {
     cwd: root,
-    stdio: "inherit",
+    encoding: "utf8",
+    stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "inherit",
   });
   if (result.error) {
-    console.log(`FAIL could not run subcheck: ${result.error.message}`);
-    return 1;
+    return {
+      status: 1,
+      result: {
+        schema_version: "0.1",
+        kind: "check_result",
+        project: "vibit",
+        check: args.join(" "),
+        status: "failed",
+        summary: { passed: 0, warnings: 0, failures: 1 },
+        results: [{
+          status: "failed",
+          severity: "error",
+          message: `could not run subcheck: ${result.error.message}`,
+        }],
+      },
+    };
   }
-  return result.status || 0;
+  if (!jsonOutput) {
+    return { status: result.status || 0, result: null };
+  }
+  try {
+    return {
+      status: result.status || 0,
+      result: JSON.parse(result.stdout),
+    };
+  } catch (error) {
+    return {
+      status: 1,
+      result: {
+        schema_version: "0.1",
+        kind: "check_result",
+        project: "vibit",
+        check: args.join(" "),
+        status: "failed",
+        summary: { passed: 0, warnings: 0, failures: 1 },
+        results: [{
+          status: "failed",
+          severity: "error",
+          message: `subcheck did not return valid JSON: ${error.message}`,
+        }],
+      },
+    };
+  }
 }
 
 function checkAll(root) {
-  console.log(`Checking all vibit standards in ${root}`);
+  if (!jsonOutput) {
+    console.log(`Checking all vibit standards in ${root}`);
+  }
 
   const checks = [["check", "architecture"], ["check", "schemas"]];
 
@@ -507,15 +607,38 @@ function checkAll(root) {
   }
 
   if (modules.length === 0) {
-    console.log("WARN no registered modules found in .arch/modules.yaml");
+    if (!jsonOutput) {
+      console.log("WARN no registered modules found in .arch/modules.yaml");
+    }
   }
 
   let failed = 0;
+  const subchecks = [];
   for (const args of checks) {
-    const status = runSubcheck(root, args);
-    if (status !== 0) {
+    const subcheck = runSubcheck(root, args);
+    subchecks.push(subcheck.result);
+    if (subcheck.status !== 0) {
       failed += 1;
     }
+  }
+
+  if (jsonOutput) {
+    const failedResults = subchecks.filter((item) => item && item.status === "failed").length;
+    printJson({
+      schema_version: "0.1",
+      kind: "check_result",
+      project: "vibit",
+      check: "check all",
+      status: failed > 0 ? "failed" : "passed",
+      summary: {
+        subchecks: checks.length,
+        passed: checks.length - failedResults,
+        warnings: subchecks.reduce((sum, item) => sum + (item ? item.summary.warnings : 0), 0),
+        failures: failedResults,
+      },
+      subchecks,
+    });
+    process.exit(failed > 0 ? 1 : 0);
   }
 
   if (failed > 0) {
@@ -527,8 +650,10 @@ function checkAll(root) {
 }
 
 function checkArchitecture(root) {
-  resetResults();
-  console.log(`Checking architecture in ${root}\n`);
+  resetResults("check architecture");
+  if (!jsonOutput) {
+    console.log(`Checking architecture in ${root}\n`);
+  }
 
   requireFiles(root, [
     "README.md",
@@ -602,8 +727,10 @@ function checkArchitecture(root) {
 }
 
 function checkSchemas(root) {
-  resetResults();
-  console.log(`Checking schemas in ${root}\n`);
+  resetResults("check schemas");
+  if (!jsonOutput) {
+    console.log(`Checking schemas in ${root}\n`);
+  }
 
   requireSchemaShape(root, "schema/module-manifest.schema.json", "vibit Module Manifest");
   requireSchemaShape(root, "schema/change-spec.schema.json", "vibit Change Spec");
@@ -706,15 +833,17 @@ function changeDirectory(root, changeId) {
 }
 
 function checkChange(root, changeId) {
-  resetResults();
+  resetResults("check change");
   checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
 
   const dir = changeDirectory(root, changeId);
-  console.log(`Checking change ${changeId} at ${rel(root, dir)}\n`);
+  if (!jsonOutput) {
+    console.log(`Checking change ${changeId} at ${rel(root, dir)}\n`);
+  }
 
   if (!fs.existsSync(dir)) {
     fail(`change directory does not exist: ${rel(root, dir)}`);
-    finish();
+    finish({ target: changeId, path: rel(root, dir) });
     return;
   }
 
@@ -755,20 +884,22 @@ function checkChange(root, changeId) {
     }
   }
 
-  finish();
+  finish({ target: changeId, path: rel(root, dir) });
 }
 
 function checkModule(root, moduleName) {
-  resetResults();
+  resetResults("check module");
   checkName(moduleName, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
 
   const moduleDir = path.join(root, "modules", moduleName);
-  console.log(`Checking module ${moduleName} at ${rel(root, moduleDir)}\n`);
+  if (!jsonOutput) {
+    console.log(`Checking module ${moduleName} at ${rel(root, moduleDir)}\n`);
+  }
 
   if (!fs.existsSync(moduleDir)) {
     fail(`module directory does not exist: ${rel(root, moduleDir)}`);
     warn(`run: vibit generate module ${moduleName}`);
-    finish();
+    finish({ target: moduleName, path: rel(root, moduleDir) });
     return;
   }
 
@@ -812,7 +943,7 @@ function checkModule(root, moduleName) {
     }
   }
 
-  finish();
+  finish({ target: moduleName, path: rel(root, moduleDir) });
 }
 
 function moduleManifest(moduleName) {
@@ -964,20 +1095,32 @@ function generateModule(root, moduleName) {
 }
 
 function main() {
-  const args = process.argv.slice(2);
+  let args = process.argv.slice(2);
+  const wantsJson = args.includes("--json");
 
   if (args.length === 0 || args[0] === "--help" || args[0] === "-h") {
     process.stdout.write(usage());
     return;
   }
 
+  if (wantsJson) {
+    args = args.filter((arg) => arg !== "--json");
+  }
+
+  const [group, command, value, extra] = args;
+
+  if (wantsJson && group !== "check") {
+    console.error("--json is only supported for check commands.");
+    process.exit(2);
+  }
+
+  jsonOutput = wantsJson;
+
   const root = findRepoRoot(process.cwd());
   if (!root) {
     console.error("Could not find vibit repository root.");
     process.exit(2);
   }
-
-  const [group, command, value, extra] = args;
 
   if (group === "check" && command === "architecture" && !value) {
     checkArchitecture(root);

@@ -79,16 +79,23 @@ Current executable tooling:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check all --json
 node tools/vibit check schemas
+node tools/vibit check schemas --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
+node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
+node tools/vibit check change <change-id> --json
 node tools/vibit check module <module>
+node tools/vibit check module <module> --json
 node tools/vibit generate module <module>
 ```
 
 Use `node tools/vibit check all` as the default repository verification command when CLI tooling is available.
+
+Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
 ## 4. Documentation Rules
 
@@ -186,7 +193,7 @@ Generated files are immutable to non-system agents. If generated output is wrong
 
 Use `docs/schema-validation.md` as the source standard for `schema/`.
 
-When changing the shape of module manifests, change specs, Agent Decision Records, or inspect output, update the paired schema file and run `node tools/vibit check schemas`.
+When changing the shape of module manifests, change specs, Agent Decision Records, or tool JSON output, update the paired schema file and run `node tools/vibit check schemas`.
 
 ## 8. Contract Rules
 

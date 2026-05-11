@@ -89,16 +89,23 @@ Initial commands:
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check all --json
 node tools/vibit check schemas
+node tools/vibit check schemas --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit check architecture
+node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
+node tools/vibit check change bootstrap-vibit-cli --json
 node tools/vibit check module inventory
+node tools/vibit check module inventory --json
 node tools/vibit generate module <module>
 ```
 
 The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks and module skeleton generation, not a server runtime.
+
+Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
 
 The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
 

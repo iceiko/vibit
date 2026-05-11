@@ -10,7 +10,7 @@ Schema validation turns standards from readable documents into machine-checkable
 
 ## 1. Purpose
 
-vibit uses manifests, change specs, decision records, and inspect output as agent-readable architecture context.
+vibit uses manifests, change specs, decision records, and tool JSON output as agent-readable architecture context.
 
 Agents should not rely only on prose or visual inspection. Important structures should be validated by tools.
 
@@ -73,6 +73,7 @@ Initial checks should cover:
 - `modules/<module>/module.yaml` declares critical fields.
 - Change specs declare critical fields and allowed verification status.
 - Agent Decision Records contain required sections.
+- Tool JSON output schemas cover inspect output and check result output.
 - Architecture conventions declare schema artifacts.
 
 This is not yet full YAML schema validation.
@@ -84,7 +85,7 @@ Agents must update schemas when changing the shape of:
 - Module manifests
 - Change specs
 - Agent Decision Records
-- Inspect JSON output
+- Tool JSON output, including inspect output and check result output
 
 If the CLI cannot fully validate a structure yet, agents must record the gap in the relevant change spec.
 
@@ -93,4 +94,4 @@ If the CLI cannot fully validate a structure yet, agents must record the gap in 
 - Which full JSON Schema validator should be used later?
 - Should YAML manifests be converted to JSON before validation?
 - Should schemas drive code generation directly?
-- Should inspect output have stable versioned schemas from the beginning?
+- Should tool JSON output have stable versioned schemas from the beginning?

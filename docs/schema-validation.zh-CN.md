@@ -11,7 +11,7 @@ Schema validation 把 standards 从可读文档推进为机器可检查契约。
 
 ## 1. 目的
 
-vibit 使用 manifests、change specs、decision records 和 inspect output 作为 agent-readable architecture context。
+vibit 使用 manifests、change specs、decision records 和 tool JSON output 作为 agent-readable architecture context。
 
 Agents 不应只依赖 prose 或肉眼检查。重要结构应由工具验证。
 
@@ -74,6 +74,7 @@ node tools/vibit check all
 - `modules/<module>/module.yaml` 声明 critical fields。
 - Change specs 声明 critical fields 和允许的 verification status。
 - Agent Decision Records 包含 required sections。
+- Tool JSON output schemas 覆盖 inspect output 和 check result output。
 - Architecture conventions 声明 schema artifacts。
 
 这还不是完整 YAML schema validation。
@@ -85,7 +86,7 @@ node tools/vibit check all
 - Module manifests
 - Change specs
 - Agent Decision Records
-- Inspect JSON output
+- Tool JSON output，包括 inspect output 和 check result output
 
 如果 CLI 尚不能完整验证某个结构，agents 必须在相关 change spec 中记录缺口。
 
@@ -94,4 +95,4 @@ node tools/vibit check all
 - 未来应使用哪个完整 JSON Schema validator？
 - YAML manifests 是否应先转换为 JSON 再验证？
 - Schemas 是否应直接驱动 code generation？
-- Inspect output 是否应从一开始就拥有稳定 versioned schemas？
+- Tool JSON output 是否应从一开始就拥有稳定 versioned schemas？

@@ -80,16 +80,23 @@ vibit is an open-source agent-native server framework for building backends that
 ```bash
 node tools/vibit --help
 node tools/vibit check all
+node tools/vibit check all --json
 node tools/vibit check schemas
+node tools/vibit check schemas --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit check architecture
+node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
+node tools/vibit check change <change-id> --json
 node tools/vibit check module <module>
+node tools/vibit check module <module> --json
 node tools/vibit generate module <module>
 ```
 
 当 CLI tooling 可用时，默认使用 `node tools/vibit check all` 作为仓库验证命令。
+
+当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。
 
 ## 4. 文档规则
 
@@ -187,7 +194,7 @@ Generated files 对 non-system agents 不可变。如果 generated output 错了
 
 `schema/` 应以 `docs/schema-validation.md` 作为源标准。
 
-当修改 module manifests、change specs、Agent Decision Records 或 inspect output 的结构时，必须更新对应 schema file，并运行 `node tools/vibit check schemas`。
+当修改 module manifests、change specs、Agent Decision Records 或 tool JSON output 的结构时，必须更新对应 schema file，并运行 `node tools/vibit check schemas`。
 
 ## 8. 契约规则
 
