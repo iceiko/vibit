@@ -45,6 +45,9 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/change-spec.md`: change spec standard
 - `docs/change-spec.zh-CN.md`: Simplified Chinese translation
 - `changes/_template/`: reusable change spec template
+- `docs/conversation-log.md`: conversation log standard
+- `docs/conversation-log.zh-CN.md`: Simplified Chinese translation
+- `conversations/`: maintainer-agent project memory
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -59,6 +62,7 @@ vibit should evolve toward:
 - Generated scaffolds for repeatable framework structure
 - Architecture checks that verify dependency, contract, event, and generated-file rules
 - Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
+- Conversation logs under `conversations/`, following `docs/conversation-log.md`
 
 The first serious prototype should prove one claim:
 

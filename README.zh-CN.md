@@ -45,6 +45,9 @@ vibit 从另一个前提出发：
 - `docs/change-spec.md`：change spec 标准
 - `docs/change-spec.zh-CN.md`：简体中文译本
 - `changes/_template/`：可复用 change spec 模板
+- `docs/conversation-log.md`：conversation log 标准
+- `docs/conversation-log.zh-CN.md`：简体中文译本
+- `conversations/`：maintainer-agent project memory
 
 英文文档是权威版本。简体中文译本服务于人类阅读和早期项目讨论。
 
@@ -59,6 +62,7 @@ vibit 应逐步演进出：
 - 为重复框架结构生成 scaffolds 的 generators
 - 能验证 dependency、contract、event 和 generated-file rules 的 architecture checks
 - `changes/<date>-<change-id>/` 下遵循 `docs/change-spec.md` 的 change specs
+- `conversations/` 下遵循 `docs/conversation-log.md` 的 conversation logs
 
 第一个严肃 prototype 应证明一个命题：
 

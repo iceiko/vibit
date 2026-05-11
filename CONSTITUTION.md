@@ -421,6 +421,27 @@ acceptance_tests:
   - duplicate_claim_is_rejected
 ```
 
+### 4.7 Conversation Logs
+
+Expected directory:
+
+```text
+conversations/
+```
+
+Purpose:
+
+- Preserves maintainer-agent project memory
+- Records maintainer narrative with high fidelity
+- Summarizes agent responses when exact wording is not required
+- Explains how decisions and standards emerged
+- Links conversations to change specs and artifacts
+- Redacts secrets, tokens, credentials, and unrelated private data before commit
+
+Conversation logs are not a replacement for change specs. A conversation log explains why the project moved in a direction. A change spec explains how a specific change is executed.
+
+Maintainer statements may be preserved in their original language because original wording can be part of product intent.
+
 ## 5. Standard Server Shape
 
 The framework should converge toward a predictable structure.
@@ -453,6 +474,7 @@ schema/
   db/
 .arch/
 changes/
+conversations/
 tools/
 docs/
 ```

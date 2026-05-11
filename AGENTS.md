@@ -62,6 +62,9 @@ Existing foundation:
 - `docs/change-spec.md`
 - `docs/change-spec.zh-CN.md`
 - `changes/_template/`
+- `docs/conversation-log.md`
+- `docs/conversation-log.zh-CN.md`
+- `conversations/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
@@ -148,6 +151,10 @@ Other modules must not reach into a module's internals directly. Cross-module co
 Use `docs/module-manifest.md` as the source standard for `modules/<module>/module.yaml`.
 
 Use `docs/change-spec.md` as the source standard for `changes/<date>-<change-id>/`.
+
+Use `docs/conversation-log.md` as the source standard for `conversations/`.
+
+When the maintainer introduces product intent, rejects an interpretation, names a concept, or makes an architectural decision, preserve that context in a conversation log. Redact secrets before committing.
 
 ## 8. Contract Rules
 

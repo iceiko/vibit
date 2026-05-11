@@ -422,6 +422,27 @@ acceptance_tests:
   - duplicate_claim_is_rejected
 ```
 
+### 4.7 Conversation Logs
+
+预期目录：
+
+```text
+conversations/
+```
+
+目的：
+
+- 保存 maintainer-agent project memory
+- 高保真记录 maintainer narrative
+- 当不需要原文时，摘要记录 agent responses
+- 解释 decisions 和 standards 是如何形成的
+- 将 conversations 链接到 change specs 和 artifacts
+- 提交前脱敏 secrets、tokens、credentials 和无关 private data
+
+Conversation logs 不取代 change specs。Conversation log 解释项目为什么走向某个方向。Change spec 解释某个具体变更如何执行。
+
+Maintainer statements 可以保留原始语言，因为原始表述本身可能就是 product intent 的一部分。
+
 ## 5. 标准服务器形态
 
 框架应逐步收敛到可预测结构。
@@ -454,6 +475,7 @@ schema/
   db/
 .arch/
 changes/
+conversations/
 tools/
 docs/
 ```

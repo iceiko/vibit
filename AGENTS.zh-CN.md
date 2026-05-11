@@ -63,6 +63,9 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/change-spec.md`
 - `docs/change-spec.zh-CN.md`
 - `changes/_template/`
+- `docs/conversation-log.md`
+- `docs/conversation-log.zh-CN.md`
+- `conversations/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
@@ -149,6 +152,10 @@ docs/<name>.zh-CN.md
 `modules/<module>/module.yaml` 应以 `docs/module-manifest.md` 作为源标准。
 
 `changes/<date>-<change-id>/` 应以 `docs/change-spec.md` 作为源标准。
+
+`conversations/` 应以 `docs/conversation-log.md` 作为源标准。
+
+当 maintainer 引入 product intent、拒绝一种解释、命名一个概念或做出架构决策时，应在 conversation log 中保留该上下文。提交前必须脱敏 secrets。
 
 ## 8. 契约规则
 
