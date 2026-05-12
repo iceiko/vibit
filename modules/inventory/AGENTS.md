@@ -37,7 +37,12 @@ If a requirement needs one of those concepts, create or update the owning module
 - Repository: inventory persistence behind the module boundary
 - Tests: command, query, event, contract, invariant, and architecture tests
 
-Runtime contract source files live under `contracts/inventory/` and are registered in `.arch/contracts.yaml`. The first generated shape is `modules/inventory/generated/contracts/GrantItem.generated.ts`.
+Runtime contract source files live under `contracts/inventory/` and are registered in `.arch/contracts.yaml`.
+
+Generated contract shapes:
+
+- `modules/inventory/generated/contracts/GrantItem.generated.ts`
+- `modules/inventory/generated/contracts/GetInventory.generated.ts`
 
 Before implementing the first runtime slice, read:
 
@@ -50,11 +55,14 @@ Before implementing the first runtime slice, read:
 The first handwritten runtime path is:
 
 - Command handler: `modules/inventory/commands/GrantItem.ts`
+- Query handler: `modules/inventory/queries/GetInventory.ts`
 - Repository: `modules/inventory/repositories/InMemoryInventoryRepository.ts`
 - Policies:
   - `modules/inventory/policies/inventoryCapacityPolicy.ts`
   - `modules/inventory/policies/inventoryPermissionPolicy.ts`
-- Tests: `modules/inventory/tests/GrantItem.test.ts`
+- Tests:
+  - `modules/inventory/tests/GrantItem.test.ts`
+  - `modules/inventory/tests/GetInventory.test.ts`
 
 ## Forbidden Shortcuts
 

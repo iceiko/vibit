@@ -101,6 +101,7 @@ invariants:
 generated:
   files:
     - generated/contracts/GrantItem.generated.ts
+    - generated/contracts/GetInventory.generated.ts
   directories:
     - generated/contracts
   planned_outputs:
@@ -147,13 +148,13 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: grant_item_handler_implemented
+  status: command_and_query_handlers_implemented
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: in_memory_repository_is_acceptable_for_first_slice
-  runtime_implementation: grant_item_command_handler
+  runtime_implementation: grant_item_command_handler_and_get_inventory_query_handler
   non_goals:
     - full_item_catalog
     - player_account_lifecycle
@@ -174,3 +175,4 @@ tests:
     - runtime_invariant_tests
   available:
     - modules/inventory/tests/GrantItem.test.ts
+    - modules/inventory/tests/GetInventory.test.ts

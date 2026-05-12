@@ -38,7 +38,12 @@
 - Repository：位于 module boundary 后面的 inventory persistence
 - Tests：command、query、event、contract、invariant 和 architecture tests
 
-Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `.arch/contracts.yaml` 中。第一份 generated shape 是 `modules/inventory/generated/contracts/GrantItem.generated.ts`。
+Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `.arch/contracts.yaml` 中。
+
+Generated contract shapes：
+
+- `modules/inventory/generated/contracts/GrantItem.generated.ts`
+- `modules/inventory/generated/contracts/GetInventory.generated.ts`
 
 在实现第一条 runtime slice 前，应阅读：
 
@@ -51,11 +56,14 @@ Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `
 第一条 handwritten runtime 路径是：
 
 - Command handler：`modules/inventory/commands/GrantItem.ts`
+- Query handler：`modules/inventory/queries/GetInventory.ts`
 - Repository：`modules/inventory/repositories/InMemoryInventoryRepository.ts`
 - Policies：
   - `modules/inventory/policies/inventoryCapacityPolicy.ts`
   - `modules/inventory/policies/inventoryPermissionPolicy.ts`
-- Tests：`modules/inventory/tests/GrantItem.test.ts`
+- Tests：
+  - `modules/inventory/tests/GrantItem.test.ts`
+  - `modules/inventory/tests/GetInventory.test.ts`
 
 ## Forbidden Shortcuts
 

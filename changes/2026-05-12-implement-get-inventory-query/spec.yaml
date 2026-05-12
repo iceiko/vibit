@@ -1,0 +1,78 @@
+schema_version: 0.1
+change_id: implement-get-inventory-query
+date: 2026-05-12
+type: feature
+status: verified
+
+summary: Implement and test the first handwritten GetInventory query handler.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed:
+      - GetInventory generated shape and runtime behavior implemented
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed:
+      - INVENTORY_PERMISSION_DENIED used by GetInventory handler
+    removed: []
+  permissions:
+    added: []
+    changed:
+      - inventory_read enforced by GetInventory handler
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - contracts/inventory/queries/GetInventory.yaml
+    - tools/vibit
+    - modules/inventory/module.yaml
+    - modules/inventory/AGENTS.md
+    - modules/inventory/AGENTS.zh-CN.md
+    - modules/inventory/generated/contracts/GetInventory.generated.ts
+    - modules/inventory/queries/GetInventory.ts
+    - modules/inventory/policies/inventoryPermissionPolicy.ts
+    - modules/inventory/tests/GetInventory.test.ts
+    - changes/2026-05-12-implement-get-inventory-query/
+    - conversations/2026-05-12-implement-get-inventory-query.md
+
+decisions:
+  - ADR-0005
+  - ADR-0006
+  - ADR-0007
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - generate_contract_get_inventory
+    - inspect_contract_get_inventory
+    - generated_check
+    - contracts_check_json
+    - schemas_check
+    - runtime_check_text
+    - runtime_check_json
+    - direct_node_query_test
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified
