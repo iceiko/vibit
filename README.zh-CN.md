@@ -107,6 +107,8 @@ node tools/vibit generate module <module>
 
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。面向人类的文本输出仍是默认行为。
 
+每条 JSON check result item 都包含稳定的 `rule_id` 和 `artifact`，让 agent 不必解析自然语言就能定位失败原因和相关产物。`check all --json` 是紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
+
 服务器实现语言和整体服务器实例架构目前有意保持开放。它们应在仓库标准和工具链足够强、可以评估 tradeoffs 后，通过 change specs 决定。
 
 ## 早期参考领域

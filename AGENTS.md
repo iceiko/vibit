@@ -97,6 +97,8 @@ Use `node tools/vibit check all` as the default repository verification command 
 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
+Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
+
 ## 4. Documentation Rules
 
 English is the canonical documentation language.

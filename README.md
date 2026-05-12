@@ -107,6 +107,8 @@ The CLI currently uses Node.js standard-library APIs only. It is a prototype for
 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
 
+Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
+
 The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
 
 ## Early Reference Domain

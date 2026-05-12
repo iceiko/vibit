@@ -35,7 +35,7 @@
     },
     {
       "type": "object",
-      "required": ["schema_version", "kind", "project", "check", "status", "summary"],
+      "required": ["schema_version", "kind", "project", "check", "status", "summary", "results"],
       "properties": {
         "schema_version": {
           "const": "0.1"
@@ -51,6 +51,37 @@
         },
         "summary": {
           "type": "object"
+        },
+        "results": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["status", "severity", "rule_id", "artifact", "message"],
+            "properties": {
+              "status": {
+                "enum": ["passed", "warning", "failed"]
+              },
+              "severity": {
+                "enum": ["info", "warning", "error"]
+              },
+              "rule_id": {
+                "type": "string",
+                "pattern": "^[a-z][a-z0-9_.-]*$"
+              },
+              "artifact": {
+                "type": ["string", "null"]
+              },
+              "message": {
+                "type": "string"
+              }
+            }
+          }
+        },
+        "subchecks": {
+          "type": "array",
+          "items": {
+            "type": ["object", "null"]
+          }
         }
       }
     }

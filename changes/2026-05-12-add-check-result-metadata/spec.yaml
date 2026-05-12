@@ -1,0 +1,67 @@
+schema_version: 0.1
+change_id: add-check-result-metadata
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add rule and artifact metadata to machine-readable check results.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - vibit check all --json
+      - vibit check schemas --json
+      - vibit check architecture --json
+      - vibit check change <change-id> --json
+      - vibit check module <module> --json
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - schema/inspect-output.schema.json
+    - tools/vibit
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_all_text
+    - check_all_json
+    - json_metadata_assertion
+    - check_schemas_json
+    - check_architecture_json
+    - check_change_json
+    - check_module_json
+    - secret_scan
+  status: Verified

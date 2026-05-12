@@ -109,37 +109,113 @@ let jsonOutput = false;
 let currentCheck = null;
 let currentResults = [];
 
-function ok(message) {
-  passes += 1;
+function inferArtifact(message) {
+  const match = message.match(/^([A-Za-z0-9_./-]+)(?:\/)?\s+(?:exists|is missing|references|parses as JSON|is invalid JSON|declares|title|contains|has section|module matches|module does not match|verification status)/);
+  if (match) {
+    return match[1];
+  }
+  if (message.startsWith("spec.yaml ")) {
+    return "spec.yaml";
+  }
+  if (message.startsWith("module.yaml ")) {
+    return "module.yaml";
+  }
+  return null;
+}
+
+function inferRuleId(message) {
+  if (message.includes(" must match ")) {
+    return "argument.format";
+  }
+  if (message.endsWith("/ exists") || message.includes("/ exists")) {
+    return "artifact.directory_exists";
+  }
+  if (message.endsWith(" exists")) {
+    return "artifact.file_exists";
+  }
+  if (message.endsWith(" is missing") || message.includes(" is missing ")) {
+    return "artifact.required";
+  }
+  if (message.includes(" references ")) {
+    return "artifact.text_includes";
+  }
+  if (message.includes(" parses as JSON") || message.includes(" invalid JSON:")) {
+    return "schema.json_parse";
+  }
+  if (message.includes(" declares $schema")) {
+    return "schema.declares_schema_uri";
+  }
+  if (message.includes(" declares $id")) {
+    return "schema.declares_id";
+  }
+  if (message.includes(" title ")) {
+    return "schema.title";
+  }
+  if (message.includes(" declares ")) {
+    return "artifact.declares_field";
+  }
+  if (message.includes(" contains ")) {
+    return "artifact.contains_field";
+  }
+  if (message.includes(" has section ") || message.includes(" missing section ")) {
+    return "markdown.section";
+  }
+  if (message.includes(" module matches registry") || message.includes(" module does not match registry")) {
+    return "module.registry_match";
+  }
+  if (message.includes(" change_id matches directory") || message.includes(" change_id does not match ")) {
+    return "change.directory_match";
+  }
+  if (message.includes(" verification status ")) {
+    return "change.verification_status";
+  }
+  if (message.includes("change_id matches requested id") || message.includes("does not declare change_id")) {
+    return "change.requested_id_match";
+  }
+  if (message.includes("module name matches directory") || message.includes("module name does not match directory")) {
+    return "module.directory_match";
+  }
+  if (message.startsWith("run: ")) {
+    return "operator.guidance";
+  }
+  if (message.startsWith("created ")) {
+    return "generator.created_artifact";
+  }
+  if (message.endsWith(" already exists")) {
+    return "generator.artifact_already_exists";
+  }
+  return "check.message";
+}
+
+function recordResult(status, severity, message, metadata = {}) {
   currentResults.push({
-    status: "passed",
-    severity: "info",
+    status,
+    severity,
+    rule_id: metadata.rule_id || inferRuleId(message),
+    artifact: Object.prototype.hasOwnProperty.call(metadata, "artifact") ? metadata.artifact : inferArtifact(message),
     message,
   });
+}
+
+function ok(message, metadata = {}) {
+  passes += 1;
+  recordResult("passed", "info", message, metadata);
   if (!jsonOutput) {
     console.log(`OK   ${message}`);
   }
 }
 
-function warn(message) {
+function warn(message, metadata = {}) {
   warnings += 1;
-  currentResults.push({
-    status: "warning",
-    severity: "warning",
-    message,
-  });
+  recordResult("warning", "warning", message, metadata);
   if (!jsonOutput) {
     console.log(`WARN ${message}`);
   }
 }
 
-function fail(message) {
+function fail(message, metadata = {}) {
   failures += 1;
-  currentResults.push({
-    status: "failed",
-    severity: "error",
-    message,
-  });
+  recordResult("failed", "error", message, metadata);
   if (!jsonOutput) {
     console.log(`FAIL ${message}`);
   }
@@ -168,6 +244,27 @@ function buildCheckResult(extra = {}) {
     results: currentResults,
     ...extra,
   };
+}
+
+function summarizeSubcheckResult(item) {
+  if (!item) {
+    return null;
+  }
+  const summary = {
+    schema_version: item.schema_version,
+    kind: item.kind,
+    project: item.project,
+    check: item.check,
+    status: item.status,
+    summary: item.summary,
+  };
+  if (Object.prototype.hasOwnProperty.call(item, "target")) {
+    summary.target = item.target;
+  }
+  if (Object.prototype.hasOwnProperty.call(item, "path")) {
+    summary.path = item.path;
+  }
+  return summary;
 }
 
 function finish(extra = {}) {
@@ -557,6 +654,8 @@ function runSubcheck(root, args) {
         results: [{
           status: "failed",
           severity: "error",
+          rule_id: "check.subcheck_spawn",
+          artifact: args.join(" "),
           message: `could not run subcheck: ${result.error.message}`,
         }],
       },
@@ -583,6 +682,8 @@ function runSubcheck(root, args) {
         results: [{
           status: "failed",
           severity: "error",
+          rule_id: "check.subcheck_json_parse",
+          artifact: args.join(" "),
           message: `subcheck did not return valid JSON: ${error.message}`,
         }],
       },
@@ -624,6 +725,18 @@ function checkAll(root) {
 
   if (jsonOutput) {
     const failedResults = subchecks.filter((item) => item && item.status === "failed").length;
+    const aggregateResults = subchecks.map((item, index) => {
+      const checkName = item ? item.check : checks[index].join(" ");
+      const status = item && item.status === "passed" ? "passed" : "failed";
+      return {
+        status,
+        severity: status === "passed" ? "info" : "error",
+        rule_id: "check.subcheck",
+        artifact: checkName,
+        message: `${checkName} ${status}`,
+      };
+    });
+    const subcheckSummaries = subchecks.map(summarizeSubcheckResult);
     printJson({
       schema_version: "0.1",
       kind: "check_result",
@@ -636,7 +749,8 @@ function checkAll(root) {
         warnings: subchecks.reduce((sum, item) => sum + (item ? item.summary.warnings : 0), 0),
         failures: failedResults,
       },
-      subchecks,
+      results: aggregateResults,
+      subchecks: subcheckSummaries,
     });
     process.exit(failed > 0 ? 1 : 0);
   }
