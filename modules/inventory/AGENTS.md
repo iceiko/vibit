@@ -67,6 +67,7 @@ The first handwritten runtime path is planned for Go under the future `runtime/`
 - Do not add unregistered public commands, queries, events, or permissions.
 - Do not put inventory business rules in WebSocket, HTTP, Protobuf, or transport handlers.
 - Do not make this module depend directly on third-party WebSocket or Protobuf libraries.
+- Do not make this module depend directly on PostgreSQL drivers, S3 SDKs, or MinIO clients. Use vibit-owned repository and storage interfaces when persistence implementation begins.
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
 - Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.
@@ -87,3 +88,5 @@ For the first runtime slice, tests should cover:
 - Architecture checks still pass.
 
 Run `node tools/vibit check runtime` after changing inventory runtime behavior. Before the Go runtime exists, runtime verification is not applicable.
+
+PostgreSQL is the first authoritative durable store when inventory persistence begins. S3-compatible object storage is not required for the first inventory slice unless a future contract introduces large object artifacts that inventory owns.

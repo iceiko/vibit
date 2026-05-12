@@ -12,6 +12,7 @@ decisions:
   - ADR-0006
   - ADR-0007
   - ADR-0009
+  - ADR-0011
 
 owns:
   entities:
@@ -87,6 +88,9 @@ dependencies:
     - reward
     - quest
     - match
+    - direct_postgresql_driver
+    - direct_s3_sdk
+    - direct_minio_client
   external_references:
     - player_id
     - item_id
@@ -159,7 +163,8 @@ proof_slice:
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
-  persistence_assumption: in_memory_repository_is_acceptable_for_first_slice
+  persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
+  object_storage_required_for_first_slice: false
   runtime_implementation: not_started
   first_runtime_language: Go
   first_client_protocol: WebSocket

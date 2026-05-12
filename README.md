@@ -68,6 +68,8 @@ vibit should evolve toward:
 - A first Go server runtime governed by `.arch/runtime.yaml` and Agent Decision Records
 - WebSocket as the first gameplay/client protocol
 - Protobuf as the first client/server wire message format
+- PostgreSQL as the first authoritative durable relational store
+- S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
@@ -151,6 +153,8 @@ Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsin
 Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
 
 The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
+
+PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
 
 ## Early Reference Domain
 

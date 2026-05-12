@@ -91,6 +91,7 @@ runtime_readiness:
     first_runtime_proof_slice: ADR-0006
     client_protocol_and_wire_format: ADR-0009
     dependency_adoption: ADR-0010
+    persistence_direction: ADR-0011
 
 server_runtime:
   first_reference_language: Go
@@ -99,6 +100,14 @@ server_runtime:
   wire_message_format: protobuf
   tooling_cli_language: JavaScript
   tooling_cli_is_server_runtime: false
+
+persistence:
+  first_authoritative_store: PostgreSQL
+  object_storage_interface: s3_compatible
+  object_storage_candidate: MinIO
+  object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency
+  decision: ADR-0011
+  module_dependency_rule: Domain modules use vibit-owned storage interfaces rather than PostgreSQL drivers, S3 SDKs, or MinIO clients directly.
 
 contracts:
   registry: .arch/contracts.yaml

@@ -34,7 +34,7 @@ The `.arch/` directory should answer the questions an agent must resolve before 
 
 This is the first draft. The files describe expected shape before implementation code exists.
 
-`runtime.yaml` records the runtime readiness decisions for the first Go server runtime direction. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, client protocol, wire format, dependency adoption, and proof slice.
+`runtime.yaml` records the runtime readiness decisions for the first Go server runtime direction. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, client protocol, wire format, persistence direction, dependency adoption, and proof slice.
 
 `contracts.yaml` registers public command, query, event, error, and permission contract source files. Contract files live under `contracts/` and are semantic source artifacts, not generated output. Protobuf wire schemas are planned under `proto/` and must align with these semantic contracts.
 

@@ -14,6 +14,7 @@ canonical_decisions:
   first_runtime_proof_slice: ADR-0006
   client_protocol_and_wire_format: ADR-0009
   dependency_adoption: ADR-0010
+  persistence_direction: ADR-0011
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -89,6 +90,45 @@ server_instance_model:
     - service_mesh_deployment
     - cloud_orchestration
 
+persistence_model:
+  decision: ADR-0011
+  status: runtime_readiness_decision
+  authoritative_store:
+    engine: PostgreSQL
+    role: first_authoritative_durable_relational_store
+    scope:
+      - module_owned_state
+      - transactional_state_changes
+      - invariants_requiring_consistency
+      - outbox_or_event_log_when_needed
+    not_started: true
+  object_storage:
+    interface: s3_compatible
+    role: planned_large_object_storage_abstraction
+    preferred_local_self_hosted_candidate: MinIO
+    candidate_status: requires_dependency_adoption_before_required_runtime_dependency
+    suitable_for:
+      - replay_archives
+      - snapshots
+      - exports
+      - binary_assets
+      - large_audit_or_diagnostic_artifacts
+    not_suitable_for:
+      - authoritative_transactional_domain_state
+      - module_invariant_enforcement
+  domain_rules:
+    - Domain modules must depend on vibit-owned repository or object-store interfaces, not PostgreSQL drivers or S3 SDKs directly.
+    - PostgreSQL schema, migrations, repository interfaces, and transaction boundaries must be declared before runtime persistence implementation.
+    - S3-compatible object storage must remain optional until a concrete module or platform capability requires it.
+    - MinIO must not become a mandatory runtime dependency without an adoption record covering license, maintenance, operations, and replacement path.
+  deferred:
+    - first_go_postgresql_driver
+    - migration_tooling
+    - transaction_boundary_standard
+    - repository_interface_layout
+    - outbox_or_event_log_storage_standard
+    - first_s3_client_or_sdk
+
 contract_model:
   source_format: vibit_manifest_yaml
   wire_schema_format: protobuf
@@ -131,11 +171,13 @@ first_runtime_proof_slice:
     - Build a full game backend.
     - Add AI gameplay features.
     - Optimize distributed performance.
-    - Choose final persistence for all future modules.
+    - Choose a PostgreSQL driver, migration tool, S3 SDK, or required object storage deployment.
 
 open_questions:
   - Decide whether the first Go workspace should use runtime/ only or split runtime/ and packages/.
   - Choose the first WebSocket library through a dependency adoption record.
   - Choose Protobuf tooling and generation layout through a dependency adoption record.
   - Define the manifest-to-proto consistency check before broad protocol generation.
-  - Decide whether initial persistence is in-memory only or includes a file-backed adapter.
+  - Choose the first Go PostgreSQL driver through a dependency adoption record.
+  - Define the migration and transaction boundary standard before implementing persistent repositories.
+  - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.

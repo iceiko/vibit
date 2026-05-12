@@ -68,6 +68,8 @@ vibit 应逐步演进出：
 - 由 `.arch/runtime.yaml` 和 Agent Decision Records 约束的第一版 Go server runtime
 - WebSocket 作为第一版 gameplay/client protocol
 - Protobuf 作为第一版 client/server wire message format
+- PostgreSQL 作为第一版 authoritative durable relational store
+- S3-compatible object storage 作为计划中的大对象存储抽象，MinIO 作为本地/自托管优先候选，但需要先完成 dependency adoption
 - `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
 - Contract-first 的 commands、queries、events、errors、permissions 和 migrations
@@ -151,6 +153,8 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 使用 `node tools/vibit inspect rules` 或 `node tools/vibit inspect rules --category <category>` 可以发现可用 rules。
 
 第一版 server runtime 方向是 Go，并采用 modular monolith single-process server model。WebSocket 是第一版 gameplay/client protocol，Protobuf 是第一版 client/server wire format。Semantic business contracts 仍然保留在 vibit manifests 和 contract source files 中；Protobuf 负责 wire schema shape。见 `.arch/runtime.yaml`、`decisions/ADR-0008-go-server-runtime-language.md` 和 `decisions/ADR-0009-websocket-protobuf-client-protocol.md`。
+
+PostgreSQL 是 runtime state 的第一版 authoritative durable relational store。S3-compatible object storage 计划用于 replays、snapshots、exports、binary assets 和 diagnostic archives 等大对象 artifacts。MinIO 是这个 S3-compatible 角色的本地/自托管优先候选，但在具体 use case 和 dependency adoption record 证明它必要之前，它不是 mandatory runtime dependency。Domain modules 必须使用 vibit-owned storage interfaces，而不是直接依赖 database drivers 或 object-storage clients。见 `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`。
 
 ## 早期参考领域
 

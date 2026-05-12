@@ -237,7 +237,9 @@ docs/<name>.zh-CN.md
 
 Generated files 对 non-system agents 不可变。如果 generated output 错了，应修改 source schema、template 或 generator，除非 change spec 或 decision record 显式授予 `generated_file_override`。
 
-对于 server runtime，Go 是第一版 implementation language。WebSocket 是第一版 gameplay/client protocol。Protobuf 是第一版 wire message format。Domain modules 不得直接依赖第三方 transport 或 protocol libraries；这些依赖由 platform adapters 通过 vibit-owned interfaces 承载。
+对于 server runtime，Go 是第一版 implementation language。WebSocket 是第一版 gameplay/client protocol。Protobuf 是第一版 wire message format。PostgreSQL 是第一版 authoritative durable relational store。S3-compatible object storage 是计划中的 object-storage abstraction，MinIO 是本地/自托管方向的优先候选，但必须先经过 dependency adoption record。Domain modules 不得直接依赖第三方 transport、protocol、persistence、object-storage 或 framework libraries；这些依赖由 platform adapters 通过 vibit-owned interfaces 承载。
+
+在新增 persistence implementation 前，agents 必须先声明或更新相关 repository interfaces、migration expectations、transaction boundaries 和 storage verification path。未通过遵循 `ADR-0010` 和 `ADR-0011` 的 change spec 或 adoption record，不要添加 PostgreSQL drivers、migration tools、S3 SDKs 或 MinIO clients。
 
 `schema/` 应以 `docs/schema-validation.md` 作为源标准。
 

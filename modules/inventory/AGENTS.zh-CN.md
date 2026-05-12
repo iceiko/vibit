@@ -68,6 +68,7 @@ Generated contract shapes：
 - 不要添加未登记的 public commands、queries、events 或 permissions。
 - 不要把 inventory business rules 放进 WebSocket、HTTP、Protobuf 或 transport handlers。
 - 不要让本模块直接依赖第三方 WebSocket 或 Protobuf libraries。
+- 不要让本模块直接依赖 PostgreSQL drivers、S3 SDKs 或 MinIO clients。开始 persistence implementation 时，应使用 vibit-owned repository 和 storage interfaces。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。
@@ -88,3 +89,5 @@ Generated contract shapes：
 - Architecture checks 仍然通过。
 
 修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，runtime verification 不适用。
+
+当 inventory persistence 开始时，PostgreSQL 是第一版 authoritative durable store。除非未来 contract 引入 inventory 自己拥有的大对象 artifacts，否则第一条 inventory slice 不需要 S3-compatible object storage。
