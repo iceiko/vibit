@@ -97,6 +97,7 @@ node tools/vibit check schemas --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect change bootstrap-vibit-cli
+node tools/vibit inspect memory
 node tools/vibit inspect rule check.subcheck
 node tools/vibit inspect rules --category check
 node tools/vibit check architecture
@@ -115,6 +116,8 @@ Use `--json` when an agent needs machine-readable check results during intake, v
 Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
 
 Use `node tools/vibit inspect change <change-id>` to inspect a change spec directory and its verification metadata without manually opening every file.
+
+Use `node tools/vibit inspect memory` to list change specs, conversation logs, and Agent Decision Records as a machine-readable project memory index.
 
 Rule metadata for check output lives in `rules/check-rules.json`.
 

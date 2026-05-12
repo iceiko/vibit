@@ -60,6 +60,7 @@ Usage:
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
   vibit inspect change <change-id>
+  vibit inspect memory
   vibit inspect rule <rule-id>
   vibit inspect rules
   vibit inspect rules --category <category>
@@ -74,6 +75,7 @@ Commands:
   inspect module <module>  Print module metadata as JSON.
   inspect boundary         Print boundary metadata as JSON.
   inspect change           Print change spec metadata as JSON.
+  inspect memory           Print project memory indexes as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
@@ -605,6 +607,62 @@ function listAfterPath(text, pathKeys) {
   return values;
 }
 
+function firstMarkdownField(text, fieldName) {
+  const match = text.match(new RegExp(`^${fieldName}:\\s*(.+?)\\s*$`, "m"));
+  if (!match) {
+    return null;
+  }
+  return match[1].trim();
+}
+
+function firstMarkdownHeading(text) {
+  const match = text.match(/^#\s+(.+?)\s*$/m);
+  return match ? match[1].trim() : null;
+}
+
+function cleanMarkdownListValue(value) {
+  let cleaned = value.trim();
+  if (cleaned.startsWith("`") && cleaned.endsWith("`")) {
+    cleaned = cleaned.slice(1, -1);
+  }
+  if (/^none yet\.?$/i.test(cleaned)) {
+    return null;
+  }
+  return cleaned;
+}
+
+function markdownListAfterLabel(text, label) {
+  const lines = text.split(/\r?\n/);
+  const startIndex = lines.findIndex((line) => line.trim() === `${label}:`);
+  if (startIndex === -1) {
+    return [];
+  }
+  const values = [];
+  let sawList = false;
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const trimmed = lines[i].trim();
+    if (trimmed === "") {
+      continue;
+    }
+    if (trimmed.startsWith("## ") || /^[A-Za-z][A-Za-z -]+:$/.test(trimmed)) {
+      break;
+    }
+    const match = trimmed.match(/^-\s+(.+?)\s*$/);
+    if (!match) {
+      if (sawList) {
+        break;
+      }
+      continue;
+    }
+    sawList = true;
+    const value = cleanMarkdownListValue(match[1]);
+    if (value) {
+      values.push(value);
+    }
+  }
+  return values;
+}
+
 function loadModuleInfo(root, moduleName) {
   const moduleDir = path.join(root, "modules", moduleName);
   const manifestPath = path.join(moduleDir, "module.yaml");
@@ -809,9 +867,7 @@ function inspectRules(root, options) {
   });
 }
 
-function inspectChange(root, changeId) {
-  checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
-
+function loadChangeInfo(root, changeId) {
   const dir = changeDirectory(root, changeId);
   const specPath = path.join(dir, "spec.yaml");
   const existsOnDisk = fs.existsSync(dir) && fs.statSync(dir).isDirectory();
@@ -853,11 +909,105 @@ function inspectChange(root, changeId) {
     change.verification.status = firstScalar(sectionBody(spec, "verification").join("\n"), "status");
   }
 
+  return change;
+}
+
+function inspectChange(root, changeId) {
+  checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
+
   printJson({
     schema_version: "0.1",
     kind: "change_inspection",
     project: "vibit",
-    change,
+    change: loadChangeInfo(root, changeId),
+  });
+}
+
+function discoverConversationFiles(root) {
+  const dir = path.join(root, "conversations");
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
+  return fs.readdirSync(dir)
+    .filter((name) => name.endsWith(".md"))
+    .filter((name) => !["README.md", "README.zh-CN.md"].includes(name))
+    .sort()
+    .map((name) => path.join(dir, name));
+}
+
+function loadConversationInfo(root, filePath) {
+  const text = readText(filePath);
+  const heading = firstMarkdownHeading(text) || path.basename(filePath, ".md");
+  return {
+    conversation_id: path.basename(filePath, ".md"),
+    title: heading.replace(/^Conversation:\s*/, ""),
+    date: firstMarkdownField(text, "Date"),
+    path: rel(root, filePath),
+    related_changes: markdownListAfterLabel(text, "Related changes"),
+    related_artifacts: markdownListAfterLabel(text, "Related artifacts"),
+  };
+}
+
+function discoverDecisionFiles(root) {
+  const dir = path.join(root, "decisions");
+  if (!fs.existsSync(dir)) {
+    return [];
+  }
+  return fs.readdirSync(dir)
+    .filter((name) => /^ADR-\d{4}-.*\.md$/.test(name))
+    .sort()
+    .map((name) => path.join(dir, name));
+}
+
+function loadDecisionInfo(root, filePath) {
+  const text = readText(filePath);
+  const fileName = path.basename(filePath, ".md");
+  const heading = firstMarkdownHeading(text) || fileName;
+  const decisionIdMatch = heading.match(/^(ADR-\d{4})/);
+  return {
+    decision_id: decisionIdMatch ? decisionIdMatch[1] : fileName,
+    title: heading.replace(/^ADR-\d{4}:\s*/, ""),
+    status: firstMarkdownField(text, "Status"),
+    date: firstMarkdownField(text, "Date"),
+    path: rel(root, filePath),
+    related_changes: markdownListAfterLabel(text, "Related changes"),
+    related_conversations: markdownListAfterLabel(text, "Related conversations"),
+    related_artifacts: markdownListAfterLabel(text, "Related artifacts"),
+  };
+}
+
+function inspectMemory(root) {
+  const changes = discoverChangeIds(root).map((changeId) => loadChangeInfo(root, changeId));
+  const conversations = discoverConversationFiles(root).map((filePath) => loadConversationInfo(root, filePath));
+  const decisions = discoverDecisionFiles(root).map((filePath) => loadDecisionInfo(root, filePath));
+
+  printJson({
+    schema_version: "0.1",
+    kind: "memory_inspection",
+    project: "vibit",
+    summary: {
+      changes: changes.length,
+      conversations: conversations.length,
+      decisions: decisions.length,
+    },
+    memory: {
+      changes,
+      conversations,
+      decisions,
+    },
+    guidance: {
+      intake_order: [
+        "Read CONSTITUTION.md and AGENTS.md first.",
+        "Use memory.changes for active or recent work.",
+        "Use memory.conversations for maintainer intent and project history.",
+        "Use memory.decisions for durable architectural rationale.",
+      ],
+      related_commands: [
+        "node tools/vibit inspect change <change-id>",
+        "node tools/vibit inspect rule <rule-id>",
+        "node tools/vibit check all --json",
+      ],
+    },
   });
 }
 
@@ -1508,6 +1658,11 @@ function main() {
 
   if (group === "inspect" && command === "change" && value && !extra) {
     inspectChange(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "memory" && !value) {
+    inspectMemory(root);
     return;
   }
 

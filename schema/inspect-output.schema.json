@@ -177,6 +177,89 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "summary", "memory", "guidance"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "memory_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "summary": {
+          "type": "object",
+          "required": ["changes", "conversations", "decisions"],
+          "properties": {
+            "changes": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "conversations": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "decisions": {
+              "type": "integer",
+              "minimum": 0
+            }
+          }
+        },
+        "memory": {
+          "type": "object",
+          "required": ["changes", "conversations", "decisions"],
+          "properties": {
+            "changes": {
+              "type": "array"
+            },
+            "conversations": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["conversation_id", "title", "date", "path", "related_changes", "related_artifacts"]
+              }
+            },
+            "decisions": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": [
+                  "decision_id",
+                  "title",
+                  "status",
+                  "date",
+                  "path",
+                  "related_changes",
+                  "related_conversations",
+                  "related_artifacts"
+                ]
+              }
+            }
+          }
+        },
+        "guidance": {
+          "type": "object",
+          "required": ["intake_order", "related_commands"],
+          "properties": {
+            "intake_order": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "related_commands": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "check", "status", "summary", "results"],
       "properties": {
         "schema_version": {
