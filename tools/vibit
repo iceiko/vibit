@@ -51,6 +51,8 @@ Usage:
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
   vibit inspect rule <rule-id>
+  vibit inspect rules
+  vibit inspect rules --category <category>
   vibit generate module <module>
 
 Commands:
@@ -62,6 +64,7 @@ Commands:
   inspect module <module>  Print module metadata as JSON.
   inspect boundary         Print boundary metadata as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
+  inspect rules            Print check rule catalog metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
 `;
 }
@@ -695,6 +698,23 @@ function parseBoundaryArgs(args) {
   return parsed.from && parsed.to ? parsed : null;
 }
 
+function parseInspectRulesArgs(args) {
+  const parsed = { category: null };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === "--category") {
+      parsed.category = args[i + 1] || null;
+      i += 1;
+    } else {
+      return null;
+    }
+  }
+  if (parsed.category && !/^[a-z][a-z0-9_-]*$/.test(parsed.category)) {
+    return null;
+  }
+  return parsed;
+}
+
 function inspectBoundary(root, fromModule, toModule) {
   checkName(fromModule, "from module", /^[a-z][a-z0-9_]*$/, "snake_case");
   checkName(toModule, "to module", /^[a-z][a-z0-9_]*$/, "snake_case");
@@ -752,6 +772,29 @@ function inspectRule(root, ruleId) {
       status: catalog.status,
     },
     rule,
+  });
+}
+
+function inspectRules(root, options) {
+  const { path: catalogPath, catalog } = loadRuleCatalog(root);
+  const allRules = Array.isArray(catalog.rules) ? catalog.rules : [];
+  const rules = options.category
+    ? allRules.filter((rule) => rule.category === options.category)
+    : allRules;
+  printJson({
+    schema_version: "0.1",
+    kind: "rules_inspection",
+    project: "vibit",
+    catalog: {
+      name: catalog.catalog,
+      path: catalogPath,
+      status: catalog.status,
+    },
+    filter: {
+      category: options.category,
+    },
+    count: rules.length,
+    rules,
   });
 }
 
@@ -1411,6 +1454,16 @@ function main() {
 
   if (group === "inspect" && command === "rule" && value && !extra) {
     inspectRule(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "rules") {
+    const parsed = parseInspectRulesArgs(args.slice(2));
+    if (!parsed) {
+      console.error("Usage: vibit inspect rules [--category <category>]");
+      process.exit(2);
+    }
+    inspectRules(root, parsed);
     return;
   }
 

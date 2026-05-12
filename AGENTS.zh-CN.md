@@ -87,6 +87,8 @@ node tools/vibit check schemas --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect rule <rule-id>
+node tools/vibit inspect rules
+node tools/vibit inspect rules --category <category>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -105,6 +107,8 @@ node tools/vibit generate module <module>
 使用 `rules/check-rules.json` 解读 check result 中的 `rule_id`。
 
 当只需要单条 rule metadata 时，使用 `node tools/vibit inspect rule <rule-id>`。
+
+使用 `node tools/vibit inspect rules --category <category>` 按 category 发现 rules。
 
 ## 4. 文档规则
 

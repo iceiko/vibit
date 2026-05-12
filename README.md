@@ -97,6 +97,7 @@ node tools/vibit check schemas --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect rule check.subcheck
+node tools/vibit inspect rules --category check
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -115,6 +116,8 @@ Each JSON check result item includes a stable `rule_id` and an `artifact` value 
 Rule metadata for check output lives in `rules/check-rules.json`.
 
 Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsing the full catalog.
+
+Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
 
 The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
 

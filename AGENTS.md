@@ -86,6 +86,8 @@ node tools/vibit check schemas --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect rule <rule-id>
+node tools/vibit inspect rules
+node tools/vibit inspect rules --category <category>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -104,6 +106,8 @@ Every JSON check result item should include `rule_id` and `artifact`. Treat `che
 Use `rules/check-rules.json` to interpret check result `rule_id` values.
 
 Use `node tools/vibit inspect rule <rule-id>` when only one rule's metadata is needed.
+
+Use `node tools/vibit inspect rules --category <category>` to discover rules by category.
 
 ## 4. Documentation Rules
 

@@ -54,6 +54,35 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "catalog", "filter", "count", "rules"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "rules_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "filter": {
+          "type": "object"
+        },
+        "count": {
+          "type": "integer",
+          "minimum": 0
+        },
+        "rules": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["rule_id", "category", "default_severity", "title", "description", "agent_guidance"]
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "check", "status", "summary", "results"],
       "properties": {
         "schema_version": {
