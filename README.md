@@ -93,6 +93,9 @@ tools/vibit
 Initial commands:
 
 ```bash
+npm run typecheck
+npm test
+npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -125,6 +128,13 @@ node tools/vibit generate module <module>
 
 The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks and module skeleton generation, not a server runtime.
 
+The current TypeScript package baseline is intentionally small:
+
+- `npm run typecheck` runs no-emit TypeScript checks for current runtime files.
+- `npm test` runs Node.js built-in tests for module runtime behavior.
+- `npm run check` runs `node tools/vibit check all`.
+- Root runtime TypeScript is ESM. `tools/package.json` keeps the existing `tools/vibit` CLI in CommonJS scope.
+
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
 
 Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
@@ -135,7 +145,7 @@ Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
 
-Use `node tools/vibit check runtime` to run the current module runtime tests.
+Use `node tools/vibit check runtime` to run TypeScript typecheck and the current module runtime tests.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
 

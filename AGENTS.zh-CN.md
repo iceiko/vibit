@@ -83,6 +83,9 @@ vibit is an open-source agent-native server framework for building backends that
 当前可执行工具：
 
 ```bash
+npm run typecheck
+npm test
+npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -116,6 +119,14 @@ node tools/vibit generate module <module>
 
 当 CLI tooling 可用时，默认使用 `node tools/vibit check all` 作为仓库验证命令。
 
+当前 TypeScript package baseline 使用 npm scripts：
+
+- `npm run typecheck` 对 runtime files 运行 no-emit TypeScript checks。
+- `npm test` 运行 Node.js built-in module runtime tests。
+- `npm run check` 运行 `node tools/vibit check all`。
+
+根 TypeScript runtime files 使用 ESM。`tools/package.json` 让现有 `tools/vibit` CLI 保持在 CommonJS scope 内。
+
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。
 
 每条 JSON check result item 都应包含 `rule_id` 和 `artifact`。把 `check all --json` 视为紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
@@ -126,7 +137,7 @@ node tools/vibit generate module <module>
 
 当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
 
-当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。
+当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。当 package baseline 存在时，该检查会先运行 TypeScript typecheck，再运行 runtime tests。
 
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
 

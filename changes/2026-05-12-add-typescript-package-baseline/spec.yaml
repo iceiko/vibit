@@ -1,0 +1,76 @@
+schema_version: 0.1
+change_id: add-typescript-package-baseline
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add a minimal npm and TypeScript baseline for the first runtime slice.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - package.json
+    - package-lock.json
+    - tsconfig.json
+    - tools/package.json
+    - rules/check-rules.json
+    - tools/vibit
+    - .arch/runtime.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - changes/2026-05-12-add-typescript-package-baseline/
+    - conversations/2026-05-12-add-typescript-package-baseline.md
+
+decisions:
+  - ADR-0003
+  - ADR-0004
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - npm_install_package_lock
+    - npm_run_typecheck
+    - npm_test
+    - npm_run_check
+    - runtime_check_text
+    - runtime_check_json
+    - rules_runtime_inspect
+    - schemas_check
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

@@ -31,6 +31,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.declared",
   "generated.exists",
   "generated.trace",
+  "runtime.typecheck_result",
   "runtime.test_file",
   "runtime.test_result",
   "change.directory_match",
@@ -2403,6 +2404,38 @@ function checkRuntime(root) {
   resetResults("check runtime");
   if (!jsonOutput) {
     console.log(`Checking runtime tests in ${root}\n`);
+  }
+
+  const packageJsonPath = path.join(root, "package.json");
+  if (fs.existsSync(packageJsonPath)) {
+    const typecheck = childProcess.spawnSync("npm", ["run", "typecheck", "--", "--pretty", "false"], {
+      cwd: root,
+      encoding: "utf8",
+      stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
+    });
+
+    if (!jsonOutput) {
+      if (typecheck.stdout) {
+        process.stdout.write(typecheck.stdout);
+      }
+      if (typecheck.stderr) {
+        process.stderr.write(typecheck.stderr);
+      }
+    }
+
+    if (typecheck.status === 0) {
+      ok("runtime typecheck passed", {
+        rule_id: "runtime.typecheck_result",
+        artifact: "package.json",
+      });
+    } else {
+      fail("runtime typecheck failed", {
+        rule_id: "runtime.typecheck_result",
+        artifact: "package.json",
+      });
+      finish();
+      return;
+    }
   }
 
   const testFiles = discoverRuntimeTestFiles(root);

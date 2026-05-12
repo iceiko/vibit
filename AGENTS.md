@@ -82,6 +82,9 @@ Runtime readiness decisions currently point to TypeScript on Node.js as the firs
 Current executable tooling:
 
 ```bash
+npm run typecheck
+npm test
+npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -115,6 +118,14 @@ node tools/vibit generate module <module>
 
 Use `node tools/vibit check all` as the default repository verification command when CLI tooling is available.
 
+Use npm scripts for the current TypeScript package baseline:
+
+- `npm run typecheck` runs no-emit TypeScript checks for runtime files.
+- `npm test` runs Node.js built-in module runtime tests.
+- `npm run check` runs `node tools/vibit check all`.
+
+Root TypeScript runtime files are ESM. `tools/package.json` keeps the existing `tools/vibit` CLI in CommonJS scope.
+
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
 Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
@@ -125,7 +136,7 @@ Use `node tools/vibit check contracts` when contract source files or `.arch/cont
 
 Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
 
-Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed.
+Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. This check runs TypeScript typecheck before runtime tests when the package baseline exists.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
 

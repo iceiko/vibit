@@ -21,11 +21,23 @@ architecture_scope:
 first_reference_runtime:
   language: TypeScript
   platform: Node.js
-  package_manager: undecided
+  package_manager: npm
+  test_runner: node_builtin_test_runner
+  typecheck: typescript_no_emit
   dependency_policy: minimal_initial_dependencies
+  current_scripts:
+    typecheck: npm run typecheck
+    test: npm test
+    repository_check: npm run check
+  module_system:
+    runtime_typescript: esm
+    tools_cli: commonjs
+    tools_cli_scope_file: tools/package.json
   rationale:
     - Existing repository tooling already uses Node.js.
     - TypeScript gives agents explicit types and strong editor feedback.
+    - npm is available with Node.js and adds the least extra bootstrapping machinery for the first runtime package baseline.
+    - Node.js built-in tests keep the first runtime verification dependency-light.
     - The ecosystem is practical for HTTP, WebSocket, schemas, tests, and code generation.
     - The choice remains a reference implementation decision, not a permanent language lock.
 
@@ -99,7 +111,7 @@ first_runtime_proof_slice:
     - Choose final persistence for all future modules.
 
 open_questions:
-  - Choose package manager only when runtime scaffolding starts.
-  - Choose test runner only when the first executable TypeScript package exists.
+  - Decide whether a future workspace layout should introduce runtime/ or packages/.
+  - Decide whether Node.js built-in tests remain enough after transport and persistence adapters exist.
   - Choose schema source format after evaluating the first command/query/event contract.
   - Decide whether initial persistence is in-memory only or includes a file-backed adapter.
