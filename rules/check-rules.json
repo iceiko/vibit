@@ -196,20 +196,20 @@
       "agent_guidance": "Regenerate the file or update the generator so it emits generated, source, and generator markers."
     },
     {
-      "rule_id": "runtime.typecheck_result",
+      "rule_id": "runtime.not_started",
       "category": "runtime",
-      "default_severity": "error",
-      "title": "Runtime typecheck result",
-      "description": "Runtime TypeScript files must typecheck when a TypeScript package baseline exists.",
-      "agent_guidance": "Run `npm run typecheck` or `node tools/vibit check runtime` and fix the reported TypeScript errors."
+      "default_severity": "info",
+      "title": "Runtime implementation not started",
+      "description": "The server runtime check may pass as not applicable before the Go runtime exists.",
+      "agent_guidance": "Do not create runtime code only to satisfy this check; add Go runtime verification when implementation begins."
     },
     {
       "rule_id": "runtime.test_file",
       "category": "runtime",
       "default_severity": "error",
       "title": "Runtime test file",
-      "description": "Runtime checks must discover at least one module runtime test file.",
-      "agent_guidance": "Add focused module tests under `modules/<module>/tests/*.test.ts` or update the runtime check if the test layout changes."
+      "description": "Runtime checks must discover at least one runtime test file after Go runtime implementation begins.",
+      "agent_guidance": "Add focused Go runtime tests or update the runtime check if the test layout changes."
     },
     {
       "rule_id": "runtime.test_result",

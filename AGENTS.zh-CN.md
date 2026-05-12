@@ -78,14 +78,11 @@ vibit is an open-source agent-native server framework for building backends that
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
-当前 runtime readiness decisions 指向 TypeScript on Node.js 作为第一参考实现、modular monolith single-process server model、contract-first commands/queries/events/errors/permissions，以及 `inventory` 作为优先的第一 proof slice。在创建 runtime implementation code 前，必须阅读 `.arch/runtime.yaml` 以及 `ADR-0003` 到 `ADR-0006`。
+当前 runtime readiness decisions 指向 Go 作为第一版 server runtime implementation language、WebSocket 作为第一版 gameplay/client protocol、Protobuf 作为第一版 wire message format、modular monolith single-process server model、contract-first commands/queries/events/errors/permissions，以及 `inventory` 作为优先的第一 proof slice。在创建 runtime implementation code 前，必须阅读 `.arch/runtime.yaml`、`ADR-0004` 到 `ADR-0010`，并注意 `ADR-0003` 已被 superseded。
 
 当前可执行工具：
 
 ```bash
-npm run typecheck
-npm test
-npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -107,7 +104,6 @@ node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
 node tools/vibit inspect rules
 node tools/vibit inspect rules --category <category>
-node tools/vibit generate contract --module <module> --type <type> --id <id>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -119,13 +115,7 @@ node tools/vibit generate module <module>
 
 当 CLI tooling 可用时，默认使用 `node tools/vibit check all` 作为仓库验证命令。
 
-当前 TypeScript package baseline 使用 npm scripts：
-
-- `npm run typecheck` 对 runtime files 运行 no-emit TypeScript checks。
-- `npm test` 运行 Node.js built-in module runtime tests。
-- `npm run check` 运行 `node tools/vibit check all`。
-
-根 TypeScript runtime files 使用 ESM。`tools/package.json` 让现有 `tools/vibit` CLI 保持在 CommonJS scope 内。
+当前 CLI 只是 Node.js standard-library tooling。不要把 CLI implementation language 当成 server runtime language。
 
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。
 
@@ -137,11 +127,9 @@ node tools/vibit generate module <module>
 
 当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
 
-当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。当 package baseline 存在时，该检查会先运行 TypeScript typecheck，再运行 runtime tests。
+当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。
 
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
-
-使用 `node tools/vibit generate contract --module <module> --type <type> --id <id>` 从 contract source files 重新生成已声明的 contract shapes，而不是手工编辑 generated output。
 
 当 change spec 已存在，并且 agent 在 intake 或 handoff 阶段需要结构化了解它的文件、metadata、affected modules 和 verification state 时，使用 `node tools/vibit inspect change <change-id>`。
 
@@ -153,7 +141,7 @@ node tools/vibit generate module <module>
 
 使用 `node tools/vibit inspect rules --category <category>` 按 category 发现 rules。
 
-使用 `.arch/runtime.yaml` 作为 runtime readiness 的机器可读 intake 入口。它链接了约束语言、服务器实例模型、contract 与 generation boundary，以及第一 proof slice 的 ADR。
+使用 `.arch/runtime.yaml` 作为 runtime readiness 的机器可读 intake 入口。它链接了约束语言、服务器实例模型、contract 与 generation boundary、client protocol、dependency adoption，以及第一 proof slice 的 ADR。
 
 ## 4. 文档规则
 
@@ -248,6 +236,8 @@ docs/<name>.zh-CN.md
 当某个 decision 影响长期 architecture、generated file conventions、module ownership 或拒绝了一个合理替代方案时，应创建或更新 Agent Decision Record。Rationale 应简洁、公开；不要存储隐藏 chain-of-thought。
 
 Generated files 对 non-system agents 不可变。如果 generated output 错了，应修改 source schema、template 或 generator，除非 change spec 或 decision record 显式授予 `generated_file_override`。
+
+对于 server runtime，Go 是第一版 implementation language。WebSocket 是第一版 gameplay/client protocol。Protobuf 是第一版 wire message format。Domain modules 不得直接依赖第三方 transport 或 protocol libraries；这些依赖由 platform adapters 通过 vibit-owned interfaces 承载。
 
 `schema/` 应以 `docs/schema-validation.md` 作为源标准。
 

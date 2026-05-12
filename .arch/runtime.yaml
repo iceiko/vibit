@@ -7,39 +7,45 @@ purpose: >
   before creating server implementation code.
 
 canonical_decisions:
-  language_and_package_layout: ADR-0003
+  superseded_language_decision: ADR-0003
+  language_and_package_layout: ADR-0008
   server_instance_model: ADR-0004
   contract_and_generation_boundary: ADR-0005
   first_runtime_proof_slice: ADR-0006
+  client_protocol_and_wire_format: ADR-0009
+  dependency_adoption: ADR-0010
 
 architecture_scope:
-  framework_standard: language_neutral
-  first_reference_implementation: typescript_node
+  framework_standard: agent_native_language_portable
+  first_reference_implementation: go
   current_phase: runtime_readiness
   implementation_code_status: not_started
+  previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
-  language: TypeScript
-  platform: Node.js
-  package_manager: npm
-  test_runner: node_builtin_test_runner
-  typecheck: typescript_no_emit
-  dependency_policy: minimal_initial_dependencies
-  current_scripts:
-    typecheck: npm run typecheck
-    test: npm test
-    repository_check: npm run check
-  module_system:
-    runtime_typescript: esm
-    tools_cli: commonjs
-    tools_cli_scope_file: tools/package.json
+  language: Go
+  platform: Go runtime
+  package_manager: go_modules
+  dependency_policy: explicit_adoption_record_for_foundational_dependencies
+  current_scripts: {}
+  planned_verification:
+    format: gofmt
+    vet: go vet ./...
+    tests: go test ./...
+    repository_check: node tools/vibit check all
   rationale:
-    - Existing repository tooling already uses Node.js.
-    - TypeScript gives agents explicit types and strong editor feedback.
-    - npm is available with Node.js and adds the least extra bootstrapping machinery for the first runtime package baseline.
-    - Node.js built-in tests keep the first runtime verification dependency-light.
-    - The ecosystem is practical for HTTP, WebSocket, schemas, tests, and code generation.
-    - The choice remains a reference implementation decision, not a permanent language lock.
+    - Go is a strong long-term server implementation language for concurrent network services.
+    - Go has a stable standard toolchain, simple deployment shape, and readable explicit error handling.
+    - Go aligns well with WebSocket servers, Protobuf message handling, and production operations.
+    - The choice is the ratified first server runtime direction, while vibit's architecture standard remains portable at the manifest and contract level.
+
+tooling_runtime:
+  current_cli:
+    language: JavaScript
+    platform: Node.js
+    dependency_policy: standard_library_only
+    role: architecture_checks_generators_and_inspection
+    not_server_runtime: true
 
 package_layout:
   intended_roots:
@@ -58,9 +64,20 @@ package_layout:
 server_instance_model:
   first_model: modular_monolith_single_process
   network_surface:
-    http_api: planned
-    websocket_api: planned_later
+    gameplay_client_protocol: websocket
+    wire_message_format: protobuf
+    http_api: later_health_admin_or_dev_tooling_only
     internal_commands: planned
+  protocol_rules:
+    - WebSocket is the first client gameplay protocol.
+    - Protobuf is the first wire message format for client/server messages.
+    - HTTP must not become the first gameplay API without a superseding decision.
+    - Transport adapters convert wire messages into commands and queries.
+    - Domain modules do not own WebSocket connections, Protobuf framing, or third-party network library details.
+  boundary_to_contract_model:
+    protobuf_role: wire_schema
+    manifest_role: business_semantics_source
+    consistency_requirement: tooling_must_check_manifest_proto_alignment_before_protocol_surface_grows
   boundaries:
     - Modules communicate through commands, queries, events, public module APIs, or generated clients.
     - Transport handlers adapt requests into commands or queries.
@@ -73,7 +90,12 @@ server_instance_model:
     - cloud_orchestration
 
 contract_model:
-  source_format: yaml_or_json_schema
+  source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  source_of_truth:
+    business_semantics: vibit_manifests_and_contract_sources
+    wire_messages: protobuf_files
+    required_alignment: checked_by_tooling
   public_contract_types:
     - commands
     - queries
@@ -81,8 +103,9 @@ contract_model:
     - errors
     - permissions
   generated_outputs:
-    - typed_contracts
-    - route_or_dispatch_shapes
+    - go_typed_contracts
+    - protobuf_message_shapes
+    - websocket_dispatch_shapes
     - clients_or_call_helpers
     - test_fixtures
   handwritten_outputs:
@@ -111,7 +134,8 @@ first_runtime_proof_slice:
     - Choose final persistence for all future modules.
 
 open_questions:
-  - Decide whether a future workspace layout should introduce runtime/ or packages/.
-  - Decide whether Node.js built-in tests remain enough after transport and persistence adapters exist.
-  - Choose schema source format after evaluating the first command/query/event contract.
+  - Decide whether the first Go workspace should use runtime/ only or split runtime/ and packages/.
+  - Choose the first WebSocket library through a dependency adoption record.
+  - Choose Protobuf tooling and generation layout through a dependency adoption record.
+  - Define the manifest-to-proto consistency check before broad protocol generation.
   - Decide whether initial persistence is in-memory only or includes a file-backed adapter.

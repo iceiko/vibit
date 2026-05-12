@@ -41,8 +41,8 @@ Runtime contract source files live under `contracts/inventory/` and are register
 
 Generated contract shapes:
 
-- `modules/inventory/generated/contracts/GrantItem.generated.ts`
-- `modules/inventory/generated/contracts/GetInventory.generated.ts`
+- Planned Go contract shapes for `GrantItem`, `GetInventory`, and `ItemGranted`
+- Planned Protobuf wire schemas for WebSocket client/server messages
 
 Before implementing the first runtime slice, read:
 
@@ -52,24 +52,21 @@ Before implementing the first runtime slice, read:
 - `contracts/inventory/errors/inventory_errors.yaml`
 - `contracts/inventory/permissions/inventory_permissions.yaml`
 
-The first handwritten runtime path is:
+The first handwritten runtime path is planned for Go under the future `runtime/` tree:
 
-- Command handler: `modules/inventory/commands/GrantItem.ts`
-- Query handler: `modules/inventory/queries/GetInventory.ts`
-- Repository: `modules/inventory/repositories/InMemoryInventoryRepository.ts`
-- Policies:
-  - `modules/inventory/policies/inventoryCapacityPolicy.ts`
-  - `modules/inventory/policies/inventoryPermissionPolicy.ts`
-- Tests:
-  - `modules/inventory/tests/GrantItem.test.ts`
-  - `modules/inventory/tests/GetInventory.test.ts`
+- Command handler: `runtime/internal/modules/inventory/commands/GrantItem`
+- Query handler: `runtime/internal/modules/inventory/queries/GetInventory`
+- Repository behind the inventory module boundary
+- Policies for inventory capacity and inventory permissions
+- Tests for command, query, event, permission, and invariant behavior
 
 ## Forbidden Shortcuts
 
 - Do not bypass boundaries declared in `module.yaml`.
 - Do not directly modify data owned by another module.
 - Do not add unregistered public commands, queries, events, or permissions.
-- Do not put inventory business rules in HTTP or transport handlers.
+- Do not put inventory business rules in WebSocket, HTTP, Protobuf, or transport handlers.
+- Do not make this module depend directly on third-party WebSocket or Protobuf libraries.
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
 - Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.
@@ -89,4 +86,4 @@ For the first runtime slice, tests should cover:
 - Permission failures use `INVENTORY_PERMISSION_DENIED`.
 - Architecture checks still pass.
 
-Run `node tools/vibit check runtime` after changing inventory runtime behavior.
+Run `node tools/vibit check runtime` after changing inventory runtime behavior. Before the Go runtime exists, runtime verification is not applicable.

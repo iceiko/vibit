@@ -1,0 +1,104 @@
+schema_version: 0.1
+change_id: ratify-go-websocket-protobuf-runtime
+date: 2026-05-12
+type: standard
+status: verified
+
+summary: Ratify Go, WebSocket, and Protobuf as the first server runtime direction and remove the misleading TypeScript runtime baseline.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - GrantItem
+    removed: []
+  queries:
+    added: []
+    changed:
+      - GetInventory
+    removed: []
+  events:
+    added: []
+    changed:
+      - ItemGranted
+    removed: []
+  errors:
+    added: []
+    changed:
+      - inventory_errors
+    removed: []
+  permissions:
+    added: []
+    changed:
+      - inventory_permissions
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/runtime.yaml
+    - .arch/contracts.yaml
+    - .arch/conventions.yaml
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - modules/inventory/module.yaml
+    - modules/inventory/AGENTS.md
+    - modules/inventory/AGENTS.zh-CN.md
+    - decisions/ADR-0003-first-reference-runtime-language.md
+    - decisions/ADR-0004-minimal-server-instance-model.md
+    - decisions/ADR-0007-yaml-contract-source-format.md
+    - decisions/ADR-0008-go-server-runtime-language.md
+    - decisions/ADR-0009-websocket-protobuf-client-protocol.md
+    - decisions/ADR-0010-foundational-dependency-adoption.md
+    - conversations/2026-05-12-go-websocket-protobuf-direction.md
+
+removed_artifacts:
+  - package.json
+  - package-lock.json
+  - tsconfig.json
+  - tools/package.json
+  - modules/inventory/commands/GrantItem.ts
+  - modules/inventory/queries/GetInventory.ts
+  - modules/inventory/repositories/InMemoryInventoryRepository.ts
+  - modules/inventory/policies/inventoryCapacityPolicy.ts
+  - modules/inventory/policies/inventoryPermissionPolicy.ts
+  - modules/inventory/tests/GrantItem.test.ts
+  - modules/inventory/tests/GetInventory.test.ts
+  - modules/inventory/generated/contracts/GrantItem.generated.ts
+  - modules/inventory/generated/contracts/GetInventory.generated.ts
+
+decisions:
+  - ADR-0003
+  - ADR-0004
+  - ADR-0007
+  - ADR-0008
+  - ADR-0009
+  - ADR-0010
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_contracts
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

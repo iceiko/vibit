@@ -42,8 +42,8 @@ Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `
 
 Generated contract shapes：
 
-- `modules/inventory/generated/contracts/GrantItem.generated.ts`
-- `modules/inventory/generated/contracts/GetInventory.generated.ts`
+- 计划中的 `GrantItem`、`GetInventory` 和 `ItemGranted` Go contract shapes
+- 计划中的 WebSocket client/server messages Protobuf wire schemas
 
 在实现第一条 runtime slice 前，应阅读：
 
@@ -53,24 +53,21 @@ Generated contract shapes：
 - `contracts/inventory/errors/inventory_errors.yaml`
 - `contracts/inventory/permissions/inventory_permissions.yaml`
 
-第一条 handwritten runtime 路径是：
+第一条 handwritten runtime 路径计划使用 Go，并位于未来的 `runtime/` 树下：
 
-- Command handler：`modules/inventory/commands/GrantItem.ts`
-- Query handler：`modules/inventory/queries/GetInventory.ts`
-- Repository：`modules/inventory/repositories/InMemoryInventoryRepository.ts`
-- Policies：
-  - `modules/inventory/policies/inventoryCapacityPolicy.ts`
-  - `modules/inventory/policies/inventoryPermissionPolicy.ts`
-- Tests：
-  - `modules/inventory/tests/GrantItem.test.ts`
-  - `modules/inventory/tests/GetInventory.test.ts`
+- Command handler：`runtime/internal/modules/inventory/commands/GrantItem`
+- Query handler：`runtime/internal/modules/inventory/queries/GetInventory`
+- 位于 inventory module boundary 后面的 repository
+- Inventory capacity 和 inventory permissions policies
+- 覆盖 command、query、event、permission 和 invariant behavior 的 tests
 
 ## Forbidden Shortcuts
 
 - 不要绕过 `module.yaml` 中声明的边界。
 - 不要直接修改其他模块拥有的数据。
 - 不要添加未登记的 public commands、queries、events 或 permissions。
-- 不要把 inventory business rules 放进 HTTP 或 transport handlers。
+- 不要把 inventory business rules 放进 WebSocket、HTTP、Protobuf 或 transport handlers。
+- 不要让本模块直接依赖第三方 WebSocket 或 Protobuf libraries。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。
@@ -90,4 +87,4 @@ Generated contract shapes：
 - Permission failure 使用 `INVENTORY_PERMISSION_DENIED`。
 - Architecture checks 仍然通过。
 
-修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。
+修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，runtime verification 不适用。

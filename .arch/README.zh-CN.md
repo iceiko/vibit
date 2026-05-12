@@ -35,9 +35,9 @@
 
 这是第一版草案。这些文件在实现代码存在前先描述预期形态。
 
-`runtime.yaml` 记录第一参考实现的 runtime readiness decisions。它指向约束第一语言、服务器实例模型、contract boundary 和 proof slice 的 Agent Decision Records。
+`runtime.yaml` 记录第一版 Go server runtime 方向的 runtime readiness decisions。它指向约束第一语言、服务器实例模型、contract boundary、client protocol、wire format、dependency adoption 和 proof slice 的 Agent Decision Records。
 
-`contracts.yaml` 登记 public command、query、event、error 和 permission contract source files。Contract files 位于 `contracts/` 下，是 source artifacts，不是 generated output。
+`contracts.yaml` 登记 public command、query、event、error 和 permission contract source files。Contract files 位于 `contracts/` 下，是 semantic source artifacts，不是 generated output。Protobuf wire schemas 计划位于 `proto/` 下，并且必须与这些 semantic contracts 对齐。
 
 ## 未来预期文件
 

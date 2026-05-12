@@ -77,14 +77,11 @@ Existing foundation:
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
-Runtime readiness decisions currently point to TypeScript on Node.js as the first reference implementation, a modular monolith single-process server model, contract-first commands/queries/events/errors/permissions, and `inventory` as the preferred first proof slice. Read `.arch/runtime.yaml` and `ADR-0003` through `ADR-0006` before creating runtime implementation code.
+Runtime readiness decisions currently point to Go as the first server runtime implementation language, WebSocket as the first gameplay/client protocol, Protobuf as the first wire message format, a modular monolith single-process server model, contract-first commands/queries/events/errors/permissions, and `inventory` as the preferred first proof slice. Read `.arch/runtime.yaml`, `ADR-0004` through `ADR-0010`, and note that `ADR-0003` is superseded before creating runtime implementation code.
 
 Current executable tooling:
 
 ```bash
-npm run typecheck
-npm test
-npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -106,7 +103,6 @@ node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
 node tools/vibit inspect rules
 node tools/vibit inspect rules --category <category>
-node tools/vibit generate contract --module <module> --type <type> --id <id>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -118,13 +114,7 @@ node tools/vibit generate module <module>
 
 Use `node tools/vibit check all` as the default repository verification command when CLI tooling is available.
 
-Use npm scripts for the current TypeScript package baseline:
-
-- `npm run typecheck` runs no-emit TypeScript checks for runtime files.
-- `npm test` runs Node.js built-in module runtime tests.
-- `npm run check` runs `node tools/vibit check all`.
-
-Root TypeScript runtime files are ESM. `tools/package.json` keeps the existing `tools/vibit` CLI in CommonJS scope.
+The current CLI is Node.js standard-library tooling only. Do not treat CLI implementation language as the server runtime language.
 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
@@ -136,11 +126,9 @@ Use `node tools/vibit check contracts` when contract source files or `.arch/cont
 
 Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
 
-Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. This check runs TypeScript typecheck before runtime tests when the package baseline exists.
+Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
-
-Use `node tools/vibit generate contract --module <module> --type <type> --id <id>` to regenerate declared contract shapes from contract source files instead of hand-editing generated output.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
 
@@ -152,7 +140,7 @@ Use `node tools/vibit inspect rule <rule-id>` when only one rule's metadata is n
 
 Use `node tools/vibit inspect rules --category <category>` to discover rules by category.
 
-Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, and first proof slice.
+Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, client protocol, dependency adoption, and first proof slice.
 
 ## 4. Documentation Rules
 
@@ -247,6 +235,8 @@ Use `docs/agent-decision-record.md` as the source standard for `decisions/`.
 When a decision affects long-term architecture, generated file conventions, module ownership, or a rejected plausible alternative, create or update an Agent Decision Record. Keep rationale concise and public; do not store hidden chain-of-thought.
 
 Generated files are immutable to non-system agents. If generated output is wrong, change the source schema, template, or generator unless a change spec or decision record explicitly grants a `generated_file_override`.
+
+For the server runtime, Go is the first implementation language. WebSocket is the first gameplay/client protocol. Protobuf is the first wire message format. Domain modules must not depend directly on third-party transport or protocol libraries; platform adapters own those dependencies behind vibit-owned interfaces.
 
 Use `docs/schema-validation.md` as the source standard for `schema/`.
 

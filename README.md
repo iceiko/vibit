@@ -40,7 +40,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/README.md`: machine-readable architecture manifest entry point
 - `.arch/modules.yaml`: first draft module registry manifest
 - `.arch/conventions.yaml`: first draft repository convention manifest
-- `.arch/runtime.yaml`: runtime readiness manifest for the first reference implementation
+- `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
 - `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
@@ -65,7 +65,9 @@ English documents are canonical. Simplified Chinese translations are maintained 
 vibit should evolve toward:
 
 - Architecture manifests under `.arch/`
-- A first TypeScript/Node.js reference runtime governed by `.arch/runtime.yaml` and Agent Decision Records
+- A first Go server runtime governed by `.arch/runtime.yaml` and Agent Decision Records
+- WebSocket as the first gameplay/client protocol
+- Protobuf as the first client/server wire message format
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
@@ -93,9 +95,6 @@ tools/vibit
 Initial commands:
 
 ```bash
-npm run typecheck
-npm test
-npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -116,7 +115,6 @@ node tools/vibit inspect change bootstrap-vibit-cli
 node tools/vibit inspect memory
 node tools/vibit inspect rule check.subcheck
 node tools/vibit inspect rules --category check
-node tools/vibit generate contract --module inventory --type command --id GrantItem
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -126,14 +124,7 @@ node tools/vibit check module inventory --json
 node tools/vibit generate module <module>
 ```
 
-The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks and module skeleton generation, not a server runtime.
-
-The current TypeScript package baseline is intentionally small:
-
-- `npm run typecheck` runs no-emit TypeScript checks for current runtime files.
-- `npm test` runs Node.js built-in tests for module runtime behavior.
-- `npm run check` runs `node tools/vibit check all`.
-- Root runtime TypeScript is ESM. `tools/package.json` keeps the existing `tools/vibit` CLI in CommonJS scope.
+The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks, inspection, and generators. It is not the server runtime and does not determine the server runtime language.
 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
 
@@ -145,11 +136,9 @@ Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
 
-Use `node tools/vibit check runtime` to run TypeScript typecheck and the current module runtime tests.
+Use `node tools/vibit check runtime` for server runtime verification. Before the Go runtime exists, this check reports that runtime implementation has not started. After Go runtime work begins, it should run the Go runtime test path.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
-
-Use `node tools/vibit generate contract --module <module> --type <type> --id <id>` to regenerate contract shapes from contract source files.
 
 Use `node tools/vibit inspect change <change-id>` to inspect a change spec directory and its verification metadata without manually opening every file.
 
@@ -161,7 +150,7 @@ Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsin
 
 Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
 
-The first reference runtime is TypeScript on Node.js, using a modular monolith single-process server model. This is a reference implementation decision, not a permanent restriction on the broader architecture standard. See `.arch/runtime.yaml` and `decisions/ADR-0003-first-reference-runtime-language.md` through `decisions/ADR-0006-first-runtime-proof-slice.md`.
+The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
 
 ## Early Reference Domain
 
@@ -176,7 +165,7 @@ Suggested modules:
 - Tasks or quests
 - Match sessions
 
-The demo should emphasize maintainability and agent workflow over feature count.
+The first backend slice should emphasize maintainability and agent workflow over feature count. It should still be treated as the beginning of a long-maintained system, not as disposable demo code.
 
 ## Governance
 

@@ -6,11 +6,12 @@ summary: Owns player inventory state, item grants, inventory reads, capacity rul
 
 decisions:
   - ADR-0001
-  - ADR-0003
+  - ADR-0008
   - ADR-0004
   - ADR-0005
   - ADR-0006
   - ADR-0007
+  - ADR-0009
 
 owns:
   entities:
@@ -99,17 +100,20 @@ invariants:
   - inventory_item_identity_must_be_stable
 
 generated:
-  files:
-    - generated/contracts/GrantItem.generated.ts
-    - generated/contracts/GetInventory.generated.ts
-  directories:
-    - generated/contracts
+  files: []
+  directories: []
   planned_outputs:
-    typed_contracts:
+    go_typed_contracts:
       - GrantItem
       - GetInventory
       - ItemGranted
-    dispatch_shapes:
+    protobuf_message_shapes:
+      - GrantItemRequest
+      - GrantItemResponse
+      - GetInventoryRequest
+      - GetInventoryResponse
+      - ItemGranted
+    websocket_dispatch_shapes:
       - inventory_command_dispatch
       - inventory_query_dispatch
     test_fixtures:
@@ -120,7 +124,9 @@ generated:
 
 contracts:
   registry: .arch/contracts.yaml
-  source_format: yaml
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  wire_schema_status: planned
   commands:
     GrantItem: contracts/inventory/commands/GrantItem.yaml
   queries:
@@ -148,13 +154,16 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: command_and_query_handlers_implemented
+  status: contracts_declared_runtime_not_started
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: in_memory_repository_is_acceptable_for_first_slice
-  runtime_implementation: grant_item_command_handler_and_get_inventory_query_handler
+  runtime_implementation: not_started
+  first_runtime_language: Go
+  first_client_protocol: WebSocket
+  first_wire_format: Protobuf
   non_goals:
     - full_item_catalog
     - player_account_lifecycle
@@ -172,7 +181,8 @@ tests:
     - invariant_tests
     - architecture_tests
   not_available_until_runtime:
+    - command_tests
+    - query_tests
+    - event_tests
     - runtime_invariant_tests
-  available:
-    - modules/inventory/tests/GrantItem.test.ts
-    - modules/inventory/tests/GetInventory.test.ts
+  available: []

@@ -40,7 +40,7 @@ vibit 从另一个前提出发：
 - `.arch/README.md`：机器可读 architecture manifest 入口
 - `.arch/modules.yaml`：第一版 module registry manifest 草案
 - `.arch/conventions.yaml`：第一版 repository convention manifest 草案
-- `.arch/runtime.yaml`：第一参考实现的 runtime readiness manifest
+- `.arch/runtime.yaml`：第一版 Go server runtime 方向的 runtime readiness manifest
 - `.arch/contracts.yaml`：public command、query、event、error 和 permission source files 的 contract registry
 - `docs/module-manifest.md`：module manifest 标准
 - `docs/module-manifest.zh-CN.md`：简体中文译本
@@ -65,7 +65,9 @@ vibit 从另一个前提出发：
 vibit 应逐步演进出：
 
 - `.arch/` 下的 architecture manifests
-- 由 `.arch/runtime.yaml` 和 Agent Decision Records 约束的第一版 TypeScript/Node.js reference runtime
+- 由 `.arch/runtime.yaml` 和 Agent Decision Records 约束的第一版 Go server runtime
+- WebSocket 作为第一版 gameplay/client protocol
+- Protobuf 作为第一版 client/server wire message format
 - `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
 - Contract-first 的 commands、queries、events、errors、permissions 和 migrations
@@ -93,9 +95,6 @@ tools/vibit
 初始命令：
 
 ```bash
-npm run typecheck
-npm test
-npm run check
 node tools/vibit --help
 node tools/vibit check all
 node tools/vibit check all --json
@@ -116,7 +115,6 @@ node tools/vibit inspect change bootstrap-vibit-cli
 node tools/vibit inspect memory
 node tools/vibit inspect rule check.subcheck
 node tools/vibit inspect rules --category check
-node tools/vibit generate contract --module inventory --type command --id GrantItem
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -126,14 +124,7 @@ node tools/vibit check module inventory --json
 node tools/vibit generate module <module>
 ```
 
-当前 CLI 只使用 Node.js standard-library APIs。它是 architecture checks 和 module skeleton generation 的 prototype，不是 server runtime。
-
-当前 TypeScript package baseline 有意保持很小：
-
-- `npm run typecheck` 对当前 runtime files 运行 no-emit TypeScript checks。
-- `npm test` 使用 Node.js built-in tests 运行 module runtime behavior tests。
-- `npm run check` 运行 `node tools/vibit check all`。
-- 根 runtime TypeScript 使用 ESM。`tools/package.json` 让现有 `tools/vibit` CLI 保持在 CommonJS scope 内。
+当前 CLI 只使用 Node.js standard-library APIs。它是 architecture checks、inspection 和 generators 的 prototype，不是 server runtime，也不决定 server runtime language。
 
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。面向人类的文本输出仍是默认行为。
 
@@ -145,11 +136,9 @@ node tools/vibit generate module <module>
 
 使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
 
-使用 `node tools/vibit check runtime` 可以运行 TypeScript typecheck 和当前 module runtime tests。
+使用 `node tools/vibit check runtime` 做 server runtime verification。在 Go runtime 尚不存在前，该检查会报告 runtime implementation 尚未开始；当 Go runtime work 开始后，它应运行 Go runtime test path。
 
 使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>` 可以在 agent intake 阶段以 JSON 查询单个已登记 command、query、event、error catalog 或 permission catalog。
-
-使用 `node tools/vibit generate contract --module <module> --type <type> --id <id>` 可以从 contract source files 重新生成 contract shapes。
 
 使用 `node tools/vibit inspect change <change-id>` 可以查询 change spec 目录及其 verification metadata，而不必手动打开每个文件。
 
@@ -161,7 +150,7 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 
 使用 `node tools/vibit inspect rules` 或 `node tools/vibit inspect rules --category <category>` 可以发现可用 rules。
 
-第一参考 runtime 使用 TypeScript on Node.js，并采用 modular monolith single-process server model。这是 reference implementation decision，不是对更广义 architecture standard 的永久限制。见 `.arch/runtime.yaml` 以及 `decisions/ADR-0003-first-reference-runtime-language.md` 到 `decisions/ADR-0006-first-runtime-proof-slice.md`。
+第一版 server runtime 方向是 Go，并采用 modular monolith single-process server model。WebSocket 是第一版 gameplay/client protocol，Protobuf 是第一版 client/server wire format。Semantic business contracts 仍然保留在 vibit manifests 和 contract source files 中；Protobuf 负责 wire schema shape。见 `.arch/runtime.yaml`、`decisions/ADR-0008-go-server-runtime-language.md` 和 `decisions/ADR-0009-websocket-protobuf-client-protocol.md`。
 
 ## 早期参考领域
 
@@ -176,7 +165,7 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 - Tasks or quests
 - Match sessions
 
-Demo 应强调 maintainability 和 agent workflow，而不是功能数量。
+第一条 backend slice 应强调 maintainability 和 agent workflow，而不是功能数量。但它仍应被视为长期维护系统的起点，而不是一次性 demo code。
 
 ## 治理
 

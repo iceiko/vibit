@@ -1,11 +1,12 @@
 # ADR-0003: First Reference Runtime Language
 
-Status: Accepted  
+Status: Superseded
 Date: 2026-05-12  
 Decision Makers: Maintainer, Agent  
 Related changes:
 
 - `changes/2026-05-12-add-runtime-readiness-decisions/`
+- `changes/2026-05-12-ratify-go-websocket-protobuf-runtime/`
 
 Related conversations:
 
@@ -16,6 +17,11 @@ Related artifacts:
 - `.arch/runtime.yaml`
 - `README.md`
 - `AGENTS.md`
+- `decisions/ADR-0008-go-server-runtime-language.md`
+
+Superseded by:
+
+- `ADR-0008`
 
 ## Context
 
@@ -25,9 +31,13 @@ The existing repository tooling is a Node.js standard-library CLI. No production
 
 ## Decision
 
-The first reference implementation will use TypeScript on Node.js.
+This decision is superseded.
 
-The broader vibit architecture standard remains language-neutral. TypeScript is the first proof vehicle, not a permanent restriction on future runtimes.
+The earlier decision selected TypeScript on Node.js as the first reference implementation. That selection was made without enough explicit maintainer confirmation for a major architecture choice.
+
+The ratified first server runtime implementation language is now Go, as recorded in `ADR-0008`.
+
+The broader vibit architecture standard remains portable at the manifest, contract, generation, and verification levels. JavaScript/Node.js may remain useful for repository tooling, but it is not the server runtime direction unless a future ADR explicitly says so.
 
 Initial dependency policy is conservative: start with the smallest dependency set that can support contracts, generation, tests, and server behavior. Do not add a major framework dependency until a change spec explains why the first slice needs it.
 
@@ -41,13 +51,15 @@ Initial dependency policy is conservative: start with the smallest dependency se
 
 ## Rationale
 
-TypeScript gives agents readable types, fast local feedback, practical schema tooling, and a broad backend ecosystem. It also aligns with the current `tools/vibit` implementation, which reduces bootstrapping friction.
+TypeScript would have given agents readable types, fast local feedback, practical schema tooling, and a broad backend ecosystem. It also aligned with the current `tools/vibit` implementation, which reduced bootstrapping friction.
 
-The decision is deliberately scoped to the first reference implementation. A successful TypeScript slice should prove the agent-native workflow. It should not prevent future adapters, generators, or runtime implementations in other languages.
+That reasoning was not sufficient for a server runtime decision because it weighted existing tooling convenience too heavily. The server runtime is a long-term product architecture choice, not a side effect of the bootstrap CLI implementation.
+
+Go is now preferred because vibit is intended to become a long-lived server framework with a serious network runtime, WebSocket-first gameplay protocol support, Protobuf wire messages, and production-oriented deployment expectations.
 
 ## Agent Reasoning Summary
 
-The most useful next step is to make one runtime path concrete while keeping the architectural standard portable. TypeScript balances agent readability, code generation friendliness, test ergonomics, and current repository momentum better than the alternatives for the first proof.
+The useful lesson from this superseded decision is procedural: major runtime choices must be discussed with the maintainer before being accepted. Existing tooling can inform a decision, but it cannot silently ratify the server architecture.
 
 ## Decision Weights
 
@@ -58,22 +70,22 @@ decision_weights:
   implementation_cost: medium
   reversibility: high
   long_term_maintainability: high
-confidence: high
+confidence: superseded
 ```
 
 ## Consequences
 
-- The first runtime package layout should assume TypeScript and Node.js.
-- Runtime scaffolding should avoid dependencies that make the framework hard to inspect or generate.
-- Documentation should describe TypeScript as the first reference implementation, not as the whole project identity.
-- Future language implementations may exist if they preserve the same contracts, manifests, generated boundaries, and verification expectations.
+- Do not use this ADR as authority for new server implementation work.
+- Treat the TypeScript runtime slice and npm package baseline as historical artifacts that were removed from the mainline direction.
+- Keep the Node.js CLI classified as tooling only.
+- Use `ADR-0008` for the first server runtime language.
 
 ## Reversal Conditions
 
-Revisit this decision if the first runtime slice shows that TypeScript prevents clear contracts, reliable verification, simple deployment, or agent-safe maintainability.
+This decision has already been reversed by maintainer discussion and `ADR-0008`.
 
 ## Follow-Up
 
-- Define the first TypeScript package layout when runtime scaffolding starts.
-- Choose the package manager and test runner only when they are needed by executable runtime code.
-- Keep `.arch/runtime.yaml` updated as runtime decisions become more precise.
+- Keep this ADR for historical traceability.
+- Do not relabel removed TypeScript runtime work as the server runtime direction.
+- Update conversation logs and change specs when future agents encounter this superseded context.

@@ -7,6 +7,7 @@ decision_refs:
   - ADR-0005
   - ADR-0006
   - ADR-0007
+  - ADR-0009
 
 summary: Read a player's inventory without mutating state.
 
@@ -66,9 +67,10 @@ authorization:
   requires_permission: inventory_read
 
 implementation:
-  handwritten_extension_point: modules/inventory/queries/GetInventory
+  handwritten_extension_point: runtime/internal/modules/inventory/queries/GetInventory
   generated_outputs:
-    - typed_contract
-    - query_dispatch_shape
+    - go_typed_contract
+    - protobuf_message_shape
+    - websocket_query_dispatch_shape
     - test_fixture
-  runtime_status: implemented
+  runtime_status: not_started

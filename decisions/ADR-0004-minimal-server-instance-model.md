@@ -6,6 +6,7 @@ Decision Makers: Maintainer, Agent
 Related changes:
 
 - `changes/2026-05-12-add-runtime-readiness-decisions/`
+- `changes/2026-05-12-ratify-go-websocket-protobuf-runtime/`
 
 Related conversations:
 
@@ -16,6 +17,7 @@ Related artifacts:
 - `.arch/runtime.yaml`
 - `.arch/modules.yaml`
 - `CONSTITUTION.md`
+- `decisions/ADR-0009-websocket-protobuf-client-protocol.md`
 
 ## Context
 
@@ -34,20 +36,27 @@ The runtime should distinguish these responsibilities:
 - Domain modules own state, policies, invariants, and public contracts.
 - A platform layer owns shared runtime concerns such as transport, storage adapters, event dispatch, generated clients, and verification hooks.
 
-The first instance may support HTTP first. WebSocket, realtime sessions, distributed actors, multi-process clustering, and orchestration are deferred until contracts and module boundaries are proven in a smaller shape.
+The first instance uses WebSocket as the gameplay/client protocol and Protobuf as the wire message format, as recorded in `ADR-0009`.
+
+HTTP is deferred to later health checks, admin APIs, development tooling, gateway integration, or observability. It is not the first gameplay/client API.
+
+Realtime sessions are allowed as part of the WebSocket protocol surface, but distributed actors, multi-process clustering, and orchestration are still deferred until contracts, module boundaries, and protocol adapters are proven in a smaller shape.
 
 ## Alternatives Considered
 
 - Distributed actor model from the beginning.
 - Microservices from the beginning.
 - A pure library without a server process.
-- A game-server-specific realtime runtime as the first shape.
+- HTTP as the first gameplay/client API.
+- A distributed game-server-specific realtime runtime as the first shape.
 
 ## Rationale
 
 A modular monolith keeps the first proof understandable while still forcing the important boundaries: commands, queries, events, permissions, errors, modules, generated files, and tests.
 
 This shape is also more agent-friendly at the start. Agents can inspect one process, one repository, and explicit module boundaries without reasoning about deployment topology, network partitions, service discovery, or distributed consistency before those concerns have earned their place.
+
+WebSocket first does not require a distributed runtime first. The first implementation can still keep transport adapters, application dispatch, domain modules, and platform services explicit inside one process.
 
 ## Agent Reasoning Summary
 
@@ -71,6 +80,7 @@ confidence: high
 - Cross-module communication must still use declared commands, queries, events, public module APIs, or generated clients.
 - Performance and distribution concerns are valid later, but they should not dominate the first proof slice.
 - The first module tests should run without requiring distributed infrastructure.
+- Transport tests may include WebSocket message adaptation, but domain behavior must still be tested behind module-owned handlers and interfaces.
 
 ## Reversal Conditions
 

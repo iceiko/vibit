@@ -84,16 +84,33 @@ templates:
 runtime_readiness:
   manifest: .arch/runtime.yaml
   decisions:
-    language_and_package_layout: ADR-0003
+    superseded_language_decision: ADR-0003
+    language_and_package_layout: ADR-0008
     server_instance_model: ADR-0004
     contract_and_generation_boundary: ADR-0005
     first_runtime_proof_slice: ADR-0006
+    client_protocol_and_wire_format: ADR-0009
+    dependency_adoption: ADR-0010
+
+server_runtime:
+  first_reference_language: Go
+  package_manager: go_modules
+  gameplay_client_protocol: websocket
+  wire_message_format: protobuf
+  tooling_cli_language: JavaScript
+  tooling_cli_is_server_runtime: false
 
 contracts:
   registry: .arch/contracts.yaml
   source_root: contracts
-  source_format: yaml
+  source_format: vibit_manifest_yaml
   source_format_decision: ADR-0007
+  wire_schema_root: proto
+  wire_schema_format: protobuf
+  wire_schema_decision: ADR-0009
+  source_of_truth:
+    business_semantics: contracts
+    wire_messages: proto
   contract_types:
     - commands
     - queries

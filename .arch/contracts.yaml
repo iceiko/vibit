@@ -5,10 +5,25 @@ purpose: >
   Registry of public runtime contracts declared before implementation.
 
 contract_source_format:
-  format: yaml
+  format: vibit_manifest_yaml
   decision: ADR-0007
   payload_shape: json_schema_like
   source_root: contracts
+  semantic_source_of_truth: true
+
+wire_schema_format:
+  format: protobuf
+  decision: ADR-0009
+  source_root: proto
+  status: planned
+  role: client_server_wire_messages
+  source_of_truth_for_wire_shape: true
+
+source_alignment:
+  semantic_contracts: contracts
+  wire_schemas: proto
+  rule: Protobuf wire schemas must align with vibit semantic contracts before protocol generation becomes broad.
+  check_status: planned
 
 rules:
   - id: contracts_before_implementation
@@ -16,10 +31,13 @@ rules:
     description: Public commands, queries, events, errors, and permissions must be declared before handwritten runtime behavior uses them.
   - id: contract_source_is_not_generated
     level: required
-    description: Contract YAML files are source artifacts and must not be treated as generated output.
+    description: Contract manifest files are semantic source artifacts and must not be treated as generated output.
   - id: generated_output_traces_to_contract
     level: required
     description: Generated types, validators, dispatch shapes, clients, and fixtures must trace back to contract source files.
+  - id: protobuf_aligns_with_semantic_contract
+    level: planned
+    description: Protobuf wire messages must align with registered commands, queries, events, errors, permissions, and module ownership.
 
 modules:
   inventory:
@@ -29,6 +47,7 @@ modules:
       - ADR-0005
       - ADR-0006
       - ADR-0007
+      - ADR-0009
     commands:
       - id: GrantItem
         path: contracts/inventory/commands/GrantItem.yaml

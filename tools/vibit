@@ -31,7 +31,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.declared",
   "generated.exists",
   "generated.trace",
-  "runtime.typecheck_result",
+  "runtime.not_started",
   "runtime.test_file",
   "runtime.test_result",
   "change.directory_match",
@@ -87,7 +87,6 @@ Usage:
   vibit inspect rule <rule-id>
   vibit inspect rules
   vibit inspect rules --category <category>
-  vibit generate contract --module <module> --type <type> --id <id>
   vibit generate module <module>
 
 Commands:
@@ -96,7 +95,7 @@ Commands:
   check memory             Check conversation logs and decision records.
   check contracts          Check contract registry and source files.
   check generated          Check generated files declared by module manifests.
-  check runtime            Run current runtime tests.
+  check runtime            Run current runtime checks when implementation exists.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -107,7 +106,6 @@ Commands:
   inspect memory           Print project memory indexes as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
-  generate contract        Generate a contract shape from a contract source file.
   generate module <module> Generate a minimal module skeleton.
 `;
 }
@@ -712,85 +710,6 @@ function objectPropertyKeysAfterPath(text, pathKeys) {
   return keys;
 }
 
-function objectPropertiesAfterPath(text, pathKeys) {
-  const lines = text.split(/\r?\n/);
-  let startIndex = -1;
-  let currentIndent = -1;
-
-  for (const key of pathKeys) {
-    let found = false;
-    for (let i = startIndex + 1; i < lines.length; i += 1) {
-      const line = lines[i];
-      const match = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*$/);
-      if (!match) {
-        continue;
-      }
-      const indent = match[1].length;
-      const name = match[2];
-      if (indent <= currentIndent && startIndex !== -1) {
-        break;
-      }
-      if (name === key) {
-        startIndex = i;
-        currentIndent = indent;
-        found = true;
-        break;
-      }
-    }
-    if (!found) {
-      return [];
-    }
-  }
-
-  const properties = [];
-  const propertyIndent = currentIndent + 2;
-  let current = null;
-  for (let i = startIndex + 1; i < lines.length; i += 1) {
-    const line = lines[i];
-    if (/^\S/.test(line)) {
-      break;
-    }
-    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_]+):\s*$/);
-    if (keyMatch) {
-      const indent = keyMatch[1].length;
-      if (indent <= currentIndent) {
-        break;
-      }
-      if (indent === propertyIndent) {
-        current = {
-          name: keyMatch[2],
-          type: null,
-          constValue: null,
-          arrayItemProperties: [],
-          arrayItemRequired: [],
-          indent,
-        };
-        properties.push(current);
-        continue;
-      }
-    }
-    if (!current) {
-      continue;
-    }
-    const typeMatch = line.match(/^(\s*)type:\s+(.+?)\s*$/);
-    if (typeMatch && typeMatch[1].length === current.indent + 2) {
-      current.type = typeMatch[2].replace(/^["']|["']$/g, "");
-    }
-    const constMatch = line.match(/^(\s*)const:\s+(.+?)\s*$/);
-    if (constMatch && constMatch[1].length === current.indent + 2) {
-      current.constValue = constMatch[2].replace(/^["']|["']$/g, "");
-    }
-  }
-  for (const property of properties) {
-    delete property.indent;
-    if (property.type === "array") {
-      property.arrayItemProperties = objectPropertiesAfterPath(text, [...pathKeys, property.name, "items", "properties"]);
-      property.arrayItemRequired = listAfterPath(text, [...pathKeys, property.name, "items", "required"]);
-    }
-  }
-  return properties;
-}
-
 function listAfterPath(text, pathKeys) {
   const lines = text.split(/\r?\n/);
   let startIndex = -1;
@@ -1110,35 +1029,6 @@ function parseInspectContractArgs(args) {
   return parsed;
 }
 
-function parseContractCommandArgs(args) {
-  const parsed = { module: null, type: null, id: null };
-  for (let i = 0; i < args.length; i += 1) {
-    const arg = args[i];
-    if (arg === "--module") {
-      parsed.module = args[i + 1] || null;
-      i += 1;
-    } else if (arg === "--type") {
-      parsed.type = args[i + 1] || null;
-      i += 1;
-    } else if (arg === "--id") {
-      parsed.id = args[i + 1] || null;
-      i += 1;
-    } else {
-      return null;
-    }
-  }
-  if (!parsed.module || !/^[a-z][a-z0-9_]*$/.test(parsed.module)) {
-    return null;
-  }
-  if (!parsed.type || !normalizeContractType(parsed.type)) {
-    return null;
-  }
-  if (!parsed.id || !/^[A-Za-z][A-Za-z0-9_]*$/.test(parsed.id)) {
-    return null;
-  }
-  return parsed;
-}
-
 function normalizeContractType(value) {
   const normalized = {
     command: "commands",
@@ -1298,144 +1188,6 @@ function loadContractInspection(root, moduleName, requestedType, contractId) {
       ? "Contract is registered, sourced, and declared by the module manifest."
       : "Run `node tools/vibit check contracts --json` for full consistency failures before generating or implementing this contract.",
   };
-}
-
-function tsStringArray(values) {
-  return `[${values.map((value) => JSON.stringify(value)).join(", ")}]`;
-}
-
-function generatedContractPath(moduleName, contractType, contractId) {
-  const directories = {
-    commands: "contracts",
-    queries: "contracts",
-    events: "events",
-    errors: "errors",
-    permissions: "permissions",
-  };
-  return `modules/${moduleName}/generated/${directories[contractType] || "contracts"}/${contractId}.generated.ts`;
-}
-
-function contractTypeName(contractId, suffix) {
-  return `${contractId}${suffix}`;
-}
-
-function tsTypeForProperty(property, indent = "  ") {
-  if (property.constValue !== null) {
-    return JSON.stringify(property.constValue);
-  }
-  if (property.type === "array" && property.arrayItemProperties && property.arrayItemProperties.length > 0) {
-    const fields = property.arrayItemProperties
-      .map((itemProperty) => {
-        const optional = property.arrayItemRequired.includes(itemProperty.name) ? "" : "?";
-        return `${indent}  ${itemProperty.name}${optional}: ${tsTypeForProperty(itemProperty, `${indent}  `)};`;
-      })
-      .join("\n");
-    return `Array<{\n${fields}\n${indent}}>`;
-  }
-  const mapping = {
-    string: "string",
-    integer: "number",
-    number: "number",
-    boolean: "boolean",
-    object: "Record<string, unknown>",
-    array: "unknown[]",
-  };
-  return mapping[property.type] || "unknown";
-}
-
-function tsInterfaceFields(properties, required) {
-  return properties
-    .map((property) => {
-      const optional = required.includes(property.name) ? "" : "?";
-      return `  ${property.name}${optional}: ${tsTypeForProperty(property, "  ")};`;
-    })
-    .join("\n");
-}
-
-function buildGeneratedContract(moduleName, contractType, contractId, sourcePath, sourceText) {
-  const inputProperties = objectPropertiesAfterPath(sourceText, ["input", "properties"]);
-  const inputFields = inputProperties.map((property) => property.name);
-  const inputRequired = listAfterPath(sourceText, ["input", "required"]);
-  const outputProperties = objectPropertiesAfterPath(sourceText, ["output", "properties"]);
-  const outputFields = outputProperties.map((property) => property.name);
-  const outputRequired = listAfterPath(sourceText, ["output", "required"]);
-  const emits = listAfterKey(sourceText, "emits");
-  const errors = listAfterKey(sourceText, "errors");
-  const invariants = listAfterKey(sourceText, "invariants");
-  const permission = firstScalar(sourceText, "permission");
-  const summary = firstScalar(sourceText, "summary") || "";
-  const kind = singularContractType(contractType);
-
-  return `// @generated by vibit. Do not edit by hand.
-// Source: ${sourcePath}
-// Generator: tools/vibit generate contract
-// Contract: ${moduleName}:${kind}:${contractId}
-
-export const ${contractId}Contract = {
-  schemaVersion: "0.1",
-  kind: "${kind}",
-  module: "${moduleName}",
-  name: "${contractId}",
-  status: "${firstScalar(sourceText, "status") || "draft"}",
-  summary: ${JSON.stringify(summary)},
-  permission: ${JSON.stringify(permission)},
-  input: {
-    required: ${tsStringArray(inputRequired)},
-    fields: ${tsStringArray(inputFields)},
-  },
-  output: {
-    required: ${tsStringArray(outputRequired)},
-    fields: ${tsStringArray(outputFields)},
-  },
-  emits: ${tsStringArray(emits)},
-  errors: ${tsStringArray(errors)},
-  invariants: ${tsStringArray(invariants)},
-} as const;
-
-export type ${contractTypeName(contractId, "InputField")} = typeof ${contractId}Contract.input.fields[number];
-export type ${contractTypeName(contractId, "OutputField")} = typeof ${contractId}Contract.output.fields[number];
-export type ${contractTypeName(contractId, "EmittedEvent")} = typeof ${contractId}Contract.emits[number];
-export type ${contractTypeName(contractId, "ErrorCode")} = typeof ${contractId}Contract.errors[number];
-
-export interface ${contractTypeName(contractId, "Input")} {
-${tsInterfaceFields(inputProperties, inputRequired)}
-}
-
-export interface ${contractTypeName(contractId, "Output")} {
-${tsInterfaceFields(outputProperties, outputRequired)}
-}
-`;
-}
-
-function generateContract(root, options) {
-  ensureName(options.module, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
-  ensureName(options.id, "contract id", /^[A-Za-z][A-Za-z0-9_]*$/, "PascalCase or snake_case identifier");
-
-  const contractType = normalizeContractType(options.type);
-  const inspection = loadContractInspection(root, options.module, contractType, options.id);
-  if (!inspection.registry.entry) {
-    console.error(`Unknown ${singularContractType(contractType)} contract ${options.module}:${options.id}`);
-    process.exit(1);
-  }
-  if (!["commands", "queries"].includes(contractType)) {
-    console.error("Only command and query contract generation is supported in this generator slice.");
-    process.exit(1);
-  }
-  if (!inspection.source.exists || !inspection.source.path) {
-    console.error(`Contract source is missing for ${options.module}:${options.id}`);
-    process.exit(1);
-  }
-
-  const sourcePath = inspection.source.path;
-  const sourceText = readText(path.join(root, sourcePath));
-  const outputPath = generatedContractPath(options.module, contractType, options.id);
-  const output = buildGeneratedContract(options.module, contractType, options.id, sourcePath, sourceText);
-  const absoluteOutput = path.join(root, outputPath);
-  fs.mkdirSync(path.dirname(absoluteOutput), { recursive: true });
-  fs.writeFileSync(absoluteOutput, output, "utf8");
-
-  console.log(`Generated ${outputPath}`);
-  console.log(`Source ${sourcePath}`);
 }
 
 function inspectContract(root, options) {
@@ -2207,13 +1959,13 @@ function checkContracts(root) {
   requireScalarValue(registry, registryPath, "status", ["draft", "active", "deprecated"]);
 
   const format = firstScalar(registry, "format");
-  if (format === "yaml") {
-    ok(`${registryPath} contract source format is yaml`, {
+  if (["yaml", "vibit_manifest_yaml"].includes(format)) {
+    ok(`${registryPath} contract source format is ${format}`, {
       rule_id: "contract.registry_declared",
       artifact: registryPath,
     });
   } else {
-    fail(`${registryPath} contract source format is not yaml`, {
+    fail(`${registryPath} contract source format is not vibit_manifest_yaml`, {
       rule_id: "contract.registry_declared",
       artifact: registryPath,
     });
@@ -2392,7 +2144,7 @@ function discoverRuntimeTestFiles(root) {
       continue;
     }
     for (const name of fs.readdirSync(testDir).sort()) {
-      if (/\.test\.ts$/.test(name)) {
+      if (/(_test\.go|\.test\.ts)$/.test(name)) {
         files.push(rel(root, path.join(testDir, name)));
       }
     }
@@ -2403,46 +2155,28 @@ function discoverRuntimeTestFiles(root) {
 function checkRuntime(root) {
   resetResults("check runtime");
   if (!jsonOutput) {
-    console.log(`Checking runtime tests in ${root}\n`);
+    console.log(`Checking runtime implementation in ${root}\n`);
   }
 
-  const packageJsonPath = path.join(root, "package.json");
-  if (fs.existsSync(packageJsonPath)) {
-    const typecheck = childProcess.spawnSync("npm", ["run", "typecheck", "--", "--pretty", "false"], {
-      cwd: root,
-      encoding: "utf8",
-      stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
+  const goModPath = path.join(root, "go.mod");
+  if (!fs.existsSync(goModPath)) {
+    ok("server runtime implementation has not started", {
+      rule_id: "runtime.not_started",
+      artifact: ".arch/runtime.yaml",
     });
-
-    if (!jsonOutput) {
-      if (typecheck.stdout) {
-        process.stdout.write(typecheck.stdout);
-      }
-      if (typecheck.stderr) {
-        process.stderr.write(typecheck.stderr);
-      }
-    }
-
-    if (typecheck.status === 0) {
-      ok("runtime typecheck passed", {
-        rule_id: "runtime.typecheck_result",
-        artifact: "package.json",
-      });
-    } else {
-      fail("runtime typecheck failed", {
-        rule_id: "runtime.typecheck_result",
-        artifact: "package.json",
-      });
-      finish();
-      return;
-    }
+    finish({
+      summary_counts: {
+        test_files: 0,
+      },
+    });
+    return;
   }
 
   const testFiles = discoverRuntimeTestFiles(root);
   if (testFiles.length === 0) {
     fail("no runtime test files found", {
       rule_id: "runtime.test_file",
-      artifact: "modules",
+      artifact: "runtime",
     });
     finish();
     return;
@@ -2455,7 +2189,7 @@ function checkRuntime(root) {
     });
   }
 
-  const result = childProcess.spawnSync(process.execPath, ["--experimental-strip-types", "--test", ...testFiles], {
+  const result = childProcess.spawnSync("go", ["test", "./..."], {
     cwd: root,
     encoding: "utf8",
     stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
@@ -2840,16 +2574,6 @@ function main() {
       process.exit(2);
     }
     generateModule(root, value);
-    return;
-  }
-
-  if (group === "generate" && command === "contract") {
-    const parsed = parseContractCommandArgs(args.slice(2));
-    if (!parsed) {
-      console.error("Usage: vibit generate contract --module <module> --type <type> --id <id>");
-      process.exit(2);
-    }
-    generateContract(root, parsed);
     return;
   }
 
