@@ -23,7 +23,9 @@ source_alignment:
   semantic_contracts: contracts
   wire_schemas: proto
   rule: Protobuf wire schemas must align with vibit semantic contracts before protocol generation becomes broad.
-  check_status: planned
+  check_status: active_planned_missing_allowed
+  check_command: node tools/vibit check protocol
+  missing_proto_rule: allowed_until_proto_files_exist_or_alignment_status_active
 
 rules:
   - id: contracts_before_implementation
@@ -36,7 +38,7 @@ rules:
     level: required
     description: Generated types, validators, dispatch shapes, clients, and fixtures must trace back to contract source files.
   - id: protobuf_aligns_with_semantic_contract
-    level: planned
+    level: required_when_proto_exists
     description: Protobuf wire messages must align with registered commands, queries, events, errors, permissions, and module ownership.
 
 modules:

@@ -118,6 +118,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check protocol
+node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check runtime
@@ -147,6 +149,8 @@ Each JSON check result item includes a stable `rule_id` and an `artifact` value 
 Use `node tools/vibit check memory` to verify required conversation log and Agent Decision Record structure.
 
 Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
+
+Use `node tools/vibit check protocol` to verify manifest-to-Protobuf alignment before adding or changing `.proto` files. While no `.proto` files exist, it reports planned protocol sources and messages; once `.proto` files exist, it checks package names, source traces, expected messages, and field names.
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
 

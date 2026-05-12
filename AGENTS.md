@@ -94,6 +94,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check protocol
+node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check runtime
@@ -126,6 +128,8 @@ Every JSON check result item should include `rule_id` and `artifact`. Treat `che
 Use `node tools/vibit check memory` when conversation logs or Agent Decision Records are added or changed.
 
 Use `node tools/vibit check contracts` when contract source files or `.arch/contracts.yaml` are added or changed.
+
+Use `node tools/vibit check protocol` before creating or changing `.proto` files, generated Protobuf output, or protocol generation rules. Missing `.proto` files may pass while protocol sources are still planned, but once a `.proto` file exists it must align with registered command, query, and event contracts.
 
 Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
 

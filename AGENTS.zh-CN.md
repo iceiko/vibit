@@ -95,6 +95,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check protocol
+node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check runtime
@@ -127,6 +129,8 @@ node tools/vibit generate module <module>
 当新增或修改 conversation logs 或 Agent Decision Records 时，使用 `node tools/vibit check memory`。
 
 当新增或修改 contract source files 或 `.arch/contracts.yaml` 时，使用 `node tools/vibit check contracts`。
+
+在创建或修改 `.proto` files、生成的 Protobuf output 或 protocol generation rules 前，使用 `node tools/vibit check protocol`。当 protocol sources 仍处于 planned 状态时，缺失 `.proto` files 可以通过；但一旦 `.proto` file 存在，它就必须与已登记的 command、query 和 event contracts 对齐。
 
 当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
 

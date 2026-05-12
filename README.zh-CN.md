@@ -118,6 +118,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check protocol
+node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check runtime
@@ -147,6 +149,8 @@ node tools/vibit generate module <module>
 使用 `node tools/vibit check memory` 可以验证 conversation logs 和 Agent Decision Records 的必需结构。
 
 使用 `node tools/vibit check contracts` 可以验证 `.arch/contracts.yaml` 与已登记 contract source files 的一致性。
+
+使用 `node tools/vibit check protocol` 可以在添加或修改 `.proto` files 前验证 manifest-to-Protobuf alignment。当还没有 `.proto` files 时，它会报告计划中的 protocol sources 和 messages；一旦 `.proto` files 存在，它会检查 package names、source traces、expected messages 和 field names。
 
 使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
 

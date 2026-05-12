@@ -172,6 +172,54 @@
       "agent_guidance": "Align the contract source, `.arch/contracts.yaml`, and `modules/<module>/module.yaml`."
     },
     {
+      "rule_id": "protocol.source_root",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol source root",
+      "description": "The Protobuf source root and expected module-level source paths must exist when required by the protocol alignment status.",
+      "agent_guidance": "Inspect `proto/`, `.arch/contracts.yaml`, and `.arch/runtime.yaml`; create the expected source directory or make the alignment status explicit before adding Protobuf files."
+    },
+    {
+      "rule_id": "protocol.planned_missing",
+      "category": "protocol",
+      "default_severity": "info",
+      "title": "Planned missing Protobuf source",
+      "description": "A registered contract has a planned Protobuf source or message, but missing `.proto` files are still allowed by the current alignment status.",
+      "agent_guidance": "Treat this as a planning signal. Before creating `.proto` files, run `node tools/vibit check protocol` and keep the new source aligned with the reported expected path and messages."
+    },
+    {
+      "rule_id": "protocol.package",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol package",
+      "description": "A Protobuf source file must declare the expected package for its owning module and version.",
+      "agent_guidance": "Use package `vibit.<module>.v1` for `proto/vibit/<module>/v1/<module>.proto` unless a later protocol ADR changes the layout."
+    },
+    {
+      "rule_id": "protocol.message",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol message",
+      "description": "A Protobuf source file must declare the expected wire messages for registered commands, queries, and events.",
+      "agent_guidance": "Add or correct messages generated from registered contract IDs, such as `<Command>Request`, `<Command>Response`, `<Query>Request`, `<Query>Response`, and event names."
+    },
+    {
+      "rule_id": "protocol.field",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol field",
+      "description": "A Protobuf source file must expose fields matching the registered semantic contract payload, input, and output property names.",
+      "agent_guidance": "Compare the failing field with the corresponding file under `contracts/<module>/` and update the Protobuf source or contract intentionally."
+    },
+    {
+      "rule_id": "protocol.source_trace",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol source trace",
+      "description": "A Protobuf source file must include trace metadata pointing back to the semantic contract sources it represents.",
+      "agent_guidance": "Add a source trace comment that references the relevant `contracts/` path or an `@source` marker before generated output is created."
+    },
+    {
       "rule_id": "generated.declared",
       "category": "generated",
       "default_severity": "error",

@@ -31,7 +31,7 @@ runtime/internal/generated/proto/
 
 ## Rules
 
-- 在相关 surface 的 manifest-to-Protobuf alignment rule 定义前，不要创建 `.proto` files。
+- 在创建或修改 `.proto` files 前，运行 `node tools/vibit check protocol`。
 - 不要手工编辑生成的 Go Protobuf output。
 - Protobuf package names、message names、service names 和 field names 使用英文。
 - Public wire schemas 必须显式 versioned。

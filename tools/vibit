@@ -28,6 +28,12 @@ const KNOWN_CHECK_RULE_IDS = [
   "contract.source_exists",
   "contract.source_field",
   "contract.source_match",
+  "protocol.source_root",
+  "protocol.planned_missing",
+  "protocol.package",
+  "protocol.message",
+  "protocol.field",
+  "protocol.source_trace",
   "generated.declared",
   "generated.exists",
   "generated.trace",
@@ -72,6 +78,8 @@ Usage:
   vibit check memory --json
   vibit check contracts
   vibit check contracts --json
+  vibit check protocol
+  vibit check protocol --json
   vibit check generated
   vibit check generated --json
   vibit check runtime
@@ -97,6 +105,7 @@ Commands:
   check schemas            Check schema files and critical artifact fields.
   check memory             Check conversation logs and decision records.
   check contracts          Check contract registry and source files.
+  check protocol           Check manifest-to-Protobuf alignment.
   check generated          Check generated files declared by module manifests.
   check runtime            Run current runtime checks when implementation exists.
   check architecture       Check required root architecture artifacts.
@@ -160,7 +169,7 @@ function readText(filePath) {
 }
 
 function printJson(value) {
-  process.stdout.write(`${JSON.stringify(value, null, 2)}\n`);
+  fs.writeSync(1, `${JSON.stringify(value, null, 2)}\n`);
 }
 
 function writeFileIfMissing(filePath, content) {
@@ -357,6 +366,20 @@ function summarizeSubcheckResult(item) {
     summary.path = item.path;
   }
   return summary;
+}
+
+function parseCheckResultSummary(stdout, args) {
+  const item = JSON.parse(stdout);
+  return {
+    schema_version: item.schema_version,
+    kind: item.kind,
+    project: item.project,
+    check: item.check || args.join(" "),
+    status: item.status,
+    summary: item.summary,
+    target: item.target,
+    path: item.path,
+  };
 }
 
 function finish(extra = {}) {
@@ -824,6 +847,159 @@ function parseContractEntries(registry, moduleName, contractType) {
   }
 
   return entries;
+}
+
+function discoverProtoFiles(root) {
+  const files = [];
+  const protoDir = path.join(root, "proto");
+  function walk(dir) {
+    if (!fs.existsSync(dir)) {
+      return;
+    }
+    for (const name of fs.readdirSync(dir).sort()) {
+      const fullPath = path.join(dir, name);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        walk(fullPath);
+      } else if (/\.proto$/.test(name)) {
+        files.push(rel(root, fullPath));
+      }
+    }
+  }
+  walk(protoDir);
+  return files;
+}
+
+function protoPackageForModule(moduleName) {
+  return `vibit.${moduleName}.v1`;
+}
+
+function protoSourcePathForModule(moduleName) {
+  return `proto/vibit/${moduleName}/v1/${moduleName}.proto`;
+}
+
+function expectedProtocolMessages(contractType, contractId) {
+  if (contractType === "commands") {
+    return [`${contractId}Request`, `${contractId}Response`];
+  }
+  if (contractType === "queries") {
+    return [`${contractId}Request`, `${contractId}Response`];
+  }
+  if (contractType === "events") {
+    return [contractId];
+  }
+  return [];
+}
+
+function expectedProtocolMessageSpecs(contractType, contractId, entryPath) {
+  if (contractType === "commands" || contractType === "queries") {
+    return [
+      {
+        name: `${contractId}Request`,
+        source_section: "input",
+        source: entryPath,
+      },
+      {
+        name: `${contractId}Response`,
+        source_section: "output",
+        source: entryPath,
+      },
+    ];
+  }
+  if (contractType === "events") {
+    return [
+      {
+        name: contractId,
+        source_section: "payload",
+        source: entryPath,
+      },
+    ];
+  }
+  return [];
+}
+
+function protoMessageBody(text, messageName) {
+  const messageMatch = new RegExp(`\\bmessage\\s+${messageName}\\s*\\{`, "m").exec(text);
+  if (!messageMatch) {
+    return null;
+  }
+  const bodyStart = messageMatch.index + messageMatch[0].length;
+  let depth = 1;
+  for (let i = bodyStart; i < text.length; i += 1) {
+    const char = text[i];
+    if (char === "{") {
+      depth += 1;
+    } else if (char === "}") {
+      depth -= 1;
+      if (depth === 0) {
+        return text.slice(bodyStart, i);
+      }
+    }
+  }
+  return null;
+}
+
+function nestedSectionLines(text, sectionKey) {
+  const lines = text.split(/\r?\n/);
+  const startIndex = lines.findIndex((line) => line.trim() === `${sectionKey}:`);
+  if (startIndex === -1) {
+    return [];
+  }
+  const indent = (lines[startIndex].match(/^(\s*)/) || [""])[0].length;
+  const body = [];
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (line.trim() === "") {
+      body.push(line);
+      continue;
+    }
+    const currentIndent = (line.match(/^(\s*)/) || [""])[0].length;
+    if (currentIndent <= indent) {
+      break;
+    }
+    body.push(line);
+  }
+  return body;
+}
+
+function propertyNamesFromSection(text, sectionKey) {
+  const lines = nestedSectionLines(text, sectionKey);
+  const propertiesIndex = lines.findIndex((line) => line.trim() === "properties:");
+  if (propertiesIndex === -1) {
+    return [];
+  }
+  const propertiesIndent = (lines[propertiesIndex].match(/^(\s*)/) || [""])[0].length;
+  const names = [];
+  for (let i = propertiesIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    const match = line.match(/^(\s*)([A-Za-z_][A-Za-z0-9_]*):\s*$/);
+    if (!match) {
+      continue;
+    }
+    const indent = match[1].length;
+    if (indent <= propertiesIndent) {
+      break;
+    }
+    if (indent === propertiesIndent + 2) {
+      names.push(match[2]);
+    }
+  }
+  return names;
+}
+
+function expectedProtocolFields(root, contractType, entry) {
+  if (!entry || !entry.path || !isFile(root, entry.path)) {
+    return [];
+  }
+  const text = readText(path.join(root, entry.path));
+  return expectedProtocolMessageSpecs(contractType, entry.id, entry.path).map((message) => ({
+    ...message,
+    fields: propertyNamesFromSection(text, message.source_section),
+  }));
+}
+
+function protocolAlignmentIsStrict(checkStatus) {
+  return checkStatus === "active";
 }
 
 function firstMarkdownField(text, fieldName) {
@@ -1406,6 +1582,7 @@ function runSubcheck(root, args) {
   const result = childProcess.spawnSync(process.execPath, [__filename, ...subcheckArgs], {
     cwd: root,
     encoding: "utf8",
+    maxBuffer: 1024 * 1024 * 16,
     stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "inherit",
   });
   if (result.error) {
@@ -1434,7 +1611,7 @@ function runSubcheck(root, args) {
   try {
     return {
       status: result.status || 0,
-      result: JSON.parse(result.stdout),
+      result: parseCheckResultSummary(result.stdout, args),
     };
   } catch (error) {
     return {
@@ -1463,7 +1640,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "generated"], ["check", "runtime"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "runtime"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -2050,6 +2227,193 @@ function checkContracts(root) {
   }
 
   finish();
+}
+
+function checkProtocol(root) {
+  resetResults("check protocol");
+  if (!jsonOutput) {
+    console.log(`Checking protocol alignment in ${root}\n`);
+  }
+
+  const registryPath = ".arch/contracts.yaml";
+  const protoRoot = "proto";
+  if (isDirectory(root, protoRoot)) {
+    ok("proto/ exists", {
+      rule_id: "protocol.source_root",
+      artifact: protoRoot,
+    });
+  } else {
+    fail("proto/ is missing", {
+      rule_id: "protocol.source_root",
+      artifact: protoRoot,
+    });
+    finish();
+    return;
+  }
+
+  if (!isFile(root, registryPath)) {
+    fail(`${registryPath} is missing`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+    finish();
+    return;
+  }
+
+  const registry = readText(path.join(root, registryPath));
+  const checkStatus = firstScalar(sectionBody(registry, "source_alignment").join("\n"), "check_status") || firstScalar(registry, "check_status");
+  const strictAlignment = protocolAlignmentIsStrict(checkStatus);
+  const protoFiles = discoverProtoFiles(root);
+  const plannedMissingAllowed = !strictAlignment && protoFiles.length === 0;
+  if (protoFiles.length === 0 && strictAlignment) {
+    fail("protocol alignment is active but no .proto files exist", {
+      rule_id: "protocol.source_root",
+      artifact: protoRoot,
+    });
+  } else if (plannedMissingAllowed) {
+    ok(`no .proto files yet; protocol alignment allows planned missing files (${checkStatus || "unspecified"})`, {
+      rule_id: "protocol.planned_missing",
+      artifact: protoRoot,
+    });
+  }
+
+  const contractTypes = ["commands", "queries", "events"];
+  let expectedMessages = 0;
+  for (const moduleName of discoverRegisteredModules(root)) {
+    const protoPath = protoSourcePathForModule(moduleName);
+    const packageName = protoPackageForModule(moduleName);
+    if (isDirectory(root, `proto/vibit/${moduleName}/v1`)) {
+      ok(`proto/vibit/${moduleName}/v1 exists`, {
+        rule_id: "protocol.source_root",
+        artifact: `proto/vibit/${moduleName}/v1`,
+      });
+    } else {
+      fail(`proto/vibit/${moduleName}/v1 is missing`, {
+        rule_id: "protocol.source_root",
+        artifact: `proto/vibit/${moduleName}/v1`,
+      });
+    }
+
+    const protoExists = isFile(root, protoPath);
+    const protoText = protoExists ? readText(path.join(root, protoPath)) : "";
+    if (protoExists) {
+      ok(`${protoPath} exists`, {
+        rule_id: "protocol.source_root",
+        artifact: protoPath,
+      });
+      if (protoText.includes(`package ${packageName};`)) {
+        ok(`${protoPath} declares package ${packageName}`, {
+          rule_id: "protocol.package",
+          artifact: protoPath,
+        });
+      } else {
+        fail(`${protoPath} does not declare package ${packageName}`, {
+          rule_id: "protocol.package",
+          artifact: protoPath,
+        });
+      }
+      if (protoText.includes("contracts/") || protoText.includes("@source")) {
+        ok(`${protoPath} declares contract source trace`, {
+          rule_id: "protocol.source_trace",
+          artifact: protoPath,
+        });
+      } else {
+        fail(`${protoPath} is missing contract source trace`, {
+          rule_id: "protocol.source_trace",
+          artifact: protoPath,
+        });
+      }
+    } else if (!plannedMissingAllowed) {
+      fail(`${protoPath} is missing while protocol source files are active`, {
+        rule_id: "protocol.source_root",
+        artifact: protoPath,
+      });
+    } else {
+      ok(`${protoPath} is planned but not created`, {
+        rule_id: "protocol.planned_missing",
+        artifact: protoPath,
+      });
+    }
+
+    for (const contractType of contractTypes) {
+      const entries = parseContractEntries(registry, moduleName, contractType);
+      for (const entry of entries) {
+        const messages = expectedProtocolMessages(contractType, entry.id);
+        expectedMessages += messages.length;
+        const declaredMessages = new Set();
+        for (const messageName of messages) {
+          if (!protoExists) {
+            ok(`${messageName} is planned in ${protoPath}`, {
+              rule_id: "protocol.planned_missing",
+              artifact: protoPath,
+            });
+            continue;
+          }
+          const messagePattern = new RegExp(`\\bmessage\\s+${messageName}\\b`);
+          if (messagePattern.test(protoText)) {
+            declaredMessages.add(messageName);
+            ok(`${protoPath} declares message ${messageName}`, {
+              rule_id: "protocol.message",
+              artifact: protoPath,
+            });
+          } else {
+            fail(`${protoPath} is missing message ${messageName}`, {
+              rule_id: "protocol.message",
+              artifact: protoPath,
+            });
+          }
+        }
+
+        if (protoExists) {
+          for (const message of expectedProtocolFields(root, contractType, entry)) {
+            if (!declaredMessages.has(message.name)) {
+              continue;
+            }
+            const messageBody = protoMessageBody(protoText, message.name);
+            if (messageBody === null) {
+              fail(`${protoPath} has malformed message ${message.name}`, {
+                rule_id: "protocol.message",
+                artifact: protoPath,
+              });
+              continue;
+            }
+            for (const fieldName of message.fields) {
+              const fieldPattern = new RegExp(`\\b${fieldName}\\s*=\\s*\\d+\\s*;`);
+              if (fieldPattern.test(messageBody)) {
+                ok(`${protoPath} ${message.name} declares field ${fieldName}`, {
+                  rule_id: "protocol.field",
+                  artifact: protoPath,
+                });
+              } else {
+                fail(`${protoPath} ${message.name} is missing field ${fieldName}`, {
+                  rule_id: "protocol.field",
+                  artifact: protoPath,
+                });
+              }
+            }
+            if (messageBody.includes(message.source) || messageBody.includes("@source") || protoText.includes(message.source)) {
+              ok(`${protoPath} ${message.name} declares source trace`, {
+                rule_id: "protocol.source_trace",
+                artifact: protoPath,
+              });
+            } else {
+              fail(`${protoPath} ${message.name} is missing source trace`, {
+                rule_id: "protocol.source_trace",
+                artifact: protoPath,
+              });
+            }
+          }
+        }
+      }
+    }
+  }
+
+  finish({
+    summary_counts: {
+      proto_files: protoFiles.length,
+      expected_messages: expectedMessages,
+    },
+  });
 }
 
 function checkGenerated(root) {
@@ -2660,6 +3024,11 @@ function main() {
 
   if (group === "check" && command === "contracts" && !value) {
     checkContracts(root);
+    return;
+  }
+
+  if (group === "check" && command === "protocol" && !value) {
+    checkProtocol(root);
     return;
   }
 

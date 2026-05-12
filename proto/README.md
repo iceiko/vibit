@@ -30,7 +30,7 @@ runtime/internal/generated/proto/
 
 ## Rules
 
-- Do not create `.proto` files before the manifest-to-Protobuf alignment rule is defined for the relevant surface.
+- Run `node tools/vibit check protocol` before creating or changing `.proto` files.
 - Do not hand-edit generated Go Protobuf output.
 - Keep Protobuf package names, message names, service names, and field names in English.
 - Version public wire schemas explicitly.

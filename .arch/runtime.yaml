@@ -126,6 +126,10 @@ server_instance_model:
     protobuf_role: wire_schema
     manifest_role: business_semantics_source
     consistency_requirement: tooling_must_check_manifest_proto_alignment_before_protocol_surface_grows
+  protocol_alignment:
+    check_command: node tools/vibit check protocol
+    status: active_for_planned_and_existing_proto_sources
+    missing_proto_files_allowed_until_generation_starts: true
   protobuf_layout:
     source_root: proto
     module_source_pattern: proto/vibit/<module>/v1
@@ -248,7 +252,6 @@ first_runtime_proof_slice:
     - Choose an S3 SDK or required object storage deployment.
 
 open_questions:
-  - Define the manifest-to-proto consistency check before broad protocol generation.
   - Decide whether the first repository implementation starts with a fake, PostgreSQL, or both.
   - Decide whether outbox storage is required before the first durable cross-boundary event delivery.
   - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.
