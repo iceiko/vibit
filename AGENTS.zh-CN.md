@@ -130,7 +130,7 @@ node tools/vibit generate module <module>
 
 当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
 
-当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。
+当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
 
@@ -148,7 +148,7 @@ node tools/vibit generate module <module>
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 
-创建 Go runtime 文件前，先阅读 `ADR-0014`。第一版 Go module 计划位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`。Process startup 放在 `runtime/cmd/vibit-server/`，application dispatch 和 composition 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain module logic 放在 `runtime/internal/modules/<module>/`，生成的 Go contract shapes 放在 `runtime/internal/generated/contracts/`，生成的 Go Protobuf output 放在 `runtime/internal/generated/proto/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录的 `proto/vibit/<module>/v1/`。
+修改 Go runtime 文件前，先阅读 `ADR-0014`。第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`。Process startup 放在 `runtime/cmd/vibit-server/`，application dispatch 和 composition 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain module logic 放在 `runtime/internal/modules/<module>/`，生成的 Go contract shapes 放在 `runtime/internal/generated/contracts/`，生成的 Go Protobuf output 放在 `runtime/internal/generated/proto/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录的 `proto/vibit/<module>/v1/`。
 
 ## 4. 文档规则
 

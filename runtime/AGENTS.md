@@ -1,0 +1,111 @@
+# Go Runtime Agent Guide
+
+Status: Draft v0.1
+Last updated: 2026-05-13
+Scope: `runtime/` Go server runtime workspace
+Canonical source: `../CONSTITUTION.md`, `../AGENTS.md`, and `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
+
+This guide applies to the first Go server runtime implementation.
+
+The paired Simplified Chinese translation is `runtime/AGENTS.zh-CN.md`. The English file is authoritative.
+
+## 1. Purpose
+
+`runtime/` is the first Go module for vibit's server runtime.
+
+The Go module path is:
+
+```text
+github.com/iceiko/vibit/runtime
+```
+
+The runtime exists to prove vibit's core claim through a small, long-lived backend slice:
+
+```text
+requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
+```
+
+Do not treat this workspace as a disposable demo.
+
+## 2. Required Reading
+
+Before changing files under `runtime/`, read:
+
+- `../CONSTITUTION.md`
+- `../AGENTS.md`
+- `../.arch/runtime.yaml`
+- `../.arch/dependencies.yaml`
+- `../.arch/contracts.yaml`
+- `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
+- The affected module manifest, such as `../modules/inventory/module.yaml`
+- The relevant change spec under `../changes/`
+
+## 3. Package Ownership
+
+Use these package boundaries:
+
+- `cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
+- `internal/app/`: command/query dispatch, application composition, and transaction orchestration.
+- `internal/platform/transport/ws/`: WebSocket transport adapter and `github.com/coder/websocket` ownership.
+- `internal/platform/protocol/protobuf/`: Protobuf framing, envelope conversion, and wire message adaptation.
+- `internal/platform/persistence/postgres/`: PostgreSQL adapter implementation and `github.com/jackc/pgx/v5` ownership.
+- `internal/platform/migrations/`: migration tooling invocation and validation.
+- `internal/platform/events/`: event recording and publication mechanisms.
+- `internal/platform/tx/`: transaction boundary and unit-of-work interfaces.
+- `internal/modules/<module>/`: handwritten domain module runtime logic.
+- `internal/generated/contracts/`: generated Go contract shapes.
+- `internal/generated/proto/`: generated Go Protobuf files.
+- `migrations/postgres/`: SQL-first PostgreSQL migration sources.
+
+## 4. Dependency Rules
+
+Domain modules must not import third-party transport, protocol, persistence, migration, object-storage, or framework dependencies directly.
+
+Allowed owner packages:
+
+- `github.com/coder/websocket`: `internal/platform/transport/ws/` only.
+- `google.golang.org/protobuf`: generated protocol packages and protocol adapter packages only.
+- `github.com/jackc/pgx/v5`: `internal/platform/persistence/postgres/` only.
+- `github.com/pressly/goose/v3`: `internal/platform/migrations/` only.
+
+Do not add new foundational dependencies without checking `../.arch/dependencies.yaml` and creating the required adoption record.
+
+## 5. Runtime Boundary Rules
+
+Transport handlers adapt requests into commands or queries. They must not hide business logic.
+
+State-changing commands should enter through `internal/app/` and run inside an application-owned unit of work. Repository mutations and domain event recording should happen inside that same unit of work.
+
+Query handlers should not mutate state and do not require a write transaction by default.
+
+Event publication outside the transaction remains deferred until vibit adopts an explicit event delivery or outbox standard.
+
+## 6. Generated Files
+
+Generated files are immutable to non-system agents.
+
+If generated output is wrong, change the source contract, schema, template, or generator. Do not hand-edit generated files unless a change spec or Agent Decision Record explicitly grants `generated_file_override`.
+
+## 7. Current State
+
+This runtime workspace is currently a skeleton.
+
+No Go source files, generated files, `.proto` files, migrations, or runtime tests are implemented yet.
+
+## 8. Verification
+
+Run repository verification from the repository root:
+
+```bash
+node tools/vibit check runtime
+node tools/vibit check all
+```
+
+When Go source files exist and the local Go toolchain is available, runtime verification should include:
+
+```bash
+go test ./...
+go vet ./...
+```
+
+Do not claim Go test verification when the Go toolchain is unavailable or tests were not run.

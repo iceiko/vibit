@@ -204,6 +204,30 @@
       "agent_guidance": "Do not create runtime code only to satisfy this check; add Go runtime verification when implementation begins."
     },
     {
+      "rule_id": "runtime.go_mod",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime Go module",
+      "description": "The Go runtime module file must exist at the ADR-0014 path and declare the accepted module path.",
+      "agent_guidance": "Use `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime` unless a superseding ADR changes the runtime layout."
+    },
+    {
+      "rule_id": "runtime.skeleton",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime skeleton",
+      "description": "The Go runtime skeleton must include the package boundary roots declared by ADR-0014.",
+      "agent_guidance": "Create missing runtime or proto skeleton directories before adding runtime implementation code."
+    },
+    {
+      "rule_id": "runtime.toolchain",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime Go toolchain",
+      "description": "After Go source files exist, runtime verification requires a local Go toolchain.",
+      "agent_guidance": "Install or expose the Go toolchain, then rerun `node tools/vibit check runtime`."
+    },
+    {
       "rule_id": "runtime.test_file",
       "category": "runtime",
       "default_severity": "error",

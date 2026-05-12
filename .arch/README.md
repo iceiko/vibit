@@ -52,7 +52,7 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
 
-No Go runtime implementation code has started yet. When it starts, agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages.
+The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages.
 
 ## Expected Future Files
 

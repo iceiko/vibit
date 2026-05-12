@@ -32,6 +32,9 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.exists",
   "generated.trace",
   "runtime.not_started",
+  "runtime.go_mod",
+  "runtime.skeleton",
+  "runtime.toolchain",
   "runtime.test_file",
   "runtime.test_result",
   "change.directory_match",
@@ -1588,6 +1591,8 @@ function checkArchitecture(root) {
     "rules",
     "schema",
     "tools",
+    "runtime",
+    "proto",
   ]);
 
   requireFiles(root, [
@@ -1601,6 +1606,11 @@ function checkArchitecture(root) {
     "decisions/_template/adr-agent.md",
     "docs/_templates/dependency-adoption.md",
     "decisions/ADR-0001-agent-native-maintainability.md",
+    "runtime/go.mod",
+    "runtime/AGENTS.md",
+    "runtime/AGENTS.zh-CN.md",
+    "proto/README.md",
+    "proto/README.zh-CN.md",
   ]);
 
   checkTextIncludes(root, ".arch/conventions.yaml", "project_name: vibit");
@@ -1619,6 +1629,7 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/dependencies.yaml", "governing_decision: ADR-0010");
   checkTextIncludes(root, ".arch/dependencies.yaml", "postgresql_driver:");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
+  checkTextIncludes(root, "runtime/go.mod", "module github.com/iceiko/vibit/runtime");
 
   finish();
 }
@@ -2141,22 +2152,44 @@ function checkGenerated(root) {
 }
 
 function discoverRuntimeTestFiles(root) {
-  const modulesDir = path.join(root, "modules");
-  if (!fs.existsSync(modulesDir)) {
-    return [];
-  }
   const files = [];
-  for (const moduleName of discoverRegisteredModules(root)) {
-    const testDir = path.join(modulesDir, moduleName, "tests");
-    if (!fs.existsSync(testDir)) {
-      continue;
+  const runtimeDir = path.join(root, "runtime");
+  function walk(dir) {
+    if (!fs.existsSync(dir)) {
+      return;
     }
-    for (const name of fs.readdirSync(testDir).sort()) {
-      if (/(_test\.go|\.test\.ts)$/.test(name)) {
-        files.push(rel(root, path.join(testDir, name)));
+    for (const name of fs.readdirSync(dir).sort()) {
+      const fullPath = path.join(dir, name);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        walk(fullPath);
+      } else if (/_test\.go$/.test(name)) {
+        files.push(rel(root, fullPath));
       }
     }
   }
+  walk(runtimeDir);
+  return files;
+}
+
+function discoverRuntimeGoFiles(root) {
+  const files = [];
+  const runtimeDir = path.join(root, "runtime");
+  function walk(dir) {
+    if (!fs.existsSync(dir)) {
+      return;
+    }
+    for (const name of fs.readdirSync(dir).sort()) {
+      const fullPath = path.join(dir, name);
+      const stat = fs.statSync(fullPath);
+      if (stat.isDirectory()) {
+        walk(fullPath);
+      } else if (/\.go$/.test(name)) {
+        files.push(rel(root, fullPath));
+      }
+    }
+  }
+  walk(runtimeDir);
   return files;
 }
 
@@ -2166,7 +2199,7 @@ function checkRuntime(root) {
     console.log(`Checking runtime implementation in ${root}\n`);
   }
 
-  const goModPath = path.join(root, "go.mod");
+  const goModPath = path.join(root, "runtime", "go.mod");
   if (!fs.existsSync(goModPath)) {
     ok("server runtime implementation has not started", {
       rule_id: "runtime.not_started",
@@ -2174,6 +2207,66 @@ function checkRuntime(root) {
     });
     finish({
       summary_counts: {
+        test_files: 0,
+      },
+    });
+    return;
+  }
+
+  const goModText = readText(goModPath);
+  if (goModText.includes("module github.com/iceiko/vibit/runtime")) {
+    ok("runtime/go.mod declares module github.com/iceiko/vibit/runtime", {
+      rule_id: "runtime.go_mod",
+      artifact: "runtime/go.mod",
+    });
+  } else {
+    fail("runtime/go.mod does not declare module github.com/iceiko/vibit/runtime", {
+      rule_id: "runtime.go_mod",
+      artifact: "runtime/go.mod",
+    });
+  }
+
+  for (const runtimePath of [
+    "runtime/AGENTS.md",
+    "runtime/AGENTS.zh-CN.md",
+    "runtime/cmd/vibit-server",
+    "runtime/internal/app",
+    "runtime/internal/platform/transport/ws",
+    "runtime/internal/platform/protocol/protobuf",
+    "runtime/internal/platform/persistence/postgres",
+    "runtime/internal/platform/migrations",
+    "runtime/internal/platform/events",
+    "runtime/internal/platform/tx",
+    "runtime/internal/modules/inventory",
+    "runtime/internal/generated/contracts/inventory",
+    "runtime/internal/generated/proto",
+    "runtime/migrations/postgres",
+    "proto/README.md",
+    "proto/README.zh-CN.md",
+    "proto/vibit/inventory/v1",
+  ]) {
+    if (exists(root, runtimePath)) {
+      ok(`${runtimePath} exists`, {
+        rule_id: "runtime.skeleton",
+        artifact: runtimePath,
+      });
+    } else {
+      fail(`${runtimePath} is missing`, {
+        rule_id: "runtime.skeleton",
+        artifact: runtimePath,
+      });
+    }
+  }
+
+  const goFiles = discoverRuntimeGoFiles(root);
+  if (goFiles.length === 0) {
+    ok("runtime skeleton has no Go source files yet", {
+      rule_id: "runtime.skeleton",
+      artifact: "runtime",
+    });
+    finish({
+      summary_counts: {
+        go_files: 0,
         test_files: 0,
       },
     });
@@ -2197,8 +2290,27 @@ function checkRuntime(root) {
     });
   }
 
+  const goTool = childProcess.spawnSync("go", ["version"], {
+    cwd: path.join(root, "runtime"),
+    encoding: "utf8",
+    stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
+  });
+  if (goTool.status !== 0) {
+    fail("Go toolchain is unavailable", {
+      rule_id: "runtime.toolchain",
+      artifact: "go",
+    });
+    finish({
+      summary_counts: {
+        go_files: goFiles.length,
+        test_files: testFiles.length,
+      },
+    });
+    return;
+  }
+
   const result = childProcess.spawnSync("go", ["test", "./..."], {
-    cwd: root,
+    cwd: path.join(root, "runtime"),
     encoding: "utf8",
     stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
   });
@@ -2226,6 +2338,7 @@ function checkRuntime(root) {
 
   finish({
     summary_counts: {
+      go_files: goFiles.length,
       test_files: testFiles.length,
     },
   });

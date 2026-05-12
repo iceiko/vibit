@@ -129,7 +129,7 @@ Use `node tools/vibit check contracts` when contract source files or `.arch/cont
 
 Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
 
-Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started.
+Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
 
@@ -147,7 +147,7 @@ Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readin
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 
-Use `ADR-0014` before creating Go runtime files. The first Go module is planned at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`. Keep process startup under `runtime/cmd/vibit-server/`, application dispatch and composition under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain module logic under `runtime/internal/modules/<module>/`, generated Go contract shapes under `runtime/internal/generated/contracts/`, generated Go Protobuf output under `runtime/internal/generated/proto/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/vibit/<module>/v1/`.
+Use `ADR-0014` before changing Go runtime files. The first Go module lives at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`. Keep process startup under `runtime/cmd/vibit-server/`, application dispatch and composition under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain module logic under `runtime/internal/modules/<module>/`, generated Go contract shapes under `runtime/internal/generated/contracts/`, generated Go Protobuf output under `runtime/internal/generated/proto/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/vibit/<module>/v1/`.
 
 ## 4. Documentation Rules
 

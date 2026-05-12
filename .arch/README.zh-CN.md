@@ -53,7 +53,7 @@
 
 S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-Go runtime implementation code 尚未开始。当它开始时，agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。
+第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。
 
 ## 未来预期文件
 

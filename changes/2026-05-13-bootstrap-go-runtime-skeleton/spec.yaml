@@ -1,0 +1,84 @@
+schema_version: 0.1
+change_id: bootstrap-go-runtime-skeleton
+date: 2026-05-13
+type: standard
+status: verified
+
+summary: Create the first Go runtime skeleton and align runtime verification with ADR-0014.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/conventions.yaml
+    - .arch/runtime.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - proto/README.md
+    - proto/README.zh-CN.md
+    - conversations/2026-05-13-go-runtime-skeleton.md
+    - changes/2026-05-13-bootstrap-go-runtime-skeleton/
+
+tooling:
+  changed:
+    - tools/vibit
+    - rules/check-rules.json
+
+decisions:
+  - ADR-0008
+  - ADR-0009
+  - ADR-0013
+  - ADR-0014
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node_check_tools
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_contracts
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - check_change
+    - diff_check
+    - secret_scan
+  status: Verified

@@ -76,7 +76,7 @@ vibit should evolve toward:
 - `google.golang.org/protobuf`, `protoc-gen-go`, and Buf CLI as the first Protobuf tooling stack
 - `github.com/jackc/pgx/v5` as the first PostgreSQL driver behind platform persistence adapters
 - `github.com/pressly/goose/v3` as the first SQL-first migration tooling
-- A first Go module planned at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
+- A first Go module at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
 - Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
 - SQL-first PostgreSQL migration source files under `runtime/migrations/postgres/`
@@ -150,7 +150,7 @@ Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
 
-Use `node tools/vibit check runtime` for server runtime verification. Before the Go runtime exists, this check reports that runtime implementation has not started. After Go runtime work begins, it should run the Go runtime test path.
+Use `node tools/vibit check runtime` for server runtime verification. Before the Go runtime exists, this check reports that runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, it verifies the ADR-0014 skeleton. Once Go source files exist, it must discover Go test files and run the Go runtime test path.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
 
@@ -170,7 +170,7 @@ PostgreSQL is the first authoritative durable relational store for runtime state
 
 The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
 
-The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. Runtime code has not started yet, but future Go files should follow these boundaries:
+The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime skeleton exists, but server business code has not started yet. Future Go files should follow these boundaries:
 
 - `runtime/cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
 - `runtime/internal/app/`: command/query dispatch, application composition, and transaction orchestration.
@@ -179,6 +179,8 @@ The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout
 - `runtime/internal/generated/`: generated Go contract and Protobuf output.
 
 State-changing commands should run inside an application-owned unit of work before repository mutation and domain-event recording. Event publication outside the transaction is deferred until vibit adopts an explicit event delivery or outbox standard.
+
+`node tools/vibit check runtime` currently verifies the skeleton. Once Go source files exist, it must also discover Go test files and run the Go runtime test path.
 
 ## Early Reference Domain
 

@@ -22,8 +22,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: runtime_readiness
-  implementation_code_status: not_started
+  current_phase: runtime_skeleton
+  implementation_code_status: skeleton_created_no_business_logic
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -83,7 +83,7 @@ package_layout:
   go_module:
     path: github.com/iceiko/vibit/runtime
     location: runtime/go.mod
-    status: planned_not_created
+    status: created
   package_owners:
     runtime/cmd/vibit-server: process_startup_configuration_and_lifecycle
     runtime/internal/app: command_query_dispatch_application_composition_and_transaction_orchestration
@@ -133,6 +133,7 @@ server_instance_model:
     buf_generation_config: buf.gen.yaml
     generated_go_output: runtime/internal/generated/proto
     generated_go_output_status: planned_not_created
+    source_root_status: skeleton_created
     registry_required_before_broad_generation: true
   boundaries:
     - Modules communicate through commands, queries, events, public module APIs, or generated clients.
@@ -186,7 +187,7 @@ persistence_model:
     source_root: runtime/migrations/postgres
     default_style: sql_first
     go_migrations_allowed: only_with_change_spec
-    status: planned_not_created
+    status: skeleton_created_no_migrations
   transaction_boundary:
     decision: ADR-0014
     owner: runtime/internal/platform/tx
@@ -232,6 +233,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
+  skeleton_status: created_no_business_logic
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.
