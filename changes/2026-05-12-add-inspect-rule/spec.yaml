@@ -1,0 +1,60 @@
+schema_version: 0.1
+change_id: add-inspect-rule
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add a CLI command for inspecting check rule metadata by rule ID.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added:
+      - vibit inspect rule <rule-id>
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - Unknown rule ID exits non-zero with a clear message
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - schema/inspect-output.schema.json
+    - tools/vibit
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - inspect_rule_json
+    - inspect_rule_missing
+    - check_all_text
+    - check_all_json
+    - secret_scan
+  status: Verified

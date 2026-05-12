@@ -35,6 +35,25 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "catalog", "rule"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "rule_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "rule": {
+          "type": "object",
+          "required": ["rule_id", "category", "default_severity", "title", "description", "agent_guidance"]
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "check", "status", "summary", "results"],
       "properties": {
         "schema_version": {

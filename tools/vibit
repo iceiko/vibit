@@ -50,6 +50,7 @@ Usage:
   vibit check change <change-id> --json
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
+  vibit inspect rule <rule-id>
   vibit generate module <module>
 
 Commands:
@@ -60,6 +61,7 @@ Commands:
   check change <change-id> Check a change spec directory.
   inspect module <module>  Print module metadata as JSON.
   inspect boundary         Print boundary metadata as JSON.
+  inspect rule <rule-id>   Print check rule metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
 `;
 }
@@ -657,6 +659,15 @@ function loadModuleInfo(root, moduleName) {
   return info;
 }
 
+function loadRuleCatalog(root) {
+  const catalogPath = path.join(root, "rules", "check-rules.json");
+  const catalog = JSON.parse(readText(catalogPath));
+  return {
+    path: rel(root, catalogPath),
+    catalog,
+  };
+}
+
 function inspectModule(root, moduleName) {
   checkName(moduleName, "module", /^[a-z][a-z0-9_]*$/, "snake_case");
   printJson({
@@ -718,6 +729,29 @@ function inspectBoundary(root, fromModule, toModule) {
       : allowed
         ? "Dependency is declared as allowed."
         : "Dependency is undeclared; update manifests or ask before coupling modules.",
+  });
+}
+
+function inspectRule(root, ruleId) {
+  checkName(ruleId, "rule-id", /^[a-z][a-z0-9_.-]*$/, "dotted rule id");
+  const { path: catalogPath, catalog } = loadRuleCatalog(root);
+  const rule = Array.isArray(catalog.rules)
+    ? catalog.rules.find((item) => item.rule_id === ruleId)
+    : null;
+  if (!rule) {
+    console.error(`Unknown rule_id: ${ruleId}`);
+    process.exit(1);
+  }
+  printJson({
+    schema_version: "0.1",
+    kind: "rule_inspection",
+    project: "vibit",
+    catalog: {
+      name: catalog.catalog,
+      path: catalogPath,
+      status: catalog.status,
+    },
+    rule,
   });
 }
 
@@ -1372,6 +1406,11 @@ function main() {
 
   if (group === "inspect" && command === "module" && value && !extra) {
     inspectModule(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "rule" && value && !extra) {
+    inspectRule(root, value);
     return;
   }
 

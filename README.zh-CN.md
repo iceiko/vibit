@@ -96,6 +96,7 @@ node tools/vibit check schemas
 node tools/vibit check schemas --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
+node tools/vibit inspect rule check.subcheck
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -112,6 +113,8 @@ node tools/vibit generate module <module>
 每条 JSON check result item 都包含稳定的 `rule_id` 和 `artifact`，让 agent 不必解析自然语言就能定位失败原因和相关产物。`check all --json` 是紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
 
 Check output 的 rule metadata 位于 `rules/check-rules.json`。
+
+使用 `node tools/vibit inspect rule <rule-id>` 可以查询单条 rule，而不必解析整个 catalog。
 
 服务器实现语言和整体服务器实例架构目前有意保持开放。它们应在仓库标准和工具链足够强、可以评估 tradeoffs 后，通过 change specs 决定。
 

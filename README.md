@@ -96,6 +96,7 @@ node tools/vibit check schemas
 node tools/vibit check schemas --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
+node tools/vibit inspect rule check.subcheck
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -112,6 +113,8 @@ Use `--json` when an agent needs machine-readable check results during intake, v
 Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
 
 Rule metadata for check output lives in `rules/check-rules.json`.
+
+Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsing the full catalog.
 
 The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
 
