@@ -33,6 +33,15 @@ const KNOWN_CHECK_RULE_IDS = [
   "check.subcheck",
 ];
 
+const CHANGE_SPEC_REQUIRED_FILES = [
+  "request.md",
+  "spec.yaml",
+  "impact.md",
+  "plan.md",
+  "checklist.md",
+  "verification.md",
+];
+
 function usage() {
   return `vibit ${VERSION}
 
@@ -50,6 +59,7 @@ Usage:
   vibit check change <change-id> --json
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
+  vibit inspect change <change-id>
   vibit inspect rule <rule-id>
   vibit inspect rules
   vibit inspect rules --category <category>
@@ -63,6 +73,7 @@ Commands:
   check change <change-id> Check a change spec directory.
   inspect module <module>  Print module metadata as JSON.
   inspect boundary         Print boundary metadata as JSON.
+  inspect change           Print change spec metadata as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
@@ -798,6 +809,58 @@ function inspectRules(root, options) {
   });
 }
 
+function inspectChange(root, changeId) {
+  checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
+
+  const dir = changeDirectory(root, changeId);
+  const specPath = path.join(dir, "spec.yaml");
+  const existsOnDisk = fs.existsSync(dir) && fs.statSync(dir).isDirectory();
+  const specExists = fs.existsSync(specPath) && fs.statSync(specPath).isFile();
+  const files = {};
+  for (const file of CHANGE_SPEC_REQUIRED_FILES) {
+    const target = path.join(dir, file);
+    files[file] = fs.existsSync(target) && fs.statSync(target).isFile();
+  }
+
+  const change = {
+    change_id: changeId,
+    declared_change_id: null,
+    exists: existsOnDisk,
+    path: rel(root, dir),
+    spec: rel(root, specPath),
+    spec_exists: specExists,
+    date: null,
+    type: null,
+    status: null,
+    summary: null,
+    affected_modules: [],
+    verification: {
+      required: [],
+      status: null,
+    },
+    files,
+  };
+
+  if (specExists) {
+    const spec = readText(specPath);
+    change.declared_change_id = firstScalar(spec, "change_id");
+    change.date = firstScalar(spec, "date");
+    change.type = firstScalar(spec, "type");
+    change.status = firstScalar(spec, "status");
+    change.summary = firstScalar(spec, "summary");
+    change.affected_modules = listAfterKey(spec, "affected_modules");
+    change.verification.required = listAfterPath(spec, ["verification", "required"]);
+    change.verification.status = firstScalar(sectionBody(spec, "verification").join("\n"), "status");
+  }
+
+  printJson({
+    schema_version: "0.1",
+    kind: "change_inspection",
+    project: "vibit",
+    change,
+  });
+}
+
 function runSubcheck(root, args) {
   if (!jsonOutput) {
     console.log(`\n==> vibit ${args.join(" ")}\n`);
@@ -1137,16 +1200,7 @@ function checkChange(root, changeId) {
     return;
   }
 
-  const required = [
-    "request.md",
-    "spec.yaml",
-    "impact.md",
-    "plan.md",
-    "checklist.md",
-    "verification.md",
-  ];
-
-  for (const file of required) {
+  for (const file of CHANGE_SPEC_REQUIRED_FILES) {
     const target = path.join(dir, file);
     if (fs.existsSync(target) && fs.statSync(target).isFile()) {
       ok(`${rel(root, target)} exists`);
@@ -1449,6 +1503,11 @@ function main() {
 
   if (group === "inspect" && command === "module" && value && !extra) {
     inspectModule(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "change" && value && !extra) {
+    inspectChange(root, value);
     return;
   }
 

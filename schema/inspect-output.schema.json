@@ -35,6 +35,100 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "change"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "change_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "change": {
+          "type": "object",
+          "required": [
+            "change_id",
+            "declared_change_id",
+            "exists",
+            "path",
+            "spec",
+            "spec_exists",
+            "date",
+            "type",
+            "status",
+            "summary",
+            "affected_modules",
+            "verification",
+            "files"
+          ],
+          "properties": {
+            "change_id": {
+              "type": "string",
+              "pattern": "^[a-z0-9][a-z0-9-]*[a-z0-9]$"
+            },
+            "declared_change_id": {
+              "type": ["string", "null"]
+            },
+            "exists": {
+              "type": "boolean"
+            },
+            "path": {
+              "type": "string"
+            },
+            "spec": {
+              "type": "string"
+            },
+            "spec_exists": {
+              "type": "boolean"
+            },
+            "date": {
+              "type": ["string", "null"]
+            },
+            "type": {
+              "type": ["string", "null"]
+            },
+            "status": {
+              "type": ["string", "null"]
+            },
+            "summary": {
+              "type": ["string", "null"]
+            },
+            "affected_modules": {
+              "type": "array",
+              "items": {
+                "type": "string"
+              }
+            },
+            "verification": {
+              "type": "object",
+              "required": ["required", "status"],
+              "properties": {
+                "required": {
+                  "type": "array",
+                  "items": {
+                    "type": "string"
+                  }
+                },
+                "status": {
+                  "type": ["string", "null"]
+                }
+              }
+            },
+            "files": {
+              "type": "object",
+              "required": ["request.md", "spec.yaml", "impact.md", "plan.md", "checklist.md", "verification.md"],
+              "additionalProperties": {
+                "type": "boolean"
+              }
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "catalog", "rule"],
       "properties": {
         "schema_version": {
