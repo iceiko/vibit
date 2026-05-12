@@ -38,7 +38,15 @@
 - Repository：位于 module boundary 后面的 inventory persistence
 - Tests：command、query、event、contract、invariant 和 architecture tests
 
-Runtime schema files 和 generated files 还没有创建。在实现第一条 runtime slice 前，必须先声明 `GrantItem`、`GetInventory`、`ItemGranted`、inventory errors 和 inventory permissions 的 schemas。
+Runtime contract source files 现在位于 `contracts/inventory/` 下，并登记在 `.arch/contracts.yaml` 中。Generated files 还没有创建。
+
+在实现第一条 runtime slice 前，应阅读：
+
+- `contracts/inventory/commands/GrantItem.yaml`
+- `contracts/inventory/queries/GetInventory.yaml`
+- `contracts/inventory/events/ItemGranted.yaml`
+- `contracts/inventory/errors/inventory_errors.yaml`
+- `contracts/inventory/permissions/inventory_permissions.yaml`
 
 ## Forbidden Shortcuts
 
@@ -47,6 +55,7 @@ Runtime schema files 和 generated files 还没有创建。在实现第一条 ru
 - 不要添加未登记的 public commands、queries、events 或 permissions。
 - 不要把 inventory business rules 放进 HTTP 或 transport handlers。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
+- 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。
 - Grant flows 中不要使用负数或零数量。
 

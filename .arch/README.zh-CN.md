@@ -30,21 +30,19 @@
   modules.yaml
   conventions.yaml
   runtime.yaml
+  contracts.yaml
 ```
 
 这是第一版草案。这些文件在实现代码存在前先描述预期形态。
 
 `runtime.yaml` 记录第一参考实现的 runtime readiness decisions。它指向约束第一语言、服务器实例模型、contract boundary 和 proof slice 的 Agent Decision Records。
 
+`contracts.yaml` 登记 public command、query、event、error 和 permission contract source files。Contract files 位于 `contracts/` 下，是 source artifacts，不是 generated output。
+
 ## 未来预期文件
 
 ```text
 .arch/dependencies.yaml
-.arch/commands.yaml
-.arch/queries.yaml
-.arch/events.yaml
-.arch/errors.yaml
-.arch/permissions.yaml
 .arch/test-matrix.yaml
 .arch/generation.yaml
 ```
@@ -60,8 +58,9 @@
 3. 阅读 `.arch/modules.yaml`。
 4. 阅读 `.arch/conventions.yaml`。
 5. 在修改或创建 runtime implementation code 前，阅读 `.arch/runtime.yaml`。
-6. 在相关 module 存在时，阅读其 `module.yaml`。
-7. 当 public architecture 变化时，先更新 manifests，再实现。
+6. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
+7. 在相关 module 存在时，阅读其 `module.yaml`。
+8. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 

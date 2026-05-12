@@ -1,0 +1,77 @@
+schema_version: 0.1
+change_id: add-inventory-contracts
+date: 2026-05-12
+type: standard
+status: verified
+
+summary: Add first inventory runtime contract source files.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added:
+      - GrantItem
+    changed: []
+    removed: []
+  queries:
+    added:
+      - GetInventory
+    changed: []
+    removed: []
+  events:
+    added:
+      - ItemGranted
+    changed: []
+    removed: []
+  errors:
+    added:
+      - INVALID_ITEM_QUANTITY
+      - INVENTORY_CAPACITY_EXCEEDED
+      - INVENTORY_PERMISSION_DENIED
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - inventory_grant_item
+      - inventory_read
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/contracts.yaml
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/conventions.yaml
+    - modules/inventory/module.yaml
+    - modules/inventory/AGENTS.md
+    - modules/inventory/AGENTS.zh-CN.md
+    - decisions/ADR-0007-yaml-contract-source-format.md
+    - conversations/2026-05-12-inventory-contracts.md
+
+decisions:
+  - ADR-0005
+  - ADR-0006
+  - ADR-0007
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_module_inventory
+    - inspect_module_inventory
+    - check_memory
+    - contract_source_file_check
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

@@ -1,0 +1,64 @@
+schema_version: 0.1
+kind: event
+module: inventory
+name: ItemGranted
+status: draft
+decision_refs:
+  - ADR-0005
+  - ADR-0006
+  - ADR-0007
+
+summary: Fact emitted after an item quantity has been granted to an inventory.
+
+fact: >
+  A positive quantity of an item was granted to a player's inventory and the
+  resulting inventory quantity is now recorded by the inventory module.
+
+version: 1
+
+payload:
+  type: object
+  required:
+    - event_id
+    - occurred_at
+    - player_id
+    - item_id
+    - quantity
+    - new_quantity
+    - reason
+  properties:
+    event_id:
+      type: string
+      minLength: 1
+    occurred_at:
+      type: string
+      format: date-time
+    player_id:
+      type: string
+      minLength: 1
+    item_id:
+      type: string
+      minLength: 1
+    quantity:
+      type: integer
+      minimum: 1
+    new_quantity:
+      type: integer
+      minimum: 1
+    reason:
+      type: string
+      minLength: 1
+
+published_by:
+  command: GrantItem
+
+subscribers: []
+
+compatibility:
+  breaking_changes_require_new_version: true
+
+implementation:
+  generated_outputs:
+    - typed_event
+    - event_fixture
+  runtime_status: not_started

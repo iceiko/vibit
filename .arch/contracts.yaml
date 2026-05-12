@@ -1,0 +1,46 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Registry of public runtime contracts declared before implementation.
+
+contract_source_format:
+  format: yaml
+  decision: ADR-0007
+  payload_shape: json_schema_like
+  source_root: contracts
+
+rules:
+  - id: contracts_before_implementation
+    level: required
+    description: Public commands, queries, events, errors, and permissions must be declared before handwritten runtime behavior uses them.
+  - id: contract_source_is_not_generated
+    level: required
+    description: Contract YAML files are source artifacts and must not be treated as generated output.
+  - id: generated_output_traces_to_contract
+    level: required
+    description: Generated types, validators, dispatch shapes, clients, and fixtures must trace back to contract source files.
+
+modules:
+  inventory:
+    status: draft
+    module_manifest: modules/inventory/module.yaml
+    decisions:
+      - ADR-0005
+      - ADR-0006
+      - ADR-0007
+    commands:
+      - id: GrantItem
+        path: contracts/inventory/commands/GrantItem.yaml
+    queries:
+      - id: GetInventory
+        path: contracts/inventory/queries/GetInventory.yaml
+    events:
+      - id: ItemGranted
+        path: contracts/inventory/events/ItemGranted.yaml
+    errors:
+      - id: inventory_errors
+        path: contracts/inventory/errors/inventory_errors.yaml
+    permissions:
+      - id: inventory_permissions
+        path: contracts/inventory/permissions/inventory_permissions.yaml

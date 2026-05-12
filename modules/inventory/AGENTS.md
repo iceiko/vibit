@@ -37,7 +37,15 @@ If a requirement needs one of those concepts, create or update the owning module
 - Repository: inventory persistence behind the module boundary
 - Tests: command, query, event, contract, invariant, and architecture tests
 
-Runtime schema files and generated files are not created yet. Before implementing the first runtime slice, declare schemas for `GrantItem`, `GetInventory`, `ItemGranted`, inventory errors, and inventory permissions.
+Runtime contract source files now live under `contracts/inventory/` and are registered in `.arch/contracts.yaml`. Generated files are not created yet.
+
+Before implementing the first runtime slice, read:
+
+- `contracts/inventory/commands/GrantItem.yaml`
+- `contracts/inventory/queries/GetInventory.yaml`
+- `contracts/inventory/events/ItemGranted.yaml`
+- `contracts/inventory/errors/inventory_errors.yaml`
+- `contracts/inventory/permissions/inventory_permissions.yaml`
 
 ## Forbidden Shortcuts
 
@@ -46,6 +54,7 @@ Runtime schema files and generated files are not created yet. Before implementin
 - Do not add unregistered public commands, queries, events, or permissions.
 - Do not put inventory business rules in HTTP or transport handlers.
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
+- Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.
 - Do not use negative or zero item quantities in grant flows.
 

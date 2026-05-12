@@ -10,6 +10,7 @@ decisions:
   - ADR-0004
   - ADR-0005
   - ADR-0006
+  - ADR-0007
 
 owns:
   entities:
@@ -41,22 +42,28 @@ public_api:
   queries:
     - GetInventory
   command_schemas:
-    status: planned
+    status: declared
     required_before_implementation:
       - GrantItem
+    sources:
+      GrantItem: contracts/inventory/commands/GrantItem.yaml
   query_schemas:
-    status: planned
+    status: declared
     required_before_implementation:
       - GetInventory
+    sources:
+      GetInventory: contracts/inventory/queries/GetInventory.yaml
 
 events:
   publishes:
     - ItemGranted
   subscribes: []
   event_schemas:
-    status: planned
+    status: declared
     required_before_implementation:
       - ItemGranted
+    sources:
+      ItemGranted: contracts/inventory/events/ItemGranted.yaml
 
 errors:
   owns:
@@ -64,7 +71,12 @@ errors:
     - INVALID_ITEM_QUANTITY
     - INVENTORY_PERMISSION_DENIED
   schemas:
-    status: planned
+    status: declared
+    source: contracts/inventory/errors/inventory_errors.yaml
+
+permission_schemas:
+  status: declared
+  source: contracts/inventory/permissions/inventory_permissions.yaml
 
 dependencies:
   allowed: []
@@ -102,6 +114,18 @@ generated:
       - get_inventory_fixture
   immutable_to_non_system_agents: true
   override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  source_format: yaml
+  commands:
+    GrantItem: contracts/inventory/commands/GrantItem.yaml
+  queries:
+    GetInventory: contracts/inventory/queries/GetInventory.yaml
+  events:
+    ItemGranted: contracts/inventory/events/ItemGranted.yaml
+  errors: contracts/inventory/errors/inventory_errors.yaml
+  permissions: contracts/inventory/permissions/inventory_permissions.yaml
 
 handwritten:
   extension_points:

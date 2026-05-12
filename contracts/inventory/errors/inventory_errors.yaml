@@ -1,0 +1,43 @@
+schema_version: 0.1
+kind: error_catalog
+module: inventory
+status: draft
+decision_refs:
+  - ADR-0005
+  - ADR-0006
+  - ADR-0007
+
+summary: Error catalog for the first inventory proof slice.
+
+errors:
+  - code: INVALID_ITEM_QUANTITY
+    category: validation
+    retryable: false
+    message: Item quantity must be a positive integer.
+    used_by:
+      commands:
+        - GrantItem
+      queries: []
+  - code: INVENTORY_CAPACITY_EXCEEDED
+    category: invariant
+    retryable: false
+    message: Inventory capacity would be exceeded by this grant.
+    used_by:
+      commands:
+        - GrantItem
+      queries: []
+  - code: INVENTORY_PERMISSION_DENIED
+    category: authorization
+    retryable: false
+    message: Actor does not have permission to perform this inventory operation.
+    used_by:
+      commands:
+        - GrantItem
+      queries:
+        - GetInventory
+
+implementation:
+  generated_outputs:
+    - typed_error_codes
+    - error_test_fixtures
+  runtime_status: not_started
