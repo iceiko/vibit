@@ -54,6 +54,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/schema-validation.md`: schema validation standard
 - `docs/schema-validation.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
+- `rules/`: rule catalogs for machine-readable check metadata
 
 English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
 
@@ -71,6 +72,7 @@ vibit should evolve toward:
 - Conversation logs under `conversations/`, following `docs/conversation-log.md`
 - Agent Decision Records under `decisions/`, following `docs/agent-decision-record.md`
 - Schema validation under `schema/`, following `docs/schema-validation.md`
+- Rule catalogs under `rules/`, starting with `rules/check-rules.json`
 
 The first serious prototype should prove one claim:
 
@@ -108,6 +110,8 @@ The CLI currently uses Node.js standard-library APIs only. It is a prototype for
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
 
 Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
+
+Rule metadata for check output lives in `rules/check-rules.json`.
 
 The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
 

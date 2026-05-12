@@ -1,0 +1,48 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://vibit.dev/schema/rule-catalog.schema.json",
+  "title": "vibit Rule Catalog",
+  "type": "object",
+  "required": ["schema_version", "catalog", "status", "rules"],
+  "properties": {
+    "schema_version": {
+      "const": "0.1"
+    },
+    "catalog": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9_-]*$"
+    },
+    "status": {
+      "enum": ["draft", "active", "deprecated"]
+    },
+    "rules": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["rule_id", "category", "default_severity", "title", "description", "agent_guidance"],
+        "properties": {
+          "rule_id": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_.-]*$"
+          },
+          "category": {
+            "type": "string",
+            "pattern": "^[a-z][a-z0-9_-]*$"
+          },
+          "default_severity": {
+            "enum": ["info", "warning", "error"]
+          },
+          "title": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "agent_guidance": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  }
+}

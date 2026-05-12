@@ -54,6 +54,7 @@ vibit 从另一个前提出发：
 - `docs/schema-validation.md`：schema validation 标准
 - `docs/schema-validation.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
+- `rules/`：面向机器可读 check metadata 的 rule catalogs
 
 英文文档是权威版本。简体中文译本服务于人类阅读和早期项目讨论。
 
@@ -71,6 +72,7 @@ vibit 应逐步演进出：
 - `conversations/` 下遵循 `docs/conversation-log.md` 的 conversation logs
 - `decisions/` 下遵循 `docs/agent-decision-record.md` 的 Agent Decision Records
 - `schema/` 下遵循 `docs/schema-validation.md` 的 schema validation
+- `rules/` 下的 rule catalogs，首先是 `rules/check-rules.json`
 
 第一个严肃 prototype 应证明一个命题：
 
@@ -108,6 +110,8 @@ node tools/vibit generate module <module>
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。面向人类的文本输出仍是默认行为。
 
 每条 JSON check result item 都包含稳定的 `rule_id` 和 `artifact`，让 agent 不必解析自然语言就能定位失败原因和相关产物。`check all --json` 是紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
+
+Check output 的 rule metadata 位于 `rules/check-rules.json`。
 
 服务器实现语言和整体服务器实例架构目前有意保持开放。它们应在仓库标准和工具链足够强、可以评估 tradeoffs 后，通过 change specs 决定。
 

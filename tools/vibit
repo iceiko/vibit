@@ -6,6 +6,33 @@ const childProcess = require("child_process");
 
 const VERSION = "0.1.0";
 
+const KNOWN_CHECK_RULE_IDS = [
+  "argument.format",
+  "artifact.directory_exists",
+  "artifact.file_exists",
+  "artifact.required",
+  "artifact.text_includes",
+  "schema.json_parse",
+  "schema.declares_schema_uri",
+  "schema.declares_id",
+  "schema.title",
+  "artifact.declares_field",
+  "artifact.contains_field",
+  "markdown.section",
+  "module.registry_match",
+  "change.directory_match",
+  "change.verification_status",
+  "change.requested_id_match",
+  "module.directory_match",
+  "operator.guidance",
+  "generator.created_artifact",
+  "generator.artifact_already_exists",
+  "check.message",
+  "check.subcheck_spawn",
+  "check.subcheck_json_parse",
+  "check.subcheck",
+];
+
 function usage() {
   return `vibit ${VERSION}
 
@@ -348,6 +375,69 @@ function requireSchemaShape(root, relativePath, title) {
     ok(`${relativePath} title is ${title}`);
   } else {
     fail(`${relativePath} title does not match ${title}`);
+  }
+}
+
+function requireRuleCatalog(root, relativePath, expectedCatalog, expectedRuleIds) {
+  const catalog = requireJsonFile(root, relativePath);
+  if (!catalog) {
+    return;
+  }
+  if (catalog.schema_version === "0.1") {
+    ok(`${relativePath} declares schema_version: 0.1`);
+  } else {
+    fail(`${relativePath} is missing schema_version: 0.1`);
+  }
+  if (catalog.catalog === expectedCatalog) {
+    ok(`${relativePath} catalog is ${expectedCatalog}`);
+  } else {
+    fail(`${relativePath} catalog does not match ${expectedCatalog}`);
+  }
+  if (["draft", "active", "deprecated"].includes(catalog.status)) {
+    ok(`${relativePath} status is ${catalog.status}`);
+  } else {
+    fail(`${relativePath} status is invalid or missing`);
+  }
+  if (!Array.isArray(catalog.rules)) {
+    fail(`${relativePath} rules must be an array`);
+    return;
+  }
+
+  const seen = new Set();
+  for (const [index, rule] of catalog.rules.entries()) {
+    const artifact = `${relativePath}#rules/${index}`;
+    if (!rule || typeof rule !== "object") {
+      fail(`${artifact} must be an object`);
+      continue;
+    }
+    if (!rule.rule_id || !/^[a-z][a-z0-9_.-]*$/.test(rule.rule_id)) {
+      fail(`${artifact} has invalid rule_id`);
+      continue;
+    }
+    if (seen.has(rule.rule_id)) {
+      fail(`${relativePath} has duplicate rule_id ${rule.rule_id}`);
+    } else {
+      seen.add(rule.rule_id);
+      ok(`${relativePath} declares rule_id ${rule.rule_id}`);
+    }
+    for (const key of ["category", "default_severity", "title", "description", "agent_guidance"]) {
+      if (typeof rule[key] === "string" && rule[key].length > 0) {
+        ok(`${artifact} declares ${key}`);
+      } else {
+        fail(`${artifact} is missing ${key}`);
+      }
+    }
+    if (!["info", "warning", "error"].includes(rule.default_severity)) {
+      fail(`${artifact} default_severity is invalid`);
+    }
+  }
+
+  for (const ruleId of expectedRuleIds) {
+    if (seen.has(ruleId)) {
+      ok(`${relativePath} covers rule_id ${ruleId}`);
+    } else {
+      fail(`${relativePath} is missing rule_id ${ruleId}`);
+    }
   }
 }
 
@@ -797,10 +887,14 @@ function checkArchitecture(root) {
     "conversations/README.zh-CN.md",
     "decisions/README.md",
     "decisions/README.zh-CN.md",
+    "rules/README.md",
+    "rules/README.zh-CN.md",
     "schema/module-manifest.schema.json",
     "schema/change-spec.schema.json",
     "schema/agent-decision-record.schema.json",
     "schema/inspect-output.schema.json",
+    "schema/rule-catalog.schema.json",
+    "rules/check-rules.json",
   ]);
 
   requireDirectories(root, [
@@ -812,6 +906,7 @@ function checkArchitecture(root) {
     "decisions",
     "decisions/_template",
     "docs",
+    "rules",
     "schema",
     "tools",
   ]);
@@ -835,6 +930,8 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/conventions.yaml", "immutable_to_non_system_agents: true");
   checkTextIncludes(root, ".arch/conventions.yaml", "module_manifest: schema/module-manifest.schema.json");
   checkTextIncludes(root, ".arch/conventions.yaml", "inspect_output: schema/inspect-output.schema.json");
+  checkTextIncludes(root, ".arch/conventions.yaml", "rule_catalog: schema/rule-catalog.schema.json");
+  checkTextIncludes(root, ".arch/conventions.yaml", "check_rules: rules/check-rules.json");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
 
   finish();
@@ -850,6 +947,8 @@ function checkSchemas(root) {
   requireSchemaShape(root, "schema/change-spec.schema.json", "vibit Change Spec");
   requireSchemaShape(root, "schema/agent-decision-record.schema.json", "vibit Agent Decision Record");
   requireSchemaShape(root, "schema/inspect-output.schema.json", "vibit Inspect Output");
+  requireSchemaShape(root, "schema/rule-catalog.schema.json", "vibit Rule Catalog");
+  requireRuleCatalog(root, "rules/check-rules.json", "check_rules", KNOWN_CHECK_RULE_IDS);
 
   checkTextIncludes(root, ".arch/conventions.yaml", "schema_validation_standard:");
   checkTextIncludes(root, ".arch/conventions.yaml", "schemas:");

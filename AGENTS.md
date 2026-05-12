@@ -71,6 +71,7 @@ Existing foundation:
 - `docs/schema-validation.md`
 - `docs/schema-validation.zh-CN.md`
 - `schema/`
+- `rules/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
@@ -98,6 +99,8 @@ Use `node tools/vibit check all` as the default repository verification command 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
 Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
+
+Use `rules/check-rules.json` to interpret check result `rule_id` values.
 
 ## 4. Documentation Rules
 

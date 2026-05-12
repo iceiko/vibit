@@ -72,6 +72,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/schema-validation.md`
 - `docs/schema-validation.zh-CN.md`
 - `schema/`
+- `rules/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
@@ -99,6 +100,8 @@ node tools/vibit generate module <module>
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。
 
 每条 JSON check result item 都应包含 `rule_id` 和 `artifact`。把 `check all --json` 视为紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
+
+使用 `rules/check-rules.json` 解读 check result 中的 `rule_id`。
 
 ## 4. 文档规则
 

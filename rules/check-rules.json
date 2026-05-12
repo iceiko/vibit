@@ -1,0 +1,199 @@
+{
+  "schema_version": "0.1",
+  "catalog": "check_rules",
+  "status": "draft",
+  "rules": [
+    {
+      "rule_id": "argument.format",
+      "category": "arguments",
+      "default_severity": "error",
+      "title": "Argument format",
+      "description": "A command argument must match the expected naming format.",
+      "agent_guidance": "Check the command usage and retry with the expected identifier format."
+    },
+    {
+      "rule_id": "artifact.directory_exists",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required directory exists",
+      "description": "A required repository directory must exist.",
+      "agent_guidance": "Create the missing directory or update the standard if the directory is no longer required."
+    },
+    {
+      "rule_id": "artifact.file_exists",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required file exists",
+      "description": "A required repository file must exist.",
+      "agent_guidance": "Create the missing file, restore it, or update the standard if the file is no longer required."
+    },
+    {
+      "rule_id": "artifact.required",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required artifact or field",
+      "description": "A required artifact, section, or field is missing.",
+      "agent_guidance": "Inspect the referenced artifact and add the missing required structure."
+    },
+    {
+      "rule_id": "artifact.text_includes",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required text reference",
+      "description": "A text artifact must include a required reference.",
+      "agent_guidance": "Update the referenced artifact so it includes the required standard pointer."
+    },
+    {
+      "rule_id": "schema.json_parse",
+      "category": "schema",
+      "default_severity": "error",
+      "title": "JSON parses",
+      "description": "A JSON schema or output file must parse as JSON.",
+      "agent_guidance": "Fix JSON syntax before making semantic changes."
+    },
+    {
+      "rule_id": "schema.declares_schema_uri",
+      "category": "schema",
+      "default_severity": "error",
+      "title": "Schema URI declared",
+      "description": "A JSON Schema file must declare `$schema`.",
+      "agent_guidance": "Add the JSON Schema draft URI to the schema file."
+    },
+    {
+      "rule_id": "schema.declares_id",
+      "category": "schema",
+      "default_severity": "error",
+      "title": "Schema ID declared",
+      "description": "A JSON Schema file must declare `$id`.",
+      "agent_guidance": "Add a stable schema ID to the schema file."
+    },
+    {
+      "rule_id": "schema.title",
+      "category": "schema",
+      "default_severity": "error",
+      "title": "Schema title",
+      "description": "A JSON Schema file must declare the expected title.",
+      "agent_guidance": "Update the schema title or the check expectation so they match intentionally."
+    },
+    {
+      "rule_id": "artifact.declares_field",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required field declared",
+      "description": "A manifest, spec, or schema must declare a required field.",
+      "agent_guidance": "Add the missing field with a valid value according to the relevant standard."
+    },
+    {
+      "rule_id": "artifact.contains_field",
+      "category": "artifact",
+      "default_severity": "error",
+      "title": "Required field group exists",
+      "description": "A manifest or spec must contain a required field group.",
+      "agent_guidance": "Add the missing group and keep its structure aligned with the source standard."
+    },
+    {
+      "rule_id": "markdown.section",
+      "category": "documentation",
+      "default_severity": "error",
+      "title": "Required Markdown section",
+      "description": "A Markdown document must include a required section.",
+      "agent_guidance": "Add the missing section and preserve the expected heading text."
+    },
+    {
+      "rule_id": "module.registry_match",
+      "category": "module",
+      "default_severity": "error",
+      "title": "Module registry match",
+      "description": "A module manifest must match the module registry entry.",
+      "agent_guidance": "Align `.arch/modules.yaml` and `modules/<module>/module.yaml`."
+    },
+    {
+      "rule_id": "change.directory_match",
+      "category": "change",
+      "default_severity": "error",
+      "title": "Change directory match",
+      "description": "A change spec ID must match its directory name.",
+      "agent_guidance": "Rename the change directory or update `spec.yaml` so the IDs match."
+    },
+    {
+      "rule_id": "change.verification_status",
+      "category": "change",
+      "default_severity": "error",
+      "title": "Change verification status",
+      "description": "A change spec must declare an allowed verification status.",
+      "agent_guidance": "Set verification status to `Verified`, `Not verified`, or `Not applicable`."
+    },
+    {
+      "rule_id": "change.requested_id_match",
+      "category": "change",
+      "default_severity": "error",
+      "title": "Requested change ID match",
+      "description": "A checked change spec must declare the requested change ID.",
+      "agent_guidance": "Update `spec.yaml` or run the check with the correct change ID."
+    },
+    {
+      "rule_id": "module.directory_match",
+      "category": "module",
+      "default_severity": "error",
+      "title": "Module directory match",
+      "description": "A module manifest name must match its directory.",
+      "agent_guidance": "Update `module.yaml` or the module directory name so they match."
+    },
+    {
+      "rule_id": "operator.guidance",
+      "category": "operator",
+      "default_severity": "warning",
+      "title": "Operator guidance",
+      "description": "A check emitted an actionable command or hint.",
+      "agent_guidance": "Treat this as follow-up guidance, not as a failed rule by itself."
+    },
+    {
+      "rule_id": "generator.created_artifact",
+      "category": "generator",
+      "default_severity": "info",
+      "title": "Generated artifact created",
+      "description": "A generator created a repository artifact.",
+      "agent_guidance": "Review the created artifact and update manifests or docs if needed."
+    },
+    {
+      "rule_id": "generator.artifact_already_exists",
+      "category": "generator",
+      "default_severity": "warning",
+      "title": "Generated artifact already exists",
+      "description": "A generator found an existing artifact and left it in place.",
+      "agent_guidance": "Inspect the existing artifact before assuming it matches the current generator template."
+    },
+    {
+      "rule_id": "check.message",
+      "category": "check",
+      "default_severity": "info",
+      "title": "Generic check message",
+      "description": "A check result did not match a more specific rule pattern.",
+      "agent_guidance": "Read the result message and consider adding a more specific rule if this becomes common."
+    },
+    {
+      "rule_id": "check.subcheck_spawn",
+      "category": "check",
+      "default_severity": "error",
+      "title": "Subcheck spawn",
+      "description": "An aggregate check could not run a subcheck process.",
+      "agent_guidance": "Inspect the runtime error and verify the CLI can run the subcheck directly."
+    },
+    {
+      "rule_id": "check.subcheck_json_parse",
+      "category": "check",
+      "default_severity": "error",
+      "title": "Subcheck JSON parse",
+      "description": "An aggregate check expected JSON from a subcheck but could not parse it.",
+      "agent_guidance": "Run the subcheck directly with `--json` and fix invalid output or stderr pollution."
+    },
+    {
+      "rule_id": "check.subcheck",
+      "category": "check",
+      "default_severity": "error",
+      "title": "Aggregate subcheck",
+      "description": "An aggregate check summarized the status of a subcheck.",
+      "agent_guidance": "If this result failed, run the referenced subcheck directly with `--json` for details."
+    }
+  ]
+}

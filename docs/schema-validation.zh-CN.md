@@ -30,6 +30,7 @@ schema/module-manifest.schema.json
 schema/change-spec.schema.json
 schema/agent-decision-record.schema.json
 schema/inspect-output.schema.json
+schema/rule-catalog.schema.json
 ```
 
 ## 3. 验证策略
@@ -75,6 +76,7 @@ node tools/vibit check all
 - Change specs 声明 critical fields 和允许的 verification status。
 - Agent Decision Records 包含 required sections。
 - Tool JSON output schemas 覆盖 inspect output 和 check result output。
+- Rule catalogs 声明 required metadata，并覆盖已知 check result `rule_id` values。
 - Architecture conventions 声明 schema artifacts。
 
 这还不是完整 YAML schema validation。
@@ -87,6 +89,7 @@ node tools/vibit check all
 - Change specs
 - Agent Decision Records
 - Tool JSON output，包括 inspect output 和 check result output
+- Rule catalogs
 
 如果 CLI 尚不能完整验证某个结构，agents 必须在相关 change spec 中记录缺口。
 

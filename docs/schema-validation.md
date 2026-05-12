@@ -29,6 +29,7 @@ schema/module-manifest.schema.json
 schema/change-spec.schema.json
 schema/agent-decision-record.schema.json
 schema/inspect-output.schema.json
+schema/rule-catalog.schema.json
 ```
 
 ## 3. Validation Strategy
@@ -74,6 +75,7 @@ Initial checks should cover:
 - Change specs declare critical fields and allowed verification status.
 - Agent Decision Records contain required sections.
 - Tool JSON output schemas cover inspect output and check result output.
+- Rule catalogs declare required metadata and cover known check result `rule_id` values.
 - Architecture conventions declare schema artifacts.
 
 This is not yet full YAML schema validation.
@@ -86,6 +88,7 @@ Agents must update schemas when changing the shape of:
 - Change specs
 - Agent Decision Records
 - Tool JSON output, including inspect output and check result output
+- Rule catalogs
 
 If the CLI cannot fully validate a structure yet, agents must record the gap in the relevant change spec.
 
