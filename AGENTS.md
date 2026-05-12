@@ -91,6 +91,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check generated
+node tools/vibit check generated --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
@@ -99,6 +101,7 @@ node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
 node tools/vibit inspect rules
 node tools/vibit inspect rules --category <category>
+node tools/vibit generate contract --module <module> --type <type> --id <id>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -118,7 +121,11 @@ Use `node tools/vibit check memory` when conversation logs or Agent Decision Rec
 
 Use `node tools/vibit check contracts` when contract source files or `.arch/contracts.yaml` are added or changed.
 
+Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
+
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
+
+Use `node tools/vibit generate contract --module <module> --type <type> --id <id>` to regenerate declared contract shapes from contract source files instead of hand-editing generated output.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
 

@@ -102,6 +102,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check generated
+node tools/vibit check generated --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect contract --module inventory --type command --id GrantItem
@@ -109,6 +111,7 @@ node tools/vibit inspect change bootstrap-vibit-cli
 node tools/vibit inspect memory
 node tools/vibit inspect rule check.subcheck
 node tools/vibit inspect rules --category check
+node tools/vibit generate contract --module inventory --type command --id GrantItem
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -128,7 +131,11 @@ Use `node tools/vibit check memory` to verify required conversation log and Agen
 
 Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
 
+Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
+
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
+
+Use `node tools/vibit generate contract --module <module> --type <type> --id <id>` to regenerate contract shapes from contract source files.
 
 Use `node tools/vibit inspect change <change-id>` to inspect a change spec directory and its verification metadata without manually opening every file.
 

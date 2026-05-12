@@ -1,0 +1,75 @@
+schema_version: 0.1
+change_id: generate-inventory-contract-shape
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Generate the first TypeScript contract shape for inventory GrantItem.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added:
+      - vibit generate contract --module <module> --type <type> --id <id>
+      - vibit check generated
+      - vibit check generated --json
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - tools/vibit
+    - rules/check-rules.json
+    - modules/inventory/module.yaml
+    - modules/inventory/generated/contracts/GrantItem.generated.ts
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - changes/2026-05-12-generate-inventory-contract-shape/
+    - conversations/2026-05-12-generate-inventory-contract-shape.md
+
+decisions:
+  - ADR-0005
+  - ADR-0006
+  - ADR-0007
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - inspect_contract_grant_item
+    - generate_contract_grant_item
+    - check_generated_text
+    - check_generated_json
+    - check_contracts_json
+    - check_all_json
+    - generated_file_trace_scan
+    - secret_scan
+    - diff_check
+  status: Verified

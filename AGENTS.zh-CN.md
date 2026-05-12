@@ -92,6 +92,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check generated
+node tools/vibit check generated --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
@@ -100,6 +102,7 @@ node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
 node tools/vibit inspect rules
 node tools/vibit inspect rules --category <category>
+node tools/vibit generate contract --module <module> --type <type> --id <id>
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change <change-id>
@@ -119,7 +122,11 @@ node tools/vibit generate module <module>
 
 当新增或修改 contract source files 或 `.arch/contracts.yaml` 时，使用 `node tools/vibit check contracts`。
 
+当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
+
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
+
+使用 `node tools/vibit generate contract --module <module> --type <type> --id <id>` 从 contract source files 重新生成已声明的 contract shapes，而不是手工编辑 generated output。
 
 当 change spec 已存在，并且 agent 在 intake 或 handoff 阶段需要结构化了解它的文件、metadata、affected modules 和 verification state 时，使用 `node tools/vibit inspect change <change-id>`。
 

@@ -102,6 +102,8 @@ node tools/vibit check memory
 node tools/vibit check memory --json
 node tools/vibit check contracts
 node tools/vibit check contracts --json
+node tools/vibit check generated
+node tools/vibit check generated --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect contract --module inventory --type command --id GrantItem
@@ -109,6 +111,7 @@ node tools/vibit inspect change bootstrap-vibit-cli
 node tools/vibit inspect memory
 node tools/vibit inspect rule check.subcheck
 node tools/vibit inspect rules --category check
+node tools/vibit generate contract --module inventory --type command --id GrantItem
 node tools/vibit check architecture
 node tools/vibit check architecture --json
 node tools/vibit check change bootstrap-vibit-cli
@@ -128,7 +131,11 @@ node tools/vibit generate module <module>
 
 使用 `node tools/vibit check contracts` 可以验证 `.arch/contracts.yaml` 与已登记 contract source files 的一致性。
 
+使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
+
 使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>` 可以在 agent intake 阶段以 JSON 查询单个已登记 command、query、event、error catalog 或 permission catalog。
+
+使用 `node tools/vibit generate contract --module <module> --type <type> --id <id>` 可以从 contract source files 重新生成 contract shapes。
 
 使用 `node tools/vibit inspect change <change-id>` 可以查询 change spec 目录及其 verification metadata，而不必手动打开每个文件。
 

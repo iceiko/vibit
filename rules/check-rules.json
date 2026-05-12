@@ -172,6 +172,30 @@
       "agent_guidance": "Align the contract source, `.arch/contracts.yaml`, and `modules/<module>/module.yaml`."
     },
     {
+      "rule_id": "generated.declared",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated output declared",
+      "description": "A module manifest must declare generated files and directories that belong to the module.",
+      "agent_guidance": "Update `modules/<module>/module.yaml` so generated outputs are explicit."
+    },
+    {
+      "rule_id": "generated.exists",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated output exists",
+      "description": "A generated file declared by a module manifest must exist on disk.",
+      "agent_guidance": "Run the generator or update the module manifest declaration."
+    },
+    {
+      "rule_id": "generated.trace",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated output trace",
+      "description": "A generated file must include trace metadata for its source and generator.",
+      "agent_guidance": "Regenerate the file or update the generator so it emits generated, source, and generator markers."
+    },
+    {
       "rule_id": "change.directory_match",
       "category": "change",
       "default_severity": "error",
