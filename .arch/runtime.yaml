@@ -1,0 +1,105 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Runtime readiness manifest for the first reference implementation.
+  This file records the minimum runtime decisions that agents should read
+  before creating server implementation code.
+
+canonical_decisions:
+  language_and_package_layout: ADR-0003
+  server_instance_model: ADR-0004
+  contract_and_generation_boundary: ADR-0005
+  first_runtime_proof_slice: ADR-0006
+
+architecture_scope:
+  framework_standard: language_neutral
+  first_reference_implementation: typescript_node
+  current_phase: runtime_readiness
+  implementation_code_status: not_started
+
+first_reference_runtime:
+  language: TypeScript
+  platform: Node.js
+  package_manager: undecided
+  dependency_policy: minimal_initial_dependencies
+  rationale:
+    - Existing repository tooling already uses Node.js.
+    - TypeScript gives agents explicit types and strong editor feedback.
+    - The ecosystem is practical for HTTP, WebSocket, schemas, tests, and code generation.
+    - The choice remains a reference implementation decision, not a permanent language lock.
+
+package_layout:
+  intended_roots:
+    runtime: runtime
+    packages: packages
+    modules: modules
+    contracts: contracts
+    generated: generated
+    tests: tests
+  rules:
+    - Public contracts are declared before handwritten behavior.
+    - Generated files must be traceable to schemas or manifests.
+    - Handwritten module logic lives in explicit extension points.
+    - Runtime packages must not hide domain behavior in transport handlers.
+
+server_instance_model:
+  first_model: modular_monolith_single_process
+  network_surface:
+    http_api: planned
+    websocket_api: planned_later
+    internal_commands: planned
+  boundaries:
+    - Modules communicate through commands, queries, events, public module APIs, or generated clients.
+    - Transport handlers adapt requests into commands or queries.
+    - Domain modules own state and invariants.
+    - Platform code owns runtime concerns such as transport, storage adapters, event dispatch, and verification hooks.
+  deferred:
+    - distributed_actor_runtime
+    - multi_process_cluster
+    - service_mesh_deployment
+    - cloud_orchestration
+
+contract_model:
+  source_format: yaml_or_json_schema
+  public_contract_types:
+    - commands
+    - queries
+    - events
+    - errors
+    - permissions
+  generated_outputs:
+    - typed_contracts
+    - route_or_dispatch_shapes
+    - clients_or_call_helpers
+    - test_fixtures
+  handwritten_outputs:
+    - domain_policies
+    - command_handlers
+    - query_handlers
+    - repositories
+    - invariant_tests
+  generated_file_policy:
+    immutable_to_non_system_agents: true
+    override_permission: generated_file_override
+
+first_runtime_proof_slice:
+  preferred_module: inventory
+  proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
+  minimum_capabilities:
+    - Declare one command, one query, one event, one error, and one permission.
+    - Generate the repeatable shape from contracts and manifests.
+    - Implement handwritten logic only in declared extension points.
+    - Test command behavior, query behavior, emitted events, and invariants.
+    - Run architecture, schema, module, and runtime tests from one default verification command.
+  non_goals:
+    - Build a full game backend.
+    - Add AI gameplay features.
+    - Optimize distributed performance.
+    - Choose final persistence for all future modules.
+
+open_questions:
+  - Choose package manager only when runtime scaffolding starts.
+  - Choose test runner only when the first executable TypeScript package exists.
+  - Choose schema source format after evaluating the first command/query/event contract.
+  - Decide whether initial persistence is in-memory only or includes a file-backed adapter.

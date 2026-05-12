@@ -57,6 +57,7 @@ Existing foundation:
 - `.arch/README.md`
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
+- `.arch/runtime.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -74,6 +75,8 @@ Existing foundation:
 - `rules/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
+
+Runtime readiness decisions currently point to TypeScript on Node.js as the first reference implementation, a modular monolith single-process server model, contract-first commands/queries/events/errors/permissions, and `inventory` as the preferred first proof slice. Read `.arch/runtime.yaml` and `ADR-0003` through `ADR-0006` before creating runtime implementation code.
 
 Current executable tooling:
 
@@ -118,6 +121,8 @@ Use `rules/check-rules.json` to interpret check result `rule_id` values.
 Use `node tools/vibit inspect rule <rule-id>` when only one rule's metadata is needed.
 
 Use `node tools/vibit inspect rules --category <category>` to discover rules by category.
+
+Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, and first proof slice.
 
 ## 4. Documentation Rules
 

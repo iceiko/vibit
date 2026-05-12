@@ -58,6 +58,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/README.md`
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
+- `.arch/runtime.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -75,6 +76,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `rules/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
+
+当前 runtime readiness decisions 指向 TypeScript on Node.js 作为第一参考实现、modular monolith single-process server model、contract-first commands/queries/events/errors/permissions，以及 `inventory` 作为优先的第一 proof slice。在创建 runtime implementation code 前，必须阅读 `.arch/runtime.yaml` 以及 `ADR-0003` 到 `ADR-0006`。
 
 当前可执行工具：
 
@@ -119,6 +122,8 @@ node tools/vibit generate module <module>
 当只需要单条 rule metadata 时，使用 `node tools/vibit inspect rule <rule-id>`。
 
 使用 `node tools/vibit inspect rules --category <category>` 按 category 发现 rules。
+
+使用 `.arch/runtime.yaml` 作为 runtime readiness 的机器可读 intake 入口。它链接了约束语言、服务器实例模型、contract 与 generation boundary，以及第一 proof slice 的 ADR。
 
 ## 4. 文档规则
 

@@ -1,0 +1,72 @@
+schema_version: 0.1
+change_id: add-runtime-readiness-decisions
+date: 2026-05-12
+type: standard
+status: verified
+
+summary: Add runtime readiness decisions before the first backend vertical slice.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/runtime.yaml
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - .arch/conventions.yaml
+    - modules/inventory/module.yaml
+    - decisions/ADR-0003-first-reference-runtime-language.md
+    - decisions/ADR-0004-minimal-server-instance-model.md
+    - decisions/ADR-0005-contract-and-generation-boundary.md
+    - decisions/ADR-0006-first-runtime-proof-slice.md
+    - conversations/2026-05-12-runtime-readiness-decisions.md
+
+decisions:
+  - ADR-0003
+  - ADR-0004
+  - ADR-0005
+  - ADR-0006
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_memory
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

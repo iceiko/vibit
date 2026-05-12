@@ -28,9 +28,12 @@ The `.arch/` directory should answer the questions an agent must resolve before 
   README.zh-CN.md
   modules.yaml
   conventions.yaml
+  runtime.yaml
 ```
 
 This is the first draft. The files describe expected shape before implementation code exists.
+
+`runtime.yaml` records the runtime readiness decisions for the first reference implementation. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, and proof slice.
 
 ## Expected Future Files
 
@@ -55,8 +58,9 @@ Before changing implementation code, agents should:
 2. Read `AGENTS.md`.
 3. Read `.arch/modules.yaml`.
 4. Read `.arch/conventions.yaml`.
-5. Read the affected module's `module.yaml`, when it exists.
-6. Update manifests before implementation when public architecture changes.
+5. Read `.arch/runtime.yaml` before changing or creating runtime implementation code.
+6. Read the affected module's `module.yaml`, when it exists.
+7. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 

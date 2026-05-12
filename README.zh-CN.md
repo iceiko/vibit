@@ -40,6 +40,7 @@ vibit 从另一个前提出发：
 - `.arch/README.md`：机器可读 architecture manifest 入口
 - `.arch/modules.yaml`：第一版 module registry manifest 草案
 - `.arch/conventions.yaml`：第一版 repository convention manifest 草案
+- `.arch/runtime.yaml`：第一参考实现的 runtime readiness manifest
 - `docs/module-manifest.md`：module manifest 标准
 - `docs/module-manifest.zh-CN.md`：简体中文译本
 - `docs/change-spec.md`：change spec 标准
@@ -63,6 +64,7 @@ vibit 从另一个前提出发：
 vibit 应逐步演进出：
 
 - `.arch/` 下的 architecture manifests
+- 由 `.arch/runtime.yaml` 和 Agent Decision Records 约束的第一版 TypeScript/Node.js reference runtime
 - `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
 - Contract-first 的 commands、queries、events、errors、permissions 和 migrations
@@ -129,7 +131,7 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 
 使用 `node tools/vibit inspect rules` 或 `node tools/vibit inspect rules --category <category>` 可以发现可用 rules。
 
-服务器实现语言和整体服务器实例架构目前有意保持开放。它们应在仓库标准和工具链足够强、可以评估 tradeoffs 后，通过 change specs 决定。
+第一参考 runtime 使用 TypeScript on Node.js，并采用 modular monolith single-process server model。这是 reference implementation decision，不是对更广义 architecture standard 的永久限制。见 `.arch/runtime.yaml` 以及 `decisions/ADR-0003-first-reference-runtime-language.md` 到 `decisions/ADR-0006-first-runtime-proof-slice.md`。
 
 ## 早期参考领域
 

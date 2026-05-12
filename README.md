@@ -40,6 +40,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/README.md`: machine-readable architecture manifest entry point
 - `.arch/modules.yaml`: first draft module registry manifest
 - `.arch/conventions.yaml`: first draft repository convention manifest
+- `.arch/runtime.yaml`: runtime readiness manifest for the first reference implementation
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
 - `docs/change-spec.md`: change spec standard
@@ -63,6 +64,7 @@ English documents are canonical. Simplified Chinese translations are maintained 
 vibit should evolve toward:
 
 - Architecture manifests under `.arch/`
+- A first TypeScript/Node.js reference runtime governed by `.arch/runtime.yaml` and Agent Decision Records
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
@@ -129,7 +131,7 @@ Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsin
 
 Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
 
-The server implementation language and overall server instance architecture are intentionally still open decisions. They should be decided through change specs after the repository standards and tooling are strong enough to evaluate the tradeoffs.
+The first reference runtime is TypeScript on Node.js, using a modular monolith single-process server model. This is a reference implementation decision, not a permanent restriction on the broader architecture standard. See `.arch/runtime.yaml` and `decisions/ADR-0003-first-reference-runtime-language.md` through `decisions/ADR-0006-first-runtime-proof-slice.md`.
 
 ## Early Reference Domain
 
