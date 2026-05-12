@@ -1,0 +1,63 @@
+schema_version: 0.1
+change_id: add-check-memory
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add a CLI command for verifying project memory artifacts.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added:
+      - vibit check memory
+      - vibit check memory --json
+    changed:
+      - vibit check all
+      - vibit check all --json
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_memory_text
+    - check_memory_json
+    - check_all_text
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

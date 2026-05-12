@@ -18,7 +18,10 @@ const KNOWN_CHECK_RULE_IDS = [
   "schema.title",
   "artifact.declares_field",
   "artifact.contains_field",
+  "artifact.minimum_count",
   "markdown.section",
+  "markdown.heading",
+  "markdown.metadata",
   "module.registry_match",
   "change.directory_match",
   "change.verification_status",
@@ -51,6 +54,8 @@ Usage:
   vibit check all --json
   vibit check schemas
   vibit check schemas --json
+  vibit check memory
+  vibit check memory --json
   vibit check architecture
   vibit check architecture --json
   vibit check module <module>
@@ -69,6 +74,7 @@ Usage:
 Commands:
   check all                Run all current repository checks.
   check schemas            Check schema files and critical artifact fields.
+  check memory             Check conversation logs and decision records.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -202,8 +208,17 @@ function inferRuleId(message) {
   if (message.includes(" contains ")) {
     return "artifact.contains_field";
   }
+  if (message.includes(" has at least ")) {
+    return "artifact.minimum_count";
+  }
   if (message.includes(" has section ") || message.includes(" missing section ")) {
     return "markdown.section";
+  }
+  if (message.includes(" heading ")) {
+    return "markdown.heading";
+  }
+  if (message.includes(" metadata ")) {
+    return "markdown.metadata";
   }
   if (message.includes(" module matches registry") || message.includes(" module does not match registry")) {
     return "module.registry_match";
@@ -486,6 +501,40 @@ function requireMarkdownSections(root, relativePath, sections) {
       fail(`${relativePath} is missing section ${section}`);
     }
   }
+}
+
+function requireMarkdownHeading(root, relativePath, prefix) {
+  if (!isFile(root, relativePath)) {
+    fail(`${relativePath} is missing`);
+    return null;
+  }
+  const text = readText(path.join(root, relativePath));
+  const heading = firstMarkdownHeading(text);
+  if (!heading) {
+    fail(`${relativePath} heading is missing`);
+    return null;
+  }
+  if (prefix && !heading.startsWith(prefix)) {
+    fail(`${relativePath} heading does not start with ${prefix}`);
+  } else {
+    ok(`${relativePath} heading is ${heading}`);
+  }
+  return heading;
+}
+
+function requireMarkdownField(root, relativePath, fieldName) {
+  if (!isFile(root, relativePath)) {
+    fail(`${relativePath} is missing`);
+    return null;
+  }
+  const text = readText(path.join(root, relativePath));
+  const value = firstMarkdownField(text, fieldName);
+  if (value) {
+    ok(`${relativePath} metadata ${fieldName}: ${value}`);
+  } else {
+    fail(`${relativePath} metadata ${fieldName} is missing`);
+  }
+  return value;
 }
 
 function discoverChangeIds(root) {
@@ -1076,7 +1125,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -1315,6 +1364,85 @@ function checkSchemas(root) {
   }
 
   finish();
+}
+
+function checkMemory(root) {
+  resetResults("check memory");
+  if (!jsonOutput) {
+    console.log(`Checking project memory in ${root}\n`);
+  }
+
+  const conversations = discoverConversationFiles(root).map((filePath) => rel(root, filePath));
+  const decisions = discoverDecisionFiles(root).map((filePath) => rel(root, filePath));
+
+  if (conversations.length > 0) {
+    ok(`conversations has at least one log`, {
+      rule_id: "artifact.minimum_count",
+      artifact: "conversations",
+    });
+  } else {
+    fail(`conversations has no logs`, {
+      rule_id: "artifact.minimum_count",
+      artifact: "conversations",
+    });
+  }
+
+  if (decisions.length > 0) {
+    ok(`decisions has at least one ADR`, {
+      rule_id: "artifact.minimum_count",
+      artifact: "decisions",
+    });
+  } else {
+    fail(`decisions has no ADRs`, {
+      rule_id: "artifact.minimum_count",
+      artifact: "decisions",
+    });
+  }
+
+  for (const conversation of conversations) {
+    requireMarkdownHeading(root, conversation, "Conversation:");
+    requireMarkdownField(root, conversation, "Date");
+    requireMarkdownSections(root, conversation, [
+      "Context",
+      "Maintainer Narrative",
+      "Agent Response Summary",
+      "Decisions",
+      "Artifacts",
+      "Open Questions",
+      "Follow-Up",
+      "Redaction Notes",
+    ]);
+  }
+
+  for (const decision of decisions) {
+    const heading = requireMarkdownHeading(root, decision, "ADR-");
+    const idFromFile = path.basename(decision).match(/^(ADR-\d{4})-/);
+    if (heading && idFromFile && heading.startsWith(idFromFile[1])) {
+      ok(`${decision} heading matches file id`);
+    } else if (idFromFile) {
+      fail(`${decision} heading does not match file id ${idFromFile[1]}`);
+    }
+    requireMarkdownField(root, decision, "Status");
+    requireMarkdownField(root, decision, "Date");
+    requireMarkdownSections(root, decision, [
+      "Context",
+      "Decision",
+      "Alternatives Considered",
+      "Rationale",
+      "Agent Reasoning Summary",
+      "Decision Weights",
+      "Consequences",
+      "Reversal Conditions",
+      "Follow-Up",
+    ]);
+  }
+
+  finish({
+    summary_counts: {
+      conversations: conversations.length,
+      decisions: decisions.length,
+    },
+  });
 }
 
 function changeDirectory(root, changeId) {
@@ -1623,6 +1751,11 @@ function main() {
 
   if (group === "check" && command === "schemas" && !value) {
     checkSchemas(root);
+    return;
+  }
+
+  if (group === "check" && command === "memory" && !value) {
+    checkMemory(root);
     return;
   }
 

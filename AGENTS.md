@@ -83,6 +83,8 @@ node tools/vibit check all
 node tools/vibit check all --json
 node tools/vibit check schemas
 node tools/vibit check schemas --json
+node tools/vibit check memory
+node tools/vibit check memory --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect change <change-id>
@@ -104,6 +106,8 @@ Use `node tools/vibit check all` as the default repository verification command 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
 Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
+
+Use `node tools/vibit check memory` when conversation logs or Agent Decision Records are added or changed.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
 
