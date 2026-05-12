@@ -42,6 +42,7 @@ vibit 从另一个前提出发：
 - `.arch/conventions.yaml`：第一版 repository convention manifest 草案
 - `.arch/runtime.yaml`：第一版 Go server runtime 方向的 runtime readiness manifest
 - `.arch/contracts.yaml`：public command、query、event、error 和 permission source files 的 contract registry
+- `.arch/dependencies.yaml`：foundational dependency decision slots 的 dependency adoption registry
 - `docs/module-manifest.md`：module manifest 标准
 - `docs/module-manifest.zh-CN.md`：简体中文译本
 - `docs/change-spec.md`：change spec 标准
@@ -55,6 +56,8 @@ vibit 从另一个前提出发：
 - `decisions/`：持久 decision rationale
 - `docs/schema-validation.md`：schema validation 标准
 - `docs/schema-validation.zh-CN.md`：简体中文译本
+- `docs/dependency-adoption.md`：dependency adoption 标准
+- `docs/dependency-adoption.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
 - `rules/`：面向机器可读 check metadata 的 rule catalogs
 
@@ -74,6 +77,7 @@ vibit 应逐步演进出：
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
 - Contract-first 的 commands、queries、events、errors、permissions 和 migrations
 - `contracts/` 下的 contract source files，并由 `.arch/contracts.yaml` 登记
+- 由 `.arch/dependencies.yaml` 登记 foundational dependency decisions
 - 为重复框架结构生成 scaffolds 的 generators
 - 能验证 dependency、contract、event 和 generated-file rules 的 architecture checks
 - `changes/<date>-<change-id>/` 下遵循 `docs/change-spec.md` 的 change specs

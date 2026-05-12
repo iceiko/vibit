@@ -60,6 +60,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/conventions.yaml`
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
+- `.arch/dependencies.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -73,6 +74,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `decisions/`
 - `docs/schema-validation.md`
 - `docs/schema-validation.zh-CN.md`
+- `docs/dependency-adoption.md`
+- `docs/dependency-adoption.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -142,6 +145,8 @@ node tools/vibit generate module <module>
 使用 `node tools/vibit inspect rules --category <category>` 按 category 发现 rules。
 
 使用 `.arch/runtime.yaml` 作为 runtime readiness 的机器可读 intake 入口。它链接了约束语言、服务器实例模型、contract 与 generation boundary、client protocol、dependency adoption，以及第一 proof slice 的 ADR。
+
+在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 
 ## 4. 文档规则
 
@@ -240,6 +245,8 @@ Generated files 对 non-system agents 不可变。如果 generated output 错了
 对于 server runtime，Go 是第一版 implementation language。WebSocket 是第一版 gameplay/client protocol。Protobuf 是第一版 wire message format。PostgreSQL 是第一版 authoritative durable relational store。S3-compatible object storage 是计划中的 object-storage abstraction，MinIO 是本地/自托管方向的优先候选，但必须先经过 dependency adoption record。Domain modules 不得直接依赖第三方 transport、protocol、persistence、object-storage 或 framework libraries；这些依赖由 platform adapters 通过 vibit-owned interfaces 承载。
 
 在新增 persistence implementation 前，agents 必须先声明或更新相关 repository interfaces、migration expectations、transaction boundaries 和 storage verification path。未通过遵循 `ADR-0010` 和 `ADR-0011` 的 change spec 或 adoption record，不要添加 PostgreSQL drivers、migration tools、S3 SDKs 或 MinIO clients。
+
+在添加 foundational dependencies 前，agents 必须检查 `.arch/dependencies.yaml`。在 adoption record 尚未记录 problem solved、license、maintenance activity、abstraction boundary、allowed owners、forbidden owners、replacement path 和 verification path 前，不要把 dependency slot 改为 `accepted`。
 
 `schema/` 应以 `docs/schema-validation.md` 作为源标准。
 

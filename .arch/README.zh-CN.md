@@ -31,6 +31,7 @@
   conventions.yaml
   runtime.yaml
   contracts.yaml
+  dependencies.yaml
 ```
 
 这是第一版草案。这些文件在实现代码存在前先描述预期形态。
@@ -39,10 +40,11 @@
 
 `contracts.yaml` 登记 public command、query、event、error 和 permission contract source files。Contract files 位于 `contracts/` 下，是 semantic source artifacts，不是 generated output。Protobuf wire schemas 计划位于 `proto/` 下，并且必须与这些 semantic contracts 对齐。
 
+`dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
+
 ## 未来预期文件
 
 ```text
-.arch/dependencies.yaml
 .arch/test-matrix.yaml
 .arch/generation.yaml
 ```
@@ -59,8 +61,9 @@
 4. 阅读 `.arch/conventions.yaml`。
 5. 在修改或创建 runtime implementation code 前，阅读 `.arch/runtime.yaml`。
 6. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
-7. 在相关 module 存在时，阅读其 `module.yaml`。
-8. 当 public architecture 变化时，先更新 manifests，再实现。
+7. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
+8. 在相关 module 存在时，阅读其 `module.yaml`。
+9. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 

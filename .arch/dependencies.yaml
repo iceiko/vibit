@@ -1,0 +1,148 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Registry of foundational dependency categories and adoption status.
+  This file records dependency decision slots before implementation code
+  imports or requires concrete packages.
+
+standard:
+  document: docs/dependency-adoption.md
+  template: docs/_templates/dependency-adoption.md
+  governing_decision: ADR-0010
+
+rules:
+  - id: foundational_dependency_requires_adoption_record
+    level: required
+    description: Foundational dependencies must have an adoption record before they become required architecture.
+  - id: domain_modules_do_not_import_foundational_dependencies
+    level: required
+    description: Domain modules depend on vibit-owned interfaces rather than direct transport, protocol, persistence, object-storage, or framework packages.
+  - id: popularity_is_not_sufficient
+    level: required
+    description: Stars, usage, and reputation are useful signals but not enough to accept a dependency.
+  - id: accepted_dependencies_need_replacement_path
+    level: required
+    description: Accepted foundational dependencies must document a replacement path and verification path.
+
+status_values:
+  - proposed
+  - accepted
+  - deferred
+  - rejected
+  - superseded
+
+dependency_slots:
+  websocket_server:
+    category: transport
+    status: proposed
+    required_before:
+      - first_websocket_runtime_adapter
+    governing_decisions:
+      - ADR-0009
+      - ADR-0010
+    allowed_owner: platform_transport_adapter
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null
+
+  protobuf_tooling:
+    category: protocol_generation
+    status: proposed
+    required_before:
+      - first_proto_generation
+      - manifest_proto_alignment_check
+    governing_decisions:
+      - ADR-0009
+      - ADR-0010
+    allowed_owner: generation_tooling
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null
+
+  postgresql_driver:
+    category: persistence
+    status: proposed
+    required_before:
+      - first_persistent_repository
+    governing_decisions:
+      - ADR-0010
+      - ADR-0011
+    allowed_owner: platform_persistence_adapter
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null
+
+  migration_tooling:
+    category: migration_tooling
+    status: proposed
+    required_before:
+      - first_database_migration
+      - first_persistent_repository
+    governing_decisions:
+      - ADR-0010
+      - ADR-0011
+    allowed_owner: platform_migration_tooling
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null
+
+  s3_client:
+    category: object_storage
+    status: deferred
+    required_before:
+      - first_object_storage_adapter
+    governing_decisions:
+      - ADR-0010
+      - ADR-0011
+    allowed_owner: platform_object_storage_adapter
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null
+
+  minio_server:
+    category: object_storage_deployment
+    status: deferred
+    required_before:
+      - required_local_object_storage_deployment
+    governing_decisions:
+      - ADR-0010
+      - ADR-0011
+    allowed_owner: deployment_or_dev_environment
+    forbidden_owners:
+      - domain_modules
+      - core_runtime_requirement_without_adoption_record
+    selected_dependency: null
+    adoption_record: null
+    note: MinIO is a preferred local/self-hosted S3-compatible candidate, but it is not a mandatory runtime dependency until adopted.
+
+  test_framework:
+    category: testing
+    status: proposed
+    required_before:
+      - first_go_runtime_tests_beyond_standard_library
+    governing_decisions:
+      - ADR-0010
+    allowed_owner: test_infrastructure
+    forbidden_owners:
+      - domain_runtime_logic
+    selected_dependency: null
+    adoption_record: null
+
+  observability:
+    category: observability
+    status: deferred
+    required_before:
+      - production_observability_adapter
+    governing_decisions:
+      - ADR-0010
+    allowed_owner: platform_observability_adapter
+    forbidden_owners:
+      - domain_modules
+    selected_dependency: null
+    adoption_record: null

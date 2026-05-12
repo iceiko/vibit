@@ -59,6 +59,7 @@ Existing foundation:
 - `.arch/conventions.yaml`
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
+- `.arch/dependencies.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -72,6 +73,8 @@ Existing foundation:
 - `decisions/`
 - `docs/schema-validation.md`
 - `docs/schema-validation.zh-CN.md`
+- `docs/dependency-adoption.md`
+- `docs/dependency-adoption.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -141,6 +144,8 @@ Use `node tools/vibit inspect rule <rule-id>` when only one rule's metadata is n
 Use `node tools/vibit inspect rules --category <category>` to discover rules by category.
 
 Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, client protocol, dependency adoption, and first proof slice.
+
+Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 
 ## 4. Documentation Rules
 
@@ -239,6 +244,8 @@ Generated files are immutable to non-system agents. If generated output is wrong
 For the server runtime, Go is the first implementation language. WebSocket is the first gameplay/client protocol. Protobuf is the first wire message format. PostgreSQL is the first authoritative durable relational store. S3-compatible object storage is a planned object-storage abstraction, with MinIO as the preferred local/self-hosted candidate pending a dependency adoption record. Domain modules must not depend directly on third-party transport, protocol, persistence, object-storage, or framework libraries; platform adapters own those dependencies behind vibit-owned interfaces.
 
 Before adding persistence implementation, agents must declare or update the relevant repository interfaces, migration expectations, transaction boundaries, and storage verification path. Do not add PostgreSQL drivers, migration tools, S3 SDKs, or MinIO clients without a change spec or adoption record that follows `ADR-0010` and `ADR-0011`.
+
+Before adding foundational dependencies, agents must check `.arch/dependencies.yaml`. Do not change a dependency slot to `accepted` until an adoption record documents the problem solved, license, maintenance activity, abstraction boundary, allowed owners, forbidden owners, replacement path, and verification path.
 
 Use `docs/schema-validation.md` as the source standard for `schema/`.
 

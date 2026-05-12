@@ -30,6 +30,7 @@ The `.arch/` directory should answer the questions an agent must resolve before 
   conventions.yaml
   runtime.yaml
   contracts.yaml
+  dependencies.yaml
 ```
 
 This is the first draft. The files describe expected shape before implementation code exists.
@@ -38,10 +39,11 @@ This is the first draft. The files describe expected shape before implementation
 
 `contracts.yaml` registers public command, query, event, error, and permission contract source files. Contract files live under `contracts/` and are semantic source artifacts, not generated output. Protobuf wire schemas are planned under `proto/` and must align with these semantic contracts.
 
+`dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
+
 ## Expected Future Files
 
 ```text
-.arch/dependencies.yaml
 .arch/test-matrix.yaml
 .arch/generation.yaml
 ```
@@ -58,8 +60,9 @@ Before changing implementation code, agents should:
 4. Read `.arch/conventions.yaml`.
 5. Read `.arch/runtime.yaml` before changing or creating runtime implementation code.
 6. Read `.arch/contracts.yaml` before adding or changing public contracts.
-7. Read the affected module's `module.yaml`, when it exists.
-8. Update manifests before implementation when public architecture changes.
+7. Read `.arch/dependencies.yaml` before adding foundational dependencies.
+8. Read the affected module's `module.yaml`, when it exists.
+9. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 

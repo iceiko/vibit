@@ -42,6 +42,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/conventions.yaml`: first draft repository convention manifest
 - `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
 - `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
+- `.arch/dependencies.yaml`: dependency adoption registry for foundational dependency decision slots
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
 - `docs/change-spec.md`: change spec standard
@@ -55,6 +56,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `decisions/`: durable decision rationale
 - `docs/schema-validation.md`: schema validation standard
 - `docs/schema-validation.zh-CN.md`: Simplified Chinese translation
+- `docs/dependency-adoption.md`: dependency adoption standard
+- `docs/dependency-adoption.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
 - `rules/`: rule catalogs for machine-readable check metadata
 
@@ -74,6 +77,7 @@ vibit should evolve toward:
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
 - Contract source files under `contracts/`, registered by `.arch/contracts.yaml`
+- Foundational dependency decisions registered by `.arch/dependencies.yaml`
 - Generated scaffolds for repeatable framework structure
 - Architecture checks that verify dependency, contract, event, and generated-file rules
 - Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
