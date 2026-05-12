@@ -250,6 +250,30 @@ The project should avoid decorative documentation that sounds complete but does 
 
 Every module should eventually have an agent-readable operating guide.
 
+### 3.11 Bootstrapping Must Stay Productive
+
+The project may bootstrap its own standards, tools, checks, and memory systems, but self-bootstrapping is only valid when it keeps the framework moving toward a working server architecture.
+
+Meta-tooling is justified when it directly reduces agent ambiguity, strengthens verification, protects long-term design intent, or enables the next runtime slice.
+
+Meta-tooling should be deferred when it mainly improves the tooling system itself without helping a concrete server capability, module boundary, contract, generator, test, or verification path.
+
+Before adding another standard, inspect command, check command, schema, generator, or workflow rule, an agent should ask:
+
+- What concrete future server change will this make safer or easier?
+- Can the same benefit be proven in the next runtime vertical slice instead?
+- Is the expected artifact small enough to maintain?
+- Is there a clear verification path?
+- Will this reduce context for future agents, or increase process weight?
+
+Once the repository has enough standards and checks to support a first runtime slice, the default next step should become a small end-to-end backend capability rather than more meta-tooling.
+
+The preferred proof unit is:
+
+```text
+requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
+```
+
 ## 4. Required Project Artifacts
 
 The project should evolve toward the following artifact system.

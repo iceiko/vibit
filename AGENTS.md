@@ -322,7 +322,25 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 
 A good first implementation target should include a small but complete backend domain, such as player accounts, inventory, currency, rewards, quests, or match sessions.
 
-## 14. Handoff Requirements
+## 14. Bootstrapping Control
+
+Self-bootstrapping is useful only while it improves the path to a working server framework.
+
+Before adding a new standard, inspect command, check command, schema, generator, or workflow rule, confirm that it directly supports at least one of:
+
+- The next runtime vertical slice
+- A concrete module boundary
+- A public contract or generated shape
+- A test or verification path
+- Agent context reduction for an expected implementation task
+
+If the benefit is mainly that the tooling becomes more complete, defer it.
+
+When the repository already has enough tooling to attempt a small end-to-end backend capability, prefer the runtime slice over additional meta-tooling.
+
+Record exceptions in a change spec or Agent Decision Record.
+
+## 15. Handoff Requirements
 
 At the end of a change, leave enough context for the next agent or human to continue.
 

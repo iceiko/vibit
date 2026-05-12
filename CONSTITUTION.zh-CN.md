@@ -251,6 +251,30 @@ Agent 写出的代码不能削弱 server authority。
 
 每个模块最终都应该有 agent-readable operating guide。
 
+### 3.11 自举必须保持生产性
+
+项目可以自举自己的 standards、tools、checks 和 memory systems，但只有当自举能持续推动框架走向可工作的服务器架构时，它才是有效的。
+
+当 meta-tooling 能直接减少 agent 歧义、增强 verification、保护长期设计意图，或支持下一个 runtime slice 时，它是合理的。
+
+当 meta-tooling 主要是在完善工具系统本身，而没有帮助具体 server capability、module boundary、contract、generator、test 或 verification path 时，应推迟。
+
+在新增另一个 standard、inspect command、check command、schema、generator 或 workflow rule 前，agent 应该先问：
+
+- 它会让哪个具体的未来服务器变更更安全或更容易？
+- 同样的收益能否在下一个 runtime vertical slice 中被证明？
+- 预期 artifact 是否足够小、可维护？
+- 是否有清晰的 verification path？
+- 它会减少 future agents 的上下文负担，还是增加流程重量？
+
+当仓库已有足够 standards 和 checks 支撑第一个 runtime slice 后，默认下一步应该变成一个小的端到端后端能力，而不是继续增加 meta-tooling。
+
+推荐的证明单元是：
+
+```text
+requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
+```
+
 ## 4. 必需项目产物
 
 项目应逐步演进出以下 artifact system。

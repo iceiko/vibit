@@ -323,7 +323,25 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 
 一个好的第一版实现目标，应包含一个小而完整的后端领域，例如 player accounts、inventory、currency、rewards、quests 或 match sessions。
 
-## 14. 交接要求
+## 14. 自举控制
+
+Self-bootstrapping 只有在它能改善通向可工作服务器框架的路径时才有价值。
+
+在新增 standard、inspect command、check command、schema、generator 或 workflow rule 前，先确认它直接支持以下至少一项：
+
+- 下一个 runtime vertical slice
+- 具体 module boundary
+- Public contract 或 generated shape
+- Test 或 verification path
+- 针对预期实现任务减少 agent context
+
+如果收益主要只是让 tooling 本身更完整，应推迟。
+
+当仓库已经有足够 tooling 可以尝试一个小的端到端后端能力时，优先做 runtime slice，而不是继续增加 meta-tooling。
+
+例外情况应记录在 change spec 或 Agent Decision Record 中。
+
+## 15. 交接要求
 
 每次变更结束时，都要给下一个 agent 或 human 留下足够上下文。
 
