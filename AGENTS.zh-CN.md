@@ -58,6 +58,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/README.md`
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
+- `.arch/protocol.yaml`
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
 - `.arch/dependencies.yaml`
@@ -76,12 +77,16 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/schema-validation.zh-CN.md`
 - `docs/dependency-adoption.md`
 - `docs/dependency-adoption.zh-CN.md`
+- `docs/game-protocol.md`
+- `docs/game-protocol.zh-CN.md`
 - `schema/`
 - `rules/`
 
 框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
 
 当前 runtime readiness decisions 指向 Go 作为第一版 server runtime implementation language、WebSocket 作为第一版 gameplay/client protocol、Protobuf 作为第一版 wire message format、modular monolith single-process server model、contract-first commands/queries/events/errors/permissions，以及 `inventory` 作为优先的第一 proof slice。在创建 runtime implementation code 前，必须阅读 `.arch/runtime.yaml`、`ADR-0004` 到 `ADR-0010`，并注意 `ADR-0003` 已被 superseded。
+
+第一版 game protocol framework 记录在 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `ADR-0015` 中。它定义 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 session metadata、game target scopes、server-authoritative message rules、error mapping 和 compatibility expectations。在新增 `.proto` files、WebSocket protocol handlers、generated protocol output 或 client/server protocol rules 前，必须阅读它。
 
 当前可执行工具：
 
@@ -149,6 +154,8 @@ node tools/vibit generate module <module>
 使用 `node tools/vibit inspect rules --category <category>` 按 category 发现 rules。
 
 使用 `.arch/runtime.yaml` 作为 runtime readiness 的机器可读 intake 入口。它链接了约束语言、服务器实例模型、contract 与 generation boundary、client protocol、dependency adoption，以及第一 proof slice 的 ADR。
+
+使用 `.arch/protocol.yaml` 作为 game protocol framework decisions 的机器可读 intake 入口。它链接 `ADR-0015`，并定义第一版 WebSocket Protobuf envelope、route fields、session model、target scopes、authority rules、error model 和第一版 inventory slice protocol scope。
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 

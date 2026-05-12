@@ -66,6 +66,9 @@ documentation_pairs:
   dependency_adoption_standard:
     canonical: docs/dependency-adoption.md
     zh-CN: docs/dependency-adoption.zh-CN.md
+  game_protocol_standard:
+    canonical: docs/game-protocol.md
+    zh-CN: docs/game-protocol.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -99,6 +102,22 @@ runtime_readiness:
     technical_decision_authority: ADR-0012
     first_go_runtime_dependencies: ADR-0013
     go_runtime_layout_and_boundaries: ADR-0014
+    game_protocol_framework: ADR-0015
+
+protocol_framework:
+  manifest: .arch/protocol.yaml
+  standard: docs/game-protocol.md
+  translation: docs/game-protocol.zh-CN.md
+  decision: ADR-0015
+  first_endpoint: /v1/ws
+  envelope_model: websocket_framed_protobuf_envelope
+  routing_fields:
+    - kind
+    - module
+    - name
+  first_slice_scope: player
+  authority_model: server_authoritative
+  check_command: node tools/vibit check protocol
 
 server_runtime:
   first_reference_language: Go
@@ -119,6 +138,9 @@ server_runtime:
     proto_sources: proto
   gameplay_client_protocol: websocket
   wire_message_format: protobuf
+  protocol_framework_manifest: .arch/protocol.yaml
+  protocol_framework_decision: ADR-0015
+  gameplay_websocket_endpoint: /v1/ws
   accepted_websocket_library: github.com/coder/websocket
   accepted_protobuf_runtime: google.golang.org/protobuf
   accepted_protobuf_generator: google.golang.org/protobuf/cmd/protoc-gen-go

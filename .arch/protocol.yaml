@@ -1,0 +1,220 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Machine-readable game protocol framework for the first gameplay/client
+  protocol. This manifest records envelope, routing, session, targeting,
+  authority, compatibility, and implementation-boundary rules before
+  Protobuf sources or runtime protocol handlers are created.
+
+canonical_decisions:
+  websocket_and_protobuf: ADR-0009
+  go_runtime_layout_and_boundaries: ADR-0014
+  game_protocol_framework: ADR-0015
+
+standard:
+  document: docs/game-protocol.md
+  zh-CN: docs/game-protocol.zh-CN.md
+
+external_reference_signals:
+  nakama:
+    useful_patterns:
+      - realtime_socket_surface
+      - presence_and_streams
+      - parties_and_matchmaker
+      - server_authoritative_multiplayer
+    adoption_rule: borrow_concepts_not_api_surface
+  colyseus:
+    useful_patterns:
+      - room_lifecycle
+      - server_owned_state
+      - synchronized_state_changes
+      - room_scoped_client_messages
+    adoption_rule: reserve_room_state_sync_until_room_or_match_module_exists
+  pitaya_pomelo:
+    useful_patterns:
+      - connector_or_frontend_network_ownership
+      - route_based_dispatch
+      - connection_session
+      - server_push
+      - handler_and_remote_boundaries
+    adoption_rule: use_structured_route_fields_instead_of_opaque_route_strings
+  skynet:
+    useful_patterns:
+      - service_message_dispatch
+      - concurrency_boundaries
+    adoption_rule: useful_for_runtime_architecture_not_first_client_wire_protocol
+  agones_open_match:
+    useful_patterns:
+      - game_server_allocation
+      - match_construction_lifecycle
+    adoption_rule: keep_allocation_and_matchmaking_lifecycle_outside_first_inventory_protocol_slice
+
+transport:
+  gameplay_client_protocol: websocket
+  first_endpoint:
+    path: /v1/ws
+    status: planned_until_transport_implementation
+    compatibility: changing_after_clients_exist_requires_change_spec_and_adr
+  owner: runtime/internal/platform/transport/ws
+  adapter_dependency: github.com/coder/websocket
+
+wire_format:
+  format: protobuf
+  source_root: proto
+  generated_go_output: runtime/internal/generated/proto
+  owner: runtime/internal/platform/protocol/protobuf
+  module_package_pattern: vibit.<module>.v1
+  module_source_pattern: proto/vibit/<module>/v1/<module>.proto
+
+envelope:
+  model: websocket_framed_protobuf_envelope
+  status: standard_defined_proto_not_created
+  owner: runtime/internal/platform/protocol/protobuf
+  domain_ownership: forbidden
+  required_concepts:
+    - protocol_version
+    - message_kind
+    - request_correlation
+    - module
+    - name
+    - target
+    - session
+    - payload_encoding
+    - error_mapping
+  routing:
+    route_fields:
+      - kind
+      - module
+      - name
+    semantic_route_key_pattern: <module>.<name>
+    examples:
+      - inventory.GrantItem
+      - inventory.GetInventory
+      - inventory.ItemGranted
+    rule: Business meaning must not be hidden in opaque route strings.
+
+message_kinds:
+  active_for_first_inventory_slice:
+    - command
+    - query
+    - event
+    - error
+    - system
+  reserved:
+    - ack
+    - heartbeat
+    - input
+    - state
+  rules:
+    - Commands express client intent, not server facts.
+    - Queries read server state and do not mutate domain state.
+    - Events pushed to clients are server facts.
+    - Client input is reserved for future authoritative room or match modules.
+    - State snapshots and patches are reserved for future room or match state synchronization.
+
+session_model:
+  identities:
+    connection_id:
+      owner: transport
+      stability: transport_local_may_change_after_reconnect
+    session_id:
+      owner: authentication_or_session_layer
+      stability: logical_session_when_authentication_exists
+    player_id:
+      owner: player_domain
+      stability: domain_identity_when_available
+    connection_epoch:
+      owner: protocol
+      stability: reserved_for_reconnect_rules
+  rule: Inventory protocol work must not invent an authentication shortcut before an auth or player module exists.
+
+target_model:
+  field_status: reserved_for_envelope_metadata
+  scopes:
+    - global
+    - player
+    - party
+    - room
+    - match
+    - stream
+    - system
+  first_slice_scope: player
+  rules:
+    - Player-owned inventory operations use player scope.
+    - Room, match, party, and stream behavior require their own module, contracts, and lifecycle rules before implementation.
+
+authority_model:
+  server_authoritative: true
+  rules:
+    - Client-to-server commands, queries, and inputs are requests.
+    - Server validation determines whether a request is accepted.
+    - Domain events are server facts.
+    - Clients must not publish domain facts directly.
+
+error_model:
+  maps_to_registered_error_catalogs: true
+  required_fields:
+    - code
+    - message
+    - request_id
+    - retryable
+    - details
+  required_distinctions:
+    - transport_error
+    - malformed_envelope
+    - permission_denied
+    - invariant_failed
+    - unknown_route
+    - internal_error
+
+compatibility:
+  envelope_versioning: separate_from_module_package_versioning
+  module_package_version: v1
+  protobuf_rules:
+    - Do not reuse removed field numbers.
+    - Prefer additive evolution.
+    - Breaking protocol changes require a change spec and ADR.
+    - Public wire schemas must remain aligned with registered vibit semantic contracts.
+
+implementation_boundaries:
+  transport_adapter: runtime/internal/platform/transport/ws
+  protocol_adapter: runtime/internal/platform/protocol/protobuf
+  application_dispatch: runtime/internal/app
+  domain_modules: runtime/internal/modules/<module>
+  generated_contracts: runtime/internal/generated/contracts
+  generated_proto: runtime/internal/generated/proto
+  proto_sources: proto/vibit/<module>/v1
+  rules:
+    - Transport handlers must not hide business logic.
+    - Protocol adapters decode envelopes and generated payloads.
+    - Application dispatch routes command and query requests to module handlers.
+    - Domain modules must not own WebSocket connections or Protobuf framing.
+    - Generated output remains immutable to non-system agents.
+
+first_runtime_slice:
+  module: inventory
+  recommended_flow:
+    - websocket_frame
+    - protobuf_envelope
+    - kind_module_name_dispatch
+    - generated_command_or_query_payload
+    - application_dispatcher
+    - inventory_handler
+    - response_envelope
+  excluded_until_separate_decision:
+    - room_state_sync
+    - matchmaking
+    - game_server_allocation
+    - reconnect_replay
+    - presence
+    - streams
+
+verification:
+  check_command: node tools/vibit check protocol
+  current_status: manifest_check_and_contract_proto_alignment
+  future_checks:
+    - envelope_proto_shape
+    - generated_output_traceability
+    - reserved_field_policy
+    - runtime_dispatch_ownership

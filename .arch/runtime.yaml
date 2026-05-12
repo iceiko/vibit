@@ -18,6 +18,7 @@ canonical_decisions:
   technical_decision_authority: ADR-0012
   first_go_runtime_dependencies: ADR-0013
   go_runtime_layout_and_boundaries: ADR-0014
+  game_protocol_framework: ADR-0015
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -116,6 +117,12 @@ server_instance_model:
   protocol_rules:
     - WebSocket is the first client gameplay protocol.
     - Protobuf is the first wire message format for client/server messages.
+    - The first game protocol framework is a WebSocket-framed Protobuf envelope.
+    - Protocol routing uses explicit kind, module, and name fields.
+    - Client-to-server commands, queries, and future inputs are requests, not facts.
+    - Server-pushed domain events are authoritative facts.
+    - Game target metadata reserves global, player, party, room, match, stream, and system scopes.
+    - The first inventory protocol slice uses player scope.
     - The first WebSocket platform adapter uses github.com/coder/websocket.
     - Protobuf generation uses the official Go Protobuf runtime and protoc-gen-go, orchestrated by Buf.
     - Buf Schema Registry is not required by the first runtime dependency decision.
@@ -130,6 +137,38 @@ server_instance_model:
     check_command: node tools/vibit check protocol
     status: active_for_planned_and_existing_proto_sources
     missing_proto_files_allowed_until_generation_starts: true
+  protocol_framework:
+    manifest: .arch/protocol.yaml
+    standard: docs/game-protocol.md
+    decision: ADR-0015
+    envelope_model: websocket_framed_protobuf_envelope
+    first_endpoint: /v1/ws
+    endpoint_status: planned_until_transport_implementation
+    routing_fields:
+      - kind
+      - module
+      - name
+    active_message_kinds_for_first_inventory_slice:
+      - command
+      - query
+      - event
+      - error
+      - system
+    reserved_message_kinds:
+      - ack
+      - heartbeat
+      - input
+      - state
+    target_scopes:
+      - global
+      - player
+      - party
+      - room
+      - match
+      - stream
+      - system
+    first_slice_scope: player
+    authority_model: server_authoritative
   protobuf_layout:
     source_root: proto
     module_source_pattern: proto/vibit/<module>/v1

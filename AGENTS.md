@@ -57,6 +57,7 @@ Existing foundation:
 - `.arch/README.md`
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
+- `.arch/protocol.yaml`
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
 - `.arch/dependencies.yaml`
@@ -75,12 +76,16 @@ Existing foundation:
 - `docs/schema-validation.zh-CN.md`
 - `docs/dependency-adoption.md`
 - `docs/dependency-adoption.zh-CN.md`
+- `docs/game-protocol.md`
+- `docs/game-protocol.zh-CN.md`
 - `schema/`
 - `rules/`
 
 Framework implementation code, generators, modules, and verification commands may not exist yet. When they do not exist, document that verification is not available instead of pretending that it ran.
 
 Runtime readiness decisions currently point to Go as the first server runtime implementation language, WebSocket as the first gameplay/client protocol, Protobuf as the first wire message format, a modular monolith single-process server model, contract-first commands/queries/events/errors/permissions, and `inventory` as the preferred first proof slice. Read `.arch/runtime.yaml`, `ADR-0004` through `ADR-0010`, and note that `ADR-0003` is superseded before creating runtime implementation code.
+
+The first game protocol framework is recorded in `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`. It defines a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, session metadata, game target scopes, server-authoritative message rules, error mapping, and compatibility expectations. Read it before adding `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
 
 Current executable tooling:
 
@@ -148,6 +153,8 @@ Use `node tools/vibit inspect rule <rule-id>` when only one rule's metadata is n
 Use `node tools/vibit inspect rules --category <category>` to discover rules by category.
 
 Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, client protocol, dependency adoption, and first proof slice.
+
+Use `.arch/protocol.yaml` as the machine-readable intake point for game protocol framework decisions. It links `ADR-0015` and defines the first WebSocket Protobuf envelope, route fields, session model, target scopes, authority rules, error model, and first inventory slice protocol scope.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 

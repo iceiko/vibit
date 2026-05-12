@@ -40,6 +40,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/README.md`: machine-readable architecture manifest entry point
 - `.arch/modules.yaml`: first draft module registry manifest
 - `.arch/conventions.yaml`: first draft repository convention manifest
+- `.arch/protocol.yaml`: game protocol framework manifest for the first WebSocket Protobuf envelope
 - `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
 - `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
 - `.arch/dependencies.yaml`: dependency adoption registry for foundational dependency decision slots
@@ -58,6 +59,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/schema-validation.zh-CN.md`: Simplified Chinese translation
 - `docs/dependency-adoption.md`: dependency adoption standard
 - `docs/dependency-adoption.zh-CN.md`: Simplified Chinese translation
+- `docs/game-protocol.md`: game protocol framework standard
+- `docs/game-protocol.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
 - `rules/`: rule catalogs for machine-readable check metadata
 
@@ -79,6 +82,7 @@ vibit should evolve toward:
 - A first Go module at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
 - Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
+- A game-aware WebSocket Protobuf envelope governed by `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`
 - SQL-first PostgreSQL migration source files under `runtime/migrations/postgres/`
 - S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
@@ -169,6 +173,8 @@ Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsin
 Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
 
 The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
+
+The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is planned as `/v1/ws` until transport implementation begins. The first inventory slice should use player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
 
 PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
 

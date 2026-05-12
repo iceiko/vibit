@@ -28,6 +28,7 @@ The `.arch/` directory should answer the questions an agent must resolve before 
   README.zh-CN.md
   modules.yaml
   conventions.yaml
+  protocol.yaml
   runtime.yaml
   contracts.yaml
   dependencies.yaml
@@ -36,6 +37,8 @@ The `.arch/` directory should answer the questions an agent must resolve before 
 This is the first draft. The files describe expected shape before implementation code exists.
 
 `runtime.yaml` records the runtime readiness decisions for the first Go server runtime direction. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, client protocol, wire format, persistence direction, dependency adoption, and proof slice.
+
+`protocol.yaml` records the first game protocol framework. It defines the planned WebSocket-framed Protobuf envelope, structured routing fields, session identity model, game target scopes, server-authoritative message rules, compatibility expectations, and implementation boundaries. The human-readable standard is `docs/game-protocol.md`, and the governing decision is `ADR-0015`.
 
 `ADR-0014` records the first Go runtime package layout and boundary rules. The planned Go module root is `runtime/`, with process startup under `runtime/cmd/vibit-server/`, application orchestration under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain runtime logic under `runtime/internal/modules/<module>/`, generated Go outputs under `runtime/internal/generated/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/`.
 
@@ -72,10 +75,11 @@ Before changing implementation code, agents should:
 3. Read `.arch/modules.yaml`.
 4. Read `.arch/conventions.yaml`.
 5. Read `.arch/runtime.yaml` before changing or creating runtime implementation code.
-6. Read `.arch/contracts.yaml` before adding or changing public contracts.
-7. Read `.arch/dependencies.yaml` before adding foundational dependencies.
-8. Read the affected module's `module.yaml`, when it exists.
-9. Update manifests before implementation when public architecture changes.
+6. Read `.arch/protocol.yaml` before adding or changing `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
+7. Read `.arch/contracts.yaml` before adding or changing public contracts.
+8. Read `.arch/dependencies.yaml` before adding foundational dependencies.
+9. Read the affected module's `module.yaml`, when it exists.
+10. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 
@@ -89,6 +93,7 @@ These manifests should eventually power checks similar to:
 vibit check architecture
 vibit check module <module>
 vibit check contracts
+vibit check protocol
 vibit check change <change-id>
 ```
 

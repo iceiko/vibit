@@ -1,0 +1,85 @@
+schema_version: 0.1
+change_id: define-game-protocol-framework
+date: 2026-05-13
+type: standard
+status: verified
+
+summary: Define the first game-aware WebSocket Protobuf protocol framework before creating protocol source files or runtime handlers.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  added:
+    - .arch/protocol.yaml
+    - docs/game-protocol.md
+    - docs/game-protocol.zh-CN.md
+    - decisions/ADR-0015-game-protocol-framework.md
+    - conversations/2026-05-13-game-protocol-framework.md
+    - changes/2026-05-13-define-game-protocol-framework/
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/conventions.yaml
+    - .arch/runtime.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - proto/README.md
+    - proto/README.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+decisions:
+  - ADR-0009
+  - ADR-0014
+  - ADR-0015
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node_check_tools
+    - check_protocol
+    - check_protocol_json
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_contracts
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - check_change
+    - diff_check
+    - secret_scan
+  status: Verified

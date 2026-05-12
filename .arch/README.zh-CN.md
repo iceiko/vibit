@@ -29,6 +29,7 @@
   README.zh-CN.md
   modules.yaml
   conventions.yaml
+  protocol.yaml
   runtime.yaml
   contracts.yaml
   dependencies.yaml
@@ -37,6 +38,8 @@
 这是第一版草案。这些文件在实现代码存在前先描述预期形态。
 
 `runtime.yaml` 记录第一版 Go server runtime 方向的 runtime readiness decisions。它指向约束第一语言、服务器实例模型、contract boundary、client protocol、wire format、persistence direction、dependency adoption 和 proof slice 的 Agent Decision Records。
+
+`protocol.yaml` 记录第一版 game protocol framework。它定义计划中的 WebSocket-framed Protobuf envelope、structured routing fields、session identity model、game target scopes、server-authoritative message rules、compatibility expectations 和 implementation boundaries。面向人类阅读的标准是 `docs/game-protocol.md`，治理决策是 `ADR-0015`。
 
 `ADR-0014` 记录第一版 Go runtime package layout 和 boundary rules。计划中的 Go module root 是 `runtime/`，process startup 放在 `runtime/cmd/vibit-server/`，application orchestration 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain runtime logic 放在 `runtime/internal/modules/<module>/`，生成的 Go outputs 放在 `runtime/internal/generated/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录 `proto/`。
 
@@ -73,10 +76,11 @@ S3 client tooling、MinIO deployment、observability 和外部 Go test framework
 3. 阅读 `.arch/modules.yaml`。
 4. 阅读 `.arch/conventions.yaml`。
 5. 在修改或创建 runtime implementation code 前，阅读 `.arch/runtime.yaml`。
-6. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
-7. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
-8. 在相关 module 存在时，阅读其 `module.yaml`。
-9. 当 public architecture 变化时，先更新 manifests，再实现。
+6. 在新增或修改 `.proto` files、WebSocket protocol handlers、generated protocol output 或 client/server protocol rules 前，阅读 `.arch/protocol.yaml`。
+7. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
+8. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
+9. 在相关 module 存在时，阅读其 `module.yaml`。
+10. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 
@@ -90,6 +94,7 @@ Decision authority boundary 以 `ADR-0012` 为准。在 maintainer 授权后，a
 vibit check architecture
 vibit check module <module>
 vibit check contracts
+vibit check protocol
 vibit check change <change-id>
 ```
 

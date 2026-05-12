@@ -9,6 +9,8 @@
 
 Business behavior 的 semantic source of truth 仍然位于 `contracts/` 和 module manifests。Protobuf files 定义 client/server wire message shape，并且必须与 semantic contract sources 保持一致。
 
+Game protocol envelope standard 由 `docs/game-protocol.md`、`.arch/protocol.yaml` 和 `ADR-0015` 定义。创建 `.proto` files 前必须阅读这些 artifacts。第一版 protocol model 是 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 session metadata、target metadata、server-authoritative message rules 和 error mapping。
+
 ## Layout
 
 Module Protobuf sources 应使用：
@@ -32,10 +34,12 @@ runtime/internal/generated/proto/
 ## Rules
 
 - 在创建或修改 `.proto` files 前，运行 `node tools/vibit check protocol`。
+- 保持 envelope 和 module payload schemas 与 `.arch/protocol.yaml` 对齐。
 - 不要手工编辑生成的 Go Protobuf output。
 - Protobuf package names、message names、service names 和 field names 使用英文。
 - Public wire schemas 必须显式 versioned。
 - Transport adapters 应把 Protobuf wire messages 转换为 vibit commands 和 queries；domain modules 不拥有 Protobuf framing。
+- 在相关 modules 和 standards 存在前，不要在 Protobuf files 中实现 room state sync、matchmaking、allocation、reconnect replay、presence、streams、realtime input 或 state patches。
 
 ## Future Tooling
 

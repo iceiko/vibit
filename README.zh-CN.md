@@ -40,6 +40,7 @@ vibit 从另一个前提出发：
 - `.arch/README.md`：机器可读 architecture manifest 入口
 - `.arch/modules.yaml`：第一版 module registry manifest 草案
 - `.arch/conventions.yaml`：第一版 repository convention manifest 草案
+- `.arch/protocol.yaml`：第一版 WebSocket Protobuf envelope 的 game protocol framework manifest
 - `.arch/runtime.yaml`：第一版 Go server runtime 方向的 runtime readiness manifest
 - `.arch/contracts.yaml`：public command、query、event、error 和 permission source files 的 contract registry
 - `.arch/dependencies.yaml`：foundational dependency decision slots 的 dependency adoption registry
@@ -58,6 +59,8 @@ vibit 从另一个前提出发：
 - `docs/schema-validation.zh-CN.md`：简体中文译本
 - `docs/dependency-adoption.md`：dependency adoption 标准
 - `docs/dependency-adoption.zh-CN.md`：简体中文译本
+- `docs/game-protocol.md`：game protocol framework 标准
+- `docs/game-protocol.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
 - `rules/`：面向机器可读 check metadata 的 rule catalogs
 
@@ -79,6 +82,7 @@ vibit 应逐步演进出：
 - 第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries 位于 `runtime/cmd/vibit-server/`、`runtime/internal/app/`、`runtime/internal/platform/`、`runtime/internal/modules/` 和 `runtime/internal/generated/`
 - Protobuf source files 位于 `proto/vibit/<module>/v1/`，生成的 Go Protobuf output 位于 `runtime/internal/generated/proto/`
+- 由 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `ADR-0015` 约束的 game-aware WebSocket Protobuf envelope
 - SQL-first PostgreSQL migration source files 位于 `runtime/migrations/postgres/`
 - S3-compatible object storage 作为计划中的大对象存储抽象，MinIO 作为本地/自托管优先候选，但需要先完成 dependency adoption
 - `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
@@ -169,6 +173,8 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 使用 `node tools/vibit inspect rules` 或 `node tools/vibit inspect rules --category <category>` 可以发现可用 rules。
 
 第一版 server runtime 方向是 Go，并采用 modular monolith single-process server model。WebSocket 是第一版 gameplay/client protocol，Protobuf 是第一版 client/server wire format。Semantic business contracts 仍然保留在 vibit manifests 和 contract source files 中；Protobuf 负责 wire schema shape。见 `.arch/runtime.yaml`、`decisions/ADR-0008-go-server-runtime-language.md` 和 `decisions/ADR-0009-websocket-protobuf-client-protocol.md`。
+
+第一版 game protocol framework 是 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 request correlation、session metadata、target scopes、server-authoritative message rules 和 error mapping。第一版 endpoint 在 transport implementation 开始前计划为 `/v1/ws`。第一版 inventory slice 应使用 player-scoped command/query/event/error/system messages；room state sync、matchmaking、allocation、reconnect replay、presence、streams、realtime input 和 state patches 仍然 deferred，直到它们拥有独立 modules 和 standards。见 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `decisions/ADR-0015-game-protocol-framework.md`。
 
 PostgreSQL 是 runtime state 的第一版 authoritative durable relational store。S3-compatible object storage 计划用于 replays、snapshots、exports、binary assets 和 diagnostic archives 等大对象 artifacts。MinIO 是这个 S3-compatible 角色的本地/自托管优先候选，但在具体 use case 和 dependency adoption record 证明它必要之前，它不是 mandatory runtime dependency。Domain modules 必须使用 vibit-owned storage interfaces，而不是直接依赖 database drivers 或 object-storage clients。见 `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`。
 
