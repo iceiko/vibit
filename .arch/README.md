@@ -1,7 +1,7 @@
 # Architecture Manifests
 
 Status: Draft v0.1  
-Last updated: 2026-05-12  
+Last updated: 2026-05-13
 Scope: Machine-readable architecture entry point for vibit
 
 This directory contains architecture manifests for agents, humans, generators, and future verification commands.
@@ -41,6 +41,15 @@ This is the first draft. The files describe expected shape before implementation
 
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
 
+The first accepted Go runtime dependencies are recorded by `ADR-0013`:
+
+- `github.com/coder/websocket` for the platform WebSocket transport adapter.
+- `google.golang.org/protobuf`, `protoc-gen-go`, and Buf CLI for Protobuf runtime, generation, linting, breaking checks, formatting, and orchestration.
+- `github.com/jackc/pgx/v5` for PostgreSQL platform persistence adapters.
+- `github.com/pressly/goose/v3` for SQL-first migration tooling.
+
+S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
+
 ## Expected Future Files
 
 ```text
@@ -65,6 +74,8 @@ Before changing implementation code, agents should:
 9. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
+
+Use `ADR-0012` for the decision authority boundary. After maintainer authorization, agents may professionally evaluate technical sub-decisions inside ratified directions, but must still ask before changing product direction, constitutional principles, runtime language, primary protocol direction, persistence direction, major architecture patterns, module ownership, breaking contracts, validation or permission strength, licensing-risk acceptance, hosting, cost, operations, or vendor-lock-in commitments.
 
 ## Verification Direction
 

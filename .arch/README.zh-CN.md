@@ -1,7 +1,7 @@
 # Architecture Manifests 中文版
 
 状态：Draft v0.1  
-最后更新：2026-05-12  
+最后更新：2026-05-13
 范围：vibit 的机器可读架构入口  
 说明：本文件是 `.arch/README.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
@@ -42,6 +42,15 @@
 
 `dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
 
+第一批已接受的 Go runtime dependencies 由 `ADR-0013` 记录：
+
+- `github.com/coder/websocket` 用于 platform WebSocket transport adapter。
+- `google.golang.org/protobuf`、`protoc-gen-go` 和 Buf CLI 用于 Protobuf runtime、generation、linting、breaking checks、formatting 和 orchestration。
+- `github.com/jackc/pgx/v5` 用于 PostgreSQL platform persistence adapters。
+- `github.com/pressly/goose/v3` 用于 SQL-first migration tooling。
+
+S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
+
 ## 未来预期文件
 
 ```text
@@ -66,6 +75,8 @@
 9. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
+
+Decision authority boundary 以 `ADR-0012` 为准。在 maintainer 授权后，agents 可以在已确认方向内按专业评估决定 technical sub-decisions，但修改 product direction、constitutional principles、runtime language、primary protocol direction、persistence direction、major architecture patterns、module ownership、breaking contracts、validation 或 permission 强度，以及接受 licensing-risk、hosting、cost、operations 或 vendor-lock-in commitments 前，仍必须询问。
 
 ## 验证方向
 

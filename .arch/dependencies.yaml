@@ -10,6 +10,8 @@ standard:
   document: docs/dependency-adoption.md
   template: docs/_templates/dependency-adoption.md
   governing_decision: ADR-0010
+  technical_decision_authority: ADR-0012
+  first_runtime_adoption_record: ADR-0013
 
 rules:
   - id: foundational_dependency_requires_adoption_record
@@ -35,61 +37,82 @@ status_values:
 dependency_slots:
   websocket_server:
     category: transport
-    status: proposed
+    status: accepted
     required_before:
       - first_websocket_runtime_adapter
     governing_decisions:
       - ADR-0009
       - ADR-0010
+      - ADR-0013
     allowed_owner: platform_transport_adapter
     forbidden_owners:
       - domain_modules
-    selected_dependency: null
-    adoption_record: null
+    selected_dependency: github.com/coder/websocket
+    adoption_record: decisions/ADR-0013-first-go-runtime-dependencies.md
+    replacement_candidates:
+      - github.com/gorilla/websocket
+    note: Use only behind vibit-owned transport adapter interfaces.
 
   protobuf_tooling:
     category: protocol_generation
-    status: proposed
+    status: accepted
     required_before:
       - first_proto_generation
       - manifest_proto_alignment_check
     governing_decisions:
       - ADR-0009
       - ADR-0010
+      - ADR-0013
     allowed_owner: generation_tooling
     forbidden_owners:
       - domain_modules
-    selected_dependency: null
-    adoption_record: null
+      - handwritten_domain_logic
+    selected_dependency:
+      runtime: google.golang.org/protobuf
+      generator: google.golang.org/protobuf/cmd/protoc-gen-go
+      orchestrator: buf.build CLI
+    adoption_record: decisions/ADR-0013-first-go-runtime-dependencies.md
+    note: Buf Schema Registry is not required by this adoption.
 
   postgresql_driver:
     category: persistence
-    status: proposed
+    status: accepted
     required_before:
       - first_persistent_repository
     governing_decisions:
       - ADR-0010
       - ADR-0011
+      - ADR-0013
     allowed_owner: platform_persistence_adapter
     forbidden_owners:
       - domain_modules
-    selected_dependency: null
-    adoption_record: null
+    selected_dependency: github.com/jackc/pgx/v5
+    adoption_record: decisions/ADR-0013-first-go-runtime-dependencies.md
+    replacement_candidates:
+      - database/sql with github.com/lib/pq
+    note: Domain modules use vibit-owned repository interfaces, not pgx packages.
 
   migration_tooling:
     category: migration_tooling
-    status: proposed
+    status: accepted
     required_before:
       - first_database_migration
       - first_persistent_repository
     governing_decisions:
       - ADR-0010
       - ADR-0011
+      - ADR-0013
     allowed_owner: platform_migration_tooling
     forbidden_owners:
       - domain_modules
-    selected_dependency: null
-    adoption_record: null
+      - domain_runtime_logic
+    selected_dependency: github.com/pressly/goose/v3
+    adoption_record: decisions/ADR-0013-first-go-runtime-dependencies.md
+    replacement_candidates:
+      - github.com/golang-migrate/migrate
+      - ariga.io/atlas
+      - custom_vibit_migration_runner
+    note: SQL-first migrations are the default. Go migrations require a change spec explaining why SQL is insufficient.
 
   s3_client:
     category: object_storage
@@ -123,16 +146,18 @@ dependency_slots:
 
   test_framework:
     category: testing
-    status: proposed
+    status: deferred
     required_before:
       - first_go_runtime_tests_beyond_standard_library
     governing_decisions:
       - ADR-0010
+      - ADR-0013
     allowed_owner: test_infrastructure
     forbidden_owners:
       - domain_runtime_logic
     selected_dependency: null
-    adoption_record: null
+    adoption_record: decisions/ADR-0013-first-go-runtime-dependencies.md
+    note: External Go test framework adoption is deferred until the standard library is insufficient for a concrete runtime test need.
 
   observability:
     category: observability

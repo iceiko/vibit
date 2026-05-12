@@ -72,6 +72,10 @@ vibit should evolve toward:
 - WebSocket as the first gameplay/client protocol
 - Protobuf as the first client/server wire message format
 - PostgreSQL as the first authoritative durable relational store
+- `github.com/coder/websocket` as the first WebSocket platform adapter dependency
+- `google.golang.org/protobuf`, `protoc-gen-go`, and Buf CLI as the first Protobuf tooling stack
+- `github.com/jackc/pgx/v5` as the first PostgreSQL driver behind platform persistence adapters
+- `github.com/pressly/goose/v3` as the first SQL-first migration tooling
 - S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
@@ -159,6 +163,8 @@ Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --catego
 The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
 
 PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
+
+The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
 
 ## Early Reference Domain
 

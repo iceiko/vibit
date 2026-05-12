@@ -1,7 +1,7 @@
 # Agent 操作指南
 
 状态：Draft v0.1  
-最后更新：2026-05-12  
+最后更新：2026-05-13
 范围：仓库级 coding agent 操作指令  
 权威来源：`CONSTITUTION.md`  
 说明：本文件是 `AGENTS.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
@@ -244,9 +244,24 @@ Generated files 对 non-system agents 不可变。如果 generated output 错了
 
 对于 server runtime，Go 是第一版 implementation language。WebSocket 是第一版 gameplay/client protocol。Protobuf 是第一版 wire message format。PostgreSQL 是第一版 authoritative durable relational store。S3-compatible object storage 是计划中的 object-storage abstraction，MinIO 是本地/自托管方向的优先候选，但必须先经过 dependency adoption record。Domain modules 不得直接依赖第三方 transport、protocol、persistence、object-storage 或 framework libraries；这些依赖由 platform adapters 通过 vibit-owned interfaces 承载。
 
+第一批已接受的 Go runtime dependencies 记录在 `ADR-0013` 和 `.arch/dependencies.yaml` 中：
+
+- `github.com/coder/websocket` 用于 platform WebSocket transport adapter。
+- `google.golang.org/protobuf` 和 `google.golang.org/protobuf/cmd/protoc-gen-go` 用于 Go Protobuf runtime 和 generation。
+- Buf CLI 用于 Protobuf linting、breaking checks、formatting 和 generation orchestration。
+- `github.com/jackc/pgx/v5` 用于 PostgreSQL platform persistence adapters。
+- `github.com/pressly/goose/v3` 用于 SQL-first migration tooling。
+- 先使用 Go standard-library `testing`；目前尚未采纳外部 test framework。
+
+只有声明过的 owner layers 可以直接 import 或 invoke 这些已接受依赖。Domain runtime logic 和 domain modules 必须使用 vibit-owned interfaces、generated contracts、repositories 和 adapters。
+
+Goose migrations 应以 SQL-first 为默认。Go migrations 需要 change spec 解释为什么 SQL 不足，并且不得成为隐藏 domain business logic 的位置。
+
 在新增 persistence implementation 前，agents 必须先声明或更新相关 repository interfaces、migration expectations、transaction boundaries 和 storage verification path。未通过遵循 `ADR-0010` 和 `ADR-0011` 的 change spec 或 adoption record，不要添加 PostgreSQL drivers、migration tools、S3 SDKs 或 MinIO clients。
 
 在添加 foundational dependencies 前，agents 必须检查 `.arch/dependencies.yaml`。在 adoption record 尚未记录 problem solved、license、maintenance activity、abstraction boundary、allowed owners、forbidden owners、replacement path 和 verification path 前，不要把 dependency slot 改为 `accepted`。
+
+Decision authority 以 `ADR-0012` 为准。在 maintainer 明确授权后，agents 可以在既有已确认方向内，按专业评估决定 technical sub-decisions。但修改 constitutional principles、product direction、runtime language、primary protocol direction、persistence direction、major architecture patterns、module ownership、breaking contracts、validation 或 permission 强度，以及接受 licensing-risk、hosting、cost、operations 或 vendor-lock-in commitments 之前，仍必须询问 maintainer。
 
 `schema/` 应以 `docs/schema-validation.md` 作为源标准。
 
@@ -314,6 +329,8 @@ Not applicable: <reason>
 - 删除 tests
 - 削弱 validation 或 permission checks
 - 在 modules 之间迁移 data ownership
+- 接受有实质影响的 licensing-risk、hosting、cost、operations 或 vendor-lock-in commitments
+- 修改 server runtime language、primary protocol direction、persistence direction 或 core project thesis
 - 添加重大的外部框架依赖
 
 ## 11. 禁止事项

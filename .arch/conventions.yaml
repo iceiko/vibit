@@ -96,17 +96,26 @@ runtime_readiness:
     client_protocol_and_wire_format: ADR-0009
     dependency_adoption: ADR-0010
     persistence_direction: ADR-0011
+    technical_decision_authority: ADR-0012
+    first_go_runtime_dependencies: ADR-0013
 
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules
   gameplay_client_protocol: websocket
   wire_message_format: protobuf
+  accepted_websocket_library: github.com/coder/websocket
+  accepted_protobuf_runtime: google.golang.org/protobuf
+  accepted_protobuf_generator: google.golang.org/protobuf/cmd/protoc-gen-go
+  accepted_protobuf_orchestrator: buf.build CLI
   tooling_cli_language: JavaScript
   tooling_cli_is_server_runtime: false
 
 persistence:
   first_authoritative_store: PostgreSQL
+  accepted_postgresql_driver: github.com/jackc/pgx/v5
+  accepted_migration_tooling: github.com/pressly/goose/v3
+  migration_default: SQL-first migrations
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency
@@ -153,6 +162,12 @@ dependency_adoption:
   standard: docs/dependency-adoption.md
   template: docs/_templates/dependency-adoption.md
   governing_decision: ADR-0010
+  technical_decision_authority: ADR-0012
+  first_runtime_adoption_record: ADR-0013
+
+agent_decision_authority:
+  delegated_technical_decisions: ADR-0012
+  rule: Agents may professionally evaluate and decide technical sub-decisions after maintainer authorization, while ask-first categories remain maintainer-owned.
 
 change_workflow:
   required_steps:
@@ -181,6 +196,8 @@ agent_rules:
     - Introduce a major architecture pattern.
     - Make breaking public contract changes.
     - Move data ownership between modules.
+    - Accept licensing-risk, hosting, cost, operations, or vendor-lock-in commitments.
+    - Change server runtime language, primary protocol direction, persistence direction, or core project thesis.
   never:
     - Claim verification was run when it was not.
     - Bypass module boundaries for convenience.

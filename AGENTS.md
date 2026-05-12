@@ -1,7 +1,7 @@
 # Agent Operating Guide
 
 Status: Draft v0.1  
-Last updated: 2026-05-12  
+Last updated: 2026-05-13
 Scope: Repository-level operating instructions for coding agents  
 Canonical source: `CONSTITUTION.md`
 
@@ -243,9 +243,24 @@ Generated files are immutable to non-system agents. If generated output is wrong
 
 For the server runtime, Go is the first implementation language. WebSocket is the first gameplay/client protocol. Protobuf is the first wire message format. PostgreSQL is the first authoritative durable relational store. S3-compatible object storage is a planned object-storage abstraction, with MinIO as the preferred local/self-hosted candidate pending a dependency adoption record. Domain modules must not depend directly on third-party transport, protocol, persistence, object-storage, or framework libraries; platform adapters own those dependencies behind vibit-owned interfaces.
 
+Accepted first Go runtime dependencies are recorded in `ADR-0013` and `.arch/dependencies.yaml`:
+
+- `github.com/coder/websocket` for the platform WebSocket transport adapter.
+- `google.golang.org/protobuf` and `google.golang.org/protobuf/cmd/protoc-gen-go` for Go Protobuf runtime and generation.
+- Buf CLI for Protobuf linting, breaking checks, formatting, and generation orchestration.
+- `github.com/jackc/pgx/v5` for PostgreSQL platform persistence adapters.
+- `github.com/pressly/goose/v3` for SQL-first migration tooling.
+- Go standard-library `testing` first; no external test framework is adopted yet.
+
+Direct imports or invocations of accepted dependencies are allowed only in their declared owner layers. Domain runtime logic and domain modules must use vibit-owned interfaces, generated contracts, repositories, and adapters.
+
+Goose migrations should be SQL-first. Go migrations require a change spec explaining why SQL is insufficient and must not hide domain business logic.
+
 Before adding persistence implementation, agents must declare or update the relevant repository interfaces, migration expectations, transaction boundaries, and storage verification path. Do not add PostgreSQL drivers, migration tools, S3 SDKs, or MinIO clients without a change spec or adoption record that follows `ADR-0010` and `ADR-0011`.
 
 Before adding foundational dependencies, agents must check `.arch/dependencies.yaml`. Do not change a dependency slot to `accepted` until an adoption record documents the problem solved, license, maintenance activity, abstraction boundary, allowed owners, forbidden owners, replacement path, and verification path.
+
+Use `ADR-0012` for decision authority. After explicit maintainer authorization, agents may professionally evaluate and decide technical sub-decisions inside an already ratified direction. Still ask the maintainer before changing constitutional principles, product direction, runtime language, primary protocol direction, persistence direction, major architecture patterns, module ownership, breaking contracts, validation or permission strength, licensing-risk acceptance, hosting, cost, operations, or vendor-lock-in commitments.
 
 Use `docs/schema-validation.md` as the source standard for `schema/`.
 
@@ -313,6 +328,8 @@ Ask the human maintainer before:
 - Removing tests
 - Weakening validation or permission checks
 - Moving data ownership between modules
+- Accepting meaningful licensing-risk, hosting, cost, operations, or vendor-lock-in commitments
+- Changing server runtime language, primary protocol direction, persistence direction, or core project thesis
 - Adding a major external framework dependency
 
 ## 11. Never

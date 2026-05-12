@@ -15,6 +15,8 @@ canonical_decisions:
   client_protocol_and_wire_format: ADR-0009
   dependency_adoption: ADR-0010
   persistence_direction: ADR-0011
+  technical_decision_authority: ADR-0012
+  first_go_runtime_dependencies: ADR-0013
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -28,6 +30,19 @@ first_reference_runtime:
   platform: Go runtime
   package_manager: go_modules
   dependency_policy: explicit_adoption_record_for_foundational_dependencies
+  accepted_foundational_dependencies:
+    websocket_server: github.com/coder/websocket
+    protobuf_runtime: google.golang.org/protobuf
+    protobuf_generator: google.golang.org/protobuf/cmd/protoc-gen-go
+    protobuf_orchestrator: buf.build CLI
+    postgresql_driver: github.com/jackc/pgx/v5
+    migration_tooling: github.com/pressly/goose/v3
+    test_framework: Go standard library testing first
+  deferred_foundational_dependencies:
+    - s3_client
+    - minio_server
+    - observability
+    - external_go_test_framework
   current_scripts: {}
   planned_verification:
     format: gofmt
@@ -72,6 +87,9 @@ server_instance_model:
   protocol_rules:
     - WebSocket is the first client gameplay protocol.
     - Protobuf is the first wire message format for client/server messages.
+    - The first WebSocket platform adapter uses github.com/coder/websocket.
+    - Protobuf generation uses the official Go Protobuf runtime and protoc-gen-go, orchestrated by Buf.
+    - Buf Schema Registry is not required by the first runtime dependency decision.
     - HTTP must not become the first gameplay API without a superseding decision.
     - Transport adapters convert wire messages into commands and queries.
     - Domain modules do not own WebSocket connections, Protobuf framing, or third-party network library details.
@@ -95,6 +113,7 @@ persistence_model:
   status: runtime_readiness_decision
   authoritative_store:
     engine: PostgreSQL
+    accepted_driver: github.com/jackc/pgx/v5
     role: first_authoritative_durable_relational_store
     scope:
       - module_owned_state
@@ -119,11 +138,11 @@ persistence_model:
   domain_rules:
     - Domain modules must depend on vibit-owned repository or object-store interfaces, not PostgreSQL drivers or S3 SDKs directly.
     - PostgreSQL schema, migrations, repository interfaces, and transaction boundaries must be declared before runtime persistence implementation.
+    - The first migration tool is github.com/pressly/goose/v3 with SQL-first migration files.
+    - Go migrations require a change spec explaining why SQL is insufficient and must not hide domain business logic.
     - S3-compatible object storage must remain optional until a concrete module or platform capability requires it.
     - MinIO must not become a mandatory runtime dependency without an adoption record covering license, maintenance, operations, and replacement path.
   deferred:
-    - first_go_postgresql_driver
-    - migration_tooling
     - transaction_boundary_standard
     - repository_interface_layout
     - outbox_or_event_log_storage_standard
@@ -171,13 +190,12 @@ first_runtime_proof_slice:
     - Build a full game backend.
     - Add AI gameplay features.
     - Optimize distributed performance.
-    - Choose a PostgreSQL driver, migration tool, S3 SDK, or required object storage deployment.
+    - Choose an S3 SDK or required object storage deployment.
 
 open_questions:
   - Decide whether the first Go workspace should use runtime/ only or split runtime/ and packages/.
-  - Choose the first WebSocket library through a dependency adoption record.
-  - Choose Protobuf tooling and generation layout through a dependency adoption record.
+  - Define the Go package layout for platform adapters and generated protocol packages.
   - Define the manifest-to-proto consistency check before broad protocol generation.
-  - Choose the first Go PostgreSQL driver through a dependency adoption record.
-  - Define the migration and transaction boundary standard before implementing persistent repositories.
+  - Define migration directory layout before adding the first database migration.
+  - Define the transaction boundary standard before implementing persistent repositories.
   - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.
