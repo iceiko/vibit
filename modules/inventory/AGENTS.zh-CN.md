@@ -38,7 +38,7 @@
 - Repository：位于 module boundary 后面的 inventory persistence
 - Tests：command、query、event、contract、invariant 和 architecture tests
 
-Runtime contract source files 现在位于 `contracts/inventory/` 下，并登记在 `.arch/contracts.yaml` 中。Generated files 还没有创建。
+Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `.arch/contracts.yaml` 中。第一份 generated shape 是 `modules/inventory/generated/contracts/GrantItem.generated.ts`。
 
 在实现第一条 runtime slice 前，应阅读：
 
@@ -47,6 +47,15 @@ Runtime contract source files 现在位于 `contracts/inventory/` 下，并登�
 - `contracts/inventory/events/ItemGranted.yaml`
 - `contracts/inventory/errors/inventory_errors.yaml`
 - `contracts/inventory/permissions/inventory_permissions.yaml`
+
+第一条 handwritten runtime 路径是：
+
+- Command handler：`modules/inventory/commands/GrantItem.ts`
+- Repository：`modules/inventory/repositories/InMemoryInventoryRepository.ts`
+- Policies：
+  - `modules/inventory/policies/inventoryCapacityPolicy.ts`
+  - `modules/inventory/policies/inventoryPermissionPolicy.ts`
+- Tests：`modules/inventory/tests/GrantItem.test.ts`
 
 ## Forbidden Shortcuts
 
@@ -73,4 +82,4 @@ Runtime contract source files 现在位于 `contracts/inventory/` 下，并登�
 - Permission failure 使用 `INVENTORY_PERMISSION_DENIED`。
 - Architecture checks 仍然通过。
 
-如果 runtime test infrastructure 尚不存在，应把相关 tests 记录为 not available，而不是从 manifest 中移除。
+修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。

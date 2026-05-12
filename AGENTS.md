@@ -93,6 +93,8 @@ node tools/vibit check contracts
 node tools/vibit check contracts --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check runtime
+node tools/vibit check runtime --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
@@ -122,6 +124,8 @@ Use `node tools/vibit check memory` when conversation logs or Agent Decision Rec
 Use `node tools/vibit check contracts` when contract source files or `.arch/contracts.yaml` are added or changed.
 
 Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
+
+Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
 

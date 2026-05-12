@@ -104,6 +104,8 @@ node tools/vibit check contracts
 node tools/vibit check contracts --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check runtime
+node tools/vibit check runtime --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect contract --module inventory --type command --id GrantItem
@@ -132,6 +134,8 @@ node tools/vibit generate module <module>
 使用 `node tools/vibit check contracts` 可以验证 `.arch/contracts.yaml` 与已登记 contract source files 的一致性。
 
 使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
+
+使用 `node tools/vibit check runtime` 可以运行当前 module runtime tests。
 
 使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>` 可以在 agent intake 阶段以 JSON 查询单个已登记 command、query、event、error catalog 或 permission catalog。
 

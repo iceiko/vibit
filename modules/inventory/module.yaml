@@ -147,13 +147,13 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: prepared
+  status: grant_item_handler_implemented
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: in_memory_repository_is_acceptable_for_first_slice
-  runtime_implementation: not_started
+  runtime_implementation: grant_item_command_handler
   non_goals:
     - full_item_catalog
     - player_account_lifecycle
@@ -171,6 +171,6 @@ tests:
     - invariant_tests
     - architecture_tests
   not_available_until_runtime:
-    - runtime_unit_tests
-    - runtime_contract_tests
     - runtime_invariant_tests
+  available:
+    - modules/inventory/tests/GrantItem.test.ts

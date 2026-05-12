@@ -94,6 +94,8 @@ node tools/vibit check contracts
 node tools/vibit check contracts --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check runtime
+node tools/vibit check runtime --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
@@ -123,6 +125,8 @@ node tools/vibit generate module <module>
 当新增或修改 contract source files 或 `.arch/contracts.yaml` 时，使用 `node tools/vibit check contracts`。
 
 当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
+
+当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。
 
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
 

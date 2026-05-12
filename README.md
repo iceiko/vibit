@@ -104,6 +104,8 @@ node tools/vibit check contracts
 node tools/vibit check contracts --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check runtime
+node tools/vibit check runtime --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect contract --module inventory --type command --id GrantItem
@@ -132,6 +134,8 @@ Use `node tools/vibit check memory` to verify required conversation log and Agen
 Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
+
+Use `node tools/vibit check runtime` to run the current module runtime tests.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
 

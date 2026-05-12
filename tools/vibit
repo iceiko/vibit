@@ -31,6 +31,8 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.declared",
   "generated.exists",
   "generated.trace",
+  "runtime.test_file",
+  "runtime.test_result",
   "change.directory_match",
   "change.verification_status",
   "change.requested_id_match",
@@ -68,6 +70,8 @@ Usage:
   vibit check contracts --json
   vibit check generated
   vibit check generated --json
+  vibit check runtime
+  vibit check runtime --json
   vibit check architecture
   vibit check architecture --json
   vibit check module <module>
@@ -91,6 +95,7 @@ Commands:
   check memory             Check conversation logs and decision records.
   check contracts          Check contract registry and source files.
   check generated          Check generated files declared by module manifests.
+  check runtime            Run current runtime tests.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -1678,7 +1683,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "generated"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "generated"], ["check", "runtime"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -2350,6 +2355,83 @@ function checkGenerated(root) {
   finish();
 }
 
+function discoverRuntimeTestFiles(root) {
+  const modulesDir = path.join(root, "modules");
+  if (!fs.existsSync(modulesDir)) {
+    return [];
+  }
+  const files = [];
+  for (const moduleName of discoverRegisteredModules(root)) {
+    const testDir = path.join(modulesDir, moduleName, "tests");
+    if (!fs.existsSync(testDir)) {
+      continue;
+    }
+    for (const name of fs.readdirSync(testDir).sort()) {
+      if (/\.test\.ts$/.test(name)) {
+        files.push(rel(root, path.join(testDir, name)));
+      }
+    }
+  }
+  return files;
+}
+
+function checkRuntime(root) {
+  resetResults("check runtime");
+  if (!jsonOutput) {
+    console.log(`Checking runtime tests in ${root}\n`);
+  }
+
+  const testFiles = discoverRuntimeTestFiles(root);
+  if (testFiles.length === 0) {
+    fail("no runtime test files found", {
+      rule_id: "runtime.test_file",
+      artifact: "modules",
+    });
+    finish();
+    return;
+  }
+
+  for (const testFile of testFiles) {
+    ok(`${testFile} exists`, {
+      rule_id: "runtime.test_file",
+      artifact: testFile,
+    });
+  }
+
+  const result = childProcess.spawnSync(process.execPath, ["--experimental-strip-types", "--test", ...testFiles], {
+    cwd: root,
+    encoding: "utf8",
+    stdio: jsonOutput ? ["ignore", "pipe", "pipe"] : "pipe",
+  });
+
+  if (!jsonOutput) {
+    if (result.stdout) {
+      process.stdout.write(result.stdout);
+    }
+    if (result.stderr) {
+      process.stderr.write(result.stderr);
+    }
+  }
+
+  if (result.status === 0) {
+    ok("runtime tests passed", {
+      rule_id: "runtime.test_result",
+      artifact: "runtime tests",
+    });
+  } else {
+    fail("runtime tests failed", {
+      rule_id: "runtime.test_result",
+      artifact: "runtime tests",
+    });
+  }
+
+  finish({
+    summary_counts: {
+      test_files: testFiles.length,
+    },
+  });
+}
+
 function changeDirectory(root, changeId) {
   const direct = path.join(root, "changes", changeId);
   if (fs.existsSync(direct)) {
@@ -2671,6 +2753,11 @@ function main() {
 
   if (group === "check" && command === "generated" && !value) {
     checkGenerated(root);
+    return;
+  }
+
+  if (group === "check" && command === "runtime" && !value) {
+    checkRuntime(root);
     return;
   }
 
