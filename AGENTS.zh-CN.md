@@ -337,7 +337,19 @@ Self-bootstrapping 只有在它能改善通向可工作服务器框架的路径�
 
 如果收益主要只是让 tooling 本身更完整，应推迟。
 
-当仓库已经有足够 tooling 可以尝试一个小的端到端后端能力时，优先做 runtime slice，而不是继续增加 meta-tooling。
+当仓库已经有足够 tooling 可以尝试一个小的端到端后端能力时，优先做 runtime readiness work，而不是继续增加 meta-tooling，然后再实现 runtime slice。
+
+Runtime readiness 只应回答让第一个 slice 成立所必需的决策：
+
+- Implementation language 和 package layout
+- Minimal server instance model
+- 第一个 module 和 capability boundary
+- Contract format
+- Generated files 与 handwritten files 的边界
+- 最小 test 和 verification strategy
+- Persistence 和 migration 假设
+
+当这些选择仍然含糊时，不要仓促进入实现。但当 readiness work 不再改变第一个 slice 如何构建、验证或维护时，也不要继续扩张准备工作。
 
 例外情况应记录在 change spec 或 Agent Decision Record 中。
 

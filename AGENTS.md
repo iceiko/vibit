@@ -336,7 +336,19 @@ Before adding a new standard, inspect command, check command, schema, generator,
 
 If the benefit is mainly that the tooling becomes more complete, defer it.
 
-When the repository already has enough tooling to attempt a small end-to-end backend capability, prefer the runtime slice over additional meta-tooling.
+When the repository already has enough tooling to attempt a small end-to-end backend capability, prefer runtime readiness work over additional meta-tooling, then implement the runtime slice.
+
+Runtime readiness should answer only the decisions needed to make the first slice coherent:
+
+- Implementation language and package layout
+- Minimal server instance model
+- First module and capability boundary
+- Contract format
+- Generated versus handwritten file boundary
+- Minimum test and verification strategy
+- Persistence and migration assumptions
+
+Do not rush into implementation when these choices are still ambiguous. Also do not extend readiness work after it stops changing how the first slice will be built, verified, or maintained.
 
 Record exceptions in a change spec or Agent Decision Record.
 

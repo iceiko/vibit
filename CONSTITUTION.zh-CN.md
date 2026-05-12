@@ -267,7 +267,19 @@ Agent 写出的代码不能削弱 server authority。
 - 是否有清晰的 verification path？
 - 它会减少 future agents 的上下文负担，还是增加流程重量？
 
-当仓库已有足够 standards 和 checks 支撑第一个 runtime slice 后，默认下一步应该变成一个小的端到端后端能力，而不是继续增加 meta-tooling。
+当仓库已有足够 standards 和 checks 支撑第一个 runtime slice 后，默认下一步应该变成 runtime readiness work，然后才是一个小的端到端后端能力，而不是继续增加 meta-tooling。
+
+Runtime readiness 不等于仓促进入实现。在第一个 runtime slice 之前，项目应该有意识地决定足够的架构，以避免可预见的返工：
+
+- 第一版实现语言和 package layout
+- 最小 server instance model
+- 第一个 module 和 capability boundary
+- Commands、queries、events、errors 和 permissions 的 contract format
+- Generated files 与 handwritten files 的边界
+- 最小 test strategy 和 verification commands
+- Persistence 和 migration 假设，即使第一版 persistence 从 in-memory 开始
+
+当准备工作能减少第一个 runtime slice 的可预见歧义时，它是有效的。当准备工作不再改变这个 slice 将如何构建、验证或维护时，它就变成了 drift。
 
 推荐的证明单元是：
 

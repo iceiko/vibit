@@ -266,7 +266,19 @@ Before adding another standard, inspect command, check command, schema, generato
 - Is there a clear verification path?
 - Will this reduce context for future agents, or increase process weight?
 
-Once the repository has enough standards and checks to support a first runtime slice, the default next step should become a small end-to-end backend capability rather than more meta-tooling.
+Once the repository has enough standards and checks to support a first runtime slice, the default next step should become runtime readiness work and then a small end-to-end backend capability, rather than more meta-tooling.
+
+Runtime readiness is not the same as rushing into implementation. Before the first runtime slice, the project should deliberately decide enough architecture to avoid preventable churn:
+
+- The first implementation language and package layout
+- The minimal server instance model
+- The first module and capability boundary
+- The contract format for commands, queries, events, errors, and permissions
+- The generated versus handwritten file boundary
+- The minimum test strategy and verification commands
+- The persistence and migration assumptions, even if persistence starts in memory
+
+Preparation is valid when it reduces foreseeable ambiguity for the first runtime slice. Preparation becomes drift when it no longer changes how that slice will be built, verified, or maintained.
 
 The preferred proof unit is:
 
