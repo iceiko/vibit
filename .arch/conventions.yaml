@@ -98,10 +98,25 @@ runtime_readiness:
     persistence_direction: ADR-0011
     technical_decision_authority: ADR-0012
     first_go_runtime_dependencies: ADR-0013
+    go_runtime_layout_and_boundaries: ADR-0014
 
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules
+  package_layout_decision: ADR-0014
+  go_module:
+    root: runtime
+    path: github.com/iceiko/vibit/runtime
+    status: planned_not_created
+  package_roots:
+    command: runtime/cmd/vibit-server
+    app: runtime/internal/app
+    platform: runtime/internal/platform
+    modules: runtime/internal/modules
+    generated_contracts: runtime/internal/generated/contracts
+    generated_proto: runtime/internal/generated/proto
+    postgres_migrations: runtime/migrations/postgres
+    proto_sources: proto
   gameplay_client_protocol: websocket
   wire_message_format: protobuf
   accepted_websocket_library: github.com/coder/websocket
@@ -116,6 +131,9 @@ persistence:
   accepted_postgresql_driver: github.com/jackc/pgx/v5
   accepted_migration_tooling: github.com/pressly/goose/v3
   migration_default: SQL-first migrations
+  migration_root: runtime/migrations/postgres
+  transaction_boundary_owner: runtime/internal/platform/tx
+  transaction_orchestrator: runtime/internal/app
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency

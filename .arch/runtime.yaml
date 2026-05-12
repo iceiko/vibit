@@ -17,6 +17,7 @@ canonical_decisions:
   persistence_direction: ADR-0011
   technical_decision_authority: ADR-0012
   first_go_runtime_dependencies: ADR-0013
+  go_runtime_layout_and_boundaries: ADR-0014
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -64,18 +65,46 @@ tooling_runtime:
     not_server_runtime: true
 
 package_layout:
+  decision: ADR-0014
   intended_roots:
     runtime: runtime
+    runtime_go_module: runtime
+    runtime_command: runtime/cmd/vibit-server
+    runtime_app: runtime/internal/app
+    runtime_platform: runtime/internal/platform
+    runtime_modules: runtime/internal/modules
+    runtime_generated: runtime/internal/generated
+    runtime_migrations: runtime/migrations/postgres
     packages: packages
     modules: modules
     contracts: contracts
-    generated: generated
+    proto_sources: proto
     tests: tests
+  go_module:
+    path: github.com/iceiko/vibit/runtime
+    location: runtime/go.mod
+    status: planned_not_created
+  package_owners:
+    runtime/cmd/vibit-server: process_startup_configuration_and_lifecycle
+    runtime/internal/app: command_query_dispatch_application_composition_and_transaction_orchestration
+    runtime/internal/platform/transport/ws: websocket_transport_adapter
+    runtime/internal/platform/protocol/protobuf: protobuf_framing_and_wire_conversion
+    runtime/internal/platform/persistence/postgres: postgresql_persistence_adapter
+    runtime/internal/platform/migrations: migration_tool_invocation_and_validation
+    runtime/internal/platform/events: event_recording_and_publication_mechanisms
+    runtime/internal/platform/tx: transaction_boundary_and_unit_of_work
+    runtime/internal/modules: handwritten_domain_module_runtime_logic
+    runtime/internal/generated/contracts: generated_go_contract_shapes
+    runtime/internal/generated/proto: generated_go_protobuf_files
+    runtime/migrations/postgres: sql_first_postgresql_migration_sources
+    proto: protobuf_source_files
   rules:
     - Public contracts are declared before handwritten behavior.
     - Generated files must be traceable to schemas or manifests.
     - Handwritten module logic lives in explicit extension points.
     - Runtime packages must not hide domain behavior in transport handlers.
+    - Third-party transport, protocol, persistence, and migration dependencies stay inside platform or generated owner packages.
+    - Domain modules under runtime/internal/modules depend on vibit-owned interfaces and generated contracts, not platform dependencies.
 
 server_instance_model:
   first_model: modular_monolith_single_process
@@ -97,6 +126,14 @@ server_instance_model:
     protobuf_role: wire_schema
     manifest_role: business_semantics_source
     consistency_requirement: tooling_must_check_manifest_proto_alignment_before_protocol_surface_grows
+  protobuf_layout:
+    source_root: proto
+    module_source_pattern: proto/vibit/<module>/v1
+    buf_config: buf.yaml
+    buf_generation_config: buf.gen.yaml
+    generated_go_output: runtime/internal/generated/proto
+    generated_go_output_status: planned_not_created
+    registry_required_before_broad_generation: true
   boundaries:
     - Modules communicate through commands, queries, events, public module APIs, or generated clients.
     - Transport handlers adapt requests into commands or queries.
@@ -143,10 +180,22 @@ persistence_model:
     - S3-compatible object storage must remain optional until a concrete module or platform capability requires it.
     - MinIO must not become a mandatory runtime dependency without an adoption record covering license, maintenance, operations, and replacement path.
   deferred:
-    - transaction_boundary_standard
-    - repository_interface_layout
     - outbox_or_event_log_storage_standard
     - first_s3_client_or_sdk
+  migration_layout:
+    source_root: runtime/migrations/postgres
+    default_style: sql_first
+    go_migrations_allowed: only_with_change_spec
+    status: planned_not_created
+  transaction_boundary:
+    decision: ADR-0014
+    owner: runtime/internal/platform/tx
+    orchestrator: runtime/internal/app
+    command_rule: State-changing commands run inside an application-owned unit of work.
+    query_rule: Queries do not mutate state and do not require a write transaction by default.
+    event_rule: Domain events produced by commands are recorded inside the same unit of work.
+    publication_rule: Publication outside the transaction is deferred until an event delivery or outbox decision is made.
+    outbox_status: deferred_until_cross_boundary_durable_event_delivery
 
 contract_model:
   source_format: vibit_manifest_yaml
@@ -179,6 +228,10 @@ contract_model:
 
 first_runtime_proof_slice:
   preferred_module: inventory
+  planned_runtime_path: runtime/internal/modules/inventory
+  planned_generated_contract_path: runtime/internal/generated/contracts/inventory
+  planned_proto_source_path: proto/vibit/inventory/v1
+  planned_generated_proto_path: runtime/internal/generated/proto
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.
@@ -193,9 +246,7 @@ first_runtime_proof_slice:
     - Choose an S3 SDK or required object storage deployment.
 
 open_questions:
-  - Decide whether the first Go workspace should use runtime/ only or split runtime/ and packages/.
-  - Define the Go package layout for platform adapters and generated protocol packages.
   - Define the manifest-to-proto consistency check before broad protocol generation.
-  - Define migration directory layout before adding the first database migration.
-  - Define the transaction boundary standard before implementing persistent repositories.
+  - Decide whether the first repository implementation starts with a fake, PostgreSQL, or both.
+  - Decide whether outbox storage is required before the first durable cross-boundary event delivery.
   - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.

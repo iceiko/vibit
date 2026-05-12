@@ -76,6 +76,10 @@ vibit 应逐步演进出：
 - `google.golang.org/protobuf`、`protoc-gen-go` 和 Buf CLI 作为第一版 Protobuf tooling stack
 - `github.com/jackc/pgx/v5` 作为 platform persistence adapters 后面的第一版 PostgreSQL driver
 - `github.com/pressly/goose/v3` 作为第一版 SQL-first migration tooling
+- 第一版 Go module 计划位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`
+- Go runtime package boundaries 位于 `runtime/cmd/vibit-server/`、`runtime/internal/app/`、`runtime/internal/platform/`、`runtime/internal/modules/` 和 `runtime/internal/generated/`
+- Protobuf source files 位于 `proto/vibit/<module>/v1/`，生成的 Go Protobuf output 位于 `runtime/internal/generated/proto/`
+- SQL-first PostgreSQL migration source files 位于 `runtime/migrations/postgres/`
 - S3-compatible object storage 作为计划中的大对象存储抽象，MinIO 作为本地/自托管优先候选，但需要先完成 dependency adoption
 - `modules/<module>/module.yaml` 中遵循 `docs/module-manifest.md` 的 module manifests
 - `modules/<module>/AGENTS.md` 中的 module-level agent guides
@@ -165,6 +169,16 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 PostgreSQL 是 runtime state 的第一版 authoritative durable relational store。S3-compatible object storage 计划用于 replays、snapshots、exports、binary assets 和 diagnostic archives 等大对象 artifacts。MinIO 是这个 S3-compatible 角色的本地/自托管优先候选，但在具体 use case 和 dependency adoption record 证明它必要之前，它不是 mandatory runtime dependency。Domain modules 必须使用 vibit-owned storage interfaces，而不是直接依赖 database drivers 或 object-storage clients。见 `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`。
 
 第一批已接受的 foundational runtime dependencies 记录在 `decisions/ADR-0013-first-go-runtime-dependencies.md` 和 `.arch/dependencies.yaml` 中。它们只被接受用于 platform adapters 和 generation tooling，不允许 domain modules 直接使用。S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
+
+第一版 Go runtime layout 记录在 `decisions/ADR-0014-go-runtime-layout-and-boundaries.md` 中。Runtime code 尚未开始，但未来 Go files 应遵循这些边界：
+
+- `runtime/cmd/vibit-server/`：process startup、configuration wiring 和 lifecycle。
+- `runtime/internal/app/`：command/query dispatch、application composition 和 transaction orchestration。
+- `runtime/internal/platform/`：WebSocket、Protobuf、PostgreSQL、migration、event 和 transaction platform adapters。
+- `runtime/internal/modules/<module>/`：手写 domain module logic。
+- `runtime/internal/generated/`：生成的 Go contract 和 Protobuf output。
+
+State-changing commands 应在 application-owned unit of work 中运行，然后才进行 repository mutation 和 domain-event recording。在 vibit 采纳明确的 event delivery 或 outbox standard 前，transaction 外的 event publication 继续 deferred。
 
 ## 早期参考领域
 

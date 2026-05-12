@@ -76,6 +76,10 @@ vibit should evolve toward:
 - `google.golang.org/protobuf`, `protoc-gen-go`, and Buf CLI as the first Protobuf tooling stack
 - `github.com/jackc/pgx/v5` as the first PostgreSQL driver behind platform persistence adapters
 - `github.com/pressly/goose/v3` as the first SQL-first migration tooling
+- A first Go module planned at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
+- Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
+- Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
+- SQL-first PostgreSQL migration source files under `runtime/migrations/postgres/`
 - S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
@@ -165,6 +169,16 @@ The first server runtime direction is Go, using a modular monolith single-proces
 PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
 
 The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
+
+The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. Runtime code has not started yet, but future Go files should follow these boundaries:
+
+- `runtime/cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
+- `runtime/internal/app/`: command/query dispatch, application composition, and transaction orchestration.
+- `runtime/internal/platform/`: WebSocket, Protobuf, PostgreSQL, migration, event, and transaction platform adapters.
+- `runtime/internal/modules/<module>/`: handwritten domain module logic.
+- `runtime/internal/generated/`: generated Go contract and Protobuf output.
+
+State-changing commands should run inside an application-owned unit of work before repository mutation and domain-event recording. Event publication outside the transaction is deferred until vibit adopts an explicit event delivery or outbox standard.
 
 ## Early Reference Domain
 

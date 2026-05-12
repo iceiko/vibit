@@ -1,0 +1,78 @@
+schema_version: 0.1
+change_id: define-go-runtime-layout
+date: 2026-05-13
+type: standard
+status: verified
+
+summary: Define the first Go runtime package layout, adapter boundaries, Protobuf layout, migration layout, and transaction boundary before implementation.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - decisions/ADR-0014-go-runtime-layout-and-boundaries.md
+    - conversations/2026-05-13-go-runtime-layout-and-boundaries.md
+    - changes/2026-05-13-define-go-runtime-layout/
+
+decisions:
+  - ADR-0004
+  - ADR-0005
+  - ADR-0008
+  - ADR-0009
+  - ADR-0011
+  - ADR-0013
+  - ADR-0014
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node_check_tools
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_contracts
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - diff_check
+    - secret_scan
+  status: Verified

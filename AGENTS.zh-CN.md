@@ -148,6 +148,8 @@ node tools/vibit generate module <module>
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 
+创建 Go runtime 文件前，先阅读 `ADR-0014`。第一版 Go module 计划位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`。Process startup 放在 `runtime/cmd/vibit-server/`，application dispatch 和 composition 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain module logic 放在 `runtime/internal/modules/<module>/`，生成的 Go contract shapes 放在 `runtime/internal/generated/contracts/`，生成的 Go Protobuf output 放在 `runtime/internal/generated/proto/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录的 `proto/vibit/<module>/v1/`。
+
 ## 4. 文档规则
 
 英文是项目权威文档语言。
@@ -256,6 +258,20 @@ Generated files 对 non-system agents 不可变。如果 generated output 错了
 只有声明过的 owner layers 可以直接 import 或 invoke 这些已接受依赖。Domain runtime logic 和 domain modules 必须使用 vibit-owned interfaces、generated contracts、repositories 和 adapters。
 
 Goose migrations 应以 SQL-first 为默认。Go migrations 需要 change spec 解释为什么 SQL 不足，并且不得成为隐藏 domain business logic 的位置。
+
+新增 Go runtime code 时，遵循 ADR-0014 的 package boundary：
+
+- `runtime/cmd/vibit-server/` 拥有 startup、configuration wiring 和 process lifecycle。
+- `runtime/internal/app/` 拥有 command/query dispatch、application service composition 和 transaction orchestration。
+- `runtime/internal/platform/transport/ws/` 拥有 `github.com/coder/websocket`。
+- `runtime/internal/platform/protocol/protobuf/` 拥有 Protobuf framing 和 envelope conversion。
+- `runtime/internal/platform/persistence/postgres/` 拥有 `github.com/jackc/pgx/v5`。
+- `runtime/internal/platform/migrations/` 拥有 `github.com/pressly/goose/v3` invocation 和 migration validation。
+- `runtime/internal/platform/events/` 拥有 event recording 和 publication mechanisms。
+- `runtime/internal/platform/tx/` 拥有 unit-of-work 和 transaction boundary interfaces。
+- `runtime/internal/modules/<module>/` 只拥有手写 domain behavior。
+
+State-changing commands 应通过 application dispatch 进入，并在 application-owned unit of work 中运行。Command 产生的 domain events 应记录在同一个 unit of work 中。Query handlers 不应改变状态，默认不需要 write transaction。在明确 event delivery 或 outbox decision 前，transaction 外的 event publication 继续 deferred。
 
 在新增 persistence implementation 前，agents 必须先声明或更新相关 repository interfaces、migration expectations、transaction boundaries 和 storage verification path。未通过遵循 `ADR-0010` 和 `ADR-0011` 的 change spec 或 adoption record，不要添加 PostgreSQL drivers、migration tools、S3 SDKs 或 MinIO clients。
 

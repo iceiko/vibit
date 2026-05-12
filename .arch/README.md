@@ -37,6 +37,8 @@ This is the first draft. The files describe expected shape before implementation
 
 `runtime.yaml` records the runtime readiness decisions for the first Go server runtime direction. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, client protocol, wire format, persistence direction, dependency adoption, and proof slice.
 
+`ADR-0014` records the first Go runtime package layout and boundary rules. The planned Go module root is `runtime/`, with process startup under `runtime/cmd/vibit-server/`, application orchestration under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain runtime logic under `runtime/internal/modules/<module>/`, generated Go outputs under `runtime/internal/generated/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/`.
+
 `contracts.yaml` registers public command, query, event, error, and permission contract source files. Contract files live under `contracts/` and are semantic source artifacts, not generated output. Protobuf wire schemas are planned under `proto/` and must align with these semantic contracts.
 
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
@@ -49,6 +51,8 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 - `github.com/pressly/goose/v3` for SQL-first migration tooling.
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
+
+No Go runtime implementation code has started yet. When it starts, agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages.
 
 ## Expected Future Files
 

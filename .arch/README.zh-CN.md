@@ -38,6 +38,8 @@
 
 `runtime.yaml` 记录第一版 Go server runtime 方向的 runtime readiness decisions。它指向约束第一语言、服务器实例模型、contract boundary、client protocol、wire format、persistence direction、dependency adoption 和 proof slice 的 Agent Decision Records。
 
+`ADR-0014` 记录第一版 Go runtime package layout 和 boundary rules。计划中的 Go module root 是 `runtime/`，process startup 放在 `runtime/cmd/vibit-server/`，application orchestration 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain runtime logic 放在 `runtime/internal/modules/<module>/`，生成的 Go outputs 放在 `runtime/internal/generated/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录 `proto/`。
+
 `contracts.yaml` 登记 public command、query、event、error 和 permission contract source files。Contract files 位于 `contracts/` 下，是 semantic source artifacts，不是 generated output。Protobuf wire schemas 计划位于 `proto/` 下，并且必须与这些 semantic contracts 对齐。
 
 `dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
@@ -50,6 +52,8 @@
 - `github.com/pressly/goose/v3` 用于 SQL-first migration tooling。
 
 S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
+
+Go runtime implementation code 尚未开始。当它开始时，agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。
 
 ## 未来预期文件
 

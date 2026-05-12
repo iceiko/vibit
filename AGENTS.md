@@ -147,6 +147,8 @@ Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readin
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 
+Use `ADR-0014` before creating Go runtime files. The first Go module is planned at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`. Keep process startup under `runtime/cmd/vibit-server/`, application dispatch and composition under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain module logic under `runtime/internal/modules/<module>/`, generated Go contract shapes under `runtime/internal/generated/contracts/`, generated Go Protobuf output under `runtime/internal/generated/proto/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/vibit/<module>/v1/`.
+
 ## 4. Documentation Rules
 
 English is the canonical documentation language.
@@ -255,6 +257,20 @@ Accepted first Go runtime dependencies are recorded in `ADR-0013` and `.arch/dep
 Direct imports or invocations of accepted dependencies are allowed only in their declared owner layers. Domain runtime logic and domain modules must use vibit-owned interfaces, generated contracts, repositories, and adapters.
 
 Goose migrations should be SQL-first. Go migrations require a change spec explaining why SQL is insufficient and must not hide domain business logic.
+
+When adding Go runtime code, follow the ADR-0014 package boundary:
+
+- `runtime/cmd/vibit-server/` owns startup, configuration wiring, and process lifecycle.
+- `runtime/internal/app/` owns command/query dispatch, application service composition, and transaction orchestration.
+- `runtime/internal/platform/transport/ws/` owns `github.com/coder/websocket`.
+- `runtime/internal/platform/protocol/protobuf/` owns Protobuf framing and envelope conversion.
+- `runtime/internal/platform/persistence/postgres/` owns `github.com/jackc/pgx/v5`.
+- `runtime/internal/platform/migrations/` owns `github.com/pressly/goose/v3` invocation and migration validation.
+- `runtime/internal/platform/events/` owns event recording and publication mechanisms.
+- `runtime/internal/platform/tx/` owns unit-of-work and transaction boundary interfaces.
+- `runtime/internal/modules/<module>/` owns handwritten domain behavior only.
+
+State-changing commands should enter through application dispatch and run inside an application-owned unit of work. Domain events produced by a command should be recorded in the same unit of work. Query handlers should not mutate state and do not require a write transaction by default. Event publication outside the transaction remains deferred until an explicit event delivery or outbox decision exists.
 
 Before adding persistence implementation, agents must declare or update the relevant repository interfaces, migration expectations, transaction boundaries, and storage verification path. Do not add PostgreSQL drivers, migration tools, S3 SDKs, or MinIO clients without a change spec or adoption record that follows `ADR-0010` and `ADR-0011`.
 
