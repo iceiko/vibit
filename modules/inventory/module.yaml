@@ -2,34 +2,138 @@ schema_version: 0.1
 module: inventory
 category: domain
 status: draft
-summary: Replace with this module's responsibility.
+summary: Owns player inventory state, item grants, inventory reads, capacity rules, and inventory item invariants.
 
 decisions:
   - ADR-0001
+  - ADR-0003
+  - ADR-0004
+  - ADR-0005
   - ADR-0006
 
 owns:
-  entities: []
-  data: []
-  permissions: []
+  entities:
+    - inventory
+    - inventory_item
+  data:
+    - inventory_records
+    - inventory_items
+  permissions:
+    - inventory_grant_item
+    - inventory_read
+  does_not_own:
+    entities:
+      - player_account
+      - item_catalog
+      - currency_balance
+      - reward_claim
+      - match_session
+    data:
+      - player_accounts
+      - item_catalog_entries
+      - currency_balances
+      - reward_claims
+      - match_sessions
 
 public_api:
-  commands: []
-  queries: []
+  commands:
+    - GrantItem
+  queries:
+    - GetInventory
+  command_schemas:
+    status: planned
+    required_before_implementation:
+      - GrantItem
+  query_schemas:
+    status: planned
+    required_before_implementation:
+      - GetInventory
 
 events:
-  publishes: []
+  publishes:
+    - ItemGranted
   subscribes: []
+  event_schemas:
+    status: planned
+    required_before_implementation:
+      - ItemGranted
+
+errors:
+  owns:
+    - INVENTORY_CAPACITY_EXCEEDED
+    - INVALID_ITEM_QUANTITY
+    - INVENTORY_PERMISSION_DENIED
+  schemas:
+    status: planned
 
 dependencies:
   allowed: []
-  forbidden: []
+  forbidden:
+    - player
+    - currency
+    - reward
+    - quest
+    - match
+  external_references:
+    - player_id
+    - item_id
+    - reason
 
-invariants: []
+invariants:
+  - item_quantity_must_be_positive
+  - inventory_capacity_must_not_be_exceeded
+  - grant_item_must_emit_item_granted_once
+  - get_inventory_must_not_mutate_state
+  - inventory_item_identity_must_be_stable
 
 generated:
   files: []
   directories: []
+  planned_outputs:
+    typed_contracts:
+      - GrantItem
+      - GetInventory
+      - ItemGranted
+    dispatch_shapes:
+      - inventory_command_dispatch
+      - inventory_query_dispatch
+    test_fixtures:
+      - grant_item_fixture
+      - get_inventory_fixture
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+handwritten:
+  extension_points:
+    command_handlers:
+      - GrantItem
+    query_handlers:
+      - GetInventory
+    policies:
+      - inventory_capacity_policy
+      - inventory_permission_policy
+    repositories:
+      - inventory_repository
+    test_suites:
+      - grant_item_command_tests
+      - get_inventory_query_tests
+      - item_granted_event_tests
+      - inventory_invariant_tests
+
+proof_slice:
+  status: prepared
+  goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
+  first_command: GrantItem
+  first_query: GetInventory
+  first_event: ItemGranted
+  persistence_assumption: in_memory_repository_is_acceptable_for_first_slice
+  runtime_implementation: not_started
+  non_goals:
+    - full_item_catalog
+    - player_account_lifecycle
+    - currency_transactions
+    - reward_claim_flow
+    - match_session_inventory_sync
 
 tests:
   required:
@@ -37,5 +141,10 @@ tests:
     - command_tests
     - query_tests
     - event_tests
+    - contract_tests
     - invariant_tests
     - architecture_tests
+  not_available_until_runtime:
+    - runtime_unit_tests
+    - runtime_contract_tests
+    - runtime_invariant_tests
