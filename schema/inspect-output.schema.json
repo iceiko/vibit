@@ -35,6 +35,61 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "contract"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "contract_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "contract": {
+          "type": "object",
+          "required": ["request", "registry", "source", "module_manifest", "consistency", "guidance"],
+          "properties": {
+            "request": {
+              "type": "object",
+              "required": ["module", "type", "normalized_type", "id"]
+            },
+            "registry": {
+              "type": "object",
+              "required": ["exists", "path", "entry"]
+            },
+            "source": {
+              "type": "object",
+              "required": ["exists", "path", "schema_version", "kind", "module", "status"]
+            },
+            "module_manifest": {
+              "type": "object",
+              "required": ["exists", "path", "declares_id", "references_source"]
+            },
+            "consistency": {
+              "type": "object",
+              "required": [
+                "registered",
+                "source_exists",
+                "source_under_module",
+                "kind_matches",
+                "module_matches",
+                "id_matches",
+                "module_manifest_exists",
+                "module_manifest_declares_id",
+                "module_manifest_references_source",
+                "status"
+              ]
+            },
+            "guidance": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "change"],
       "properties": {
         "schema_version": {

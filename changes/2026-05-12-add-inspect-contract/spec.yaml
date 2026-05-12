@@ -1,0 +1,71 @@
+schema_version: 0.1
+change_id: add-inspect-contract
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add a CLI command for inspecting one registered contract as JSON.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added:
+      - vibit inspect contract --module <module> --type <type> --id <id>
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - Missing contract inspection exits non-zero with a clear message
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - tools/vibit
+    - schema/inspect-output.schema.json
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - changes/2026-05-12-add-inspect-contract/
+    - conversations/2026-05-12-inspect-contract.md
+
+decisions:
+  - ADR-0005
+  - ADR-0007
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - inspect_contract_command_json
+    - inspect_contract_error_json
+    - inspect_contract_missing
+    - help_mentions_inspect_contract
+    - check_contracts_json
+    - check_schemas
+    - check_all_json
+    - secret_scan
+    - diff_check
+  status: Verified

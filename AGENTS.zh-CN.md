@@ -94,6 +94,7 @@ node tools/vibit check contracts
 node tools/vibit check contracts --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
+node tools/vibit inspect contract --module <module> --type <type> --id <id>
 node tools/vibit inspect change <change-id>
 node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
@@ -117,6 +118,8 @@ node tools/vibit generate module <module>
 当新增或修改 conversation logs 或 Agent Decision Records 时，使用 `node tools/vibit check memory`。
 
 当新增或修改 contract source files 或 `.arch/contracts.yaml` 时，使用 `node tools/vibit check contracts`。
+
+当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
 
 当 change spec 已存在，并且 agent 在 intake 或 handoff 阶段需要结构化了解它的文件、metadata、affected modules 和 verification state 时，使用 `node tools/vibit inspect change <change-id>`。
 
