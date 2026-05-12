@@ -132,6 +132,46 @@
       "agent_guidance": "Align `.arch/modules.yaml` and `modules/<module>/module.yaml`."
     },
     {
+      "rule_id": "contract.registry_declared",
+      "category": "contract",
+      "default_severity": "error",
+      "title": "Contract registry declared",
+      "description": "The contract registry must exist and declare the expected source format and decision.",
+      "agent_guidance": "Inspect `.arch/contracts.yaml` and align it with the contract source format decision."
+    },
+    {
+      "rule_id": "contract.registry_entry",
+      "category": "contract",
+      "default_severity": "error",
+      "title": "Contract registry entry",
+      "description": "A registered module contract entry must declare an id and source path in the expected location.",
+      "agent_guidance": "Update `.arch/contracts.yaml` so each command, query, event, error catalog, and permission catalog has a valid entry."
+    },
+    {
+      "rule_id": "contract.source_exists",
+      "category": "contract",
+      "default_severity": "error",
+      "title": "Contract source exists",
+      "description": "A registered contract source file must exist.",
+      "agent_guidance": "Create the missing contract source file or update the registry path."
+    },
+    {
+      "rule_id": "contract.source_field",
+      "category": "contract",
+      "default_severity": "error",
+      "title": "Contract source field",
+      "description": "A contract source file must declare required fields such as schema_version and status.",
+      "agent_guidance": "Open the contract source file and add the missing required field."
+    },
+    {
+      "rule_id": "contract.source_match",
+      "category": "contract",
+      "default_severity": "error",
+      "title": "Contract source match",
+      "description": "A contract source file must match the registry and module manifest declarations.",
+      "agent_guidance": "Align the contract source, `.arch/contracts.yaml`, and `modules/<module>/module.yaml`."
+    },
+    {
       "rule_id": "change.directory_match",
       "category": "change",
       "default_severity": "error",

@@ -41,6 +41,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/modules.yaml`: first draft module registry manifest
 - `.arch/conventions.yaml`: first draft repository convention manifest
 - `.arch/runtime.yaml`: runtime readiness manifest for the first reference implementation
+- `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
 - `docs/change-spec.md`: change spec standard
@@ -68,6 +69,7 @@ vibit should evolve toward:
 - Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
 - Module-level agent guides at `modules/<module>/AGENTS.md`
 - Contract-first commands, queries, events, errors, permissions, and migrations
+- Contract source files under `contracts/`, registered by `.arch/contracts.yaml`
 - Generated scaffolds for repeatable framework structure
 - Architecture checks that verify dependency, contract, event, and generated-file rules
 - Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
@@ -98,6 +100,8 @@ node tools/vibit check schemas
 node tools/vibit check schemas --json
 node tools/vibit check memory
 node tools/vibit check memory --json
+node tools/vibit check contracts
+node tools/vibit check contracts --json
 node tools/vibit inspect module inventory
 node tools/vibit inspect boundary --from inventory --to player
 node tools/vibit inspect change bootstrap-vibit-cli
@@ -120,6 +124,8 @@ Use `--json` when an agent needs machine-readable check results during intake, v
 Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
 
 Use `node tools/vibit check memory` to verify required conversation log and Agent Decision Record structure.
+
+Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
 
 Use `node tools/vibit inspect change <change-id>` to inspect a change spec directory and its verification metadata without manually opening every file.
 

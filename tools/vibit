@@ -23,6 +23,11 @@ const KNOWN_CHECK_RULE_IDS = [
   "markdown.heading",
   "markdown.metadata",
   "module.registry_match",
+  "contract.registry_declared",
+  "contract.registry_entry",
+  "contract.source_exists",
+  "contract.source_field",
+  "contract.source_match",
   "change.directory_match",
   "change.verification_status",
   "change.requested_id_match",
@@ -56,6 +61,8 @@ Usage:
   vibit check schemas --json
   vibit check memory
   vibit check memory --json
+  vibit check contracts
+  vibit check contracts --json
   vibit check architecture
   vibit check architecture --json
   vibit check module <module>
@@ -75,6 +82,7 @@ Commands:
   check all                Run all current repository checks.
   check schemas            Check schema files and critical artifact fields.
   check memory             Check conversation logs and decision records.
+  check contracts          Check contract registry and source files.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -656,6 +664,71 @@ function listAfterPath(text, pathKeys) {
   return values;
 }
 
+function parseContractEntries(registry, moduleName, contractType) {
+  const lines = registry.split(/\r?\n/);
+  const moduleIndex = lines.findIndex((line) => line.trim() === `${moduleName}:`);
+  if (moduleIndex === -1) {
+    return [];
+  }
+
+  let moduleIndent = null;
+  const moduleMatch = lines[moduleIndex].match(/^(\s*)/);
+  moduleIndent = moduleMatch ? moduleMatch[1].length : 0;
+
+  let typeIndex = -1;
+  let typeIndent = -1;
+  for (let i = moduleIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*$/);
+    if (!keyMatch) {
+      continue;
+    }
+    const indent = keyMatch[1].length;
+    if (indent <= moduleIndent) {
+      break;
+    }
+    if (keyMatch[2] === contractType) {
+      typeIndex = i;
+      typeIndent = indent;
+      break;
+    }
+  }
+
+  if (typeIndex === -1) {
+    return [];
+  }
+
+  const entries = [];
+  let current = null;
+  for (let i = typeIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (/^\S/.test(line)) {
+      break;
+    }
+    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):/);
+    if (keyMatch && keyMatch[1].length <= typeIndent) {
+      break;
+    }
+    const idMatch = line.match(/^\s+- id:\s+(.+?)\s*$/);
+    if (idMatch) {
+      if (current) {
+        entries.push(current);
+      }
+      current = { id: idMatch[1].replace(/^["']|["']$/g, ""), path: null };
+      continue;
+    }
+    const pathMatch = line.match(/^\s+path:\s+(.+?)\s*$/);
+    if (pathMatch && current) {
+      current.path = pathMatch[1].replace(/^["']|["']$/g, "");
+    }
+  }
+  if (current) {
+    entries.push(current);
+  }
+
+  return entries;
+}
+
 function firstMarkdownField(text, fieldName) {
   const match = text.match(new RegExp(`^${fieldName}:\\s*(.+?)\\s*$`, "m"));
   if (!match) {
@@ -1125,7 +1198,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -1210,6 +1283,7 @@ function checkArchitecture(root) {
     ".arch/README.zh-CN.md",
     ".arch/modules.yaml",
     ".arch/conventions.yaml",
+    ".arch/contracts.yaml",
     "docs/module-manifest.md",
     "docs/module-manifest.zh-CN.md",
     "docs/change-spec.md",
@@ -1242,6 +1316,7 @@ function checkArchitecture(root) {
     "changes/_template",
     "conversations",
     "conversations/_template",
+    "contracts",
     "decisions",
     "decisions/_template",
     "docs",
@@ -1271,6 +1346,8 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/conventions.yaml", "inspect_output: schema/inspect-output.schema.json");
   checkTextIncludes(root, ".arch/conventions.yaml", "rule_catalog: schema/rule-catalog.schema.json");
   checkTextIncludes(root, ".arch/conventions.yaml", "check_rules: rules/check-rules.json");
+  checkTextIncludes(root, ".arch/conventions.yaml", "registry: .arch/contracts.yaml");
+  checkTextIncludes(root, ".arch/conventions.yaml", "source_root: contracts");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
 
   finish();
@@ -1443,6 +1520,255 @@ function checkMemory(root) {
       decisions: decisions.length,
     },
   });
+}
+
+function checkContractSource(root, moduleName, contractType, expectedKind, entry, moduleInfo, moduleManifest) {
+  const artifact = entry.path || `${moduleName}:${contractType}:${entry.id || "missing-id"}`;
+  if (!entry.id) {
+    fail(`${artifact} contract entry is missing id`, {
+      rule_id: "contract.registry_entry",
+      artifact,
+    });
+    return;
+  }
+  if (!entry.path) {
+    fail(`${moduleName} ${contractType} ${entry.id} contract entry is missing path`, {
+      rule_id: "contract.registry_entry",
+      artifact,
+    });
+    return;
+  }
+  if (!entry.path.startsWith(`contracts/${moduleName}/`)) {
+    fail(`${entry.path} is outside contracts/${moduleName}/`, {
+      rule_id: "contract.registry_entry",
+      artifact: entry.path,
+    });
+  } else {
+    ok(`${entry.path} is under contracts/${moduleName}/`, {
+      rule_id: "contract.registry_entry",
+      artifact: entry.path,
+    });
+  }
+  if (isFile(root, entry.path)) {
+    ok(`${entry.path} exists`, {
+      rule_id: "contract.source_exists",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} is missing`, {
+      rule_id: "contract.source_exists",
+      artifact: entry.path,
+    });
+    return;
+  }
+
+  const text = readText(path.join(root, entry.path));
+  const schemaVersion = firstScalar(text, "schema_version");
+  if (schemaVersion === "0.1") {
+    ok(`${entry.path} declares schema_version: 0.1`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} is missing schema_version: 0.1`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  }
+  const kind = firstScalar(text, "kind");
+  if (kind === expectedKind) {
+    ok(`${entry.path} kind is ${expectedKind}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} kind does not match ${expectedKind}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const module = firstScalar(text, "module");
+  if (module === moduleName) {
+    ok(`${entry.path} module is ${moduleName}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} module does not match ${moduleName}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const status = firstScalar(text, "status");
+  if (["draft", "active", "deprecated"].includes(status)) {
+    ok(`${entry.path} status is ${status}`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} status is invalid or missing`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  }
+
+  if (["commands", "queries", "events"].includes(contractType)) {
+    const name = firstScalar(text, "name");
+    if (name === entry.id) {
+      ok(`${entry.path} name matches registry id ${entry.id}`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    } else {
+      fail(`${entry.path} name does not match registry id ${entry.id}`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    }
+  }
+
+  const declared = {
+    commands: moduleInfo.public_api.commands,
+    queries: moduleInfo.public_api.queries,
+    events: moduleInfo.events.publishes,
+  };
+  if (declared[contractType]) {
+    if (declared[contractType].includes(entry.id)) {
+      ok(`${entry.id} is declared by modules/${moduleName}/module.yaml`, {
+        rule_id: "contract.source_match",
+        artifact: `modules/${moduleName}/module.yaml`,
+      });
+    } else {
+      fail(`${entry.id} is not declared by modules/${moduleName}/module.yaml`, {
+        rule_id: "contract.source_match",
+        artifact: `modules/${moduleName}/module.yaml`,
+      });
+    }
+  }
+
+  if (moduleManifest.includes(entry.path)) {
+    ok(`modules/${moduleName}/module.yaml references ${entry.path}`, {
+      rule_id: "contract.source_match",
+      artifact: `modules/${moduleName}/module.yaml`,
+    });
+  } else {
+    fail(`modules/${moduleName}/module.yaml does not reference ${entry.path}`, {
+      rule_id: "contract.source_match",
+      artifact: `modules/${moduleName}/module.yaml`,
+    });
+  }
+}
+
+function checkContracts(root) {
+  resetResults("check contracts");
+  if (!jsonOutput) {
+    console.log(`Checking contracts in ${root}\n`);
+  }
+
+  const registryPath = ".arch/contracts.yaml";
+  if (isFile(root, registryPath)) {
+    ok(`${registryPath} exists`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+  } else {
+    fail(`${registryPath} is missing`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+    finish();
+    return;
+  }
+  if (isDirectory(root, "contracts")) {
+    ok("contracts/ exists", {
+      rule_id: "artifact.directory_exists",
+      artifact: "contracts",
+    });
+  } else {
+    fail("contracts/ is missing", {
+      rule_id: "artifact.directory_exists",
+      artifact: "contracts",
+    });
+  }
+
+  const registry = readText(path.join(root, registryPath));
+  requireScalarValue(registry, registryPath, "schema_version", ["0.1"]);
+  requireScalarValue(registry, registryPath, "project", ["vibit"]);
+  requireScalarValue(registry, registryPath, "status", ["draft", "active", "deprecated"]);
+
+  const format = firstScalar(registry, "format");
+  if (format === "yaml") {
+    ok(`${registryPath} contract source format is yaml`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+  } else {
+    fail(`${registryPath} contract source format is not yaml`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+  }
+  const decision = firstScalar(registry, "decision");
+  if (decision === "ADR-0007") {
+    ok(`${registryPath} references ADR-0007`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+  } else {
+    fail(`${registryPath} does not reference ADR-0007`, {
+      rule_id: "contract.registry_declared",
+      artifact: registryPath,
+    });
+  }
+
+  const contractTypes = [
+    ["commands", "command"],
+    ["queries", "query"],
+    ["events", "event"],
+    ["errors", "error_catalog"],
+    ["permissions", "permission_catalog"],
+  ];
+
+  for (const moduleName of discoverRegisteredModules(root)) {
+    const moduleInfo = loadModuleInfo(root, moduleName);
+    const moduleManifestPath = `modules/${moduleName}/module.yaml`;
+    const moduleManifest = isFile(root, moduleManifestPath)
+      ? readText(path.join(root, moduleManifestPath))
+      : "";
+
+    if (registry.includes(`  ${moduleName}:`)) {
+      ok(`${registryPath} registers module ${moduleName}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+    } else {
+      fail(`${registryPath} does not register module ${moduleName}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+      continue;
+    }
+
+    for (const [contractType, expectedKind] of contractTypes) {
+      const entries = parseContractEntries(registry, moduleName, contractType);
+      if (entries.length > 0) {
+        ok(`${registryPath} registers ${moduleName} ${contractType}`, {
+          rule_id: "contract.registry_entry",
+          artifact: registryPath,
+        });
+      } else {
+        fail(`${registryPath} has no ${moduleName} ${contractType}`, {
+          rule_id: "contract.registry_entry",
+          artifact: registryPath,
+        });
+      }
+      for (const entry of entries) {
+        checkContractSource(root, moduleName, contractType, expectedKind, entry, moduleInfo, moduleManifest);
+      }
+    }
+  }
+
+  finish();
 }
 
 function changeDirectory(root, changeId) {
@@ -1756,6 +2082,11 @@ function main() {
 
   if (group === "check" && command === "memory" && !value) {
     checkMemory(root);
+    return;
+  }
+
+  if (group === "check" && command === "contracts" && !value) {
+    checkContracts(root);
     return;
   }
 

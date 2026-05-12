@@ -58,6 +58,7 @@ Existing foundation:
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
 - `.arch/runtime.yaml`
+- `.arch/contracts.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -88,6 +89,8 @@ node tools/vibit check schemas
 node tools/vibit check schemas --json
 node tools/vibit check memory
 node tools/vibit check memory --json
+node tools/vibit check contracts
+node tools/vibit check contracts --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect change <change-id>
@@ -111,6 +114,8 @@ Use `--json` when an agent needs machine-readable check results during intake, v
 Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
 
 Use `node tools/vibit check memory` when conversation logs or Agent Decision Records are added or changed.
+
+Use `node tools/vibit check contracts` when contract source files or `.arch/contracts.yaml` are added or changed.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
 

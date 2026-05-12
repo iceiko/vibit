@@ -1,0 +1,66 @@
+schema_version: 0.1
+change_id: add-check-contracts
+date: 2026-05-12
+type: tooling
+status: verified
+
+summary: Add a CLI check for contract registry and source files.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - tools/vibit
+    - rules/check-rules.json
+    - README.md
+    - README.zh-CN.md
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - changes/2026-05-12-add-check-contracts/
+    - conversations/2026-05-12-check-contracts.md
+
+decisions:
+  - ADR-0005
+  - ADR-0007
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - check_contracts_text
+    - check_contracts_json
+    - check_all_json
+    - inspect_rule_contract_registry
+    - secret_scan
+    - diff_check
+  status: Verified

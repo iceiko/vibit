@@ -59,6 +59,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/modules.yaml`
 - `.arch/conventions.yaml`
 - `.arch/runtime.yaml`
+- `.arch/contracts.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -89,6 +90,8 @@ node tools/vibit check schemas
 node tools/vibit check schemas --json
 node tools/vibit check memory
 node tools/vibit check memory --json
+node tools/vibit check contracts
+node tools/vibit check contracts --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect change <change-id>
@@ -112,6 +115,8 @@ node tools/vibit generate module <module>
 每条 JSON check result item 都应包含 `rule_id` 和 `artifact`。把 `check all --json` 视为紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
 
 当新增或修改 conversation logs 或 Agent Decision Records 时，使用 `node tools/vibit check memory`。
+
+当新增或修改 contract source files 或 `.arch/contracts.yaml` 时，使用 `node tools/vibit check contracts`。
 
 当 change spec 已存在，并且 agent 在 intake 或 handoff 阶段需要结构化了解它的文件、metadata、affected modules 和 verification state 时，使用 `node tools/vibit inspect change <change-id>`。
 
