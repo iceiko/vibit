@@ -32,6 +32,7 @@ The `.arch/` directory should answer the questions an agent must resolve before 
   runtime.yaml
   contracts.yaml
   dependencies.yaml
+  reference.yaml
 ```
 
 This is the first draft. The files describe expected shape before implementation code exists.
@@ -51,6 +52,8 @@ This is the first draft. The files describe expected shape before implementation
 `docs/runtime-protocol-adapter.md` records the runtime protocol adapter boundary standard. `ADR-0018` governs the first handoff between WebSocket transport, Protobuf protocol adaptation, application dispatch, generated code, and domain modules.
 
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
+
+`reference.yaml` records the active reference baseline for game server capability planning. It links `docs/reference-game-server-alignment.md` and `ADR-0019`. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. These references guide planning; they do not override vibit's constitution, ADRs, manifests, generated boundaries, or verification commands.
 
 The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
@@ -85,8 +88,9 @@ Before changing implementation code, agents should:
 7. Read `docs/runtime-protocol-adapter.md` before adding WebSocket transport code, Protobuf runtime adapter code, application dispatch code, or domain runtime handlers.
 8. Read `.arch/contracts.yaml` before adding or changing public contracts.
 9. Read `.arch/dependencies.yaml` before adding foundational dependencies.
-10. Read the affected module's `module.yaml`, when it exists.
-11. Update manifests before implementation when public architecture changes.
+10. Read `.arch/reference.yaml` and `docs/reference-game-server-alignment.md` before adding new game server capability families, runtime subsystems, social/realtime features, matchmaking, match runtime, cluster/RPC work, or operational surfaces.
+11. Read the affected module's `module.yaml`, when it exists.
+12. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 

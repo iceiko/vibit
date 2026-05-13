@@ -75,6 +75,9 @@ documentation_pairs:
   runtime_protocol_adapter_standard:
     canonical: docs/runtime-protocol-adapter.md
     zh-CN: docs/runtime-protocol-adapter.zh-CN.md
+  reference_alignment_standard:
+    canonical: docs/reference-game-server-alignment.md
+    zh-CN: docs/reference-game-server-alignment.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -129,6 +132,20 @@ protocol_framework:
   first_slice_scope: player
   authority_model: server_authoritative
   check_command: node tools/vibit check protocol
+
+reference_alignment:
+  manifest: .arch/reference.yaml
+  standard: docs/reference-game-server-alignment.md
+  translation: docs/reference-game-server-alignment.zh-CN.md
+  decision: ADR-0019
+  active_reference_baselines:
+    - Nakama
+    - Pitaya
+  rule: >
+    Nakama and Pitaya guide game server capability planning, but vibit's
+    constitution, ADRs, manifests, generated boundaries, and verification
+    commands remain authoritative.
+  check_command: node tools/vibit check architecture
 
 server_runtime:
   first_reference_language: Go

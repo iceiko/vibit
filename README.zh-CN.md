@@ -44,6 +44,7 @@ vibit 从另一个前提出发：
 - `.arch/runtime.yaml`：第一版 Go server runtime 方向的 runtime readiness manifest
 - `.arch/contracts.yaml`：public command、query、event、error 和 permission source files 的 contract registry
 - `.arch/dependencies.yaml`：foundational dependency decision slots 的 dependency adoption registry
+- `.arch/reference.yaml`：game server capability planning 的 Nakama/Pitaya 主动参考基线 manifest
 - `buf.yaml`：Protobuf 的 Buf source、lint 和 breaking-check configuration
 - `buf.gen.yaml`：计划中的 Go Protobuf output 的 Buf generation configuration
 - `proto/`：protocol envelope 和 module wire schemas 的 Protobuf source root
@@ -68,6 +69,8 @@ vibit 从另一个前提出发：
 - `docs/generated-output.zh-CN.md`：简体中文译本
 - `docs/runtime-protocol-adapter.md`：runtime protocol adapter boundary 标准
 - `docs/runtime-protocol-adapter.zh-CN.md`：简体中文译本
+- `docs/reference-game-server-alignment.md`：Nakama 和 Pitaya 的 active game server reference alignment 标准
+- `docs/reference-game-server-alignment.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
 - `rules/`：面向机器可读 check metadata 的 rule catalogs
 
@@ -197,6 +200,8 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 第一版 game protocol framework 是 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 request correlation、session metadata、target scopes、server-authoritative message rules 和 error mapping。第一版 endpoint 在 transport implementation 开始前计划为 `/v1/ws`。第一版 inventory slice 应使用 player-scoped command/query/event/error/system messages；room state sync、matchmaking、allocation、reconnect replay、presence、streams、realtime input 和 state patches 仍然 deferred，直到它们拥有独立 modules 和 standards。见 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `decisions/ADR-0015-game-protocol-framework.md`。
 
 Runtime protocol adapter boundary 定义在 `docs/runtime-protocol-adapter.md` 和 `decisions/ADR-0018-runtime-protocol-adapter-boundary.md` 中。WebSocket transport 拥有 frames，Protobuf adapter 拥有 envelope conversion，application dispatch 拥有 command/query routing，domain modules 拥有 invariants 和 behavior，generated packages 只提供 shapes。
+
+Nakama 和 Pitaya 是 capability planning 的主动参考基线。Nakama 应指导 broad game backend product surface：accounts、sessions、storage、social systems、chat、groups、parties、leaderboards、tournaments、matchmaking、realtime multiplayer、authoritative matches 和 operations。Pitaya 应指导 Go game server architecture vocabulary：acceptors、sessions、routes、handlers、remotes/RPC、frontend/backend roles、groups、broadcast、serializers 和 cluster service discovery。它们是 references，不是 governing standards；vibit 的 Agent-Native constraints 仍然权威。见 `.arch/reference.yaml`、`docs/reference-game-server-alignment.md` 和 `decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md`。
 
 PostgreSQL 是 runtime state 的第一版 authoritative durable relational store。S3-compatible object storage 计划用于 replays、snapshots、exports、binary assets 和 diagnostic archives 等大对象 artifacts。MinIO 是这个 S3-compatible 角色的本地/自托管优先候选，但在具体 use case 和 dependency adoption record 证明它必要之前，它不是 mandatory runtime dependency。Domain modules 必须使用 vibit-owned storage interfaces，而不是直接依赖 database drivers 或 object-storage clients。见 `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`。
 

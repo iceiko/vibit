@@ -44,6 +44,7 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
 - `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
 - `.arch/dependencies.yaml`: dependency adoption registry for foundational dependency decision slots
+- `.arch/reference.yaml`: active Nakama/Pitaya reference baseline manifest for game server capability planning
 - `buf.yaml`: Buf source, lint, and breaking-check configuration for Protobuf
 - `buf.gen.yaml`: Buf generation configuration for planned Go Protobuf output
 - `proto/`: Protobuf source root for the protocol envelope and module wire schemas
@@ -68,6 +69,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/generated-output.zh-CN.md`: Simplified Chinese translation
 - `docs/runtime-protocol-adapter.md`: runtime protocol adapter boundary standard
 - `docs/runtime-protocol-adapter.zh-CN.md`: Simplified Chinese translation
+- `docs/reference-game-server-alignment.md`: active game server reference alignment standard for Nakama and Pitaya
+- `docs/reference-game-server-alignment.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
 - `rules/`: rule catalogs for machine-readable check metadata
 
@@ -197,6 +200,8 @@ The first server runtime direction is Go, using a modular monolith single-proces
 The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is planned as `/v1/ws` until transport implementation begins. The first inventory slice should use player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
 
 The runtime protocol adapter boundary is defined in `docs/runtime-protocol-adapter.md` and `decisions/ADR-0018-runtime-protocol-adapter-boundary.md`. WebSocket transport owns frames, the Protobuf adapter owns envelope conversion, application dispatch owns command/query routing, domain modules own invariants and behavior, and generated packages provide shapes only.
+
+Nakama and Pitaya are active reference baselines for capability planning. Nakama should guide the broad game backend product surface: accounts, sessions, storage, social systems, chat, groups, parties, leaderboards, tournaments, matchmaking, realtime multiplayer, authoritative matches, and operations. Pitaya should guide Go game server architecture vocabulary: acceptors, sessions, routes, handlers, remotes/RPC, frontend/backend roles, groups, broadcast, serializers, and cluster service discovery. They are references, not governing standards; vibit's Agent-Native constraints remain authoritative. See `.arch/reference.yaml`, `docs/reference-game-server-alignment.md`, and `decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md`.
 
 PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
 

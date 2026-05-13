@@ -62,6 +62,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
 - `.arch/dependencies.yaml`
+- `.arch/reference.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -83,6 +84,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/generated-output.zh-CN.md`
 - `docs/runtime-protocol-adapter.md`
 - `docs/runtime-protocol-adapter.zh-CN.md`
+- `docs/reference-game-server-alignment.md`
+- `docs/reference-game-server-alignment.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -97,6 +100,8 @@ vibit is an open-source agent-native server framework for building backends that
 Generated output standard 是 `docs/generated-output.md`，配套简体中文译本是 `docs/generated-output.zh-CN.md`。`ADR-0017` 记录 generated output decision。在添加 generated files、generated output checks 或 generator behavior 前，应阅读这些文件。`runtime/internal/generated/proto/` 下的 Go Protobuf output 必须是 `*.pb.go`，必须包含 `protoc-gen-go` generated-code marker，并且必须能追溯到现有 `.proto` source。
 
 Runtime protocol adapter boundary standard 是 `docs/runtime-protocol-adapter.md`，配套简体中文译本是 `docs/runtime-protocol-adapter.zh-CN.md`。`ADR-0018` 记录 boundary decision。在添加 WebSocket transport code、Protobuf runtime adapter code、application dispatch code 或 domain runtime handlers 前，应阅读这些文件。
+
+Active game server reference alignment standard 是 `docs/reference-game-server-alignment.md`，配套简体中文译本是 `docs/reference-game-server-alignment.zh-CN.md`。`ADR-0019` 记录 Nakama 和 Pitaya 是主动参考基线。在新增 game server capability families、runtime subsystems、social/realtime features、matchmaking、match runtime、cluster/RPC work 或 operational surfaces 前，应阅读 `.arch/reference.yaml` 和该标准。Nakama 和 Pitaya 指导 capability planning；它们不覆盖 vibit 的 constitution、ADRs、manifests、generated boundaries 或 verification commands。
 
 当前可执行工具：
 
@@ -172,6 +177,8 @@ node tools/vibit generate module <module>
 修改 WebSocket transport、Protobuf protocol adaptation、application dispatch、generated code 和 domain modules 之间的 runtime code 前，先阅读 `ADR-0018` 和 `docs/runtime-protocol-adapter.md`。
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
+
+使用 `.arch/reference.yaml` 作为 Nakama/Pitaya reference alignment 的机器可读 intake 入口。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。改造 reference patterns 时必须保留 vibit 的 Agent-Native constraints，并记录为什么采纳、改造或拒绝某个 reference pattern。
 
 修改 Go runtime 文件前，先阅读 `ADR-0014`。第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`。Process startup 放在 `runtime/cmd/vibit-server/`，application dispatch 和 composition 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain module logic 放在 `runtime/internal/modules/<module>/`，生成的 Go contract shapes 放在 `runtime/internal/generated/contracts/`，生成的 Go Protobuf output 放在 `runtime/internal/generated/proto/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录的 `proto/vibit/<module>/v1/`。
 
@@ -303,6 +310,8 @@ State-changing commands 应通过 application dispatch 进入，并在 applicati
 在新增 persistence implementation 前，agents 必须先声明或更新相关 repository interfaces、migration expectations、transaction boundaries 和 storage verification path。未通过遵循 `ADR-0010` 和 `ADR-0011` 的 change spec 或 adoption record，不要添加 PostgreSQL drivers、migration tools、S3 SDKs 或 MinIO clients。
 
 在添加 foundational dependencies 前，agents 必须检查 `.arch/dependencies.yaml`。在 adoption record 尚未记录 problem solved、license、maintenance activity、abstraction boundary、allowed owners、forbidden owners、replacement path 和 verification path 前，不要把 dependency slot 改为 `accepted`。
+
+在新增 game server capability families 或 runtime subsystems 前，agents 必须检查 `.arch/reference.yaml` 和 `docs/reference-game-server-alignment.md`。先把 proposal 映射到相关 Nakama/Pitaya capability family，再让实现顺序符合 vibit 的 contract-first、manifest-first、generated 和 checkable architecture。没有明确 compatibility ADR，不要复制外部 APIs。在 modular monolith proof slice 稳定前，不要加入 Pitaya-style cluster/RPC/service-discovery work。
 
 Decision authority 以 `ADR-0012` 为准。在 maintainer 明确授权后，agents 可以在既有已确认方向内，按专业评估决定 technical sub-decisions。但修改 constitutional principles、product direction、runtime language、primary protocol direction、persistence direction、major architecture patterns、module ownership、breaking contracts、validation 或 permission 强度，以及接受 licensing-risk、hosting、cost、operations 或 vendor-lock-in commitments 之前，仍必须询问 maintainer。
 

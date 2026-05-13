@@ -61,6 +61,7 @@ Existing foundation:
 - `.arch/runtime.yaml`
 - `.arch/contracts.yaml`
 - `.arch/dependencies.yaml`
+- `.arch/reference.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -82,6 +83,8 @@ Existing foundation:
 - `docs/generated-output.zh-CN.md`
 - `docs/runtime-protocol-adapter.md`
 - `docs/runtime-protocol-adapter.zh-CN.md`
+- `docs/reference-game-server-alignment.md`
+- `docs/reference-game-server-alignment.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -96,6 +99,8 @@ The first protocol source files are `proto/vibit/protocol/v1/envelope.proto` and
 The generated output standard is `docs/generated-output.md`, with `docs/generated-output.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0017` records the generated output decision. Read these before adding generated files, generated output checks, or generator behavior. Go Protobuf output under `runtime/internal/generated/proto/` must be `*.pb.go`, must contain the `protoc-gen-go` generated-code marker, and must trace to an existing `.proto` source.
 
 The runtime protocol adapter boundary standard is `docs/runtime-protocol-adapter.md`, with `docs/runtime-protocol-adapter.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0018` records the boundary decision. Read these before adding WebSocket transport code, Protobuf runtime adapter code, application dispatch code, or domain runtime handlers.
+
+The active game server reference alignment standard is `docs/reference-game-server-alignment.md`, with `docs/reference-game-server-alignment.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0019` records Nakama and Pitaya as active reference baselines. Read `.arch/reference.yaml` and the standard before adding new game server capability families, runtime subsystems, social/realtime features, matchmaking, match runtime, cluster/RPC work, or operational surfaces. Nakama and Pitaya guide capability planning; they do not override vibit's constitution, ADRs, manifests, generated boundaries, or verification commands.
 
 Current executable tooling:
 
@@ -171,6 +176,8 @@ Use `ADR-0016`, `ADR-0017`, `buf.yaml`, `buf.gen.yaml`, `proto/README.md`, and `
 Use `ADR-0018` and `docs/runtime-protocol-adapter.md` before changing runtime code that sits between WebSocket transport, Protobuf protocol adaptation, application dispatch, generated code, and domain modules.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
+
+Use `.arch/reference.yaml` as the machine-readable intake point for Nakama/Pitaya reference alignment. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. Preserve vibit's Agent-Native constraints when adapting reference patterns, and record why a reference pattern is adopted, adapted, or rejected.
 
 Use `ADR-0014` before changing Go runtime files. The first Go module lives at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`. Keep process startup under `runtime/cmd/vibit-server/`, application dispatch and composition under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain module logic under `runtime/internal/modules/<module>/`, generated Go contract shapes under `runtime/internal/generated/contracts/`, generated Go Protobuf output under `runtime/internal/generated/proto/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/vibit/<module>/v1/`.
 
@@ -302,6 +309,8 @@ State-changing commands should enter through application dispatch and run inside
 Before adding persistence implementation, agents must declare or update the relevant repository interfaces, migration expectations, transaction boundaries, and storage verification path. Do not add PostgreSQL drivers, migration tools, S3 SDKs, or MinIO clients without a change spec or adoption record that follows `ADR-0010` and `ADR-0011`.
 
 Before adding foundational dependencies, agents must check `.arch/dependencies.yaml`. Do not change a dependency slot to `accepted` until an adoption record documents the problem solved, license, maintenance activity, abstraction boundary, allowed owners, forbidden owners, replacement path, and verification path.
+
+Before adding new game server capability families or runtime subsystems, agents must check `.arch/reference.yaml` and `docs/reference-game-server-alignment.md`. Map the proposal to the relevant Nakama/Pitaya capability family, then keep the implementation sequence aligned with vibit's contract-first, manifest-first, generated, and checkable architecture. Do not copy external APIs without an explicit compatibility ADR. Do not add Pitaya-style cluster/RPC/service-discovery work before the modular monolith proof slice is stable.
 
 Use `ADR-0012` for decision authority. After explicit maintainer authorization, agents may professionally evaluate and decide technical sub-decisions inside an already ratified direction. Still ask the maintainer before changing constitutional principles, product direction, runtime language, primary protocol direction, persistence direction, major architecture patterns, module ownership, breaking contracts, validation or permission strength, licensing-risk acceptance, hosting, cost, operations, or vendor-lock-in commitments.
 

@@ -1951,6 +1951,7 @@ function checkArchitecture(root) {
     ".arch/protocol.yaml",
     ".arch/contracts.yaml",
     ".arch/dependencies.yaml",
+    ".arch/reference.yaml",
     "docs/module-manifest.md",
     "docs/module-manifest.zh-CN.md",
     "docs/change-spec.md",
@@ -1969,6 +1970,8 @@ function checkArchitecture(root) {
     "docs/generated-output.zh-CN.md",
     "docs/runtime-protocol-adapter.md",
     "docs/runtime-protocol-adapter.zh-CN.md",
+    "docs/reference-game-server-alignment.md",
+    "docs/reference-game-server-alignment.zh-CN.md",
     "changes/README.md",
     "changes/README.zh-CN.md",
     "conversations/README.md",
@@ -2013,6 +2016,7 @@ function checkArchitecture(root) {
     "decisions/_template/adr-agent.md",
     "docs/_templates/dependency-adoption.md",
     "decisions/ADR-0001-agent-native-maintainability.md",
+    "decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md",
     "runtime/go.mod",
     "runtime/AGENTS.md",
     "runtime/AGENTS.zh-CN.md",
@@ -2047,6 +2051,12 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/conventions.yaml", "registry: .arch/dependencies.yaml");
   checkTextIncludes(root, ".arch/dependencies.yaml", "governing_decision: ADR-0010");
   checkTextIncludes(root, ".arch/dependencies.yaml", "postgresql_driver:");
+  checkTextIncludes(root, ".arch/reference.yaml", "standard: docs/reference-game-server-alignment.md");
+  checkTextIncludes(root, ".arch/reference.yaml", "decision: ADR-0019");
+  checkTextIncludes(root, ".arch/reference.yaml", "name: Nakama");
+  checkTextIncludes(root, ".arch/reference.yaml", "name: Pitaya");
+  checkTextIncludes(root, ".arch/reference.yaml", "agent_native_maintainability");
+  checkTextIncludes(root, ".arch/reference.yaml", "distributed_runtime_deferred");
   checkTextIncludes(root, ".arch/protocol.yaml", "game_protocol_framework: ADR-0015");
   checkTextIncludes(root, ".arch/protocol.yaml", "generated_output_standard: ADR-0017");
   checkTextIncludes(root, ".arch/protocol.yaml", "runtime_protocol_adapter_boundary: ADR-0018");
@@ -2061,6 +2071,9 @@ function checkArchitecture(root) {
   checkTextIncludes(root, "runtime/go.mod", "module github.com/iceiko/vibit/runtime");
   checkTextIncludes(root, "buf.yaml", "path: proto");
   checkTextIncludes(root, "buf.gen.yaml", "out: runtime/internal/generated/proto");
+  checkTextIncludes(root, "README.md", "docs/reference-game-server-alignment.md");
+  checkTextIncludes(root, "AGENTS.md", ".arch/reference.yaml");
+  checkTextIncludes(root, ".arch/README.md", "reference.yaml");
 
   finish();
 }

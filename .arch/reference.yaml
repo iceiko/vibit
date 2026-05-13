@@ -1,0 +1,164 @@
+schema_version: 0.1
+project: vibit
+status: draft
+purpose: >
+  Machine-readable reference alignment manifest for game server capability
+  planning. This manifest records external reference projects that agents
+  should consult when planning modules, runtime subsystems, and roadmap scope.
+
+standard: docs/reference-game-server-alignment.md
+translation: docs/reference-game-server-alignment.zh-CN.md
+decision: ADR-0019
+
+reference_projects:
+  - name: Nakama
+    role: broad_game_backend_capability_surface
+    homepage: https://heroiclabs.com/nakama
+    documentation: https://heroiclabs.com/docs/
+    repository: https://github.com/heroiclabs/nakama
+    use_for:
+      - authentication_users_accounts_sessions
+      - social_friends_groups_parties_chat
+      - storage_objects_and_custom_server_logic
+      - matchmaker_realtime_multiplayer_authoritative_matches
+      - leaderboards_tournaments_competitive_systems
+      - dashboard_metrics_operations
+      - economy_rewards_currencies_liveops_capability_families
+    not_governing:
+      - public_api_shape
+      - runtime_module_layout
+      - generated_file_conventions
+      - agent_workflow
+  - name: Pitaya
+    role: go_game_server_framework_architecture_vocabulary
+    documentation: https://pitaya.readthedocs.io/
+    repository: https://github.com/topfreegames/pitaya
+    use_for:
+      - websocket_tcp_acceptors
+      - session_binding
+      - route_handler_model
+      - frontend_backend_server_roles
+      - rpc_and_remote_calls
+      - groups_rooms_broadcast
+      - cluster_service_discovery_vocabulary
+    not_governing:
+      - first_runtime_instance_model
+      - immediate_distributed_architecture
+      - public_api_shape
+      - agent_workflow
+
+vibit_differentiators:
+  - agent_native_maintainability
+  - explicit_module_ownership
+  - contract_first_public_behavior
+  - generated_repeatable_structure
+  - machine_readable_manifests
+  - architecture_checks
+  - durable_change_specs_conversation_logs_and_adrs
+
+capability_families:
+  foundational:
+    - player_identity
+    - authentication
+    - sessions
+    - permissions
+    - durable_storage
+  metagame:
+    - inventory
+    - currency_wallet
+    - rewards_claims
+    - quests_tasks
+    - leaderboards
+    - tournaments
+  social_realtime:
+    - friends
+    - groups
+    - parties
+    - chat
+    - presence
+    - status
+  multiplayer:
+    - matchmaking
+    - match_session_lifecycle
+    - rooms
+    - broadcast_groups
+    - authoritative_match_runtime
+    - reconnect_replay
+  operations:
+    - admin_dashboard
+    - inspection
+    - metrics
+    - observability
+    - migrations
+  distributed_runtime:
+    - frontend_backend_split
+    - server_to_server_rpc
+    - service_discovery
+    - distributed_groups
+    - cluster_safe_session_routing
+
+phase_plan:
+  phase_0_agent_native_foundation:
+    status: active
+    focus:
+      - constitution_guides_change_specs_memory_adrs
+      - architecture_manifests_and_checks
+      - go_websocket_protobuf_postgresql_direction
+      - runtime_handoff_protocol_adapter_dispatch_skeleton
+      - inventory_contracts
+  phase_1_first_vertical_backend_slice:
+    status: next
+    focus:
+      - inventory_handler_boundary
+      - repository_policy_interfaces
+      - postgresql_persistence_for_first_module_state
+      - invariant_error_event_repository_tests
+      - protocol_response_mapping
+  phase_2_player_session_transport:
+    status: planned
+    focus:
+      - player_account_session_modules
+      - websocket_transport_adapter
+      - session_validation_connection_lifecycle
+      - minimal_client_server_request_flow
+  phase_3_core_game_backend_modules:
+    status: planned
+    focus:
+      - currency
+      - rewards
+      - friends_groups_parties
+      - presence_status
+      - chat
+      - leaderboards
+  phase_4_multiplayer_match_runtime:
+    status: planned
+    focus:
+      - matchmaking
+      - match_lifecycle
+      - room_group_broadcast
+      - authoritative_match_loop
+      - reconnect_replay
+  phase_5_distributed_runtime:
+    status: deferred
+    focus:
+      - frontend_backend_roles
+      - server_to_server_rpc
+      - service_discovery
+      - distributed_groups_rooms
+
+rules:
+  - id: references_are_planning_baselines_not_governing_standards
+    level: required
+    description: Nakama and Pitaya guide capability planning but do not override vibit's constitution, ADRs, manifests, or checks.
+  - id: no_external_api_copy_without_adr
+    level: required
+    description: External API compatibility or copying requires a future explicit compatibility ADR.
+  - id: agent_native_constraints_remain_primary
+    level: required
+    description: Feature parity must not weaken contract-first design, module ownership, generated boundaries, or verification.
+  - id: distributed_runtime_deferred
+    level: required
+    description: Pitaya-style distributed clustering is deferred until single-process module, protocol, transaction, and verification boundaries are stable.
+  - id: reference_before_new_capability
+    level: recommended
+    description: Agents should consult this manifest and docs/reference-game-server-alignment.md before adding a new game server capability family.

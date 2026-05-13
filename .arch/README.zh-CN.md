@@ -33,6 +33,7 @@
   runtime.yaml
   contracts.yaml
   dependencies.yaml
+  reference.yaml
 ```
 
 这是第一版草案。这些文件在实现代码存在前先描述预期形态。
@@ -52,6 +53,8 @@
 `docs/runtime-protocol-adapter.md` 记录 runtime protocol adapter boundary standard。`ADR-0018` 约束 WebSocket transport、Protobuf protocol adaptation、application dispatch、generated code 和 domain modules 之间的第一版 handoff。
 
 `dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
+
+`reference.yaml` 记录 game server capability planning 的主动参考基线。它链接 `docs/reference-game-server-alignment.md` 和 `ADR-0019`。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。这些 reference 用于指导规划；它们不覆盖 vibit 的 constitution、ADRs、manifests、generated boundaries 或 verification commands。
 
 第一批已接受的 Go runtime dependencies 由 `ADR-0013` 记录：
 
@@ -86,8 +89,9 @@ S3 client tooling、MinIO deployment、observability 和外部 Go test framework
 7. 在添加 WebSocket transport code、Protobuf runtime adapter code、application dispatch code 或 domain runtime handlers 前，阅读 `docs/runtime-protocol-adapter.md`。
 8. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
 9. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
-10. 在相关 module 存在时，阅读其 `module.yaml`。
-11. 当 public architecture 变化时，先更新 manifests，再实现。
+10. 在新增 game server capability families、runtime subsystems、social/realtime features、matchmaking、match runtime、cluster/RPC work 或 operational surfaces 前，阅读 `.arch/reference.yaml` 和 `docs/reference-game-server-alignment.md`。
+11. 在相关 module 存在时，阅读其 `module.yaml`。
+12. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 
