@@ -72,10 +72,12 @@ For the first durable implementation:
 - Inventory repository interfaces remain owned by this module.
 - PostgreSQL adapter code belongs under `runtime/internal/platform/persistence/postgres/`.
 - SQL migrations belong under `runtime/migrations/postgres/`.
+- The first migration source is `runtime/migrations/postgres/000001_create_inventory_state.sql`.
 - `GrantItem` must call `LockInventoryForMutation` after request validation and permission checks, then use the returned `MutationLock` for the current inventory read and grant mutation.
 - PostgreSQL adapters must implement that lock as an inventory account row lock for `player_id` inside the application-owned unit of work.
 - `MutationLock.Release` releases the aggregate lock or adapter-local resource; it must not commit or roll back a transaction.
 - Durable grant behavior must record the item quantity change and the `ItemGranted` grant record inside the same application-owned unit of work.
+- Migration apply/rollback verification is not available until migration tooling checks are implemented.
 
 ## Forbidden Shortcuts
 

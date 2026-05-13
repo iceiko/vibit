@@ -390,7 +390,7 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: mutation_lock_and_transaction_boundary_defined_no_postgresql_adapter_or_migration_yet
+    status: first_migration_source_created_no_postgresql_adapter_yet
     mutation_lock:
       aggregate: inventory_account
       key: player_id
@@ -441,7 +441,15 @@ persistence_model:
       - "-- +goose Up"
       - "-- +goose Down"
     go_migrations_allowed: only_with_change_spec
-    status: transaction_boundary_skeleton_defined_no_migrations
+    status: first_inventory_migration_source_created_apply_verification_pending
+    first_migration:
+      file: runtime/migrations/postgres/000001_create_inventory_state.sql
+      module: inventory
+      creates:
+        - inventory_accounts
+        - inventory_items
+        - inventory_item_grants
+      verification_status: source_checked_no_apply_or_rollback_yet
   transaction_boundary:
     decision: ADR-0014
     boundary_decision: ADR-0020

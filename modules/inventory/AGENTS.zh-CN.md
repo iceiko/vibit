@@ -73,10 +73,12 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - Inventory repository interfaces 继续由本模块拥有。
 - PostgreSQL adapter code 位于 `runtime/internal/platform/persistence/postgres/`。
 - SQL migrations 位于 `runtime/migrations/postgres/`。
+- 第一版 migration source 是 `runtime/migrations/postgres/000001_create_inventory_state.sql`。
 - `GrantItem` 必须在 request validation 和 permission checks 之后调用 `LockInventoryForMutation`，然后用返回的 `MutationLock` 读取 current inventory 并执行 grant mutation。
 - PostgreSQL adapters 必须在 application-owned unit of work 内，把这个 lock 实现为 `player_id` 对应的 inventory account row lock。
 - `MutationLock.Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back transaction。
 - Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。
+- 在 migration tooling checks 实现前，migration apply/rollback verification 还不可用。
 
 ## Forbidden Shortcuts
 

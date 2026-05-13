@@ -195,7 +195,9 @@ proof_slice:
       - inventory_accounts
       - inventory_items
       - inventory_item_grants
-    status: boundary_defined_no_postgresql_adapter_or_migration_yet
+    migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql
+    migration_status: source_created_apply_verification_pending
+    status: first_migration_source_created_no_postgresql_adapter_yet
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
     file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go

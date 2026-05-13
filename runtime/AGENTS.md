@@ -96,6 +96,8 @@ PostgreSQL persistence work must follow `../docs/postgresql-persistence-boundary
 
 For the first durable inventory implementation, `GrantItem` must use a transaction-bound repository and call `LockInventoryForMutation` before reading current items and applying capacity-sensitive mutations. The returned `MutationLock` is a locked aggregate view, not a transaction owner. Repositories must not silently open independent write transactions for command flows.
 
+The first inventory migration source is `migrations/postgres/000001_create_inventory_state.sql`. It creates `inventory_accounts`, `inventory_items`, and `inventory_item_grants`. Migration apply/rollback verification remains pending until migration checks are implemented.
+
 ## 6. Generated Files
 
 Generated files are immutable to non-system agents.
@@ -110,7 +112,7 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
 
-The workspace has a documented PostgreSQL persistence boundary and transaction skeleton, but it still does not implement PostgreSQL persistence, migrations, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, and first inventory migration source, but it still does not implement PostgreSQL repository adapters, migration apply/rollback tooling, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 
