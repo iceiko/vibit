@@ -437,11 +437,12 @@ persistence_model:
     source_root: runtime/migrations/postgres
     default_style: sql_first
     naming_pattern: 000001_create_inventory_state.sql
+    check_command: node tools/vibit check migrations
     required_markers:
       - "-- +goose Up"
       - "-- +goose Down"
     go_migrations_allowed: only_with_change_spec
-    status: first_inventory_migration_source_created_apply_verification_pending
+    status: first_inventory_migration_source_created_and_source_checks_available_apply_verification_pending
     first_migration:
       file: runtime/migrations/postgres/000001_create_inventory_state.sql
       module: inventory
@@ -449,7 +450,7 @@ persistence_model:
         - inventory_accounts
         - inventory_items
         - inventory_item_grants
-      verification_status: source_checked_no_apply_or_rollback_yet
+      verification_status: source_check_available_no_apply_or_rollback_yet
   transaction_boundary:
     decision: ADR-0014
     boundary_decision: ADR-0020

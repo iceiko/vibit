@@ -95,7 +95,7 @@ PostgreSQL persistence work 必须遵循 `../docs/postgresql-persistence-boundar
 
 第一版 durable inventory implementation 中，`GrantItem` 必须使用 transaction-bound repository，并在读取当前 items、执行 capacity-sensitive mutation 前调用 `LockInventoryForMutation`。返回的 `MutationLock` 是 locked aggregate view，不是 transaction owner。Repositories 不得在 command flows 中偷偷开启独立 write transactions。
 
-第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。在 migration checks 实现前，migration apply/rollback verification 仍然 pending。
+第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。当 migration sources 或 migration guidance 发生变化时，运行 `node ../tools/vibit check migrations`。在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 仍然 pending。
 
 ## 6. Generated Files
 
@@ -127,6 +127,7 @@ go run ./cmd/vibit-server
 ```bash
 node tools/vibit check runtime
 node tools/vibit check generated
+node tools/vibit check migrations
 node tools/vibit check all
 ```
 

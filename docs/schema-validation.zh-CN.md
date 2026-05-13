@@ -81,6 +81,12 @@ node tools/vibit check all
 
 这还不是完整 YAML schema validation。
 
+Migration checks 独立于 schema checks。新增或修改 PostgreSQL migration source files、migration ownership guidance 或 persistence migration manifests 时，使用：
+
+```bash
+node tools/vibit check migrations
+```
+
 ## 6. Agent 规则
 
 当改变以下结构时，agents 必须更新 schemas：

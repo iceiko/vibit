@@ -124,6 +124,8 @@ node tools/vibit check protocol
 node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check migrations
+node tools/vibit check migrations --json
 node tools/vibit check runtime
 node tools/vibit check runtime --json
 node tools/vibit check work
@@ -162,6 +164,8 @@ node tools/vibit generate module <module>
 在创建或修改 `.proto` files、生成的 Protobuf output 或 protocol generation rules 前，使用 `node tools/vibit check protocol`。当 protocol sources 仍处于 planned 状态时，缺失 `.proto` files 可以通过；但一旦 `.proto` file 存在，它就必须与已登记的 command、query 和 event contracts 对齐。
 
 当新增或修改 generated files、module manifest 中的 `generated` declarations、generated output standards 或 Go Protobuf generated output 时，使用 `node tools/vibit check generated`。
+
+当新增或修改 SQL migration sources、migration ownership manifests、migration guidance 或 persistence migration standards 时，使用 `node tools/vibit check migrations`。该检查会验证 PostgreSQL migration naming、goose markers、SQL-first boundaries、owning-module traces，以及第一版 inventory migration 的 table references。
 
 当新增或修改 runtime module behavior、runtime adapter boundaries、runtime guidance 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton 和 ADR-0018 runtime protocol adapter boundary，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 

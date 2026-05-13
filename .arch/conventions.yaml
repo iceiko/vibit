@@ -209,7 +209,8 @@ persistence:
   boundary_decision: ADR-0020
   migration_default: SQL-first migrations
   migration_root: runtime/migrations/postgres
-  migration_root_status: first_inventory_migration_source_created_apply_verification_pending
+  migration_check_command: node tools/vibit check migrations
+  migration_root_status: first_inventory_migration_source_created_and_source_checks_available_apply_verification_pending
   migration_naming_pattern: 000001_create_inventory_state.sql
   migration_required_markers:
     - "-- +goose Up"

@@ -123,6 +123,8 @@ node tools/vibit check protocol
 node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check migrations
+node tools/vibit check migrations --json
 node tools/vibit check runtime
 node tools/vibit check runtime --json
 node tools/vibit check work
@@ -161,6 +163,8 @@ Use `node tools/vibit check contracts` when contract source files or `.arch/cont
 Use `node tools/vibit check protocol` before creating or changing `.proto` files, generated Protobuf output, or protocol generation rules. Missing `.proto` files may pass while protocol sources are still planned, but once a `.proto` file exists it must align with registered command, query, and event contracts.
 
 Use `node tools/vibit check generated` when generated files, module manifest `generated` declarations, generated output standards, or Go Protobuf generated output are added or changed.
+
+Use `node tools/vibit check migrations` when SQL migration sources, migration ownership manifests, migration guidance, or persistence migration standards are added or changed. This check validates PostgreSQL migration naming, goose markers, SQL-first boundaries, owning-module traces, and first inventory migration table references.
 
 Use `node tools/vibit check runtime` when runtime module behavior, runtime adapter boundaries, runtime guidance, or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and the ADR-0018 runtime protocol adapter boundary, and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 

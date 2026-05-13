@@ -80,6 +80,14 @@ Initial checks should cover:
 
 This is not yet full YAML schema validation.
 
+Migration checks are separate from schema checks. Use:
+
+```bash
+node tools/vibit check migrations
+```
+
+when PostgreSQL migration source files, migration ownership guidance, or persistence migration manifests change.
+
 ## 6. Agent Rules
 
 Agents must update schemas when changing the shape of:

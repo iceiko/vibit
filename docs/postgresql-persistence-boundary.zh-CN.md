@@ -239,9 +239,18 @@ Persistence work 应在拥有行为的层添加 tests：
 ```bash
 cd runtime && go test ./...
 cd runtime && go vet ./...
+node tools/vibit check migrations
 node tools/vibit check runtime
 node tools/vibit check all
 ```
+
+当前 migration source check 是：
+
+```bash
+node tools/vibit check migrations
+```
+
+它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references，以及第一版 inventory table references。它还不会针对 PostgreSQL 执行 apply 或 rollback。
 
 未来 persistence verification 应增加：
 

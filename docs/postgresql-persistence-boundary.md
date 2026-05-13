@@ -238,9 +238,18 @@ Current repository verification remains:
 ```bash
 cd runtime && go test ./...
 cd runtime && go vet ./...
+node tools/vibit check migrations
 node tools/vibit check runtime
 node tools/vibit check all
 ```
+
+The current migration source check is:
+
+```bash
+node tools/vibit check migrations
+```
+
+It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, and the first inventory table references. It does not apply or roll back migrations against PostgreSQL yet.
 
 Future persistence verification should add:
 

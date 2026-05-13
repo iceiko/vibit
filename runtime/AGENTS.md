@@ -96,7 +96,7 @@ PostgreSQL persistence work must follow `../docs/postgresql-persistence-boundary
 
 For the first durable inventory implementation, `GrantItem` must use a transaction-bound repository and call `LockInventoryForMutation` before reading current items and applying capacity-sensitive mutations. The returned `MutationLock` is a locked aggregate view, not a transaction owner. Repositories must not silently open independent write transactions for command flows.
 
-The first inventory migration source is `migrations/postgres/000001_create_inventory_state.sql`. It creates `inventory_accounts`, `inventory_items`, and `inventory_item_grants`. Migration apply/rollback verification remains pending until migration checks are implemented.
+The first inventory migration source is `migrations/postgres/000001_create_inventory_state.sql`. It creates `inventory_accounts`, `inventory_items`, and `inventory_item_grants`. Run `node ../tools/vibit check migrations` when migration sources or migration guidance change. Migration apply/rollback verification remains pending until migration tooling can run against a disposable PostgreSQL environment.
 
 ## 6. Generated Files
 
@@ -128,6 +128,7 @@ Run repository verification from the repository root:
 ```bash
 node tools/vibit check runtime
 node tools/vibit check generated
+node tools/vibit check migrations
 node tools/vibit check all
 ```
 

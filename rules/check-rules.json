@@ -316,6 +316,54 @@
       "agent_guidance": "Move handwritten code to the correct runtime package and keep generated roots reserved for generated output."
     },
     {
+      "rule_id": "migration.root",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Migration source root",
+      "description": "PostgreSQL migration sources must live under the accepted runtime migration root.",
+      "agent_guidance": "Use `runtime/migrations/postgres/` for SQL-first PostgreSQL migration sources unless a superseding decision changes the layout."
+    },
+    {
+      "rule_id": "migration.file_shape",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Migration file shape",
+      "description": "PostgreSQL SQL migration files must use deterministic sequence names and the accepted `.sql` shape.",
+      "agent_guidance": "Rename the migration to the `000001_name.sql` pattern or update the migration standard intentionally."
+    },
+    {
+      "rule_id": "migration.marker",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Migration goose marker",
+      "description": "SQL migrations must declare both goose Up and Down sections.",
+      "agent_guidance": "Add `-- +goose Up` and `-- +goose Down` sections before treating the migration as reviewable source."
+    },
+    {
+      "rule_id": "migration.source_trace",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Migration source trace",
+      "description": "Architecture manifests, standards, and module guidance must point to the accepted migration source root and first migration.",
+      "agent_guidance": "Update `.arch/runtime.yaml`, `.arch/conventions.yaml`, persistence docs, and module/runtime guides so future agents can find migration ownership."
+    },
+    {
+      "rule_id": "migration.ownership",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Migration ownership",
+      "description": "A migration that creates module-owned state must declare ownership and reference the expected module-owned tables.",
+      "agent_guidance": "Add an owning module trace comment and align created tables with the relevant module manifest and persistence boundary."
+    },
+    {
+      "rule_id": "migration.go_forbidden",
+      "category": "migration",
+      "default_severity": "error",
+      "title": "Go migration forbidden by default",
+      "description": "Go migrations are forbidden unless a change spec explicitly explains why SQL is insufficient.",
+      "agent_guidance": "Prefer SQL migrations. If a Go migration is truly required, create a change spec and decision record before adding it."
+    },
+    {
       "rule_id": "runtime.not_started",
       "category": "runtime",
       "default_severity": "info",

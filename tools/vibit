@@ -46,6 +46,12 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.trace",
   "generated.source_trace",
   "generated.handwritten_forbidden",
+  "migration.root",
+  "migration.file_shape",
+  "migration.marker",
+  "migration.source_trace",
+  "migration.ownership",
+  "migration.go_forbidden",
   "runtime.not_started",
   "runtime.go_mod",
   "runtime.skeleton",
@@ -100,6 +106,8 @@ Usage:
   vibit check protocol --json
   vibit check generated
   vibit check generated --json
+  vibit check migrations
+  vibit check migrations --json
   vibit check runtime
   vibit check runtime --json
   vibit check work
@@ -129,6 +137,7 @@ Commands:
   check contracts          Check contract registry and source files.
   check protocol           Check manifest-to-Protobuf alignment.
   check generated          Check generated files declared by module manifests.
+  check migrations         Check PostgreSQL migration source files.
   check runtime            Run current runtime checks when implementation exists.
   check work               Check work-item continuation state.
   check architecture       Check required root architecture artifacts.
@@ -2041,7 +2050,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "runtime"], ["check", "work"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "migrations"], ["check", "runtime"], ["check", "work"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -3191,6 +3200,199 @@ function checkGeneratedProtoOutput(root) {
   }
 }
 
+function discoverMigrationFiles(root) {
+  const migrationRoot = path.join(root, "runtime", "migrations", "postgres");
+  if (!fs.existsSync(migrationRoot)) {
+    return [];
+  }
+  return fs.readdirSync(migrationRoot)
+    .sort()
+    .filter((name) => name !== ".gitkeep")
+    .filter((name) => {
+      const fullPath = path.join(migrationRoot, name);
+      return fs.statSync(fullPath).isFile();
+    })
+    .map((name) => `runtime/migrations/postgres/${name}`);
+}
+
+function checkMigrationManifestReferences(root) {
+  const requiredReferences = [
+    [".arch/conventions.yaml", "migration_root: runtime/migrations/postgres"],
+    [".arch/conventions.yaml", "migration_naming_pattern: 000001_create_inventory_state.sql"],
+    [".arch/conventions.yaml", "first_durable_migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql"],
+    [".arch/runtime.yaml", "source_root: runtime/migrations/postgres"],
+    [".arch/runtime.yaml", "naming_pattern: 000001_create_inventory_state.sql"],
+    [".arch/runtime.yaml", "file: runtime/migrations/postgres/000001_create_inventory_state.sql"],
+    ["docs/postgresql-persistence-boundary.md", "runtime/migrations/postgres/"],
+    ["docs/postgresql-persistence-boundary.md", "-- +goose Up"],
+    ["docs/postgresql-persistence-boundary.md", "-- +goose Down"],
+    ["docs/postgresql-persistence-boundary.zh-CN.md", "runtime/migrations/postgres/"],
+    ["docs/postgresql-persistence-boundary.zh-CN.md", "-- +goose Up"],
+    ["docs/postgresql-persistence-boundary.zh-CN.md", "-- +goose Down"],
+    ["modules/inventory/module.yaml", "runtime/migrations/postgres/000001_create_inventory_state.sql"],
+    ["runtime/AGENTS.md", "node ../tools/vibit check migrations"],
+    ["runtime/AGENTS.zh-CN.md", "node ../tools/vibit check migrations"],
+  ];
+
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, "migration.source_trace", requiredText);
+  }
+}
+
+function checkMigrations(root) {
+  resetResults("check migrations");
+  if (!jsonOutput) {
+    console.log(`Checking PostgreSQL migrations in ${root}\n`);
+  }
+
+  const migrationRoot = "runtime/migrations/postgres";
+  if (isDirectory(root, migrationRoot)) {
+    ok(`${migrationRoot}/ exists`, {
+      rule_id: "migration.root",
+      artifact: migrationRoot,
+    });
+  } else {
+    fail(`${migrationRoot}/ is missing`, {
+      rule_id: "migration.root",
+      artifact: migrationRoot,
+    });
+    finish({
+      summary_counts: {
+        migration_files: 0,
+        go_migrations: 0,
+      },
+    });
+    return;
+  }
+
+  checkMigrationManifestReferences(root);
+
+  const files = discoverMigrationFiles(root);
+  const sqlFiles = files.filter((file) => file.endsWith(".sql"));
+  const goFiles = files.filter((file) => file.endsWith(".go"));
+
+  if (sqlFiles.length > 0) {
+    ok(`${migrationRoot}/ contains SQL migration sources`, {
+      rule_id: "migration.root",
+      artifact: migrationRoot,
+    });
+  } else {
+    fail(`${migrationRoot}/ has no SQL migration sources`, {
+      rule_id: "migration.root",
+      artifact: migrationRoot,
+    });
+  }
+
+  if (goFiles.length === 0) {
+    ok(`${migrationRoot}/ has no Go migrations`, {
+      rule_id: "migration.go_forbidden",
+      artifact: migrationRoot,
+    });
+  } else {
+    for (const file of goFiles) {
+      fail(`${file} is a Go migration without an explicit change-spec allowance`, {
+        rule_id: "migration.go_forbidden",
+        artifact: file,
+      });
+    }
+  }
+
+  const expectedFirstMigration = `${migrationRoot}/000001_create_inventory_state.sql`;
+  if (isFile(root, expectedFirstMigration)) {
+    ok(`${expectedFirstMigration} exists`, {
+      rule_id: "migration.root",
+      artifact: expectedFirstMigration,
+    });
+  } else {
+    fail(`${expectedFirstMigration} is missing`, {
+      rule_id: "migration.root",
+      artifact: expectedFirstMigration,
+    });
+  }
+
+  for (const file of sqlFiles) {
+    const name = path.basename(file);
+    if (/^\d{6}_[a-z0-9_]+\.sql$/.test(name)) {
+      ok(`${file} matches SQL migration naming pattern`, {
+        rule_id: "migration.file_shape",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} does not match SQL migration naming pattern`, {
+        rule_id: "migration.file_shape",
+        artifact: file,
+      });
+    }
+
+    const text = readText(path.join(root, file));
+    if (text.includes("-- +goose Up")) {
+      ok(`${file} declares -- +goose Up`, {
+        rule_id: "migration.marker",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing -- +goose Up`, {
+        rule_id: "migration.marker",
+        artifact: file,
+      });
+    }
+
+    if (text.includes("-- +goose Down")) {
+      ok(`${file} declares -- +goose Down`, {
+        rule_id: "migration.marker",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing -- +goose Down`, {
+        rule_id: "migration.marker",
+        artifact: file,
+      });
+    }
+
+    if (/^--\s*Module:\s*[a-z][a-z0-9_]*\s*$/m.test(text)) {
+      ok(`${file} declares owning module`, {
+        rule_id: "migration.ownership",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing owning module trace`, {
+        rule_id: "migration.ownership",
+        artifact: file,
+      });
+    }
+  }
+
+  if (isFile(root, expectedFirstMigration)) {
+    const firstMigration = readText(path.join(root, expectedFirstMigration));
+    const requiredTables = [
+      "inventory_accounts",
+      "inventory_items",
+      "inventory_item_grants",
+    ];
+    for (const table of requiredTables) {
+      if (firstMigration.includes(table)) {
+        ok(`${expectedFirstMigration} references ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: expectedFirstMigration,
+        });
+      } else {
+        fail(`${expectedFirstMigration} does not reference ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: expectedFirstMigration,
+        });
+      }
+    }
+  }
+
+  finish({
+    summary_counts: {
+      migration_files: files.length,
+      sql_migrations: sqlFiles.length,
+      go_migrations: goFiles.length,
+    },
+  });
+}
+
 function discoverRuntimeTestFiles(root) {
   const files = [];
   const runtimeDir = path.join(root, "runtime");
@@ -4139,6 +4341,11 @@ function main() {
 
   if (group === "check" && command === "generated" && !value) {
     checkGenerated(root);
+    return;
+  }
+
+  if (group === "check" && command === "migrations" && !value) {
+    checkMigrations(root);
     return;
   }
 
