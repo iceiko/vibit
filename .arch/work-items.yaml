@@ -50,6 +50,12 @@ milestones:
     title: Durable Inventory Runtime
     status: active
     goal: Add PostgreSQL-backed inventory persistence and transaction boundaries after the in-process request loop is proven.
+    completion_criteria:
+      - PostgreSQL runtime configuration and a pgx-backed transaction runner exist behind declared platform boundaries.
+      - Migration apply and status tooling can execute SQL-first migration sources explicitly.
+      - A disposable PostgreSQL verification environment is defined before live integration checks become mandatory.
+      - Persistent inventory runtime composition can serve the existing WebSocket Protobuf request loop without moving persistence details into domain, protocol, or transport packages.
+      - Durable inventory behavior is verified end to end or any unavailable external verification is explicitly recorded.
     non_goals:
       - object storage
       - cluster runtime
@@ -293,3 +299,132 @@ work_items:
     ask_first:
       - Skipping transaction-bound repository behavior.
       - Making PostgreSQL integration tests mandatory without a local test environment standard.
+
+  - id: W-0016
+    milestone: M-002
+    title: Plan durable inventory runtime work queue
+    status: completed
+    change: changes/2026-05-13-plan-durable-inventory-runtime-work-queue
+    depends_on:
+      - W-0015
+    related_decisions:
+      - ADR-0011
+      - ADR-0014
+      - ADR-0018
+      - ADR-0020
+    completion:
+      - Restore deterministic continuation by planning the remaining M-002 work items.
+      - Mark the next conservative durable inventory work item as next_ready.
+      - Keep persistence wiring, migration execution, integration environment, and end-to-end verification as separate bounded steps.
+
+  - id: W-0017
+    milestone: M-002
+    title: Add PostgreSQL configuration and transaction runner
+    status: next_ready
+    expected_change_id: add-postgresql-configuration-and-transaction-runner
+    depends_on:
+      - W-0016
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0014
+      - ADR-0020
+    completion:
+      - Add explicit PostgreSQL runtime configuration for connection input without storing secrets in tracked files.
+      - Add a pgx-backed transaction runner adapter that implements the existing vibit-owned tx.Runner boundary.
+      - Keep pgx imports inside the PostgreSQL platform owner package.
+      - Keep transaction interfaces driver-neutral for application and domain packages.
+      - Cover configuration parsing and transaction runner behavior with focused tests that do not require a live PostgreSQL server unless an explicit integration environment is present.
+    ask_first:
+      - Exposing pgx types outside the PostgreSQL platform owner package.
+      - Changing transaction ownership away from runtime/internal/platform/tx and runtime/internal/app.
+      - Introducing transaction retry or isolation policy beyond a documented default.
+      - Making a live PostgreSQL server mandatory for normal unit tests.
+      - Adding a new configuration framework dependency.
+
+  - id: W-0018
+    milestone: M-002
+    title: Add migration apply and status tooling
+    status: planned
+    expected_change_id: add-postgresql-migration-apply-and-status-tooling
+    depends_on:
+      - W-0017
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0020
+    completion:
+      - Add explicit migration apply and status tooling through the migration platform owner package.
+      - Keep goose ownership under runtime/internal/platform/migrations.
+      - Provide CLI or runtime-invoked commands that can report migration state and apply SQL-first sources.
+      - Record what can be verified without a live PostgreSQL server and what requires the disposable verification environment.
+    ask_first:
+      - Applying migrations automatically during normal server startup.
+      - Replacing SQL-first migrations with Go migrations.
+      - Adding a second migration tool.
+      - Weakening migration source validation.
+
+  - id: W-0019
+    milestone: M-002
+    title: Define disposable PostgreSQL verification environment
+    status: planned
+    expected_change_id: define-disposable-postgresql-verification-environment
+    depends_on:
+      - W-0018
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0020
+    completion:
+      - Define how agents run PostgreSQL integration checks without relying on maintainer memory.
+      - Document required environment variables, cleanup expectations, and what checks may be skipped when the environment is unavailable.
+      - Keep integration checks opt-in until the environment standard is available in repository tooling.
+      - Add repository guidance so agents do not confuse source validation with live database verification.
+    ask_first:
+      - Making Docker, Podman, or any external service manager a required project dependency.
+      - Making live PostgreSQL integration tests mandatory in every default check.
+      - Adding cloud-hosted PostgreSQL assumptions.
+
+  - id: W-0020
+    milestone: M-002
+    title: Wire persistent inventory runtime composition
+    status: planned
+    expected_change_id: wire-persistent-inventory-runtime-composition
+    depends_on:
+      - W-0019
+    related_decisions:
+      - ADR-0011
+      - ADR-0014
+      - ADR-0018
+      - ADR-0020
+    completion:
+      - Add runtime composition that binds inventory handlers to PostgreSQL repositories through the application-owned transaction boundary.
+      - Keep business logic out of process startup, transport, protocol, and persistence adapters.
+      - Keep the in-memory inventory path available for tests or explicitly documented local development until a replacement is confirmed.
+      - Update the runtime runbook and agent guides with the persistent process path.
+    ask_first:
+      - Making PostgreSQL mandatory for local process startup.
+      - Removing the in-memory bootstrap path.
+      - Introducing authentication, session validation, or player account ownership.
+      - Replacing the inventory account row-lock model.
+
+  - id: W-0021
+    milestone: M-002
+    title: Verify durable inventory runtime end to end
+    status: planned
+    expected_change_id: verify-durable-inventory-runtime-end-to-end
+    depends_on:
+      - W-0020
+    related_decisions:
+      - ADR-0011
+      - ADR-0015
+      - ADR-0018
+      - ADR-0020
+    completion:
+      - Verify the WebSocket Protobuf GrantItem and GetInventory request loop against the persistent inventory runtime.
+      - Verify migration apply/status behavior against the defined disposable PostgreSQL environment or record explicit unavailability.
+      - Verify that domain, application, protocol, transport, persistence, and migration boundaries still pass repository checks.
+      - Update M-002 completion status when durable inventory runtime criteria are satisfied.
+    ask_first:
+      - Closing M-002 with unavailable live PostgreSQL verification.
+      - Expanding scope into outbox delivery, auth/session, player accounts, item catalog, currency, rewards, or match sessions.
