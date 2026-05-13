@@ -262,6 +262,21 @@ Errors should be mapped at the layer that owns the failure:
 
 Public module errors must map to registered error catalogs.
 
+Application errors are encoded by the Protobuf protocol adapter as `MESSAGE_KIND_ERROR` envelopes. The first active mapper is:
+
+```text
+runtime/internal/platform/protocol/protobuf/error_envelope.go
+```
+
+Rules:
+
+- Preserve `request_id`, route metadata, target metadata, and session metadata from the application result.
+- Copy stable application error code and public message into `protocolv1.Error`.
+- Set `Error.request_id` to the correlated request id.
+- Leave `payload_type` and `payload` empty for error envelopes.
+- Treat application errors as non-retryable by default until retryability is generated from registered error catalogs.
+- Do not expose non-application internal errors through this mapper without a separate protocol error handling decision.
+
 ## 7. Session And Target Boundaries
 
 The protocol adapter may parse session and target metadata, but it must not invent authentication shortcuts.

@@ -179,7 +179,7 @@ server_instance_model:
     standard: docs/runtime-protocol-adapter.md
     decision: ADR-0018
     check_command: node tools/vibit check runtime
-    status: inventory_bridge_started
+    status: inventory_bridge_and_application_error_envelopes_started
     first_request_flow:
       - websocket_frame
       - transport_frame
@@ -209,6 +209,13 @@ server_instance_model:
       generated_contracts: runtime/internal/generated/contracts
       generated_proto: runtime/internal/generated/proto
     current_bridges:
+      application_errors:
+        mapper: runtime/internal/platform/protocol/protobuf/error_envelope.go
+        tests: runtime/internal/platform/protocol/protobuf/error_envelope_test.go
+        maps_results:
+          - app.ApplicationError -> protocolv1.Error
+        message_kind: error
+        retryability: non_retryable_by_default_until_catalog_driven_mapping_exists
       inventory:
         request_mapper: runtime/internal/platform/protocol/protobuf/inventory_bridge.go
         tests: runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go
@@ -367,7 +374,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: inventory_runtime_and_protocol_bridge_started
+  skeleton_status: inventory_runtime_protocol_bridge_and_error_envelopes_started
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.

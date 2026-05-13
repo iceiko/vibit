@@ -263,6 +263,21 @@ Errors 应在拥有该失败的层映射：
 
 Public module errors 必须映射到已登记的 error catalogs。
 
+Application errors 由 Protobuf protocol adapter 编码为 `MESSAGE_KIND_ERROR` envelopes。第一条 active mapper 是：
+
+```text
+runtime/internal/platform/protocol/protobuf/error_envelope.go
+```
+
+规则：
+
+- 保留 application result 中的 `request_id`、route metadata、target metadata 和 session metadata。
+- 把 stable application error code 和 public message 复制到 `protocolv1.Error`。
+- 把 `Error.request_id` 设置为关联的 request id。
+- Error envelopes 中保持 `payload_type` 和 `payload` 为空。
+- 在 retryability 从已登记 error catalogs 生成之前，application errors 默认 non-retryable。
+- 没有单独的 protocol error handling decision 时，不要通过这个 mapper 暴露 non-application internal errors。
+
 ## 7. Session And Target Boundaries
 
 Protocol adapter 可以解析 session 和 target metadata，但不得发明 authentication shortcuts。

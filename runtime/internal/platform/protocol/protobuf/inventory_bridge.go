@@ -60,6 +60,9 @@ func RouteRequestWithDomainPayload(request app.RouteRequest) (app.RouteRequest, 
 }
 
 func BuildEnvelopeFromApplicationResult(result app.ApplicationResult) (*protocolv1.Envelope, error) {
+	if result.Error != nil {
+		return BuildErrorEnvelopeFromApplicationResult(result)
+	}
 	payload, err := ProtoPayloadFromApplicationResult(result)
 	if err != nil {
 		return nil, err
@@ -77,7 +80,7 @@ func BuildEnvelopeFromApplicationEvent(event app.ApplicationEvent, requestID str
 
 func ProtoPayloadFromApplicationResult(result app.ApplicationResult) (proto.Message, error) {
 	if result.Error != nil {
-		return nil, &PayloadBridgeError{Message: "application error result payload mapping is not implemented"}
+		return nil, &PayloadBridgeError{Message: "application error result has no success payload"}
 	}
 	return protoPayloadFromRouteAndPayload(result.Route, result.Payload)
 }

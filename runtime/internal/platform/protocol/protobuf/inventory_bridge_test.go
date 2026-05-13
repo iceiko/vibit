@@ -9,6 +9,7 @@ import (
 
 	"github.com/iceiko/vibit/runtime/internal/app"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
+	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 )
 
@@ -172,7 +173,7 @@ func TestInventoryProtobufDomainBridgeDispatchesAndBuildsResponseEnvelope(t *tes
 	repository := newBridgeMemoryRepository()
 	handlers := inventory.Handlers{
 		Repository:       repository,
-		PermissionPolicy: bridgePermissionPolicy{},
+		PermissionPolicy: bridgePermissionPolicy{grantAllowed: true, readAllowed: true},
 		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 16},
 		EventIDs:         &bridgeEventIDs{},
 		Clock:            bridgeClock{},
@@ -241,14 +242,79 @@ func TestInventoryProtobufDomainBridgeDispatchesAndBuildsResponseEnvelope(t *tes
 	}
 }
 
-type bridgePermissionPolicy struct{}
+func TestInventoryProtobufDomainBridgeBuildsPermissionErrorEnvelope(t *testing.T) {
+	repository := newBridgeMemoryRepository()
+	handlers := inventory.Handlers{
+		Repository:       repository,
+		PermissionPolicy: bridgePermissionPolicy{grantAllowed: false, readAllowed: true},
+		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 16},
+		EventIDs:         &bridgeEventIDs{},
+		Clock:            bridgeClock{},
+	}
+	dispatcher := app.NewDispatcher()
+	if err := handlers.RegisterRoutes(dispatcher); err != nil {
+		t.Fatalf("RegisterRoutes() error = %v, want nil", err)
+	}
 
-func (bridgePermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
-	return true, nil
+	envelope, err := BuildEnvelope(
+		inventory.GrantItemRoute(),
+		"request-1",
+		app.Target{Scope: app.TargetScopePlayer, ID: "player-1"},
+		app.Session{ConnectionID: "connection-1", SessionID: "session-1", PlayerID: "player-1"},
+		&inventoryv1.GrantItemRequest{
+			PlayerId:    "player-1",
+			ItemId:      "item-1",
+			Quantity:    2,
+			Reason:      "reward",
+			RequestedBy: "admin-1",
+		},
+	)
+	if err != nil {
+		t.Fatalf("BuildEnvelope() request error = %v, want nil", err)
+	}
+
+	request, err := RouteRequestFromEnvelopeForDispatch(envelope)
+	if err != nil {
+		t.Fatalf("RouteRequestFromEnvelopeForDispatch() error = %v, want nil", err)
+	}
+
+	result, err := dispatcher.Dispatch(context.Background(), request)
+	if err == nil {
+		t.Fatal("Dispatch() error = nil, want permission error")
+	}
+	if result.Error == nil {
+		t.Fatal("result error = nil, want application error")
+	}
+
+	errorEnvelope, err := BuildEnvelopeFromApplicationResult(result)
+	if err != nil {
+		t.Fatalf("BuildEnvelopeFromApplicationResult() error = %v, want nil", err)
+	}
+	if errorEnvelope.GetKind() != protocolv1.MessageKind_MESSAGE_KIND_ERROR {
+		t.Fatalf("error kind = %v, want MESSAGE_KIND_ERROR", errorEnvelope.GetKind())
+	}
+	if errorEnvelope.GetError().GetCode() != string(inventory.ErrorCodeInventoryPermission) {
+		t.Fatalf("error code = %q, want %s", errorEnvelope.GetError().GetCode(), inventory.ErrorCodeInventoryPermission)
+	}
+	if errorEnvelope.GetError().GetRequestId() != "request-1" {
+		t.Fatalf("error request_id = %q, want request-1", errorEnvelope.GetError().GetRequestId())
+	}
+	if errorEnvelope.GetPayloadType() != "" || len(errorEnvelope.GetPayload()) != 0 {
+		t.Fatalf("error payload_type = %q payload len = %d, want no success payload", errorEnvelope.GetPayloadType(), len(errorEnvelope.GetPayload()))
+	}
 }
 
-func (bridgePermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
-	return true, nil
+type bridgePermissionPolicy struct {
+	grantAllowed bool
+	readAllowed  bool
+}
+
+func (p bridgePermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
+	return p.grantAllowed, nil
+}
+
+func (p bridgePermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
+	return p.readAllowed, nil
 }
 
 type bridgeMemoryRepository struct {
