@@ -1,0 +1,71 @@
+schema_version: 0.1
+change_id: add-work-item-continuation-system
+date: 2026-05-13
+type: tooling
+status: verified
+
+summary: Add a checked work-item continuation system for deterministic agent progress.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+documentation:
+  added:
+    - docs/workflow.md
+    - docs/workflow.zh-CN.md
+    - changes/2026-05-13-add-work-item-continuation-system/
+  changed:
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+
+architecture:
+  added:
+    - .arch/work-items.yaml
+
+tooling:
+  changed:
+    - tools/vibit
+    - rules/check-rules.json
+    - schema/inspect-output.schema.json
+
+verification:
+  required:
+    - node_tools_vibit_check_work_json
+    - node_tools_vibit_inspect_work
+    - node_tools_vibit_check_schemas_json
+    - node_tools_vibit_check_all_json
+    - git_diff_check
+    - secret_scan
+  status: Verified

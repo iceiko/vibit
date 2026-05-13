@@ -59,6 +59,12 @@ const KNOWN_CHECK_RULE_IDS = [
   "change.verification_status",
   "change.requested_id_match",
   "module.directory_match",
+  "work.manifest",
+  "work.milestone",
+  "work.item",
+  "work.dependency",
+  "work.next_ready",
+  "work.workflow",
   "operator.guidance",
   "generator.created_artifact",
   "generator.artifact_already_exists",
@@ -96,6 +102,8 @@ Usage:
   vibit check generated --json
   vibit check runtime
   vibit check runtime --json
+  vibit check work
+  vibit check work --json
   vibit check architecture
   vibit check architecture --json
   vibit check module <module>
@@ -106,6 +114,8 @@ Usage:
   vibit inspect boundary --from <module> --to <module>
   vibit inspect contract --module <module> --type <type> --id <id>
   vibit inspect change <change-id>
+  vibit inspect work
+  vibit inspect work --json
   vibit inspect memory
   vibit inspect rule <rule-id>
   vibit inspect rules
@@ -120,6 +130,7 @@ Commands:
   check protocol           Check manifest-to-Protobuf alignment.
   check generated          Check generated files declared by module manifests.
   check runtime            Run current runtime checks when implementation exists.
+  check work               Check work-item continuation state.
   check architecture       Check required root architecture artifacts.
   check module <module>    Check a module skeleton and manifest files.
   check change <change-id> Check a change spec directory.
@@ -127,6 +138,7 @@ Commands:
   inspect boundary         Print boundary metadata as JSON.
   inspect contract         Print contract metadata as JSON.
   inspect change           Print change spec metadata as JSON.
+  inspect work             Print current work-item continuation context as JSON.
   inspect memory           Print project memory indexes as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
@@ -287,6 +299,9 @@ function inferRuleId(message) {
   }
   if (message.includes("module name matches directory") || message.includes("module name does not match directory")) {
     return "module.directory_match";
+  }
+  if (message.includes("work-items") || message.includes("work item") || message.includes("milestone")) {
+    return "work.item";
   }
   if (message.startsWith("run: ")) {
     return "operator.guidance";
@@ -673,6 +688,91 @@ function listAfterKey(text, key) {
     }
   }
   return values;
+}
+
+function sectionRange(lines, sectionName) {
+  const startIndex = lines.findIndex((line) => line.trim() === `${sectionName}:`);
+  if (startIndex === -1) {
+    return { start: -1, end: -1, indent: -1 };
+  }
+  const indent = lines[startIndex].match(/^(\s*)/)[1].length;
+  let end = lines.length;
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) {
+      continue;
+    }
+    const lineIndent = line.match(/^(\s*)/)[1].length;
+    if (lineIndent <= indent && /^[A-Za-z0-9_-]+:/.test(line.trim())) {
+      end = i;
+      break;
+    }
+  }
+  return { start: startIndex, end, indent };
+}
+
+function parseYamlListObjects(text, sectionName) {
+  const lines = text.split(/\r?\n/);
+  const range = sectionRange(lines, sectionName);
+  if (range.start === -1) {
+    return [];
+  }
+
+  const items = [];
+  let current = null;
+  let currentListKey = null;
+  let currentListIndent = -1;
+
+  for (let i = range.start + 1; i < range.end; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) {
+      continue;
+    }
+
+    const itemMatch = line.match(/^\s{2}-\s+([A-Za-z0-9_-]+):\s*(.*?)\s*$/);
+    if (itemMatch) {
+      current = {};
+      items.push(current);
+      currentListKey = null;
+      currentListIndent = -1;
+      current[itemMatch[1]] = unquoteScalar(itemMatch[2]);
+      continue;
+    }
+
+    if (!current) {
+      continue;
+    }
+
+    const listValueMatch = line.match(/^(\s*)-\s+(.+?)\s*$/);
+    if (listValueMatch && currentListKey && listValueMatch[1].length > currentListIndent) {
+      current[currentListKey].push(unquoteScalar(listValueMatch[2]));
+      continue;
+    }
+
+    const fieldMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):(?:\s*(.*?))?\s*$/);
+    if (!fieldMatch) {
+      continue;
+    }
+
+    const indent = fieldMatch[1].length;
+    const key = fieldMatch[2];
+    const rawValue = fieldMatch[3] || "";
+    if (rawValue === "") {
+      current[key] = [];
+      currentListKey = key;
+      currentListIndent = indent;
+    } else {
+      current[key] = unquoteScalar(rawValue);
+      currentListKey = null;
+      currentListIndent = -1;
+    }
+  }
+
+  return items;
+}
+
+function unquoteScalar(value) {
+  return String(value || "").trim().replace(/^["']|["']$/g, "");
 }
 
 function listItemFieldAfterKey(text, sectionKey, fieldKey) {
@@ -1698,6 +1798,52 @@ function loadChangeInfo(root, changeId) {
   return change;
 }
 
+function loadWorkState(root) {
+  const manifestPath = ".arch/work-items.yaml";
+  const existsOnDisk = isFile(root, manifestPath);
+  const text = existsOnDisk ? readText(path.join(root, manifestPath)) : "";
+  const milestones = existsOnDisk ? parseYamlListObjects(text, "milestones") : [];
+  const workItems = existsOnDisk ? parseYamlListObjects(text, "work_items") : [];
+  const currentMilestone = existsOnDisk ? firstScalar(text, "current_milestone") : null;
+  const itemsById = new Map(workItems.map((item) => [item.id, item]));
+
+  const nextReady = workItems.filter((item) => item.status === "next_ready");
+  const active = workItems.filter((item) => item.status === "active");
+  const blocked = workItems.filter((item) => item.status === "blocked");
+  const completed = workItems.filter((item) => item.status === "completed");
+  const planned = workItems.filter((item) => item.status === "planned");
+
+  return {
+    manifest: manifestPath,
+    exists: existsOnDisk,
+    schema_version: existsOnDisk ? firstScalar(text, "schema_version") : null,
+    status: existsOnDisk ? firstScalar(text, "status") : null,
+    standard: existsOnDisk ? firstScalar(text, "standard") : null,
+    current_milestone: currentMilestone,
+    milestones,
+    work_items: workItems,
+    indexes: {
+      items_by_id: itemsById,
+      milestone_ids: new Set(milestones.map((milestone) => milestone.id)),
+    },
+    summary: {
+      milestones: milestones.length,
+      work_items: workItems.length,
+      next_ready: nextReady.length,
+      active: active.length,
+      blocked: blocked.length,
+      completed: completed.length,
+      planned: planned.length,
+    },
+    current: {
+      milestone: milestones.find((milestone) => milestone.id === currentMilestone) || null,
+      active,
+      next_ready: nextReady,
+      blocked,
+    },
+  };
+}
+
 function inspectChange(root, changeId) {
   checkName(changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
 
@@ -1706,6 +1852,38 @@ function inspectChange(root, changeId) {
     kind: "change_inspection",
     project: "vibit",
     change: loadChangeInfo(root, changeId),
+  });
+}
+
+function inspectWork(root) {
+  const state = loadWorkState(root);
+  if (!state.exists) {
+    console.error(".arch/work-items.yaml is missing");
+    process.exit(1);
+  }
+
+  printJson({
+    schema_version: "0.1",
+    kind: "work_inspection",
+    project: "vibit",
+    work: {
+      manifest: state.manifest,
+      standard: state.standard,
+      status: state.status,
+      current_milestone: state.current_milestone,
+      summary: state.summary,
+      current: state.current,
+      milestones: state.milestones,
+      work_items: state.work_items,
+    },
+    continuation: {
+      default_step_unit: "work_item",
+      one_step: "advance one next_ready work item",
+      multi_step: "advance up to the requested number of next_ready work items in dependency order, stopping early at blockers or ask-first boundaries",
+      next_command: state.current.next_ready.length > 0
+        ? `Create or update change spec for ${state.current.next_ready[0].expected_change_id || state.current.next_ready[0].id}`
+        : "No next_ready work item is available.",
+    },
   });
 }
 
@@ -1863,7 +2041,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "runtime"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "runtime"], ["check", "work"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -3159,6 +3337,243 @@ function checkRuntimeLayerBoundaries(root, goFiles) {
   }
 }
 
+function checkWork(root) {
+  resetResults("check work");
+  if (!jsonOutput) {
+    console.log(`Checking work-item continuation state in ${root}\n`);
+  }
+
+  requireFiles(root, [
+    ".arch/work-items.yaml",
+    "docs/workflow.md",
+    "docs/workflow.zh-CN.md",
+  ]);
+
+  checkTextIncludes(root, "AGENTS.md", "node tools/vibit inspect work");
+  checkTextIncludes(root, "AGENTS.zh-CN.md", "node tools/vibit inspect work");
+  checkTextIncludes(root, ".arch/README.md", ".arch/work-items.yaml");
+  checkTextIncludes(root, ".arch/README.zh-CN.md", ".arch/work-items.yaml");
+
+  const state = loadWorkState(root);
+  if (!state.exists) {
+    finish();
+    return;
+  }
+
+  if (state.schema_version === "0.1") {
+    ok(".arch/work-items.yaml declares schema_version: 0.1", {
+      rule_id: "work.manifest",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml schema_version is invalid or missing", {
+      rule_id: "work.manifest",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (state.status && ["draft", "active", "deprecated"].includes(state.status)) {
+    ok(`.arch/work-items.yaml status is ${state.status}`, {
+      rule_id: "work.manifest",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml status is invalid or missing", {
+      rule_id: "work.manifest",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (state.standard === "docs/workflow.md") {
+    ok(".arch/work-items.yaml references docs/workflow.md", {
+      rule_id: "work.workflow",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml standard must be docs/workflow.md", {
+      rule_id: "work.workflow",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  const activeMilestones = state.milestones.filter((milestone) => milestone.status === "active");
+  if (state.milestones.length > 0) {
+    ok(".arch/work-items.yaml declares milestones", {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml must declare at least one milestone", {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (activeMilestones.length > 0) {
+    ok(".arch/work-items.yaml has an active milestone", {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml must have at least one active milestone", {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (state.current.milestone) {
+    ok(`current milestone ${state.current_milestone} exists`, {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(`current milestone ${state.current_milestone || "<missing>"} is missing`, {
+      rule_id: "work.milestone",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  const seenWorkItems = new Set();
+  const validWorkStatuses = new Set(["planned", "next_ready", "active", "blocked", "completed", "paused", "superseded"]);
+  for (const item of state.work_items) {
+    const artifact = `.arch/work-items.yaml#${item.id || "<missing>"}`;
+    if (!item.id || !/^W-\d{4}$/.test(item.id)) {
+      fail(`${artifact} has invalid work item id`, {
+        rule_id: "work.item",
+        artifact,
+      });
+      continue;
+    }
+    if (seenWorkItems.has(item.id)) {
+      fail(`${artifact} duplicates a work item id`, {
+        rule_id: "work.item",
+        artifact,
+      });
+    } else {
+      seenWorkItems.add(item.id);
+      ok(`${artifact} declares a valid work item id`, {
+        rule_id: "work.item",
+        artifact,
+      });
+    }
+
+    if (item.milestone && state.indexes.milestone_ids.has(item.milestone)) {
+      ok(`${artifact} references milestone ${item.milestone}`, {
+        rule_id: "work.milestone",
+        artifact,
+      });
+    } else {
+      fail(`${artifact} references missing milestone ${item.milestone || "<missing>"}`, {
+        rule_id: "work.milestone",
+        artifact,
+      });
+    }
+
+    if (validWorkStatuses.has(item.status)) {
+      ok(`${artifact} status is ${item.status}`, {
+        rule_id: "work.item",
+        artifact,
+      });
+    } else {
+      fail(`${artifact} status is invalid or missing`, {
+        rule_id: "work.item",
+        artifact,
+      });
+    }
+
+    if (item.status === "completed") {
+      if (item.change || item.no_change_spec_reason) {
+        ok(`${artifact} records completion trace`, {
+          rule_id: "work.item",
+          artifact,
+        });
+      } else {
+        fail(`${artifact} completed work item must reference a change spec or no_change_spec_reason`, {
+          rule_id: "work.item",
+          artifact,
+        });
+      }
+      if (item.change) {
+        const relativeChange = String(item.change).replace(/^changes\/\d{4}-\d{2}-\d{2}-/, "");
+        if (loadChangeInfo(root, relativeChange).exists) {
+          ok(`${artifact} references existing change ${item.change}`, {
+            rule_id: "work.item",
+            artifact,
+          });
+        } else {
+          fail(`${artifact} references missing change ${item.change}`, {
+            rule_id: "work.item",
+            artifact,
+          });
+        }
+      }
+    }
+
+    const dependencies = Array.isArray(item.depends_on) ? item.depends_on : [];
+    for (const dependencyId of dependencies) {
+      const dependency = state.indexes.items_by_id.get(dependencyId);
+      if (!dependency) {
+        fail(`${artifact} depends on missing work item ${dependencyId}`, {
+          rule_id: "work.dependency",
+          artifact,
+        });
+      } else if (item.status === "next_ready" && dependency.status !== "completed") {
+        fail(`${artifact} is next_ready but dependency ${dependencyId} is ${dependency.status}`, {
+          rule_id: "work.dependency",
+          artifact,
+        });
+      } else {
+        ok(`${artifact} dependency ${dependencyId} is declared`, {
+          rule_id: "work.dependency",
+          artifact,
+        });
+      }
+    }
+  }
+
+  if (state.work_items.length > 0) {
+    ok(".arch/work-items.yaml declares work items", {
+      rule_id: "work.item",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    fail(".arch/work-items.yaml must declare at least one work item", {
+      rule_id: "work.item",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (state.current.next_ready.length > 0) {
+    ok(".arch/work-items.yaml has next_ready work", {
+      rule_id: "work.next_ready",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    warn(".arch/work-items.yaml has no next_ready work item", {
+      rule_id: "work.next_ready",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  if (state.current.next_ready.length <= 1) {
+    ok(".arch/work-items.yaml has at most one next_ready work item", {
+      rule_id: "work.next_ready",
+      artifact: ".arch/work-items.yaml",
+    });
+  } else {
+    warn(".arch/work-items.yaml has multiple next_ready work items", {
+      rule_id: "work.next_ready",
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  finish({
+    summary_counts: state.summary,
+    current_milestone: state.current_milestone,
+    next_ready: state.current.next_ready.map((item) => item.id),
+  });
+}
+
 function checkRuntime(root) {
   resetResults("check runtime");
   if (!jsonOutput) {
@@ -3663,7 +4078,7 @@ function main() {
 
   const [group, command, value, extra] = args;
 
-  if (wantsJson && group !== "check") {
+  if (wantsJson && group !== "check" && group !== "inspect") {
     console.error("--json is only supported for check commands.");
     process.exit(2);
   }
@@ -3711,6 +4126,11 @@ function main() {
     return;
   }
 
+  if (group === "check" && command === "work" && !value) {
+    checkWork(root);
+    return;
+  }
+
   if (group === "check" && command === "all" && !value) {
     checkAll(root);
     return;
@@ -3743,6 +4163,11 @@ function main() {
 
   if (group === "inspect" && command === "change" && value && !extra) {
     inspectChange(root, value);
+    return;
+  }
+
+  if (group === "inspect" && command === "work" && !value) {
+    inspectWork(root);
     return;
   }
 

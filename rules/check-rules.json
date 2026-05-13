@@ -420,6 +420,54 @@
       "agent_guidance": "Update `module.yaml` or the module directory name so they match."
     },
     {
+      "rule_id": "work.manifest",
+      "category": "work",
+      "default_severity": "error",
+      "title": "Work manifest",
+      "description": "The work-item continuation manifest must exist and declare the expected top-level metadata.",
+      "agent_guidance": "Inspect `.arch/work-items.yaml` and align it with `docs/workflow.md`."
+    },
+    {
+      "rule_id": "work.milestone",
+      "category": "work",
+      "default_severity": "error",
+      "title": "Work milestone",
+      "description": "Milestones must be declared and referenced by work items.",
+      "agent_guidance": "Add the missing milestone or correct the work item milestone reference."
+    },
+    {
+      "rule_id": "work.item",
+      "category": "work",
+      "default_severity": "error",
+      "title": "Work item",
+      "description": "Work items must have valid IDs, statuses, and completion traces when completed.",
+      "agent_guidance": "Update `.arch/work-items.yaml` so each work item is a bounded continuation step."
+    },
+    {
+      "rule_id": "work.dependency",
+      "category": "work",
+      "default_severity": "error",
+      "title": "Work dependency",
+      "description": "Work item dependencies must reference existing work items, and next-ready items must depend only on completed items.",
+      "agent_guidance": "Complete the dependency, change the work item status, or correct the dependency list."
+    },
+    {
+      "rule_id": "work.next_ready",
+      "category": "work",
+      "default_severity": "warning",
+      "title": "Next ready work",
+      "description": "The work queue should identify the next ready bounded work item for continuation.",
+      "agent_guidance": "Mark exactly one suitable work item as `next_ready`, unless no work is ready or parallel ready work is intentional."
+    },
+    {
+      "rule_id": "work.workflow",
+      "category": "work",
+      "default_severity": "error",
+      "title": "Work workflow standard",
+      "description": "Work-item manifests and agent guides must reference the workflow standard and inspect command.",
+      "agent_guidance": "Update `.arch/work-items.yaml`, `docs/workflow.md`, and AGENTS guides so continuation semantics are discoverable."
+    },
+    {
       "rule_id": "operator.guidance",
       "category": "operator",
       "default_severity": "warning",

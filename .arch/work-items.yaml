@@ -1,0 +1,196 @@
+schema_version: 0.1
+project: vibit
+status: draft
+standard: docs/workflow.md
+current_milestone: M-001
+
+continuation_semantics:
+  default_step_unit: work_item
+  one_step_request:
+    phrases:
+      - continue
+      - 继续
+    meaning: Advance one next_ready work item unless blocked or confirmation is required.
+  multi_step_request:
+    pattern: continue <n> steps
+    meaning: Advance up to n next_ready work items in dependency order, stopping early if blocked or confirmation is required.
+  stop_conditions:
+    - no_next_ready_work_item
+    - work_item_blocked
+    - ask_first_boundary_reached
+    - verification_failure
+    - maintainer_redirect
+
+milestones:
+  - id: M-000
+    title: Constitutional And Operating Foundation
+    status: completed
+    goal: Establish the constitution, bilingual documentation rule, change specs, ADRs, architecture manifests, conversation memory, and baseline verification tooling.
+    completion_summary: The repository has a constitution, AGENTS guides, change spec workflow, ADRs, conversation logs, architecture checks, and initial runtime direction.
+
+  - id: M-001
+    title: First Go Runtime Request Loop
+    status: active
+    goal: Build the first bounded WebSocket Protobuf application request loop without persistence.
+    completion_criteria:
+      - WebSocket transport accepts binary frames without owning protocol or domain behavior.
+      - Protobuf adapter decodes envelopes and bridges inventory payloads.
+      - Application dispatch routes command and query requests.
+      - Composition connects WebSocket frames to Protobuf envelopes and application dispatch.
+      - The loop is covered by Go tests and repository checks.
+    non_goals:
+      - PostgreSQL persistence
+      - authentication
+      - session validation
+      - generated route registration
+      - distributed runtime
+
+  - id: M-002
+    title: Durable Inventory Runtime
+    status: planned
+    goal: Add PostgreSQL-backed inventory persistence and transaction boundaries after the in-process request loop is proven.
+    non_goals:
+      - object storage
+      - cluster runtime
+      - multi-module economy behavior
+
+work_items:
+  - id: W-0001
+    milestone: M-001
+    title: Define runtime protocol adapter boundary
+    status: completed
+    change: changes/2026-05-13-define-runtime-protocol-adapter-boundary
+    commits:
+      - fa92f94
+    related_decisions:
+      - ADR-0018
+    completion:
+      - Runtime handoff between transport, protocol, app, domain, and generated output is documented.
+
+  - id: W-0002
+    milestone: M-001
+    title: Add application dispatch skeleton
+    status: completed
+    change: changes/2026-05-13-add-application-dispatch-skeleton
+    commits:
+      - e119e02
+    related_decisions:
+      - ADR-0014
+      - ADR-0018
+    completion:
+      - Application dispatch routes command and query requests through vibit-owned interfaces.
+
+  - id: W-0003
+    milestone: M-001
+    title: Add inventory runtime boundary
+    status: completed
+    change: changes/2026-05-13-add-inventory-runtime-boundary
+    commits:
+      - b5fe5b2
+    related_decisions:
+      - ADR-0014
+    completion:
+      - Inventory runtime has handwritten repository, policy, command, query, event, and invariant behavior.
+
+  - id: W-0004
+    milestone: M-001
+    title: Add inventory Protobuf domain bridge
+    status: completed
+    change: changes/2026-05-13-add-inventory-protobuf-domain-bridge
+    commits:
+      - 3034f11
+    related_decisions:
+      - ADR-0016
+      - ADR-0018
+    completion:
+      - Inventory wire payloads are mapped to and from handwritten domain runtime payloads outside domain modules.
+
+  - id: W-0005
+    milestone: M-001
+    title: Add application error envelope mapping
+    status: completed
+    change: changes/2026-05-13-add-application-error-envelope-mapping
+    commits:
+      - d64513d
+    related_decisions:
+      - ADR-0016
+      - ADR-0018
+    completion:
+      - Application errors can be encoded as Protobuf error envelopes without exposing internal errors.
+
+  - id: W-0006
+    milestone: M-001
+    title: Add first WebSocket transport adapter
+    status: completed
+    change: changes/2026-05-13-add-first-websocket-transport-adapter
+    commits:
+      - 63556cb
+    related_decisions:
+      - ADR-0013
+      - ADR-0018
+    completion:
+      - WebSocket transport accepts binary frames, rejects text frames, copies payload bytes, and delegates opaque frames to an injected handler.
+
+  - id: W-0007
+    milestone: M-001
+    title: Add WebSocket Protobuf application composition adapter
+    status: next_ready
+    expected_change_id: add-websocket-protobuf-application-composition
+    depends_on:
+      - W-0002
+      - W-0004
+      - W-0005
+      - W-0006
+    related_decisions:
+      - ADR-0018
+    completion:
+      - Decode binary WebSocket frame payloads as Protobuf envelopes outside the WebSocket transport package.
+      - Convert command and query envelopes to application route requests.
+      - Dispatch through app.Dispatcher.
+      - Encode application payload results and application errors back to Protobuf envelopes.
+      - Preserve transport, protocol, application, domain, and generated output boundaries.
+      - Cover the composition with Go tests.
+    ask_first:
+      - Changing the protocol envelope shape.
+      - Moving generated Protobuf imports into application or domain packages.
+      - Adding authentication or session validation.
+
+  - id: W-0008
+    milestone: M-001
+    title: Add minimal /v1/ws process wiring
+    status: planned
+    expected_change_id: add-minimal-websocket-process-wiring
+    depends_on:
+      - W-0007
+    related_decisions:
+      - ADR-0014
+      - ADR-0015
+      - ADR-0018
+    completion:
+      - Mount the composed WebSocket handler at /v1/ws from runtime process startup.
+      - Keep business logic out of cmd/vibit-server.
+      - Add a narrow integration test or documented manual run path.
+
+  - id: W-0009
+    milestone: M-001
+    title: Add request loop test fixture
+    status: planned
+    expected_change_id: add-request-loop-test-fixture
+    depends_on:
+      - W-0007
+    completion:
+      - Provide a repeatable test fixture for command/query request loop tests without opening unrelated runtime dependencies.
+
+  - id: W-0010
+    milestone: M-002
+    title: Define PostgreSQL repository and migration boundary
+    status: planned
+    expected_change_id: define-postgresql-repository-and-migration-boundary
+    depends_on:
+      - W-0008
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0014
+    completion:
+      - Define repository, transaction, migration, and ownership rules before adding persistent inventory behavior.

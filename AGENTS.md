@@ -62,6 +62,7 @@ Existing foundation:
 - `.arch/contracts.yaml`
 - `.arch/dependencies.yaml`
 - `.arch/reference.yaml`
+- `.arch/work-items.yaml`
 - `docs/module-manifest.md`
 - `docs/module-manifest.zh-CN.md`
 - `docs/change-spec.md`
@@ -85,6 +86,8 @@ Existing foundation:
 - `docs/runtime-protocol-adapter.zh-CN.md`
 - `docs/reference-game-server-alignment.md`
 - `docs/reference-game-server-alignment.zh-CN.md`
+- `docs/workflow.md`
+- `docs/workflow.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -101,6 +104,8 @@ The generated output standard is `docs/generated-output.md`, with `docs/generate
 The runtime protocol adapter boundary standard is `docs/runtime-protocol-adapter.md`, with `docs/runtime-protocol-adapter.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0018` records the boundary decision. Read these before adding WebSocket transport code, Protobuf runtime adapter code, application dispatch code, or domain runtime handlers.
 
 The active game server reference alignment standard is `docs/reference-game-server-alignment.md`, with `docs/reference-game-server-alignment.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0019` records Nakama and Pitaya as active reference baselines. Read `.arch/reference.yaml` and the standard before adding new game server capability families, runtime subsystems, social/realtime features, matchmaking, match runtime, cluster/RPC work, or operational surfaces. Nakama and Pitaya guide capability planning; they do not override vibit's constitution, ADRs, manifests, generated boundaries, or verification commands.
+
+The work continuation standard is `docs/workflow.md`, with `docs/workflow.zh-CN.md` as the paired Simplified Chinese translation. The machine-readable work queue is `.arch/work-items.yaml`. When the maintainer says "continue" or "继续", interpret that as advancing one `next_ready` work item unless blocked or confirmation is required. When the maintainer asks to continue multiple steps, advance up to that many work items in order, stopping at blockers, verification failures, ask-first boundaries, or maintainer redirection.
 
 Current executable tooling:
 
@@ -120,10 +125,14 @@ node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check runtime
 node tools/vibit check runtime --json
+node tools/vibit check work
+node tools/vibit check work --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
 node tools/vibit inspect change <change-id>
+node tools/vibit inspect work
+node tools/vibit inspect work --json
 node tools/vibit inspect memory
 node tools/vibit inspect rule <rule-id>
 node tools/vibit inspect rules
@@ -155,6 +164,8 @@ Use `node tools/vibit check generated` when generated files, module manifest `ge
 
 Use `node tools/vibit check runtime` when runtime module behavior, runtime adapter boundaries, runtime guidance, or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and the ADR-0018 runtime protocol adapter boundary, and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
+Use `node tools/vibit inspect work` before interpreting a continuation request. Use `node tools/vibit check work` when `.arch/work-items.yaml`, workflow docs, or work item state changes. The default continuation unit is one work item.
+
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
@@ -178,6 +189,8 @@ Use `ADR-0018` and `docs/runtime-protocol-adapter.md` before changing runtime co
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 
 Use `.arch/reference.yaml` as the machine-readable intake point for Nakama/Pitaya reference alignment. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. Preserve vibit's Agent-Native constraints when adapting reference patterns, and record why a reference pattern is adopted, adapted, or rejected.
+
+Use `.arch/work-items.yaml` as the machine-readable intake point for continuation. Work item IDs such as `W-0007` are execution steps; ADR IDs remain architectural decisions; change spec IDs remain concrete execution records; Git hashes remain repository snapshots; versions remain release identifiers.
 
 Use `ADR-0014` before changing Go runtime files. The first Go module lives at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`. Keep process startup under `runtime/cmd/vibit-server/`, application dispatch and composition under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain module logic under `runtime/internal/modules/<module>/`, generated Go contract shapes under `runtime/internal/generated/contracts/`, generated Go Protobuf output under `runtime/internal/generated/proto/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/vibit/<module>/v1/`.
 

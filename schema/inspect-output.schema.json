@@ -315,6 +315,29 @@
     },
     {
       "type": "object",
+      "required": ["schema_version", "kind", "project", "work", "continuation"],
+      "properties": {
+        "schema_version": {
+          "const": "0.1"
+        },
+        "kind": {
+          "const": "work_inspection"
+        },
+        "project": {
+          "const": "vibit"
+        },
+        "work": {
+          "type": "object",
+          "required": ["manifest", "standard", "status", "current_milestone", "summary", "current", "milestones", "work_items"]
+        },
+        "continuation": {
+          "type": "object",
+          "required": ["default_step_unit", "one_step", "multi_step", "next_command"]
+        }
+      }
+    },
+    {
+      "type": "object",
       "required": ["schema_version", "kind", "project", "check", "status", "summary", "results"],
       "properties": {
         "schema_version": {
