@@ -37,7 +37,9 @@ Before changing files under `runtime/`, read:
 - `../.arch/dependencies.yaml`
 - `../.arch/contracts.yaml`
 - `../docs/generated-output.md`
+- `../docs/runtime-protocol-adapter.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
+- `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
 - The affected module manifest, such as `../modules/inventory/module.yaml`
 - The relevant change spec under `../changes/`
 
@@ -72,6 +74,10 @@ Allowed owner packages:
 Do not add new foundational dependencies without checking `../.arch/dependencies.yaml` and creating the required adoption record.
 
 ## 5. Runtime Boundary Rules
+
+Runtime protocol handoff must follow `../docs/runtime-protocol-adapter.md`.
+
+WebSocket transport reads and writes frames. Protobuf protocol adaptation decodes and encodes envelopes. Application dispatch routes commands and queries. Domain modules enforce invariants. Generated packages provide shapes only.
 
 Transport handlers adapt requests into commands or queries. They must not hide business logic.
 

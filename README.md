@@ -66,6 +66,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/game-protocol.zh-CN.md`: Simplified Chinese translation
 - `docs/generated-output.md`: generated output standard
 - `docs/generated-output.zh-CN.md`: Simplified Chinese translation
+- `docs/runtime-protocol-adapter.md`: runtime protocol adapter boundary standard
+- `docs/runtime-protocol-adapter.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
 - `rules/`: rule catalogs for machine-readable check metadata
 
@@ -88,6 +90,7 @@ vibit should evolve toward:
 - Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
 - Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
 - Generated output rules under `docs/generated-output.md`, with Go Protobuf output checked before commit
+- Runtime protocol adapter boundary rules under `docs/runtime-protocol-adapter.md`
 - A protocol envelope source at `proto/vibit/protocol/v1/envelope.proto`
 - Buf generation configuration at `buf.yaml` and `buf.gen.yaml`
 - A game-aware WebSocket Protobuf envelope governed by `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`
@@ -192,6 +195,8 @@ Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --catego
 The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
 
 The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is planned as `/v1/ws` until transport implementation begins. The first inventory slice should use player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
+
+The runtime protocol adapter boundary is defined in `docs/runtime-protocol-adapter.md` and `decisions/ADR-0018-runtime-protocol-adapter-boundary.md`. WebSocket transport owns frames, the Protobuf adapter owns envelope conversion, application dispatch owns command/query routing, domain modules own invariants and behavior, and generated packages provide shapes only.
 
 PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
 

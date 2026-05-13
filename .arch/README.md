@@ -48,6 +48,8 @@ This is the first draft. The files describe expected shape before implementation
 
 `docs/generated-output.md` records the generated output standard. `ADR-0017` governs generated output traceability, the `runtime/internal/generated/proto/` ownership rule, and the requirement that generated Go Protobuf files use `protoc-gen-go` markers and source traces back to `proto/`.
 
+`docs/runtime-protocol-adapter.md` records the runtime protocol adapter boundary standard. `ADR-0018` governs the first handoff between WebSocket transport, Protobuf protocol adaptation, application dispatch, generated code, and domain modules.
+
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
 
 The first accepted Go runtime dependencies are recorded by `ADR-0013`:
@@ -59,7 +61,7 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
 
-The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand. Run `node tools/vibit check generated` after generated output changes.
+The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand. Runtime protocol handoff rules are defined in `docs/runtime-protocol-adapter.md`. Run `node tools/vibit check generated` after generated output changes and `node tools/vibit check runtime` after runtime boundary changes.
 
 ## Expected Future Files
 
@@ -80,10 +82,11 @@ Before changing implementation code, agents should:
 4. Read `.arch/conventions.yaml`.
 5. Read `.arch/runtime.yaml` before changing or creating runtime implementation code.
 6. Read `.arch/protocol.yaml` before adding or changing `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
-7. Read `.arch/contracts.yaml` before adding or changing public contracts.
-8. Read `.arch/dependencies.yaml` before adding foundational dependencies.
-9. Read the affected module's `module.yaml`, when it exists.
-10. Update manifests before implementation when public architecture changes.
+7. Read `docs/runtime-protocol-adapter.md` before adding WebSocket transport code, Protobuf runtime adapter code, application dispatch code, or domain runtime handlers.
+8. Read `.arch/contracts.yaml` before adding or changing public contracts.
+9. Read `.arch/dependencies.yaml` before adding foundational dependencies.
+10. Read the affected module's `module.yaml`, when it exists.
+11. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 

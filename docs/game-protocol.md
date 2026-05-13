@@ -216,6 +216,8 @@ Generated output must be produced from `.proto` sources. Agents must not create 
 
 Generated output rules are defined by `docs/generated-output.md` and `ADR-0017`.
 
+Runtime transport, protocol adapter, application dispatch, generated code, and domain module handoff rules are defined by `docs/runtime-protocol-adapter.md` and `ADR-0018`.
+
 ## Compatibility Rules
 
 The envelope Protobuf package is:
@@ -252,8 +254,10 @@ Before adding or changing `.proto` files, runtime protocol handlers, or generate
 - `ADR-0014`
 - `ADR-0015`
 - `ADR-0017`
+- `ADR-0018`
 - `.arch/contracts.yaml`
 - `docs/generated-output.md`
+- `docs/runtime-protocol-adapter.md`
 - The affected module manifest and contract files
 
 Agents must preserve these boundaries:

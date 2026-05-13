@@ -80,6 +80,8 @@ Existing foundation:
 - `docs/game-protocol.zh-CN.md`
 - `docs/generated-output.md`
 - `docs/generated-output.zh-CN.md`
+- `docs/runtime-protocol-adapter.md`
+- `docs/runtime-protocol-adapter.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -92,6 +94,8 @@ The first game protocol framework is recorded in `.arch/protocol.yaml`, `docs/ga
 The first protocol source files are `proto/vibit/protocol/v1/envelope.proto` and `proto/vibit/inventory/v1/inventory.proto`. Buf configuration lives at `buf.yaml` and `buf.gen.yaml`. `ADR-0016` records the envelope and generation configuration decision. Generated Go Protobuf output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand.
 
 The generated output standard is `docs/generated-output.md`, with `docs/generated-output.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0017` records the generated output decision. Read these before adding generated files, generated output checks, or generator behavior. Go Protobuf output under `runtime/internal/generated/proto/` must be `*.pb.go`, must contain the `protoc-gen-go` generated-code marker, and must trace to an existing `.proto` source.
+
+The runtime protocol adapter boundary standard is `docs/runtime-protocol-adapter.md`, with `docs/runtime-protocol-adapter.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0018` records the boundary decision. Read these before adding WebSocket transport code, Protobuf runtime adapter code, application dispatch code, or domain runtime handlers.
 
 Current executable tooling:
 
@@ -144,7 +148,7 @@ Use `node tools/vibit check protocol` before creating or changing `.proto` files
 
 Use `node tools/vibit check generated` when generated files, module manifest `generated` declarations, generated output standards, or Go Protobuf generated output are added or changed.
 
-Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
+Use `node tools/vibit check runtime` when runtime module behavior, runtime adapter boundaries, runtime guidance, or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and the ADR-0018 runtime protocol adapter boundary, and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
 
@@ -163,6 +167,8 @@ Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readin
 Use `.arch/protocol.yaml` as the machine-readable intake point for game protocol framework decisions. It links `ADR-0015` and defines the first WebSocket Protobuf envelope, route fields, session model, target scopes, authority rules, error model, and first inventory slice protocol scope.
 
 Use `ADR-0016`, `ADR-0017`, `buf.yaml`, `buf.gen.yaml`, `proto/README.md`, and `docs/generated-output.md` before changing the protocol envelope, inventory Protobuf source, Buf generation configuration, generated output checks, or generated Go Protobuf output path.
+
+Use `ADR-0018` and `docs/runtime-protocol-adapter.md` before changing runtime code that sits between WebSocket transport, Protobuf protocol adaptation, application dispatch, generated code, and domain modules.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 
@@ -288,6 +294,8 @@ When adding Go runtime code, follow the ADR-0014 package boundary:
 - `runtime/internal/platform/events/` owns event recording and publication mechanisms.
 - `runtime/internal/platform/tx/` owns unit-of-work and transaction boundary interfaces.
 - `runtime/internal/modules/<module>/` owns handwritten domain behavior only.
+
+Runtime protocol handoff must follow `docs/runtime-protocol-adapter.md`: WebSocket transport reads and writes frames, the Protobuf adapter converts envelopes and payloads, application dispatch routes commands and queries, domain modules enforce invariants, and generated packages provide shapes only.
 
 State-changing commands should enter through application dispatch and run inside an application-owned unit of work. Domain events produced by a command should be recorded in the same unit of work. Query handlers should not mutate state and do not require a write transaction by default. Event publication outside the transaction remains deferred until an explicit event delivery or outbox decision exists.
 

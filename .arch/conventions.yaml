@@ -72,6 +72,9 @@ documentation_pairs:
   generated_output_standard:
     canonical: docs/generated-output.md
     zh-CN: docs/generated-output.zh-CN.md
+  runtime_protocol_adapter_standard:
+    canonical: docs/runtime-protocol-adapter.md
+    zh-CN: docs/runtime-protocol-adapter.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -108,6 +111,7 @@ runtime_readiness:
     game_protocol_framework: ADR-0015
     protobuf_envelope_and_generation: ADR-0016
     generated_output_standard: ADR-0017
+    runtime_protocol_adapter_boundary: ADR-0018
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -147,6 +151,8 @@ server_runtime:
   wire_message_format: protobuf
   protocol_framework_manifest: .arch/protocol.yaml
   protocol_framework_decision: ADR-0015
+  runtime_protocol_adapter_standard: docs/runtime-protocol-adapter.md
+  runtime_protocol_adapter_decision: ADR-0018
   gameplay_websocket_endpoint: /v1/ws
   accepted_websocket_library: github.com/coder/websocket
   accepted_protobuf_runtime: google.golang.org/protobuf
@@ -154,6 +160,29 @@ server_runtime:
   accepted_protobuf_orchestrator: buf.build CLI
   tooling_cli_language: JavaScript
   tooling_cli_is_server_runtime: false
+
+runtime_protocol_adapter:
+  standard: docs/runtime-protocol-adapter.md
+  translation: docs/runtime-protocol-adapter.zh-CN.md
+  decision: ADR-0018
+  check_command: node tools/vibit check runtime
+  first_flow:
+    - websocket_frame
+    - transport_frame
+    - protocol_envelope
+    - route_request
+    - application_dispatch
+    - domain_command_or_query_handler
+    - application_result
+    - protocol_envelope
+    - websocket_frame
+  owners:
+    transport: runtime/internal/platform/transport/ws
+    protocol: runtime/internal/platform/protocol/protobuf
+    application_dispatch: runtime/internal/app
+    domain_modules: runtime/internal/modules/<module>
+    generated_contracts: runtime/internal/generated/contracts
+    generated_proto: runtime/internal/generated/proto
 
 persistence:
   first_authoritative_store: PostgreSQL

@@ -36,7 +36,9 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../.arch/dependencies.yaml`
 - `../.arch/contracts.yaml`
 - `../docs/generated-output.md`
+- `../docs/runtime-protocol-adapter.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
+- `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
 - 受影响的 module manifest，例如 `../modules/inventory/module.yaml`
 - `../changes/` 下相关 change spec
 
@@ -71,6 +73,10 @@ Domain modules 不得直接 import 第三方 transport、protocol、persistence�
 未经检查 `../.arch/dependencies.yaml` 并创建所需 adoption record，不要添加新的 foundational dependencies。
 
 ## 5. Runtime Boundary Rules
+
+Runtime protocol handoff 必须遵循 `../docs/runtime-protocol-adapter.md`。
+
+WebSocket transport 读写 frames。Protobuf protocol adaptation 解码和编码 envelopes。Application dispatch 路由 commands 和 queries。Domain modules 执行 invariants。Generated packages 只提供 shapes。
 
 Transport handlers 只负责把 requests 适配成 commands 或 queries。它们不得隐藏 business logic。
 

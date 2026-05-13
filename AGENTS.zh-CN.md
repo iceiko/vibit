@@ -81,6 +81,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/game-protocol.zh-CN.md`
 - `docs/generated-output.md`
 - `docs/generated-output.zh-CN.md`
+- `docs/runtime-protocol-adapter.md`
+- `docs/runtime-protocol-adapter.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -93,6 +95,8 @@ vibit is an open-source agent-native server framework for building backends that
 第一批 protocol source files 是 `proto/vibit/protocol/v1/envelope.proto` 和 `proto/vibit/inventory/v1/inventory.proto`。Buf configuration 位于 `buf.yaml` 和 `buf.gen.yaml`。`ADR-0016` 记录 envelope 和 generation configuration decision。生成的 Go Protobuf output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。
 
 Generated output standard 是 `docs/generated-output.md`，配套简体中文译本是 `docs/generated-output.zh-CN.md`。`ADR-0017` 记录 generated output decision。在添加 generated files、generated output checks 或 generator behavior 前，应阅读这些文件。`runtime/internal/generated/proto/` 下的 Go Protobuf output 必须是 `*.pb.go`，必须包含 `protoc-gen-go` generated-code marker，并且必须能追溯到现有 `.proto` source。
+
+Runtime protocol adapter boundary standard 是 `docs/runtime-protocol-adapter.md`，配套简体中文译本是 `docs/runtime-protocol-adapter.zh-CN.md`。`ADR-0018` 记录 boundary decision。在添加 WebSocket transport code、Protobuf runtime adapter code、application dispatch code 或 domain runtime handlers 前，应阅读这些文件。
 
 当前可执行工具：
 
@@ -145,7 +149,7 @@ node tools/vibit generate module <module>
 
 当新增或修改 generated files、module manifest 中的 `generated` declarations、generated output standards 或 Go Protobuf generated output 时，使用 `node tools/vibit check generated`。
 
-当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
+当新增或修改 runtime module behavior、runtime adapter boundaries、runtime guidance 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton 和 ADR-0018 runtime protocol adapter boundary，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
 
@@ -164,6 +168,8 @@ node tools/vibit generate module <module>
 使用 `.arch/protocol.yaml` 作为 game protocol framework decisions 的机器可读 intake 入口。它链接 `ADR-0015`，并定义第一版 WebSocket Protobuf envelope、route fields、session model、target scopes、authority rules、error model 和第一版 inventory slice protocol scope。
 
 修改 protocol envelope、inventory Protobuf source、Buf generation configuration、generated output checks 或生成的 Go Protobuf output path 前，先阅读 `ADR-0016`、`ADR-0017`、`buf.yaml`、`buf.gen.yaml`、`proto/README.md` 和 `docs/generated-output.md`。
+
+修改 WebSocket transport、Protobuf protocol adaptation、application dispatch、generated code 和 domain modules 之间的 runtime code 前，先阅读 `ADR-0018` 和 `docs/runtime-protocol-adapter.md`。
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 
@@ -289,6 +295,8 @@ Goose migrations 应以 SQL-first 为默认。Go migrations 需要 change spec �
 - `runtime/internal/platform/events/` 拥有 event recording 和 publication mechanisms。
 - `runtime/internal/platform/tx/` 拥有 unit-of-work 和 transaction boundary interfaces。
 - `runtime/internal/modules/<module>/` 只拥有手写 domain behavior。
+
+Runtime protocol handoff 必须遵循 `docs/runtime-protocol-adapter.md`：WebSocket transport 读写 frames，Protobuf adapter 转换 envelopes 和 payloads，application dispatch 路由 commands 和 queries，domain modules 执行 invariants，generated packages 只提供 shapes。
 
 State-changing commands 应通过 application dispatch 进入，并在 application-owned unit of work 中运行。Command 产生的 domain events 应记录在同一个 unit of work 中。Query handlers 不应改变状态，默认不需要 write transaction。在明确 event delivery 或 outbox decision 前，transaction 外的 event publication 继续 deferred。
 

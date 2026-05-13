@@ -217,6 +217,8 @@ Generated output 必须从 `.proto` sources 生成。Agents 不得为了绕过 s
 
 Generated output rules 由 `docs/generated-output.md` 和 `ADR-0017` 定义。
 
+Runtime transport、protocol adapter、application dispatch、generated code 和 domain module handoff rules 由 `docs/runtime-protocol-adapter.md` 和 `ADR-0018` 定义。
+
 ## Compatibility Rules
 
 Envelope Protobuf package 是：
@@ -253,8 +255,10 @@ Envelope versioning 与 module message versioning 相关但分离：
 - `ADR-0014`
 - `ADR-0015`
 - `ADR-0017`
+- `ADR-0018`
 - `.arch/contracts.yaml`
 - `docs/generated-output.md`
+- `docs/runtime-protocol-adapter.md`
 - 受影响的 module manifest 和 contract files
 
 Agents 必须保持这些边界：

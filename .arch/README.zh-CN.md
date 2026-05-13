@@ -49,6 +49,8 @@
 
 `docs/generated-output.md` 记录 generated output standard。`ADR-0017` 约束 generated output traceability、`runtime/internal/generated/proto/` 的 ownership rule，以及 generated Go Protobuf files 必须使用 `protoc-gen-go` markers 并通过 source traces 回到 `proto/` 的要求。
 
+`docs/runtime-protocol-adapter.md` 记录 runtime protocol adapter boundary standard。`ADR-0018` 约束 WebSocket transport、Protobuf protocol adaptation、application dispatch、generated code 和 domain modules 之间的第一版 handoff。
+
 `dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
 
 第一批已接受的 Go runtime dependencies 由 `ADR-0013` 记录：
@@ -60,7 +62,7 @@
 
 S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Protobuf generation output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。Generated output 变化后运行 `node tools/vibit check generated`。
+第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Protobuf generation output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。Runtime protocol handoff rules 定义在 `docs/runtime-protocol-adapter.md`。Generated output 变化后运行 `node tools/vibit check generated`，runtime boundary 变化后运行 `node tools/vibit check runtime`。
 
 ## 未来预期文件
 
@@ -81,10 +83,11 @@ S3 client tooling、MinIO deployment、observability 和外部 Go test framework
 4. 阅读 `.arch/conventions.yaml`。
 5. 在修改或创建 runtime implementation code 前，阅读 `.arch/runtime.yaml`。
 6. 在新增或修改 `.proto` files、WebSocket protocol handlers、generated protocol output 或 client/server protocol rules 前，阅读 `.arch/protocol.yaml`。
-7. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
-8. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
-9. 在相关 module 存在时，阅读其 `module.yaml`。
-10. 当 public architecture 变化时，先更新 manifests，再实现。
+7. 在添加 WebSocket transport code、Protobuf runtime adapter code、application dispatch code 或 domain runtime handlers 前，阅读 `docs/runtime-protocol-adapter.md`。
+8. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
+9. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
+10. 在相关 module 存在时，阅读其 `module.yaml`。
+11. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 

@@ -13,10 +13,12 @@ canonical_decisions:
   game_protocol_framework: ADR-0015
   protobuf_envelope_and_generation: ADR-0016
   generated_output_standard: ADR-0017
+  runtime_protocol_adapter_boundary: ADR-0018
 
 standard:
   document: docs/game-protocol.md
   zh-CN: docs/game-protocol.zh-CN.md
+  runtime_adapter_boundary: docs/runtime-protocol-adapter.md
 
 external_reference_signals:
   nakama:
@@ -204,6 +206,7 @@ implementation_boundaries:
     - Application dispatch routes command and query requests to module handlers.
     - Domain modules must not own WebSocket connections or Protobuf framing.
     - Generated output remains immutable to non-system agents.
+    - Runtime handoff follows docs/runtime-protocol-adapter.md.
 
 first_runtime_slice:
   module: inventory
