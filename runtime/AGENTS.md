@@ -123,9 +123,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL configuration parser, the first pgx-backed transaction runner adapter, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, minimal process wiring that mounts `/v1/ws`, and an explicit PostgreSQL inventory runtime composition path.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL configuration parser, the first pgx-backed transaction runner adapter, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, minimal process wiring that mounts `/v1/ws`, an explicit PostgreSQL inventory runtime composition path, and an opt-in live PostgreSQL durable inventory request-loop verification test.
 
-The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, first explicit migration apply/status runner, first PostgreSQL repository adapter, and explicit runtime store selection. `VIBIT_RUNTIME_STORE=memory` remains the default. `VIBIT_RUNTIME_STORE=postgres` enables PostgreSQL-backed inventory composition when `VIBIT_POSTGRES_DSN` is provided. The workspace still does not implement generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, automatic startup migrations, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, first explicit migration apply/status runner, first PostgreSQL repository adapter, explicit runtime store selection, and a live verification test that skips unless `VIBIT_POSTGRES_TEST_DSN` is set. `VIBIT_RUNTIME_STORE=memory` remains the default. `VIBIT_RUNTIME_STORE=postgres` enables PostgreSQL-backed inventory composition when `VIBIT_POSTGRES_DSN` is provided. The workspace still does not implement generated route registration, generated protocol bridge creation, authentication/session validation, automatic startup migrations, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 
@@ -142,6 +142,15 @@ VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:
 ```
 
 Migrations are not applied automatically during normal server startup.
+
+The first opt-in live durable inventory verification command is:
+
+```bash
+cd runtime
+VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+If `VIBIT_POSTGRES_TEST_DSN` is unset, this test skips and records that live PostgreSQL verification was unavailable.
 
 ## 8. Verification
 

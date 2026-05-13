@@ -196,7 +196,7 @@ proof_slice:
       - inventory_items
       - inventory_item_grants
     migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql
-    migration_status: source_created_apply_status_runner_created_live_verification_pending
+    migration_status: source_created_apply_status_runner_created_opt_in_live_test_created_skipped_without_dsn
     verification_environment: docs/postgresql-verification-environment.md
     postgres_adapter:
       package: runtime/internal/platform/persistence/postgres
@@ -206,7 +206,7 @@ proof_slice:
       status: wired_in_explicit_postgres_runtime_path
       binding_rule: Adapter receives an injected pgx-shaped executor from the application-owned unit of work and does not open hidden write transactions.
       grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so inventory_item_grants rows can be recorded with the quantity mutation.
-      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
+      live_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
     runtime_composition:
       store_selector: VIBIT_RUNTIME_STORE
       default_store: memory
@@ -218,8 +218,9 @@ proof_slice:
       command_repository_source: postgres.UnitOfWork.NewInventoryRepository
       query_repository_source: postgres.NewInventoryRepositoryForUnitOfWork(pool)
       startup_migrations: not_applied_automatically
-      live_end_to_end_status: opt_in_environment_standard_defined_live_execution_pending
-    status: postgresql_adapter_wired_in_explicit_runtime_path_live_verification_pending
+      live_end_to_end_status: opt_in_test_created_live_execution_skipped_without_dsn
+      live_end_to_end_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
+    status: postgresql_adapter_wired_in_explicit_runtime_path_opt_in_live_test_created_skipped_without_dsn
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
     file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go

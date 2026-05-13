@@ -1,0 +1,56 @@
+schema_version: 0.1
+change_id: verify-durable-inventory-runtime-end-to-end
+date: 2026-05-13
+type: feature
+status: verified
+
+summary: Add an opt-in live PostgreSQL verification path for the durable inventory WebSocket Protobuf request loop.
+
+affected_modules:
+  - runtime
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - runtime_tests
+    - runtime_vet
+    - live_postgresql_request_loop_test_or_explicit_skip
+    - architecture_check
+    - schema_check
+    - module_check
+    - postgres_env_check
+    - runtime_check
+    - change_check
+    - all_check
+  status: Verified

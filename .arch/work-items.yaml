@@ -419,8 +419,8 @@ work_items:
   - id: W-0021
     milestone: M-002
     title: Verify durable inventory runtime end to end
-    status: next_ready
-    expected_change_id: verify-durable-inventory-runtime-end-to-end
+    status: completed
+    change: changes/2026-05-13-verify-durable-inventory-runtime-end-to-end
     depends_on:
       - W-0020
     related_decisions:
@@ -433,6 +433,7 @@ work_items:
       - Verify migration apply/status behavior against the defined disposable PostgreSQL environment or record explicit unavailability.
       - Verify that domain, application, protocol, transport, persistence, and migration boundaries still pass repository checks.
       - Update M-002 completion status when durable inventory runtime criteria are satisfied.
+    completion_summary: Added an opt-in live PostgreSQL request-loop verification test and recorded that live execution was skipped because no VIBIT_POSTGRES_TEST_DSN was available. M-002 remains active because closing it with unavailable live PostgreSQL verification requires maintainer confirmation.
     ask_first:
       - Closing M-002 with unavailable live PostgreSQL verification.
       - Expanding scope into outbox delivery, auth/session, player accounts, item catalog, currency, rewards, or match sessions.

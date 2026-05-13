@@ -96,6 +96,14 @@ runtime/internal/platform/migrations/postgres.go
 
 它暴露 vibit-owned `PostgresRunner`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，配置 PostgreSQL dialect 的 goose，禁用全局 Go migration registry，列出已知 migration sources，报告结构化 migration status，并应用 pending 的 SQL-first migrations。它有意不负责构造 database connection，不关闭调用方拥有的 database handles，也不会在普通 `cmd/vibit-server` startup 中运行。
 
+PostgreSQL platform owner 可以提供窄 helper，把 package-owned pool 适配为 migration tooling 需要的 `*sql.DB`，例如：
+
+```text
+runtime/internal/platform/persistence/postgres/sql_db.go
+```
+
+这些 helpers 必须把 pgx stdlib imports 留在 PostgreSQL platform owner package 内。它们不会把 migration execution ownership 从 `runtime/internal/platform/migrations/` 移走。
+
 ### Migration Sources
 
 Owner：
@@ -194,6 +202,7 @@ VIBIT_POSTGRES_MIN_CONNS
 - Configuration parsing 可以构建 `pgxpool.Config`，但普通 unit tests 不得要求 live PostgreSQL server。
 - Connection strings 和 credentials 必须来自 environment 或显式 runtime input，不得存入 tracked files。
 - Process startup 必须保持 PostgreSQL optional。`VIBIT_RUNTIME_STORE=postgres` 会显式选择 PostgreSQL-backed inventory composition path；默认仍然是 in-memory startup。
+- Migration tooling 需要 `*sql.DB` adaptation 时，该 adaptation 必须留在 PostgreSQL platform owner package 内。
 
 ## 3. Inventory Persistence Boundary
 

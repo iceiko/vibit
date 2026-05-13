@@ -151,13 +151,13 @@ transaction runner integration tests against VIBIT_POSTGRES_TEST_DSN
 rollback or cleanup checks when destructive verification is explicitly allowed
 ```
 
-Until live verification commands exist, agents must record:
+When a change does not yet provide live verification commands, agents must record:
 
 ```text
 Not verified: live PostgreSQL verification is unavailable because no repository command exists yet.
 ```
 
-or, if commands exist but `VIBIT_POSTGRES_TEST_DSN` is unset:
+When commands exist but `VIBIT_POSTGRES_TEST_DSN` is unset, agents must record:
 
 ```text
 Not verified: live PostgreSQL verification skipped because VIBIT_POSTGRES_TEST_DSN was not set.
@@ -219,4 +219,18 @@ node tools/vibit check postgres-env
 
 This check verifies that the disposable PostgreSQL verification standard, runtime manifest references, and guidance artifacts exist. It does not connect to PostgreSQL.
 
-Live migration and repository integration commands remain future work.
+The first opt-in live migration and repository request-loop verification path is:
+
+```bash
+cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+This command verifies migration status, migration apply, and the persistent inventory `GrantItem` then `GetInventory` Protobuf request loop when a disposable PostgreSQL DSN is provided. If `VIBIT_POSTGRES_TEST_DSN` is unset, the test skips and prints:
+
+```text
+live PostgreSQL verification skipped because VIBIT_POSTGRES_TEST_DSN was not set
+```
+
+This command is also part of `cd runtime && go test ./...`; it remains opt-in because the live branch only executes when the DSN is set.
+
+The first durable inventory live test requires `VIBIT_POSTGRES_TEST_CLEANUP=drop_schema`, either explicitly or through the default value, because it verifies migration apply from a clean schema.

@@ -423,8 +423,9 @@ persistence_model:
       tests:
         - runtime/cmd/vibit-server/main_test.go
         - runtime/internal/app/bootstrap/inventory_test.go
+        - runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
       startup_migrations: not_applied_automatically
-      live_end_to_end_status: opt_in_environment_standard_defined_live_execution_pending
+      live_end_to_end_status: opt_in_test_created_live_execution_skipped_without_dsn
     postgres_adapter:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/inventory_repository.go
@@ -438,7 +439,7 @@ persistence_model:
         - inventory.MutationLock.GrantItem
       grant_recording: Quantity mutation and inventory_item_grants insert use the same injected executor.
       runtime_wiring_status: wired_in_explicit_postgres_runtime_path
-      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
+      live_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
     postgres_transaction_runner:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/runner.go
@@ -451,7 +452,7 @@ persistence_model:
       unit_of_work_type: runtime/internal/platform/persistence/postgres.UnitOfWork
       inventory_repository_factory: UnitOfWork.NewInventoryRepository
       boundary_rule: The runner owns pgx handles inside the PostgreSQL platform package; application and domain code continue to depend on vibit-owned transaction and repository interfaces.
-      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
+      live_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
     postgres_migration_runner:
       package: runtime/internal/platform/migrations
       file: runtime/internal/platform/migrations/postgres.go
@@ -470,13 +471,15 @@ persistence_model:
         - Return vibit-owned status and result shapes instead of exposing goose result types.
         - Do not apply migrations during normal server startup.
         - Do not close caller-owned database handles.
-      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
+      live_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
   verification_environment:
     standard: docs/postgresql-verification-environment.md
     translation: docs/postgresql-verification-environment.zh-CN.md
     check_command: node tools/vibit check postgres-env
     status: opt_in_environment_standard_defined
-    live_execution_status: commands_pending
+    live_execution_status: opt_in_test_created_live_execution_skipped_without_dsn
+    opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
+    opt_in_live_command: cd runtime && VIBIT_POSTGRES_TEST_DSN='...' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
     required_environment:
       test_dsn: VIBIT_POSTGRES_TEST_DSN
     optional_environment:
@@ -488,6 +491,7 @@ persistence_model:
       - truncate
       - keep
     default_cleanup: drop_schema
+    first_live_test_cleanup_mode: drop_schema
     default_behavior_when_dsn_missing: skip_and_record_not_verified
     mandatory_service_manager: none
     docker_required: false

@@ -105,3 +105,13 @@ node tools/vibit check all
 ```
 
 `node tools/vibit check postgres-env` 是静态标准检查。它不会连接 PostgreSQL。Live PostgreSQL verification 继续通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用。
+
+使用下面的 command 针对 disposable PostgreSQL database 运行当前 live durable inventory verification：
+
+```bash
+cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+该 test 会显式 apply inventory migration，并通过 PostgreSQL-backed runtime composition 验证 WebSocket Protobuf `GrantItem` 后接 `GetInventory` 的 request loop。如果未设置 `VIBIT_POSTGRES_TEST_DSN`，test 会 skip，并记录 live PostgreSQL verification 不可用。
+
+该 test 默认使用 `drop_schema` cleanup semantics。其他 cleanup modes 会被该 test 有意 skip，因为 migration apply 必须从 clean schema 验证。

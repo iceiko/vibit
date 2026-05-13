@@ -253,7 +253,9 @@ persistence:
     standard: docs/postgresql-verification-environment.md
     translation: docs/postgresql-verification-environment.zh-CN.md
     check_command: node tools/vibit check postgres-env
-    status: opt_in_environment_standard_defined
+    status: opt_in_test_created_live_execution_skipped_without_dsn
+    opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
+    opt_in_live_command: cd runtime && VIBIT_POSTGRES_TEST_DSN='...' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
     required_for_live_checks:
       dsn: VIBIT_POSTGRES_TEST_DSN
     optional_inputs:
@@ -261,6 +263,7 @@ persistence:
       cleanup: VIBIT_POSTGRES_TEST_CLEANUP
       allow_destructive: VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE
     default_cleanup: drop_schema
+    first_live_test_cleanup_mode: drop_schema
     allowed_cleanup_modes:
       - drop_schema
       - truncate
@@ -268,7 +271,7 @@ persistence:
     default_live_check_behavior: skip_when_test_dsn_unset
     mandatory_service_manager: none
     cloud_postgresql_assumption: false
-  live_postgresql_integration_status: opt_in_environment_standard_defined
+  live_postgresql_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency

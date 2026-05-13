@@ -95,6 +95,14 @@ runtime/internal/platform/migrations/postgres.go
 
 It exposes a vibit-owned `PostgresRunner` that accepts a caller-supplied `*sql.DB` and migration source filesystem or directory, configures goose for PostgreSQL, disables the global Go migration registry, lists known migration sources, reports structured migration status, and applies pending SQL-first migrations. It intentionally does not own database connection construction, does not close caller-owned database handles, and does not run during normal `cmd/vibit-server` startup.
 
+The PostgreSQL platform owner may provide narrow helpers that adapt a package-owned pool into `*sql.DB` for migration tooling, such as:
+
+```text
+runtime/internal/platform/persistence/postgres/sql_db.go
+```
+
+Those helpers must keep pgx stdlib imports inside the PostgreSQL platform owner package. They do not move migration execution ownership out of `runtime/internal/platform/migrations/`.
+
 ### Migration Sources
 
 Owner:
@@ -193,6 +201,7 @@ Rules:
 - Configuration parsing may build a `pgxpool.Config`, but normal unit tests must not require a live PostgreSQL server.
 - Connection strings and credentials must come from environment or explicit runtime input and must not be stored in tracked files.
 - Process startup must keep PostgreSQL optional. `VIBIT_RUNTIME_STORE=postgres` explicitly selects the PostgreSQL-backed inventory composition path; the default remains in-memory startup.
+- `*sql.DB` adaptation for migration tooling, when needed, must stay inside the PostgreSQL platform owner package.
 
 ## 3. Inventory Persistence Boundary
 

@@ -150,13 +150,13 @@ Live PostgreSQL verification 是 opt-in。
 当 destructive verification 被显式允许时，运行 rollback 或 cleanup checks
 ```
 
-在 live verification commands 存在前，agents 必须记录：
+当某个 change 还没有提供 live verification commands 时，agents 必须记录：
 
 ```text
 Not verified: live PostgreSQL verification is unavailable because no repository command exists yet.
 ```
 
-或者，如果 commands 已存在但 `VIBIT_POSTGRES_TEST_DSN` 未设置：
+当 commands 已存在但 `VIBIT_POSTGRES_TEST_DSN` 未设置时，agents 必须记录：
 
 ```text
 Not verified: live PostgreSQL verification skipped because VIBIT_POSTGRES_TEST_DSN was not set.
@@ -218,4 +218,18 @@ node tools/vibit check postgres-env
 
 该检查验证 disposable PostgreSQL verification standard、runtime manifest references 和 guidance artifacts 是否存在。它不会连接 PostgreSQL。
 
-Live migration 和 repository integration commands 仍属于未来工作。
+第一条 opt-in live migration 和 repository request-loop verification path 是：
+
+```bash
+cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+当提供 disposable PostgreSQL DSN 时，该 command 会验证 migration status、migration apply，以及 persistent inventory `GrantItem` 后接 `GetInventory` 的 Protobuf request loop。如果未设置 `VIBIT_POSTGRES_TEST_DSN`，test 会 skip，并打印：
+
+```text
+live PostgreSQL verification skipped because VIBIT_POSTGRES_TEST_DSN was not set
+```
+
+这个 command 也包含在 `cd runtime && go test ./...` 中；它仍然是 opt-in，因为只有设置 DSN 后 live branch 才会执行。
+
+第一条 durable inventory live test 要求 `VIBIT_POSTGRES_TEST_CLEANUP=drop_schema`，可以显式设置，也可以使用默认值，因为它需要从 clean schema 验证 migration apply。

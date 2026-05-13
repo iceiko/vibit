@@ -122,9 +122,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一版 PostgreSQL configuration parser、第一版 pgx-backed transaction runner adapter、第一版 PostgreSQL inventory repository adapter、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture、挂载 `/v1/ws` 的 minimal process wiring，以及显式 PostgreSQL inventory runtime composition path。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一版 PostgreSQL configuration parser、第一版 pgx-backed transaction runner adapter、第一版 PostgreSQL inventory repository adapter、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture、挂载 `/v1/ws` 的 minimal process wiring、显式 PostgreSQL inventory runtime composition path，以及 opt-in live PostgreSQL durable inventory request-loop verification test。
 
-这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source、第一版显式 migration apply/status runner、第一版 PostgreSQL repository adapter，以及显式 runtime store selection。`VIBIT_RUNTIME_STORE=memory` 仍然是默认值。提供 `VIBIT_POSTGRES_DSN` 时，`VIBIT_RUNTIME_STORE=postgres` 会启用 PostgreSQL-backed inventory composition。这个 workspace 仍然没有实现 generated route registration、generated protocol bridge creation、authentication/session validation、live PostgreSQL integration testing、automatic startup migrations 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source、第一版显式 migration apply/status runner、第一版 PostgreSQL repository adapter、显式 runtime store selection，以及只有设置 `VIBIT_POSTGRES_TEST_DSN` 才会运行 live branch 的 live verification test。`VIBIT_RUNTIME_STORE=memory` 仍然是默认值。提供 `VIBIT_POSTGRES_DSN` 时，`VIBIT_RUNTIME_STORE=postgres` 会启用 PostgreSQL-backed inventory composition。这个 workspace 仍然没有实现 generated route registration、generated protocol bridge creation、authentication/session validation、automatic startup migrations 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 
@@ -141,6 +141,15 @@ VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:
 ```
 
 普通 server startup 不会自动 apply migrations。
+
+第一条 opt-in live durable inventory verification command 是：
+
+```bash
+cd runtime
+VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+如果未设置 `VIBIT_POSTGRES_TEST_DSN`，该 test 会 skip，并记录 live PostgreSQL verification 不可用。
 
 ## 8. 验证
 

@@ -3426,11 +3426,13 @@ function checkPostgresEnv(root) {
     [".arch/conventions.yaml", "standard: docs/postgresql-verification-environment.md"],
     [".arch/conventions.yaml", "translation: docs/postgresql-verification-environment.zh-CN.md"],
     [".arch/conventions.yaml", "check_command: node tools/vibit check postgres-env"],
-    [".arch/conventions.yaml", "live_postgresql_integration_status: opt_in_environment_standard_defined"],
+    [".arch/conventions.yaml", "live_postgresql_integration_status: opt_in_test_created_live_execution_skipped_without_dsn"],
+    [".arch/conventions.yaml", "opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go"],
     [".arch/runtime.yaml", "verification_environment:"],
     [".arch/runtime.yaml", "standard: docs/postgresql-verification-environment.md"],
     [".arch/runtime.yaml", "check_command: node tools/vibit check postgres-env"],
     [".arch/runtime.yaml", "VIBIT_POSTGRES_TEST_DSN"],
+    [".arch/runtime.yaml", "opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go"],
     ["AGENTS.md", "node tools/vibit check postgres-env"],
     ["AGENTS.zh-CN.md", "node tools/vibit check postgres-env"],
     ["runtime/AGENTS.md", "../docs/postgresql-verification-environment.md"],
@@ -3454,6 +3456,7 @@ function checkPostgresEnv(root) {
     ["docs/postgresql-verification-environment.md", "must not require a running PostgreSQL server"],
     ["docs/postgresql-verification-environment.md", "node tools/vibit check postgres-env"],
     ["docs/postgresql-verification-environment.md", "It does not connect to PostgreSQL"],
+    ["docs/postgresql-verification-environment.md", "TestPostgresPersistentInventoryRequestLoop"],
     ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_DSN"],
     ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_DATABASE"],
     ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_CLEANUP"],
@@ -3461,6 +3464,7 @@ function checkPostgresEnv(root) {
     ["docs/postgresql-verification-environment.zh-CN.md", "Docker、Podman"],
     ["docs/postgresql-verification-environment.zh-CN.md", "node tools/vibit check postgres-env"],
     ["docs/postgresql-verification-environment.zh-CN.md", "它不会连接 PostgreSQL"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "TestPostgresPersistentInventoryRequestLoop"],
   ];
   for (const [relativePath, requiredText] of standardReferences) {
     checkRequiredText(root, relativePath, requiredText, "postgres_env.standard", requiredText);
