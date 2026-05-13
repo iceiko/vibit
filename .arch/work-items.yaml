@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-001
+current_milestone: M-002
 
 continuation_semantics:
   default_step_unit: work_item
@@ -30,7 +30,7 @@ milestones:
 
   - id: M-001
     title: First Go Runtime Request Loop
-    status: active
+    status: completed
     goal: Build the first bounded WebSocket Protobuf application request loop without persistence.
     completion_criteria:
       - WebSocket transport accepts binary frames without owning protocol or domain behavior.
@@ -44,10 +44,11 @@ milestones:
       - session validation
       - generated route registration
       - distributed runtime
+    completion_summary: The first bounded WebSocket Protobuf request loop is implemented with transport, protocol, application dispatch, inventory runtime behavior, process wiring, request-loop test support, and repository checks.
 
   - id: M-002
     title: Durable Inventory Runtime
-    status: planned
+    status: active
     goal: Add PostgreSQL-backed inventory persistence and transaction boundaries after the in-process request loop is proven.
     non_goals:
       - object storage
@@ -178,8 +179,10 @@ work_items:
   - id: W-0009
     milestone: M-001
     title: Add request loop test fixture
-    status: next_ready
-    expected_change_id: add-request-loop-test-fixture
+    status: completed
+    change: changes/2026-05-13-add-request-loop-test-fixture
+    commits:
+      - 77374fe
     depends_on:
       - W-0007
     completion:
@@ -188,7 +191,7 @@ work_items:
   - id: W-0010
     milestone: M-002
     title: Define PostgreSQL repository and migration boundary
-    status: planned
+    status: next_ready
     expected_change_id: define-postgresql-repository-and-migration-boundary
     depends_on:
       - W-0008
