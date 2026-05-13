@@ -12,6 +12,7 @@ canonical_decisions:
   go_runtime_layout_and_boundaries: ADR-0014
   game_protocol_framework: ADR-0015
   protobuf_envelope_and_generation: ADR-0016
+  generated_output_standard: ADR-0017
 
 standard:
   document: docs/game-protocol.md
@@ -64,6 +65,8 @@ wire_format:
   format: protobuf
   source_root: proto
   generated_go_output: runtime/internal/generated/proto
+  generated_output_standard: docs/generated-output.md
+  generated_output_check: node tools/vibit check generated
   owner: runtime/internal/platform/protocol/protobuf
   module_package_pattern: vibit.<module>.v1
   module_source_pattern: proto/vibit/<module>/v1/<module>.proto
@@ -185,6 +188,7 @@ compatibility:
     - Public wire schemas must remain aligned with registered vibit semantic contracts.
     - Generated Go Protobuf output is immutable and must be regenerated from proto sources.
     - Handwritten runtime code must not be placed under runtime/internal/generated/proto.
+    - Generated Go Protobuf output must use .pb.go files with protoc-gen-go markers and source traces.
 
 implementation_boundaries:
   transport_adapter: runtime/internal/platform/transport/ws

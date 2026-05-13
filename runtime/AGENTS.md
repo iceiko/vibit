@@ -36,6 +36,7 @@ Before changing files under `runtime/`, read:
 - `../.arch/runtime.yaml`
 - `../.arch/dependencies.yaml`
 - `../.arch/contracts.yaml`
+- `../docs/generated-output.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - The affected module manifest, such as `../modules/inventory/module.yaml`
 - The relevant change spec under `../changes/`
@@ -86,6 +87,10 @@ Generated files are immutable to non-system agents.
 
 If generated output is wrong, change the source contract, schema, template, or generator. Do not hand-edit generated files unless a change spec or Agent Decision Record explicitly grants `generated_file_override`.
 
+Go Protobuf generated output under `internal/generated/proto/` must be produced from `../proto/` sources through the accepted Buf and `protoc-gen-go` path. Files under that root must be generated `*.pb.go` files with the `protoc-gen-go` marker and source trace, or temporary `.gitkeep` placeholders while generation has not run.
+
+Do not place handwritten runtime code under `internal/generated/proto/` or `internal/generated/contracts/`.
+
 ## 7. Current State
 
 This runtime workspace is currently a skeleton.
@@ -98,6 +103,7 @@ Run repository verification from the repository root:
 
 ```bash
 node tools/vibit check runtime
+node tools/vibit check generated
 node tools/vibit check all
 ```
 

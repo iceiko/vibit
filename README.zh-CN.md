@@ -64,6 +64,8 @@ vibit 从另一个前提出发：
 - `docs/dependency-adoption.zh-CN.md`：简体中文译本
 - `docs/game-protocol.md`：game protocol framework 标准
 - `docs/game-protocol.zh-CN.md`：简体中文译本
+- `docs/generated-output.md`：generated output 标准
+- `docs/generated-output.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
 - `rules/`：面向机器可读 check metadata 的 rule catalogs
 
@@ -85,6 +87,7 @@ vibit 应逐步演进出：
 - 第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries 位于 `runtime/cmd/vibit-server/`、`runtime/internal/app/`、`runtime/internal/platform/`、`runtime/internal/modules/` 和 `runtime/internal/generated/`
 - Protobuf source files 位于 `proto/vibit/<module>/v1/`，生成的 Go Protobuf output 位于 `runtime/internal/generated/proto/`
+- Generated output rules 位于 `docs/generated-output.md`，Go Protobuf output 在提交前应被检查
 - Protocol envelope source 位于 `proto/vibit/protocol/v1/envelope.proto`
 - Buf generation configuration 位于 `buf.yaml` 和 `buf.gen.yaml`
 - 由 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `ADR-0015` 约束的 game-aware WebSocket Protobuf envelope
@@ -170,7 +173,7 @@ proto/vibit/inventory/v1/inventory.proto
 
 `buf.yaml` 和 `buf.gen.yaml` 定义计划中的 generation path，但在使用已接受 toolchain 实际运行 generation 前，不提交生成的 Go Protobuf output。不要手工创建或编辑生成的 Go Protobuf files。
 
-使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
+使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。它也会检查 `runtime/internal/generated/proto/` 下计划中的 Go Protobuf output root；generated Protobuf Go files 必须使用 `*.pb.go` 后缀，包含 `protoc-gen-go` generated-code marker，并能追溯到现有 `.proto` sources。
 
 使用 `node tools/vibit check runtime` 做 server runtime verification。在 Go runtime 尚不存在前，该检查会报告 runtime implementation 尚未开始；当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，它会验证 ADR-0014 skeleton。一旦 Go source files 存在，它必须发现 Go test files 并运行 Go runtime test path。
 

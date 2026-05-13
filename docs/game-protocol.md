@@ -214,6 +214,8 @@ runtime/internal/generated/proto/
 
 Generated output must be produced from `.proto` sources. Agents must not create or hand-edit generated Go Protobuf files to work around source or generator problems.
 
+Generated output rules are defined by `docs/generated-output.md` and `ADR-0017`.
+
 ## Compatibility Rules
 
 The envelope Protobuf package is:
@@ -249,7 +251,9 @@ Before adding or changing `.proto` files, runtime protocol handlers, or generate
 - `ADR-0009`
 - `ADR-0014`
 - `ADR-0015`
+- `ADR-0017`
 - `.arch/contracts.yaml`
+- `docs/generated-output.md`
 - The affected module manifest and contract files
 
 Agents must preserve these boundaries:

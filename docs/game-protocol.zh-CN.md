@@ -215,6 +215,8 @@ runtime/internal/generated/proto/
 
 Generated output 必须从 `.proto` sources 生成。Agents 不得为了绕过 source 或 generator 问题而创建或手工编辑生成的 Go Protobuf files。
 
+Generated output rules 由 `docs/generated-output.md` 和 `ADR-0017` 定义。
+
 ## Compatibility Rules
 
 Envelope Protobuf package 是：
@@ -250,7 +252,9 @@ Envelope versioning 与 module message versioning 相关但分离：
 - `ADR-0009`
 - `ADR-0014`
 - `ADR-0015`
+- `ADR-0017`
 - `.arch/contracts.yaml`
+- `docs/generated-output.md`
 - 受影响的 module manifest 和 contract files
 
 Agents 必须保持这些边界：

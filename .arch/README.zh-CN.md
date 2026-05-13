@@ -47,6 +47,8 @@
 
 `buf.yaml` 和 `buf.gen.yaml` 配置 Protobuf source discovery、linting、breaking checks 和计划中的 Go generation output。它们是根目录 generation configuration，不是 architecture manifests，但 `.arch/protocol.yaml` 和 `.arch/runtime.yaml` 会指向它们，因为 agents 在 protocol generation 前必须阅读它们。
 
+`docs/generated-output.md` 记录 generated output standard。`ADR-0017` 约束 generated output traceability、`runtime/internal/generated/proto/` 的 ownership rule，以及 generated Go Protobuf files 必须使用 `protoc-gen-go` markers 并通过 source traces 回到 `proto/` 的要求。
+
 `dependencies.yaml` 记录 foundational dependency decision slots。它标识哪些 dependency categories 在 implementation import 或 require 具体 packages 前需要 adoption records。
 
 第一批已接受的 Go runtime dependencies 由 `ADR-0013` 记录：
@@ -58,7 +60,7 @@
 
 S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Protobuf generation output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。
+第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Protobuf generation output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。Generated output 变化后运行 `node tools/vibit check generated`。
 
 ## 未来预期文件
 

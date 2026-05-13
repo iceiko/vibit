@@ -46,6 +46,8 @@ This is the first draft. The files describe expected shape before implementation
 
 `buf.yaml` and `buf.gen.yaml` configure Protobuf source discovery, linting, breaking checks, and planned Go generation output. They are root-level generation configuration rather than architecture manifests, but `.arch/protocol.yaml` and `.arch/runtime.yaml` point to them because agents must read them before protocol generation.
 
+`docs/generated-output.md` records the generated output standard. `ADR-0017` governs generated output traceability, the `runtime/internal/generated/proto/` ownership rule, and the requirement that generated Go Protobuf files use `protoc-gen-go` markers and source traces back to `proto/`.
+
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
 
 The first accepted Go runtime dependencies are recorded by `ADR-0013`:
@@ -57,7 +59,7 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
 
-The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand.
+The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand. Run `node tools/vibit check generated` after generated output changes.
 
 ## Expected Future Files
 

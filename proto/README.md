@@ -36,6 +36,12 @@ Generated Go Protobuf output should go under:
 runtime/internal/generated/proto/
 ```
 
+Generated output rules are defined in:
+
+```text
+docs/generated-output.md
+```
+
 Root Protobuf generation configuration is:
 
 ```text
@@ -51,6 +57,7 @@ buf.gen.yaml
 - Keep envelope and module payload schemas aligned with `.arch/protocol.yaml`.
 - Do not hand-edit generated Go Protobuf output.
 - Do not create handwritten runtime code under `runtime/internal/generated/proto/`.
+- Generated Go Protobuf files under `runtime/internal/generated/proto/` must be `*.pb.go`, include the `protoc-gen-go` generated-code marker, and include a source trace that resolves to an existing `.proto` file.
 - Keep Protobuf package names, message names, service names, and field names in English.
 - Version public wire schemas explicitly.
 - Keep `option go_package` aligned with `runtime/internal/generated/proto/`.
@@ -67,4 +74,10 @@ Planned generation command:
 
 ```text
 buf generate
+```
+
+After generation, run:
+
+```text
+node tools/vibit check generated
 ```

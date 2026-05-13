@@ -35,6 +35,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../.arch/runtime.yaml`
 - `../.arch/dependencies.yaml`
 - `../.arch/contracts.yaml`
+- `../docs/generated-output.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - 受影响的 module manifest，例如 `../modules/inventory/module.yaml`
 - `../changes/` 下相关 change spec
@@ -85,6 +86,10 @@ Generated files 对 non-system agents 不可变。
 
 如果 generated output 错了，应修改 source contract、schema、template 或 generator。除非 change spec 或 Agent Decision Record 明确授予 `generated_file_override`，不要手工编辑 generated files。
 
+`internal/generated/proto/` 下的 Go Protobuf generated output 必须通过已接受的 Buf 和 `protoc-gen-go` 路径从 `../proto/` sources 生成。该目录下的文件必须是带有 `protoc-gen-go` marker 和 source trace 的 generated `*.pb.go` files，或者是在 generation 尚未运行时使用的临时 `.gitkeep` placeholders。
+
+不要把 handwritten runtime code 放在 `internal/generated/proto/` 或 `internal/generated/contracts/` 下。
+
 ## 7. 当前状态
 
 这个 runtime workspace 当前只是 skeleton。
@@ -97,6 +102,7 @@ Generated files 对 non-system agents 不可变。
 
 ```bash
 node tools/vibit check runtime
+node tools/vibit check generated
 node tools/vibit check all
 ```
 

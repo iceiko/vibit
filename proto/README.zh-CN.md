@@ -37,6 +37,12 @@ proto/vibit/protocol/v1/envelope.proto
 runtime/internal/generated/proto/
 ```
 
+Generated output rules 定义在：
+
+```text
+docs/generated-output.md
+```
+
 根目录 Protobuf generation 配置是：
 
 ```text
@@ -52,6 +58,7 @@ buf.gen.yaml
 - 保持 envelope 和 module payload schemas 与 `.arch/protocol.yaml` 对齐。
 - 不要手工编辑生成的 Go Protobuf output。
 - 不要在 `runtime/internal/generated/proto/` 下创建手写 runtime code。
+- `runtime/internal/generated/proto/` 下的 generated Go Protobuf files 必须是 `*.pb.go`，包含 `protoc-gen-go` generated-code marker，并包含能解析到现有 `.proto` file 的 source trace。
 - Protobuf package names、message names、service names 和 field names 使用英文。
 - Public wire schemas 必须显式 versioned。
 - 保持 `option go_package` 与 `runtime/internal/generated/proto/` 对齐。
@@ -68,4 +75,10 @@ Buf linting、formatting、breaking checks 和 generation orchestration 已由 A
 
 ```text
 buf generate
+```
+
+Generation 后运行：
+
+```text
+node tools/vibit check generated
 ```

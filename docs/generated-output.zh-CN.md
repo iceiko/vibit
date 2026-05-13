@@ -1,0 +1,156 @@
+# Generated Output Standard 中文版
+
+状态：Draft v0.1
+最后更新：2026-05-13
+范围：`runtime/internal/generated/` 下的 generated files
+说明：本文件是 `docs/generated-output.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
+
+本标准定义 vibit 在 source contracts、schemas 和 Protobuf files 开始生成 runtime code 后，如何对待 generated files。
+
+本标准应与 `CONSTITUTION.md`、`.arch/runtime.yaml`、`.arch/protocol.yaml` 和 `ADR-0017` 一起使用。
+
+## 1. 目的
+
+Generated files 是 vibit agent-native architecture 的一部分。
+
+它们减少重复工作，保持结构一致，并让未来 agents 更容易预测 framework shape。它们也会带来风险：如果 agent 为了解决局部问题而悄悄手改 generated output，仓库就可能偏离 source contracts 和 generators。
+
+本标准让 generated output 保持可检查、可复现，并与 handwritten logic 清晰分离。
+
+## 2. Source Before Output
+
+Generated files 必须能追溯到 source artifacts。
+
+有效 sources 可以包括：
+
+- `contracts/` 下的 contract source files。
+- `modules/<module>/module.yaml` 下的 module manifests。
+- `proto/` 下的 Protobuf source files。
+- Generator templates 和 configuration。
+- `.arch/` 下的 architecture manifests。
+
+如果 generated output 错了，agents 应修改 source contract、schema、Protobuf file、template 或 generator。除非 change spec 或 Agent Decision Record 明确授予 `generated_file_override`，否则不能直接 patch generated output。
+
+## 3. Generated Roots
+
+当前 generated output roots：
+
+```text
+runtime/internal/generated/contracts/
+runtime/internal/generated/proto/
+```
+
+`runtime/internal/generated/contracts/` 保留给生成的 Go contract shapes。
+
+`runtime/internal/generated/proto/` 保留给从 `proto/` 下 `.proto` files 生成的 Go Protobuf output。
+
+Handwritten runtime logic 不得放在这些目录下。
+
+## 4. Go Protobuf Output
+
+Go Protobuf output 由 `protoc-gen-go` 生成，并由 Buf 编排。
+
+Source files：
+
+```text
+proto/**/*.proto
+```
+
+Configuration：
+
+```text
+buf.yaml
+buf.gen.yaml
+```
+
+Output root：
+
+```text
+runtime/internal/generated/proto/
+```
+
+`runtime/internal/generated/proto/` 下允许的文件形态：
+
+```text
+**/*.pb.go
+```
+
+当 generated directory 尚无 generated files 时，允许临时 `.gitkeep` 文件存在。
+
+Generated Go Protobuf files 必须包含 `protoc-gen-go` 生成的标准 generated-code marker，以及能映射回现有 `.proto` file 的 source trace comment。
+
+Agents 不得在 `runtime/internal/generated/proto/` 下创建手写 `.go` files。
+
+## 5. Trace Requirements
+
+Generated file 应让这些事实可发现：
+
+- 它是 generated。
+- 哪个 source artifact 生成了它。
+- 哪个 generator 或 generation command 生成了它。
+- 哪个 output root 拥有它。
+
+对于 Go Protobuf output，`protoc-gen-go` 的标准 header 足以说明 generated-code identity 和 source tracing。预期的 source trace 是生成注释：
+
+```text
+// source: <path>.proto
+```
+
+Source trace 必须解析到 `proto/` 下一个已存在的文件。
+
+对于 vibit 自有 generators，generated files 应包含：
+
+```text
+@generated
+Source: <source artifact>
+Generator: <generator identity>
+```
+
+## 6. Agent Rules
+
+Agents 必须：
+
+- 在修改 generated output、generator behavior 或 generated output manifests 前阅读本标准。
+- 先修改 source artifacts，再修改 generated output。
+- 不把 generated output 混入 handwritten module logic。
+- 在添加、删除或修改 generated files 后运行 `node tools/vibit check generated`。
+- 在相关 change verification 中记录 generation commands 和不可用的 tooling。
+
+Agents 不得：
+
+- 在没有 `generated_file_override` 的情况下手改 generated files。
+- 把 business logic 放到 `runtime/internal/generated/` 下。
+- 把手写 protocol adapters 放到 `runtime/internal/generated/proto/` 下。
+- 提交无法追溯到现有 `.proto` sources 的 generated Go Protobuf files。
+- 在本地 toolchain 不可用时声称已经运行 generation。
+
+## 7. Verification
+
+当前 verification：
+
+```bash
+node tools/vibit check generated
+node tools/vibit check protocol
+node tools/vibit check all
+```
+
+`check generated` 会验证 module-declared generated files 和 Go Protobuf output root。对于 `runtime/internal/generated/proto/`，它允许空的 planned directory，允许 `.gitkeep`，要求 generated Protobuf Go files 使用 `*.pb.go` 后缀，要求 `protoc-gen-go` generated-code marker，并要求 source trace 能解析到 `proto/` 下的现有文件。
+
+未来 verification 应增加：
+
+- Generator reproducibility checks。
+- Generated output drift checks。
+- Generated packages 的 import-boundary checks。
+- Generated contract files 对 contract manifests 和 generator versions 的追溯检查。
+
+## 8. Migration Path
+
+在提交 generated files 前：
+
+1. 用 `.gitkeep` 保持 output directories 作为 skeleton directories。
+2. 稳定 source contracts、`.proto` files 和 generation configuration。
+3. 运行 `node tools/vibit check generated`。
+4. 只有在本地 Buf 和 Go Protobuf toolchain 可用时，才运行 `buf lint` 和 `buf generate`。
+5. 只有通过 source trace 和 ownership checks 后，才提交 generated output。
+
+如果 generated output 已经提交并发现 source mismatch，应更新 source artifact 或 generator，重新生成，并记录 verification path。

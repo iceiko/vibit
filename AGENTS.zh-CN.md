@@ -79,6 +79,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/dependency-adoption.zh-CN.md`
 - `docs/game-protocol.md`
 - `docs/game-protocol.zh-CN.md`
+- `docs/generated-output.md`
+- `docs/generated-output.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -89,6 +91,8 @@ vibit is an open-source agent-native server framework for building backends that
 第一版 game protocol framework 记录在 `.arch/protocol.yaml`、`docs/game-protocol.md`、`ADR-0015` 和 `ADR-0016` 中。它定义 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 session metadata、game target scopes、server-authoritative message rules、error mapping 和 compatibility expectations。在新增 `.proto` files、WebSocket protocol handlers、generated protocol output 或 client/server protocol rules 前，必须阅读它。
 
 第一批 protocol source files 是 `proto/vibit/protocol/v1/envelope.proto` 和 `proto/vibit/inventory/v1/inventory.proto`。Buf configuration 位于 `buf.yaml` 和 `buf.gen.yaml`。`ADR-0016` 记录 envelope 和 generation configuration decision。生成的 Go Protobuf output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。
+
+Generated output standard 是 `docs/generated-output.md`，配套简体中文译本是 `docs/generated-output.zh-CN.md`。`ADR-0017` 记录 generated output decision。在添加 generated files、generated output checks 或 generator behavior 前，应阅读这些文件。`runtime/internal/generated/proto/` 下的 Go Protobuf output 必须是 `*.pb.go`，必须包含 `protoc-gen-go` generated-code marker，并且必须能追溯到现有 `.proto` source。
 
 当前可执行工具：
 
@@ -139,7 +143,7 @@ node tools/vibit generate module <module>
 
 在创建或修改 `.proto` files、生成的 Protobuf output 或 protocol generation rules 前，使用 `node tools/vibit check protocol`。当 protocol sources 仍处于 planned 状态时，缺失 `.proto` files 可以通过；但一旦 `.proto` file 存在，它就必须与已登记的 command、query 和 event contracts 对齐。
 
-当新增或修改 generated files 或 module manifest 中的 `generated` declarations 时，使用 `node tools/vibit check generated`。
+当新增或修改 generated files、module manifest 中的 `generated` declarations、generated output standards 或 Go Protobuf generated output 时，使用 `node tools/vibit check generated`。
 
 当新增或修改 runtime module behavior 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
@@ -159,7 +163,7 @@ node tools/vibit generate module <module>
 
 使用 `.arch/protocol.yaml` 作为 game protocol framework decisions 的机器可读 intake 入口。它链接 `ADR-0015`，并定义第一版 WebSocket Protobuf envelope、route fields、session model、target scopes、authority rules、error model 和第一版 inventory slice protocol scope。
 
-修改 protocol envelope、inventory Protobuf source、Buf generation configuration 或生成的 Go Protobuf output path 前，先阅读 `ADR-0016`、`buf.yaml`、`buf.gen.yaml` 和 `proto/README.md`。
+修改 protocol envelope、inventory Protobuf source、Buf generation configuration、generated output checks 或生成的 Go Protobuf output path 前，先阅读 `ADR-0016`、`ADR-0017`、`buf.yaml`、`buf.gen.yaml`、`proto/README.md` 和 `docs/generated-output.md`。
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
 

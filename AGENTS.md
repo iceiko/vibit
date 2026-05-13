@@ -78,6 +78,8 @@ Existing foundation:
 - `docs/dependency-adoption.zh-CN.md`
 - `docs/game-protocol.md`
 - `docs/game-protocol.zh-CN.md`
+- `docs/generated-output.md`
+- `docs/generated-output.zh-CN.md`
 - `schema/`
 - `rules/`
 
@@ -88,6 +90,8 @@ Runtime readiness decisions currently point to Go as the first server runtime im
 The first game protocol framework is recorded in `.arch/protocol.yaml`, `docs/game-protocol.md`, `ADR-0015`, and `ADR-0016`. It defines a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, session metadata, game target scopes, server-authoritative message rules, error mapping, and compatibility expectations. Read it before adding `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
 
 The first protocol source files are `proto/vibit/protocol/v1/envelope.proto` and `proto/vibit/inventory/v1/inventory.proto`. Buf configuration lives at `buf.yaml` and `buf.gen.yaml`. `ADR-0016` records the envelope and generation configuration decision. Generated Go Protobuf output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand.
+
+The generated output standard is `docs/generated-output.md`, with `docs/generated-output.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0017` records the generated output decision. Read these before adding generated files, generated output checks, or generator behavior. Go Protobuf output under `runtime/internal/generated/proto/` must be `*.pb.go`, must contain the `protoc-gen-go` generated-code marker, and must trace to an existing `.proto` source.
 
 Current executable tooling:
 
@@ -138,7 +142,7 @@ Use `node tools/vibit check contracts` when contract source files or `.arch/cont
 
 Use `node tools/vibit check protocol` before creating or changing `.proto` files, generated Protobuf output, or protocol generation rules. Missing `.proto` files may pass while protocol sources are still planned, but once a `.proto` file exists it must align with registered command, query, and event contracts.
 
-Use `node tools/vibit check generated` when generated files or module manifest `generated` declarations are added or changed.
+Use `node tools/vibit check generated` when generated files, module manifest `generated` declarations, generated output standards, or Go Protobuf generated output are added or changed.
 
 Use `node tools/vibit check runtime` when runtime module behavior or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
@@ -158,7 +162,7 @@ Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readin
 
 Use `.arch/protocol.yaml` as the machine-readable intake point for game protocol framework decisions. It links `ADR-0015` and defines the first WebSocket Protobuf envelope, route fields, session model, target scopes, authority rules, error model, and first inventory slice protocol scope.
 
-Use `ADR-0016`, `buf.yaml`, `buf.gen.yaml`, and `proto/README.md` before changing the protocol envelope, inventory Protobuf source, Buf generation configuration, or generated Go Protobuf output path.
+Use `ADR-0016`, `ADR-0017`, `buf.yaml`, `buf.gen.yaml`, `proto/README.md`, and `docs/generated-output.md` before changing the protocol envelope, inventory Protobuf source, Buf generation configuration, generated output checks, or generated Go Protobuf output path.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 

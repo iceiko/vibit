@@ -64,6 +64,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/dependency-adoption.zh-CN.md`: Simplified Chinese translation
 - `docs/game-protocol.md`: game protocol framework standard
 - `docs/game-protocol.zh-CN.md`: Simplified Chinese translation
+- `docs/generated-output.md`: generated output standard
+- `docs/generated-output.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
 - `rules/`: rule catalogs for machine-readable check metadata
 
@@ -85,6 +87,7 @@ vibit should evolve toward:
 - A first Go module at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
 - Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
+- Generated output rules under `docs/generated-output.md`, with Go Protobuf output checked before commit
 - A protocol envelope source at `proto/vibit/protocol/v1/envelope.proto`
 - Buf generation configuration at `buf.yaml` and `buf.gen.yaml`
 - A game-aware WebSocket Protobuf envelope governed by `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`
@@ -170,7 +173,7 @@ proto/vibit/inventory/v1/inventory.proto
 
 `buf.yaml` and `buf.gen.yaml` define the planned generation path, but generated Go Protobuf output is not committed until generation is run with the accepted toolchain. Do not create or edit generated Go Protobuf files by hand.
 
-Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
+Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers. It also checks the planned Go Protobuf output root under `runtime/internal/generated/proto/`; generated Protobuf Go files must use the `*.pb.go` suffix, include the `protoc-gen-go` generated-code marker, and trace to existing `.proto` sources.
 
 Use `node tools/vibit check runtime` for server runtime verification. Before the Go runtime exists, this check reports that runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, it verifies the ADR-0014 skeleton. Once Go source files exist, it must discover Go test files and run the Go runtime test path.
 

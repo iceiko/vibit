@@ -276,12 +276,44 @@
       "agent_guidance": "Run the generator or update the module manifest declaration."
     },
     {
+      "rule_id": "generated.root",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated output root",
+      "description": "A generated output root must exist and contain only allowed placeholder or generated files for its current phase.",
+      "agent_guidance": "Inspect the generated output standard and keep handwritten runtime code outside generated roots."
+    },
+    {
+      "rule_id": "generated.file_shape",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated file shape",
+      "description": "A generated file must use the expected suffix and file shape for its generator and output root.",
+      "agent_guidance": "Regenerate the file with the accepted generator or move handwritten code out of the generated output root."
+    },
+    {
       "rule_id": "generated.trace",
       "category": "generated",
       "default_severity": "error",
       "title": "Generated output trace",
       "description": "A generated file must include trace metadata for its source and generator.",
       "agent_guidance": "Regenerate the file or update the generator so it emits generated, source, and generator markers."
+    },
+    {
+      "rule_id": "generated.source_trace",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated source trace",
+      "description": "A generated file must trace back to an existing source artifact.",
+      "agent_guidance": "Fix the source trace by regenerating from an existing source file; do not hand-edit generated output to mask drift."
+    },
+    {
+      "rule_id": "generated.handwritten_forbidden",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Handwritten generated-root code forbidden",
+      "description": "Handwritten runtime code is forbidden under generated output roots.",
+      "agent_guidance": "Move handwritten code to the correct runtime package and keep generated roots reserved for generated output."
     },
     {
       "rule_id": "runtime.not_started",

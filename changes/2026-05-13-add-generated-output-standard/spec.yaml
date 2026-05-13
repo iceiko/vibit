@@ -1,0 +1,83 @@
+schema_version: 0.1
+change_id: add-generated-output-standard
+date: 2026-05-13
+type: standard
+status: verified
+
+summary: Define generated output rules and add Go Protobuf generated-output checks.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  added:
+    - docs/generated-output.md
+    - docs/generated-output.zh-CN.md
+    - decisions/ADR-0017-generated-output-standard.md
+    - conversations/2026-05-13-generated-output-standard.md
+    - changes/2026-05-13-add-generated-output-standard/
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/conventions.yaml
+    - .arch/protocol.yaml
+    - .arch/runtime.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - proto/README.md
+    - proto/README.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+decisions:
+  - ADR-0017
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node_check_tools
+    - check_generated
+    - check_generated_json
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_protocol
+    - check_runtime
+    - check_change
+    - check_all_json
+    - diff_check
+    - secret_scan
+  status: Verified
