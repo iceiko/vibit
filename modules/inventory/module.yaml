@@ -178,8 +178,18 @@ proof_slice:
     mutation_lock:
       aggregate: inventory_account
       key: player_id
+      interface: LockInventoryForMutation
+      locked_view: MutationLock
       applies_to:
         - GrantItem
+      required_sequence:
+        - validate_request
+        - check_permission
+        - lock_inventory_for_mutation
+        - read_current_inventory_through_lock
+        - enforce_capacity_policy
+        - grant_item_through_lock
+        - release_lock_without_committing_transaction
       reason: Inventory capacity depends on the current player item set, so persistent grants require a command-safe aggregate lock before mutation.
     planned_tables:
       - inventory_accounts

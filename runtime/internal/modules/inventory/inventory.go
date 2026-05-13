@@ -90,7 +90,17 @@ type ItemGrantedEvent struct {
 
 type Repository interface {
 	GetInventory(context.Context, string) ([]Item, error)
+	LockInventoryForMutation(context.Context, string) (MutationLock, error)
+}
+
+type MutationRepository interface {
+	GetInventory(context.Context, string) ([]Item, error)
 	GrantItem(context.Context, GrantItemMutation) (Item, error)
+}
+
+type MutationLock interface {
+	MutationRepository
+	Release()
 }
 
 type GrantItemMutation struct {
@@ -272,7 +282,16 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 		return GrantItemResponse{}, nil, inventoryError(ErrorCodeInventoryPermission, "actor cannot grant inventory items")
 	}
 
-	current, err := repository.GetInventory(ctx, request.PlayerID)
+	mutationLock, err := repository.LockInventoryForMutation(ctx, request.PlayerID)
+	if err != nil {
+		return GrantItemResponse{}, nil, err
+	}
+	if mutationLock == nil {
+		return GrantItemResponse{}, nil, errors.New("inventory: mutation lock is required")
+	}
+	defer mutationLock.Release()
+
+	current, err := mutationLock.GetInventory(ctx, request.PlayerID)
 	if err != nil {
 		return GrantItemResponse{}, nil, err
 	}
@@ -286,7 +305,7 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 		return GrantItemResponse{}, nil, inventoryError(ErrorCodeInventoryCapacity, "inventory capacity would be exceeded")
 	}
 
-	granted, err := repository.GrantItem(ctx, GrantItemMutation{
+	granted, err := mutationLock.GrantItem(ctx, GrantItemMutation{
 		PlayerID: request.PlayerID,
 		ItemID:   request.ItemID,
 		Quantity: request.Quantity,

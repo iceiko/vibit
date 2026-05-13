@@ -209,7 +209,7 @@ persistence:
   boundary_decision: ADR-0020
   migration_default: SQL-first migrations
   migration_root: runtime/migrations/postgres
-  migration_root_status: boundary_defined_no_migrations
+  migration_root_status: mutation_lock_boundary_defined_no_migrations
   migration_naming_pattern: 000001_create_inventory_state.sql
   migration_required_markers:
     - "-- +goose Up"
@@ -217,7 +217,7 @@ persistence:
   transaction_boundary_owner: runtime/internal/platform/tx
   transaction_orchestrator: runtime/internal/app
   first_durable_module: inventory
-  first_durable_module_lock: GrantItem locks the inventory account row by player_id before capacity-sensitive mutation.
+  first_durable_module_lock: GrantItem calls inventory.Repository.LockInventoryForMutation before capacity-sensitive reads and writes; PostgreSQL adapters implement it with an inventory account row lock by player_id.
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency

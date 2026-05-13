@@ -73,7 +73,9 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - Inventory repository interfaces 继续由本模块拥有。
 - PostgreSQL adapter code 位于 `runtime/internal/platform/persistence/postgres/`。
 - SQL migrations 位于 `runtime/migrations/postgres/`。
-- `GrantItem` 必须在读取当前 items、执行 capacity-sensitive mutation 前，按 `player_id` lock inventory account row。
+- `GrantItem` 必须在 request validation 和 permission checks 之后调用 `LockInventoryForMutation`，然后用返回的 `MutationLock` 读取 current inventory 并执行 grant mutation。
+- PostgreSQL adapters 必须在 application-owned unit of work 内，把这个 lock 实现为 `player_id` 对应的 inventory account row lock。
+- `MutationLock.Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back transaction。
 - Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。
 
 ## Forbidden Shortcuts
@@ -85,6 +87,7 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - 不要让本模块直接依赖第三方 WebSocket 或 Protobuf libraries。
 - 不要让本模块直接依赖 PostgreSQL drivers、S3 SDKs 或 MinIO clients。开始 persistence implementation 时，应使用 vibit-owned repository 和 storage interfaces。
 - 不要在 command flows 中把 transaction creation 隐藏到 inventory repositories 里。
+- 不要在 mutation lock 之外，为 capacity-sensitive grants 读取 current inventory。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。

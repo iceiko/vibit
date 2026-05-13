@@ -170,6 +170,17 @@ application command dispatch
 
 The lock is required because inventory capacity depends on the player's current set of items. The first PostgreSQL implementation should use an explicit inventory account row lock, not an implicit best-effort read.
 
+The module-owned Go boundary for this flow is:
+
+```text
+Repository.LockInventoryForMutation(ctx, player_id) -> MutationLock
+MutationLock.GetInventory(ctx, player_id)
+MutationLock.GrantItem(ctx, GrantItemMutation)
+MutationLock.Release()
+```
+
+`MutationLock` is a locked repository view for one inventory aggregate. It is not a transaction owner. `Release` only releases the aggregate lock or adapter-local resource; it must not commit or roll back the application-owned unit of work.
+
 ## 4. Repository Rules
 
 Repository interfaces are module-owned. PostgreSQL adapters implement them.
@@ -183,7 +194,9 @@ Rules:
 - A persistent command flow must use a transaction-bound repository.
 - An in-memory repository may remain for tests and pre-persistence bootstrap, but it is not the authoritative durable store.
 
-For inventory, the persistent repository boundary must support a command-safe mutation lock before `GrantItem` becomes PostgreSQL-backed.
+For inventory, `GrantItem` must acquire `LockInventoryForMutation` after request validation and permission checks, and before reading current inventory for capacity enforcement. Capacity-sensitive reads and the grant mutation must go through the returned `MutationLock`.
+
+The PostgreSQL adapter must implement the lock with an explicit inventory account row lock for `player_id` inside the application-owned unit of work. It must not replace this with an advisory lock or hidden repository-owned transaction without a superseding decision.
 
 ## 5. Migration Rules
 

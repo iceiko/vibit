@@ -171,6 +171,17 @@ application command dispatch
 
 这个 lock 是必须的，因为 inventory capacity 依赖玩家当前 item 集合。第一版 PostgreSQL implementation 应使用显式 inventory account row lock，而不是隐式 best-effort read。
 
+这个 flow 对应的 module-owned Go boundary 是：
+
+```text
+Repository.LockInventoryForMutation(ctx, player_id) -> MutationLock
+MutationLock.GetInventory(ctx, player_id)
+MutationLock.GrantItem(ctx, GrantItemMutation)
+MutationLock.Release()
+```
+
+`MutationLock` 是单个 inventory aggregate 的 locked repository view。它不是 transaction owner。`Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back application-owned unit of work。
+
 ## 4. Repository Rules
 
 Repository interfaces 属于 module。PostgreSQL adapters 实现这些 interfaces。
@@ -184,7 +195,9 @@ Repository interfaces 属于 module。PostgreSQL adapters 实现这些 interface
 - Persistent command flow 必须使用 transaction-bound repository。
 - In-memory repository 可继续用于 tests 和 pre-persistence bootstrap，但它不是 authoritative durable store。
 
-对于 inventory，在 `GrantItem` 变成 PostgreSQL-backed 前，persistent repository boundary 必须支持 command-safe mutation lock。
+对于 inventory，`GrantItem` 必须在 request validation 和 permission checks 之后、为 capacity enforcement 读取 current inventory 之前，获取 `LockInventoryForMutation`。Capacity-sensitive reads 和 grant mutation 必须通过返回的 `MutationLock` 执行。
+
+PostgreSQL adapter 必须在 application-owned unit of work 内，用 `player_id` 上的显式 inventory account row lock 实现该 lock。除非有 superseding decision，否则不得用 advisory lock 或隐藏的 repository-owned transaction 替代。
 
 ## 5. Migration Rules
 

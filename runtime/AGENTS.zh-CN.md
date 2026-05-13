@@ -91,7 +91,7 @@ Query handlers 不应改变状态，默认不需要 write transaction。
 
 PostgreSQL persistence work 必须遵循 `../docs/postgresql-persistence-boundary.md`。Repository interfaces 保持 module-owned，`pgx` 保持在 `internal/platform/persistence/postgres/` 下，`goose` 保持在 `internal/platform/migrations/` 下，SQL migration sources 保持在 `migrations/postgres/` 下。
 
-第一版 durable inventory implementation 中，`GrantItem` 必须使用 transaction-bound repository，并在读取当前 items、执行 capacity-sensitive mutation 前，按 `player_id` lock inventory account row。Repositories 不得在 command flows 中偷偷开启独立 write transactions。
+第一版 durable inventory implementation 中，`GrantItem` 必须使用 transaction-bound repository，并在读取当前 items、执行 capacity-sensitive mutation 前调用 `LockInventoryForMutation`。返回的 `MutationLock` 是 locked aggregate view，不是 transaction owner。Repositories 不得在 command flows 中偷偷开启独立 write transactions。
 
 ## 6. Generated Files
 
@@ -105,7 +105,7 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
 这个 workspace 已经有 documented PostgreSQL persistence boundary，但仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
 

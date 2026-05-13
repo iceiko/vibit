@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"strings"
 	"testing"
 	"time"
 
@@ -88,6 +89,28 @@ func TestGrantItemAccumulatesExistingItemQuantity(t *testing.T) {
 	}
 }
 
+func TestGrantItemUsesMutationLockBeforeReadingAndGranting(t *testing.T) {
+	repository := newMemoryRepository()
+	handlers := testHandlers(repository)
+
+	_, _, err := handlers.GrantItem(context.Background(), GrantItemRequest{
+		PlayerID:    "player-1",
+		ItemID:      "item-1",
+		Quantity:    3,
+		Reason:      "test",
+		RequestedBy: "admin-1",
+	})
+	if err != nil {
+		t.Fatalf("GrantItem() error = %v, want nil", err)
+	}
+
+	got := strings.Join(repository.operations, ",")
+	want := "lock:player-1,locked_get:player-1,locked_grant:player-1:item-1,release:player-1"
+	if got != want {
+		t.Fatalf("repository operations = %s, want %s", got, want)
+	}
+}
+
 func TestGrantItemRejectsInvalidQuantityBeforeMutation(t *testing.T) {
 	repository := newMemoryRepository()
 	handlers := testHandlers(repository)
@@ -103,6 +126,9 @@ func TestGrantItemRejectsInvalidQuantityBeforeMutation(t *testing.T) {
 
 	if repository.grantCalls != 0 {
 		t.Fatalf("repository grant calls = %d, want 0", repository.grantCalls)
+	}
+	if repository.lockCalls != 0 {
+		t.Fatalf("repository lock calls = %d, want 0", repository.lockCalls)
 	}
 }
 
@@ -124,6 +150,12 @@ func TestGrantItemRejectsCapacityBeforeMutation(t *testing.T) {
 	if repository.grantCalls != 0 {
 		t.Fatalf("repository grant calls = %d, want 0", repository.grantCalls)
 	}
+	if repository.lockCalls != 1 {
+		t.Fatalf("repository lock calls = %d, want 1", repository.lockCalls)
+	}
+	if repository.releaseCalls != 1 {
+		t.Fatalf("repository release calls = %d, want 1", repository.releaseCalls)
+	}
 }
 
 func TestGrantItemRejectsPermissionBeforeMutation(t *testing.T) {
@@ -142,6 +174,9 @@ func TestGrantItemRejectsPermissionBeforeMutation(t *testing.T) {
 
 	if repository.grantCalls != 0 {
 		t.Fatalf("repository grant calls = %d, want 0", repository.grantCalls)
+	}
+	if repository.lockCalls != 0 {
+		t.Fatalf("repository lock calls = %d, want 0", repository.lockCalls)
 	}
 }
 
@@ -172,6 +207,9 @@ func TestGetInventoryReadsWithoutMutation(t *testing.T) {
 	}
 	if repository.grantCalls != 0 {
 		t.Fatalf("repository grant calls = %d, want 0", repository.grantCalls)
+	}
+	if repository.lockCalls != 0 {
+		t.Fatalf("repository lock calls = %d, want 0", repository.lockCalls)
 	}
 }
 
@@ -303,8 +341,12 @@ func (p staticPermissionPolicy) CanReadInventory(context.Context, string, string
 }
 
 type memoryRepository struct {
-	items      map[string]map[string]int64
-	grantCalls int
+	items        map[string]map[string]int64
+	getCalls     int
+	lockCalls    int
+	releaseCalls int
+	grantCalls   int
+	operations   []string
 }
 
 func newMemoryRepository() *memoryRepository {
@@ -314,15 +356,30 @@ func newMemoryRepository() *memoryRepository {
 }
 
 func (r *memoryRepository) GetInventory(_ context.Context, playerID string) ([]Item, error) {
+	r.getCalls += 1
+	r.operations = append(r.operations, "get:"+playerID)
+	return r.getInventory(playerID), nil
+}
+
+func (r *memoryRepository) LockInventoryForMutation(_ context.Context, playerID string) (MutationLock, error) {
+	r.lockCalls += 1
+	r.operations = append(r.operations, "lock:"+playerID)
+	return &recordingMutationLock{
+		repository: r,
+		playerID:   playerID,
+	}, nil
+}
+
+func (r *memoryRepository) getInventory(playerID string) []Item {
 	playerItems := r.items[playerID]
 	items := make([]Item, 0, len(playerItems))
 	for itemID, quantity := range playerItems {
 		items = append(items, Item{ItemID: itemID, Quantity: quantity})
 	}
-	return items, nil
+	return items
 }
 
-func (r *memoryRepository) GrantItem(_ context.Context, mutation GrantItemMutation) (Item, error) {
+func (r *memoryRepository) grantItem(mutation GrantItemMutation) Item {
 	r.grantCalls += 1
 	if r.items[mutation.PlayerID] == nil {
 		r.items[mutation.PlayerID] = make(map[string]int64)
@@ -331,7 +388,51 @@ func (r *memoryRepository) GrantItem(_ context.Context, mutation GrantItemMutati
 	return Item{
 		ItemID:   mutation.ItemID,
 		Quantity: r.items[mutation.PlayerID][mutation.ItemID],
-	}, nil
+	}
+}
+
+type recordingMutationLock struct {
+	repository *memoryRepository
+	playerID   string
+	released   bool
+}
+
+func (l *recordingMutationLock) GetInventory(_ context.Context, playerID string) ([]Item, error) {
+	if err := l.ensureUsable(playerID); err != nil {
+		return nil, err
+	}
+	l.repository.operations = append(l.repository.operations, "locked_get:"+playerID)
+	return l.repository.getInventory(playerID), nil
+}
+
+func (l *recordingMutationLock) GrantItem(_ context.Context, mutation GrantItemMutation) (Item, error) {
+	if err := l.ensureUsable(mutation.PlayerID); err != nil {
+		return Item{}, err
+	}
+	l.repository.operations = append(l.repository.operations, "locked_grant:"+mutation.PlayerID+":"+mutation.ItemID)
+	return l.repository.grantItem(mutation), nil
+}
+
+func (l *recordingMutationLock) Release() {
+	if l == nil || l.released {
+		return
+	}
+	l.released = true
+	l.repository.releaseCalls += 1
+	l.repository.operations = append(l.repository.operations, "release:"+l.playerID)
+}
+
+func (l *recordingMutationLock) ensureUsable(playerID string) error {
+	if l == nil || l.repository == nil {
+		return errors.New("inventory test: mutation lock is not initialized")
+	}
+	if l.released {
+		return errors.New("inventory test: mutation lock was released")
+	}
+	if playerID != l.playerID {
+		return errors.New("inventory test: mutation lock player_id mismatch")
+	}
+	return nil
 }
 
 type fixedEventIDs struct {

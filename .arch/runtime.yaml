@@ -27,8 +27,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: minimal_websocket_process_wiring
-  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_and_protocol_bridge
+  current_phase: durable_inventory_runtime
+  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_protocol_bridge_and_inventory_mutation_lock_boundary
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -388,11 +388,21 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: boundary_defined_no_postgresql_adapter_or_migration_yet
+    status: mutation_lock_boundary_defined_no_postgresql_adapter_or_migration_yet
     mutation_lock:
       aggregate: inventory_account
       key: player_id
+      interface: inventory.Repository.LockInventoryForMutation
+      locked_view: inventory.MutationLock
       rule: GrantItem must lock the inventory account row before reading current inventory and applying capacity-sensitive item grants.
+      sequence:
+        - validate_request
+        - check_permission
+        - lock_inventory_for_mutation
+        - read_current_inventory_through_lock
+        - enforce_capacity_policy
+        - grant_item_through_lock
+        - release_lock_without_committing_transaction
     first_tables_planned:
       - inventory_accounts
       - inventory_items
@@ -479,7 +489,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_websocket_process_wiring_and_request_loop_fixture_created
+  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_websocket_process_wiring_request_loop_fixture_and_mutation_lock_boundary_created
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.
