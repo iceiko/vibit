@@ -80,13 +80,21 @@ runtime/internal/platform/migrations/
 职责：
 
 - 拥有 `github.com/pressly/goose/v3` invocation 和 validation。
-- 在 tooling 实现后提供 migration status、apply、rollback 和 validation helpers。
+- 提供 migration status、apply 和 validation helpers。Rollback helpers 在有变更需要前，仍属于未来的显式工作。
 - 让 migration execution 保持 operationally explicit。
 
 不得：
 
 - 把 domain business behavior 隐藏在 Go migrations 中。
 - 在没有 `runtime/migrations/postgres/` 下 source files 的情况下生成或应用 migrations。
+
+第一版显式 migration runner 位于：
+
+```text
+runtime/internal/platform/migrations/postgres.go
+```
+
+它暴露 vibit-owned `PostgresRunner`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，配置 PostgreSQL dialect 的 goose，禁用全局 Go migration registry，列出已知 migration sources，报告结构化 migration status，并应用 pending 的 SQL-first migrations。它有意不负责构造 database connection，不关闭调用方拥有的 database handles，也不会在普通 `cmd/vibit-server` startup 中运行。
 
 ### Migration Sources
 
@@ -297,6 +305,7 @@ SQL migrations 是 source artifacts。
 - 每个执行 invariant 的 migration 都应能映射回 module invariant 或 persistence boundary rule。
 - Destructive migrations 需要带 rollback 和 data compatibility notes 的 change spec。
 - 在 persistent repository 被视为 verified 前，必须记录 migration validation。
+- Migration execution helpers 必须由 operator、tool 或已批准的 runtime composition path 显式调用。除非后续 change spec 授权，普通 server startup 不得自动 apply migrations。
 
 ## 6. Test And Verification Rules
 
@@ -320,6 +329,14 @@ runtime/internal/platform/persistence/postgres/config_test.go
 runtime/internal/platform/persistence/postgres/runner_test.go
 ```
 
+当前 PostgreSQL migration runner 的 focused tests 位于：
+
+```text
+runtime/internal/platform/migrations/postgres_test.go
+```
+
+这些 tests 在不要求 live PostgreSQL server 的情况下验证 option handling、SQL source discovery 和 error propagation。
+
 当前 repository verification 仍是：
 
 ```bash
@@ -338,14 +355,17 @@ node tools/vibit check migrations
 
 它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references，以及第一版 inventory table references。它还不会针对 PostgreSQL 执行 apply 或 rollback。
 
-未来 persistence verification 应增加：
+当前 migration apply/status API 是：
 
-```bash
-goose status
-goose up
-goose down
-PostgreSQL repository integration tests
+```text
+runtime/internal/platform/migrations.NewPostgresRunner
+runtime/internal/platform/migrations.PostgresRunner.Status
+runtime/internal/platform/migrations.PostgresRunner.Apply
 ```
+
+Live migration apply/status verification 继续 deferred，直到 disposable PostgreSQL verification environment 被定义。
+
+未来 persistence verification 应在该 disposable environment 上增加 PostgreSQL-backed migration status、apply、rollback 和 repository integration checks。
 
 ## 7. Agent Rules
 
@@ -362,6 +382,7 @@ Agents 不得：
 
 - 向 domain modules 添加 PostgreSQL imports。
 - 向 command handlers 添加 migration side effects。
+- 未经 change spec 授权，向普通 server startup 添加 migration side effects。
 - 把 database constraints 当成唯一可见的 business rules 来源。
 - 在没有 concrete large-object use case 和 dependency adoption record 的情况下，向 inventory persistence 添加 object storage。
 - 让 MinIO 成为 durable inventory runtime 的 mandatory dependency。

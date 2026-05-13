@@ -105,6 +105,8 @@ pgx-backed transaction runner 是 `internal/platform/persistence/postgres/runner
 
 第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。当 migration sources 或 migration guidance 发生变化时，运行 `node ../tools/vibit check migrations`。在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 仍然 pending。
 
+第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
+
 ## 6. Generated Files
 
 Generated files 对 non-system agents 不可变。
@@ -119,7 +121,7 @@ Generated files 对 non-system agents 不可变。
 
 这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一版 PostgreSQL configuration parser、第一版 pgx-backed transaction runner adapter、第一版 PostgreSQL inventory repository adapter、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
-这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source 和第一版 PostgreSQL repository adapter，但仍然没有实现 migration apply/rollback tooling、persistent runtime wiring、generated route registration、generated protocol bridge creation、authentication/session validation、live PostgreSQL integration testing 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source、第一版显式 migration apply/status runner 和第一版 PostgreSQL repository adapter，但仍然没有实现 persistent runtime wiring、generated route registration、generated protocol bridge creation、authentication/session validation、live PostgreSQL integration testing 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 

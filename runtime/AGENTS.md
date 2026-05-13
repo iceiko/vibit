@@ -106,6 +106,8 @@ The pgx-backed transaction runner is `internal/platform/persistence/postgres/run
 
 The first inventory migration source is `migrations/postgres/000001_create_inventory_state.sql`. It creates `inventory_accounts`, `inventory_items`, and `inventory_item_grants`. Run `node ../tools/vibit check migrations` when migration sources or migration guidance change. Migration apply/rollback verification remains pending until migration tooling can run against a disposable PostgreSQL environment.
 
+The first explicit PostgreSQL migration runner is `internal/platform/migrations/postgres.go`. It owns `github.com/pressly/goose/v3`, accepts a caller-supplied `*sql.DB` and migration source filesystem or directory, lists SQL migration sources, reports structured status, and applies pending migrations only when explicitly invoked. Do not wire it into normal `cmd/vibit-server` startup without a change spec.
+
 ## 6. Generated Files
 
 Generated files are immutable to non-system agents.
@@ -120,7 +122,7 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL configuration parser, the first pgx-backed transaction runner adapter, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
 
-The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, and first PostgreSQL repository adapter, but it still does not implement migration apply/rollback tooling, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, first explicit migration apply/status runner, and first PostgreSQL repository adapter, but it still does not implement persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 

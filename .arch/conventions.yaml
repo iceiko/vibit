@@ -210,7 +210,7 @@ persistence:
   migration_default: SQL-first migrations
   migration_root: runtime/migrations/postgres
   migration_check_command: node tools/vibit check migrations
-  migration_root_status: first_inventory_migration_source_created_and_source_checks_available_apply_verification_pending
+  migration_root_status: first_inventory_migration_source_created_apply_status_runner_created_live_apply_verification_pending
   migration_naming_pattern: 000001_create_inventory_state.sql
   migration_required_markers:
     - "-- +goose Up"
@@ -232,6 +232,15 @@ persistence:
   postgresql_transaction_runner: runtime/internal/platform/persistence/postgres/runner.go
   postgresql_transaction_runner_status: created_not_wired
   postgresql_transaction_runner_tests: runtime/internal/platform/persistence/postgres/runner_test.go
+  postgresql_migration_runner: runtime/internal/platform/migrations/postgres.go
+  postgresql_migration_runner_status: created_not_wired
+  postgresql_migration_runner_tests: runtime/internal/platform/migrations/postgres_test.go
+  postgresql_migration_runner_rules:
+    - caller_supplied_database_sql_handle
+    - caller_supplied_migration_source_filesystem_or_directory
+    - structured_status_and_apply_results
+    - no_normal_startup_side_effects
+    - no_caller_owned_database_handle_close
   first_durable_module_lock: GrantItem calls inventory.Repository.LockInventoryForMutation before capacity-sensitive reads and writes; PostgreSQL adapters implement it with an inventory account row lock by player_id.
   first_durable_grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so PostgreSQL adapters can record inventory_item_grants in the same unit of work as quantity changes.
   live_postgresql_integration_status: deferred_until_disposable_postgresql_test_environment_standard

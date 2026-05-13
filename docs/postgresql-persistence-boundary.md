@@ -79,13 +79,21 @@ runtime/internal/platform/migrations/
 Responsibilities:
 
 - Own `github.com/pressly/goose/v3` invocation and validation.
-- Provide migration status, apply, rollback, and validation helpers when tooling is implemented.
+- Provide migration status, apply, and validation helpers. Rollback helpers remain future explicit work until a change requires them.
 - Keep migration execution operationally explicit.
 
 Must not:
 
 - Hide domain business behavior in Go migrations.
 - Allow migrations to be generated or applied without source files under `runtime/migrations/postgres/`.
+
+The first explicit migration runner lives under:
+
+```text
+runtime/internal/platform/migrations/postgres.go
+```
+
+It exposes a vibit-owned `PostgresRunner` that accepts a caller-supplied `*sql.DB` and migration source filesystem or directory, configures goose for PostgreSQL, disables the global Go migration registry, lists known migration sources, reports structured migration status, and applies pending SQL-first migrations. It intentionally does not own database connection construction, does not close caller-owned database handles, and does not run during normal `cmd/vibit-server` startup.
 
 ### Migration Sources
 
@@ -296,6 +304,7 @@ Rules:
 - Every migration that enforces an invariant should map back to a module invariant or persistence boundary rule.
 - Destructive migrations require a change spec with rollback and data compatibility notes.
 - Migration validation must be recorded before a persistent repository is considered verified.
+- Migration execution helpers must be invoked explicitly by an operator, tool, or approved runtime composition path. Normal server startup must not apply migrations unless a later change spec authorizes that behavior.
 
 ## 6. Test And Verification Rules
 
@@ -319,6 +328,14 @@ runtime/internal/platform/persistence/postgres/config_test.go
 runtime/internal/platform/persistence/postgres/runner_test.go
 ```
 
+The current PostgreSQL migration runner has focused tests under:
+
+```text
+runtime/internal/platform/migrations/postgres_test.go
+```
+
+These tests validate option handling, SQL source discovery, and error propagation without requiring a live PostgreSQL server.
+
 Current repository verification remains:
 
 ```bash
@@ -337,14 +354,17 @@ node tools/vibit check migrations
 
 It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, and the first inventory table references. It does not apply or roll back migrations against PostgreSQL yet.
 
-Future persistence verification should add:
+The current migration apply/status API is:
 
-```bash
-goose status
-goose up
-goose down
-PostgreSQL repository integration tests
+```text
+runtime/internal/platform/migrations.NewPostgresRunner
+runtime/internal/platform/migrations.PostgresRunner.Status
+runtime/internal/platform/migrations.PostgresRunner.Apply
 ```
+
+Live migration apply/status verification remains deferred until the disposable PostgreSQL verification environment is defined.
+
+Future persistence verification should add PostgreSQL-backed migration status, apply, rollback, and repository integration checks against that disposable environment.
 
 ## 7. Agent Rules
 
@@ -361,6 +381,7 @@ Agents must not:
 
 - Add PostgreSQL imports to domain modules.
 - Add migration side effects to command handlers.
+- Add migration side effects to normal server startup without a change spec.
 - Use database constraints as the only visible source of business rules.
 - Add object storage to inventory persistence without a concrete large-object use case and dependency adoption record.
 - Make MinIO mandatory for the durable inventory runtime.

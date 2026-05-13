@@ -28,7 +28,7 @@ architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
   current_phase: durable_inventory_runtime
-  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_protocol_bridge_inventory_mutation_lock_boundary_postgresql_adapter_and_transaction_runner
+  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_protocol_bridge_inventory_mutation_lock_boundary_postgresql_adapter_transaction_runner_and_migration_runner
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -371,7 +371,7 @@ persistence_model:
   decision: ADR-0011
   boundary_decision: ADR-0020
   standard: docs/postgresql-persistence-boundary.md
-  status: postgresql_config_transaction_runner_and_first_inventory_adapter_created_not_wired
+  status: postgresql_config_transaction_runner_migration_runner_and_first_inventory_adapter_created_not_wired
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -381,7 +381,7 @@ persistence_model:
       - transactional_state_changes
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
-    implementation_status: config_pool_builder_transaction_runner_and_adapter_created_process_wiring_pending
+    implementation_status: config_pool_builder_transaction_runner_migration_runner_and_adapter_created_process_wiring_pending
     config:
       owner: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/config.go
@@ -399,7 +399,7 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: postgresql_config_transaction_runner_and_adapter_created_not_wired
+    status: postgresql_config_transaction_runner_migration_runner_and_adapter_created_not_wired
     postgres_adapter:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/inventory_repository.go
@@ -425,6 +425,25 @@ persistence_model:
       unit_of_work_type: runtime/internal/platform/persistence/postgres.UnitOfWork
       inventory_repository_factory: UnitOfWork.NewInventoryRepository
       boundary_rule: The runner owns pgx handles inside the PostgreSQL platform package; application and domain code continue to depend on vibit-owned transaction and repository interfaces.
+      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+    postgres_migration_runner:
+      package: runtime/internal/platform/migrations
+      file: runtime/internal/platform/migrations/postgres.go
+      tests: runtime/internal/platform/migrations/postgres_test.go
+      dependency: github.com/pressly/goose/v3
+      construction: NewPostgresRunner
+      directory_construction: NewPostgresRunnerFromDir
+      owns:
+        - goose_provider_configuration
+        - postgresql_migration_source_listing
+        - structured_migration_status
+        - explicit_pending_migration_apply
+      rules:
+        - Accept caller-supplied database/sql handles and migration source filesystems or directories.
+        - Disable the global Go migration registry.
+        - Return vibit-owned status and result shapes instead of exposing goose result types.
+        - Do not apply migrations during normal server startup.
+        - Do not close caller-owned database handles.
       live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
     mutation_lock:
       aggregate: inventory_account
@@ -462,6 +481,7 @@ persistence_model:
     - Domain modules must depend on vibit-owned repository or object-store interfaces, not PostgreSQL drivers or S3 SDKs directly.
     - PostgreSQL schema, migrations, repository interfaces, and transaction boundaries must be declared before runtime persistence implementation.
     - The first migration tool is github.com/pressly/goose/v3 with SQL-first migration files.
+    - Migration apply/status tooling must be invoked explicitly and must not run during normal server startup without a later change spec.
     - Go migrations require a change spec explaining why SQL is insufficient and must not hide domain business logic.
     - S3-compatible object storage must remain optional until a concrete module or platform capability requires it.
     - MinIO must not become a mandatory runtime dependency without an adoption record covering license, maintenance, operations, and replacement path.
@@ -480,7 +500,7 @@ persistence_model:
       - "-- +goose Up"
       - "-- +goose Down"
     go_migrations_allowed: only_with_change_spec
-    status: first_inventory_migration_source_created_and_source_checks_available_apply_verification_pending
+    status: first_inventory_migration_source_created_apply_status_runner_created_live_apply_verification_pending
     first_migration:
       file: runtime/migrations/postgres/000001_create_inventory_state.sql
       module: inventory
@@ -488,7 +508,7 @@ persistence_model:
         - inventory_accounts
         - inventory_items
         - inventory_item_grants
-      verification_status: source_check_available_no_apply_or_rollback_yet
+      verification_status: source_check_available_apply_status_api_created_live_apply_or_rollback_pending
   transaction_boundary:
     decision: ADR-0014
     boundary_decision: ADR-0020
