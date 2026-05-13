@@ -130,6 +130,16 @@ Responsibilities:
 - Transaction retry policy is platform-owned and must be explicit before use.
 - Event publication outside the transaction remains deferred until an event delivery or outbox standard exists.
 
+The first Go skeleton for this boundary is:
+
+```text
+runtime/internal/platform/tx.Runner
+runtime/internal/platform/tx.UnitOfWork
+runtime/internal/app.TransactionalDispatcher
+```
+
+`TransactionalDispatcher` opens a unit of work for command routes and passes query routes through without a write unit of work by default. The skeleton is intentionally driver-neutral; it must not expose PostgreSQL driver handles to application handlers or domain modules.
+
 Must not:
 
 - Let repositories silently open independent write transactions for command flows.
@@ -193,6 +203,7 @@ Rules:
 - A repository method must preserve module-owned invariants that are also expressible as database constraints.
 - A persistent command flow must use a transaction-bound repository.
 - An in-memory repository may remain for tests and pre-persistence bootstrap, but it is not the authoritative durable store.
+- Repositories receive transaction binding from application composition. They must not create their own hidden write transaction for a command flow.
 
 For inventory, `GrantItem` must acquire `LockInventoryForMutation` after request validation and permission checks, and before reading current inventory for capacity enforcement. Capacity-sensitive reads and the grant mutation must go through the returned `MutationLock`.
 

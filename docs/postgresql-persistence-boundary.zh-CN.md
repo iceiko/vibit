@@ -131,6 +131,16 @@ runtime/internal/app/
 - Transaction retry policy 属于 platform，使用前必须显式定义。
 - 在 event delivery 或 outbox standard 存在前，transaction 外的 event publication 继续 deferred。
 
+这个 boundary 的第一版 Go skeleton 是：
+
+```text
+runtime/internal/platform/tx.Runner
+runtime/internal/platform/tx.UnitOfWork
+runtime/internal/app.TransactionalDispatcher
+```
+
+`TransactionalDispatcher` 为 command routes 开启 unit of work，并默认让 query routes 不经过 write unit of work。这个 skeleton 有意保持 driver-neutral；它不得向 application handlers 或 domain modules 暴露 PostgreSQL driver handles。
+
 不得：
 
 - 让 repositories 在 command flows 中偷偷开启独立 write transactions。
@@ -194,6 +204,7 @@ Repository interfaces 属于 module。PostgreSQL adapters 实现这些 interface
 - Repository method 必须保留那些也可表达为 database constraints 的 module-owned invariants。
 - Persistent command flow 必须使用 transaction-bound repository。
 - In-memory repository 可继续用于 tests 和 pre-persistence bootstrap，但它不是 authoritative durable store。
+- Repositories 从 application composition 获得 transaction binding。它们不得为 command flow 创建隐藏的独立 write transaction。
 
 对于 inventory，`GrantItem` 必须在 request validation 和 permission checks 之后、为 capacity enforcement 读取 current inventory 之前，获取 `LockInventoryForMutation`。Capacity-sensitive reads 和 grant mutation 必须通过返回的 `MutationLock` 执行。
 

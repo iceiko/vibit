@@ -3295,7 +3295,8 @@ function checkRuntimeLayerBoundaries(root, goFiles) {
     {
       ownerPrefix: "runtime/internal/app/",
       forbiddenImport: "github.com/iceiko/vibit/runtime/internal/platform/",
-      description: "application layer must not import platform adapters",
+      allowedImports: ["github.com/iceiko/vibit/runtime/internal/platform/tx"],
+      description: "application layer must not import platform adapters except the transaction boundary",
     },
     {
       ownerPrefix: "runtime/internal/app/",
@@ -3322,7 +3323,15 @@ function checkRuntimeLayerBoundaries(root, goFiles) {
 
     const text = readText(path.join(root, file));
     for (const rule of matchingRules) {
-      if (text.includes(`"${rule.forbiddenImport}`)) {
+      const forbiddenImports = importsWithPrefix(text, rule.forbiddenImport);
+      const allowedImports = rule.allowedImports || [];
+      const violations = forbiddenImports.filter((importPath) => {
+        return !allowedImports.some((allowedImport) => {
+          return importPath === allowedImport || importPath.startsWith(`${allowedImport}/`);
+        });
+      });
+
+      if (violations.length > 0) {
         fail(`${file} violates runtime layer boundary: ${rule.description}`, {
           rule_id: "runtime.layer_boundary",
           artifact: file,
@@ -3335,6 +3344,18 @@ function checkRuntimeLayerBoundaries(root, goFiles) {
       }
     }
   }
+}
+
+function importsWithPrefix(text, prefix) {
+  const imports = [];
+  const pattern = /"([^"]+)"/g;
+  let match;
+  while ((match = pattern.exec(text)) !== null) {
+    if (match[1].startsWith(prefix)) {
+      imports.push(match[1]);
+    }
+  }
+  return imports;
 }
 
 function checkWork(root) {

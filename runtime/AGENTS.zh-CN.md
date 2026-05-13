@@ -85,6 +85,8 @@ WebSocket transport handlers 把 opaque frame bytes 交给注入的 protocol/app
 
 State-changing commands 应通过 `internal/app/` 进入，并在 application-owned unit of work 中运行。Repository mutations 和 domain event recording 应发生在同一个 unit of work 内。
 
+当前 transaction skeleton 是 `internal/platform/tx.Runner`、`internal/platform/tx.UnitOfWork` 和 `internal/app.TransactionalDispatcher`。Application code 可以 import 这个 transaction boundary package，但不得 import persistence、migration、protocol 或 transport platform adapters。Query routes 默认应不经过 write unit of work。
+
 Query handlers 不应改变状态，默认不需要 write transaction。
 
 在 vibit 采纳明确的 event delivery 或 outbox standard 前，transaction 外的 event publication 继续 deferred。
@@ -105,9 +107,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
-这个 workspace 已经有 documented PostgreSQL persistence boundary，但仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary 和 transaction skeleton，但仍然没有实现 PostgreSQL persistence、migrations、persistent runtime wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 

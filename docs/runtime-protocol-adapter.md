@@ -154,7 +154,15 @@ Must not:
 - Own Protobuf wire framing.
 - Import `github.com/coder/websocket`.
 - Import generated Protobuf packages unless a later adapter decision explicitly allows a narrow bridge.
+- Import platform adapters other than the transaction boundary package `runtime/internal/platform/tx`.
 - Hide module-specific business rules.
+
+Current behavior:
+
+- `runtime/internal/app/dispatch.go` provides explicit command/query route registration and dispatch.
+- `runtime/internal/app/transactional_dispatch.go` provides `TransactionalDispatcher`, which wraps command routes in an injected `tx.Runner` unit of work and passes query routes through by default.
+- The transaction wrapper depends only on the driver-neutral `runtime/internal/platform/tx` boundary package.
+- The default in-memory bootstrap still uses the plain dispatcher until persistent composition exists.
 
 The first process bootstrap helper is:
 

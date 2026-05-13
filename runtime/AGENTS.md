@@ -86,6 +86,8 @@ WebSocket transport handlers pass opaque frame bytes to injected protocol/applic
 
 State-changing commands should enter through `internal/app/` and run inside an application-owned unit of work. Repository mutations and domain event recording should happen inside that same unit of work.
 
+The current transaction skeleton is `internal/platform/tx.Runner`, `internal/platform/tx.UnitOfWork`, and `internal/app.TransactionalDispatcher`. Application code may import this transaction boundary package, but it must not import persistence, migration, protocol, or transport platform adapters. Query routes should pass through without a write unit of work by default.
+
 Query handlers should not mutate state and do not require a write transaction by default.
 
 Event publication outside the transaction remains deferred until vibit adopts an explicit event delivery or outbox standard.
@@ -106,9 +108,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
 
-The workspace has a documented PostgreSQL persistence boundary, but it still does not implement PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary and transaction skeleton, but it still does not implement PostgreSQL persistence, migrations, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 

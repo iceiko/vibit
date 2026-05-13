@@ -155,7 +155,15 @@ runtime/internal/app/
 - 拥有 Protobuf wire framing。
 - Import `github.com/coder/websocket`。
 - Import generated Protobuf packages，除非后续 adapter decision 明确允许一个窄 bridge。
+- Import transaction boundary package `runtime/internal/platform/tx` 之外的 platform adapters。
 - 隐藏 module-specific business rules。
+
+当前行为：
+
+- `runtime/internal/app/dispatch.go` 提供显式 command/query route registration 和 dispatch。
+- `runtime/internal/app/transactional_dispatch.go` 提供 `TransactionalDispatcher`，它用注入的 `tx.Runner` unit of work 包装 command routes，并默认让 query routes 直接通过。
+- Transaction wrapper 只依赖 driver-neutral 的 `runtime/internal/platform/tx` boundary package。
+- 在 persistent composition 存在前，默认 in-memory bootstrap 仍使用 plain dispatcher。
 
 第一版 process bootstrap helper 是：
 
