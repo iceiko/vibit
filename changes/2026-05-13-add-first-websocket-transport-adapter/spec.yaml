@@ -1,0 +1,72 @@
+schema_version: 0.1
+change_id: add-first-websocket-transport-adapter
+date: 2026-05-13
+type: feature
+status: verified
+
+summary: Add the first narrow WebSocket transport adapter for binary frame handoff.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  added:
+    - changes/2026-05-13-add-first-websocket-transport-adapter/
+  changed:
+    - .arch/runtime.yaml
+    - docs/runtime-protocol-adapter.md
+    - docs/runtime-protocol-adapter.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+
+runtime:
+  added:
+    - runtime/internal/platform/transport/ws/server.go
+    - runtime/internal/platform/transport/ws/server_test.go
+  changed:
+    - runtime/go.mod
+    - runtime/go.sum
+
+decisions: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - go_mod_tidy
+    - go_test_runtime
+    - go_vet_runtime
+    - check_runtime
+    - check_change
+    - check_all_json
+    - diff_check
+    - secret_scan
+  status: Verified

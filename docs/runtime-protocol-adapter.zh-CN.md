@@ -71,6 +71,25 @@ runtime/internal/platform/transport/ws/
 - 构造 module-specific Protobuf payloads。
 - 修改 domain state。
 
+第一条 active adapter 是：
+
+```text
+runtime/internal/platform/transport/ws/server.go
+```
+
+当前行为：
+
+- 暴露兼容 `http.Handler` 的 `Server`。
+- 通过 `github.com/coder/websocket` 接受 WebSocket connections。
+- 只把 client messages 当作 binary frames 读取。
+- 在传给注入的 `FrameHandler` 前复制 frame payload bytes。
+- 通过 transport-owned `Frame` type 提供 connection metadata。
+- 把每一个 handler response 都写成 binary WebSocket frame。
+- 对 text 或其他 non-binary client messages 执行 transport close。
+- 把 `/v1/ws` route mounting 留给 process startup 和 composition code。
+
+该 adapter 必须保持 opaque。它不得 import generated Protobuf packages、application dispatch 或 domain modules。Protocol decoding 和 application routing 属于后续在该 transport package 之外完成的 composition。
+
 ### Protobuf Protocol Adapter
 
 Owner：
@@ -219,7 +238,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-第一批 Go runtime slices 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` 和 `ApplicationResult` concepts、面向 command 和 query routes 的显式 application dispatcher，并在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
+第一批 Go runtime slices 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` 和 `ApplicationResult` concepts、面向 command 和 query routes 的显式 application dispatcher，在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion，并在 `runtime/internal/platform/transport/ws/` 下实现 transport-owned `Frame` handoff。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
 
 必需概念：
 
@@ -320,7 +339,7 @@ node tools/vibit check all
 
 `check runtime` 应在 Go runtime implementation 开始前，验证 boundary standard、runtime manifest、protocol manifest、runtime agent guide 和 repository guide 都指向 runtime protocol adapter boundary。
 
-未来 verification 应检查 Go imports 和 package contents，以确保：
+当 Go source files 存在时，`check runtime` 也会检查第一批 Go import 和 layer boundaries。Verification 应继续确保：
 
 - `github.com/coder/websocket` imports 只位于 `runtime/internal/platform/transport/ws/`。
 - Protobuf runtime imports 只位于 generated Protobuf packages 和 protocol adapters。

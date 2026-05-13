@@ -26,8 +26,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: inventory_protocol_domain_bridge
-  implementation_code_status: handoff_dispatch_inventory_runtime_and_protocol_bridge
+  current_phase: first_websocket_transport_adapter
+  implementation_code_status: websocket_transport_handoff_dispatch_inventory_runtime_and_protocol_bridge
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -133,7 +133,7 @@ server_instance_model:
     - The first envelope source is proto/vibit/protocol/v1/envelope.proto.
     - Buf Schema Registry is not required by the first runtime dependency decision.
     - HTTP must not become the first gameplay API without a superseding decision.
-    - Transport adapters convert wire messages into commands and queries.
+    - WebSocket transport adapters pass opaque frame bytes to protocol and application composition.
     - Domain modules do not own WebSocket connections, Protobuf framing, or third-party network library details.
   boundary_to_contract_model:
     protobuf_role: wire_schema
@@ -149,7 +149,7 @@ server_instance_model:
     decision: ADR-0015
     envelope_model: websocket_framed_protobuf_envelope
     first_endpoint: /v1/ws
-    endpoint_status: planned_until_transport_implementation
+    endpoint_status: transport_adapter_created_endpoint_mounting_deferred
     routing_fields:
       - kind
       - module
@@ -179,7 +179,7 @@ server_instance_model:
     standard: docs/runtime-protocol-adapter.md
     decision: ADR-0018
     check_command: node tools/vibit check runtime
-    status: inventory_bridge_and_application_error_envelopes_started
+    status: websocket_transport_inventory_bridge_and_application_error_envelopes_started
     first_request_flow:
       - websocket_frame
       - transport_frame
@@ -208,6 +208,26 @@ server_instance_model:
       domain_modules: runtime/internal/modules/<module>
       generated_contracts: runtime/internal/generated/contracts
       generated_proto: runtime/internal/generated/proto
+    websocket_transport:
+      owner: runtime/internal/platform/transport/ws
+      status: first_adapter_created
+      dependency: github.com/coder/websocket
+      adapter: runtime/internal/platform/transport/ws/server.go
+      tests: runtime/internal/platform/transport/ws/server_test.go
+      route_mounting: deferred_to_runtime_process_wiring
+      responsibilities:
+        - accept_websocket_connections
+        - read_binary_frames
+        - copy_frame_payloads_before_handler_handoff
+        - delegate_opaque_frame_bytes_to_injected_handler
+        - write_handler_responses_as_binary_frames
+        - reject_non_binary_messages
+      non_goals:
+        - protobuf_envelope_decoding
+        - application_dispatch
+        - domain_behavior
+        - session_authentication
+        - process_startup_wiring
     current_bridges:
       application_errors:
         mapper: runtime/internal/platform/protocol/protobuf/error_envelope.go
@@ -276,7 +296,8 @@ server_instance_model:
     registry_required_before_broad_generation: true
   boundaries:
     - Modules communicate through commands, queries, events, public module APIs, or generated clients.
-    - Transport handlers adapt requests into commands or queries.
+    - Transport handlers do not adapt requests into commands or queries directly.
+    - Protocol and application composition convert decoded envelopes into commands or queries.
     - Domain modules own state and invariants.
     - Platform code owns runtime concerns such as transport, storage adapters, event dispatch, and verification hooks.
   deferred:

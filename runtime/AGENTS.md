@@ -79,7 +79,7 @@ Runtime protocol handoff must follow `../docs/runtime-protocol-adapter.md`.
 
 WebSocket transport reads and writes frames. Protobuf protocol adaptation decodes and encodes envelopes. Application dispatch routes commands and queries. Domain modules enforce invariants. Generated packages provide shapes only.
 
-Transport handlers adapt requests into commands or queries. They must not hide business logic.
+WebSocket transport handlers pass opaque frame bytes to injected protocol/application composition. They do not adapt requests into commands or queries directly, and they must not hide business logic.
 
 State-changing commands should enter through `internal/app/` and run inside an application-owned unit of work. Repository mutations and domain event recording should happen inside that same unit of work.
 
@@ -99,9 +99,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary, the first inventory Protobuf/domain payload bridge, and the first application-error-to-Protobuf-error-envelope mapper.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary, the first inventory Protobuf/domain payload bridge, and the first application-error-to-Protobuf-error-envelope mapper.
 
-The workspace still does not implement WebSocket transport, PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, or catalog-driven error retryability yet.
+The workspace still does not implement process startup wiring, `/v1/ws` route mounting, full WebSocket-to-Protobuf-to-application composition, PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, or catalog-driven error retryability yet.
 
 ## 8. Verification
 

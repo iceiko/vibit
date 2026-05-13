@@ -70,6 +70,25 @@ Must not:
 - Construct module-specific Protobuf payloads.
 - Mutate domain state.
 
+The first active adapter is:
+
+```text
+runtime/internal/platform/transport/ws/server.go
+```
+
+Current behavior:
+
+- Exposes an `http.Handler`-compatible `Server`.
+- Accepts WebSocket connections through `github.com/coder/websocket`.
+- Reads client messages as binary frames only.
+- Copies frame payload bytes before passing them to an injected `FrameHandler`.
+- Provides connection metadata through the transport-owned `Frame` type.
+- Writes every handler response as a binary WebSocket frame.
+- Rejects text or other non-binary client messages with a transport close.
+- Leaves `/v1/ws` route mounting to process startup and composition code.
+
+The adapter must stay opaque. It must not import generated Protobuf packages, application dispatch, or domain modules. Protocol decoding and application routing belong to later composition outside this transport package.
+
 ### Protobuf Protocol Adapter
 
 Owner:
@@ -218,7 +237,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-The first Go runtime slices implement the application-owned `RouteRequest` and `ApplicationResult` concepts under `runtime/internal/app/`, an explicit application dispatcher for command and query routes, and the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
+The first Go runtime slices implement the application-owned `RouteRequest` and `ApplicationResult` concepts under `runtime/internal/app/`, an explicit application dispatcher for command and query routes, the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`, and the transport-owned `Frame` handoff under `runtime/internal/platform/transport/ws/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
 
 Required concepts:
 
@@ -319,7 +338,7 @@ node tools/vibit check all
 
 `check runtime` should verify that the boundary standard, runtime manifest, protocol manifest, runtime agent guide, and repository guide all point to the runtime protocol adapter boundary before Go runtime implementation starts.
 
-Future verification should inspect Go imports and package contents to ensure:
+`check runtime` also inspects the initial Go import and layer boundaries when Go source files exist. Verification should continue to ensure:
 
 - `github.com/coder/websocket` imports stay under `runtime/internal/platform/transport/ws/`.
 - Protobuf runtime imports stay under generated Protobuf packages and protocol adapters.

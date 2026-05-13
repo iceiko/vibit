@@ -78,7 +78,7 @@ Runtime protocol handoff 必须遵循 `../docs/runtime-protocol-adapter.md`。
 
 WebSocket transport 读写 frames。Protobuf protocol adaptation 解码和编码 envelopes。Application dispatch 路由 commands 和 queries。Domain modules 执行 invariants。Generated packages 只提供 shapes。
 
-Transport handlers 只负责把 requests 适配成 commands 或 queries。它们不得隐藏 business logic。
+WebSocket transport handlers 把 opaque frame bytes 交给注入的 protocol/application composition。它们不直接把 requests 适配成 commands 或 queries，也不得隐藏 business logic。
 
 State-changing commands 应通过 `internal/app/` 进入，并在 application-owned unit of work 中运行。Repository mutations 和 domain event recording 应发生在同一个 unit of work 内。
 
@@ -98,9 +98,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge，以及第一条 application-error-to-Protobuf-error-envelope mapper。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge，以及第一条 application-error-to-Protobuf-error-envelope mapper。
 
-但它仍然没有实现 WebSocket transport、PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation 或 catalog-driven error retryability。
+但它仍然没有实现 process startup wiring、`/v1/ws` route mounting、完整 WebSocket-to-Protobuf-to-application composition、PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation 或 catalog-driven error retryability。
 
 ## 8. 验证
 
