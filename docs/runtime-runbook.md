@@ -65,6 +65,7 @@ Text WebSocket messages are rejected by the transport adapter. JSON is not accep
 - Inventory bootstrap permissions allow grant and read operations.
 - Authentication and session validation are not implemented yet.
 - PostgreSQL persistence is not wired yet. The persistence boundary is defined in `docs/postgresql-persistence-boundary.md`.
+- Optional live PostgreSQL verification is defined in `docs/postgresql-verification-environment.md`; it requires `VIBIT_POSTGRES_TEST_DSN` and is not part of default server startup.
 - Generated route registration is not implemented yet.
 
 These are bootstrap assumptions for the first request loop, not long-term production policy.
@@ -77,5 +78,8 @@ Run from the repository root unless noted:
 cd runtime && go test ./...
 cd runtime && go vet ./...
 node tools/vibit check runtime
+node tools/vibit check postgres-env
 node tools/vibit check all
 ```
+
+`node tools/vibit check postgres-env` is a static standards check. It does not connect to PostgreSQL. Live PostgreSQL verification remains opt-in through `VIBIT_POSTGRES_TEST_DSN`.

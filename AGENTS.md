@@ -125,6 +125,8 @@ node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check migrations
 node tools/vibit check migrations --json
+node tools/vibit check postgres-env
+node tools/vibit check postgres-env --json
 node tools/vibit check runtime
 node tools/vibit check runtime --json
 node tools/vibit check work
@@ -166,6 +168,8 @@ Use `node tools/vibit check generated` when generated files, module manifest `ge
 
 Use `node tools/vibit check migrations` when SQL migration sources, migration ownership manifests, migration guidance, or persistence migration standards are added or changed. This check validates PostgreSQL migration naming, goose markers, SQL-first boundaries, owning-module traces, and first inventory migration table references.
 
+Use `node tools/vibit check postgres-env` when disposable PostgreSQL verification environment standards, live PostgreSQL verification guidance, or persistence verification environment manifests are added or changed. This is a static standards check; it must not connect to PostgreSQL or require Docker, Podman, cloud PostgreSQL, or another service manager.
+
 Use `node tools/vibit check runtime` when runtime module behavior, runtime adapter boundaries, runtime guidance, or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and the ADR-0018 runtime protocol adapter boundary, and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
 Use `node tools/vibit inspect work` before interpreting a continuation request. Use `node tools/vibit check work` when `.arch/work-items.yaml`, workflow docs, or work item state changes. The default continuation unit is one work item.
@@ -191,6 +195,8 @@ Use `ADR-0016`, `ADR-0017`, `buf.yaml`, `buf.gen.yaml`, `proto/README.md`, and `
 Use `ADR-0018` and `docs/runtime-protocol-adapter.md` before changing runtime code that sits between WebSocket transport, Protobuf protocol adaptation, application dispatch, generated code, and domain modules.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
+
+Use `docs/postgresql-verification-environment.md` before adding live PostgreSQL migration checks, repository integration tests, transaction-runner integration tests, or persistent-runtime end-to-end checks. Live PostgreSQL verification is opt-in through `VIBIT_POSTGRES_TEST_DSN`; default repository checks must not require a running database.
 
 Use `.arch/reference.yaml` as the machine-readable intake point for Nakama/Pitaya reference alignment. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. Preserve vibit's Agent-Native constraints when adapting reference patterns, and record why a reference pattern is adopted, adapted, or rejected.
 

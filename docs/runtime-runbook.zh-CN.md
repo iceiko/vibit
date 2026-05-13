@@ -64,6 +64,7 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 - Inventory bootstrap permissions 允许 grant 和 read operations。
 - Authentication 和 session validation 尚未实现。
 - PostgreSQL persistence 尚未 wiring。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
+- Optional live PostgreSQL verification 定义在 `docs/postgresql-verification-environment.md`；它要求 `VIBIT_POSTGRES_TEST_DSN`，且不属于默认 server startup。
 - Generated route registration 尚未实现。
 
 这些是第一版 request loop 的 bootstrap assumptions，不是长期 production policy。
@@ -76,5 +77,8 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 cd runtime && go test ./...
 cd runtime && go vet ./...
 node tools/vibit check runtime
+node tools/vibit check postgres-env
 node tools/vibit check all
 ```
+
+`node tools/vibit check postgres-env` 是静态标准检查。它不会连接 PostgreSQL。Live PostgreSQL verification 继续通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用。

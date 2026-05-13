@@ -6,7 +6,7 @@ purpose: >
   This file records the minimum runtime decisions that agents should read
   before creating server implementation code.
 
-canonical_decisions:
+  canonical_decisions:
   superseded_language_decision: ADR-0003
   language_and_package_layout: ADR-0008
   server_instance_model: ADR-0004
@@ -371,7 +371,7 @@ persistence_model:
   decision: ADR-0011
   boundary_decision: ADR-0020
   standard: docs/postgresql-persistence-boundary.md
-  status: postgresql_config_transaction_runner_migration_runner_and_first_inventory_adapter_created_not_wired
+  status: postgresql_config_transaction_runner_migration_runner_first_inventory_adapter_and_opt_in_verification_environment_created_not_wired
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -381,7 +381,7 @@ persistence_model:
       - transactional_state_changes
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
-    implementation_status: config_pool_builder_transaction_runner_migration_runner_and_adapter_created_process_wiring_pending
+    implementation_status: config_pool_builder_transaction_runner_migration_runner_adapter_and_opt_in_verification_environment_created_process_wiring_pending
     config:
       owner: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/config.go
@@ -412,7 +412,7 @@ persistence_model:
         - inventory.MutationLock.GetInventory
         - inventory.MutationLock.GrantItem
       grant_recording: Quantity mutation and inventory_item_grants insert use the same injected executor.
-      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
     postgres_transaction_runner:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/runner.go
@@ -425,7 +425,7 @@ persistence_model:
       unit_of_work_type: runtime/internal/platform/persistence/postgres.UnitOfWork
       inventory_repository_factory: UnitOfWork.NewInventoryRepository
       boundary_rule: The runner owns pgx handles inside the PostgreSQL platform package; application and domain code continue to depend on vibit-owned transaction and repository interfaces.
-      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
     postgres_migration_runner:
       package: runtime/internal/platform/migrations
       file: runtime/internal/platform/migrations/postgres.go
@@ -444,7 +444,30 @@ persistence_model:
         - Return vibit-owned status and result shapes instead of exposing goose result types.
         - Do not apply migrations during normal server startup.
         - Do not close caller-owned database handles.
-      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+      live_integration_status: opt_in_environment_standard_defined_live_execution_pending
+  verification_environment:
+    standard: docs/postgresql-verification-environment.md
+    translation: docs/postgresql-verification-environment.zh-CN.md
+    check_command: node tools/vibit check postgres-env
+    status: opt_in_environment_standard_defined
+    live_execution_status: commands_pending
+    required_environment:
+      test_dsn: VIBIT_POSTGRES_TEST_DSN
+    optional_environment:
+      test_database: VIBIT_POSTGRES_TEST_DATABASE
+      cleanup: VIBIT_POSTGRES_TEST_CLEANUP
+      allow_destructive: VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE
+    cleanup_modes:
+      - drop_schema
+      - truncate
+      - keep
+    default_cleanup: drop_schema
+    default_behavior_when_dsn_missing: skip_and_record_not_verified
+    mandatory_service_manager: none
+    docker_required: false
+    podman_required: false
+    cloud_postgresql_assumption: false
+    default_repository_checks_open_database_connections: false
     mutation_lock:
       aggregate: inventory_account
       key: player_id
@@ -490,7 +513,7 @@ persistence_model:
     - outbox_or_event_log_storage_standard
     - first_s3_client_or_sdk
     - persistent_runtime_process_wiring
-    - disposable_postgresql_integration_test_environment
+    - live_postgresql_integration_commands
   migration_layout:
     source_root: runtime/migrations/postgres
     default_style: sql_first

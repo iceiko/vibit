@@ -66,7 +66,7 @@ Generated contract shapes：
 
 不要在本模块中直接 import generated Protobuf types。Protocol adapters 或 generated bridges 应把 wire payloads 转换成 inventory runtime request structs。
 
-PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.md` 和 `ADR-0020`。
+PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.md`、`docs/postgresql-verification-environment.md` 和 `ADR-0020`。
 
 第一版 durable implementation 中：
 
@@ -79,8 +79,8 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - `MutationLock.Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back transaction。
 - 第一版 PostgreSQL adapter 是 `runtime/internal/platform/persistence/postgres/inventory_repository.go`，focused tests 位于 `runtime/internal/platform/persistence/postgres/inventory_repository_test.go`。
 - Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。`GrantItemMutation` 为此携带 `event_id`、`occurred_at` 和 `reason`。
-- 在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 还不可用。
-- 在项目定义本地 disposable database test standard 前，live PostgreSQL repository integration tests 不是 mandatory。
+- Migration apply/status 和 repository integration verification 需要通过 `VIBIT_POSTGRES_TEST_DSN` 显式提供 disposable PostgreSQL environment。
+- Live PostgreSQL repository integration tests 是 opt-in；当 `VIBIT_POSTGRES_TEST_DSN` 未设置时，必须 skip 并在 verification notes 中明确记录。
 
 ## Forbidden Shortcuts
 

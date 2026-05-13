@@ -65,7 +65,7 @@ The first inventory Protobuf/domain bridge lives under `runtime/internal/platfor
 
 Do not import generated Protobuf types directly into this module. Protocol adapters or generated bridges should translate wire payloads into inventory runtime request structs.
 
-PostgreSQL persistence work must follow `docs/postgresql-persistence-boundary.md` and `ADR-0020`.
+PostgreSQL persistence work must follow `docs/postgresql-persistence-boundary.md`, `docs/postgresql-verification-environment.md`, and `ADR-0020`.
 
 For the first durable implementation:
 
@@ -78,8 +78,8 @@ For the first durable implementation:
 - `MutationLock.Release` releases the aggregate lock or adapter-local resource; it must not commit or roll back a transaction.
 - The first PostgreSQL adapter is `runtime/internal/platform/persistence/postgres/inventory_repository.go`, with focused tests in `runtime/internal/platform/persistence/postgres/inventory_repository_test.go`.
 - Durable grant behavior must record the item quantity change and the `ItemGranted` grant record inside the same application-owned unit of work. `GrantItemMutation` carries `event_id`, `occurred_at`, and `reason` for this purpose.
-- Migration apply/rollback verification is not available until migration tooling can run against a disposable PostgreSQL environment.
-- Live PostgreSQL repository integration tests are not mandatory until the project defines a local disposable database test standard.
+- Migration apply/status and repository integration verification require an explicit disposable PostgreSQL environment through `VIBIT_POSTGRES_TEST_DSN`.
+- Live PostgreSQL repository integration tests are opt-in and must be skipped with an explicit verification note when `VIBIT_POSTGRES_TEST_DSN` is not set.
 
 ## Forbidden Shortcuts
 

@@ -38,6 +38,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../docs/generated-output.md`
 - `../docs/runtime-protocol-adapter.md`
 - persistence work 前阅读 `../docs/postgresql-persistence-boundary.md`
+- live PostgreSQL verification work 前阅读 `../docs/postgresql-verification-environment.md`
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
@@ -107,6 +108,8 @@ pgx-backed transaction runner 是 `internal/platform/persistence/postgres/runner
 
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 
+Live PostgreSQL verification 受 `../docs/postgresql-verification-environment.md` 约束。它通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用；普通 unit tests、`node ../tools/vibit check runtime` 和默认 repository checks 不得要求运行中的 PostgreSQL server。当 live PostgreSQL check 因为没有 disposable DSN 而跳过时，必须显式记录。
+
 ## 6. Generated Files
 
 Generated files 对 non-system agents 不可变。
@@ -138,6 +141,7 @@ go run ./cmd/vibit-server
 node tools/vibit check runtime
 node tools/vibit check generated
 node tools/vibit check migrations
+node tools/vibit check postgres-env
 node tools/vibit check all
 ```
 

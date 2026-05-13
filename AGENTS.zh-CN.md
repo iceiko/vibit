@@ -126,6 +126,8 @@ node tools/vibit check generated
 node tools/vibit check generated --json
 node tools/vibit check migrations
 node tools/vibit check migrations --json
+node tools/vibit check postgres-env
+node tools/vibit check postgres-env --json
 node tools/vibit check runtime
 node tools/vibit check runtime --json
 node tools/vibit check work
@@ -167,6 +169,8 @@ node tools/vibit generate module <module>
 
 当新增或修改 SQL migration sources、migration ownership manifests、migration guidance 或 persistence migration standards 时，使用 `node tools/vibit check migrations`。该检查会验证 PostgreSQL migration naming、goose markers、SQL-first boundaries、owning-module traces，以及第一版 inventory migration 的 table references。
 
+当新增或修改 disposable PostgreSQL verification environment standards、live PostgreSQL verification guidance 或 persistence verification environment manifests 时，使用 `node tools/vibit check postgres-env`。这是静态标准检查；它不得连接 PostgreSQL，也不得要求 Docker、Podman、cloud PostgreSQL 或其他 service manager。
+
 当新增或修改 runtime module behavior、runtime adapter boundaries、runtime guidance 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton 和 ADR-0018 runtime protocol adapter boundary，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
 在解释 continuation request 前，使用 `node tools/vibit inspect work`。当 `.arch/work-items.yaml`、workflow docs 或 work item state 发生变化时，使用 `node tools/vibit check work`。默认 continuation unit 是一个 work item。
@@ -192,6 +196,8 @@ node tools/vibit generate module <module>
 修改 WebSocket transport、Protobuf protocol adaptation、application dispatch、generated code 和 domain modules 之间的 runtime code 前，先阅读 `ADR-0018` 和 `docs/runtime-protocol-adapter.md`。
 
 在添加 foundational dependencies 前，使用 `.arch/dependencies.yaml` 作为机器可读 intake 入口。Adoption records 使用 `docs/dependency-adoption.md` 和 `docs/_templates/dependency-adoption.md`。
+
+在添加 live PostgreSQL migration checks、repository integration tests、transaction-runner integration tests 或 persistent-runtime end-to-end checks 前，使用 `docs/postgresql-verification-environment.md`。Live PostgreSQL verification 通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用；默认 repository checks 不得要求运行中的 database。
 
 使用 `.arch/reference.yaml` 作为 Nakama/Pitaya reference alignment 的机器可读 intake 入口。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。改造 reference patterns 时必须保留 vibit 的 Agent-Native constraints，并记录为什么采纳、改造或拒绝某个 reference pattern。
 

@@ -52,6 +52,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "migration.source_trace",
   "migration.ownership",
   "migration.go_forbidden",
+  "postgres_env.standard",
   "runtime.not_started",
   "runtime.go_mod",
   "runtime.skeleton",
@@ -108,6 +109,8 @@ Usage:
   vibit check generated --json
   vibit check migrations
   vibit check migrations --json
+  vibit check postgres-env
+  vibit check postgres-env --json
   vibit check runtime
   vibit check runtime --json
   vibit check work
@@ -138,6 +141,7 @@ Commands:
   check protocol           Check manifest-to-Protobuf alignment.
   check generated          Check generated files declared by module manifests.
   check migrations         Check PostgreSQL migration source files.
+  check postgres-env       Check disposable PostgreSQL verification environment standards.
   check runtime            Run current runtime checks when implementation exists.
   check work               Check work-item continuation state.
   check architecture       Check required root architecture artifacts.
@@ -2050,7 +2054,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "migrations"], ["check", "runtime"], ["check", "work"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "migrations"], ["check", "postgres-env"], ["check", "runtime"], ["check", "work"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -3393,6 +3397,78 @@ function checkMigrations(root) {
   });
 }
 
+function checkPostgresEnv(root) {
+  resetResults("check postgres-env");
+  if (!jsonOutput) {
+    console.log(`Checking PostgreSQL verification environment standard in ${root}\n`);
+  }
+
+  const requiredFiles = [
+    "docs/postgresql-verification-environment.md",
+    "docs/postgresql-verification-environment.zh-CN.md",
+  ];
+  for (const file of requiredFiles) {
+    if (isFile(root, file)) {
+      ok(`${file} exists`, {
+        rule_id: "postgres_env.standard",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing`, {
+        rule_id: "postgres_env.standard",
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "postgresql_verification_environment:"],
+    [".arch/conventions.yaml", "standard: docs/postgresql-verification-environment.md"],
+    [".arch/conventions.yaml", "translation: docs/postgresql-verification-environment.zh-CN.md"],
+    [".arch/conventions.yaml", "check_command: node tools/vibit check postgres-env"],
+    [".arch/conventions.yaml", "live_postgresql_integration_status: opt_in_environment_standard_defined"],
+    [".arch/runtime.yaml", "verification_environment:"],
+    [".arch/runtime.yaml", "standard: docs/postgresql-verification-environment.md"],
+    [".arch/runtime.yaml", "check_command: node tools/vibit check postgres-env"],
+    [".arch/runtime.yaml", "VIBIT_POSTGRES_TEST_DSN"],
+    ["AGENTS.md", "node tools/vibit check postgres-env"],
+    ["AGENTS.zh-CN.md", "node tools/vibit check postgres-env"],
+    ["runtime/AGENTS.md", "../docs/postgresql-verification-environment.md"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/postgresql-verification-environment.md"],
+    ["docs/runtime-runbook.md", "VIBIT_POSTGRES_TEST_DSN"],
+    ["docs/runtime-runbook.zh-CN.md", "VIBIT_POSTGRES_TEST_DSN"],
+    ["modules/inventory/AGENTS.md", "docs/postgresql-verification-environment.md"],
+    ["modules/inventory/AGENTS.zh-CN.md", "docs/postgresql-verification-environment.md"],
+    ["modules/inventory/module.yaml", "verification_environment: docs/postgresql-verification-environment.md"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, "postgres_env.standard", requiredText);
+  }
+
+  const standardReferences = [
+    ["docs/postgresql-verification-environment.md", "VIBIT_POSTGRES_TEST_DSN"],
+    ["docs/postgresql-verification-environment.md", "VIBIT_POSTGRES_TEST_DATABASE"],
+    ["docs/postgresql-verification-environment.md", "VIBIT_POSTGRES_TEST_CLEANUP"],
+    ["docs/postgresql-verification-environment.md", "VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE"],
+    ["docs/postgresql-verification-environment.md", "Docker, Podman"],
+    ["docs/postgresql-verification-environment.md", "must not require a running PostgreSQL server"],
+    ["docs/postgresql-verification-environment.md", "node tools/vibit check postgres-env"],
+    ["docs/postgresql-verification-environment.md", "It does not connect to PostgreSQL"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_DSN"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_DATABASE"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_CLEANUP"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "Docker、Podman"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "node tools/vibit check postgres-env"],
+    ["docs/postgresql-verification-environment.zh-CN.md", "它不会连接 PostgreSQL"],
+  ];
+  for (const [relativePath, requiredText] of standardReferences) {
+    checkRequiredText(root, relativePath, requiredText, "postgres_env.standard", requiredText);
+  }
+
+  finish();
+}
+
 function discoverRuntimeTestFiles(root) {
   const files = [];
   const runtimeDir = path.join(root, "runtime");
@@ -4346,6 +4422,11 @@ function main() {
 
   if (group === "check" && command === "migrations" && !value) {
     checkMigrations(root);
+    return;
+  }
+
+  if (group === "check" && command === "postgres-env" && !value) {
+    checkPostgresEnv(root);
     return;
   }
 

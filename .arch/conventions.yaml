@@ -78,6 +78,9 @@ documentation_pairs:
   reference_alignment_standard:
     canonical: docs/reference-game-server-alignment.md
     zh-CN: docs/reference-game-server-alignment.zh-CN.md
+  postgresql_verification_environment_standard:
+    canonical: docs/postgresql-verification-environment.md
+    zh-CN: docs/postgresql-verification-environment.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -243,7 +246,26 @@ persistence:
     - no_caller_owned_database_handle_close
   first_durable_module_lock: GrantItem calls inventory.Repository.LockInventoryForMutation before capacity-sensitive reads and writes; PostgreSQL adapters implement it with an inventory account row lock by player_id.
   first_durable_grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so PostgreSQL adapters can record inventory_item_grants in the same unit of work as quantity changes.
-  live_postgresql_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+  postgresql_verification_environment:
+    standard: docs/postgresql-verification-environment.md
+    translation: docs/postgresql-verification-environment.zh-CN.md
+    check_command: node tools/vibit check postgres-env
+    status: opt_in_environment_standard_defined
+    required_for_live_checks:
+      dsn: VIBIT_POSTGRES_TEST_DSN
+    optional_inputs:
+      database: VIBIT_POSTGRES_TEST_DATABASE
+      cleanup: VIBIT_POSTGRES_TEST_CLEANUP
+      allow_destructive: VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE
+    default_cleanup: drop_schema
+    allowed_cleanup_modes:
+      - drop_schema
+      - truncate
+      - keep
+    default_live_check_behavior: skip_when_test_dsn_unset
+    mandatory_service_manager: none
+    cloud_postgresql_assumption: false
+  live_postgresql_integration_status: opt_in_environment_standard_defined
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency

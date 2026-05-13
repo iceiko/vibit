@@ -39,6 +39,7 @@ Before changing files under `runtime/`, read:
 - `../docs/generated-output.md`
 - `../docs/runtime-protocol-adapter.md`
 - `../docs/postgresql-persistence-boundary.md`, before persistence work
+- `../docs/postgresql-verification-environment.md`, before live PostgreSQL verification work
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
@@ -108,6 +109,8 @@ The first inventory migration source is `migrations/postgres/000001_create_inven
 
 The first explicit PostgreSQL migration runner is `internal/platform/migrations/postgres.go`. It owns `github.com/pressly/goose/v3`, accepts a caller-supplied `*sql.DB` and migration source filesystem or directory, lists SQL migration sources, reports structured status, and applies pending migrations only when explicitly invoked. Do not wire it into normal `cmd/vibit-server` startup without a change spec.
 
+Live PostgreSQL verification is governed by `../docs/postgresql-verification-environment.md`. It is opt-in through `VIBIT_POSTGRES_TEST_DSN`; normal unit tests, `node ../tools/vibit check runtime`, and default repository checks must not require a running PostgreSQL server. When a live PostgreSQL check is skipped because no disposable DSN is available, record that explicitly.
+
 ## 6. Generated Files
 
 Generated files are immutable to non-system agents.
@@ -139,6 +142,7 @@ Run repository verification from the repository root:
 node tools/vibit check runtime
 node tools/vibit check generated
 node tools/vibit check migrations
+node tools/vibit check postgres-env
 node tools/vibit check all
 ```
 
