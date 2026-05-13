@@ -53,13 +53,16 @@ Generated contract shapes：
 - `contracts/inventory/errors/inventory_errors.yaml`
 - `contracts/inventory/permissions/inventory_permissions.yaml`
 
-第一条 handwritten runtime 路径计划使用 Go，并位于未来的 `runtime/` 树下：
+第一条 handwritten runtime 路径现在从 `runtime/internal/modules/inventory/` 开始：
 
-- Command handler：`runtime/internal/modules/inventory/commands/GrantItem`
-- Query handler：`runtime/internal/modules/inventory/queries/GetInventory`
-- 位于 inventory module boundary 后面的 repository
-- Inventory capacity 和 inventory permissions policies
-- 覆盖 command、query、event、permission 和 invariant behavior 的 tests
+- `GrantItemHandler`
+- `GetInventoryHandler`
+- 位于 module boundary 后面的 inventory repository interface
+- Inventory capacity 和 permission policy interfaces
+- 面向 `runtime/internal/app.Dispatcher` 的 `RegisterRoutes`
+- 覆盖 command、query、event、permission、capacity 和 dispatcher integration behavior 的 tests
+
+不要在本模块中直接 import generated Protobuf types。Protocol adapters 或 generated bridges 应把 wire payloads 转换成 inventory runtime request structs。
 
 ## Forbidden Shortcuts
 
@@ -88,6 +91,6 @@ Generated contract shapes：
 - Permission failure 使用 `INVENTORY_PERMISSION_DENIED`。
 - Architecture checks 仍然通过。
 
-修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，runtime verification 不适用。
+修改 inventory runtime behavior 后，运行 `node tools/vibit check runtime`。当 Go 可用时，还应运行 `cd runtime && go test ./...`。
 
 当 inventory persistence 开始时，PostgreSQL 是第一版 authoritative durable store。除非未来 contract 引入 inventory 自己拥有的大对象 artifacts，否则第一条 inventory slice 不需要 S3-compatible object storage。

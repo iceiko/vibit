@@ -158,14 +158,14 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: contracts_declared_runtime_not_started
+  status: runtime_boundary_started
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
   object_storage_required_for_first_slice: false
-  runtime_implementation: not_started
+  runtime_implementation: repository_policy_and_handler_boundary_started
   first_runtime_language: Go
   first_client_protocol: WebSocket
   first_wire_format: Protobuf
@@ -186,8 +186,10 @@ tests:
     - invariant_tests
     - architecture_tests
   not_available_until_runtime:
-    - command_tests
-    - query_tests
     - event_tests
-    - runtime_invariant_tests
-  available: []
+  available:
+    - runtime_command_tests
+    - runtime_query_tests
+    - runtime_permission_tests
+    - runtime_capacity_tests
+    - runtime_dispatcher_integration_tests

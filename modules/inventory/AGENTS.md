@@ -52,13 +52,16 @@ Before implementing the first runtime slice, read:
 - `contracts/inventory/errors/inventory_errors.yaml`
 - `contracts/inventory/permissions/inventory_permissions.yaml`
 
-The first handwritten runtime path is planned for Go under the future `runtime/` tree:
+The first handwritten runtime path now starts under `runtime/internal/modules/inventory/`:
 
-- Command handler: `runtime/internal/modules/inventory/commands/GrantItem`
-- Query handler: `runtime/internal/modules/inventory/queries/GetInventory`
-- Repository behind the inventory module boundary
-- Policies for inventory capacity and inventory permissions
-- Tests for command, query, event, permission, and invariant behavior
+- `GrantItemHandler`
+- `GetInventoryHandler`
+- Inventory repository interface behind the module boundary
+- Inventory capacity and permission policy interfaces
+- `RegisterRoutes` for `runtime/internal/app.Dispatcher`
+- Tests for command, query, event, permission, capacity, and dispatcher integration behavior
+
+Do not import generated Protobuf types directly into this module. Protocol adapters or generated bridges should translate wire payloads into inventory runtime request structs.
 
 ## Forbidden Shortcuts
 
@@ -87,6 +90,6 @@ For the first runtime slice, tests should cover:
 - Permission failures use `INVENTORY_PERMISSION_DENIED`.
 - Architecture checks still pass.
 
-Run `node tools/vibit check runtime` after changing inventory runtime behavior. Before the Go runtime exists, runtime verification is not applicable.
+Run `node tools/vibit check runtime` after changing inventory runtime behavior. When Go is available, also run `cd runtime && go test ./...`.
 
 PostgreSQL is the first authoritative durable store when inventory persistence begins. S3-compatible object storage is not required for the first inventory slice unless a future contract introduces large object artifacts that inventory owns.
