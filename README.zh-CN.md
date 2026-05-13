@@ -202,7 +202,7 @@ PostgreSQL 是 runtime state 的第一版 authoritative durable relational store
 
 第一批已接受的 foundational runtime dependencies 记录在 `decisions/ADR-0013-first-go-runtime-dependencies.md` 和 `.arch/dependencies.yaml` 中。它们只被接受用于 platform adapters 和 generation tooling，不允许 domain modules 直接使用。S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-第一版 Go runtime layout 记录在 `decisions/ADR-0014-go-runtime-layout-and-boundaries.md` 中。Runtime skeleton 已经存在，但 server business code 尚未开始。未来 Go files 应遵循这些边界：
+第一版 Go runtime layout 记录在 `decisions/ADR-0014-go-runtime-layout-and-boundaries.md` 中。Runtime 现在已有第一段窄 handoff slice：generated Go Protobuf output、纯 application handoff types，以及把 generated envelopes 转换为 application route requests 的 Protobuf protocol adapter。Server business code、WebSocket transport、PostgreSQL persistence、migrations 和完整 application dispatch 尚未开始。未来 Go files 应遵循这些边界：
 
 - `runtime/cmd/vibit-server/`：process startup、configuration wiring 和 lifecycle。
 - `runtime/internal/app/`：command/query dispatch、application composition 和 transaction orchestration。
@@ -212,7 +212,7 @@ PostgreSQL 是 runtime state 的第一版 authoritative durable relational store
 
 State-changing commands 应在 application-owned unit of work 中运行，然后才进行 repository mutation 和 domain-event recording。在 vibit 采纳明确的 event delivery 或 outbox standard 前，transaction 外的 event publication 继续 deferred。
 
-`node tools/vibit check runtime` 当前会验证 skeleton。一旦 Go source files 存在，它还必须发现 Go test files 并运行 Go runtime test path。
+`node tools/vibit check runtime` 现在会在 Go source files 存在时验证 skeleton、import boundaries、runtime test discovery 和 Go runtime test path。
 
 ## 早期参考领域
 

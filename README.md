@@ -202,7 +202,7 @@ PostgreSQL is the first authoritative durable relational store for runtime state
 
 The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
 
-The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime skeleton exists, but server business code has not started yet. Future Go files should follow these boundaries:
+The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime now has its first narrow handoff slice: generated Go Protobuf output, pure application handoff types, and a Protobuf protocol adapter that converts generated envelopes into application route requests. Server business code, WebSocket transport, PostgreSQL persistence, migrations, and full application dispatch have not started yet. Future Go files should follow these boundaries:
 
 - `runtime/cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
 - `runtime/internal/app/`: command/query dispatch, application composition, and transaction orchestration.
@@ -212,7 +212,7 @@ The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout
 
 State-changing commands should run inside an application-owned unit of work before repository mutation and domain-event recording. Event publication outside the transaction is deferred until vibit adopts an explicit event delivery or outbox standard.
 
-`node tools/vibit check runtime` currently verifies the skeleton. Once Go source files exist, it must also discover Go test files and run the Go runtime test path.
+`node tools/vibit check runtime` now verifies the skeleton, import boundaries, runtime test discovery, and Go runtime test path once Go source files exist.
 
 ## Early Reference Domain
 

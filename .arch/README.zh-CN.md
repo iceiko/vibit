@@ -62,7 +62,7 @@
 
 S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-第一版 Go runtime skeleton 已位于 `runtime/` 下，但 server business implementation 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Protobuf generation output 仍计划位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。Runtime protocol handoff rules 定义在 `docs/runtime-protocol-adapter.md`。Generated output 变化后运行 `node tools/vibit check generated`，runtime boundary 变化后运行 `node tools/vibit check runtime`。
+第一版 Go runtime skeleton 已位于 `runtime/` 下，第一段窄 runtime handoff slice 现在已经包含 generated Go Protobuf output 和 typed application handoff structures。Server business behavior、WebSocket transport、PostgreSQL persistence、migrations 和完整 application dispatch 尚未开始。Agents 应先更新相关 manifests，再实现，并把第三方 transport、protocol、persistence 和 migration dependencies 保持在它们声明过的 owner packages 中。Generated Go Protobuf output 位于 `runtime/internal/generated/proto/`；不要手工创建或编辑生成的 Go Protobuf files。Runtime protocol handoff rules 定义在 `docs/runtime-protocol-adapter.md`。Generated output 变化后运行 `node tools/vibit check generated`，runtime boundary 变化后运行 `node tools/vibit check runtime`。
 
 ## 未来预期文件
 

@@ -98,9 +98,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 当前只是 skeleton。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output 和第一段窄 runtime handoff slice。
 
-尚未实现 Go source files、generated files、`.proto` files、migrations 或 runtime tests。
+但它仍然没有实现 WebSocket transport、PostgreSQL persistence、migrations 或完整的 application dispatcher。
 
 ## 8. 验证
 

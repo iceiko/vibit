@@ -348,6 +348,14 @@
       "agent_guidance": "Read `docs/runtime-protocol-adapter.md` and align `.arch/runtime.yaml`, `.arch/protocol.yaml`, runtime guides, and implementation code with the declared handoff."
     },
     {
+      "rule_id": "runtime.import_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime import boundary",
+      "description": "Runtime Go imports for WebSocket, Protobuf, PostgreSQL, migration tooling, and generated Protobuf packages must stay inside their declared owner packages.",
+      "agent_guidance": "Move the import behind the appropriate platform adapter or generated package boundary instead of importing foundational dependencies directly from domain or application code."
+    },
+    {
       "rule_id": "runtime.toolchain",
       "category": "runtime",
       "default_severity": "error",

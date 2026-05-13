@@ -61,7 +61,7 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
 
-The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand. Runtime protocol handoff rules are defined in `docs/runtime-protocol-adapter.md`. Run `node tools/vibit check generated` after generated output changes and `node tools/vibit check runtime` after runtime boundary changes.
+The first Go runtime skeleton exists under `runtime/`, and the first narrow runtime handoff slice now contains generated Go Protobuf output plus typed application handoff structures. Server business behavior, WebSocket transport, PostgreSQL persistence, migrations, and full application dispatch have not started yet. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Generated Go Protobuf output lives under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand. Runtime protocol handoff rules are defined in `docs/runtime-protocol-adapter.md`. Run `node tools/vibit check generated` after generated output changes and `node tools/vibit check runtime` after runtime boundary changes.
 
 ## Expected Future Files
 

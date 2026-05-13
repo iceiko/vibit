@@ -1,0 +1,70 @@
+schema_version: 0.1
+change_id: implement-initial-runtime-handoff-slice
+date: 2026-05-13
+type: feature
+status: verified
+
+summary: Implement the first Go runtime handoff slice with generated Protobuf output and narrow protocol adapter helpers.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/runtime.yaml
+    - README.md
+    - README.zh-CN.md
+    - docs/runtime-protocol-adapter.md
+    - docs/runtime-protocol-adapter.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+    - conversations/2026-05-13-initial-runtime-handoff-slice.md
+    - changes/2026-05-13-implement-initial-runtime-handoff-slice/
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - buf_generate
+    - go_mod_tidy
+    - node_check_tools
+    - go_test
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - diff_check
+    - secret_scan
+  status: Verified

@@ -179,7 +179,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-These names are conceptual until Go source files are added. The implementation may choose idiomatic Go names, but it must preserve the responsibilities.
+The first Go runtime slice implements the application-owned `RouteRequest` concept under `runtime/internal/app/` and the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
 
 Required concepts:
 

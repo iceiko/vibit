@@ -99,9 +99,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace is currently a skeleton.
+This runtime workspace now has the first generated Protobuf output and the first narrow runtime handoff slice.
 
-No Go source files, generated files, `.proto` files, migrations, or runtime tests are implemented yet.
+The workspace still does not implement WebSocket transport, PostgreSQL persistence, migrations, or a full application dispatcher yet.
 
 ## 8. Verification
 

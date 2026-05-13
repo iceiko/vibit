@@ -50,6 +50,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.go_mod",
   "runtime.skeleton",
   "runtime.boundary",
+  "runtime.import_boundary",
   "runtime.toolchain",
   "runtime.test_file",
   "runtime.test_result",
@@ -3040,6 +3041,63 @@ function discoverRuntimeGoFiles(root) {
   return files;
 }
 
+function checkRuntimeImportBoundaries(root, goFiles) {
+  const importRules = [
+    {
+      importPath: "github.com/coder/websocket",
+      allowedPrefixes: ["runtime/internal/platform/transport/ws/"],
+      description: "WebSocket dependency",
+    },
+    {
+      importPath: "github.com/jackc/pgx/v5",
+      allowedPrefixes: ["runtime/internal/platform/persistence/postgres/"],
+      description: "PostgreSQL dependency",
+    },
+    {
+      importPath: "github.com/pressly/goose/v3",
+      allowedPrefixes: ["runtime/internal/platform/migrations/"],
+      description: "migration dependency",
+    },
+    {
+      importPath: "google.golang.org/protobuf",
+      allowedPrefixes: [
+        "runtime/internal/generated/proto/",
+        "runtime/internal/platform/protocol/protobuf/",
+      ],
+      description: "Protobuf runtime dependency",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/generated/proto",
+      allowedPrefixes: [
+        "runtime/internal/generated/proto/",
+        "runtime/internal/platform/protocol/protobuf/",
+      ],
+      description: "generated Protobuf package",
+    },
+  ];
+
+  for (const file of goFiles) {
+    const text = readText(path.join(root, file));
+    for (const rule of importRules) {
+      if (!text.includes(`"${rule.importPath}`)) {
+        continue;
+      }
+      const allowed = rule.allowedPrefixes.some((prefix) => file.startsWith(prefix));
+      if (allowed) {
+        ok(`${file} imports ${rule.description} inside allowed boundary`, {
+          rule_id: "runtime.import_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} imports ${rule.description} outside allowed boundary`, {
+          rule_id: "runtime.import_boundary",
+          artifact: file,
+        });
+      }
+    }
+  }
+}
+
 function checkRuntime(root) {
   resetResults("check runtime");
   if (!jsonOutput) {
@@ -3141,6 +3199,8 @@ function checkRuntime(root) {
       artifact: testFile,
     });
   }
+
+  checkRuntimeImportBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {
     cwd: path.join(root, "runtime"),

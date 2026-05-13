@@ -180,7 +180,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-这些名字在 Go source files 添加前只是概念名。实现可以选择符合 Go 习惯的名称，但必须保留这些职责。
+第一段 Go runtime slice 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` concept，并在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
 
 必需概念：
 
