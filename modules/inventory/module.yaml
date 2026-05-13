@@ -159,14 +159,14 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: runtime_request_loop_complete_postgresql_adapter_created_not_wired
+  status: runtime_request_loop_complete_explicit_postgresql_composition_created_live_verification_pending
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
   object_storage_required_for_first_slice: false
-  runtime_implementation: repository_policy_handler_protocol_bridge_websocket_process_wiring_request_loop_fixture_and_postgresql_adapter_created
+  runtime_implementation: repository_policy_handler_protocol_bridge_websocket_process_wiring_request_loop_fixture_postgresql_adapter_and_explicit_postgresql_composition_created
   persistence_boundary:
     standard: docs/postgresql-persistence-boundary.md
     decision: ADR-0020
@@ -203,11 +203,23 @@ proof_slice:
       file: runtime/internal/platform/persistence/postgres/inventory_repository.go
       tests: runtime/internal/platform/persistence/postgres/inventory_repository_test.go
       construction: NewInventoryRepositoryForUnitOfWork
-      status: created_not_wired
+      status: wired_in_explicit_postgres_runtime_path
       binding_rule: Adapter receives an injected pgx-shaped executor from the application-owned unit of work and does not open hidden write transactions.
       grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so inventory_item_grants rows can be recorded with the quantity mutation.
       live_integration_status: opt_in_environment_standard_defined_live_execution_pending
-    status: postgresql_adapter_created_not_wired
+    runtime_composition:
+      store_selector: VIBIT_RUNTIME_STORE
+      default_store: memory
+      postgres_store: postgres
+      process_file: runtime/cmd/vibit-server/main.go
+      application_bootstrap_files:
+        - runtime/internal/app/bootstrap/inventory.go
+        - runtime/internal/app/bootstrap/postgres_inventory.go
+      command_repository_source: postgres.UnitOfWork.NewInventoryRepository
+      query_repository_source: postgres.NewInventoryRepositoryForUnitOfWork(pool)
+      startup_migrations: not_applied_automatically
+      live_end_to_end_status: opt_in_environment_standard_defined_live_execution_pending
+    status: postgresql_adapter_wired_in_explicit_runtime_path_live_verification_pending
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
     file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go

@@ -193,7 +193,7 @@ VIBIT_POSTGRES_MIN_CONNS
 - Pool size settings 是可选项，且必须是非负整数。
 - Configuration parsing 可以构建 `pgxpool.Config`，但普通 unit tests 不得要求 live PostgreSQL server。
 - Connection strings 和 credentials 必须来自 environment 或显式 runtime input，不得存入 tracked files。
-- 在后续 persistent runtime composition change 明确接入 PostgreSQL 前，process startup 不得让 PostgreSQL 成为 mandatory dependency。
+- Process startup 必须保持 PostgreSQL optional。`VIBIT_RUNTIME_STORE=postgres` 会显式选择 PostgreSQL-backed inventory composition path；默认仍然是 in-memory startup。
 
 ## 3. Inventory Persistence Boundary
 
@@ -293,6 +293,16 @@ runtime/internal/platform/persistence/postgres.UnitOfWork.NewInventoryRepository
 
 这个 helper 有意由 PostgreSQL platform package 拥有。它不改变 module-owned repository interface，也不向 inventory domain code 暴露 `pgx`。
 
+第一版 persistent runtime composition 是显式启用的：
+
+```text
+VIBIT_RUNTIME_STORE=postgres
+```
+
+该路径会从 `VIBIT_POSTGRES_DSN` 打开 PostgreSQL pool，用 `runtime/internal/platform/persistence/postgres.Runner` 拥有 command unit-of-work，用 `postgres.UnitOfWork.NewInventoryRepository` 创建 command repository，并用 PostgreSQL inventory repository 服务 query routes。默认 server path 仍然是 `VIBIT_RUNTIME_STORE=memory`。
+
+普通 server startup 不会自动 apply migrations。除非未来 change spec 授权 startup 自动迁移行为，migration execution 仍然必须是显式 operator 或 tooling action。
+
 ## 5. Migration Rules
 
 SQL migrations 是 source artifacts。
@@ -320,13 +330,15 @@ Persistence work 应在拥有行为的层添加 tests：
 
 在 disposable PostgreSQL test environment 存在前，PostgreSQL integration tests 可以由显式 environment variable 控制。Agents 必须记录这些 tests 是否被 skip 以及原因。
 
-当前 PostgreSQL adapter 已经有 focused fake-executor tests，覆盖 SQL shape 和 transaction-bound behavior。在 vibit 定义 disposable PostgreSQL test environment standard 前，live repository integration tests 不是 mandatory。
+当前 PostgreSQL adapter 已经有 focused fake-executor tests，覆盖 SQL shape 和 transaction-bound behavior。当前 runtime wiring tests 覆盖 store selection 和 application composition，默认不会打开 live PostgreSQL connection。Live repository integration tests 通过 disposable PostgreSQL verification environment standard 选择性启用。
 
 当前 PostgreSQL configuration 和 transaction runner 的 focused tests 位于：
 
 ```text
 runtime/internal/platform/persistence/postgres/config_test.go
 runtime/internal/platform/persistence/postgres/runner_test.go
+runtime/internal/app/bootstrap/inventory_test.go
+runtime/cmd/vibit-server/main_test.go
 ```
 
 当前 PostgreSQL migration runner 的 focused tests 位于：

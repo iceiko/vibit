@@ -123,9 +123,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL configuration parser, the first pgx-backed transaction runner adapter, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL configuration parser, the first pgx-backed transaction runner adapter, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, minimal process wiring that mounts `/v1/ws`, and an explicit PostgreSQL inventory runtime composition path.
 
-The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, first explicit migration apply/status runner, and first PostgreSQL repository adapter, but it still does not implement persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, PostgreSQL configuration parser, pgx-backed transaction runner, first inventory migration source, first explicit migration apply/status runner, first PostgreSQL repository adapter, and explicit runtime store selection. `VIBIT_RUNTIME_STORE=memory` remains the default. `VIBIT_RUNTIME_STORE=postgres` enables PostgreSQL-backed inventory composition when `VIBIT_POSTGRES_DSN` is provided. The workspace still does not implement generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, automatic startup migrations, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 
@@ -133,6 +133,15 @@ The first manual process run path is:
 cd runtime
 go run ./cmd/vibit-server
 ```
+
+The first explicit persistent process run path is:
+
+```bash
+cd runtime
+VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:5432/vibit?sslmode=disable' go run ./cmd/vibit-server
+```
+
+Migrations are not applied automatically during normal server startup.
 
 ## 8. Verification
 

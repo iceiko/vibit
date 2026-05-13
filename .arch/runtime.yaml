@@ -371,7 +371,7 @@ persistence_model:
   decision: ADR-0011
   boundary_decision: ADR-0020
   standard: docs/postgresql-persistence-boundary.md
-  status: postgresql_config_transaction_runner_migration_runner_first_inventory_adapter_and_opt_in_verification_environment_created_not_wired
+  status: explicit_postgresql_inventory_runtime_composition_created_live_verification_pending
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -381,7 +381,16 @@ persistence_model:
       - transactional_state_changes
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
-    implementation_status: config_pool_builder_transaction_runner_migration_runner_adapter_and_opt_in_verification_environment_created_process_wiring_pending
+    implementation_status: config_pool_builder_transaction_runner_adapter_and_explicit_process_wiring_created_migration_runner_explicit_only_live_verification_pending
+    runtime_store_selection:
+      environment: VIBIT_RUNTIME_STORE
+      default: memory
+      postgres_value: postgres
+      memory_path: runtime/internal/app/bootstrap.NewInMemoryInventoryDispatcher
+      postgres_path: runtime/cmd/vibit-server newPostgresHTTPHandler
+      postgres_required_environment:
+        - VIBIT_POSTGRES_DSN
+      startup_migrations: not_applied_automatically
     config:
       owner: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/config.go
@@ -399,7 +408,23 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: postgresql_config_transaction_runner_migration_runner_and_adapter_created_not_wired
+    status: postgresql_config_transaction_runner_and_adapter_wired_in_explicit_runtime_path_migration_runner_explicit_only
+    runtime_composition:
+      store_selector: VIBIT_RUNTIME_STORE
+      default_store: memory
+      postgres_store: postgres
+      process_file: runtime/cmd/vibit-server/main.go
+      application_bootstrap_files:
+        - runtime/internal/app/bootstrap/inventory.go
+        - runtime/internal/app/bootstrap/postgres_inventory.go
+      transaction_wrapper: runtime/internal/app.TransactionalDispatcher
+      command_repository_source: postgres.UnitOfWork.NewInventoryRepository
+      query_repository_source: postgres.NewInventoryRepositoryForUnitOfWork(pool)
+      tests:
+        - runtime/cmd/vibit-server/main_test.go
+        - runtime/internal/app/bootstrap/inventory_test.go
+      startup_migrations: not_applied_automatically
+      live_end_to_end_status: opt_in_environment_standard_defined_live_execution_pending
     postgres_adapter:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/inventory_repository.go
@@ -412,6 +437,7 @@ persistence_model:
         - inventory.MutationLock.GetInventory
         - inventory.MutationLock.GrantItem
       grant_recording: Quantity mutation and inventory_item_grants insert use the same injected executor.
+      runtime_wiring_status: wired_in_explicit_postgres_runtime_path
       live_integration_status: opt_in_environment_standard_defined_live_execution_pending
     postgres_transaction_runner:
       package: runtime/internal/platform/persistence/postgres
@@ -512,7 +538,6 @@ persistence_model:
   deferred:
     - outbox_or_event_log_storage_standard
     - first_s3_client_or_sdk
-    - persistent_runtime_process_wiring
     - live_postgresql_integration_commands
   migration_layout:
     source_root: runtime/migrations/postgres

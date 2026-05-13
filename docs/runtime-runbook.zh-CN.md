@@ -49,6 +49,27 @@ go run ./cmd/vibit-server
 VIBIT_ADDR=:9090 go run ./cmd/vibit-server
 ```
 
+默认 runtime store 是 in memory：
+
+```text
+VIBIT_RUNTIME_STORE=memory
+```
+
+如果要启动显式 PostgreSQL-backed inventory composition path，需要同时提供 store selector 和 PostgreSQL DSN：
+
+```bash
+VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:5432/vibit?sslmode=disable' go run ./cmd/vibit-server
+```
+
+可选 PostgreSQL pool settings：
+
+```text
+VIBIT_POSTGRES_MAX_CONNS
+VIBIT_POSTGRES_MIN_CONNS
+```
+
+普通 server startup 不会自动 apply migrations。在 fresh database 上使用 PostgreSQL store path 前，必须显式 apply 或 verify migrations。
+
 ## Manual Verification Path
 
 1. 启动 server。
@@ -60,10 +81,12 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 
 ## Current Runtime Assumptions
 
-- Runtime 使用 in-memory inventory repository。
+- Runtime 默认使用 in-memory inventory repository。
+- `VIBIT_RUNTIME_STORE=postgres` 会启用显式 PostgreSQL inventory composition path。
 - Inventory bootstrap permissions 允许 grant 和 read operations。
 - Authentication 和 session validation 尚未实现。
-- PostgreSQL persistence 尚未 wiring。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
+- PostgreSQL persistence 只在显式选择时接入 inventory runtime composition。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
+- 普通 server startup 不会自动 apply PostgreSQL migrations。
 - Optional live PostgreSQL verification 定义在 `docs/postgresql-verification-environment.md`；它要求 `VIBIT_POSTGRES_TEST_DSN`，且不属于默认 server startup。
 - Generated route registration 尚未实现。
 

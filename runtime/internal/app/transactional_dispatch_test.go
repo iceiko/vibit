@@ -16,6 +16,9 @@ func TestTransactionalDispatcherRunsCommandsInUnitOfWork(t *testing.T) {
 		if ctx.Value(recordingContextKey("uow")) != "active" {
 			t.Fatalf("dispatcher context marker = %#v, want active", ctx.Value(recordingContextKey("uow")))
 		}
+		if _, ok := UnitOfWorkFromContext(ctx); !ok {
+			t.Fatal("dispatcher context has no unit of work")
+		}
 		return resultForRequest(req), nil
 	})
 	dispatcher := TransactionalDispatcher{

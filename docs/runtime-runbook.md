@@ -50,6 +50,27 @@ Override it with:
 VIBIT_ADDR=:9090 go run ./cmd/vibit-server
 ```
 
+The default runtime store is in memory:
+
+```text
+VIBIT_RUNTIME_STORE=memory
+```
+
+To start the explicit PostgreSQL-backed inventory composition path, provide both the store selector and a PostgreSQL DSN:
+
+```bash
+VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:5432/vibit?sslmode=disable' go run ./cmd/vibit-server
+```
+
+Optional PostgreSQL pool settings:
+
+```text
+VIBIT_POSTGRES_MAX_CONNS
+VIBIT_POSTGRES_MIN_CONNS
+```
+
+Normal server startup does not apply migrations. Apply or verify migrations explicitly before using the PostgreSQL store path against a fresh database.
+
 ## Manual Verification Path
 
 1. Start the server.
@@ -61,10 +82,12 @@ Text WebSocket messages are rejected by the transport adapter. JSON is not accep
 
 ## Current Runtime Assumptions
 
-- The runtime uses an in-memory inventory repository.
+- The runtime uses an in-memory inventory repository by default.
+- `VIBIT_RUNTIME_STORE=postgres` enables the explicit PostgreSQL inventory composition path.
 - Inventory bootstrap permissions allow grant and read operations.
 - Authentication and session validation are not implemented yet.
-- PostgreSQL persistence is not wired yet. The persistence boundary is defined in `docs/postgresql-persistence-boundary.md`.
+- PostgreSQL persistence is wired for inventory runtime composition only when explicitly selected. The persistence boundary is defined in `docs/postgresql-persistence-boundary.md`.
+- PostgreSQL migrations are not applied automatically during normal server startup.
 - Optional live PostgreSQL verification is defined in `docs/postgresql-verification-environment.md`; it requires `VIBIT_POSTGRES_TEST_DSN` and is not part of default server startup.
 - Generated route registration is not implemented yet.
 

@@ -224,19 +224,22 @@ persistence:
   first_durable_module: inventory
   first_durable_migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql
   first_durable_postgres_adapter: runtime/internal/platform/persistence/postgres/inventory_repository.go
-  first_durable_postgres_adapter_status: created_not_wired
+  first_durable_postgres_adapter_status: wired_in_explicit_postgres_runtime_path
   first_durable_postgres_adapter_tests: runtime/internal/platform/persistence/postgres/inventory_repository_test.go
   postgresql_config: runtime/internal/platform/persistence/postgres/config.go
-  postgresql_config_status: created_not_wired
+  postgresql_config_status: wired_for_explicit_postgres_runtime_path
   postgresql_config_environment:
     dsn: VIBIT_POSTGRES_DSN
     max_connections: VIBIT_POSTGRES_MAX_CONNS
     min_connections: VIBIT_POSTGRES_MIN_CONNS
+  runtime_store_selector: VIBIT_RUNTIME_STORE
+  runtime_store_default: memory
+  runtime_store_postgres_value: postgres
   postgresql_transaction_runner: runtime/internal/platform/persistence/postgres/runner.go
-  postgresql_transaction_runner_status: created_not_wired
+  postgresql_transaction_runner_status: wired_for_explicit_postgres_runtime_path
   postgresql_transaction_runner_tests: runtime/internal/platform/persistence/postgres/runner_test.go
   postgresql_migration_runner: runtime/internal/platform/migrations/postgres.go
-  postgresql_migration_runner_status: created_not_wired
+  postgresql_migration_runner_status: created_explicit_invocation_only_not_startup_wired
   postgresql_migration_runner_tests: runtime/internal/platform/migrations/postgres_test.go
   postgresql_migration_runner_rules:
     - caller_supplied_database_sql_handle

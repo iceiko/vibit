@@ -33,8 +33,9 @@ func (d TransactionalDispatcher) Dispatch(ctx context.Context, request RouteRequ
 	}
 
 	var result ApplicationResult
-	err := runner.WithinUnitOfWork(ctx, func(runCtx context.Context, _ tx.UnitOfWork) error {
+	err := runner.WithinUnitOfWork(ctx, func(runCtx context.Context, unit tx.UnitOfWork) error {
 		var dispatchErr error
+		runCtx = ContextWithUnitOfWork(runCtx, unit)
 		result, dispatchErr = dispatcher.Dispatch(runCtx, request)
 		return dispatchErr
 	})

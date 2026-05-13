@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -98,7 +99,7 @@ func (u UnitOfWork) Executor() (Executor, error) {
 	return u.executor, nil
 }
 
-func (u UnitOfWork) NewInventoryRepository() (*InventoryRepository, error) {
+func (u UnitOfWork) NewInventoryRepository() (inventory.Repository, error) {
 	executor, err := u.Executor()
 	if err != nil {
 		return nil, err

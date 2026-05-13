@@ -192,7 +192,7 @@ Rules:
 - Pool size settings are optional and must be non-negative integers.
 - Configuration parsing may build a `pgxpool.Config`, but normal unit tests must not require a live PostgreSQL server.
 - Connection strings and credentials must come from environment or explicit runtime input and must not be stored in tracked files.
-- Process startup must not make PostgreSQL mandatory until a later persistent runtime composition change explicitly wires it.
+- Process startup must keep PostgreSQL optional. `VIBIT_RUNTIME_STORE=postgres` explicitly selects the PostgreSQL-backed inventory composition path; the default remains in-memory startup.
 
 ## 3. Inventory Persistence Boundary
 
@@ -292,6 +292,16 @@ runtime/internal/platform/persistence/postgres.UnitOfWork.NewInventoryRepository
 
 This helper is intentionally owned by the PostgreSQL platform package. It does not change the module-owned repository interface and does not expose `pgx` to inventory domain code.
 
+The first persistent runtime composition is explicit:
+
+```text
+VIBIT_RUNTIME_STORE=postgres
+```
+
+That path opens a PostgreSQL pool from `VIBIT_POSTGRES_DSN`, uses `runtime/internal/platform/persistence/postgres.Runner` for command unit-of-work ownership, creates command repositories from `postgres.UnitOfWork.NewInventoryRepository`, and uses a PostgreSQL inventory repository for query routes. The default server path remains `VIBIT_RUNTIME_STORE=memory`.
+
+Normal server startup does not apply migrations. Migration execution stays an explicit operator or tooling action unless a future change spec authorizes automatic startup migration behavior.
+
 ## 5. Migration Rules
 
 SQL migrations are source artifacts.
@@ -319,13 +329,15 @@ Persistence work should add tests at the level that owns the behavior:
 
 Until a disposable PostgreSQL test environment exists, PostgreSQL integration tests may be gated by an explicit environment variable. Agents must record when those tests were skipped and why.
 
-The current PostgreSQL adapter has focused fake-executor tests for SQL shape and transaction-bound behavior. Live repository integration tests are not mandatory until vibit defines a disposable PostgreSQL test environment standard.
+The current PostgreSQL adapter has focused fake-executor tests for SQL shape and transaction-bound behavior. The current runtime wiring tests cover store selection and application composition without opening a live PostgreSQL connection by default. Live repository integration tests are opt-in through the disposable PostgreSQL verification environment standard.
 
 The current PostgreSQL configuration and transaction runner have focused tests under:
 
 ```text
 runtime/internal/platform/persistence/postgres/config_test.go
 runtime/internal/platform/persistence/postgres/runner_test.go
+runtime/internal/app/bootstrap/inventory_test.go
+runtime/cmd/vibit-server/main_test.go
 ```
 
 The current PostgreSQL migration runner has focused tests under:
