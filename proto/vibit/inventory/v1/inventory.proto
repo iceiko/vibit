@@ -1,0 +1,53 @@
+syntax = "proto3";
+
+package vibit.inventory.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1;inventoryv1";
+
+// @source contracts/inventory/commands/GrantItem.yaml
+// @source contracts/inventory/queries/GetInventory.yaml
+// @source contracts/inventory/events/ItemGranted.yaml
+// @source contracts/inventory/errors/inventory_errors.yaml
+// @source contracts/inventory/permissions/inventory_permissions.yaml
+// @source decisions/ADR-0016-protobuf-envelope-and-generation.md
+
+message GrantItemRequest {
+  string player_id = 1;
+  string item_id = 2;
+  int64 quantity = 3;
+  string reason = 4;
+  string requested_by = 5;
+}
+
+message GrantItemResponse {
+  string player_id = 1;
+  string item_id = 2;
+  int64 quantity = 3;
+  int64 new_quantity = 4;
+  string event = 5;
+}
+
+message GetInventoryRequest {
+  string player_id = 1;
+  string requested_by = 2;
+}
+
+message InventoryItem {
+  string item_id = 1;
+  int64 quantity = 2;
+}
+
+message GetInventoryResponse {
+  string player_id = 1;
+  repeated InventoryItem items = 2;
+}
+
+message ItemGranted {
+  string event_id = 1;
+  string occurred_at = 2;
+  string player_id = 3;
+  string item_id = 4;
+  int64 quantity = 5;
+  int64 new_quantity = 6;
+  string reason = 7;
+}

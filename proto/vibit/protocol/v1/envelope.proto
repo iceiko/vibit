@@ -1,0 +1,67 @@
+syntax = "proto3";
+
+package vibit.protocol.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1;protocolv1";
+
+// @source .arch/protocol.yaml
+// @source docs/game-protocol.md
+// @source decisions/ADR-0015-game-protocol-framework.md
+// @source decisions/ADR-0016-protobuf-envelope-and-generation.md
+
+message Envelope {
+  uint32 protocol_version = 1;
+  MessageKind kind = 2;
+  string request_id = 3;
+  string module = 4;
+  string name = 5;
+  Target target = 6;
+  Session session = 7;
+  string payload_type = 8;
+  bytes payload = 9;
+  Error error = 10;
+}
+
+enum MessageKind {
+  MESSAGE_KIND_UNSPECIFIED = 0;
+  MESSAGE_KIND_COMMAND = 1;
+  MESSAGE_KIND_QUERY = 2;
+  MESSAGE_KIND_EVENT = 3;
+  MESSAGE_KIND_ERROR = 4;
+  MESSAGE_KIND_SYSTEM = 5;
+  MESSAGE_KIND_ACK = 6;
+  MESSAGE_KIND_HEARTBEAT = 7;
+  MESSAGE_KIND_INPUT = 8;
+  MESSAGE_KIND_STATE = 9;
+}
+
+message Target {
+  TargetScope scope = 1;
+  string id = 2;
+}
+
+enum TargetScope {
+  TARGET_SCOPE_UNSPECIFIED = 0;
+  TARGET_SCOPE_GLOBAL = 1;
+  TARGET_SCOPE_PLAYER = 2;
+  TARGET_SCOPE_PARTY = 3;
+  TARGET_SCOPE_ROOM = 4;
+  TARGET_SCOPE_MATCH = 5;
+  TARGET_SCOPE_STREAM = 6;
+  TARGET_SCOPE_SYSTEM = 7;
+}
+
+message Session {
+  string connection_id = 1;
+  string session_id = 2;
+  string player_id = 3;
+  uint64 connection_epoch = 4;
+}
+
+message Error {
+  string code = 1;
+  string message = 2;
+  string request_id = 3;
+  bool retryable = 4;
+  bytes details = 5;
+}

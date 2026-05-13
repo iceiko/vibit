@@ -33,8 +33,12 @@ const KNOWN_CHECK_RULE_IDS = [
   "protocol.planned_missing",
   "protocol.package",
   "protocol.message",
+  "protocol.enum_value",
   "protocol.field",
   "protocol.source_trace",
+  "protocol.buf_config",
+  "protocol.envelope",
+  "protocol.go_package",
   "generated.declared",
   "generated.exists",
   "generated.trace",
@@ -999,6 +1003,217 @@ function expectedProtocolFields(root, contractType, entry) {
   }));
 }
 
+function checkRequiredText(root, relativePath, requiredText, ruleId, label) {
+  if (!isFile(root, relativePath)) {
+    fail(`${relativePath} is missing`, {
+      rule_id: ruleId,
+      artifact: relativePath,
+    });
+    return false;
+  }
+  const text = readText(path.join(root, relativePath));
+  if (text.includes(requiredText)) {
+    ok(`${relativePath} references ${label || requiredText}`, {
+      rule_id: ruleId,
+      artifact: relativePath,
+    });
+    return true;
+  }
+  fail(`${relativePath} does not reference ${label || requiredText}`, {
+    rule_id: ruleId,
+    artifact: relativePath,
+  });
+  return false;
+}
+
+function checkBufConfig(root) {
+  const required = [
+    ["buf.yaml", "version: v2"],
+    ["buf.yaml", "path: proto"],
+    ["buf.yaml", "STANDARD"],
+    ["buf.yaml", "FILE"],
+    ["buf.gen.yaml", "version: v2"],
+    ["buf.gen.yaml", "remote: buf.build/protocolbuffers/go"],
+    ["buf.gen.yaml", "out: runtime/internal/generated/proto"],
+    ["buf.gen.yaml", "paths=source_relative"],
+  ];
+  for (const [relativePath, requiredText] of required) {
+    checkRequiredText(root, relativePath, requiredText, "protocol.buf_config");
+  }
+}
+
+function checkProtoGoPackage(root, protoPath, expectedGoPackage) {
+  checkRequiredText(root, protoPath, `option go_package = "${expectedGoPackage}";`, "protocol.go_package", expectedGoPackage);
+}
+
+function checkProtoMessageShape(root, protoPath, protoText, messageName, fieldNames, ruleId = "protocol.message") {
+  const messagePattern = new RegExp(`\\bmessage\\s+${messageName}\\b`);
+  if (messagePattern.test(protoText)) {
+    ok(`${protoPath} declares message ${messageName}`, {
+      rule_id: ruleId,
+      artifact: protoPath,
+    });
+  } else {
+    fail(`${protoPath} is missing message ${messageName}`, {
+      rule_id: ruleId,
+      artifact: protoPath,
+    });
+    return;
+  }
+
+  const messageBody = protoMessageBody(protoText, messageName);
+  if (messageBody === null) {
+    fail(`${protoPath} has malformed message ${messageName}`, {
+      rule_id: "protocol.message",
+      artifact: protoPath,
+    });
+    return;
+  }
+
+  for (const fieldName of fieldNames) {
+    const fieldPattern = new RegExp(`\\b${fieldName}\\s*=\\s*\\d+\\s*;`);
+    if (fieldPattern.test(messageBody)) {
+      ok(`${protoPath} ${messageName} declares field ${fieldName}`, {
+        rule_id: "protocol.field",
+        artifact: protoPath,
+      });
+    } else {
+      fail(`${protoPath} ${messageName} is missing field ${fieldName}`, {
+        rule_id: "protocol.field",
+        artifact: protoPath,
+      });
+    }
+  }
+}
+
+function checkProtoEnumValues(root, protoPath, protoText, enumName, values) {
+  const enumPattern = new RegExp(`\\benum\\s+${enumName}\\s*\\{`, "m");
+  const enumMatch = enumPattern.exec(protoText);
+  if (!enumMatch) {
+    fail(`${protoPath} is missing enum ${enumName}`, {
+      rule_id: "protocol.message",
+      artifact: protoPath,
+    });
+    return;
+  }
+  ok(`${protoPath} declares enum ${enumName}`, {
+    rule_id: "protocol.message",
+    artifact: protoPath,
+  });
+
+  const bodyStart = enumMatch.index + enumMatch[0].length;
+  const endIndex = protoText.indexOf("}", bodyStart);
+  const enumBody = endIndex === -1 ? "" : protoText.slice(bodyStart, endIndex);
+  for (const value of values) {
+    const valuePattern = new RegExp(`\\b${value}\\s*=\\s*\\d+\\s*;`);
+    if (valuePattern.test(enumBody)) {
+      ok(`${protoPath} ${enumName} declares value ${value}`, {
+        rule_id: "protocol.enum_value",
+        artifact: protoPath,
+      });
+    } else {
+      fail(`${protoPath} ${enumName} is missing value ${value}`, {
+        rule_id: "protocol.enum_value",
+        artifact: protoPath,
+      });
+    }
+  }
+}
+
+function checkProtocolEnvelopeProto(root, protoFiles) {
+  if (protoFiles.length === 0) {
+    return;
+  }
+
+  const protoPath = "proto/vibit/protocol/v1/envelope.proto";
+  if (!isFile(root, protoPath)) {
+    fail(`${protoPath} is missing while protocol source files are active`, {
+      rule_id: "protocol.envelope",
+      artifact: protoPath,
+    });
+    return;
+  }
+
+  ok(`${protoPath} exists`, {
+    rule_id: "protocol.envelope",
+    artifact: protoPath,
+  });
+
+  const protoText = readText(path.join(root, protoPath));
+  if (protoText.includes("package vibit.protocol.v1;")) {
+    ok(`${protoPath} declares package vibit.protocol.v1`, {
+      rule_id: "protocol.package",
+      artifact: protoPath,
+    });
+  } else {
+    fail(`${protoPath} does not declare package vibit.protocol.v1`, {
+      rule_id: "protocol.package",
+      artifact: protoPath,
+    });
+  }
+
+  checkProtoGoPackage(root, protoPath, "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1;protocolv1");
+
+  for (const source of [
+    ".arch/protocol.yaml",
+    "docs/game-protocol.md",
+    "decisions/ADR-0015-game-protocol-framework.md",
+  ]) {
+    if (protoText.includes(source)) {
+      ok(`${protoPath} declares source trace ${source}`, {
+        rule_id: "protocol.source_trace",
+        artifact: protoPath,
+      });
+    } else {
+      fail(`${protoPath} is missing source trace ${source}`, {
+        rule_id: "protocol.source_trace",
+        artifact: protoPath,
+      });
+    }
+  }
+
+  checkProtoMessageShape(root, protoPath, protoText, "Envelope", [
+    "protocol_version",
+    "kind",
+    "request_id",
+    "module",
+    "name",
+    "target",
+    "session",
+    "payload_type",
+    "payload",
+    "error",
+  ], "protocol.envelope");
+
+  checkProtoMessageShape(root, protoPath, protoText, "Target", ["scope", "id"], "protocol.envelope");
+  checkProtoMessageShape(root, protoPath, protoText, "Session", ["connection_id", "session_id", "player_id", "connection_epoch"], "protocol.envelope");
+  checkProtoMessageShape(root, protoPath, protoText, "Error", ["code", "message", "request_id", "retryable", "details"], "protocol.envelope");
+
+  checkProtoEnumValues(root, protoPath, protoText, "MessageKind", [
+    "MESSAGE_KIND_UNSPECIFIED",
+    "MESSAGE_KIND_COMMAND",
+    "MESSAGE_KIND_QUERY",
+    "MESSAGE_KIND_EVENT",
+    "MESSAGE_KIND_ERROR",
+    "MESSAGE_KIND_SYSTEM",
+    "MESSAGE_KIND_ACK",
+    "MESSAGE_KIND_HEARTBEAT",
+    "MESSAGE_KIND_INPUT",
+    "MESSAGE_KIND_STATE",
+  ]);
+
+  checkProtoEnumValues(root, protoPath, protoText, "TargetScope", [
+    "TARGET_SCOPE_UNSPECIFIED",
+    "TARGET_SCOPE_GLOBAL",
+    "TARGET_SCOPE_PLAYER",
+    "TARGET_SCOPE_PARTY",
+    "TARGET_SCOPE_ROOM",
+    "TARGET_SCOPE_MATCH",
+    "TARGET_SCOPE_STREAM",
+    "TARGET_SCOPE_SYSTEM",
+  ]);
+}
+
 function protocolAlignmentIsStrict(checkStatus) {
   return checkStatus === "active";
 }
@@ -1790,6 +2005,8 @@ function checkArchitecture(root) {
     "runtime/go.mod",
     "runtime/AGENTS.md",
     "runtime/AGENTS.zh-CN.md",
+    "buf.yaml",
+    "buf.gen.yaml",
     "proto/README.md",
     "proto/README.zh-CN.md",
   ]);
@@ -1813,8 +2030,11 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/dependencies.yaml", "postgresql_driver:");
   checkTextIncludes(root, ".arch/protocol.yaml", "game_protocol_framework: ADR-0015");
   checkTextIncludes(root, ".arch/protocol.yaml", "model: websocket_framed_protobuf_envelope");
+  checkTextIncludes(root, ".arch/protocol.yaml", "envelope_proto: proto/vibit/protocol/v1/envelope.proto");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
   checkTextIncludes(root, "runtime/go.mod", "module github.com/iceiko/vibit/runtime");
+  checkTextIncludes(root, "buf.yaml", "path: proto");
+  checkTextIncludes(root, "buf.gen.yaml", "out: runtime/internal/generated/proto");
 
   finish();
 }
@@ -2365,6 +2585,8 @@ function checkProtocol(root) {
     return;
   }
 
+  checkBufConfig(root);
+
   if (!isFile(root, registryPath)) {
     fail(`${registryPath} is missing`, {
       rule_id: "contract.registry_declared",
@@ -2390,6 +2612,8 @@ function checkProtocol(root) {
       artifact: protoRoot,
     });
   }
+
+  checkProtocolEnvelopeProto(root, protoFiles);
 
   const contractTypes = ["commands", "queries", "events"];
   let expectedMessages = 0;
@@ -2426,6 +2650,7 @@ function checkProtocol(root) {
           artifact: protoPath,
         });
       }
+      checkProtoGoPackage(root, protoPath, `github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/${moduleName}/v1;${moduleName}v1`);
       if (protoText.includes("contracts/") || protoText.includes("@source")) {
         ok(`${protoPath} declares contract source trace`, {
           rule_id: "protocol.source_trace",

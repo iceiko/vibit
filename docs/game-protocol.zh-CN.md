@@ -6,7 +6,7 @@
 权威决策：`ADR-0015`  
 说明：本文件是 `docs/game-protocol.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
-本标准定义 vibit 第一版面向游戏客户端的协议，在创建 `.proto` files、runtime transport handlers 或 generated clients 之前应具备什么形态。
+本标准定义 vibit 第一版面向游戏客户端的协议，在创建 runtime transport handlers 或 generated clients 之前应具备什么形态。
 
 目标不是克隆某个现有游戏后端。目标是把成熟 game-server patterns 吸收到一个 agent-native 的 protocol surface 中，让 agents 能检查、扩展和验证。
 
@@ -69,6 +69,14 @@ Envelope 必须显式表达这些概念：
 - Error mapping。
 
 Envelope 不得包含 domain business logic。
+
+第一版 envelope Protobuf source 是：
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+```
+
+Envelope 使用 `bytes` payload，并配合显式 `payload_type` metadata。这样第一版 protocol source 不需要引入 `google.protobuf.Any`，同时仍能让 routing 和 payload identity 保持可检查。
 
 初始 message kinds 是：
 
@@ -183,7 +191,37 @@ Domain events 是 server facts。Client code 不允许直接向 domain model 发
 
 Transport errors、malformed envelopes、permission errors、invariant failures 和 unknown routes 必须可区分。
 
+## Protobuf Sources
+
+第一批 protocol source files 是：
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+proto/vibit/inventory/v1/inventory.proto
+```
+
+第一批 Buf configuration files 是：
+
+```text
+buf.yaml
+buf.gen.yaml
+```
+
+Buf 已由 `ADR-0013` 接受为 Protobuf orchestration tool。生成的 Go Protobuf output 属于：
+
+```text
+runtime/internal/generated/proto/
+```
+
+Generated output 必须从 `.proto` sources 生成。Agents 不得为了绕过 source 或 generator 问题而创建或手工编辑生成的 Go Protobuf files。
+
 ## Compatibility Rules
+
+Envelope Protobuf package 是：
+
+```text
+vibit.protocol.v1
+```
 
 第一版 Protobuf package version 仍为：
 
@@ -223,6 +261,8 @@ Agents 必须保持这些边界：
 - Domain behavior 属于 `runtime/internal/modules/<module>/`。
 - Generated Protobuf output 属于 `runtime/internal/generated/proto/`。
 - Protobuf source files 属于 `proto/vibit/<module>/v1/`。
+- Protocol envelope source 属于 `proto/vibit/protocol/v1/`。
+- 根目录 Buf generation configuration 属于 `buf.yaml` 和 `buf.gen.yaml`。
 
 ## First Implementation Guidance
 
@@ -255,6 +295,8 @@ Protocol check 应验证：
 - `.arch/protocol.yaml` 存在。
 - Manifest 引用 `ADR-0015`。
 - Manifest 记录 WebSocket、Protobuf、envelope routing、session identity、target scopes、message kinds 和 server authority。
+- `buf.yaml` 和 `buf.gen.yaml` 包含已接受的 source root、generation output、lint 和 breaking-check settings。
+- 第一版 envelope `.proto` 声明预期的 envelope、target、session、error、kind 和 target-scope shape。
 - 一旦 Protobuf source files 存在，它们与已登记 contracts 对齐。
 
-未来 checks 应验证 `.proto` envelope shape、generated output traceability、reserved field policy 和 runtime dispatch ownership。
+未来 checks 应验证 generated output traceability、reserved field policy 和 runtime dispatch ownership。

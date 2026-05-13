@@ -212,6 +212,14 @@
       "agent_guidance": "Add or correct messages generated from registered contract IDs, such as `<Command>Request`, `<Command>Response`, `<Query>Request`, `<Query>Response`, and event names."
     },
     {
+      "rule_id": "protocol.enum_value",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol enum value",
+      "description": "A Protobuf enum must declare the expected values for protocol message kinds, target scopes, or other compatibility-sensitive protocol concepts.",
+      "agent_guidance": "Compare the enum with `.arch/protocol.yaml` and the governing ADR before adding, removing, or renumbering values."
+    },
+    {
       "rule_id": "protocol.field",
       "category": "protocol",
       "default_severity": "error",
@@ -226,6 +234,30 @@
       "title": "Protocol source trace",
       "description": "A Protobuf source file must include trace metadata pointing back to the semantic contract sources it represents.",
       "agent_guidance": "Add a source trace comment that references the relevant `contracts/` path or an `@source` marker before generated output is created."
+    },
+    {
+      "rule_id": "protocol.buf_config",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol Buf configuration",
+      "description": "Buf configuration must declare the Protobuf source root, lint policy, breaking-change policy, Go generation plugin, output path, and source-relative generation mode.",
+      "agent_guidance": "Inspect `buf.yaml`, `buf.gen.yaml`, ADR-0013, and ADR-0016 before changing Protobuf generation configuration."
+    },
+    {
+      "rule_id": "protocol.envelope",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol envelope",
+      "description": "The protocol envelope Protobuf source must exist and declare the expected envelope, target, session, and error message shape.",
+      "agent_guidance": "Keep `proto/vibit/protocol/v1/envelope.proto` aligned with `.arch/protocol.yaml`, `docs/game-protocol.md`, and the accepted envelope ADR."
+    },
+    {
+      "rule_id": "protocol.go_package",
+      "category": "protocol",
+      "default_severity": "error",
+      "title": "Protocol Go package",
+      "description": "A Protobuf source file must declare the expected Go package option for generated Go output.",
+      "agent_guidance": "Align `option go_package` with the runtime generated output path and ADR-0014 before running Protobuf generation."
     },
     {
       "rule_id": "generated.declared",

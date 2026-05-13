@@ -11,6 +11,7 @@ canonical_decisions:
   websocket_and_protobuf: ADR-0009
   go_runtime_layout_and_boundaries: ADR-0014
   game_protocol_framework: ADR-0015
+  protobuf_envelope_and_generation: ADR-0016
 
 standard:
   document: docs/game-protocol.md
@@ -66,12 +67,18 @@ wire_format:
   owner: runtime/internal/platform/protocol/protobuf
   module_package_pattern: vibit.<module>.v1
   module_source_pattern: proto/vibit/<module>/v1/<module>.proto
+  buf_config: buf.yaml
+  buf_generation_config: buf.gen.yaml
 
 envelope:
   model: websocket_framed_protobuf_envelope
-  status: standard_defined_proto_not_created
+  status: proto_source_created_generation_not_run
   owner: runtime/internal/platform/protocol/protobuf
   domain_ownership: forbidden
+  envelope_proto: proto/vibit/protocol/v1/envelope.proto
+  protobuf_package: vibit.protocol.v1
+  go_package: github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1;protocolv1
+  payload_model: bytes_payload_with_explicit_payload_type
   required_concepts:
     - protocol_version
     - message_kind
@@ -176,6 +183,8 @@ compatibility:
     - Prefer additive evolution.
     - Breaking protocol changes require a change spec and ADR.
     - Public wire schemas must remain aligned with registered vibit semantic contracts.
+    - Generated Go Protobuf output is immutable and must be regenerated from proto sources.
+    - Handwritten runtime code must not be placed under runtime/internal/generated/proto.
 
 implementation_boundaries:
   transport_adapter: runtime/internal/platform/transport/ws
@@ -212,9 +221,8 @@ first_runtime_slice:
 
 verification:
   check_command: node tools/vibit check protocol
-  current_status: manifest_check_and_contract_proto_alignment
+  current_status: buf_config_envelope_proto_and_contract_proto_alignment
   future_checks:
-    - envelope_proto_shape
     - generated_output_traceability
     - reserved_field_policy
     - runtime_dispatch_ownership

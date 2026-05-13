@@ -19,6 +19,7 @@ canonical_decisions:
   first_go_runtime_dependencies: ADR-0013
   go_runtime_layout_and_boundaries: ADR-0014
   game_protocol_framework: ADR-0015
+  protobuf_envelope_and_generation: ADR-0016
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -125,6 +126,7 @@ server_instance_model:
     - The first inventory protocol slice uses player scope.
     - The first WebSocket platform adapter uses github.com/coder/websocket.
     - Protobuf generation uses the official Go Protobuf runtime and protoc-gen-go, orchestrated by Buf.
+    - The first envelope source is proto/vibit/protocol/v1/envelope.proto.
     - Buf Schema Registry is not required by the first runtime dependency decision.
     - HTTP must not become the first gameplay API without a superseding decision.
     - Transport adapters convert wire messages into commands and queries.
@@ -171,12 +173,13 @@ server_instance_model:
     authority_model: server_authoritative
   protobuf_layout:
     source_root: proto
+    envelope_source: proto/vibit/protocol/v1/envelope.proto
     module_source_pattern: proto/vibit/<module>/v1
     buf_config: buf.yaml
     buf_generation_config: buf.gen.yaml
     generated_go_output: runtime/internal/generated/proto
     generated_go_output_status: planned_not_created
-    source_root_status: skeleton_created
+    source_root_status: envelope_and_first_inventory_sources_created
     registry_required_before_broad_generation: true
   boundaries:
     - Modules communicate through commands, queries, events, public module APIs, or generated clients.

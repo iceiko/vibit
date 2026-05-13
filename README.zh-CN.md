@@ -44,6 +44,9 @@ vibit 从另一个前提出发：
 - `.arch/runtime.yaml`：第一版 Go server runtime 方向的 runtime readiness manifest
 - `.arch/contracts.yaml`：public command、query、event、error 和 permission source files 的 contract registry
 - `.arch/dependencies.yaml`：foundational dependency decision slots 的 dependency adoption registry
+- `buf.yaml`：Protobuf 的 Buf source、lint 和 breaking-check configuration
+- `buf.gen.yaml`：计划中的 Go Protobuf output 的 Buf generation configuration
+- `proto/`：protocol envelope 和 module wire schemas 的 Protobuf source root
 - `docs/module-manifest.md`：module manifest 标准
 - `docs/module-manifest.zh-CN.md`：简体中文译本
 - `docs/change-spec.md`：change spec 标准
@@ -82,6 +85,8 @@ vibit 应逐步演进出：
 - 第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries 位于 `runtime/cmd/vibit-server/`、`runtime/internal/app/`、`runtime/internal/platform/`、`runtime/internal/modules/` 和 `runtime/internal/generated/`
 - Protobuf source files 位于 `proto/vibit/<module>/v1/`，生成的 Go Protobuf output 位于 `runtime/internal/generated/proto/`
+- Protocol envelope source 位于 `proto/vibit/protocol/v1/envelope.proto`
+- Buf generation configuration 位于 `buf.yaml` 和 `buf.gen.yaml`
 - 由 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `ADR-0015` 约束的 game-aware WebSocket Protobuf envelope
 - SQL-first PostgreSQL migration source files 位于 `runtime/migrations/postgres/`
 - S3-compatible object storage 作为计划中的大对象存储抽象，MinIO 作为本地/自托管优先候选，但需要先完成 dependency adoption
@@ -155,6 +160,15 @@ node tools/vibit generate module <module>
 使用 `node tools/vibit check contracts` 可以验证 `.arch/contracts.yaml` 与已登记 contract source files 的一致性。
 
 使用 `node tools/vibit check protocol` 可以在添加或修改 `.proto` files 前验证 manifest-to-Protobuf alignment。当还没有 `.proto` files 时，它会报告计划中的 protocol sources 和 messages；一旦 `.proto` files 存在，它会检查 package names、source traces、expected messages 和 field names。
+
+第一批 Protobuf source files 现在定义 protocol envelope 和 inventory wire messages：
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+proto/vibit/inventory/v1/inventory.proto
+```
+
+`buf.yaml` 和 `buf.gen.yaml` 定义计划中的 generation path，但在使用已接受 toolchain 实际运行 generation 前，不提交生成的 Go Protobuf output。不要手工创建或编辑生成的 Go Protobuf files。
 
 使用 `node tools/vibit check generated` 可以验证 module 声明的 generated files 存在，并且包含 generated、source 和 generator trace markers。
 

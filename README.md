@@ -44,6 +44,9 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
 - `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
 - `.arch/dependencies.yaml`: dependency adoption registry for foundational dependency decision slots
+- `buf.yaml`: Buf source, lint, and breaking-check configuration for Protobuf
+- `buf.gen.yaml`: Buf generation configuration for planned Go Protobuf output
+- `proto/`: Protobuf source root for the protocol envelope and module wire schemas
 - `docs/module-manifest.md`: module manifest standard
 - `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
 - `docs/change-spec.md`: change spec standard
@@ -82,6 +85,8 @@ vibit should evolve toward:
 - A first Go module at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
 - Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
 - Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
+- A protocol envelope source at `proto/vibit/protocol/v1/envelope.proto`
+- Buf generation configuration at `buf.yaml` and `buf.gen.yaml`
 - A game-aware WebSocket Protobuf envelope governed by `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`
 - SQL-first PostgreSQL migration source files under `runtime/migrations/postgres/`
 - S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
@@ -155,6 +160,15 @@ Use `node tools/vibit check memory` to verify required conversation log and Agen
 Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
 
 Use `node tools/vibit check protocol` to verify manifest-to-Protobuf alignment before adding or changing `.proto` files. While no `.proto` files exist, it reports planned protocol sources and messages; once `.proto` files exist, it checks package names, source traces, expected messages, and field names.
+
+The first Protobuf source files now define the protocol envelope and inventory wire messages:
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+proto/vibit/inventory/v1/inventory.proto
+```
+
+`buf.yaml` and `buf.gen.yaml` define the planned generation path, but generated Go Protobuf output is not committed until generation is run with the accepted toolchain. Do not create or edit generated Go Protobuf files by hand.
 
 Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers.
 

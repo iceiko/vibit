@@ -38,11 +38,13 @@ This is the first draft. The files describe expected shape before implementation
 
 `runtime.yaml` records the runtime readiness decisions for the first Go server runtime direction. It points to the Agent Decision Records that govern the first language, server instance model, contract boundary, client protocol, wire format, persistence direction, dependency adoption, and proof slice.
 
-`protocol.yaml` records the first game protocol framework. It defines the planned WebSocket-framed Protobuf envelope, structured routing fields, session identity model, game target scopes, server-authoritative message rules, compatibility expectations, and implementation boundaries. The human-readable standard is `docs/game-protocol.md`, and the governing decision is `ADR-0015`.
+`protocol.yaml` records the first game protocol framework. It defines the WebSocket-framed Protobuf envelope, structured routing fields, session identity model, game target scopes, server-authoritative message rules, compatibility expectations, and implementation boundaries. The human-readable standard is `docs/game-protocol.md`, and the governing decisions are `ADR-0015` and `ADR-0016`.
 
 `ADR-0014` records the first Go runtime package layout and boundary rules. The planned Go module root is `runtime/`, with process startup under `runtime/cmd/vibit-server/`, application orchestration under `runtime/internal/app/`, platform adapters under `runtime/internal/platform/`, handwritten domain runtime logic under `runtime/internal/modules/<module>/`, generated Go outputs under `runtime/internal/generated/`, SQL-first PostgreSQL migrations under `runtime/migrations/postgres/`, and Protobuf source files under repository-root `proto/`.
 
-`contracts.yaml` registers public command, query, event, error, and permission contract source files. Contract files live under `contracts/` and are semantic source artifacts, not generated output. Protobuf wire schemas are planned under `proto/` and must align with these semantic contracts.
+`contracts.yaml` registers public command, query, event, error, and permission contract source files. Contract files live under `contracts/` and are semantic source artifacts, not generated output. The first Protobuf wire schemas live under `proto/` and must align with these semantic contracts.
+
+`buf.yaml` and `buf.gen.yaml` configure Protobuf source discovery, linting, breaking checks, and planned Go generation output. They are root-level generation configuration rather than architecture manifests, but `.arch/protocol.yaml` and `.arch/runtime.yaml` point to them because agents must read them before protocol generation.
 
 `dependencies.yaml` records foundational dependency decision slots. It identifies dependency categories that need adoption records before implementation imports or requires concrete packages.
 
@@ -55,7 +57,7 @@ The first accepted Go runtime dependencies are recorded by `ADR-0013`:
 
 S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs require them.
 
-The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages.
+The first Go runtime skeleton exists under `runtime/`, but server business implementation has not started. Agents should update the relevant manifests before implementation and keep third-party transport, protocol, persistence, and migration dependencies inside their declared owner packages. Protobuf generation output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand.
 
 ## Expected Future Files
 

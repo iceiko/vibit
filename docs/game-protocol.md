@@ -5,7 +5,7 @@ Last updated: 2026-05-13
 Scope: First gameplay/client protocol framework for vibit  
 Canonical decision: `ADR-0015`
 
-This standard defines how vibit's first game-facing protocol should be shaped before `.proto` files, runtime transport handlers, or generated clients are created.
+This standard defines how vibit's first game-facing protocol should be shaped before runtime transport handlers or generated clients are created.
 
 The goal is not to clone an existing game backend. The goal is to absorb mature game-server patterns into an agent-native protocol surface that agents can inspect, extend, and verify.
 
@@ -68,6 +68,14 @@ The envelope must make these concepts explicit:
 - Error mapping.
 
 The envelope must not contain domain business logic.
+
+The first envelope Protobuf source is:
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+```
+
+The envelope uses a `bytes` payload plus explicit `payload_type` metadata. This keeps routing and payload identity inspectable without requiring `google.protobuf.Any` in the first protocol source.
 
 The initial message kinds are:
 
@@ -182,7 +190,37 @@ The first wire error shape should include:
 
 Transport errors, malformed envelopes, permission errors, invariant failures, and unknown routes must be distinguishable.
 
+## Protobuf Sources
+
+The first protocol source files are:
+
+```text
+proto/vibit/protocol/v1/envelope.proto
+proto/vibit/inventory/v1/inventory.proto
+```
+
+The first Buf configuration files are:
+
+```text
+buf.yaml
+buf.gen.yaml
+```
+
+Buf is accepted as the Protobuf orchestration tool by `ADR-0013`. Generated Go Protobuf output belongs under:
+
+```text
+runtime/internal/generated/proto/
+```
+
+Generated output must be produced from `.proto` sources. Agents must not create or hand-edit generated Go Protobuf files to work around source or generator problems.
+
 ## Compatibility Rules
+
+The envelope Protobuf package is:
+
+```text
+vibit.protocol.v1
+```
 
 The first Protobuf package version remains:
 
@@ -222,6 +260,8 @@ Agents must preserve these boundaries:
 - Domain behavior belongs under `runtime/internal/modules/<module>/`.
 - Generated Protobuf output belongs under `runtime/internal/generated/proto/`.
 - Protobuf source files belong under `proto/vibit/<module>/v1/`.
+- The protocol envelope source belongs under `proto/vibit/protocol/v1/`.
+- Root Buf generation configuration belongs in `buf.yaml` and `buf.gen.yaml`.
 
 ## First Implementation Guidance
 
@@ -254,6 +294,8 @@ The protocol check should verify:
 - `.arch/protocol.yaml` exists.
 - The manifest references `ADR-0015`.
 - The manifest records WebSocket, Protobuf, envelope routing, session identity, target scopes, message kinds, and server authority.
+- `buf.yaml` and `buf.gen.yaml` contain the accepted source root, generation output, lint, and breaking-check settings.
+- The first envelope `.proto` declares expected envelope, target, session, error, kind, and target-scope shape.
 - Protobuf source files align with registered contracts once they exist.
 
-Future checks should validate `.proto` envelope shape, generated output traceability, reserved field policy, and runtime dispatch ownership.
+Future checks should validate generated output traceability, reserved field policy, and runtime dispatch ownership.

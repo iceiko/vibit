@@ -1,0 +1,96 @@
+schema_version: 0.1
+change_id: define-protobuf-envelope-and-generation
+date: 2026-05-13
+type: standard
+status: verified
+
+summary: Define the first Protobuf envelope, inventory wire schema, Buf generation config, and protocol checks.
+
+affected_modules:
+  - inventory
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - GrantItem
+    removed: []
+  queries:
+    added: []
+    changed:
+      - GetInventory
+    removed: []
+  events:
+    added: []
+    changed:
+      - ItemGranted
+    removed: []
+  errors:
+    added: []
+    changed:
+      - inventory_errors
+    removed: []
+  permissions:
+    added: []
+    changed:
+      - inventory_permissions
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+documentation:
+  added:
+    - buf.yaml
+    - buf.gen.yaml
+    - proto/vibit/protocol/v1/envelope.proto
+    - proto/vibit/inventory/v1/inventory.proto
+    - decisions/ADR-0016-protobuf-envelope-and-generation.md
+    - conversations/2026-05-13-protobuf-envelope-and-generation.md
+    - changes/2026-05-13-define-protobuf-envelope-and-generation/
+  changed:
+    - .arch/README.md
+    - .arch/README.zh-CN.md
+    - .arch/contracts.yaml
+    - .arch/conventions.yaml
+    - .arch/protocol.yaml
+    - .arch/runtime.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - README.md
+    - README.zh-CN.md
+    - docs/game-protocol.md
+    - docs/game-protocol.zh-CN.md
+    - proto/README.md
+    - proto/README.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+decisions:
+  - ADR-0013
+  - ADR-0014
+  - ADR-0015
+  - ADR-0016
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node_check_tools
+    - check_protocol
+    - check_protocol_json
+    - check_architecture
+    - check_schemas
+    - check_memory
+    - check_contracts
+    - check_generated
+    - check_runtime
+    - check_all_json
+    - check_change
+    - diff_check
+    - secret_scan
+  status: Verified

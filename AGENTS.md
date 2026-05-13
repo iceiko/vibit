@@ -85,7 +85,9 @@ Framework implementation code, generators, modules, and verification commands ma
 
 Runtime readiness decisions currently point to Go as the first server runtime implementation language, WebSocket as the first gameplay/client protocol, Protobuf as the first wire message format, a modular monolith single-process server model, contract-first commands/queries/events/errors/permissions, and `inventory` as the preferred first proof slice. Read `.arch/runtime.yaml`, `ADR-0004` through `ADR-0010`, and note that `ADR-0003` is superseded before creating runtime implementation code.
 
-The first game protocol framework is recorded in `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`. It defines a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, session metadata, game target scopes, server-authoritative message rules, error mapping, and compatibility expectations. Read it before adding `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
+The first game protocol framework is recorded in `.arch/protocol.yaml`, `docs/game-protocol.md`, `ADR-0015`, and `ADR-0016`. It defines a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, session metadata, game target scopes, server-authoritative message rules, error mapping, and compatibility expectations. Read it before adding `.proto` files, WebSocket protocol handlers, generated protocol output, or client/server protocol rules.
+
+The first protocol source files are `proto/vibit/protocol/v1/envelope.proto` and `proto/vibit/inventory/v1/inventory.proto`. Buf configuration lives at `buf.yaml` and `buf.gen.yaml`. `ADR-0016` records the envelope and generation configuration decision. Generated Go Protobuf output remains planned under `runtime/internal/generated/proto/`; do not create or edit generated Go Protobuf files by hand.
 
 Current executable tooling:
 
@@ -155,6 +157,8 @@ Use `node tools/vibit inspect rules --category <category>` to discover rules by 
 Use `.arch/runtime.yaml` as the machine-readable intake point for runtime readiness. It links the ADRs that govern language, server instance model, contract and generation boundary, client protocol, dependency adoption, and first proof slice.
 
 Use `.arch/protocol.yaml` as the machine-readable intake point for game protocol framework decisions. It links `ADR-0015` and defines the first WebSocket Protobuf envelope, route fields, session model, target scopes, authority rules, error model, and first inventory slice protocol scope.
+
+Use `ADR-0016`, `buf.yaml`, `buf.gen.yaml`, and `proto/README.md` before changing the protocol envelope, inventory Protobuf source, Buf generation configuration, or generated Go Protobuf output path.
 
 Use `.arch/dependencies.yaml` as the machine-readable intake point before adding foundational dependencies. Use `docs/dependency-adoption.md` and `docs/_templates/dependency-adoption.md` for adoption records.
 

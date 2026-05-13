@@ -103,12 +103,15 @@ runtime_readiness:
     first_go_runtime_dependencies: ADR-0013
     go_runtime_layout_and_boundaries: ADR-0014
     game_protocol_framework: ADR-0015
+    protobuf_envelope_and_generation: ADR-0016
 
 protocol_framework:
   manifest: .arch/protocol.yaml
   standard: docs/game-protocol.md
   translation: docs/game-protocol.zh-CN.md
   decision: ADR-0015
+  envelope_decision: ADR-0016
+  envelope_proto: proto/vibit/protocol/v1/envelope.proto
   first_endpoint: /v1/ws
   envelope_model: websocket_framed_protobuf_envelope
   routing_fields:
@@ -171,6 +174,10 @@ contracts:
   wire_schema_root: proto
   wire_schema_format: protobuf
   wire_schema_decision: ADR-0009
+  wire_schema_generation:
+    buf_config: buf.yaml
+    buf_generation_config: buf.gen.yaml
+    generated_go_output: runtime/internal/generated/proto
   protocol_alignment_check: node tools/vibit check protocol
   protocol_alignment_status: active_planned_missing_allowed
   source_of_truth:
