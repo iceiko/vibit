@@ -98,9 +98,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output 和第一段窄 runtime handoff slice。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice，以及一个用于 command 和 query routes 的小型 application dispatch skeleton。
 
-但它仍然没有实现 WebSocket transport、PostgreSQL persistence、migrations 或完整的 application dispatcher。
+但它仍然没有实现 WebSocket transport、PostgreSQL persistence、migrations、inventory business handlers、transaction wiring 或 generated route registration。
 
 ## 8. 验证
 

@@ -180,7 +180,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-第一段 Go runtime slice 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` concept，并在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
+第一批 Go runtime slices 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` 和 `ApplicationResult` concepts、面向 command 和 query routes 的显式 application dispatcher，并在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
 
 必需概念：
 
@@ -207,6 +207,8 @@ name
 ```
 
 Route registration 必须显式。当 generators 存在时，route registration 应从 contracts 和 manifests 生成。在 generators 存在前，手写 route registration 必须小、局限于 application dispatch，并由 change specs 覆盖。
+
+当前手写 application dispatcher 只 dispatch `command` 和 `query` route requests。`event`、`error`、`system`、`ack`、`heartbeat`、`input` 和 `state` messages 在后续 standard 定义其 lifecycle 前，不属于 application-dispatchable messages。
 
 Transport handlers 不得从 WebSocket paths 或 message text 构造 ad hoc route strings。
 
@@ -270,6 +272,7 @@ node tools/vibit check all
 - Protobuf runtime imports 只位于 generated Protobuf packages 和 protocol adapters。
 - Domain modules 不直接 import transport 或 Protobuf libraries。
 - Application dispatch 不解析 WebSocket frames。
+- Application 和 domain packages 不得直接 import platform adapters 或 generated Protobuf packages。
 - Generated output 不包含 handwritten adapter code。
 
 ## 10. Migration Path

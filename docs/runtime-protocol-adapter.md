@@ -179,7 +179,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-The first Go runtime slice implements the application-owned `RouteRequest` concept under `runtime/internal/app/` and the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
+The first Go runtime slices implement the application-owned `RouteRequest` and `ApplicationResult` concepts under `runtime/internal/app/`, an explicit application dispatcher for command and query routes, and the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
 
 Required concepts:
 
@@ -206,6 +206,8 @@ The rendered route key may be:
 ```
 
 Route registration must be explicit. When generators exist, route registration should be generated from contracts and manifests. Until generators exist, handwritten route registration must be small, local to application dispatch, and covered by change specs.
+
+The current handwritten application dispatcher only dispatches `command` and `query` route requests. `event`, `error`, `system`, `ack`, `heartbeat`, `input`, and `state` messages are not application-dispatchable until a later standard defines their lifecycle.
 
 Transport handlers must not build ad hoc route strings from WebSocket paths or message text.
 
@@ -269,6 +271,7 @@ Future verification should inspect Go imports and package contents to ensure:
 - Protobuf runtime imports stay under generated Protobuf packages and protocol adapters.
 - Domain modules do not import transport or Protobuf libraries directly.
 - Application dispatch does not parse WebSocket frames.
+- Application and domain packages do not import platform adapters or generated Protobuf packages directly.
 - Generated output does not contain handwritten adapter code.
 
 ## 10. Migration Path

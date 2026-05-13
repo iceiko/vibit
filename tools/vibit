@@ -51,6 +51,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.skeleton",
   "runtime.boundary",
   "runtime.import_boundary",
+  "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
   "runtime.test_result",
@@ -3098,6 +3099,53 @@ function checkRuntimeImportBoundaries(root, goFiles) {
   }
 }
 
+function checkRuntimeLayerBoundaries(root, goFiles) {
+  const layerRules = [
+    {
+      ownerPrefix: "runtime/internal/app/",
+      forbiddenImport: "github.com/iceiko/vibit/runtime/internal/platform/",
+      description: "application layer must not import platform adapters",
+    },
+    {
+      ownerPrefix: "runtime/internal/app/",
+      forbiddenImport: "github.com/iceiko/vibit/runtime/internal/generated/proto",
+      description: "application layer must not import generated Protobuf packages",
+    },
+    {
+      ownerPrefix: "runtime/internal/modules/",
+      forbiddenImport: "github.com/iceiko/vibit/runtime/internal/platform/",
+      description: "domain modules must not import platform adapters",
+    },
+    {
+      ownerPrefix: "runtime/internal/modules/",
+      forbiddenImport: "github.com/iceiko/vibit/runtime/internal/generated/proto",
+      description: "domain modules must not import generated Protobuf packages",
+    },
+  ];
+
+  for (const file of goFiles) {
+    const matchingRules = layerRules.filter((rule) => file.startsWith(rule.ownerPrefix));
+    if (matchingRules.length === 0) {
+      continue;
+    }
+
+    const text = readText(path.join(root, file));
+    for (const rule of matchingRules) {
+      if (text.includes(`"${rule.forbiddenImport}`)) {
+        fail(`${file} violates runtime layer boundary: ${rule.description}`, {
+          rule_id: "runtime.layer_boundary",
+          artifact: file,
+        });
+      } else {
+        ok(`${file} respects runtime layer boundary: ${rule.description}`, {
+          rule_id: "runtime.layer_boundary",
+          artifact: file,
+        });
+      }
+    }
+  }
+}
+
 function checkRuntime(root) {
   resetResults("check runtime");
   if (!jsonOutput) {
@@ -3201,6 +3249,7 @@ function checkRuntime(root) {
   }
 
   checkRuntimeImportBoundaries(root, goFiles);
+  checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {
     cwd: path.join(root, "runtime"),

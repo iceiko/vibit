@@ -26,8 +26,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: runtime_handoff_slice
-  implementation_code_status: handoff_slice_with_generated_proto
+  current_phase: application_dispatch_skeleton
+  implementation_code_status: handoff_slice_with_generated_proto_and_dispatch_skeleton
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -207,6 +207,36 @@ server_instance_model:
       domain_modules: runtime/internal/modules/<module>
       generated_contracts: runtime/internal/generated/contracts
       generated_proto: runtime/internal/generated/proto
+  application_dispatch:
+    owner: runtime/internal/app
+    status: skeleton_created
+    route_registration: explicit_handwritten_until_generator_exists
+    dispatchable_message_kinds:
+      - command
+      - query
+    non_dispatchable_message_kinds:
+      - event
+      - error
+      - system
+      - ack
+      - heartbeat
+      - input
+      - state
+    current_errors:
+      - INVALID_ROUTE
+      - UNSUPPORTED_MESSAGE_KIND
+      - ROUTE_ALREADY_REGISTERED
+      - ROUTE_NOT_FOUND
+      - NIL_HANDLER
+    current_boundaries:
+      - Application dispatch must not import WebSocket transport dependencies.
+      - Application dispatch must not import Protobuf runtime dependencies or generated Protobuf packages.
+      - Application dispatch calls vibit-owned handler interfaces.
+      - Domain business logic remains outside application dispatch.
+      - Transaction and unit-of-work wiring remains deferred until persistence interfaces exist.
+    check_rule: runtime.layer_boundary
+    tests:
+      - runtime/internal/app/dispatch_test.go
   protobuf_layout:
     source_root: proto
     envelope_source: proto/vibit/protocol/v1/envelope.proto
@@ -323,7 +353,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: created_no_business_logic
+  skeleton_status: application_dispatch_skeleton_created_no_business_logic
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.
