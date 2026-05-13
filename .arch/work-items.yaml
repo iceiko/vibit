@@ -199,5 +199,85 @@ work_items:
       - ADR-0011
       - ADR-0013
       - ADR-0014
+      - ADR-0020
     completion:
       - Define repository, transaction, migration, and ownership rules before adding persistent inventory behavior.
+
+  - id: W-0011
+    milestone: M-002
+    title: Add command-safe inventory repository mutation lock boundary
+    status: planned
+    expected_change_id: add-inventory-repository-mutation-lock-boundary
+    depends_on:
+      - W-0010
+    related_decisions:
+      - ADR-0020
+    completion:
+      - Extend the inventory repository boundary so persistent GrantItem flows can lock the player inventory aggregate before capacity-sensitive mutation.
+    ask_first:
+      - Replacing the inventory account row lock with advisory locks or another concurrency model.
+      - Moving transaction ownership into inventory repositories.
+
+  - id: W-0012
+    milestone: M-002
+    title: Add application transaction boundary skeleton
+    status: planned
+    expected_change_id: add-application-transaction-boundary-skeleton
+    depends_on:
+      - W-0011
+    related_decisions:
+      - ADR-0014
+      - ADR-0020
+    completion:
+      - Add vibit-owned unit-of-work interfaces and application orchestration points without binding domain modules to pgx.
+    ask_first:
+      - Changing the transaction boundary owner away from runtime/internal/platform/tx and runtime/internal/app.
+      - Introducing an outbox or durable event delivery standard.
+
+  - id: W-0013
+    milestone: M-002
+    title: Add first inventory PostgreSQL migration
+    status: planned
+    expected_change_id: add-first-inventory-postgresql-migration
+    depends_on:
+      - W-0012
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0020
+    completion:
+      - Add SQL-first goose migration sources for inventory accounts, inventory items, and inventory item grant records.
+    ask_first:
+      - Adding Go migrations.
+      - Adding object storage or MinIO.
+      - Changing durable inventory data ownership.
+
+  - id: W-0014
+    milestone: M-002
+    title: Add migration verification checks
+    status: planned
+    expected_change_id: add-migration-verification-checks
+    depends_on:
+      - W-0013
+    related_decisions:
+      - ADR-0013
+      - ADR-0020
+    completion:
+      - Extend repository checks to validate PostgreSQL migration naming, goose markers, and persistence boundary references.
+
+  - id: W-0015
+    milestone: M-002
+    title: Add PostgreSQL inventory repository adapter
+    status: planned
+    expected_change_id: add-postgresql-inventory-repository-adapter
+    depends_on:
+      - W-0014
+    related_decisions:
+      - ADR-0011
+      - ADR-0013
+      - ADR-0020
+    completion:
+      - Implement the inventory repository interface behind the PostgreSQL platform adapter with focused tests and recorded integration verification status.
+    ask_first:
+      - Skipping transaction-bound repository behavior.
+      - Making PostgreSQL integration tests mandatory without a local test environment standard.

@@ -22,6 +22,7 @@ canonical_decisions:
   protobuf_envelope_and_generation: ADR-0016
   generated_output_standard: ADR-0017
   runtime_protocol_adapter_boundary: ADR-0018
+  postgresql_persistence_boundary: ADR-0020
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -366,7 +367,9 @@ server_instance_model:
 
 persistence_model:
   decision: ADR-0011
-  status: runtime_readiness_decision
+  boundary_decision: ADR-0020
+  standard: docs/postgresql-persistence-boundary.md
+  status: boundary_defined_before_persistent_implementation
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -377,6 +380,23 @@ persistence_model:
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
     not_started: true
+  first_durable_module:
+    module: inventory
+    ownership_manifest: modules/inventory/module.yaml
+    repository_interface_owner: runtime/internal/modules/inventory
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    migration_source_owner: runtime/migrations/postgres
+    transaction_boundary_owner: runtime/internal/platform/tx
+    transaction_orchestrator: runtime/internal/app
+    status: boundary_defined_no_postgresql_adapter_or_migration_yet
+    mutation_lock:
+      aggregate: inventory_account
+      key: player_id
+      rule: GrantItem must lock the inventory account row before reading current inventory and applying capacity-sensitive item grants.
+    first_tables_planned:
+      - inventory_accounts
+      - inventory_items
+      - inventory_item_grants
   object_storage:
     interface: s3_compatible
     role: planned_large_object_storage_abstraction
@@ -404,10 +424,15 @@ persistence_model:
   migration_layout:
     source_root: runtime/migrations/postgres
     default_style: sql_first
+    naming_pattern: 000001_create_inventory_state.sql
+    required_markers:
+      - "-- +goose Up"
+      - "-- +goose Down"
     go_migrations_allowed: only_with_change_spec
-    status: skeleton_created_no_migrations
+    status: boundary_defined_no_migrations
   transaction_boundary:
     decision: ADR-0014
+    boundary_decision: ADR-0020
     owner: runtime/internal/platform/tx
     orchestrator: runtime/internal/app
     command_rule: State-changing commands run inside an application-owned unit of work.
@@ -415,6 +440,7 @@ persistence_model:
     event_rule: Domain events produced by commands are recorded inside the same unit of work.
     publication_rule: Publication outside the transaction is deferred until an event delivery or outbox decision is made.
     outbox_status: deferred_until_cross_boundary_durable_event_delivery
+    hidden_transaction_rule: Repositories must not silently open independent write transactions for command flows.
 
 contract_model:
   source_format: vibit_manifest_yaml
@@ -474,6 +500,5 @@ first_runtime_proof_slice:
     - Choose an S3 SDK or required object storage deployment.
 
 open_questions:
-  - Decide whether the first repository implementation starts with a fake, PostgreSQL, or both.
   - Decide whether outbox storage is required before the first durable cross-boundary event delivery.
   - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.

@@ -37,9 +37,11 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../.arch/contracts.yaml`
 - `../docs/generated-output.md`
 - `../docs/runtime-protocol-adapter.md`
+- persistence work 前阅读 `../docs/postgresql-persistence-boundary.md`
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
+- persistence work 前阅读 `../decisions/ADR-0020-postgresql-persistence-boundary.md`
 - 受影响的 module manifest，例如 `../modules/inventory/module.yaml`
 - `../changes/` 下相关 change spec
 
@@ -87,6 +89,10 @@ Query handlers 不应改变状态，默认不需要 write transaction。
 
 在 vibit 采纳明确的 event delivery 或 outbox standard 前，transaction 外的 event publication 继续 deferred。
 
+PostgreSQL persistence work 必须遵循 `../docs/postgresql-persistence-boundary.md`。Repository interfaces 保持 module-owned，`pgx` 保持在 `internal/platform/persistence/postgres/` 下，`goose` 保持在 `internal/platform/migrations/` 下，SQL migration sources 保持在 `migrations/postgres/` 下。
+
+第一版 durable inventory implementation 中，`GrantItem` 必须使用 transaction-bound repository，并在读取当前 items、执行 capacity-sensitive mutation 前，按 `player_id` lock inventory account row。Repositories 不得在 command flows 中偷偷开启独立 write transactions。
+
 ## 6. Generated Files
 
 Generated files 对 non-system agents 不可变。
@@ -101,7 +107,7 @@ Generated files 对 non-system agents 不可变。
 
 这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
-但它仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary，但仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 

@@ -63,7 +63,7 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 - Runtime 使用 in-memory inventory repository。
 - Inventory bootstrap permissions 允许 grant 和 read operations。
 - Authentication 和 session validation 尚未实现。
-- PostgreSQL persistence 尚未 wiring。
+- PostgreSQL persistence 尚未 wiring。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
 - Generated route registration 尚未实现。
 
 这些是第一版 request loop 的 bootstrap assumptions，不是长期 production policy。

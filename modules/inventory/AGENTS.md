@@ -65,6 +65,16 @@ The first inventory Protobuf/domain bridge lives under `runtime/internal/platfor
 
 Do not import generated Protobuf types directly into this module. Protocol adapters or generated bridges should translate wire payloads into inventory runtime request structs.
 
+PostgreSQL persistence work must follow `docs/postgresql-persistence-boundary.md` and `ADR-0020`.
+
+For the first durable implementation:
+
+- Inventory repository interfaces remain owned by this module.
+- PostgreSQL adapter code belongs under `runtime/internal/platform/persistence/postgres/`.
+- SQL migrations belong under `runtime/migrations/postgres/`.
+- `GrantItem` must lock the inventory account row for `player_id` before reading current items and applying capacity-sensitive mutations.
+- Durable grant behavior must record the item quantity change and the `ItemGranted` grant record inside the same application-owned unit of work.
+
 ## Forbidden Shortcuts
 
 - Do not bypass boundaries declared in `module.yaml`.
@@ -73,6 +83,7 @@ Do not import generated Protobuf types directly into this module. Protocol adapt
 - Do not put inventory business rules in WebSocket, HTTP, Protobuf, or transport handlers.
 - Do not make this module depend directly on third-party WebSocket or Protobuf libraries.
 - Do not make this module depend directly on PostgreSQL drivers, S3 SDKs, or MinIO clients. Use vibit-owned repository and storage interfaces when persistence implementation begins.
+- Do not hide transaction creation inside inventory repositories for command flows.
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
 - Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.

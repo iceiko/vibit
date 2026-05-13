@@ -13,6 +13,7 @@ decisions:
   - ADR-0007
   - ADR-0009
   - ADR-0011
+  - ADR-0020
 
 owns:
   entities:
@@ -158,14 +159,33 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: runtime_boundary_and_protocol_bridge_started
+  status: runtime_request_loop_complete_persistence_boundary_defined
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
   object_storage_required_for_first_slice: false
-  runtime_implementation: repository_policy_handler_and_protocol_bridge_started
+  runtime_implementation: repository_policy_handler_protocol_bridge_websocket_process_wiring_and_request_loop_fixture_created
+  persistence_boundary:
+    standard: docs/postgresql-persistence-boundary.md
+    decision: ADR-0020
+    first_authoritative_store: PostgreSQL
+    repository_interface_owner: runtime/internal/modules/inventory
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    migration_source_owner: runtime/migrations/postgres
+    transaction_boundary_owner: runtime/internal/platform/tx
+    mutation_lock:
+      aggregate: inventory_account
+      key: player_id
+      applies_to:
+        - GrantItem
+      reason: Inventory capacity depends on the current player item set, so persistent grants require a command-safe aggregate lock before mutation.
+    planned_tables:
+      - inventory_accounts
+      - inventory_items
+      - inventory_item_grants
+    status: boundary_defined_no_postgresql_adapter_or_migration_yet
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
     file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go

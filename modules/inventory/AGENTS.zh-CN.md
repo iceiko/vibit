@@ -66,6 +66,16 @@ Generated contract shapes：
 
 不要在本模块中直接 import generated Protobuf types。Protocol adapters 或 generated bridges 应把 wire payloads 转换成 inventory runtime request structs。
 
+PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.md` 和 `ADR-0020`。
+
+第一版 durable implementation 中：
+
+- Inventory repository interfaces 继续由本模块拥有。
+- PostgreSQL adapter code 位于 `runtime/internal/platform/persistence/postgres/`。
+- SQL migrations 位于 `runtime/migrations/postgres/`。
+- `GrantItem` 必须在读取当前 items、执行 capacity-sensitive mutation 前，按 `player_id` lock inventory account row。
+- Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。
+
 ## Forbidden Shortcuts
 
 - 不要绕过 `module.yaml` 中声明的边界。
@@ -74,6 +84,7 @@ Generated contract shapes：
 - 不要把 inventory business rules 放进 WebSocket、HTTP、Protobuf 或 transport handlers。
 - 不要让本模块直接依赖第三方 WebSocket 或 Protobuf libraries。
 - 不要让本模块直接依赖 PostgreSQL drivers、S3 SDKs 或 MinIO clients。开始 persistence implementation 时，应使用 vibit-owned repository 和 storage interfaces。
+- 不要在 command flows 中把 transaction creation 隐藏到 inventory repositories 里。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。

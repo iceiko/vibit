@@ -38,9 +38,11 @@ Before changing files under `runtime/`, read:
 - `../.arch/contracts.yaml`
 - `../docs/generated-output.md`
 - `../docs/runtime-protocol-adapter.md`
+- `../docs/postgresql-persistence-boundary.md`, before persistence work
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
+- `../decisions/ADR-0020-postgresql-persistence-boundary.md`, before persistence work
 - The affected module manifest, such as `../modules/inventory/module.yaml`
 - The relevant change spec under `../changes/`
 
@@ -88,6 +90,10 @@ Query handlers should not mutate state and do not require a write transaction by
 
 Event publication outside the transaction remains deferred until vibit adopts an explicit event delivery or outbox standard.
 
+PostgreSQL persistence work must follow `../docs/postgresql-persistence-boundary.md`. Repository interfaces stay module-owned, `pgx` stays under `internal/platform/persistence/postgres/`, `goose` stays under `internal/platform/migrations/`, and SQL migration sources stay under `migrations/postgres/`.
+
+For the first durable inventory implementation, `GrantItem` must use a transaction-bound repository and lock the inventory account row for `player_id` before reading current items and applying capacity-sensitive mutations. Repositories must not silently open independent write transactions for command flows.
+
 ## 6. Generated Files
 
 Generated files are immutable to non-system agents.
@@ -102,7 +108,7 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
 
-The workspace still does not implement PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, but it still does not implement PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 

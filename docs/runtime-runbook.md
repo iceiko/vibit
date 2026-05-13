@@ -64,7 +64,7 @@ Text WebSocket messages are rejected by the transport adapter. JSON is not accep
 - The runtime uses an in-memory inventory repository.
 - Inventory bootstrap permissions allow grant and read operations.
 - Authentication and session validation are not implemented yet.
-- PostgreSQL persistence is not wired yet.
+- PostgreSQL persistence is not wired yet. The persistence boundary is defined in `docs/postgresql-persistence-boundary.md`.
 - Generated route registration is not implemented yet.
 
 These are bootstrap assumptions for the first request loop, not long-term production policy.
