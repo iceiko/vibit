@@ -217,12 +217,21 @@ persistence:
     - "-- +goose Down"
   transaction_boundary_owner: runtime/internal/platform/tx
   transaction_orchestrator: runtime/internal/app
-  transaction_boundary_status: runner_unit_of_work_and_transactional_dispatcher_skeleton_created
+  transaction_boundary_status: driver_neutral_boundary_created_with_postgresql_runner_adapter
   first_durable_module: inventory
   first_durable_migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql
   first_durable_postgres_adapter: runtime/internal/platform/persistence/postgres/inventory_repository.go
   first_durable_postgres_adapter_status: created_not_wired
   first_durable_postgres_adapter_tests: runtime/internal/platform/persistence/postgres/inventory_repository_test.go
+  postgresql_config: runtime/internal/platform/persistence/postgres/config.go
+  postgresql_config_status: created_not_wired
+  postgresql_config_environment:
+    dsn: VIBIT_POSTGRES_DSN
+    max_connections: VIBIT_POSTGRES_MAX_CONNS
+    min_connections: VIBIT_POSTGRES_MIN_CONNS
+  postgresql_transaction_runner: runtime/internal/platform/persistence/postgres/runner.go
+  postgresql_transaction_runner_status: created_not_wired
+  postgresql_transaction_runner_tests: runtime/internal/platform/persistence/postgres/runner_test.go
   first_durable_module_lock: GrantItem calls inventory.Repository.LockInventoryForMutation before capacity-sensitive reads and writes; PostgreSQL adapters implement it with an inventory account row lock by player_id.
   first_durable_grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so PostgreSQL adapters can record inventory_item_grants in the same unit of work as quantity changes.
   live_postgresql_integration_status: deferred_until_disposable_postgresql_test_environment_standard

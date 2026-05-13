@@ -57,6 +57,8 @@ Responsibilities:
 - Convert PostgreSQL rows into module-owned runtime structs.
 - Convert PostgreSQL errors into stable module or application errors at adapter boundaries.
 - Use transaction handles supplied by the application transaction boundary.
+- Own PostgreSQL runtime configuration parsing and pgx connection-pool construction.
+- Own the pgx-backed transaction runner adapter for the vibit-owned unit-of-work boundary.
 - Keep SQL behavior explicit and covered by focused tests.
 
 Must not:
@@ -140,11 +142,49 @@ runtime/internal/app.TransactionalDispatcher
 
 `TransactionalDispatcher` opens a unit of work for command routes and passes query routes through without a write unit of work by default. The skeleton is intentionally driver-neutral; it must not expose PostgreSQL driver handles to application handlers or domain modules.
 
+The first pgx-backed implementation of this boundary lives under:
+
+```text
+runtime/internal/platform/persistence/postgres/runner.go
+```
+
+It implements `runtime/internal/platform/tx.Runner`, begins a `pgx` transaction inside the PostgreSQL platform package, commits when the application callback succeeds, rolls back when the callback fails, and attempts rollback after commit failure. The unit of work it passes to the callback still satisfies the vibit-owned `tx.UnitOfWork` interface. PostgreSQL-specific repository factories, such as `UnitOfWork.NewInventoryRepository`, must remain package-owned helpers and must not force application or domain packages to import `pgx`.
+
 Must not:
 
 - Let repositories silently open independent write transactions for command flows.
 - Let domain modules access transaction handles directly.
 - Treat a WebSocket connection as a transaction or session authority.
+
+### PostgreSQL Runtime Configuration
+
+Owner:
+
+```text
+runtime/internal/platform/persistence/postgres/
+```
+
+The first PostgreSQL configuration source is:
+
+```text
+runtime/internal/platform/persistence/postgres/config.go
+```
+
+It reads explicit process input through these environment variables:
+
+```text
+VIBIT_POSTGRES_DSN
+VIBIT_POSTGRES_MAX_CONNS
+VIBIT_POSTGRES_MIN_CONNS
+```
+
+Rules:
+
+- `VIBIT_POSTGRES_DSN` is required when opening a PostgreSQL pool.
+- Pool size settings are optional and must be non-negative integers.
+- Configuration parsing may build a `pgxpool.Config`, but normal unit tests must not require a live PostgreSQL server.
+- Connection strings and credentials must come from environment or explicit runtime input and must not be stored in tracked files.
+- Process startup must not make PostgreSQL mandatory until a later persistent runtime composition change explicitly wires it.
 
 ## 3. Inventory Persistence Boundary
 
@@ -236,6 +276,14 @@ NewInventoryRepositoryForUnitOfWork(executor)
 
 The executor must be supplied by application composition, normally from a transaction-bound handle such as `pgx.Tx`. The adapter may depend on a small pgx-shaped executor interface for testability, but it must not call `BEGIN`, `COMMIT`, or `ROLLBACK` itself.
 
+The first PostgreSQL unit-of-work helper can construct this repository from a transaction executor through:
+
+```text
+runtime/internal/platform/persistence/postgres.UnitOfWork.NewInventoryRepository
+```
+
+This helper is intentionally owned by the PostgreSQL platform package. It does not change the module-owned repository interface and does not expose `pgx` to inventory domain code.
+
 ## 5. Migration Rules
 
 SQL migrations are source artifacts.
@@ -255,12 +303,21 @@ Persistence work should add tests at the level that owns the behavior:
 
 - Domain tests cover invariants and permission behavior without PostgreSQL.
 - PostgreSQL adapter tests cover row mapping, atomic mutations, constraint handling, and concurrency-sensitive behavior.
+- PostgreSQL config tests cover environment parsing and pool config construction without opening a live connection.
+- PostgreSQL transaction runner tests cover begin, commit, rollback, and dependency validation using fake pgx transactions when a disposable PostgreSQL environment is not yet defined.
 - Migration tests or checks cover SQL file naming, `goose` markers, and apply/rollback validation.
 - Runtime wiring tests cover configuration and composition, not SQL behavior.
 
 Until a disposable PostgreSQL test environment exists, PostgreSQL integration tests may be gated by an explicit environment variable. Agents must record when those tests were skipped and why.
 
 The current PostgreSQL adapter has focused fake-executor tests for SQL shape and transaction-bound behavior. Live repository integration tests are not mandatory until vibit defines a disposable PostgreSQL test environment standard.
+
+The current PostgreSQL configuration and transaction runner have focused tests under:
+
+```text
+runtime/internal/platform/persistence/postgres/config_test.go
+runtime/internal/platform/persistence/postgres/runner_test.go
+```
 
 Current repository verification remains:
 

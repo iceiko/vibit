@@ -58,6 +58,8 @@ runtime/internal/platform/persistence/postgres/
 - 把 PostgreSQL rows 转换成 module-owned runtime structs。
 - 在 adapter boundaries 把 PostgreSQL errors 转换为稳定的 module 或 application errors。
 - 使用 application transaction boundary 提供的 transaction handles。
+- 拥有 PostgreSQL runtime configuration parsing 和 pgx connection-pool construction。
+- 拥有 vibit-owned unit-of-work boundary 的 pgx-backed transaction runner adapter。
 - 保持 SQL behavior 显式，并由 focused tests 覆盖。
 
 不得：
@@ -141,11 +143,49 @@ runtime/internal/app.TransactionalDispatcher
 
 `TransactionalDispatcher` 为 command routes 开启 unit of work，并默认让 query routes 不经过 write unit of work。这个 skeleton 有意保持 driver-neutral；它不得向 application handlers 或 domain modules 暴露 PostgreSQL driver handles。
 
+这个 boundary 的第一版 pgx-backed implementation 位于：
+
+```text
+runtime/internal/platform/persistence/postgres/runner.go
+```
+
+它实现 `runtime/internal/platform/tx.Runner`，在 PostgreSQL platform package 内部开启 `pgx` transaction；当 application callback 成功时 commit，当 callback 失败时 rollback，并在 commit failure 后尝试 rollback。传给 callback 的 unit of work 仍然满足 vibit-owned `tx.UnitOfWork` interface。PostgreSQL-specific repository factories，例如 `UnitOfWork.NewInventoryRepository`，必须保持为 package-owned helpers，不得迫使 application 或 domain packages import `pgx`。
+
 不得：
 
 - 让 repositories 在 command flows 中偷偷开启独立 write transactions。
 - 让 domain modules 直接访问 transaction handles。
 - 把 WebSocket connection 当成 transaction 或 session authority。
+
+### PostgreSQL Runtime Configuration
+
+Owner：
+
+```text
+runtime/internal/platform/persistence/postgres/
+```
+
+第一版 PostgreSQL configuration source 是：
+
+```text
+runtime/internal/platform/persistence/postgres/config.go
+```
+
+它通过这些 environment variables 读取显式 process input：
+
+```text
+VIBIT_POSTGRES_DSN
+VIBIT_POSTGRES_MAX_CONNS
+VIBIT_POSTGRES_MIN_CONNS
+```
+
+规则：
+
+- 打开 PostgreSQL pool 时，`VIBIT_POSTGRES_DSN` 是必填项。
+- Pool size settings 是可选项，且必须是非负整数。
+- Configuration parsing 可以构建 `pgxpool.Config`，但普通 unit tests 不得要求 live PostgreSQL server。
+- Connection strings 和 credentials 必须来自 environment 或显式 runtime input，不得存入 tracked files。
+- 在后续 persistent runtime composition change 明确接入 PostgreSQL 前，process startup 不得让 PostgreSQL 成为 mandatory dependency。
 
 ## 3. Inventory Persistence Boundary
 
@@ -237,6 +277,14 @@ NewInventoryRepositoryForUnitOfWork(executor)
 
 Executor 必须由 application composition 提供，通常来自 transaction-bound handle，例如 `pgx.Tx`。Adapter 可以为了 testability 依赖一个小型 pgx-shaped executor interface，但它不得自行调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`。
 
+第一版 PostgreSQL unit-of-work helper 可以通过以下入口，从 transaction executor 构造该 repository：
+
+```text
+runtime/internal/platform/persistence/postgres.UnitOfWork.NewInventoryRepository
+```
+
+这个 helper 有意由 PostgreSQL platform package 拥有。它不改变 module-owned repository interface，也不向 inventory domain code 暴露 `pgx`。
+
 ## 5. Migration Rules
 
 SQL migrations 是 source artifacts。
@@ -256,12 +304,21 @@ Persistence work 应在拥有行为的层添加 tests：
 
 - Domain tests 不依赖 PostgreSQL，覆盖 invariants 和 permission behavior。
 - PostgreSQL adapter tests 覆盖 row mapping、atomic mutations、constraint handling 和 concurrency-sensitive behavior。
+- PostgreSQL config tests 覆盖 environment parsing 和 pool config construction，且不打开 live connection。
+- PostgreSQL transaction runner tests 在 disposable PostgreSQL environment 尚未定义时，使用 fake pgx transactions 覆盖 begin、commit、rollback 和 dependency validation。
 - Migration tests 或 checks 覆盖 SQL file naming、`goose` markers 和 apply/rollback validation。
 - Runtime wiring tests 覆盖 configuration 和 composition，不覆盖 SQL behavior。
 
 在 disposable PostgreSQL test environment 存在前，PostgreSQL integration tests 可以由显式 environment variable 控制。Agents 必须记录这些 tests 是否被 skip 以及原因。
 
 当前 PostgreSQL adapter 已经有 focused fake-executor tests，覆盖 SQL shape 和 transaction-bound behavior。在 vibit 定义 disposable PostgreSQL test environment standard 前，live repository integration tests 不是 mandatory。
+
+当前 PostgreSQL configuration 和 transaction runner 的 focused tests 位于：
+
+```text
+runtime/internal/platform/persistence/postgres/config_test.go
+runtime/internal/platform/persistence/postgres/runner_test.go
+```
 
 当前 repository verification 仍是：
 

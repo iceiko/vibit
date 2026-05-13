@@ -28,7 +28,7 @@ architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
   current_phase: durable_inventory_runtime
-  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_protocol_bridge_and_inventory_mutation_lock_boundary
+  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_protocol_bridge_inventory_mutation_lock_boundary_postgresql_adapter_and_transaction_runner
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -371,7 +371,7 @@ persistence_model:
   decision: ADR-0011
   boundary_decision: ADR-0020
   standard: docs/postgresql-persistence-boundary.md
-  status: first_inventory_postgresql_adapter_created_not_wired
+  status: postgresql_config_transaction_runner_and_first_inventory_adapter_created_not_wired
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -381,7 +381,16 @@ persistence_model:
       - transactional_state_changes
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
-    implementation_status: adapter_created_process_wiring_pending
+    implementation_status: config_pool_builder_transaction_runner_and_adapter_created_process_wiring_pending
+    config:
+      owner: runtime/internal/platform/persistence/postgres
+      file: runtime/internal/platform/persistence/postgres/config.go
+      tests: runtime/internal/platform/persistence/postgres/config_test.go
+      environment:
+        dsn: VIBIT_POSTGRES_DSN
+        max_connections: VIBIT_POSTGRES_MAX_CONNS
+        min_connections: VIBIT_POSTGRES_MIN_CONNS
+      secret_rule: Connection secrets are read from environment or explicit process input and must not be stored in tracked files.
   first_durable_module:
     module: inventory
     ownership_manifest: modules/inventory/module.yaml
@@ -390,7 +399,7 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: postgresql_adapter_created_not_wired
+    status: postgresql_config_transaction_runner_and_adapter_created_not_wired
     postgres_adapter:
       package: runtime/internal/platform/persistence/postgres
       file: runtime/internal/platform/persistence/postgres/inventory_repository.go
@@ -403,6 +412,19 @@ persistence_model:
         - inventory.MutationLock.GetInventory
         - inventory.MutationLock.GrantItem
       grant_recording: Quantity mutation and inventory_item_grants insert use the same injected executor.
+      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+    postgres_transaction_runner:
+      package: runtime/internal/platform/persistence/postgres
+      file: runtime/internal/platform/persistence/postgres/runner.go
+      tests: runtime/internal/platform/persistence/postgres/runner_test.go
+      config_file: runtime/internal/platform/persistence/postgres/config.go
+      implements: runtime/internal/platform/tx.Runner
+      begins_with: pgx.Begin
+      commit_rule: Commit when the application callback succeeds.
+      rollback_rule: Roll back when the application callback fails and attempt rollback after commit failure.
+      unit_of_work_type: runtime/internal/platform/persistence/postgres.UnitOfWork
+      inventory_repository_factory: UnitOfWork.NewInventoryRepository
+      boundary_rule: The runner owns pgx handles inside the PostgreSQL platform package; application and domain code continue to depend on vibit-owned transaction and repository interfaces.
       live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
     mutation_lock:
       aggregate: inventory_account
@@ -472,13 +494,17 @@ persistence_model:
     boundary_decision: ADR-0020
     owner: runtime/internal/platform/tx
     orchestrator: runtime/internal/app
-    skeleton_status: created
+    skeleton_status: driver_neutral_boundary_created_with_postgresql_runner_adapter
     runner_interface: runtime/internal/platform/tx.Runner
     unit_of_work_interface: runtime/internal/platform/tx.UnitOfWork
     application_wrapper: runtime/internal/app.TransactionalDispatcher
+    postgresql_runner_adapter: runtime/internal/platform/persistence/postgres.Runner
+    postgresql_unit_of_work_adapter: runtime/internal/platform/persistence/postgres.UnitOfWork
+    postgresql_runner_tests: runtime/internal/platform/persistence/postgres/runner_test.go
     tests:
       - runtime/internal/platform/tx/uow_test.go
       - runtime/internal/app/transactional_dispatch_test.go
+      - runtime/internal/platform/persistence/postgres/runner_test.go
     command_rule: State-changing commands run inside an application-owned unit of work.
     query_rule: Queries do not mutate state and do not require a write transaction by default.
     event_rule: Domain events produced by commands are recorded inside the same unit of work.
