@@ -26,8 +26,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: websocket_protobuf_application_composition
-  implementation_code_status: websocket_transport_protobuf_composition_dispatch_inventory_runtime_and_protocol_bridge
+  current_phase: minimal_websocket_process_wiring
+  implementation_code_status: websocket_endpoint_mounted_with_protobuf_composition_dispatch_inventory_runtime_and_protocol_bridge
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -149,7 +149,7 @@ server_instance_model:
     decision: ADR-0015
     envelope_model: websocket_framed_protobuf_envelope
     first_endpoint: /v1/ws
-    endpoint_status: transport_and_composition_created_endpoint_mounting_deferred
+    endpoint_status: mounted_in_first_runtime_process
     routing_fields:
       - kind
       - module
@@ -179,7 +179,7 @@ server_instance_model:
     standard: docs/runtime-protocol-adapter.md
     decision: ADR-0018
     check_command: node tools/vibit check runtime
-    status: websocket_transport_protobuf_composition_inventory_bridge_and_application_error_envelopes_created
+    status: websocket_endpoint_transport_protobuf_composition_inventory_bridge_and_application_error_envelopes_created
     first_request_flow:
       - websocket_frame
       - transport_frame
@@ -202,12 +202,48 @@ server_instance_model:
       - ApplicationResult
       - OutboundMessage
     layer_owners:
+      process: runtime/cmd/vibit-server
+      application_bootstrap: runtime/internal/app/bootstrap
       transport: runtime/internal/platform/transport/ws
       protocol: runtime/internal/platform/protocol/protobuf
       application_dispatch: runtime/internal/app
       domain_modules: runtime/internal/modules/<module>
       generated_contracts: runtime/internal/generated/contracts
       generated_proto: runtime/internal/generated/proto
+    process_wiring:
+      owner: runtime/cmd/vibit-server
+      status: first_endpoint_mounted
+      command: runtime/cmd/vibit-server/main.go
+      tests: runtime/cmd/vibit-server/main_test.go
+      runbook: docs/runtime-runbook.md
+      default_listen_address: :8080
+      environment:
+        listen_address: VIBIT_ADDR
+      mounted_endpoints:
+        - /v1/ws
+      responsibilities:
+        - read_process_configuration
+        - assemble_bootstrap_dispatcher
+        - compose_protobuf_frame_handler_with_websocket_transport
+        - mount_v1_ws_endpoint
+        - start_http_server
+      non_goals:
+        - domain_business_logic
+        - authentication_or_session_validation
+        - persistence_wiring
+        - generated_route_registration
+    application_bootstrap:
+      owner: runtime/internal/app/bootstrap
+      status: first_in_memory_inventory_dispatcher_created
+      adapter: runtime/internal/app/bootstrap/inventory.go
+      responsibilities:
+        - create_application_dispatcher
+        - register_inventory_runtime_handlers
+        - choose_bootstrap_in_memory_inventory_dependencies
+      non_goals:
+        - durable_persistence
+        - authentication_policy
+        - production_permission_model
     websocket_transport:
       owner: runtime/internal/platform/transport/ws
       status: first_adapter_created
@@ -414,7 +450,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: inventory_runtime_protocol_bridge_and_error_envelopes_started
+  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_and_websocket_process_wiring_created
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.
@@ -422,6 +458,12 @@ first_runtime_proof_slice:
     - Implement handwritten logic only in declared extension points.
     - Test command behavior, query behavior, emitted events, and invariants.
     - Run architecture, schema, module, and runtime tests from one default verification command.
+  process_wiring:
+    endpoint: /v1/ws
+    command: runtime/cmd/vibit-server
+    runbook: docs/runtime-runbook.md
+    persistence: in_memory_until_postgresql_boundary
+    permission_policy: bootstrap_static_allow_until_auth_or_player_module
   non_goals:
     - Build a full game backend.
     - Add AI gameplay features.

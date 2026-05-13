@@ -69,6 +69,8 @@ vibit 从另一个前提出发：
 - `docs/generated-output.zh-CN.md`：简体中文译本
 - `docs/runtime-protocol-adapter.md`：runtime protocol adapter boundary 标准
 - `docs/runtime-protocol-adapter.zh-CN.md`：简体中文译本
+- `docs/runtime-runbook.md`：第一版 Go runtime process startup 和 manual verification runbook
+- `docs/runtime-runbook.zh-CN.md`：简体中文译本
 - `docs/reference-game-server-alignment.md`：Nakama 和 Pitaya 的 active game server reference alignment 标准
 - `docs/reference-game-server-alignment.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
@@ -197,7 +199,7 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 
 第一版 server runtime 方向是 Go，并采用 modular monolith single-process server model。WebSocket 是第一版 gameplay/client protocol，Protobuf 是第一版 client/server wire format。Semantic business contracts 仍然保留在 vibit manifests 和 contract source files 中；Protobuf 负责 wire schema shape。见 `.arch/runtime.yaml`、`decisions/ADR-0008-go-server-runtime-language.md` 和 `decisions/ADR-0009-websocket-protobuf-client-protocol.md`。
 
-第一版 game protocol framework 是 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 request correlation、session metadata、target scopes、server-authoritative message rules 和 error mapping。第一版 endpoint 在 transport implementation 开始前计划为 `/v1/ws`。第一版 inventory slice 应使用 player-scoped command/query/event/error/system messages；room state sync、matchmaking、allocation、reconnect replay、presence、streams、realtime input 和 state patches 仍然 deferred，直到它们拥有独立 modules 和 standards。见 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `decisions/ADR-0015-game-protocol-framework.md`。
+第一版 game protocol framework 是 WebSocket-framed Protobuf envelope，使用显式 `kind`、`module` 和 `name` routing fields，并包含 request correlation、session metadata、target scopes、server-authoritative message rules 和 error mapping。第一版 endpoint 是 `/v1/ws`，并已由 Go runtime process 挂载。第一版 inventory slice 使用 player-scoped command/query/event/error/system messages；room state sync、matchmaking、allocation、reconnect replay、presence、streams、realtime input 和 state patches 仍然 deferred，直到它们拥有独立 modules 和 standards。见 `.arch/protocol.yaml`、`docs/game-protocol.md` 和 `decisions/ADR-0015-game-protocol-framework.md`。
 
 Runtime protocol adapter boundary 定义在 `docs/runtime-protocol-adapter.md` 和 `decisions/ADR-0018-runtime-protocol-adapter-boundary.md` 中。WebSocket transport 拥有 frames，Protobuf adapter 拥有 envelope conversion，application dispatch 拥有 command/query routing，domain modules 拥有 invariants 和 behavior，generated packages 只提供 shapes。
 
@@ -207,7 +209,7 @@ PostgreSQL 是 runtime state 的第一版 authoritative durable relational store
 
 第一批已接受的 foundational runtime dependencies 记录在 `decisions/ADR-0013-first-go-runtime-dependencies.md` 和 `.arch/dependencies.yaml` 中。它们只被接受用于 platform adapters 和 generation tooling，不允许 domain modules 直接使用。S3 client tooling、MinIO deployment、observability 和外部 Go test framework adoption 仍然 deferred，直到具体 runtime needs 证明它们必要。
 
-第一版 Go runtime layout 记录在 `decisions/ADR-0014-go-runtime-layout-and-boundaries.md` 中。Runtime 现在已有 generated Go Protobuf output、纯 application handoff types、把 generated envelopes 转换为 application route requests 的 Protobuf protocol adapter，以及用于 command 和 query routes 的小型 application dispatch skeleton。WebSocket transport、PostgreSQL persistence、migrations、inventory business handlers、transaction wiring 和 generated route registration 尚未开始。未来 Go files 应遵循这些边界：
+第一版 Go runtime layout 记录在 `decisions/ADR-0014-go-runtime-layout-and-boundaries.md` 中。Runtime 现在已有 generated Go Protobuf output、纯 application handoff types、把 generated envelopes 转换为 application route requests 的 Protobuf protocol adapter、用于 command 和 query routes 的小型 application dispatch skeleton、inventory runtime handlers、WebSocket transport adapter，以及 `/v1/ws` 的 minimal process wiring。PostgreSQL persistence、migrations、transaction wiring、authentication/session validation 和 generated route registration 尚未开始。未来 Go files 应遵循这些边界：
 
 - `runtime/cmd/vibit-server/`：process startup、configuration wiring 和 lifecycle。
 - `runtime/internal/app/`：command/query dispatch、application composition 和 transaction orchestration。
@@ -218,6 +220,15 @@ PostgreSQL 是 runtime state 的第一版 authoritative durable relational store
 State-changing commands 应在 application-owned unit of work 中运行，然后才进行 repository mutation 和 domain-event recording。在 vibit 采纳明确的 event delivery 或 outbox standard 前，transaction 外的 event publication 继续 deferred。
 
 `node tools/vibit check runtime` 现在会在 Go source files 存在时验证 skeleton、import boundaries、app/domain layer boundaries、runtime test discovery 和 Go runtime test path。
+
+用下面命令启动第一版 runtime process：
+
+```bash
+cd runtime
+go run ./cmd/vibit-server
+```
+
+当前 endpoint 和 manual verification notes 见 `docs/runtime-runbook.md`。
 
 ## 早期参考领域
 

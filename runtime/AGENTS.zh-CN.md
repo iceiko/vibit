@@ -37,6 +37,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../.arch/contracts.yaml`
 - `../docs/generated-output.md`
 - `../docs/runtime-protocol-adapter.md`
+- `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
 - 受影响的 module manifest，例如 `../modules/inventory/module.yaml`
@@ -98,9 +99,16 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper，以及第一版 frame-to-Protobuf-to-application composition adapter。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter，以及挂载 `/v1/ws` 的 minimal process wiring。
 
-但它仍然没有实现 process startup wiring、`/v1/ws` route mounting、PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation 或 catalog-driven error retryability。
+但它仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
+
+第一版手动 process run path 是：
+
+```bash
+cd runtime
+go run ./cmd/vibit-server
+```
 
 ## 8. 验证
 

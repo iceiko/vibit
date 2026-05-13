@@ -69,6 +69,8 @@ The goal is not to make agents magically smarter. The goal is to make the codeba
 - `docs/generated-output.zh-CN.md`: Simplified Chinese translation
 - `docs/runtime-protocol-adapter.md`: runtime protocol adapter boundary standard
 - `docs/runtime-protocol-adapter.zh-CN.md`: Simplified Chinese translation
+- `docs/runtime-runbook.md`: first Go runtime process startup and manual verification runbook
+- `docs/runtime-runbook.zh-CN.md`: Simplified Chinese translation
 - `docs/reference-game-server-alignment.md`: active game server reference alignment standard for Nakama and Pitaya
 - `docs/reference-game-server-alignment.zh-CN.md`: Simplified Chinese translation
 - `schema/`: JSON Schema files for machine-checkable standards
@@ -197,7 +199,7 @@ Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --catego
 
 The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
 
-The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is planned as `/v1/ws` until transport implementation begins. The first inventory slice should use player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
+The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is `/v1/ws`, mounted by the Go runtime process. The first inventory slice uses player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
 
 The runtime protocol adapter boundary is defined in `docs/runtime-protocol-adapter.md` and `decisions/ADR-0018-runtime-protocol-adapter-boundary.md`. WebSocket transport owns frames, the Protobuf adapter owns envelope conversion, application dispatch owns command/query routing, domain modules own invariants and behavior, and generated packages provide shapes only.
 
@@ -207,7 +209,7 @@ PostgreSQL is the first authoritative durable relational store for runtime state
 
 The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
 
-The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime now has generated Go Protobuf output, pure application handoff types, a Protobuf protocol adapter that converts generated envelopes into application route requests, and a small application dispatch skeleton for command and query routes. WebSocket transport, PostgreSQL persistence, migrations, inventory business handlers, transaction wiring, and generated route registration have not started yet. Future Go files should follow these boundaries:
+The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime now has generated Go Protobuf output, pure application handoff types, a Protobuf protocol adapter that converts generated envelopes into application route requests, a small application dispatch skeleton for command and query routes, inventory runtime handlers, a WebSocket transport adapter, and minimal process wiring for `/v1/ws`. PostgreSQL persistence, migrations, transaction wiring, authentication/session validation, and generated route registration have not started yet. Future Go files should follow these boundaries:
 
 - `runtime/cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
 - `runtime/internal/app/`: command/query dispatch, application composition, and transaction orchestration.
@@ -218,6 +220,15 @@ The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout
 State-changing commands should run inside an application-owned unit of work before repository mutation and domain-event recording. Event publication outside the transaction is deferred until vibit adopts an explicit event delivery or outbox standard.
 
 `node tools/vibit check runtime` now verifies the skeleton, import boundaries, app/domain layer boundaries, runtime test discovery, and Go runtime test path once Go source files exist.
+
+Start the first runtime process with:
+
+```bash
+cd runtime
+go run ./cmd/vibit-server
+```
+
+See `docs/runtime-runbook.md` for current endpoint and manual verification notes.
 
 ## Early Reference Domain
 

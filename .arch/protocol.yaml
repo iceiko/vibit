@@ -58,7 +58,7 @@ transport:
   gameplay_client_protocol: websocket
   first_endpoint:
     path: /v1/ws
-    status: planned_until_transport_implementation
+    status: mounted_in_first_runtime_process
     compatibility: changing_after_clients_exist_requires_change_spec_and_adr
   owner: runtime/internal/platform/transport/ws
   adapter_dependency: github.com/coder/websocket
@@ -77,7 +77,7 @@ wire_format:
 
 envelope:
   model: websocket_framed_protobuf_envelope
-  status: proto_source_created_generation_not_run
+  status: proto_source_generated_and_mounted_in_first_runtime_process
   owner: runtime/internal/platform/protocol/protobuf
   domain_ownership: forbidden
   envelope_proto: proto/vibit/protocol/v1/envelope.proto
@@ -210,6 +210,8 @@ implementation_boundaries:
 
 first_runtime_slice:
   module: inventory
+  mounted_endpoint: /v1/ws
+  runbook: docs/runtime-runbook.md
   recommended_flow:
     - websocket_frame
     - protobuf_envelope

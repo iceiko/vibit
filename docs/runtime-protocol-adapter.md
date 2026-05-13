@@ -85,7 +85,7 @@ Current behavior:
 - Provides connection metadata through the transport-owned `Frame` type.
 - Writes every handler response as a binary WebSocket frame.
 - Rejects text or other non-binary client messages with a transport close.
-- Leaves `/v1/ws` route mounting to process startup and composition code.
+- Is mounted at `/v1/ws` by `runtime/cmd/vibit-server`.
 
 The adapter must stay opaque. It must not import generated Protobuf packages, application dispatch, or domain modules. Protocol decoding and application routing belong to later composition outside this transport package.
 
@@ -154,6 +154,50 @@ Must not:
 - Import `github.com/coder/websocket`.
 - Import generated Protobuf packages unless a later adapter decision explicitly allows a narrow bridge.
 - Hide module-specific business rules.
+
+The first process bootstrap helper is:
+
+```text
+runtime/internal/app/bootstrap/inventory.go
+```
+
+It creates the in-memory inventory dispatcher used by the first runtime process. This helper is application composition, not domain behavior. It may register module handlers and choose temporary bootstrap dependencies, but it must not become the long-term persistence, authentication, or permission model.
+
+### Runtime Process Wiring
+
+Owner:
+
+```text
+runtime/cmd/vibit-server/
+```
+
+Responsibilities:
+
+- Read process configuration such as listen address.
+- Assemble bootstrap application dependencies.
+- Compose the Protobuf frame handler with the WebSocket transport adapter.
+- Mount `/v1/ws`.
+- Start and own the HTTP server lifecycle.
+
+Must not:
+
+- Hide business behavior in process startup.
+- Decode Protobuf payloads directly.
+- Enforce domain permissions or invariants.
+- Own authentication/session semantics.
+- Own persistence repositories beyond calling bootstrap assembly.
+
+The first active process entrypoint is:
+
+```text
+runtime/cmd/vibit-server/main.go
+```
+
+Manual startup and endpoint verification are documented in:
+
+```text
+docs/runtime-runbook.md
+```
 
 ### Protocol-To-Domain Payload Bridges
 
@@ -382,4 +426,4 @@ Current implementation progress:
 1. Narrow Go handoff types exist for application requests/results, transport frames, and Protobuf frame composition.
 2. Protocol adapter tests cover envelope conversion, inventory payload bridging, error envelope mapping, and frame composition.
 3. Application dispatch tests cover command/query routing and application errors.
-4. `/v1/ws` endpoint mounting remains deferred to process wiring.
+4. `/v1/ws` endpoint mounting exists in `runtime/cmd/vibit-server`.

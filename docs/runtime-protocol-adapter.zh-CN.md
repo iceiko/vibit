@@ -86,7 +86,7 @@ runtime/internal/platform/transport/ws/server.go
 - 通过 transport-owned `Frame` type 提供 connection metadata。
 - 把每一个 handler response 都写成 binary WebSocket frame。
 - 对 text 或其他 non-binary client messages 执行 transport close。
-- 把 `/v1/ws` route mounting 留给 process startup 和 composition code。
+- 由 `runtime/cmd/vibit-server` 挂载到 `/v1/ws`。
 
 该 adapter 必须保持 opaque。它不得 import generated Protobuf packages、application dispatch 或 domain modules。Protocol decoding 和 application routing 属于后续在该 transport package 之外完成的 composition。
 
@@ -155,6 +155,50 @@ runtime/internal/app/
 - Import `github.com/coder/websocket`。
 - Import generated Protobuf packages，除非后续 adapter decision 明确允许一个窄 bridge。
 - 隐藏 module-specific business rules。
+
+第一版 process bootstrap helper 是：
+
+```text
+runtime/internal/app/bootstrap/inventory.go
+```
+
+它创建第一版 runtime process 使用的 in-memory inventory dispatcher。这个 helper 属于 application composition，不属于 domain behavior。它可以注册 module handlers 并选择临时 bootstrap dependencies，但不得变成长期 persistence、authentication 或 permission model。
+
+### Runtime Process Wiring
+
+Owner：
+
+```text
+runtime/cmd/vibit-server/
+```
+
+职责：
+
+- 读取 listen address 等 process configuration。
+- 组装 bootstrap application dependencies。
+- 把 Protobuf frame handler 与 WebSocket transport adapter 组合起来。
+- 挂载 `/v1/ws`。
+- 启动并拥有 HTTP server lifecycle。
+
+不得：
+
+- 把 business behavior 隐藏进 process startup。
+- 直接解码 Protobuf payloads。
+- 执行 domain permissions 或 invariants。
+- 拥有 authentication/session semantics。
+- 在调用 bootstrap assembly 之外拥有 persistence repositories。
+
+第一条 active process entrypoint 是：
+
+```text
+runtime/cmd/vibit-server/main.go
+```
+
+Manual startup 和 endpoint verification 记录在：
+
+```text
+docs/runtime-runbook.md
+```
 
 ### Protocol-To-Domain Payload Bridges
 
@@ -383,4 +427,4 @@ Implementation 开始时：
 1. Narrow Go handoff types 已经覆盖 application requests/results、transport frames 和 Protobuf frame composition。
 2. Protocol adapter tests 已覆盖 envelope conversion、inventory payload bridging、error envelope mapping 和 frame composition。
 3. Application dispatch tests 已覆盖 command/query routing 和 application errors。
-4. `/v1/ws` endpoint mounting 仍 deferred 到 process wiring。
+4. `/v1/ws` endpoint mounting 已经存在于 `runtime/cmd/vibit-server`。
