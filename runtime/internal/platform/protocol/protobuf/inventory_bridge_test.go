@@ -3,7 +3,6 @@ package protobuf
 import (
 	"context"
 	"errors"
-	"fmt"
 	"testing"
 	"time"
 
@@ -170,20 +169,10 @@ func TestProtoPayloadFromApplicationEventMapsItemGranted(t *testing.T) {
 }
 
 func TestInventoryProtobufDomainBridgeDispatchesAndBuildsResponseEnvelope(t *testing.T) {
-	repository := newBridgeMemoryRepository()
-	handlers := inventory.Handlers{
-		Repository:       repository,
-		PermissionPolicy: bridgePermissionPolicy{grantAllowed: true, readAllowed: true},
-		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 16},
-		EventIDs:         &bridgeEventIDs{},
-		Clock:            bridgeClock{},
-	}
-	dispatcher := app.NewDispatcher()
-	if err := handlers.RegisterRoutes(dispatcher); err != nil {
-		t.Fatalf("RegisterRoutes() error = %v, want nil", err)
-	}
+	fixture := newInventoryRequestLoopFixture(t, true, true)
 
-	envelope, err := BuildEnvelope(
+	envelope := mustBuildEnvelope(
+		t,
 		inventory.GrantItemRoute(),
 		"request-1",
 		app.Target{Scope: app.TargetScopePlayer, ID: "player-1"},
@@ -196,16 +185,10 @@ func TestInventoryProtobufDomainBridgeDispatchesAndBuildsResponseEnvelope(t *tes
 			RequestedBy: "admin-1",
 		},
 	)
-	if err != nil {
-		t.Fatalf("BuildEnvelope() request error = %v, want nil", err)
-	}
 
-	request, err := RouteRequestFromEnvelopeForDispatch(envelope)
-	if err != nil {
-		t.Fatalf("RouteRequestFromEnvelopeForDispatch() error = %v, want nil", err)
-	}
+	request := mustRouteRequestFromEnvelope(t, envelope)
 
-	result, err := dispatcher.Dispatch(context.Background(), request)
+	result, err := fixture.Dispatcher.Dispatch(context.Background(), request)
 	if err != nil {
 		t.Fatalf("Dispatch() error = %v, want nil", err)
 	}
@@ -243,20 +226,10 @@ func TestInventoryProtobufDomainBridgeDispatchesAndBuildsResponseEnvelope(t *tes
 }
 
 func TestInventoryProtobufDomainBridgeBuildsPermissionErrorEnvelope(t *testing.T) {
-	repository := newBridgeMemoryRepository()
-	handlers := inventory.Handlers{
-		Repository:       repository,
-		PermissionPolicy: bridgePermissionPolicy{grantAllowed: false, readAllowed: true},
-		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 16},
-		EventIDs:         &bridgeEventIDs{},
-		Clock:            bridgeClock{},
-	}
-	dispatcher := app.NewDispatcher()
-	if err := handlers.RegisterRoutes(dispatcher); err != nil {
-		t.Fatalf("RegisterRoutes() error = %v, want nil", err)
-	}
+	fixture := newInventoryRequestLoopFixture(t, false, true)
 
-	envelope, err := BuildEnvelope(
+	envelope := mustBuildEnvelope(
+		t,
 		inventory.GrantItemRoute(),
 		"request-1",
 		app.Target{Scope: app.TargetScopePlayer, ID: "player-1"},
@@ -269,16 +242,10 @@ func TestInventoryProtobufDomainBridgeBuildsPermissionErrorEnvelope(t *testing.T
 			RequestedBy: "admin-1",
 		},
 	)
-	if err != nil {
-		t.Fatalf("BuildEnvelope() request error = %v, want nil", err)
-	}
 
-	request, err := RouteRequestFromEnvelopeForDispatch(envelope)
-	if err != nil {
-		t.Fatalf("RouteRequestFromEnvelopeForDispatch() error = %v, want nil", err)
-	}
+	request := mustRouteRequestFromEnvelope(t, envelope)
 
-	result, err := dispatcher.Dispatch(context.Background(), request)
+	result, err := fixture.Dispatcher.Dispatch(context.Background(), request)
 	if err == nil {
 		t.Fatal("Dispatch() error = nil, want permission error")
 	}
@@ -302,62 +269,4 @@ func TestInventoryProtobufDomainBridgeBuildsPermissionErrorEnvelope(t *testing.T
 	if errorEnvelope.GetPayloadType() != "" || len(errorEnvelope.GetPayload()) != 0 {
 		t.Fatalf("error payload_type = %q payload len = %d, want no success payload", errorEnvelope.GetPayloadType(), len(errorEnvelope.GetPayload()))
 	}
-}
-
-type bridgePermissionPolicy struct {
-	grantAllowed bool
-	readAllowed  bool
-}
-
-func (p bridgePermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
-	return p.grantAllowed, nil
-}
-
-func (p bridgePermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
-	return p.readAllowed, nil
-}
-
-type bridgeMemoryRepository struct {
-	items map[string]map[string]int64
-}
-
-func newBridgeMemoryRepository() *bridgeMemoryRepository {
-	return &bridgeMemoryRepository{
-		items: make(map[string]map[string]int64),
-	}
-}
-
-func (r *bridgeMemoryRepository) GetInventory(_ context.Context, playerID string) ([]inventory.Item, error) {
-	playerItems := r.items[playerID]
-	items := make([]inventory.Item, 0, len(playerItems))
-	for itemID, quantity := range playerItems {
-		items = append(items, inventory.Item{ItemID: itemID, Quantity: quantity})
-	}
-	return items, nil
-}
-
-func (r *bridgeMemoryRepository) GrantItem(_ context.Context, mutation inventory.GrantItemMutation) (inventory.Item, error) {
-	if r.items[mutation.PlayerID] == nil {
-		r.items[mutation.PlayerID] = make(map[string]int64)
-	}
-	r.items[mutation.PlayerID][mutation.ItemID] += mutation.Quantity
-	return inventory.Item{
-		ItemID:   mutation.ItemID,
-		Quantity: r.items[mutation.PlayerID][mutation.ItemID],
-	}, nil
-}
-
-type bridgeEventIDs struct {
-	next int
-}
-
-func (g *bridgeEventIDs) NewEventID() string {
-	g.next += 1
-	return fmt.Sprintf("event-%d", g.next)
-}
-
-type bridgeClock struct{}
-
-func (bridgeClock) Now() time.Time {
-	return time.Date(2026, 5, 13, 10, 0, 0, 0, time.UTC)
 }

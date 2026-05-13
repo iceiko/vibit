@@ -4,18 +4,16 @@ import (
 	"context"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/iceiko/vibit/runtime/internal/app"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
-	"google.golang.org/protobuf/proto"
 )
 
 func TestFrameHandlerDispatchesGrantItemAndBuildsResponseFrame(t *testing.T) {
-	dispatcher := newFrameHandlerInventoryDispatcher(t, true, true)
-	handler := FrameHandler{Dispatcher: dispatcher}
+	fixture := newInventoryRequestLoopFixture(t, true, true)
+	handler := FrameHandler{Dispatcher: fixture.Dispatcher}
 	requestPayload := mustMarshalEnvelope(t, inventory.GrantItemRoute(), &inventoryv1.GrantItemRequest{
 		PlayerId:    "player-1",
 		ItemId:      "item-1",
@@ -64,8 +62,8 @@ func TestFrameHandlerDispatchesGrantItemAndBuildsResponseFrame(t *testing.T) {
 }
 
 func TestFrameHandlerBuildsApplicationErrorFrame(t *testing.T) {
-	dispatcher := newFrameHandlerInventoryDispatcher(t, false, true)
-	handler := FrameHandler{Dispatcher: dispatcher}
+	fixture := newInventoryRequestLoopFixture(t, false, true)
+	handler := FrameHandler{Dispatcher: fixture.Dispatcher}
 	requestPayload := mustMarshalEnvelope(t, inventory.GrantItemRoute(), &inventoryv1.GrantItemRequest{
 		PlayerId:    "player-1",
 		ItemId:      "item-1",
@@ -98,7 +96,8 @@ func TestFrameHandlerBuildsApplicationErrorFrame(t *testing.T) {
 }
 
 func TestFrameHandlerRejectsMalformedFramePayload(t *testing.T) {
-	handler := FrameHandler{Dispatcher: newFrameHandlerInventoryDispatcher(t, true, true)}
+	fixture := newInventoryRequestLoopFixture(t, true, true)
+	handler := FrameHandler{Dispatcher: fixture.Dispatcher}
 
 	_, err := handler.HandleFrame(context.Background(), FrameRequest{Payload: []byte("not protobuf")})
 	if err == nil {
@@ -108,7 +107,7 @@ func TestFrameHandlerRejectsMalformedFramePayload(t *testing.T) {
 
 func TestFrameHandlerPropagatesInternalDispatchError(t *testing.T) {
 	sentinel := errors.New("internal dispatch failed")
-	handler := FrameHandler{Dispatcher: frameHandlerDispatcherFunc(func(context.Context, app.RouteRequest) (app.ApplicationResult, error) {
+	handler := FrameHandler{Dispatcher: requestLoopDispatcherFunc(func(context.Context, app.RouteRequest) (app.ApplicationResult, error) {
 		return app.ApplicationResult{}, sentinel
 	})}
 	requestPayload := mustMarshalEnvelope(t, inventory.GetInventoryRoute(), &inventoryv1.GetInventoryRequest{
@@ -120,115 +119,4 @@ func TestFrameHandlerPropagatesInternalDispatchError(t *testing.T) {
 	if !errors.Is(err, sentinel) {
 		t.Fatalf("HandleFrame() error = %v, want sentinel", err)
 	}
-}
-
-func newFrameHandlerInventoryDispatcher(t *testing.T, grantAllowed bool, readAllowed bool) *app.Dispatcher {
-	t.Helper()
-
-	handlers := inventory.Handlers{
-		Repository:       newFrameHandlerMemoryRepository(),
-		PermissionPolicy: frameHandlerPermissionPolicy{grantAllowed: grantAllowed, readAllowed: readAllowed},
-		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 16},
-		EventIDs:         &frameHandlerEventIDs{},
-		Clock:            frameHandlerClock{},
-	}
-	dispatcher := app.NewDispatcher()
-	if err := handlers.RegisterRoutes(dispatcher); err != nil {
-		t.Fatalf("RegisterRoutes() error = %v, want nil", err)
-	}
-	return dispatcher
-}
-
-func mustMarshalEnvelope(t *testing.T, route app.RouteKey, payload proto.Message) []byte {
-	t.Helper()
-
-	envelope, err := BuildEnvelope(
-		route,
-		"request-1",
-		app.Target{Scope: app.TargetScopePlayer, ID: "player-1"},
-		app.Session{SessionID: "session-1", PlayerID: "player-1", ConnectionEpoch: 7},
-		payload,
-	)
-	if err != nil {
-		t.Fatalf("BuildEnvelope() error = %v, want nil", err)
-	}
-	encoded, err := proto.Marshal(envelope)
-	if err != nil {
-		t.Fatalf("proto.Marshal(envelope) error = %v, want nil", err)
-	}
-	return encoded
-}
-
-func mustUnmarshalFrameEnvelope(t *testing.T, payload []byte) *protocolv1.Envelope {
-	t.Helper()
-
-	var envelope protocolv1.Envelope
-	if err := proto.Unmarshal(payload, &envelope); err != nil {
-		t.Fatalf("proto.Unmarshal(response) error = %v, want nil", err)
-	}
-	return &envelope
-}
-
-type frameHandlerDispatcherFunc func(context.Context, app.RouteRequest) (app.ApplicationResult, error)
-
-func (f frameHandlerDispatcherFunc) Dispatch(ctx context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
-	return f(ctx, request)
-}
-
-type frameHandlerPermissionPolicy struct {
-	grantAllowed bool
-	readAllowed  bool
-}
-
-func (p frameHandlerPermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
-	return p.grantAllowed, nil
-}
-
-func (p frameHandlerPermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
-	return p.readAllowed, nil
-}
-
-type frameHandlerMemoryRepository struct {
-	items map[string]map[string]int64
-}
-
-func newFrameHandlerMemoryRepository() *frameHandlerMemoryRepository {
-	return &frameHandlerMemoryRepository{
-		items: make(map[string]map[string]int64),
-	}
-}
-
-func (r *frameHandlerMemoryRepository) GetInventory(_ context.Context, playerID string) ([]inventory.Item, error) {
-	playerItems := r.items[playerID]
-	items := make([]inventory.Item, 0, len(playerItems))
-	for itemID, quantity := range playerItems {
-		items = append(items, inventory.Item{ItemID: itemID, Quantity: quantity})
-	}
-	return items, nil
-}
-
-func (r *frameHandlerMemoryRepository) GrantItem(_ context.Context, mutation inventory.GrantItemMutation) (inventory.Item, error) {
-	if r.items[mutation.PlayerID] == nil {
-		r.items[mutation.PlayerID] = make(map[string]int64)
-	}
-	r.items[mutation.PlayerID][mutation.ItemID] += mutation.Quantity
-	return inventory.Item{
-		ItemID:   mutation.ItemID,
-		Quantity: r.items[mutation.PlayerID][mutation.ItemID],
-	}, nil
-}
-
-type frameHandlerEventIDs struct {
-	next int
-}
-
-func (g *frameHandlerEventIDs) NewEventID() string {
-	g.next += 1
-	return "frame-event-1"
-}
-
-type frameHandlerClock struct{}
-
-func (frameHandlerClock) Now() time.Time {
-	return time.Date(2026, 5, 13, 12, 0, 0, 0, time.UTC)
 }

@@ -128,6 +128,7 @@ runtime/internal/platform/protocol/protobuf/
 - 它把成功的 application results 编码为 Protobuf envelopes。
 - 它把 `app.ApplicationError` results 编码为 `MESSAGE_KIND_ERROR` envelopes。
 - 它返回 encoded envelope bytes，供 WebSocket transport 写回。
+- Request-loop tests 共享 `runtime/internal/platform/protocol/protobuf/request_loop_fixture_test.go` 中的 package-local fixture，让后续测试复用同一套 in-memory inventory dispatcher setup，同时不 import transport dependencies。
 
 该 adapter 有意不 import WebSocket transport package。未来 process wiring layer 可以把 `ws.Frame` 适配为这个 Protobuf-owned `FrameRequest`，同时不把 Protobuf 或 application knowledge 移入 transport package。
 
@@ -425,6 +426,6 @@ Implementation 开始时：
 当前 implementation progress：
 
 1. Narrow Go handoff types 已经覆盖 application requests/results、transport frames 和 Protobuf frame composition。
-2. Protocol adapter tests 已覆盖 envelope conversion、inventory payload bridging、error envelope mapping 和 frame composition。
+2. Protocol adapter tests 已覆盖 envelope conversion、inventory payload bridging、error envelope mapping、frame composition 和 shared request-loop fixture setup。
 3. Application dispatch tests 已覆盖 command/query routing 和 application errors。
 4. `/v1/ws` endpoint mounting 已经存在于 `runtime/cmd/vibit-server`。

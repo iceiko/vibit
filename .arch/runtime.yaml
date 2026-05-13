@@ -269,6 +269,7 @@ server_instance_model:
       status: first_adapter_created
       adapter: runtime/internal/platform/protocol/protobuf/frame_handler.go
       tests: runtime/internal/platform/protocol/protobuf/frame_handler_test.go
+      test_fixture: runtime/internal/platform/protocol/protobuf/request_loop_fixture_test.go
       route_mounting: deferred_to_runtime_process_wiring
       responsibilities:
         - decode_frame_payload_bytes_as_protobuf_envelopes
@@ -277,6 +278,7 @@ server_instance_model:
         - map_application_success_results_to_protobuf_envelopes
         - map_application_errors_to_protobuf_error_envelopes
         - return_encoded_protobuf_envelope_bytes_for_transport_write
+        - keep_request_loop_test_setup_repeatable_without_transport_dependencies
       non_goals:
         - open_websocket_connections
         - own_websocket_lifecycle
@@ -294,6 +296,7 @@ server_instance_model:
       inventory:
         request_mapper: runtime/internal/platform/protocol/protobuf/inventory_bridge.go
         tests: runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go
+        test_fixture: runtime/internal/platform/protocol/protobuf/request_loop_fixture_test.go
         maps_requests:
           - GrantItemRequest -> inventory.GrantItemRequest
           - GetInventoryRequest -> inventory.GetInventoryRequest
@@ -450,7 +453,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_and_websocket_process_wiring_created
+  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_websocket_process_wiring_and_request_loop_fixture_created
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.

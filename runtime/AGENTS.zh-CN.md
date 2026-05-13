@@ -99,7 +99,7 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter，以及挂载 `/v1/ws` 的 minimal process wiring。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
 但它仍然没有实现 PostgreSQL persistence、migrations、transaction wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
 

@@ -127,6 +127,7 @@ Current behavior:
 - It encodes successful application results as Protobuf envelopes.
 - It encodes `app.ApplicationError` results as `MESSAGE_KIND_ERROR` envelopes.
 - It returns encoded envelope bytes for the WebSocket transport to write.
+- Request-loop tests share a package-local fixture at `runtime/internal/platform/protocol/protobuf/request_loop_fixture_test.go` so future tests reuse the same in-memory inventory dispatcher setup without importing transport dependencies.
 
 This adapter intentionally does not import the WebSocket transport package. The future process wiring layer may adapt `ws.Frame` into this Protobuf-owned `FrameRequest` without moving Protobuf or application knowledge into the transport package.
 
@@ -424,6 +425,6 @@ When implementation begins:
 Current implementation progress:
 
 1. Narrow Go handoff types exist for application requests/results, transport frames, and Protobuf frame composition.
-2. Protocol adapter tests cover envelope conversion, inventory payload bridging, error envelope mapping, and frame composition.
+2. Protocol adapter tests cover envelope conversion, inventory payload bridging, error envelope mapping, frame composition, and shared request-loop fixture setup.
 3. Application dispatch tests cover command/query routing and application errors.
 4. `/v1/ws` endpoint mounting exists in `runtime/cmd/vibit-server`.
