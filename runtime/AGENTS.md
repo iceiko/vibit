@@ -99,9 +99,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary, the first inventory Protobuf/domain payload bridge, and the first application-error-to-Protobuf-error-envelope mapper.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first inventory repository/policy/handler runtime boundary, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, and the first frame-to-Protobuf-to-application composition adapter.
 
-The workspace still does not implement process startup wiring, `/v1/ws` route mounting, full WebSocket-to-Protobuf-to-application composition, PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, or catalog-driven error retryability yet.
+The workspace still does not implement process startup wiring, `/v1/ws` route mounting, PostgreSQL persistence, migrations, transaction wiring, generated route registration, generated protocol bridge creation, or catalog-driven error retryability yet.
 
 ## 8. Verification
 

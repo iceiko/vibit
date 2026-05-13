@@ -118,6 +118,19 @@ runtime/internal/platform/protocol/protobuf/
 - 直接调用 domain repositories。
 - 把 business behavior 隐藏在 envelope conversion 中。
 
+当前行为：
+
+- `runtime/internal/platform/protocol/protobuf/frame_handler.go` 提供第一版 frame composition adapter。
+- 它通过 Protobuf-owned `FrameRequest` type 接收 frame payload bytes 和 transport metadata。
+- 它把 frame payload 解码为 `vibit.protocol.v1.Envelope`。
+- 它通过显式 Protobuf/domain bridge，把 command 和 query envelopes 转换为 `app.RouteRequest`。
+- 它通过注入的 application dispatcher interface 执行 dispatch。
+- 它把成功的 application results 编码为 Protobuf envelopes。
+- 它把 `app.ApplicationError` results 编码为 `MESSAGE_KIND_ERROR` envelopes。
+- 它返回 encoded envelope bytes，供 WebSocket transport 写回。
+
+该 adapter 有意不 import WebSocket transport package。未来 process wiring layer 可以把 `ws.Frame` 适配为这个 Protobuf-owned `FrameRequest`，同时不把 Protobuf 或 application knowledge 移入 transport package。
+
 ### Application Dispatch
 
 Owner：
@@ -238,7 +251,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-第一批 Go runtime slices 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` 和 `ApplicationResult` concepts、面向 command 和 query routes 的显式 application dispatcher，在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion，并在 `runtime/internal/platform/transport/ws/` 下实现 transport-owned `Frame` handoff。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
+第一批 Go runtime slices 已经在 `runtime/internal/app/` 下实现 application-owned `RouteRequest` 和 `ApplicationResult` concepts、面向 command 和 query routes 的显式 application dispatcher，在 `runtime/internal/platform/protocol/protobuf/` 下实现 Protobuf-to-application conversion 和 Protobuf-owned `FrameRequest`、`FrameHandler` composition adapter，并在 `runtime/internal/platform/transport/ws/` 下实现 transport-owned `Frame` handoff。其余 concepts 实现时可以使用符合 Go 习惯的名称，但必须保留这些职责。
 
 必需概念：
 
@@ -364,3 +377,10 @@ Implementation 开始时：
 2. 在 wiring WebSocket transport 前添加 protocol adapter tests。
 3. 在 domain runtime behavior 扩大前添加 application dispatch tests。
 4. 保持第一版 inventory slice 小而 player-scoped。
+
+当前 implementation progress：
+
+1. Narrow Go handoff types 已经覆盖 application requests/results、transport frames 和 Protobuf frame composition。
+2. Protocol adapter tests 已覆盖 envelope conversion、inventory payload bridging、error envelope mapping 和 frame composition。
+3. Application dispatch tests 已覆盖 command/query routing 和 application errors。
+4. `/v1/ws` endpoint mounting 仍 deferred 到 process wiring。

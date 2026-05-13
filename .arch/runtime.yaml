@@ -26,8 +26,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: first_websocket_transport_adapter
-  implementation_code_status: websocket_transport_handoff_dispatch_inventory_runtime_and_protocol_bridge
+  current_phase: websocket_protobuf_application_composition
+  implementation_code_status: websocket_transport_protobuf_composition_dispatch_inventory_runtime_and_protocol_bridge
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -149,7 +149,7 @@ server_instance_model:
     decision: ADR-0015
     envelope_model: websocket_framed_protobuf_envelope
     first_endpoint: /v1/ws
-    endpoint_status: transport_adapter_created_endpoint_mounting_deferred
+    endpoint_status: transport_and_composition_created_endpoint_mounting_deferred
     routing_fields:
       - kind
       - module
@@ -179,7 +179,7 @@ server_instance_model:
     standard: docs/runtime-protocol-adapter.md
     decision: ADR-0018
     check_command: node tools/vibit check runtime
-    status: websocket_transport_inventory_bridge_and_application_error_envelopes_started
+    status: websocket_transport_protobuf_composition_inventory_bridge_and_application_error_envelopes_created
     first_request_flow:
       - websocket_frame
       - transport_frame
@@ -228,6 +228,25 @@ server_instance_model:
         - domain_behavior
         - session_authentication
         - process_startup_wiring
+    frame_composition:
+      owner: runtime/internal/platform/protocol/protobuf
+      status: first_adapter_created
+      adapter: runtime/internal/platform/protocol/protobuf/frame_handler.go
+      tests: runtime/internal/platform/protocol/protobuf/frame_handler_test.go
+      route_mounting: deferred_to_runtime_process_wiring
+      responsibilities:
+        - decode_frame_payload_bytes_as_protobuf_envelopes
+        - map_envelopes_to_application_route_requests
+        - dispatch_command_and_query_requests_through_app_dispatcher
+        - map_application_success_results_to_protobuf_envelopes
+        - map_application_errors_to_protobuf_error_envelopes
+        - return_encoded_protobuf_envelope_bytes_for_transport_write
+      non_goals:
+        - open_websocket_connections
+        - own_websocket_lifecycle
+        - change_protocol_envelope_shape
+        - authenticate_or_validate_sessions
+        - perform_domain_permission_or_invariant_checks
     current_bridges:
       application_errors:
         mapper: runtime/internal/platform/protocol/protobuf/error_envelope.go

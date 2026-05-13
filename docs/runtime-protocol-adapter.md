@@ -117,6 +117,19 @@ Must not:
 - Call domain repositories directly.
 - Hide business behavior in envelope conversion.
 
+Current behavior:
+
+- `runtime/internal/platform/protocol/protobuf/frame_handler.go` provides the first frame composition adapter.
+- It accepts frame payload bytes and transport metadata through a Protobuf-owned `FrameRequest` type.
+- It decodes the frame payload as `vibit.protocol.v1.Envelope`.
+- It converts command and query envelopes to `app.RouteRequest` through the explicit Protobuf/domain bridge.
+- It dispatches through an injected application dispatcher interface.
+- It encodes successful application results as Protobuf envelopes.
+- It encodes `app.ApplicationError` results as `MESSAGE_KIND_ERROR` envelopes.
+- It returns encoded envelope bytes for the WebSocket transport to write.
+
+This adapter intentionally does not import the WebSocket transport package. The future process wiring layer may adapt `ws.Frame` into this Protobuf-owned `FrameRequest` without moving Protobuf or application knowledge into the transport package.
+
 ### Application Dispatch
 
 Owner:
@@ -237,7 +250,7 @@ ApplicationResult
 OutboundMessage
 ```
 
-The first Go runtime slices implement the application-owned `RouteRequest` and `ApplicationResult` concepts under `runtime/internal/app/`, an explicit application dispatcher for command and query routes, the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`, and the transport-owned `Frame` handoff under `runtime/internal/platform/transport/ws/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
+The first Go runtime slices implement the application-owned `RouteRequest` and `ApplicationResult` concepts under `runtime/internal/app/`, an explicit application dispatcher for command and query routes, the Protobuf-to-application conversion under `runtime/internal/platform/protocol/protobuf/`, the Protobuf-owned `FrameRequest` and `FrameHandler` composition adapter under `runtime/internal/platform/protocol/protobuf/`, and the transport-owned `Frame` handoff under `runtime/internal/platform/transport/ws/`. The remaining concepts may use idiomatic Go names when they are implemented, but they must preserve the responsibilities.
 
 Required concepts:
 
@@ -363,3 +376,10 @@ When implementation begins:
 2. Add protocol adapter tests before wiring WebSocket transport.
 3. Add application dispatch tests before domain runtime behavior grows.
 4. Keep the first inventory slice small and player-scoped.
+
+Current implementation progress:
+
+1. Narrow Go handoff types exist for application requests/results, transport frames, and Protobuf frame composition.
+2. Protocol adapter tests cover envelope conversion, inventory payload bridging, error envelope mapping, and frame composition.
+3. Application dispatch tests cover command/query routing and application errors.
+4. `/v1/ws` endpoint mounting remains deferred to process wiring.
