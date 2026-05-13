@@ -95,6 +95,10 @@ PostgreSQL persistence work 必须遵循 `../docs/postgresql-persistence-boundar
 
 第一版 durable inventory implementation 中，`GrantItem` 必须使用 transaction-bound repository，并在读取当前 items、执行 capacity-sensitive mutation 前调用 `LockInventoryForMutation`。返回的 `MutationLock` 是 locked aggregate view，不是 transaction owner。Repositories 不得在 command flows 中偷偷开启独立 write transactions。
 
+第一版 PostgreSQL inventory repository adapter 是 `internal/platform/persistence/postgres/inventory_repository.go`。使用 `NewInventoryRepositoryForUnitOfWork` 构造它，并传入由 application-owned unit of work 提供的 executor，例如 `pgx.Tx` 或兼容的 test executor。该 adapter 不得调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`；transaction lifetime 属于 `internal/platform/tx` 和 `internal/app`。
+
+`GrantItemMutation` 携带 `event_id`、`occurred_at` 和 `reason`，这样 PostgreSQL adapter 可以在与 item quantity update 相同的 executor path 中持久化 `inventory_item_grants`。
+
 第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。当 migration sources 或 migration guidance 发生变化时，运行 `node ../tools/vibit check migrations`。在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 仍然 pending。
 
 ## 6. Generated Files
@@ -109,9 +113,9 @@ Generated files 对 non-system agents 不可变。
 
 ## 7. 当前状态
 
-这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
+这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一版 PostgreSQL inventory repository adapter、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture，以及挂载 `/v1/ws` 的 minimal process wiring。
 
-这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton 和第一版 inventory migration source，但仍然没有实现 PostgreSQL repository adapters、migration apply/rollback tooling、persistent runtime wiring、generated route registration、generated protocol bridge creation、authentication/session validation 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、第一版 inventory migration source 和第一版 PostgreSQL repository adapter，但仍然没有实现 migration apply/rollback tooling、persistent runtime wiring、generated route registration、generated protocol bridge creation、authentication/session validation、live PostgreSQL integration testing 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 

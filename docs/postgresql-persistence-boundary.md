@@ -191,6 +191,19 @@ MutationLock.Release()
 
 `MutationLock` is a locked repository view for one inventory aggregate. It is not a transaction owner. `Release` only releases the aggregate lock or adapter-local resource; it must not commit or roll back the application-owned unit of work.
 
+`GrantItemMutation` must carry the durable grant record metadata needed by PostgreSQL adapters:
+
+```text
+event_id
+occurred_at
+player_id
+item_id
+quantity
+reason
+```
+
+The domain handler must create this metadata before calling `MutationLock.GrantItem`, so the adapter can record the item quantity change and the `inventory_item_grants` row with the same application-owned executor.
+
 ## 4. Repository Rules
 
 Repository interfaces are module-owned. PostgreSQL adapters implement them.
@@ -208,6 +221,20 @@ Rules:
 For inventory, `GrantItem` must acquire `LockInventoryForMutation` after request validation and permission checks, and before reading current inventory for capacity enforcement. Capacity-sensitive reads and the grant mutation must go through the returned `MutationLock`.
 
 The PostgreSQL adapter must implement the lock with an explicit inventory account row lock for `player_id` inside the application-owned unit of work. It must not replace this with an advisory lock or hidden repository-owned transaction without a superseding decision.
+
+The first adapter source is:
+
+```text
+runtime/internal/platform/persistence/postgres/inventory_repository.go
+```
+
+It is constructed with:
+
+```text
+NewInventoryRepositoryForUnitOfWork(executor)
+```
+
+The executor must be supplied by application composition, normally from a transaction-bound handle such as `pgx.Tx`. The adapter may depend on a small pgx-shaped executor interface for testability, but it must not call `BEGIN`, `COMMIT`, or `ROLLBACK` itself.
 
 ## 5. Migration Rules
 
@@ -232,6 +259,8 @@ Persistence work should add tests at the level that owns the behavior:
 - Runtime wiring tests cover configuration and composition, not SQL behavior.
 
 Until a disposable PostgreSQL test environment exists, PostgreSQL integration tests may be gated by an explicit environment variable. Agents must record when those tests were skipped and why.
+
+The current PostgreSQL adapter has focused fake-executor tests for SQL shape and transaction-bound behavior. Live repository integration tests are not mandatory until vibit defines a disposable PostgreSQL test environment standard.
 
 Current repository verification remains:
 

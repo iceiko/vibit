@@ -76,8 +76,10 @@ For the first durable implementation:
 - `GrantItem` must call `LockInventoryForMutation` after request validation and permission checks, then use the returned `MutationLock` for the current inventory read and grant mutation.
 - PostgreSQL adapters must implement that lock as an inventory account row lock for `player_id` inside the application-owned unit of work.
 - `MutationLock.Release` releases the aggregate lock or adapter-local resource; it must not commit or roll back a transaction.
-- Durable grant behavior must record the item quantity change and the `ItemGranted` grant record inside the same application-owned unit of work.
-- Migration apply/rollback verification is not available until migration tooling checks are implemented.
+- The first PostgreSQL adapter is `runtime/internal/platform/persistence/postgres/inventory_repository.go`, with focused tests in `runtime/internal/platform/persistence/postgres/inventory_repository_test.go`.
+- Durable grant behavior must record the item quantity change and the `ItemGranted` grant record inside the same application-owned unit of work. `GrantItemMutation` carries `event_id`, `occurred_at`, and `reason` for this purpose.
+- Migration apply/rollback verification is not available until migration tooling can run against a disposable PostgreSQL environment.
+- Live PostgreSQL repository integration tests are not mandatory until the project defines a local disposable database test standard.
 
 ## Forbidden Shortcuts
 
@@ -89,6 +91,7 @@ For the first durable implementation:
 - Do not make this module depend directly on PostgreSQL drivers, S3 SDKs, or MinIO clients. Use vibit-owned repository and storage interfaces when persistence implementation begins.
 - Do not hide transaction creation inside inventory repositories for command flows.
 - Do not read current inventory for capacity-sensitive grants outside the mutation lock.
+- Do not drop event metadata from `GrantItemMutation`; durable adapters need it to persist `inventory_item_grants` atomically with the quantity update.
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
 - Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.

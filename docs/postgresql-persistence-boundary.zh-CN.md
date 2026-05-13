@@ -192,6 +192,19 @@ MutationLock.Release()
 
 `MutationLock` 是单个 inventory aggregate 的 locked repository view。它不是 transaction owner。`Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back application-owned unit of work。
 
+`GrantItemMutation` 必须携带 PostgreSQL adapters 记录 durable grant record 所需的 metadata：
+
+```text
+event_id
+occurred_at
+player_id
+item_id
+quantity
+reason
+```
+
+Domain handler 必须在调用 `MutationLock.GrantItem` 前创建这些 metadata，这样 adapter 才能用同一个 application-owned executor 记录 item quantity change 和 `inventory_item_grants` row。
+
 ## 4. Repository Rules
 
 Repository interfaces 属于 module。PostgreSQL adapters 实现这些 interfaces。
@@ -209,6 +222,20 @@ Repository interfaces 属于 module。PostgreSQL adapters 实现这些 interface
 对于 inventory，`GrantItem` 必须在 request validation 和 permission checks 之后、为 capacity enforcement 读取 current inventory 之前，获取 `LockInventoryForMutation`。Capacity-sensitive reads 和 grant mutation 必须通过返回的 `MutationLock` 执行。
 
 PostgreSQL adapter 必须在 application-owned unit of work 内，用 `player_id` 上的显式 inventory account row lock 实现该 lock。除非有 superseding decision，否则不得用 advisory lock 或隐藏的 repository-owned transaction 替代。
+
+第一版 adapter source 是：
+
+```text
+runtime/internal/platform/persistence/postgres/inventory_repository.go
+```
+
+构造方式是：
+
+```text
+NewInventoryRepositoryForUnitOfWork(executor)
+```
+
+Executor 必须由 application composition 提供，通常来自 transaction-bound handle，例如 `pgx.Tx`。Adapter 可以为了 testability 依赖一个小型 pgx-shaped executor interface，但它不得自行调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`。
 
 ## 5. Migration Rules
 
@@ -233,6 +260,8 @@ Persistence work 应在拥有行为的层添加 tests：
 - Runtime wiring tests 覆盖 configuration 和 composition，不覆盖 SQL behavior。
 
 在 disposable PostgreSQL test environment 存在前，PostgreSQL integration tests 可以由显式 environment variable 控制。Agents 必须记录这些 tests 是否被 skip 以及原因。
+
+当前 PostgreSQL adapter 已经有 focused fake-executor tests，覆盖 SQL shape 和 transaction-bound behavior。在 vibit 定义 disposable PostgreSQL test environment standard 前，live repository integration tests 不是 mandatory。
 
 当前 repository verification 仍是：
 

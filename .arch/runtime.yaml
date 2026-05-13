@@ -371,7 +371,7 @@ persistence_model:
   decision: ADR-0011
   boundary_decision: ADR-0020
   standard: docs/postgresql-persistence-boundary.md
-  status: transaction_boundary_skeleton_defined_before_persistent_implementation
+  status: first_inventory_postgresql_adapter_created_not_wired
   authoritative_store:
     engine: PostgreSQL
     accepted_driver: github.com/jackc/pgx/v5
@@ -381,7 +381,7 @@ persistence_model:
       - transactional_state_changes
       - invariants_requiring_consistency
       - outbox_or_event_log_when_needed
-    not_started: true
+    implementation_status: adapter_created_process_wiring_pending
   first_durable_module:
     module: inventory
     ownership_manifest: modules/inventory/module.yaml
@@ -390,7 +390,20 @@ persistence_model:
     migration_source_owner: runtime/migrations/postgres
     transaction_boundary_owner: runtime/internal/platform/tx
     transaction_orchestrator: runtime/internal/app
-    status: first_migration_source_created_no_postgresql_adapter_yet
+    status: postgresql_adapter_created_not_wired
+    postgres_adapter:
+      package: runtime/internal/platform/persistence/postgres
+      file: runtime/internal/platform/persistence/postgres/inventory_repository.go
+      tests: runtime/internal/platform/persistence/postgres/inventory_repository_test.go
+      construction: NewInventoryRepositoryForUnitOfWork
+      binding_rule: Adapter receives an injected pgx-shaped executor from the application-owned unit of work and does not open hidden write transactions.
+      implements:
+        - inventory.Repository.GetInventory
+        - inventory.Repository.LockInventoryForMutation
+        - inventory.MutationLock.GetInventory
+        - inventory.MutationLock.GrantItem
+      grant_recording: Quantity mutation and inventory_item_grants insert use the same injected executor.
+      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
     mutation_lock:
       aggregate: inventory_account
       key: player_id
@@ -430,9 +443,12 @@ persistence_model:
     - Go migrations require a change spec explaining why SQL is insufficient and must not hide domain business logic.
     - S3-compatible object storage must remain optional until a concrete module or platform capability requires it.
     - MinIO must not become a mandatory runtime dependency without an adoption record covering license, maintenance, operations, and replacement path.
+    - Inventory GrantItemMutation carries event_id, occurred_at, and reason so durable adapters can record grant rows in the same unit of work as quantity changes.
   deferred:
     - outbox_or_event_log_storage_standard
     - first_s3_client_or_sdk
+    - persistent_runtime_process_wiring
+    - disposable_postgresql_integration_test_environment
   migration_layout:
     source_root: runtime/migrations/postgres
     default_style: sql_first
@@ -507,7 +523,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_websocket_process_wiring_request_loop_fixture_and_mutation_lock_boundary_created
+  skeleton_status: inventory_runtime_protocol_bridge_error_envelopes_websocket_process_wiring_request_loop_fixture_mutation_lock_and_postgresql_adapter_created
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.

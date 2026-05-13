@@ -159,14 +159,14 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: runtime_request_loop_complete_persistence_boundary_defined
+  status: runtime_request_loop_complete_postgresql_adapter_created_not_wired
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
   object_storage_required_for_first_slice: false
-  runtime_implementation: repository_policy_handler_protocol_bridge_websocket_process_wiring_and_request_loop_fixture_created
+  runtime_implementation: repository_policy_handler_protocol_bridge_websocket_process_wiring_request_loop_fixture_and_postgresql_adapter_created
   persistence_boundary:
     standard: docs/postgresql-persistence-boundary.md
     decision: ADR-0020
@@ -197,7 +197,16 @@ proof_slice:
       - inventory_item_grants
     migration_source: runtime/migrations/postgres/000001_create_inventory_state.sql
     migration_status: source_created_apply_verification_pending
-    status: first_migration_source_created_no_postgresql_adapter_yet
+    postgres_adapter:
+      package: runtime/internal/platform/persistence/postgres
+      file: runtime/internal/platform/persistence/postgres/inventory_repository.go
+      tests: runtime/internal/platform/persistence/postgres/inventory_repository_test.go
+      construction: NewInventoryRepositoryForUnitOfWork
+      status: created_not_wired
+      binding_rule: Adapter receives an injected pgx-shaped executor from the application-owned unit of work and does not open hidden write transactions.
+      grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so inventory_item_grants rows can be recorded with the quantity mutation.
+      live_integration_status: deferred_until_disposable_postgresql_test_environment_standard
+    status: postgresql_adapter_created_not_wired
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
     file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go

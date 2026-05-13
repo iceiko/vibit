@@ -54,6 +54,15 @@ func TestGrantItemRecordsItemAndEmitsEvent(t *testing.T) {
 	if event.PlayerID != "player-1" || event.ItemID != "item-1" || event.Quantity != 3 || event.NewQuantity != 3 || event.Reason != "reward" {
 		t.Fatalf("event = %#v, want normalized ItemGranted event", event)
 	}
+	if repository.lastGrantMutation.EventID != event.EventID {
+		t.Fatalf("mutation event id = %q, want %q", repository.lastGrantMutation.EventID, event.EventID)
+	}
+	if repository.lastGrantMutation.OccurredAt != event.OccurredAt {
+		t.Fatalf("mutation occurred_at = %s, want %s", repository.lastGrantMutation.OccurredAt, event.OccurredAt)
+	}
+	if repository.lastGrantMutation.Reason != event.Reason {
+		t.Fatalf("mutation reason = %q, want %q", repository.lastGrantMutation.Reason, event.Reason)
+	}
 }
 
 func TestGrantItemAccumulatesExistingItemQuantity(t *testing.T) {
@@ -341,12 +350,13 @@ func (p staticPermissionPolicy) CanReadInventory(context.Context, string, string
 }
 
 type memoryRepository struct {
-	items        map[string]map[string]int64
-	getCalls     int
-	lockCalls    int
-	releaseCalls int
-	grantCalls   int
-	operations   []string
+	items             map[string]map[string]int64
+	getCalls          int
+	lockCalls         int
+	releaseCalls      int
+	grantCalls        int
+	operations        []string
+	lastGrantMutation GrantItemMutation
 }
 
 func newMemoryRepository() *memoryRepository {
@@ -381,6 +391,7 @@ func (r *memoryRepository) getInventory(playerID string) []Item {
 
 func (r *memoryRepository) grantItem(mutation GrantItemMutation) Item {
 	r.grantCalls += 1
+	r.lastGrantMutation = mutation
 	if r.items[mutation.PlayerID] == nil {
 		r.items[mutation.PlayerID] = make(map[string]int64)
 	}

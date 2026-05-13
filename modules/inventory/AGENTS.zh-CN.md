@@ -77,8 +77,10 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - `GrantItem` 必须在 request validation 和 permission checks 之后调用 `LockInventoryForMutation`，然后用返回的 `MutationLock` 读取 current inventory 并执行 grant mutation。
 - PostgreSQL adapters 必须在 application-owned unit of work 内，把这个 lock 实现为 `player_id` 对应的 inventory account row lock。
 - `MutationLock.Release` 只释放 aggregate lock 或 adapter-local resource；它不得 commit 或 roll back transaction。
-- Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。
-- 在 migration tooling checks 实现前，migration apply/rollback verification 还不可用。
+- 第一版 PostgreSQL adapter 是 `runtime/internal/platform/persistence/postgres/inventory_repository.go`，focused tests 位于 `runtime/internal/platform/persistence/postgres/inventory_repository_test.go`。
+- Durable grant behavior 必须在同一个 application-owned unit of work 中记录 item quantity change 和 `ItemGranted` grant record。`GrantItemMutation` 为此携带 `event_id`、`occurred_at` 和 `reason`。
+- 在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 还不可用。
+- 在项目定义本地 disposable database test standard 前，live PostgreSQL repository integration tests 不是 mandatory。
 
 ## Forbidden Shortcuts
 
@@ -90,6 +92,7 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - 不要让本模块直接依赖 PostgreSQL drivers、S3 SDKs 或 MinIO clients。开始 persistence implementation 时，应使用 vibit-owned repository 和 storage interfaces。
 - 不要在 command flows 中把 transaction creation 隐藏到 inventory repositories 里。
 - 不要在 mutation lock 之外，为 capacity-sensitive grants 读取 current inventory。
+- 不要从 `GrantItemMutation` 中移除 event metadata；durable adapters 需要它把 `inventory_item_grants` 与 quantity update 原子化持久化。
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。

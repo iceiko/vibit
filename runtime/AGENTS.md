@@ -96,6 +96,10 @@ PostgreSQL persistence work must follow `../docs/postgresql-persistence-boundary
 
 For the first durable inventory implementation, `GrantItem` must use a transaction-bound repository and call `LockInventoryForMutation` before reading current items and applying capacity-sensitive mutations. The returned `MutationLock` is a locked aggregate view, not a transaction owner. Repositories must not silently open independent write transactions for command flows.
 
+The first PostgreSQL inventory repository adapter is `internal/platform/persistence/postgres/inventory_repository.go`. Construct it with `NewInventoryRepositoryForUnitOfWork` and pass an executor supplied by the application-owned unit of work, such as a `pgx.Tx` or compatible test executor. The adapter must not call `BEGIN`, `COMMIT`, or `ROLLBACK`; transaction lifetime belongs to `internal/platform/tx` and `internal/app`.
+
+`GrantItemMutation` carries `event_id`, `occurred_at`, and `reason` so the PostgreSQL adapter can persist `inventory_item_grants` in the same executor path as the item quantity update.
+
 The first inventory migration source is `migrations/postgres/000001_create_inventory_state.sql`. It creates `inventory_accounts`, `inventory_items`, and `inventory_item_grants`. Run `node ../tools/vibit check migrations` when migration sources or migration guidance change. Migration apply/rollback verification remains pending until migration tooling can run against a disposable PostgreSQL environment.
 
 ## 6. Generated Files
@@ -110,9 +114,9 @@ Do not place handwritten runtime code under `internal/generated/proto/` or `inte
 
 ## 7. Current State
 
-This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
+This runtime workspace now has the first generated Protobuf output, the first narrow runtime handoff slice, the first WebSocket transport adapter, a small application dispatch skeleton for command and query routes, the first transaction boundary skeleton, the first inventory repository/policy/handler runtime boundary with a command-safe mutation lock, the first PostgreSQL inventory repository adapter, the first inventory Protobuf/domain payload bridge, the first application-error-to-Protobuf-error-envelope mapper, the first frame-to-Protobuf-to-application composition adapter, a package-local request-loop test fixture for Protobuf command/query tests, and minimal process wiring that mounts `/v1/ws`.
 
-The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, and first inventory migration source, but it still does not implement PostgreSQL repository adapters, migration apply/rollback tooling, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, or catalog-driven error retryability yet.
+The workspace has a documented PostgreSQL persistence boundary, transaction skeleton, first inventory migration source, and first PostgreSQL repository adapter, but it still does not implement migration apply/rollback tooling, persistent runtime wiring, generated route registration, generated protocol bridge creation, authentication/session validation, live PostgreSQL integration testing, or catalog-driven error retryability yet.
 
 The first manual process run path is:
 

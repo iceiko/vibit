@@ -104,9 +104,12 @@ type MutationLock interface {
 }
 
 type GrantItemMutation struct {
-	PlayerID string
-	ItemID   string
-	Quantity int64
+	EventID    string
+	OccurredAt time.Time
+	PlayerID   string
+	ItemID     string
+	Quantity   int64
+	Reason     string
 }
 
 type PermissionPolicy interface {
@@ -305,10 +308,28 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 		return GrantItemResponse{}, nil, inventoryError(ErrorCodeInventoryCapacity, "inventory capacity would be exceeded")
 	}
 
+	event := ItemGrantedEvent{
+		EventID:    eventIDs.NewEventID(),
+		OccurredAt: clock.Now().UTC(),
+		PlayerID:   request.PlayerID,
+		ItemID:     request.ItemID,
+		Quantity:   request.Quantity,
+		Reason:     request.Reason,
+	}
+	if strings.TrimSpace(event.EventID) == "" {
+		return GrantItemResponse{}, nil, errors.New("inventory: event_id is required")
+	}
+	if event.OccurredAt.IsZero() {
+		return GrantItemResponse{}, nil, errors.New("inventory: event occurred_at is required")
+	}
+
 	granted, err := mutationLock.GrantItem(ctx, GrantItemMutation{
-		PlayerID: request.PlayerID,
-		ItemID:   request.ItemID,
-		Quantity: request.Quantity,
+		EventID:    event.EventID,
+		OccurredAt: event.OccurredAt,
+		PlayerID:   request.PlayerID,
+		ItemID:     request.ItemID,
+		Quantity:   request.Quantity,
+		Reason:     request.Reason,
 	})
 	if err != nil {
 		return GrantItemResponse{}, nil, err
@@ -320,19 +341,8 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 	if granted.Quantity < request.Quantity {
 		return GrantItemResponse{}, nil, errors.New("inventory: repository returned invalid new quantity")
 	}
-
-	event := ItemGrantedEvent{
-		EventID:     eventIDs.NewEventID(),
-		OccurredAt:  clock.Now().UTC(),
-		PlayerID:    request.PlayerID,
-		ItemID:      granted.ItemID,
-		Quantity:    request.Quantity,
-		NewQuantity: granted.Quantity,
-		Reason:      request.Reason,
-	}
-	if strings.TrimSpace(event.EventID) == "" {
-		return GrantItemResponse{}, nil, errors.New("inventory: event_id is required")
-	}
+	event.ItemID = granted.ItemID
+	event.NewQuantity = granted.Quantity
 
 	response := GrantItemResponse{
 		PlayerID:    request.PlayerID,
