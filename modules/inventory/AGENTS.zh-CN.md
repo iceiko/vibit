@@ -43,7 +43,7 @@ Runtime contract source files 位于 `contracts/inventory/` 下，并登记在 `
 Generated contract shapes：
 
 - 计划中的 `GrantItem`、`GetInventory` 和 `ItemGranted` Go contract shapes
-- 计划中的 WebSocket client/server messages Protobuf wire schemas
+- 第一批 WebSocket client/server inventory messages 的 generated Protobuf wire schemas
 
 在实现第一条 runtime slice 前，应阅读：
 
@@ -61,6 +61,8 @@ Generated contract shapes：
 - Inventory capacity 和 permission policy interfaces
 - 面向 `runtime/internal/app.Dispatcher` 的 `RegisterRoutes`
 - 覆盖 command、query、event、permission、capacity 和 dispatcher integration behavior 的 tests
+
+第一条 inventory Protobuf/domain bridge 位于 `runtime/internal/platform/protocol/protobuf/inventory_bridge.go`。它把 generated inventory wire payloads 映射为 inventory runtime request structs，也把 inventory runtime results/events 映射回 generated Protobuf payloads。
 
 不要在本模块中直接 import generated Protobuf types。Protocol adapters 或 generated bridges 应把 wire payloads 转换成 inventory runtime request structs。
 

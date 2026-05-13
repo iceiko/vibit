@@ -42,7 +42,7 @@ Runtime contract source files live under `contracts/inventory/` and are register
 Generated contract shapes:
 
 - Planned Go contract shapes for `GrantItem`, `GetInventory`, and `ItemGranted`
-- Planned Protobuf wire schemas for WebSocket client/server messages
+- Generated Protobuf wire schemas for the first WebSocket client/server inventory messages
 
 Before implementing the first runtime slice, read:
 
@@ -60,6 +60,8 @@ The first handwritten runtime path now starts under `runtime/internal/modules/in
 - Inventory capacity and permission policy interfaces
 - `RegisterRoutes` for `runtime/internal/app.Dispatcher`
 - Tests for command, query, event, permission, capacity, and dispatcher integration behavior
+
+The first inventory Protobuf/domain bridge lives under `runtime/internal/platform/protocol/protobuf/inventory_bridge.go`. It maps generated inventory wire payloads into inventory runtime request structs and maps inventory runtime results/events back into generated Protobuf payloads.
 
 Do not import generated Protobuf types directly into this module. Protocol adapters or generated bridges should translate wire payloads into inventory runtime request structs.
 

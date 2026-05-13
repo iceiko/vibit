@@ -84,6 +84,8 @@ Responsibilities:
 - Validate envelope-level shape.
 - Convert `kind`, `module`, `name`, `request_id`, `target`, `session`, `payload_type`, and `payload` into an application route request.
 - Decode generated Protobuf payloads only through generated Protobuf packages.
+- Convert generated wire payloads into handwritten domain runtime payloads only through explicit protocol bridge functions.
+- Convert application results and events back into generated wire payloads only through explicit protocol bridge functions.
 - Map protocol errors into error envelopes.
 - Preserve request correlation.
 
@@ -120,6 +122,43 @@ Must not:
 - Import `github.com/coder/websocket`.
 - Import generated Protobuf packages unless a later adapter decision explicitly allows a narrow bridge.
 - Hide module-specific business rules.
+
+### Protocol-To-Domain Payload Bridges
+
+Owner:
+
+```text
+runtime/internal/platform/protocol/protobuf/
+```
+
+The first active bridge is:
+
+```text
+runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+```
+
+Responsibilities:
+
+- Map decoded generated Protobuf payloads into handwritten module runtime request structs before application dispatch.
+- Map application result payloads into generated Protobuf response payloads after application dispatch.
+- Map application events into generated Protobuf event payloads when they are ready for protocol output.
+- Keep field mapping explicit and test-covered.
+- Preserve the original envelope metadata and request correlation.
+
+Must not:
+
+- Enforce domain permissions or invariants.
+- Call repositories directly.
+- Add authentication shortcuts.
+- Change generated Protobuf output.
+- Become a hidden place for business behavior.
+
+Rules:
+
+- Domain modules must not import generated Protobuf packages.
+- `runtime/internal/app/` must not import generated Protobuf packages.
+- A bridge belongs in the protocol adapter layer until a later generated bridge standard replaces the handwritten bridge.
+- Unknown or not-yet-bridged routes may pass through unchanged only when their payload is already a protocol payload. Inventory routes must fail fast on mismatched payload types.
 
 ### Domain Module Runtime Logic
 
@@ -273,6 +312,7 @@ Future verification should inspect Go imports and package contents to ensure:
 - Application dispatch does not parse WebSocket frames.
 - Application and domain packages do not import platform adapters or generated Protobuf packages directly.
 - Generated output does not contain handwritten adapter code.
+- Inventory Protobuf/domain bridge code remains under `runtime/internal/platform/protocol/protobuf/`.
 
 ## 10. Migration Path
 

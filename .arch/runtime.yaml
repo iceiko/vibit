@@ -26,8 +26,8 @@ canonical_decisions:
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: application_dispatch_skeleton
-  implementation_code_status: handoff_slice_with_generated_proto_and_dispatch_skeleton
+  current_phase: inventory_protocol_domain_bridge
+  implementation_code_status: handoff_dispatch_inventory_runtime_and_protocol_bridge
   previous_experimental_runtime_slice: removed_from_mainline
 
 first_reference_runtime:
@@ -179,6 +179,7 @@ server_instance_model:
     standard: docs/runtime-protocol-adapter.md
     decision: ADR-0018
     check_command: node tools/vibit check runtime
+    status: inventory_bridge_started
     first_request_flow:
       - websocket_frame
       - transport_frame
@@ -207,6 +208,19 @@ server_instance_model:
       domain_modules: runtime/internal/modules/<module>
       generated_contracts: runtime/internal/generated/contracts
       generated_proto: runtime/internal/generated/proto
+    current_bridges:
+      inventory:
+        request_mapper: runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+        tests: runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go
+        maps_requests:
+          - GrantItemRequest -> inventory.GrantItemRequest
+          - GetInventoryRequest -> inventory.GetInventoryRequest
+        maps_results:
+          - inventory.GrantItemResponse -> GrantItemResponse
+          - inventory.GetInventoryResponse -> GetInventoryResponse
+        maps_events:
+          - inventory.ItemGrantedEvent -> ItemGranted
+        boundary_rule: Domain and application packages must not import generated Protobuf packages.
   application_dispatch:
     owner: runtime/internal/app
     status: skeleton_created
@@ -353,7 +367,7 @@ first_runtime_proof_slice:
   planned_generated_contract_path: runtime/internal/generated/contracts/inventory
   planned_proto_source_path: proto/vibit/inventory/v1
   planned_generated_proto_path: runtime/internal/generated/proto
-  skeleton_status: application_dispatch_skeleton_created_no_business_logic
+  skeleton_status: inventory_runtime_and_protocol_bridge_started
   proof_unit: requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs
   minimum_capabilities:
     - Declare one command, one query, one event, one error, and one permission.

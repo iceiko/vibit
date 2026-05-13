@@ -130,7 +130,7 @@ contracts:
   registry: .arch/contracts.yaml
   semantic_source_format: vibit_manifest_yaml
   wire_schema_format: protobuf
-  wire_schema_status: planned
+  wire_schema_status: first_inventory_proto_generated
   commands:
     GrantItem: contracts/inventory/commands/GrantItem.yaml
   queries:
@@ -158,14 +158,18 @@ handwritten:
       - inventory_invariant_tests
 
 proof_slice:
-  status: runtime_boundary_started
+  status: runtime_boundary_and_protocol_bridge_started
   goal: Prove requirement -> spec -> contract -> generated shape -> handwritten logic -> tests -> verification -> docs for one inventory capability.
   first_command: GrantItem
   first_query: GetInventory
   first_event: ItemGranted
   persistence_assumption: postgresql_is_first_authoritative_store_when_runtime_persistence_begins
   object_storage_required_for_first_slice: false
-  runtime_implementation: repository_policy_and_handler_boundary_started
+  runtime_implementation: repository_policy_handler_and_protocol_bridge_started
+  protocol_bridge:
+    owner: runtime/internal/platform/protocol/protobuf
+    file: runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+    tests: runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go
   first_runtime_language: Go
   first_client_protocol: WebSocket
   first_wire_format: Protobuf

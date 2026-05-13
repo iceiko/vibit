@@ -85,6 +85,8 @@ runtime/internal/platform/protocol/protobuf/
 - 验证 envelope-level shape。
 - 把 `kind`、`module`、`name`、`request_id`、`target`、`session`、`payload_type` 和 `payload` 转换为 application route request。
 - 只通过 generated Protobuf packages 解码 generated Protobuf payloads。
+- 只通过显式 protocol bridge functions，把 generated wire payloads 转换成 handwritten domain runtime payloads。
+- 只通过显式 protocol bridge functions，把 application results 和 events 转换回 generated wire payloads。
 - 把 protocol errors 映射为 error envelopes。
 - 保留 request correlation。
 
@@ -121,6 +123,43 @@ runtime/internal/app/
 - Import `github.com/coder/websocket`。
 - Import generated Protobuf packages，除非后续 adapter decision 明确允许一个窄 bridge。
 - 隐藏 module-specific business rules。
+
+### Protocol-To-Domain Payload Bridges
+
+Owner：
+
+```text
+runtime/internal/platform/protocol/protobuf/
+```
+
+第一条 active bridge 是：
+
+```text
+runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+```
+
+职责：
+
+- 在 application dispatch 前，把 decoded generated Protobuf payloads 映射为 handwritten module runtime request structs。
+- 在 application dispatch 后，把 application result payloads 映射为 generated Protobuf response payloads。
+- 当 events 准备进入 protocol output 时，把 application events 映射为 generated Protobuf event payloads。
+- 保持 field mapping 显式并由 tests 覆盖。
+- 保留原始 envelope metadata 和 request correlation。
+
+不得：
+
+- 执行 domain permissions 或 invariants。
+- 直接调用 repositories。
+- 添加 authentication shortcuts。
+- 修改 generated Protobuf output。
+- 成为隐藏 business behavior 的地方。
+
+规则：
+
+- Domain modules 不得 import generated Protobuf packages。
+- `runtime/internal/app/` 不得 import generated Protobuf packages。
+- 在后续 generated bridge standard 替代 handwritten bridge 之前，bridge 属于 protocol adapter layer。
+- 未知或尚未 bridge 的 routes 只有在 payload 已经是 protocol payload 时才可以原样通过。Inventory routes 遇到 payload type mismatch 时必须 fail fast。
 
 ### Domain Module Runtime Logic
 
@@ -274,6 +313,7 @@ node tools/vibit check all
 - Application dispatch 不解析 WebSocket frames。
 - Application 和 domain packages 不得直接 import platform adapters 或 generated Protobuf packages。
 - Generated output 不包含 handwritten adapter code。
+- Inventory Protobuf/domain bridge code 保持位于 `runtime/internal/platform/protocol/protobuf/`。
 
 ## 10. Migration Path
 
