@@ -40,11 +40,12 @@ purpose: >
   runtime_authentication_implementation_boundary: ADR-0036
   close_runtime_authentication_boundary_and_open_generated_shape_gate: ADR-0037
   authentication_generated_contract_shape_timing: ADR-0038
+  application_authentication_service_interface_boundary: ADR-0039
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: authentication_generated_contract_shape_gate
+  current_phase: token_credential_verifier_algorithm_redaction_boundary
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1260,15 +1261,59 @@ identity_session_boundary:
       - W-0089 add_runtime_authentication_contract_shape_generator_support_and_output
     rule: The timing decision and generation slice are complete. Metadata-only generated authentication shapes under the ADR-0038 path are allowed, but they must not implement runtime authentication behavior, add Protobuf messages, add WebSocket carriers, add authentication dependencies, change authentication.Repository, or change migration schemas.
   application_authentication_service_interface_boundary:
-    status: active
+    status: completed
     milestone: M-018
     first_work_item: W-0090
-    next_work_item: W-0090
+    completed_work_item: W-0090
+    change: changes/2026-05-15-define-application-authentication-service-interface-boundary
+    next_milestone: M-019
+    next_work_item: W-0091
     previous_milestone: M-017
     previous_completed_work_item: W-0089
+    decision: ADR-0039
+    application_authentication_service_interface_boundary_decision: ADR-0039
+    standard: docs/application-authentication-service-interface-boundary.md
+    translation: docs/application-authentication-service-interface-boundary.zh-CN.md
+    application_authentication_service_interface_boundary_standard: docs/application-authentication-service-interface-boundary.md
+    application_authentication_service_interface_boundary_translation: docs/application-authentication-service-interface-boundary.zh-CN.md
+    application_authentication_service_interface_boundary_defined: true
+    application_authentication_service_interface_boundary_check_rule: runtime.application_authentication_service_interface_boundary
     generated_authentication_shapes_available: true
     planned_owner: runtime/internal/app
+    planned_optional_child_package: runtime/internal/app/authentication
     planned_boundary_type: application_service_interface_only
+    allowed_scope: boundary_standard_manifests_and_checks_only
+    service_vocabulary_status: defined_no_code
+    redaction_expectations_defined: true
+    unit_of_work_repository_usage_defined: true
+    request_identity_handoff_defined: true
+    error_permission_audit_handoff_defined: true
+    application_authentication_service_interfaces_implemented: false
+    application_authentication_service_code_added: false
+    runtime_authentication_implemented: false
+    token_generation_added: false
+    token_validation_added: false
+    verifier_comparison_added: false
+    login_handlers_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    protobuf_authentication_messages_added: false
+    websocket_proof_carrier_implemented: false
+    authentication_dependencies_added: false
+    repository_interface_changed: false
+    migration_schemas_changed: false
+    work_queue:
+      - W-0090 define_application_authentication_service_interface_boundary
+    rule: The service-interface boundary is defined. Future application authentication services must stay application-owned, map generated contract vocabulary through application DTOs, use authentication.Repository through the application unit-of-work boundary, and hand off validated proof as RequestIdentity before domain dispatch. This boundary does not implement authentication behavior.
+  token_credential_verifier_algorithm_redaction_boundary:
+    status: active
+    milestone: M-019
+    first_work_item: W-0091
+    next_work_item: W-0091
+    previous_milestone: M-018
+    previous_completed_work_item: W-0090
+    planned_owner: runtime/internal/app
+    planned_boundary_type: verifier_algorithm_and_redaction_standard_only
     allowed_scope: boundary_standard_and_manifests_only
     runtime_authentication_implemented: false
     token_generation_added: false
@@ -1282,7 +1327,7 @@ identity_session_boundary:
     authentication_dependencies_added: false
     repository_interface_changed: false
     migration_schemas_changed: false
-    rule: The next slice may define the application-owned authentication service interface boundary that will later orchestrate generated contract vocabulary, authentication.Repository, and request identity handoff. It must not implement authentication behavior.
+    rule: The next slice may define verifier algorithm posture, entropy, encoding, digest classification, constant-time comparison, and redaction test expectations. It must not implement token generation, verifier comparison, login execution, token validation, logout execution, cleanup, protocol, transport, dependency, repository, or migration behavior.
 
 persistence_model:
   decision: ADR-0011

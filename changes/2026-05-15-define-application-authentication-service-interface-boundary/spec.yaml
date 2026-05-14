@@ -1,0 +1,111 @@
+schema_version: 0.1
+change_id: define-application-authentication-service-interface-boundary
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the application-owned authentication service interface boundary without adding runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0039
+  referenced:
+    - ADR-0028
+    - ADR-0036
+    - ADR-0038
+
+standards:
+  added:
+    - docs/application-authentication-service-interface-boundary.md
+    - docs/application-authentication-service-interface-boundary.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  service_code_added: false
+  application_authentication_service_interface_boundary_defined: true
+  application_authentication_service_interfaces_implemented: false
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  completed_work_item: W-0090
+  completed_milestone: M-018
+  next_milestone: M-019
+  next_ready_work_item: W-0091
+  next_direction: define_token_and_credential_verifier_algorithm_redaction_boundary
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-application-authentication-service-interface-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

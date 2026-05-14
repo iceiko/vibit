@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-018
+current_milestone: M-019
 
 continuation_semantics:
   default_step_unit: work_item
@@ -364,7 +364,7 @@ milestones:
 
   - id: M-018
     title: Application Authentication Service Interface Boundary
-    status: active
+    status: completed
     goal: Define the application-owned runtime authentication service interface boundary before adding runtime authentication behavior, token material generation, verifier comparison, Protobuf messages, or WebSocket proof carriers.
     completion_criteria:
       - The future service interface owner, package boundary, input/output vocabulary, redaction expectations, and unit-of-work dependency shape are documented before implementation.
@@ -375,6 +375,27 @@ milestones:
       - implementing application authentication services
       - generating access tokens or credential material
       - comparing credential or token verifier digests
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-018 defined the application authentication service interface boundary. The repository now has an English and Simplified Chinese service-interface boundary standard, ADR-0039, a runtime check rule, manifest and guide references, generated authentication contract shape to service vocabulary mapping, redaction expectations, unit-of-work and authentication.Repository usage rules, error/permission/audit handoff mapping, and request identity handoff expectations. No application authentication service code, runtime authentication behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes were added.
+
+  - id: M-019
+    title: Token And Credential Verifier Algorithm Redaction Boundary
+    status: active
+    goal: Define verifier algorithm posture and redaction test expectations before adding application authentication service code, token material generation, or verifier comparison.
+    completion_criteria:
+      - Credential verifier, token lookup digest, token verifier digest, entropy, encoding, key identifier, and constant-time comparison requirements are documented before implementation.
+      - Redaction tests and secret-handling expectations are defined for credentials, raw access tokens, verifier inputs, application errors, audit-safe facts, and logs.
+      - The boundary explains which future code may use Go standard cryptography packages or whether an external dependency adoption record is required.
+      - Runtime behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes remain deferred unless separately gated.
+    non_goals:
+      - implementing token generation
+      - implementing verifier comparison
+      - implementing application authentication service code
       - executing login, token validation, logout, refresh, or cleanup behavior
       - adding authentication Protobuf messages
       - changing the Protobuf envelope or WebSocket handshake
@@ -2348,7 +2369,7 @@ work_items:
   - id: W-0090
     milestone: M-018
     title: Define application authentication service interface boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-application-authentication-service-interface-boundary
     depends_on:
       - W-0089
@@ -2356,11 +2377,33 @@ work_items:
       - ADR-0028
       - ADR-0036
       - ADR-0038
+      - ADR-0039
     completion:
       - Define the future application-owned authentication service interface boundary under `runtime/internal/app` without implementing behavior.
       - Map generated authentication contract shapes to service-level request/result vocabulary, redaction expectations, and error/permission/audit handoff rules.
       - Declare how the service boundary may use the application unit-of-work and `authentication.Repository` without moving authentication behavior into the repository or PostgreSQL adapter.
       - Preserve deferral for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes.
+    completion_summary: Defined the application-owned authentication service interface boundary in ADR-0039 and the paired boundary standard. Mapped generated authentication contract shapes to future service request/result vocabulary, redaction expectations, unit-of-work usage, authentication.Repository usage, error/permission/audit handoff, and RequestIdentity handoff. Added a runtime check rule for the boundary and updated manifests and guides. No Go service code, runtime authentication behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes were added.
     ask_first:
       - Implementing application authentication service code rather than defining its boundary.
       - Adding token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
+
+  - id: W-0091
+    milestone: M-019
+    title: Define token and credential verifier algorithm redaction boundary
+    status: next_ready
+    change: changes/2026-05-15-define-token-credential-verifier-algorithm-redaction-boundary
+    depends_on:
+      - W-0090
+    related_decisions:
+      - ADR-0027
+      - ADR-0036
+      - ADR-0039
+    completion:
+      - Define verifier algorithm posture for device credential lookup/verifier material and opaque access-token lookup/verifier material without implementing generation or comparison behavior.
+      - Define minimum entropy, token encoding, digest classification, key identifier, constant-time comparison, and redaction test expectations for later application service code.
+      - Declare whether the first planned algorithms can use the Go standard library or whether an external dependency adoption record is required before implementation.
+      - Preserve deferral for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes.
+    ask_first:
+      - Selecting a major external cryptography, password-hashing, JWT, OAuth, OIDC, KMS, or provider dependency.
+      - Implementing token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.

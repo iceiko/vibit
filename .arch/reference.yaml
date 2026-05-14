@@ -437,23 +437,51 @@ phase_plan:
       - handler_context_separation
     rule: Generated authentication contract shapes are now introduced before application service interfaces and runtime behavior. The generated shapes are metadata-only and source-traced; protocol messages, WebSocket carriers, dependencies, and runtime authentication behavior remain separate gates.
   phase_2g_application_authentication_service_interface_boundary:
-    status: active
-    active_milestone: M-018
+    status: completed
+    milestone: M-018
     previous_milestone: M-017
-    next_work_item: W-0090
+    completed_work_item: W-0090
+    change: changes/2026-05-15-define-application-authentication-service-interface-boundary
+    decision: ADR-0039
+    application_authentication_service_interface_boundary_decision: ADR-0039
+    standard: docs/application-authentication-service-interface-boundary.md
+    next_milestone: M-019
+    next_work_item: W-0091
     focus:
       - application_owned_authentication_service_interface_boundary
       - generated_contract_shape_to_service_vocabulary_mapping
       - unit_of_work_and_authentication_repository_usage_boundary
       - request_identity_handoff_without_runtime_behavior
       - error_permission_audit_mapping
+      - redaction_expectations
     nakama_reference:
       - account_authentication_service_capability
       - session_token_response_shape_vocabulary
     pitaya_reference:
       - handler_context_separation
       - route_handler_identity_context
-    rule: The next phase defines the application-owned service boundary before behavior. It may document interfaces, DTO vocabulary, and handoff rules, but it must not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, or authentication dependencies.
+    rule: The application-owned service-interface boundary is defined before behavior. It documents future interface ownership, DTO vocabulary, redaction expectations, unit-of-work repository usage, error/permission/audit mapping, and request identity handoff, but it does not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, or authentication dependencies.
+  phase_2h_token_credential_verifier_algorithm_redaction_boundary:
+    status: active
+    active_milestone: M-019
+    previous_milestone: M-018
+    next_work_item: W-0091
+    focus:
+      - verifier_algorithm_posture
+      - credential_lookup_digest_classification
+      - credential_verifier_digest_classification
+      - token_lookup_digest_classification
+      - token_verifier_digest_classification
+      - raw_access_token_entropy_and_encoding
+      - constant_time_comparison_requirements
+      - redaction_test_expectations
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_lifecycle_security
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_context_boundary
+    rule: The next phase may define algorithm and redaction-test posture before service code. It must not implement token generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, or migration changes.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
