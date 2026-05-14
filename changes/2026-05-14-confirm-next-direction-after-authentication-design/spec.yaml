@@ -1,0 +1,97 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-authentication-design
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the post-authentication-design direction gate and select login method plus token format ratification as the next milestone.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0021
+    - ADR-0022
+    - ADR-0023
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/reference.yaml
+    - .arch/conventions.yaml
+    - conversations/2026-05-14-login-method-token-format-direction.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  login_method_token_format_ratification_selected: true
+  login_methods_selected: false
+  token_format_selected: false
+  token_carrier_selected: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  external_identity_linking_implemented: false
+  session_persistence_implemented: false
+  runtime_player_handlers_added: false
+  websocket_routes_added: false
+
+workflow:
+  completed_milestone: M-012
+  completed_work_item: W-0063
+  selected_direction: login_method_and_token_format_ratification
+  next_milestone: M-013
+  next_ready_work_item: W-0064
+  reference_alignment:
+    nakama: authentication_methods_session_token_refresh_expiration_revocation_reference_without_api_compatibility
+    pitaya: session_binding_handler_session_context_vocabulary_reference_without_api_compatibility
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change confirm-next-direction-after-authentication-design --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

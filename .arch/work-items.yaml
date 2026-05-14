@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-012
+current_milestone: M-013
 
 continuation_semantics:
   default_step_unit: work_item
@@ -240,7 +240,7 @@ milestones:
 
   - id: M-012
     title: Next Direction Confirmation Gate
-    status: active
+    status: completed
     goal: Hold the work queue at an explicit maintainer decision point before choosing the next major implementation or architecture direction after authentication and token/session validation design ratification.
     completion_criteria:
       - The maintainer chooses the next major milestone direction.
@@ -252,6 +252,26 @@ milestones:
       - adding runtime player handlers or WebSocket routes without a selected implementation milestone
       - adding a new game-domain module without a selected milestone
       - declaring metadata-only identity sufficient for production permissions
+    completion_summary: The maintainer authorized the agent's professional recommendation to choose `login_method_and_token_format_ratification` as the next major direction. M-013 was created as a bounded ratification milestone with W-0064 as the first design-standard work item. No production authentication implementation, concrete login handler, credential storage, external identity linking, session persistence, Protobuf envelope change, WebSocket handshake authentication, runtime player handler, WebSocket route, major dependency, production permission decision, or game-domain expansion was added.
+
+  - id: M-013
+    title: Login Method And Token Format Ratification
+    status: active
+    goal: Ratify the first production authentication entry points, token model, proof carrier boundaries, token lifecycle semantics, and implementation queue before adding login handlers, token parsing, credential storage, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, or WebSocket routes.
+    completion_criteria:
+      - Candidate first login methods are compared against Nakama capability coverage and vibit security/agent-native constraints.
+      - The first token model is ratified with issuer, verifier, subject, audience, expiration, refresh, revocation, rotation, replay, redaction, and storage implications recorded.
+      - Token/proof carrier behavior is decided or explicitly deferred without changing the Protobuf envelope or WebSocket handshake implicitly.
+      - Required contracts, errors, permissions, schemas, dependency adoption records, migration gates, tests, and repository checks are planned before implementation.
+      - The first implementation queue remains bounded and does not treat metadata-only player_id or session_id as authenticated proof.
+    non_goals:
+      - implementing production authentication in the direction-selection step
+      - adding credential storage tables, external identity tables, token tables, session tables, or migrations before schema ratification
+      - adding password hashing, JWT, OAuth, OIDC, provider SDK, cryptography, key-management, Redis-like, or other major dependencies before adoption records
+      - changing Protobuf envelope behavior before protocol impact is ratified
+      - changing WebSocket handshake authentication behavior before handshake impact is ratified
+      - adding runtime player account handlers or WebSocket routes
+      - copying Nakama or Pitaya public APIs directly
 
 work_items:
   - id: W-0001
@@ -1597,7 +1617,7 @@ work_items:
   - id: W-0063
     milestone: M-012
     title: Confirm next milestone direction after authentication design
-    status: blocked
+    status: completed
     change: changes/2026-05-14-confirm-next-direction-after-authentication-design
     depends_on:
       - W-0062
@@ -1616,15 +1636,41 @@ work_items:
       - additional_game_backend_modules_after_nakama_pitaya_review
       - operations_observability_admin_tooling
       - multiplayer_presence_matchmaking_planning
+    selected_direction: login_method_and_token_format_ratification
     completion:
       - Choose the next major milestone direction with the maintainer.
       - Record the chosen direction as a bounded milestone.
       - Create exactly one next_ready work item for the chosen milestone.
       - Preserve ask-first boundaries for login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake authentication, runtime player handlers, WebSocket routes, major dependencies, production permission, operations posture, multiplayer/presence/matchmaking scope, and major game-domain expansion decisions.
+    completion_summary: The maintainer authorized the agent's professional recommendation to select `login_method_and_token_format_ratification`. M-013 was created with W-0064 as the first bounded design-standard work item. Authentication implementation, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, WebSocket routes, major dependencies, production permission reliance on metadata-only identity, and game-domain expansion remain deferred.
     ask_first:
       - Starting production authentication implementation.
       - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, or WebSocket handshake authentication behavior.
       - Adding runtime player account command/query handlers or WebSocket routes.
       - Adding a new game-domain module or multiplayer/presence/matchmaking milestone.
       - Introducing a new major dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0064
+    milestone: M-013
+    title: Define login method and token format ratification standard
+    status: next_ready
+    change: changes/2026-05-14-define-login-method-token-format-ratification-standard
+    depends_on:
+      - W-0063
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+      - ADR-0022
+      - ADR-0023
+    completion:
+      - Define the ratification standard for first login methods, token model, proof carrier boundaries, lifecycle semantics, storage implications, and implementation gates before code.
+      - Compare Nakama authentication/session token capability coverage and Pitaya session binding vocabulary against vibit-native choices.
+      - Plan the remaining M-013 work queue without adding runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    ask_first:
+      - Implementing production authentication while defining the standard.
+      - Adding credential tables, external identity tables, token tables, session tables, or migrations.
+      - Adding password hashing, JWT, OAuth, OIDC, provider SDK, cryptography, key-management, Redis-like, or other major dependencies.
+      - Changing Protobuf envelope behavior or WebSocket handshake authentication behavior.
+      - Adding runtime player account handlers or WebSocket routes.
       - Declaring metadata-only identity sufficient for production permissions.

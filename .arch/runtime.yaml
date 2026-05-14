@@ -30,7 +30,7 @@ purpose: >
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: authentication_token_session_validation_design_selected
+  current_phase: login_method_token_format_ratification_selected
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -710,7 +710,7 @@ identity_session_boundary:
     - websocket_handshake_authentication_contract
     - player_account_migrations
     - reconnect_replay_behavior
-  previous_confirmation_gate:
+  first_confirmation_gate:
     milestone: M-004
     work_item: W-0030
     selected_direction: ratify_player_account_and_session_contracts
@@ -728,11 +728,16 @@ identity_session_boundary:
     - milestone: M-010
       work_item: W-0056
       selected_direction: ratify_authentication_and_token_session_validation_design
-  active_confirmation_gate:
+    - milestone: M-012
+      work_item: W-0063
+      selected_direction: login_method_and_token_format_ratification
+  previous_confirmation_gate:
     milestone: M-012
     work_item: W-0063
-    status: blocked
-    reason: The authentication/token/session validation design milestone is complete, and the next major direction requires maintainer choice before implementation starts.
+    status: completed
+    selected_direction: login_method_and_token_format_ratification
+    next_milestone: M-013
+    reason: The maintainer authorized the agent's professional recommendation to ratify first login methods and token format before implementing runtime authentication or player routes.
     candidate_directions:
       - login_method_and_token_format_ratification
       - runtime_player_account_handlers_and_websocket_routes
@@ -743,11 +748,42 @@ identity_session_boundary:
       - operations_observability_admin_tooling
       - multiplayer_presence_matchmaking_planning
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
+  login_method_token_format_ratification:
+    selected_by_maintainer: login_method_and_token_format_ratification
+    status: selected_standard_work_next
+    milestone: M-013
+    first_work_item: W-0064
+    latest_completed_work_item: W-0063
+    next_work_item: W-0064
+    selected_at: 2026-05-14
+    change: changes/2026-05-14-confirm-next-direction-after-authentication-design
+    reference_alignment:
+      nakama:
+        account_authentication_methods: capability_reference
+        session_token_refresh_expiration_revocation: capability_reference
+        direct_public_api_compatibility: rejected_for_now
+      pitaya:
+        session_binding: vocabulary_reference
+        handler_session_context: vocabulary_reference
+        direct_public_api_compatibility: rejected_for_now
+    implementation_status:
+      login_methods_selected: false
+      token_format_selected: false
+      token_carrier_selected: false
+      credential_storage_implemented: false
+      external_identity_linking_implemented: false
+      session_persistence_implemented: false
+      protobuf_envelope_changed: false
+      websocket_handshake_authentication_changed: false
+      runtime_authentication_implemented: false
+      runtime_player_handlers_added: false
+      websocket_routes_added: false
+    rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-012
-    latest_completed_work_item: W-0062
-    blocked_work_item: W-0063
-    status: next_direction_confirmation_gate_blocked
+    milestone: M-013
+    latest_completed_work_item: W-0063
+    next_ready_work_item: W-0064
+    status: define_login_method_token_format_ratification_standard_next
 
 persistence_model:
   decision: ADR-0011
