@@ -31,6 +31,7 @@ This standard does not choose:
 Read this standard together with:
 
 - `docs/authentication-proof-token-session-contract-dimensions.md`
+- `docs/credential-storage-external-identity-linking-boundaries.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -358,7 +359,11 @@ The semantic vocabulary for these future choices is ratified in `docs/authentica
 
 ## 8. Credential And External Identity Boundaries
 
-Credential and external identity storage require a later standard before schema or code exists.
+Credential and external identity storage require a separate boundary before schema or code exists.
+
+That boundary is now defined by `docs/credential-storage-external-identity-linking-boundaries.md`.
+
+The boundary standard defines ownership separation, deferred login-method families, provider-subject deferral, future artifact gates, and forbidden shortcuts. It does not implement credential storage or external identity linking.
 
 Future credential work must define:
 
@@ -385,6 +390,12 @@ Until those standards exist:
 - `player_accounts` remains account lifecycle storage only.
 - `player_account_events` remains lifecycle event storage only.
 - No credential, provider subject, access token, refresh token, or session row may be added by convenience.
+
+After the boundary standard exists, the same rule still applies until a future implementation standard ratifies concrete schema, dependencies, contracts, and verification:
+
+- `player_accounts` remains credential-free and provider-subject-free.
+- `player_account_events` remains credential-free, provider-subject-free, token-free, session-free, WebSocket-state-free, and request-validation-free.
+- Login-method family coverage remains deferred capability coverage, not implementation permission.
 
 ## 9. Session Persistence Boundaries
 
@@ -489,7 +500,7 @@ The remaining authentication design milestone should proceed in bounded steps:
 
 1. Add architecture checks that enforce the authentication/token/session design boundary.
 2. Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format. Completed by `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`.
-3. Define credential storage and external identity linking boundaries without adding schema or dependencies.
+3. Define credential storage and external identity linking boundaries without adding schema or dependencies. Completed by `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/`.
 4. Define session persistence and WebSocket handshake decision gates without implementing either path.
 5. Close the milestone or create a confirmation gate for the first implementation direction.
 

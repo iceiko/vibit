@@ -31,6 +31,7 @@ vibit 现在已经有 player account lifecycle persistence 和 application-owned
 本标准应与以下文件一起阅读：
 
 - `docs/authentication-proof-token-session-contract-dimensions.md`
+- `docs/credential-storage-external-identity-linking-boundaries.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -358,7 +359,11 @@ websocket frame
 
 ## 8. Credential 与 External Identity 边界
 
-Credential 和 external identity storage 需要后续标准，之后才能出现 schema 或 code。
+Credential 和 external identity storage 需要单独边界，之后才允许出现 schema 或 code。
+
+该边界现在由 `docs/credential-storage-external-identity-linking-boundaries.md` 定义。
+
+该边界标准定义 ownership separation、deferred login-method families、provider-subject deferral、future artifact gates 和 forbidden shortcuts。它不实现 credential storage 或 external identity linking。
 
 未来 credential work 必须定义：
 
@@ -385,6 +390,12 @@ Credential 和 external identity storage 需要后续标准，之后才能出现
 - `player_accounts` 仍然只存储 account lifecycle。
 - `player_account_events` 仍然只存储 lifecycle event。
 - 不得为了方便添加 credential、provider subject、access token、refresh token 或 session row。
+
+在该边界标准存在后，同一规则仍然适用，直到未来 implementation standard ratify 具体 schema、dependencies、contracts 和 verification：
+
+- `player_accounts` 仍然不包含 credential 和 provider subject。
+- `player_account_events` 仍然不包含 credential、provider subject、token、session、WebSocket state 和 request-validation。
+- Login-method family coverage 仍然只是 deferred capability coverage，不是 implementation permission。
 
 ## 9. Session Persistence 边界
 
@@ -489,7 +500,7 @@ Authentication design milestone 剩余部分应按 bounded steps 推进：
 
 1. 添加 architecture checks，用于强制 authentication/token/session design boundary。
 2. Ratify authentication proof 与 token/session validation 的 semantic contract dimensions，但不选择具体 token format。已由 `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/` 完成。
-3. 定义 credential storage 和 external identity linking 边界，但不添加 schema 或 dependencies。
+3. 定义 credential storage 和 external identity linking 边界，但不添加 schema 或 dependencies。已由 `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/` 完成。
 4. 定义 session persistence 和 WebSocket handshake decision gates，但不实现任何路径。
 5. 关闭该 milestone，或为第一个实现方向创建 confirmation gate。
 

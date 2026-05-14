@@ -120,6 +120,8 @@ Authentication、token 和 session validation design boundary 记录在 `../docs
 
 Authentication proof 与 token/session contract dimensions 记录在 `../docs/authentication-proof-token-session-contract-dimensions.md`。Actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session error metadata、session permission metadata 和 validation event metadata 应使用该标准。这些 dimensions 只是 semantic vocabulary，不授予实现 login methods、token formats、credential lookup、session persistence、Protobuf envelope changes、WebSocket handshake changes、runtime player handlers 或 WebSocket routes 的权限。
 
+Credential storage 与 external identity linking boundaries 记录在 `../docs/credential-storage-external-identity-linking-boundaries.md`。在添加 credential storage、external identity linking、login methods、provider subjects、password hashing、OAuth、OIDC、provider SDKs、account linking、recovery flows、merge behavior 或相关 schema 前，应使用该标准。该边界保持 `player_accounts` 和 `player_account_events` 作为 lifecycle-only tables，并不授权 credential tables、external identity tables、provider dependencies、runtime lookup code、player lifecycle table changes 或 direct Nakama/Pitaya API compatibility。
+
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 
 Live PostgreSQL verification 受 `../docs/postgresql-verification-environment.md` 约束。它通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用；普通 unit tests、`node ../tools/vibit check runtime` 和默认 repository checks 不得要求运行中的 PostgreSQL server。当 live PostgreSQL check 因为没有 disposable DSN 而跳过时，必须显式记录。

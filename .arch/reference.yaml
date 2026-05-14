@@ -136,18 +136,21 @@ phase_plan:
     active_tooling_milestone: M-007
     latest_completed_persistence_milestone: M-009
     active_authentication_design_milestone: M-011
-    latest_authentication_design_work_item: W-0059
-    next_authentication_design_work_item: W-0060
+    latest_authentication_design_work_item: W-0060
+    next_authentication_design_work_item: W-0061
     selected_authentication_direction: ratify_authentication_and_token_session_validation_design
     authentication_direction_change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     authentication_design_standard: docs/authentication-token-session-validation.md
     authentication_design_standard_translation: docs/authentication-token-session-validation.zh-CN.md
     authentication_contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
     authentication_contract_dimensions_standard_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
+    credential_external_identity_boundaries_standard: docs/credential-storage-external-identity-linking-boundaries.md
+    credential_external_identity_boundaries_standard_translation: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
     authentication_design_decision: ADR-0023
     authentication_design_change: changes/2026-05-14-define-authentication-token-session-validation-design-standard
     authentication_boundary_checks_change: changes/2026-05-14-add-authentication-token-session-boundary-checks
     authentication_contract_dimensions_change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
+    credential_external_identity_boundaries_change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
     authentication_boundary_check_rule: runtime.authentication_token_session_boundary
     reference_pull:
       nakama:
@@ -164,6 +167,9 @@ phase_plan:
       nakama:
         account_user_as_first_class_capability: adopted
         multiple_authentication_methods: deferred
+        login_method_families: deferred_capability_coverage
+        credential_storage: separated_and_deferred
+        external_identity_linking: separated_and_deferred
         session_token_concept: deferred
         refresh_token_concept: deferred
         realtime_socket_bound_to_authenticated_session: adapted
@@ -172,6 +178,7 @@ phase_plan:
         session_object_separate_from_acceptor: adopted
         handler_receives_session_context: adapted
         session_binding_vocabulary: adopted_as_vocabulary
+        credential_and_provider_linking_ownership: outside_transport_session_context
         frontend_backend_split: deferred
         realtime_session_context: adapted
         direct_public_api_compatibility: rejected_for_now

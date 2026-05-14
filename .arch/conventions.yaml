@@ -90,6 +90,9 @@ documentation_pairs:
   authentication_proof_token_session_contract_dimensions_standard:
     canonical: docs/authentication-proof-token-session-contract-dimensions.md
     zh-CN: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
+  credential_storage_external_identity_linking_boundaries_standard:
+    canonical: docs/credential-storage-external-identity-linking-boundaries.md
+    zh-CN: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -233,12 +236,16 @@ authentication_token_session_validation:
   translation: docs/authentication-token-session-validation.zh-CN.md
   contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
   contract_dimensions_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
+  credential_external_identity_boundaries_standard: docs/credential-storage-external-identity-linking-boundaries.md
+  credential_external_identity_boundaries_translation: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
   decision: ADR-0023
-  status: contract_dimensions_ratified_without_runtime_implementation
+  status: credential_external_identity_boundaries_defined_without_runtime_implementation
   milestone: M-011
-  latest_completed_work_item: W-0059
-  next_work_item: W-0060
-  change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
+  latest_completed_work_item: W-0060
+  next_work_item: W-0061
+  change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
+  contract_dimensions_change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
+  credential_external_identity_boundaries_change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
   conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
   boundary_check_rule: runtime.authentication_token_session_boundary
   boundary_checks_added: true
@@ -295,6 +302,19 @@ authentication_token_session_validation:
       - not_implemented
     request_identity_handoff_owner: runtime/internal/app
     metadata_only_is_production_permission_basis: false
+  credential_external_identity_boundaries:
+    credential_storage_boundary_defined: true
+    external_identity_linking_boundary_defined: true
+    credential_storage_implemented: false
+    external_identity_linking_implemented: false
+    credential_tables_added: false
+    external_identity_tables_added: false
+    login_methods_selected: false
+    provider_dependencies_added: false
+    player_account_lifecycle_tables_remain_credential_free: true
+    player_account_lifecycle_tables_remain_provider_subject_free: true
+    nakama_login_method_coverage: deferred_capability_families
+    pitaya_session_binding_vocabulary: adopted_as_vocabulary_without_api_compatibility
   current_runtime_status:
     metadata_only_validator_exists: true
     production_authentication_implemented: false

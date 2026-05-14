@@ -419,21 +419,24 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   authentication_token_session_design:
     selected_by_maintainer: ratify_authentication_and_token_session_validation_design
-    status: contract_dimensions_ratified_runtime_implementation_deferred
+    status: credential_external_identity_boundaries_defined_runtime_implementation_deferred
     milestone: M-011
     first_work_item: W-0057
-    latest_completed_work_item: W-0059
-    next_work_item: W-0060
+    latest_completed_work_item: W-0060
+    next_work_item: W-0061
     selected_at: 2026-05-14
     change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     design_standard: docs/authentication-token-session-validation.md
     design_standard_translation: docs/authentication-token-session-validation.zh-CN.md
     contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
     contract_dimensions_standard_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
+    credential_external_identity_boundaries_standard: docs/credential-storage-external-identity-linking-boundaries.md
+    credential_external_identity_boundaries_translation: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
     design_decision: ADR-0023
     design_change: changes/2026-05-14-define-authentication-token-session-validation-design-standard
     boundary_checks_change: changes/2026-05-14-add-authentication-token-session-boundary-checks
     contract_dimensions_change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
+    credential_external_identity_boundaries_change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
     boundary_check_rule: runtime.authentication_token_session_boundary
     boundary_checks_added: true
     conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
@@ -510,6 +513,23 @@ identity_session_boundary:
       - player_account_lifecycle
       - transport_connection_metadata
       - protobuf_envelope_metadata
+    credential_external_identity_boundaries:
+      credential_storage_boundary_defined: true
+      external_identity_linking_boundary_defined: true
+      credential_storage_implemented: false
+      external_identity_linking_implemented: false
+      credential_tables_added: false
+      external_identity_tables_added: false
+      login_methods_selected: false
+      provider_dependencies_added: false
+      runtime_credential_lookup_added: false
+      account_linking_handlers_added: false
+      account_recovery_flows_added: false
+      account_merge_behavior_added: false
+      player_account_lifecycle_tables_remain_credential_free: true
+      player_account_lifecycle_tables_remain_provider_subject_free: true
+      nakama_login_method_coverage: deferred_capability_families
+      pitaya_session_binding_vocabulary: adopted_as_vocabulary_without_api_compatibility
     implementation_status:
       authentication_implemented: false
       token_behavior_implemented: false
@@ -522,7 +542,6 @@ identity_session_boundary:
       websocket_routes_added: false
     rule: The design standard is ratified, but runtime implementation remains deferred. Do not implement production authentication, choose token format, add credentials, add session persistence, change the envelope, change the WebSocket handshake, or add player handlers/routes until separately ratified.
     remaining_work_queue:
-      - W-0060 define_credential_storage_and_external_identity_linking_boundaries
       - W-0061 define_session_persistence_and_websocket_handshake_decision_gates
       - W-0062 close_authentication_token_session_validation_design_milestone
   planned_owner:
@@ -679,9 +698,9 @@ identity_session_boundary:
       selected_direction: ratify_authentication_and_token_session_validation_design
   current_work:
     milestone: M-011
-    latest_completed_work_item: W-0059
-    next_ready_work_item: W-0060
-    status: credential_storage_external_identity_boundaries_next
+    latest_completed_work_item: W-0060
+    next_ready_work_item: W-0061
+    status: session_persistence_websocket_handshake_decision_gates_next
 
 persistence_model:
   decision: ADR-0011

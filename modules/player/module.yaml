@@ -2,12 +2,13 @@ schema_version: 0.1
 module: player
 category: domain
 status: draft
-summary: Owns stable player identity, player account lifecycle semantic and wire contracts, ratified PostgreSQL lifecycle schema boundaries, the module-owned storage-neutral repository interface, and the declared PostgreSQL adapter boundary without implementing authentication, credentials, sessions, runtime handlers, or persistence adapters yet.
+summary: Owns stable player identity, player account lifecycle semantic and wire contracts, ratified PostgreSQL lifecycle schema boundaries, the module-owned storage-neutral repository interface, and the declared PostgreSQL adapter boundary without implementing authentication, credentials, external identity linking, sessions, runtime handlers, or additional persistence behavior.
 
 decisions:
   - ADR-0019
   - ADR-0021
   - ADR-0022
+  - ADR-0023
 
 owns:
   entities:
@@ -97,6 +98,16 @@ dependencies:
     - direct_s3_sdk
     - direct_minio_client
   external_reference_boundaries:
+    credential_storage:
+      owner: planned_future_boundary
+      standard: docs/credential-storage-external-identity-linking-boundaries.md
+      decision: ADR-0023
+      rule: Credential storage is separate from player account lifecycle storage and is not implemented by the player module.
+    external_identity_linking:
+      owner: planned_future_boundary
+      standard: docs/credential-storage-external-identity-linking-boundaries.md
+      decision: ADR-0023
+      rule: Provider subjects, account links, recovery flows, and merge behavior are separate future concerns and are not stored in player account lifecycle tables.
     runtime_session:
       owner: runtime_session_boundary
       standard: docs/player-identity-session-boundary.md
@@ -145,6 +156,11 @@ contracts:
   authentication_implemented: false
   token_behavior_implemented: false
   credential_storage_implemented: false
+  external_identity_linking_implemented: false
+  credential_tables_added: false
+  external_identity_tables_added: false
+  login_methods_selected: false
+  provider_dependencies_added: false
   session_persistence_implemented: false
   player_account_persistence_schema_ratified: true
   player_account_persistence_implemented: false
@@ -172,6 +188,7 @@ contracts:
     - websocket_routes
     - authentication_provider
     - credential_storage
+    - external_identity_linking
     - runtime_player_module_implementation
     - session_persistence
 
@@ -220,6 +237,10 @@ persistence:
     authentication_implemented: false
     token_behavior_implemented: false
     credential_storage_implemented: false
+    external_identity_linking_implemented: false
+    credential_tables_added: false
+    external_identity_tables_added: false
+    provider_dependencies_added: false
     session_persistence_implemented: false
     player_account_persistence_implemented: false
     lifecycle_tables:
@@ -262,6 +283,23 @@ persistence:
       - request_identity_validation_results
       - inventory_state
       - permission_grants
+    credential_external_identity_boundary:
+      standard: docs/credential-storage-external-identity-linking-boundaries.md
+      status: boundary_defined_without_schema_or_implementation
+      credential_storage_implemented: false
+      external_identity_linking_implemented: false
+      credential_tables_added: false
+      external_identity_tables_added: false
+      login_methods_selected: false
+      provider_dependencies_added: false
+      runtime_credential_lookup_added: false
+      account_linking_handlers_added: false
+      account_recovery_flows_added: false
+      account_merge_behavior_added: false
+      player_accounts_remain_credential_free: true
+      player_account_events_remain_credential_free: true
+      player_accounts_remain_provider_subject_free: true
+      player_account_events_remain_provider_subject_free: true
     repository_boundary:
       - Repository.CreatePlayerAccount(ctx, CreatePlayerAccountMutation)
       - Repository.GetPlayerAccount(ctx, player_id)
