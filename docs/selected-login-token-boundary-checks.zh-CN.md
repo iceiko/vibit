@@ -119,12 +119,13 @@ implementation_status:
   runtime_player_handlers_added: false
   websocket_routes_added: false
   protobuf_envelope_changed: false
-  generated_contract_shapes_added: false
+  generated_contract_shapes_added: true
+  authentication_generated_contract_shapes_added: true
 ```
 
 这些信号不能替代 schemas 或 tests。它们是 tripwires，用来迫使未来 implementation work 明确改变 architecture state。
 
-`credential_storage_schema_added: true` 和 `token_storage_schema_added: true` 只表示 SQL migration sources 已存在。`repository_interfaces_added: true` 只表示 storage-neutral interface boundary 已存在。`postgres_adapters_added: true` 和 `authentication_postgres_adapter_added: true` 只表示 bounded PostgreSQL persistence adapter 已存在于 platform package 下。`authentication_postgresql_adapter_checks_refined: true` 只表示 checks 已能区分 persistence-adapter vocabulary 与 runtime authentication behavior。这些信号不授权 runtime credential lookup behavior、login、token behavior、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。
+`credential_storage_schema_added: true` 和 `token_storage_schema_added: true` 只表示 SQL migration sources 已存在。`repository_interfaces_added: true` 只表示 storage-neutral interface boundary 已存在。`postgres_adapters_added: true` 和 `authentication_postgres_adapter_added: true` 只表示 bounded PostgreSQL persistence adapter 已存在于 platform package 下。`authentication_postgresql_adapter_checks_refined: true` 只表示 checks 已能区分 persistence-adapter vocabulary 与 runtime authentication behavior。`authentication_generated_contract_shapes_added: true` 只表示 source-traced metadata-only Go contract shapes 已存在于 `runtime/internal/generated/contracts/runtime/authentication/` 下。这些信号不授权 runtime credential lookup behavior、login、token behavior、Protobuf messages、WebSocket behavior 或 authentication dependencies。
 
 ## 5. 禁止的捷径
 
@@ -162,7 +163,7 @@ implementation_status:
 - 标记 implementation is deferred 的 architecture manifest markers。
 - 解释边界的 agent-facing guides。
 
-Generated Go contract shapes 仍然 deferred。Protobuf wire messages 仍然 deferred。Runtime handlers 仍然 deferred。Runtime token validation 仍然 deferred。
+Generated Go contract shapes 只允许作为 `runtime/internal/generated/contracts/runtime/authentication/` 下的 metadata-only source-traced output。Protobuf wire messages 仍然 deferred。Runtime handlers 仍然 deferred。Runtime token validation 仍然 deferred。
 
 ## 7. 机器可读输出
 

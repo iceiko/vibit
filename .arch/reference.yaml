@@ -414,13 +414,14 @@ phase_plan:
       - frontend_acceptor_backend_handler_separation
     rule: This phase defined runtime authentication implementation ownership and sequencing before behavior; it did not copy Nakama or Pitaya APIs and did not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, generated authentication shapes, or authentication dependencies.
   phase_2f_authentication_generated_contract_shape_gate:
-    status: active
-    active_milestone: M-017
+    status: completed
+    milestone: M-017
     opening_decision: ADR-0037
     timing_decision: ADR-0038
     timing_standard: docs/authentication-generated-contract-shape-timing.md
-    latest_completed_work_item: W-0088
-    next_work_item: W-0089
+    latest_completed_work_item: W-0089
+    completed_work_item: W-0089
+    change: changes/2026-05-14-add-runtime-authentication-contract-shape-generator-support-and-output
     focus:
       - generated_authentication_contract_shape_timing
       - semantic_authentication_contract_trace
@@ -434,7 +435,25 @@ phase_plan:
     pitaya_reference:
       - route_payload_shape_vocabulary
       - handler_context_separation
-    rule: Generated authentication contract shapes should be introduced before application service interfaces and runtime behavior. The next slice may add generator/check support and metadata-only generated shapes; protocol messages, WebSocket carriers, dependencies, and runtime authentication behavior remain separate gates.
+    rule: Generated authentication contract shapes are now introduced before application service interfaces and runtime behavior. The generated shapes are metadata-only and source-traced; protocol messages, WebSocket carriers, dependencies, and runtime authentication behavior remain separate gates.
+  phase_2g_application_authentication_service_interface_boundary:
+    status: active
+    active_milestone: M-018
+    previous_milestone: M-017
+    next_work_item: W-0090
+    focus:
+      - application_owned_authentication_service_interface_boundary
+      - generated_contract_shape_to_service_vocabulary_mapping
+      - unit_of_work_and_authentication_repository_usage_boundary
+      - request_identity_handoff_without_runtime_behavior
+      - error_permission_audit_mapping
+    nakama_reference:
+      - account_authentication_service_capability
+      - session_token_response_shape_vocabulary
+    pitaya_reference:
+      - handler_context_separation
+      - route_handler_identity_context
+    rule: The next phase defines the application-owned service boundary before behavior. It may document interfaces, DTO vocabulary, and handoff rules, but it must not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, or authentication dependencies.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

@@ -119,12 +119,13 @@ implementation_status:
   runtime_player_handlers_added: false
   websocket_routes_added: false
   protobuf_envelope_changed: false
-  generated_contract_shapes_added: false
+  generated_contract_shapes_added: true
+  authentication_generated_contract_shapes_added: true
 ```
 
 These signals are not a substitute for schemas or tests. They are tripwires that force later implementation work to explicitly change the architecture state.
 
-`credential_storage_schema_added: true` and `token_storage_schema_added: true` mean only that the SQL migration sources exist. `repository_interfaces_added: true` means only that a storage-neutral interface boundary exists. `postgres_adapters_added: true` and `authentication_postgres_adapter_added: true` mean only that the bounded PostgreSQL persistence adapter exists under the platform package. `authentication_postgresql_adapter_checks_refined: true` means only that checks distinguish persistence-adapter vocabulary from runtime authentication behavior. These signals do not authorize runtime credential lookup behavior, login, token behavior, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+`credential_storage_schema_added: true` and `token_storage_schema_added: true` mean only that the SQL migration sources exist. `repository_interfaces_added: true` means only that a storage-neutral interface boundary exists. `postgres_adapters_added: true` and `authentication_postgres_adapter_added: true` mean only that the bounded PostgreSQL persistence adapter exists under the platform package. `authentication_postgresql_adapter_checks_refined: true` means only that checks distinguish persistence-adapter vocabulary from runtime authentication behavior. `authentication_generated_contract_shapes_added: true` means only that source-traced metadata-only Go contract shapes exist under `runtime/internal/generated/contracts/runtime/authentication/`. These signals do not authorize runtime credential lookup behavior, login, token behavior, Protobuf messages, WebSocket behavior, or authentication dependencies.
 
 ## 5. Forbidden Shortcuts
 
@@ -162,7 +163,7 @@ The following artifacts are allowed because they are semantic or gate artifacts,
 - Architecture manifest markers that state implementation is deferred.
 - Agent-facing guides that explain the boundary.
 
-Generated Go contract shapes remain deferred. Protobuf wire messages remain deferred. Runtime handlers remain deferred. Runtime token validation remains deferred.
+Generated Go contract shapes are allowed only as metadata-only source-traced output under `runtime/internal/generated/contracts/runtime/authentication/`. Protobuf wire messages remain deferred. Runtime handlers remain deferred. Runtime token validation remains deferred.
 
 ## 7. Machine-Readable Output
 

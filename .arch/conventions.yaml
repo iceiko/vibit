@@ -588,7 +588,8 @@ login_method_token_format_ratification:
     permissions: authentication_permissions
     account_linking: deferred
     refresh_token: not_in_first_implementation
-    generated_contract_shapes_added: false
+    generated_contract_shapes_added: true
+    authentication_generated_contract_shapes_added: true
     implementation_authorized: false
   credential_token_session_schema_gates:
     status: defined
@@ -816,11 +817,11 @@ runtime_authentication_implementation_boundary_planning:
     authentication dependencies.
 
 authentication_generated_contract_shape_gate:
-  status: active
+  status: completed
   milestone: M-017
   first_work_item: W-0088
-  latest_completed_work_item: W-0088
-  next_work_item: W-0089
+  latest_completed_work_item: W-0089
+  completed_work_item: W-0089
   selected_by_closeout_decision: ADR-0037
   timing_decision: ADR-0038
   timing_standard: docs/authentication-generated-contract-shape-timing.md
@@ -828,7 +829,7 @@ authentication_generated_contract_shape_gate:
   previous_milestone: M-016
   previous_closeout_work_item: W-0087
   previous_closeout_change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
-  allowed_scope: generated_shape_generator_support_and_metadata_output_next
+  allowed_scope: generated_shape_generator_support_and_metadata_output_completed
   generated_output_standard: docs/generated-output.md
   generated_output_decision: ADR-0017
   authentication_contract_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
@@ -840,7 +841,11 @@ authentication_generated_contract_shape_gate:
   planned_output_root: runtime/internal/generated/contracts/runtime/authentication
   planned_file_shape: runtime/internal/generated/contracts/runtime/authentication/<contract-type>/<ContractID>.go
   planned_package_name: runtimeauthenticationcontracts
-  generated_authentication_shapes_added: false
+  generated_authentication_shapes_added: true
+  authentication_generated_contract_shapes_added: true
+  generated_authentication_shape_count: 12
+  next_milestone: M-018
+  next_work_item: W-0090
   runtime_authentication_implemented: false
   token_generation_added: false
   token_validation_added: false
@@ -857,11 +862,40 @@ authentication_generated_contract_shape_gate:
     - W-0088 decide_authentication_generated_contract_shape_timing
     - W-0089 add_runtime_authentication_contract_shape_generator_support_and_output
   rule: >
-    The timing decision is accepted. The next slice may add generator/check
-    support and metadata-only generated authentication shapes under the
-    ADR-0038 path, but it must not implement runtime authentication behavior,
-    add Protobuf messages, add WebSocket carriers, add authentication
-    dependencies, change authentication.Repository, or change migration schemas.
+    The timing decision and generation slice are complete. Metadata-only
+    generated authentication shapes under the ADR-0038 path are allowed, but
+    they must not implement runtime authentication behavior, add Protobuf
+    messages, add WebSocket carriers, add authentication dependencies, change
+    authentication.Repository, or change migration schemas.
+
+application_authentication_service_interface_boundary:
+  status: active
+  milestone: M-018
+  first_work_item: W-0090
+  next_work_item: W-0090
+  previous_milestone: M-017
+  previous_completed_work_item: W-0089
+  generated_authentication_shapes_available: true
+  planned_owner: runtime/internal/app
+  planned_boundary_type: application_service_interface_only
+  allowed_scope: boundary_standard_and_manifests_only
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The next slice may define the application-owned authentication service
+    interface boundary that will later orchestrate generated contract
+    vocabulary, authentication.Repository, and request identity handoff. It
+    must not implement authentication behavior.
 
 server_runtime:
   first_reference_language: Go

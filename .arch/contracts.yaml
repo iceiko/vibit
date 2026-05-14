@@ -121,7 +121,7 @@ runtime_contracts:
         path: contracts/runtime/session/permissions/session_permissions.yaml
     rule: Runtime session validation semantic contracts are ratified for the application handoff only. They do not choose token format, login methods, credential storage, real authentication, session persistence, player account persistence, Protobuf envelope changes, WebSocket handshake authentication, or runtime player handlers.
   authentication:
-    status: authentication_contract_surfaces_defined_implementation_deferred
+    status: authentication_contract_surfaces_defined_generated_shapes_added_implementation_deferred
     owner: runtime/internal/app
     standard: docs/authentication-contract-error-permission-surfaces.md
     standard_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
@@ -182,14 +182,17 @@ runtime_contracts:
       runtime_authentication_implementation_boundary_translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
       runtime_authentication_implementation_boundary_decision: ADR-0036
       runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary
-      authentication_generated_contract_shape_gate_status: active
+      authentication_generated_contract_shape_gate_status: completed
       authentication_generated_contract_shape_gate_decision: ADR-0037
       authentication_generated_contract_shape_gate_milestone: M-017
       authentication_generated_contract_shape_timing_decision: ADR-0038
       authentication_generated_contract_shape_timing_standard: docs/authentication-generated-contract-shape-timing.md
       authentication_generated_contract_shape_recommended_timing: before_application_service_interfaces_and_runtime_authentication_behavior
       authentication_generated_contract_shape_planned_output_root: runtime/internal/generated/contracts/runtime/authentication
-      authentication_generated_contract_shape_gate_next_work_item: W-0089
+      authentication_generated_contract_shape_gate_completed_work_item: W-0089
+      authentication_generated_contract_shapes_added: true
+      application_authentication_service_interface_boundary_milestone: M-018
+      application_authentication_service_interface_boundary_next_work_item: W-0090
       external_identity_link_schema_gate_status: deferred_no_schema_added
       runtime_session_record_schema_gate_status: deferred_no_schema_added
       audit_persistence_schema_gate_status: defined_no_schema_added
@@ -230,20 +233,24 @@ runtime_contracts:
       runtime_authentication_implementation_boundary_defined: true
       runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
       runtime_authentication_implementation_boundary_decision: ADR-0036
-      authentication_generated_contract_shape_gate_status: active
+      authentication_generated_contract_shape_gate_status: completed
       authentication_generated_contract_shape_gate_decision: ADR-0037
       authentication_generated_contract_shape_gate_milestone: M-017
       authentication_generated_contract_shape_timing_decision: ADR-0038
       authentication_generated_contract_shape_timing_standard: docs/authentication-generated-contract-shape-timing.md
       authentication_generated_contract_shape_recommended_timing: before_application_service_interfaces_and_runtime_authentication_behavior
       authentication_generated_contract_shape_planned_output_root: runtime/internal/generated/contracts/runtime/authentication
-      authentication_generated_contract_shape_gate_next_work_item: W-0089
+      authentication_generated_contract_shape_gate_completed_work_item: W-0089
+      authentication_generated_contract_shapes_added: true
+      application_authentication_service_interface_boundary_milestone: M-018
+      application_authentication_service_interface_boundary_next_work_item: W-0090
       runtime_lookup_added: false
       websocket_handshake_authentication_changed: false
       runtime_player_handlers_added: false
       websocket_routes_added: false
       protobuf_envelope_changed: false
-      generated_contract_shapes_added: false
+      generated_contract_shapes_added: true
+      authentication_generated_contract_shapes_added: true
     commands:
       - id: AuthenticateWithDeviceCredential
         path: contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml
@@ -273,7 +280,7 @@ runtime_contracts:
     permissions:
       - id: authentication_permissions
         path: contracts/runtime/authentication/permissions/authentication_permissions.yaml
-    rule: Authentication semantic contracts are source-level surfaces only. They define future login, token validation, logout, refresh-reservation, audit, error, and permission vocabulary without adding runtime handlers, WebSocket routes, Protobuf wire messages, generated output, credential tables, token tables, session tables, migrations, or token lifecycle behavior.
+    rule: Authentication semantic contracts now have metadata-only generated Go contract shape output. They define future login, token validation, logout, refresh-reservation, audit, error, and permission vocabulary without adding runtime handlers, WebSocket routes, Protobuf wire messages, token lifecycle behavior, repository interface changes, or migration schema changes.
 
 modules:
   player:

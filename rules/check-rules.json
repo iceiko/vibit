@@ -328,7 +328,7 @@
       "category": "generated",
       "default_severity": "error",
       "title": "Generated contract shape",
-      "description": "Each registered non-runtime semantic contract must have an inspectable generated Go contract shape.",
+      "description": "Each registered generated-shape semantic contract, including runtime authentication, must have an inspectable generated Go contract shape.",
       "agent_guidance": "Run `node tools/vibit generate contract-shapes all` and then `node tools/vibit check generated --json`."
     },
     {
@@ -457,7 +457,7 @@
       "default_severity": "error",
       "title": "Selected login and token boundary",
       "description": "The selected device-credential login and opaque access-token posture must remain contract-only until schema, repository, adapter, test, generated output, protocol, and runtime implementation gates explicitly authorize concrete behavior.",
-      "agent_guidance": "Read `docs/selected-login-token-boundary-checks.md`, `docs/credential-token-session-schema-gates.md`, and `ADR-0030`; do not add login handlers, token validators, token or credential repositories, authentication Protobuf sources, generated authentication shapes, migrations, WebSocket carriers, or auth dependencies until a later bounded implementation work item authorizes them."
+      "agent_guidance": "Read `docs/selected-login-token-boundary-checks.md`, `docs/credential-token-session-schema-gates.md`, and `ADR-0030`; generated authentication shapes are allowed only as source-traced metadata under `runtime/internal/generated/contracts/runtime/authentication/`. Do not add login handlers, token validators, token or credential repositories, authentication Protobuf sources, migrations, WebSocket carriers, or auth dependencies until a later bounded implementation work item authorizes them."
     },
     {
       "rule_id": "runtime.authentication_implementation_boundary",

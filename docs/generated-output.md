@@ -120,7 +120,7 @@ The first planned runtime family-aware path is:
 runtime/authentication/<contract-type>/<ContractID>.go
 ```
 
-The authentication family timing and boundary are defined in `docs/authentication-generated-contract-shape-timing.md` and `ADR-0038`. Runtime authentication shape files remain deferred until a later work item explicitly updates generator/check support and generates those files.
+The authentication family timing and boundary are defined in `docs/authentication-generated-contract-shape-timing.md` and `ADR-0038`. `W-0089` adds generator/check support and commits metadata-only runtime authentication shape files under this path.
 
 Generated contract shape files are inspectable summaries. They do not implement command handlers, query handlers, event publication, persistence, authentication, WebSocket routing, or Protobuf envelope behavior.
 
@@ -134,6 +134,13 @@ Contract: <module>:<type>:<id>
 ```
 
 Runtime family-aware generated contract shapes must also expose the runtime family, either in the contract trace or in a separate generated field. For the first authentication family, the family value is `authentication`.
+
+The accepted runtime authentication trace header shape is:
+
+```text
+Contract: runtime:authentication:<type>:<id>
+Family: authentication
+```
 
 ## 6. Trace Requirements
 
@@ -194,9 +201,9 @@ node tools/vibit check all
 
 `check generated` verifies module-declared generated files and the Go Protobuf output root. For `runtime/internal/generated/proto/`, it allows an empty planned directory, permits `.gitkeep`, requires generated Protobuf Go files to use the `*.pb.go` suffix, requires the `protoc-gen-go` generated-code marker, and requires a source trace that resolves to an existing file under `proto/`.
 
-For `runtime/internal/generated/contracts/`, `check generated` verifies that each registered non-runtime semantic contract has a generated Go contract shape, that the shape declares source and generator traces, and that the committed file matches the current generator output.
+For `runtime/internal/generated/contracts/`, `check generated` verifies that each registered non-runtime semantic contract and each registered runtime authentication semantic contract has a generated Go contract shape, that the shape declares source and generator traces, and that the committed file matches the current generator output.
 
-Runtime family-aware contract shapes require generator and check support before they may be committed. The first planned family is `runtime/authentication`, and the required checks are defined in `docs/authentication-generated-contract-shape-timing.md`.
+Runtime family-aware contract shapes require generator and check support before they may be committed. The first supported family is `runtime/authentication`, and the required checks are defined in `docs/authentication-generated-contract-shape-timing.md`.
 
 Future verification should add:
 

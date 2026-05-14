@@ -12,7 +12,7 @@ Runtime authentication now has semantic contracts, storage schema boundaries, a 
 
 The next risk is that an agent may start service interfaces or runtime behavior directly from prose and repository code, bypassing the machine-readable contract shapes that already help inventory and player work stay predictable.
 
-This standard decides the timing and boundary for generated Go authentication contract shapes without generating those files in this change.
+This standard first decided the timing and boundary for generated Go authentication contract shapes. `W-0089` now completes the first generation slice without adding runtime behavior.
 
 ## 2. Timing Decision
 
@@ -28,7 +28,7 @@ The recommended order is:
 6. Application authentication service interface boundary.
 7. Token generation, verifier comparison, login execution, token validation, logout execution, cleanup, protocol carriers, and runtime behavior through later gated work.
 
-`W-0088` completes step 3 only. It does not authorize generated files, service interfaces, handlers, token behavior, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository changes, or migration schema changes.
+`W-0088` completed step 3 only. `W-0089` completes steps 4 and 5 by adding generator/check support and metadata-only generated files. These steps do not authorize service implementations, handlers, token behavior, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository changes, or migration schema changes.
 
 ## 3. Source And Output
 
@@ -43,13 +43,13 @@ contracts/runtime/authentication/permissions/*.yaml
 
 The registry source is `.arch/contracts.yaml`, under the runtime `authentication` family.
 
-The planned output root is:
+The output root is:
 
 ```text
 runtime/internal/generated/contracts/runtime/authentication/
 ```
 
-The planned file shape is:
+The file shape is:
 
 ```text
 runtime/internal/generated/contracts/runtime/authentication/<contract-type>/<ContractID>.go
@@ -66,7 +66,7 @@ runtime/internal/generated/contracts/runtime/authentication/permissions/authenti
 
 Runtime contract families require the family segment because `runtime` may own more than one semantic family, such as `session` and `authentication`.
 
-The planned Go package name for the first authentication shape files is:
+The Go package name for the first authentication shape files is:
 
 ```text
 runtimeauthenticationcontracts
@@ -88,7 +88,7 @@ No `generated_file_override` is granted by this standard.
 
 ## 5. Check Requirements
 
-Before generated authentication contract shapes are committed, repository tooling must support these checks:
+Generated authentication contract shapes may be committed only when repository tooling supports these checks:
 
 - `node tools/vibit generate contract-shapes all` can generate the runtime authentication family from semantic contracts.
 - `node tools/vibit check generated --json` can detect missing, stale, or drifted runtime authentication family shapes.
@@ -98,7 +98,7 @@ Before generated authentication contract shapes are committed, repository toolin
 - `runtime.selected_login_token_boundary` and `runtime.authentication_implementation_boundary` distinguish metadata-only generated shapes from runtime authentication implementation.
 - `node tools/vibit check all --json` includes the generated-shape checks.
 
-The first generation work item must update checks before or with the generated output. It must not weaken selected login/token, authentication implementation, generated-output, protocol, WebSocket, dependency, repository, or migration guards.
+`W-0089` updates checks before committing the generated output. Future changes must not weaken selected login/token, authentication implementation, generated-output, protocol, WebSocket, dependency, repository, or migration guards.
 
 ## 6. Relationship To Runtime Behavior
 
@@ -150,11 +150,11 @@ git diff --check
 
 Runtime Go tests are not required for the timing decision because it does not add or modify Go runtime behavior.
 
-The later generation work item must run generator, generated-output, runtime, and full repository checks after files are produced.
+Generation work must run generator, generated-output, runtime, and full repository checks after files are produced.
 
 ## 9. Migration Path
 
-The migration path is:
+The first migration path is:
 
 1. Record this timing decision and output boundary.
 2. Add a bounded work item that authorizes generator/check support and generated authentication shape output.
@@ -162,4 +162,3 @@ The migration path is:
 4. Generate files through tooling, not by hand.
 5. Verify source trace, drift, stale files, and runtime behavior boundaries.
 6. Only then design application authentication service interfaces.
-

@@ -13,7 +13,7 @@ Runtime authentication 现在已有 semantic contracts、storage schema boundari
 
 下一个风险是 agent 可能直接从 prose 和 repository code 开始写 service interfaces 或 runtime behavior，绕过已经帮助 inventory 和 player 工作保持可预测的 machine-readable contract shapes。
 
-本标准决定 generated Go authentication contract shapes 的时机和边界，但本次 change 不生成这些文件。
+本标准最初决定 generated Go authentication contract shapes 的时机和边界。`W-0089` 现在完成第一段 generation slice，但不添加 runtime behavior。
 
 ## 2. 时机决策
 
@@ -29,7 +29,7 @@ Generated Go authentication contract shapes 应在 application authentication se
 6. Application authentication service interface boundary。
 7. Token generation、verifier comparison、login execution、token validation、logout execution、cleanup、protocol carriers 和 runtime behavior 通过后续 gated work 推进。
 
-`W-0088` 只完成第 3 步。它不授权 generated files、service interfaces、handlers、token behavior、Protobuf messages、WebSocket proof carriers、authentication dependencies、repository changes 或 migration schema changes。
+`W-0088` 只完成第 3 步。`W-0089` 通过添加 generator/check support 和 metadata-only generated files 完成第 4 步和第 5 步。这些步骤不授权 service implementations、handlers、token behavior、Protobuf messages、WebSocket proof carriers、authentication dependencies、repository changes 或 migration schema changes。
 
 ## 3. Source And Output
 
@@ -44,13 +44,13 @@ contracts/runtime/authentication/permissions/*.yaml
 
 Registry source 是 `.arch/contracts.yaml`，位于 runtime 的 `authentication` family 下。
 
-计划的 output root 是：
+Output root 是：
 
 ```text
 runtime/internal/generated/contracts/runtime/authentication/
 ```
 
-计划的文件形态是：
+文件形态是：
 
 ```text
 runtime/internal/generated/contracts/runtime/authentication/<contract-type>/<ContractID>.go
@@ -67,7 +67,7 @@ runtime/internal/generated/contracts/runtime/authentication/permissions/authenti
 
 Runtime contract families 需要 family segment，因为 `runtime` 可能拥有多个 semantic families，例如 `session` 和 `authentication`。
 
-第一批 authentication shape files 计划使用的 Go package name 是：
+第一批 authentication shape files 使用的 Go package name 是：
 
 ```text
 runtimeauthenticationcontracts
@@ -89,7 +89,7 @@ Generated authentication contract shape files 对 non-system agents 不可变。
 
 ## 5. Check Requirements
 
-在提交 generated authentication contract shapes 之前，repository tooling 必须支持这些 checks：
+只有 repository tooling 支持这些 checks 时，才可以提交 generated authentication contract shapes：
 
 - `node tools/vibit generate contract-shapes all` 能从 semantic contracts 生成 runtime authentication family。
 - `node tools/vibit check generated --json` 能发现 runtime authentication family shapes 的 missing、stale 或 drift。
@@ -99,7 +99,7 @@ Generated authentication contract shape files 对 non-system agents 不可变。
 - `runtime.selected_login_token_boundary` 和 `runtime.authentication_implementation_boundary` 能区分 metadata-only generated shapes 与 runtime authentication implementation。
 - `node tools/vibit check all --json` 包含 generated-shape checks。
 
-第一项 generation work item 必须在生成 output 之前或同时更新 checks。它不得削弱 selected login/token、authentication implementation、generated-output、protocol、WebSocket、dependency、repository 或 migration guards。
+`W-0089` 在提交 generated output 之前更新 checks。后续 changes 不得削弱 selected login/token、authentication implementation、generated-output、protocol、WebSocket、dependency、repository 或 migration guards。
 
 ## 6. 与 Runtime Behavior 的关系
 
@@ -151,7 +151,7 @@ git diff --check
 
 本 timing decision 不添加或修改 Go runtime behavior，因此不要求 runtime Go tests。
 
-后续 generation work item 在生成文件后，必须运行 generator、generated-output、runtime 和完整 repository checks。
+Generation work 在生成文件后，必须运行 generator、generated-output、runtime 和完整 repository checks。
 
 ## 9. Migration Path
 
@@ -163,4 +163,3 @@ Migration path 是：
 4. 通过 tooling 生成文件，不要手写。
 5. 验证 source trace、drift、stale files 和 runtime behavior boundaries。
 6. 之后再设计 application authentication service interfaces。
-

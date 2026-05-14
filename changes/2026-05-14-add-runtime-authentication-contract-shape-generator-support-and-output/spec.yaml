@@ -1,0 +1,135 @@
+schema_version: 0.1
+change_id: add-runtime-authentication-contract-shape-generator-support-and-output
+date: 2026-05-14
+type: tooling
+status: verified
+
+summary: Add runtime authentication generated contract shape support and commit metadata-only generated authentication shapes before service interfaces or runtime behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0017
+    - ADR-0028
+    - ADR-0036
+    - ADR-0038
+
+standards:
+  added: []
+  changed:
+    - docs/generated-output.md
+    - docs/generated-output.zh-CN.md
+    - docs/authentication-generated-contract-shape-timing.md
+    - docs/authentication-generated-contract-shape-timing.zh-CN.md
+    - docs/selected-login-token-boundary-checks.md
+    - docs/selected-login-token-boundary-checks.zh-CN.md
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generator_code_changed: true
+  generated_code_added: true
+  generated_authentication_contract_shape_count: 12
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+generated_output:
+  generator_command: node tools/vibit generate contract-shapes all
+  source_family: contracts/runtime/authentication
+  output_root: runtime/internal/generated/contracts/runtime/authentication
+  package_name: runtimeauthenticationcontracts
+  generated_files_added:
+    - runtime/internal/generated/contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.go
+    - runtime/internal/generated/contracts/runtime/authentication/commands/LogoutAccessToken.go
+    - runtime/internal/generated/contracts/runtime/authentication/commands/RefreshAccessToken.go
+    - runtime/internal/generated/contracts/runtime/authentication/commands/ValidateAccessToken.go
+    - runtime/internal/generated/contracts/runtime/authentication/errors/authentication_errors.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/AuthenticationFailed.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/AuthenticationSucceeded.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/LogoutRequested.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/TokenIssued.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/TokenRevoked.go
+    - runtime/internal/generated/contracts/runtime/authentication/events/TokenValidationFailed.go
+    - runtime/internal/generated/contracts/runtime/authentication/permissions/authentication_permissions.go
+
+workflow:
+  completed_work_item: W-0089
+  completed_milestone: M-017
+  next_milestone: M-018
+  next_ready_work_item: W-0090
+  next_direction: define_application_authentication_service_interface_boundary
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit generate contract-shapes all
+    - node tools/vibit inspect generated --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change add-runtime-authentication-contract-shape-generator-support-and-output --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

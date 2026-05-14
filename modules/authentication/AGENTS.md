@@ -28,7 +28,7 @@ Do not use this module to implement:
 - Cleanup jobs beyond storage-neutral cleanup query shapes.
 - PostgreSQL adapters outside the separately authorized `M-015` platform boundary.
 - WebSocket routes, proof carriers, or handshake authentication.
-- Protobuf messages or generated authentication shapes.
+- Protobuf messages or handwritten authentication behavior under generated authentication shape paths.
 - Password hashing, JWT, OAuth, OIDC, provider SDKs, key-management, Redis-like token stores, S3, or MinIO dependencies.
 - Player account lifecycle storage.
 
@@ -49,9 +49,9 @@ The repository interface may normalize identifiers, digest byte slices, statuses
 
 The implemented PostgreSQL adapter boundary is `runtime/internal/platform/persistence/postgres/authentication_repository.go`, with focused tests at `runtime/internal/platform/persistence/postgres/authentication_repository_test.go`. It uses `NewAuthenticationRepositoryForUnitOfWork(executor)` and implements `authentication.Repository`; `UnitOfWork.NewAuthenticationRepository` creates it from the caller-owned executor. `M-015` authorizes only platform-owned persistence adapter work; it still does not authorize runtime authentication behavior.
 
-Runtime authentication implementation boundary planning is documented in `docs/runtime-authentication-implementation-boundary.md` and `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`. Future runtime authentication must be application-owned under `runtime/internal/app`, must use this module's `authentication.Repository` through the application unit-of-work boundary, and must convert validated proof into `RequestIdentity` before domain dispatch. This module must not absorb token generation, verifier comparison, login execution, access-token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, or authentication dependencies.
+Runtime authentication implementation boundary planning is documented in `docs/runtime-authentication-implementation-boundary.md` and `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`. Future runtime authentication must be application-owned under `runtime/internal/app`, must use this module's `authentication.Repository` through the application unit-of-work boundary, and must convert validated proof into `RequestIdentity` before domain dispatch. This module must not absorb token generation, verifier comparison, login execution, access-token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, handwritten logic under generated authentication shape paths, or authentication dependencies.
 
-The active authentication-adjacent milestone is `M-017 Authentication Generated Contract Shape Gate`. `W-0088` decided that generated Go authentication contract shapes should be introduced before application service interfaces and runtime authentication behavior. `W-0089` may add generator/check support and metadata-only generated authentication shape files under `runtime/internal/generated/contracts/runtime/authentication/`. It must not implement runtime authentication behavior unless a later work item explicitly authorizes that exact slice.
+`M-017 Authentication Generated Contract Shape Gate` is completed. `W-0089` added generator/check support and metadata-only generated authentication shape files under `runtime/internal/generated/contracts/runtime/authentication/`. The active authentication-adjacent milestone is `M-018 Application Authentication Service Interface Boundary`, with `W-0090` as the next ready work item. It may define the future application service interface boundary, but it must not implement runtime authentication behavior unless a later work item explicitly authorizes that exact slice.
 
 ## Forbidden Shortcuts
 

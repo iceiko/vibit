@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-017
+current_milestone: M-018
 
 continuation_semantics:
   default_step_unit: work_item
@@ -344,7 +344,7 @@ milestones:
 
   - id: M-017
     title: Authentication Generated Contract Shape Gate
-    status: active
+    status: completed
     goal: Decide whether and when generated Go authentication contract shapes should be introduced before application service interfaces or runtime authentication behavior.
     completion_criteria:
       - Generated authentication contract shape timing is decided before runtime authentication service code starts.
@@ -357,6 +357,27 @@ milestones:
       - implementing token generation or verifier comparison
       - implementing login, token validation, logout, refresh, or cleanup
       - adding authentication Protobuf messages
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-017 completed the generated authentication contract shape gate. The repository now has runtime-family-aware generator, inspection, and drift-check support for `contracts/runtime/authentication/**`; metadata-only Go authentication contract shape files are generated under `runtime/internal/generated/contracts/runtime/authentication/`; and runtime boundary checks allow only source-traced generated metadata output while keeping runtime authentication behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes deferred.
+
+  - id: M-018
+    title: Application Authentication Service Interface Boundary
+    status: active
+    goal: Define the application-owned runtime authentication service interface boundary before adding runtime authentication behavior, token material generation, verifier comparison, Protobuf messages, or WebSocket proof carriers.
+    completion_criteria:
+      - The future service interface owner, package boundary, input/output vocabulary, redaction expectations, and unit-of-work dependency shape are documented before implementation.
+      - The interface boundary explains how generated authentication contract shapes inform service-level DTOs without being imported into domain modules or transport handlers.
+      - Error, permission, audit, and request identity handoff expectations are mapped from existing semantic authentication contracts.
+      - Runtime behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes remain deferred unless separately gated.
+    non_goals:
+      - implementing application authentication services
+      - generating access tokens or credential material
+      - comparing credential or token verifier digests
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
       - adding WebSocket proof carriers or routes
       - adding authentication dependencies
       - changing authentication.Repository or migration schemas
@@ -2305,7 +2326,7 @@ work_items:
   - id: W-0089
     milestone: M-017
     title: Add runtime authentication contract shape generator support and output
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-add-runtime-authentication-contract-shape-generator-support-and-output
     depends_on:
       - W-0088
@@ -2319,6 +2340,27 @@ work_items:
       - Generate metadata-only Go authentication contract shape files from `contracts/runtime/authentication/**` under `runtime/internal/generated/contracts/runtime/authentication/`.
       - Update runtime authentication boundary checks so only source-traced metadata-only generated authentication shapes are allowed while runtime behavior remains deferred.
       - Verify that no application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes are added.
+    completion_summary: Extended `tools/vibit` contract-shape generation, inspection, and generated-output drift checks for the runtime authentication family-aware path. Generated 12 metadata-only Go authentication contract shape files under `runtime/internal/generated/contracts/runtime/authentication/`, each source-traced to `contracts/runtime/authentication/**` with `Family: authentication`. Updated runtime selected login/token boundary checks to allow only generated metadata shapes from the authorized source family while preserving deferral for runtime authentication behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes.
     ask_first:
       - Changing the ADR-0038 source family or planned output root.
       - Adding application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
+
+  - id: W-0090
+    milestone: M-018
+    title: Define application authentication service interface boundary
+    status: next_ready
+    change: changes/2026-05-15-define-application-authentication-service-interface-boundary
+    depends_on:
+      - W-0089
+    related_decisions:
+      - ADR-0028
+      - ADR-0036
+      - ADR-0038
+    completion:
+      - Define the future application-owned authentication service interface boundary under `runtime/internal/app` without implementing behavior.
+      - Map generated authentication contract shapes to service-level request/result vocabulary, redaction expectations, and error/permission/audit handoff rules.
+      - Declare how the service boundary may use the application unit-of-work and `authentication.Repository` without moving authentication behavior into the repository or PostgreSQL adapter.
+      - Preserve deferral for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes.
+    ask_first:
+      - Implementing application authentication service code rather than defining its boundary.
+      - Adding token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
