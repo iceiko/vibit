@@ -1798,7 +1798,7 @@ work_items:
   - id: W-0070
     milestone: M-013
     title: Define authentication contract error permission surfaces
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
     depends_on:
       - W-0069
@@ -1808,10 +1808,12 @@ work_items:
       - ADR-0024
       - ADR-0026
       - ADR-0027
+      - ADR-0028
     completion:
       - Define planned semantic contract surfaces for selected login methods, token issuance, token refresh, logout, token validation, and any account-linking behavior in scope.
       - Define required error and permission catalog surfaces before implementation.
       - Preserve current runtime code and Protobuf behavior unless a later implementation work item separately ratifies changes.
+    completion_summary: Defined the runtime-owned authentication semantic contract family with command surfaces for device credential login, access-token validation, presented-token logout, and deferred refresh; audit-oriented event surfaces for authentication success/failure, token issuance, token validation failure, token revocation, and logout request; and authentication error and permission catalogs. Extended contract inspection/check tooling to recognize the runtime authentication family. Preserved implementation, Protobuf, WebSocket, generated output, schema, migration, handler, route, and dependency deferral.
     ask_first:
       - Adding runtime handlers or WebSocket routes.
       - Adding Protobuf wire messages or generated output before the contract/protocol boundary is selected.
@@ -1820,7 +1822,7 @@ work_items:
   - id: W-0071
     milestone: M-013
     title: Define credential token session schema gates
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-define-credential-token-session-schema-gates
     depends_on:
       - W-0070

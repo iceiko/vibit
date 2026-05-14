@@ -162,8 +162,12 @@ phase_plan:
     token_lifecycle_storage_implications_standard_translation: docs/token-lifecycle-storage-implications.zh-CN.md
     token_lifecycle_storage_implications_decision: ADR-0027
     token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
-    latest_login_token_ratification_work_item: W-0069
-    next_login_token_ratification_work_item: W-0070
+    authentication_contract_error_permission_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
+    authentication_contract_error_permission_surfaces_standard_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
+    authentication_contract_error_permission_surfaces_decision: ADR-0028
+    authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
+    latest_login_token_ratification_work_item: W-0070
+    next_login_token_ratification_work_item: W-0071
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -192,6 +196,13 @@ phase_plan:
     token_storage_default_target: postgresql_schema_gate
     credential_storage_required_for_device_credential_login: true
     session_storage_required_for_first_posture: false
+    authentication_contract_surfaces_status: defined_implementation_deferred
+    authentication_contract_family: runtime.authentication
+    authentication_contract_commands:
+      - AuthenticateWithDeviceCredential
+      - ValidateAccessToken
+      - LogoutAccessToken
+      - RefreshAccessToken
     session_token_vocabulary_status: deferred_until_session_persistence
     token_format_carrier_rejections:
       - plain_session_id_as_secret

@@ -1,0 +1,81 @@
+schema_version: 0.1
+kind: permission_catalog
+module: runtime
+family: authentication
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0024
+  - ADR-0025
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
+
+summary: Permission catalog for selected first authentication and access-token contract surfaces.
+
+permissions:
+  - id: authentication_device_credential_login
+    description: Allows the public login entrypoint to validate the selected high-entropy device credential login proof after implementation gates are satisfied.
+    dimension: unauthenticated_login_entrypoint
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
+    grants_access_to:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - id: authentication_access_token_validate
+    description: Allows application dispatch to validate explicit access-token proof before production-sensitive domain dispatch.
+    dimension: validation_infrastructure_permission
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
+    grants_access_to:
+      commands:
+        - ValidateAccessToken
+      queries: []
+  - id: authentication_access_token_logout
+    description: Allows revocation of the presented access token in the first logout posture.
+    dimension: player_token_lifecycle_permission
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
+    grants_access_to:
+      commands:
+        - LogoutAccessToken
+      queries: []
+  - id: authentication_access_token_refresh
+    description: Reserved semantic permission for future refresh flows; unsupported in the first implementation posture.
+    dimension: deferred_token_lifecycle_permission
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
+    first_implementation_supported: false
+    grants_access_to:
+      commands:
+        - RefreshAccessToken
+      queries: []
+  - id: authentication_admin_revoke_token
+    description: Reserved administrative revocation permission for later operations/admin posture.
+    dimension: deferred_admin_permission
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
+    first_implementation_supported: false
+    grants_access_to:
+      commands: []
+      queries: []
+
+permission_dimensions:
+  unauthenticated_login_entrypoint: authentication_device_credential_login
+  validation_infrastructure_permission: authentication_access_token_validate
+  player_token_lifecycle_permission: authentication_access_token_logout
+  deferred_token_lifecycle_permission: authentication_access_token_refresh
+  deferred_admin_permission: authentication_admin_revoke_token
+  service_permission_catalog_ratified: false
+  admin_permission_catalog_ratified: false
+  domain_modules_must_not_treat_metadata_only_as_proof: true
+  token_possession_alone_is_not_domain_permission: true
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only

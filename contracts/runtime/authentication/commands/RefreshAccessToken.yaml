@@ -1,0 +1,76 @@
+schema_version: 0.1
+kind: command
+module: runtime
+family: authentication
+name: RefreshAccessToken
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0024
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/token-lifecycle-storage-implications.md
+
+summary: Reserve the token refresh semantic surface while keeping refresh tokens out of the first implementation.
+
+intent: >
+  Record the token refresh surface required by the M-013 standard without
+  authorizing refresh-token behavior. The first implementation renews access
+  tokens by reauthenticating with the selected login method. A future refresh
+  token requires separate lifecycle, storage, rotation, revocation, replay,
+  redaction, error, permission, and test gates.
+
+permission: authentication_access_token_refresh
+
+input:
+  type: object
+  required:
+    - refresh_proof
+  properties:
+    refresh_proof:
+      type: string
+      secret: true
+      description: Future refresh proof material. Not accepted in the first implementation posture.
+
+output:
+  type: object
+  required:
+    - refresh_supported
+  properties:
+    refresh_supported:
+      type: boolean
+      const: false
+    renewal_method:
+      type: string
+      const: reauthenticate_with_device_credential_login
+
+emits: []
+
+errors:
+  - AUTHENTICATION_REFRESH_NOT_SUPPORTED
+  - AUTHENTICATION_NOT_IMPLEMENTED
+
+invariants:
+  - refresh_token_not_in_first_implementation
+  - access_token_renewal_uses_reauthentication_first
+  - refresh_token_storage_must_not_be_added_without_future_gate
+  - refresh_tokens_must_not_use_current_session_id_metadata
+
+authorization:
+  requires_permission: authentication_access_token_refresh
+  permission_basis: future_refresh_flow_only
+  first_implementation_supported: false
+
+implementation:
+  handwritten_extension_point: none
+  generated_outputs: []
+  runtime_status: semantic_contract_only_deferred
+  blocked_until:
+    - refresh_token_decision
+    - refresh_token_schema_gate_defined
+    - refresh_rotation_and_replay_policy_defined
+    - runtime_authentication_implementation_milestone_selected

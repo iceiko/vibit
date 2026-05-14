@@ -1125,6 +1125,21 @@ function parseContractEntries(registry, moduleName, contractType) {
   return entries;
 }
 
+function runtimeContractFamilies() {
+  return [
+    {
+      family: "session",
+      registryFamily: "session_validation",
+      owner: "runtime/internal/app",
+    },
+    {
+      family: "authentication",
+      registryFamily: "authentication",
+      owner: "runtime/internal/app",
+    },
+  ];
+}
+
 function discoverContractRegistryEntries(root) {
   const registryPath = ".arch/contracts.yaml";
   if (!isFile(root, registryPath)) {
@@ -1151,14 +1166,7 @@ function discoverContractRegistryEntries(root) {
     }
   }
 
-  const runtimeFamilies = [
-    {
-      family: "session",
-      registryFamily: "session_validation",
-      owner: "runtime/internal/app",
-    },
-  ];
-  for (const family of runtimeFamilies) {
+  for (const family of runtimeContractFamilies()) {
     const familyBlock = runtimeContractFamilyBlock(registry, family.registryFamily);
     if (!familyBlock) {
       continue;
@@ -2298,15 +2306,29 @@ function loadContractInspection(root, moduleName, requestedType, contractId) {
 }
 
 function loadRuntimeContractInspection(root, contractType, contractId, registryPath, registryExists, registry) {
-  const familyName = "session";
-  const registryFamily = "session_validation";
-  const familyBlock = registryExists ? runtimeContractFamilyBlock(registry, registryFamily) : "";
-  const entries = registryExists ? parseContractEntries(familyBlock, registryFamily, contractType) : [];
-  const entry = entries.find((item) => item.id === contractId) || null;
+  const families = runtimeContractFamilies();
+  let selected = families[0];
+  let familyBlock = registryExists ? runtimeContractFamilyBlock(registry, selected.registryFamily) : "";
+  let entries = registryExists ? parseContractEntries(familyBlock, selected.registryFamily, contractType) : [];
+  let entry = entries.find((item) => item.id === contractId) || null;
+  for (const candidate of families) {
+    const candidateBlock = registryExists ? runtimeContractFamilyBlock(registry, candidate.registryFamily) : "";
+    const candidateEntries = registryExists ? parseContractEntries(candidateBlock, candidate.registryFamily, contractType) : [];
+    const candidateEntry = candidateEntries.find((item) => item.id === contractId) || null;
+    if (candidateEntry) {
+      selected = candidate;
+      familyBlock = candidateBlock;
+      entries = candidateEntries;
+      entry = candidateEntry;
+      break;
+    }
+  }
+  const familyName = selected.family;
+  const registryFamily = selected.registryFamily;
   const sourceExists = entry && entry.path ? isFile(root, entry.path) : false;
   const sourceText = sourceExists ? readText(path.join(root, entry.path)) : "";
   const expectedKind = expectedContractKind(contractType);
-  const expectedOwner = "runtime/internal/app";
+  const expectedOwner = selected.owner;
   const sourceFamily = sourceExists ? firstScalar(sourceText, "family") : null;
   const sourceOwner = sourceExists ? firstScalar(sourceText, "owner") : null;
 
@@ -2370,7 +2392,7 @@ function loadRuntimeContractInspection(root, contractType, contractId, registryP
       path: registryPath,
       declares_id: consistency.module_manifest_declares_id,
       references_source: consistency.module_manifest_references_source,
-      note: "Runtime session contracts are registered as a runtime contract family, not as a domain module manifest.",
+      note: "Runtime contracts are registered as runtime contract families, not as domain module manifests.",
     },
     consistency,
     guidance: consistency.status === "consistent"
@@ -3614,37 +3636,26 @@ function checkRuntimeContractSource(root, familyName, contractType, expectedKind
   }
 }
 
-function checkRuntimeSessionValidationContracts(root, registry, contractTypes) {
-  const familyName = "session";
+function checkRuntimeContractFamilyContracts(root, registry, contractTypes, config) {
+  const familyName = config.family;
   const registryPath = ".arch/contracts.yaml";
-  const familyBlock = runtimeContractFamilyBlock(registry, "session_validation");
+  const familyBlock = runtimeContractFamilyBlock(registry, config.registryFamily);
   if (!familyBlock) {
-    fail(`${registryPath} does not register runtime session_validation contracts`, {
+    fail(`${registryPath} does not register runtime ${config.registryFamily} contracts`, {
       rule_id: "contract.registry_entry",
       artifact: registryPath,
     });
     return;
   }
 
-  for (const marker of [
-    "status: semantic_contracts_and_dimensions_ratified_metadata_only_runtime_hook_no_authentication",
-    "owner: runtime/internal/app",
-    "dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md",
-    "metadata_only_validator_exists: true",
-    "real_authentication_implemented: false",
-    "token_behavior_implemented: false",
-    "credential_storage_implemented: false",
-    "session_persistence_implemented: false",
-    "websocket_handshake_authentication_changed: false",
-    "protobuf_envelope_changed: false",
-  ]) {
+  for (const marker of config.requiredMarkers) {
     if (familyBlock.includes(marker)) {
-      ok(`${registryPath} runtime session_validation preserves marker ${marker}`, {
+      ok(`${registryPath} runtime ${config.registryFamily} preserves marker ${marker}`, {
         rule_id: "contract.registry_entry",
         artifact: registryPath,
       });
     } else {
-      fail(`${registryPath} runtime session_validation is missing marker ${marker}`, {
+      fail(`${registryPath} runtime ${config.registryFamily} is missing marker ${marker}`, {
         rule_id: "contract.registry_entry",
         artifact: registryPath,
       });
@@ -3652,30 +3663,73 @@ function checkRuntimeSessionValidationContracts(root, registry, contractTypes) {
   }
 
   for (const [contractType, expectedKind] of contractTypes) {
-    const entries = parseContractEntries(familyBlock, "session_validation", contractType);
+    const entries = parseContractEntries(familyBlock, config.registryFamily, contractType);
     if (contractType === "queries" && entries.length === 0) {
-      ok(`${registryPath} records no runtime session_validation queries`, {
+      ok(`${registryPath} records no runtime ${config.registryFamily} queries`, {
         rule_id: "contract.registry_entry",
         artifact: registryPath,
       });
       continue;
     }
     if (entries.length > 0) {
-      ok(`${registryPath} registers runtime session_validation ${contractType}`, {
+      ok(`${registryPath} registers runtime ${config.registryFamily} ${contractType}`, {
         rule_id: "contract.registry_entry",
         artifact: registryPath,
       });
     } else {
-      fail(`${registryPath} has no runtime session_validation ${contractType}`, {
+      fail(`${registryPath} has no runtime ${config.registryFamily} ${contractType}`, {
         rule_id: "contract.registry_entry",
         artifact: registryPath,
       });
       continue;
     }
     for (const entry of entries) {
-      checkRuntimeContractSource(root, familyName, contractType, expectedKind, entry, "runtime/internal/app", familyBlock);
+      checkRuntimeContractSource(root, familyName, contractType, expectedKind, entry, config.owner, familyBlock);
     }
   }
+}
+
+function checkRuntimeSessionValidationContracts(root, registry, contractTypes) {
+  checkRuntimeContractFamilyContracts(root, registry, contractTypes, {
+    family: "session",
+    registryFamily: "session_validation",
+    owner: "runtime/internal/app",
+    requiredMarkers: [
+      "status: semantic_contracts_and_dimensions_ratified_metadata_only_runtime_hook_no_authentication",
+      "owner: runtime/internal/app",
+      "dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md",
+      "metadata_only_validator_exists: true",
+      "real_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "session_persistence_implemented: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+    ],
+  });
+}
+
+function checkRuntimeAuthenticationContracts(root, registry, contractTypes) {
+  checkRuntimeContractFamilyContracts(root, registry, contractTypes, {
+    family: "authentication",
+    registryFamily: "authentication",
+    owner: "runtime/internal/app",
+    requiredMarkers: [
+      "status: authentication_contract_surfaces_defined_implementation_deferred",
+      "owner: runtime/internal/app",
+      "standard: docs/authentication-contract-error-permission-surfaces.md",
+      "login_method: device_credential_login",
+      "token_format: opaque_high_entropy_token",
+      "refresh_token: not_in_first_implementation",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "session_persistence_implemented: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+      "runtime_player_handlers_added: false",
+    ],
+  });
 }
 
 function checkContracts(root) {
@@ -3794,6 +3848,7 @@ function checkContracts(root) {
   }
 
   checkRuntimeSessionValidationContracts(root, registry, contractTypes);
+  checkRuntimeAuthenticationContracts(root, registry, contractTypes);
 
   finish();
 }

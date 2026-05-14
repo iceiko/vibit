@@ -1,0 +1,91 @@
+schema_version: 0.1
+kind: command
+module: runtime
+family: authentication
+name: LogoutAccessToken
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0024
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/token-lifecycle-storage-implications.md
+
+summary: Revoke the presented opaque access token for the first logout posture.
+
+intent: >
+  Define the future semantic logout command for the ratified first token
+  lifecycle. The first logout scope is the presented access token only. This
+  contract does not revoke all sessions, all account tokens, all credential
+  tokens, or WebSocket connections.
+
+permission: authentication_access_token_logout
+
+input:
+  type: object
+  required:
+    - access_token
+  properties:
+    access_token:
+      type: string
+      secret: true
+      description: Presented opaque access token to revoke.
+    logout_reason:
+      type: string
+      description: Optional public-safe reason category, not a place for secrets.
+
+output:
+  type: object
+  required:
+    - revoked
+    - logout_scope
+  properties:
+    revoked:
+      type: boolean
+    logout_scope:
+      type: string
+      const: presented_access_token
+    token_record_id:
+      type: string
+      description: Audit-safe token record identifier.
+    revoked_at:
+      type: string
+      format: date-time
+
+emits:
+  - TokenRevoked
+  - LogoutRequested
+
+errors:
+  - AUTHENTICATION_TOKEN_MISSING
+  - AUTHENTICATION_TOKEN_MALFORMED
+  - AUTHENTICATION_TOKEN_INVALID
+  - AUTHENTICATION_TOKEN_STORE_UNAVAILABLE
+  - AUTHENTICATION_NOT_IMPLEMENTED
+
+invariants:
+  - logout_scope_first_posture_is_presented_access_token
+  - logout_must_not_revoke_all_account_tokens_without_future_permission
+  - raw_access_token_must_be_redacted
+  - logout_must_not_change_websocket_handshake_behavior
+  - logout_must_not_require_session_persistence_in_first_posture
+
+authorization:
+  requires_permission: authentication_access_token_logout
+  permission_basis: presented_access_token
+  admin_revocation_allowed: false
+  logout_all_sessions_allowed: false
+
+implementation:
+  handwritten_extension_point: runtime/internal/app/AuthService
+  generated_outputs: []
+  runtime_status: semantic_contract_only
+  blocked_until:
+    - token_verifier_schema_gate_defined
+    - token_revocation_repository_boundary_defined
+    - logout_tests_defined
+    - runtime_authentication_implementation_milestone_selected

@@ -1,0 +1,54 @@
+schema_version: 0.1
+kind: event
+module: runtime
+family: authentication
+name: TokenRevoked
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/token-lifecycle-storage-implications.md
+
+summary: Audit-oriented fact that an opaque access-token verifier record was revoked.
+
+description: >
+  A future authentication boundary revoked the presented access token or a
+  token selected by a later administrative policy. The first posture only
+  authorizes presented-token logout semantics.
+
+payload:
+  type: object
+  required:
+    - token_record_id
+    - revocation_scope
+    - revoked_at
+  properties:
+    token_record_id:
+      type: string
+    revocation_scope:
+      type: string
+      enum:
+        - presented_access_token
+    revoked_at:
+      type: string
+      format: date-time
+    reason:
+      type: string
+
+forbidden_payload_fields:
+  - raw_token
+  - token_prefix
+  - token_verifier_hash
+  - raw_credential
+
+visibility:
+  client_visible: false
+  audit_visible: true
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only

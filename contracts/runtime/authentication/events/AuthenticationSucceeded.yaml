@@ -1,0 +1,61 @@
+schema_version: 0.1
+kind: event
+module: runtime
+family: authentication
+name: AuthenticationSucceeded
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0025
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+
+summary: Audit-oriented fact that selected login proof succeeded and request identity may be produced.
+
+description: >
+  A future authentication boundary validated device credential proof and
+  associated it with a player account. The event is semantic and audit-oriented
+  only; it does not add an event bus, durable audit table, client event stream,
+  or runtime implementation.
+
+payload:
+  type: object
+  required:
+    - actor_kind
+    - player_id
+    - login_method
+    - occurred_at
+  properties:
+    actor_kind:
+      type: string
+      const: player
+    player_id:
+      type: string
+    login_method:
+      type: string
+      const: device_credential_login
+    credential_record_id:
+      type: string
+      description: Audit-safe credential record identifier after schema gates exist.
+    occurred_at:
+      type: string
+      format: date-time
+
+forbidden_payload_fields:
+  - raw_credentials
+  - raw_tokens
+  - token_verifier_hashes
+  - password_hashes
+  - provider_secrets
+
+visibility:
+  client_visible: false
+  audit_visible: true
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only

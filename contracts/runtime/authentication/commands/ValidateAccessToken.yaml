@@ -1,0 +1,139 @@
+schema_version: 0.1
+kind: command
+module: runtime
+family: authentication
+name: ValidateAccessToken
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0024
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
+  - docs/first-token-format-proof-carrier-posture.md
+  - docs/token-lifecycle-storage-implications.md
+
+summary: Validate an explicit opaque access-token proof payload into request identity before domain dispatch.
+
+intent: >
+  Define the future semantic validation command for the ratified explicit
+  request proof payload carrier. The command validates an opaque access token
+  and produces application-owned request identity. It does not change the
+  Protobuf envelope, WebSocket handshake, transport behavior, runtime session
+  persistence, or domain module permissions.
+
+permission: authentication_access_token_validate
+
+input:
+  type: object
+  required:
+    - access_token
+    - route_kind
+    - route_module
+    - route_name
+  properties:
+    access_token:
+      type: string
+      secret: true
+      description: Opaque high-entropy access token carried by explicit request proof payload.
+    route_kind:
+      type: string
+      enum:
+        - command
+        - query
+    route_module:
+      type: string
+      minLength: 1
+    route_name:
+      type: string
+      minLength: 1
+    connection_id:
+      type: string
+      description: Transport-local metadata. It is not proof.
+    connection_epoch:
+      type: integer
+      minimum: 0
+
+output:
+  type: object
+  required:
+    - validation_status
+    - proof_status
+    - actor_kind
+    - actor_id
+    - player_id
+    - player_id_validated
+  properties:
+    validation_status:
+      type: string
+      enum:
+        - authentication_proven
+        - rejected
+    proof_status:
+      type: string
+      enum:
+        - proven
+        - not_present
+        - malformed
+        - rejected
+        - expired
+        - revoked
+        - unavailable
+    actor_kind:
+      type: string
+      const: player
+    actor_id:
+      type: string
+    player_id:
+      type: string
+    player_id_validated:
+      type: boolean
+    session_validated:
+      type: boolean
+      const: false
+    reason:
+      type: string
+    token_record_id:
+      type: string
+      description: Audit-safe token record identifier.
+
+emits:
+  - TokenValidationFailed
+
+errors:
+  - AUTHENTICATION_TOKEN_MISSING
+  - AUTHENTICATION_TOKEN_MALFORMED
+  - AUTHENTICATION_TOKEN_INVALID
+  - AUTHENTICATION_TOKEN_EXPIRED
+  - AUTHENTICATION_TOKEN_REVOKED
+  - AUTHENTICATION_TOKEN_STORE_UNAVAILABLE
+  - AUTHENTICATION_ACCOUNT_DISABLED
+  - AUTHENTICATION_NOT_IMPLEMENTED
+
+invariants:
+  - access_token_must_be_explicit_request_proof_payload
+  - raw_access_token_must_be_redacted
+  - metadata_only_session_fields_must_not_be_proof
+  - token_validation_must_run_before_domain_dispatch
+  - domain_modules_must_not_parse_or_validate_tokens
+  - websocket_transport_must_remain_credential_neutral
+  - protobuf_envelope_must_remain_unchanged_until_protocol_decision
+
+authorization:
+  requires_permission: authentication_access_token_validate
+  permission_basis: validation_infrastructure_permission
+  grants_player_domain_authority: false
+
+implementation:
+  handwritten_extension_point: runtime/internal/app/TokenValidator
+  generated_outputs: []
+  runtime_status: semantic_contract_only
+  blocked_until:
+    - token_verifier_schema_gate_defined
+    - token_verifier_repository_boundary_defined
+    - authenticated_request_contract_shape_defined
+    - runtime_authentication_implementation_milestone_selected

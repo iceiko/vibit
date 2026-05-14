@@ -114,6 +114,9 @@ documentation_pairs:
   token_lifecycle_storage_implications_standard:
     canonical: docs/token-lifecycle-storage-implications.md
     zh-CN: docs/token-lifecycle-storage-implications.zh-CN.md
+  authentication_contract_error_permission_surfaces_standard:
+    canonical: docs/authentication-contract-error-permission-surfaces.md
+    zh-CN: docs/authentication-contract-error-permission-surfaces.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -160,6 +163,7 @@ templates:
     login_method_token_format_ratification_boundary: ADR-0024
     first_token_format_proof_carrier_posture: ADR-0026
     token_lifecycle_storage_implications: ADR-0027
+    authentication_contract_error_permission_surfaces: ADR-0028
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -398,26 +402,31 @@ login_method_token_format_ratification:
   first_token_format_proof_carrier_posture_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
   token_lifecycle_storage_implications_standard: docs/token-lifecycle-storage-implications.md
   token_lifecycle_storage_implications_translation: docs/token-lifecycle-storage-implications.zh-CN.md
+  authentication_contract_error_permission_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
+  authentication_contract_error_permission_surfaces_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
   decision: ADR-0024
   first_login_method_set_decision: ADR-0025
   first_token_format_proof_carrier_posture_decision: ADR-0026
   token_lifecycle_storage_implications_decision: ADR-0027
-  status: token_lifecycle_storage_implications_defined_implementation_deferred
+  authentication_contract_error_permission_surfaces_decision: ADR-0028
+  status: authentication_contract_error_permission_surfaces_defined_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0069
-  next_work_item: W-0070
+  latest_completed_work_item: W-0070
+  next_work_item: W-0071
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
   first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
   token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
   first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
   token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
+  authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
   first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
   token_format_carrier_options_conversation: conversations/2026-05-14-token-format-carrier-comparison.md
   first_token_format_proof_carrier_posture_conversation: conversations/2026-05-14-first-token-format-proof-carrier-ratification.md
   token_lifecycle_storage_implications_conversation: conversations/2026-05-14-token-lifecycle-storage-implications.md
+  authentication_contract_error_permission_surfaces_conversation: conversations/2026-05-14-authentication-contract-error-permission-surfaces.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -534,6 +543,29 @@ login_method_token_format_ratification:
     player_account_lifecycle_tables_remain_external_identity_free: true
     player_account_lifecycle_tables_remain_session_free: true
     implementation_authorized: false
+  authentication_contract_error_permission_surfaces:
+    status: defined
+    owner: runtime/internal/app
+    contract_family: runtime.authentication
+    standard: docs/authentication-contract-error-permission-surfaces.md
+    commands:
+      - AuthenticateWithDeviceCredential
+      - ValidateAccessToken
+      - LogoutAccessToken
+      - RefreshAccessToken
+    events:
+      - AuthenticationSucceeded
+      - AuthenticationFailed
+      - TokenIssued
+      - TokenValidationFailed
+      - TokenRevoked
+      - LogoutRequested
+    errors: authentication_errors
+    permissions: authentication_permissions
+    account_linking: deferred
+    refresh_token: not_in_first_implementation
+    generated_contract_shapes_added: false
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: true
     first_login_method_recommended: true
@@ -546,6 +578,10 @@ login_method_token_format_ratification:
     first_token_carrier_ratified: true
     token_lifecycle_selected: true
     token_lifecycle_defined: true
+    authentication_contract_surfaces_defined: true
+    authentication_error_surface_defined: true
+    authentication_permission_surface_defined: true
+    authentication_audit_event_surface_defined: true
     token_storage_schema_added: false
     credential_storage_schema_added: false
     session_storage_schema_added: false

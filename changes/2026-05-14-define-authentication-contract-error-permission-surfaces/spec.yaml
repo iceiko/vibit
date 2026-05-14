@@ -1,0 +1,72 @@
+schema_version: 0.1
+change_id: define-authentication-contract-error-permission-surfaces
+date: 2026-05-14
+type: contract
+status: complete
+
+summary: Define semantic authentication command, event, error, and permission surfaces for the selected first login/token posture while deferring implementation.
+
+affected_modules:
+  - runtime
+  - player
+
+contracts:
+  commands:
+    added:
+      - AuthenticateWithDeviceCredential
+      - ValidateAccessToken
+      - LogoutAccessToken
+      - RefreshAccessToken
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added:
+      - AuthenticationSucceeded
+      - AuthenticationFailed
+      - TokenIssued
+      - TokenValidationFailed
+      - TokenRevoked
+      - LogoutRequested
+    changed: []
+    removed: []
+  errors:
+    added:
+      - authentication_errors
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - authentication_permissions
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes:
+    - Runtime authentication semantic surfaces are owned by runtime/internal/app.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit inspect contracts --module runtime --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check agent-tooling --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-authentication-contract-error-permission-surfaces --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

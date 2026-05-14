@@ -1,0 +1,206 @@
+schema_version: 0.1
+kind: error_catalog
+module: runtime
+family: authentication
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0024
+  - ADR-0025
+  - ADR-0026
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
+
+summary: Error catalog for selected first authentication and access-token contract surfaces.
+
+errors:
+  - code: AUTHENTICATION_PROOF_MISSING
+    category: authentication
+    failure_class: missing_proof
+    retryable: false
+    message: Authentication proof is required.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - code: AUTHENTICATION_PROOF_MALFORMED
+    category: authentication
+    failure_class: malformed_proof
+    retryable: false
+    message: Authentication proof is malformed.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - code: AUTHENTICATION_CREDENTIAL_INVALID
+    category: authentication
+    failure_class: invalid_proof
+    retryable: false
+    message: Authentication proof is invalid.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - code: AUTHENTICATION_ACCOUNT_DISABLED
+    category: authorization
+    failure_class: actor_disabled
+    retryable: false
+    message: The account cannot authenticate.
+    public_safe: true
+    internal_detail_allowed: true
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+        - ValidateAccessToken
+      queries: []
+  - code: AUTHENTICATION_RATE_LIMITED
+    category: rate_limit
+    failure_class: permission_denied
+    retryable: true
+    message: Authentication is temporarily rate limited.
+    public_safe: true
+    internal_detail_allowed: true
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - code: AUTHENTICATION_TOKEN_MISSING
+    category: authentication
+    failure_class: missing_proof
+    retryable: false
+    message: Access token proof is required.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - ValidateAccessToken
+        - LogoutAccessToken
+      queries: []
+  - code: AUTHENTICATION_TOKEN_MALFORMED
+    category: authentication
+    failure_class: malformed_proof
+    retryable: false
+    message: Access token proof is malformed.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - ValidateAccessToken
+        - LogoutAccessToken
+      queries: []
+  - code: AUTHENTICATION_TOKEN_INVALID
+    category: authentication
+    failure_class: invalid_proof
+    retryable: false
+    message: Access token proof is invalid.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - ValidateAccessToken
+        - LogoutAccessToken
+      queries: []
+  - code: AUTHENTICATION_TOKEN_EXPIRED
+    category: authentication
+    failure_class: expired_proof
+    retryable: false
+    message: Access token proof has expired.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - ValidateAccessToken
+      queries: []
+  - code: AUTHENTICATION_TOKEN_REVOKED
+    category: authentication
+    failure_class: revoked_proof
+    retryable: false
+    message: Access token proof has been revoked.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - ValidateAccessToken
+      queries: []
+  - code: AUTHENTICATION_REFRESH_NOT_SUPPORTED
+    category: not_implemented
+    failure_class: unsupported_proof
+    retryable: false
+    message: Refresh tokens are not supported by the first authentication posture.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - RefreshAccessToken
+      queries: []
+  - code: AUTHENTICATION_CREDENTIAL_STORE_UNAVAILABLE
+    category: dependency
+    failure_class: validator_unavailable
+    retryable: true
+    message: Authentication could not be completed because credential storage was unavailable.
+    public_safe: true
+    internal_detail_allowed: true
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+      queries: []
+  - code: AUTHENTICATION_TOKEN_STORE_UNAVAILABLE
+    category: dependency
+    failure_class: validator_unavailable
+    retryable: true
+    message: Authentication could not be completed because token verifier storage was unavailable.
+    public_safe: true
+    internal_detail_allowed: true
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+        - ValidateAccessToken
+        - LogoutAccessToken
+      queries: []
+  - code: AUTHENTICATION_NOT_IMPLEMENTED
+    category: not_implemented
+    failure_class: not_implemented
+    retryable: false
+    message: Authentication behavior is not implemented for this runtime boundary.
+    public_safe: true
+    internal_detail_allowed: false
+    used_by:
+      commands:
+        - AuthenticateWithDeviceCredential
+        - ValidateAccessToken
+        - LogoutAccessToken
+        - RefreshAccessToken
+      queries: []
+
+failure_class_catalog:
+  adopted_from: docs/authentication-proof-token-session-contract-dimensions.md
+  values:
+    - missing_proof
+    - malformed_proof
+    - unsupported_proof
+    - invalid_proof
+    - expired_proof
+    - revoked_proof
+    - actor_disabled
+    - permission_denied
+    - validator_unavailable
+    - not_implemented
+
+redaction:
+  raw_credentials_in_errors: forbidden
+  raw_tokens_in_errors: forbidden
+  provider_secrets_in_errors: forbidden
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only

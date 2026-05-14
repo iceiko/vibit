@@ -10,7 +10,7 @@ contract_source_format:
   payload_shape: json_schema_like
   source_root: contracts
   semantic_source_of_truth: true
-  status: player_account_and_runtime_session_semantic_contracts_ratified
+  status: player_account_runtime_session_and_authentication_semantic_contracts_ratified
 
 wire_schema_format:
   format: protobuf
@@ -120,6 +120,71 @@ runtime_contracts:
       - id: session_permissions
         path: contracts/runtime/session/permissions/session_permissions.yaml
     rule: Runtime session validation semantic contracts are ratified for the application handoff only. They do not choose token format, login methods, credential storage, real authentication, session persistence, player account persistence, Protobuf envelope changes, WebSocket handshake authentication, or runtime player handlers.
+  authentication:
+    status: authentication_contract_surfaces_defined_implementation_deferred
+    owner: runtime/internal/app
+    standard: docs/authentication-contract-error-permission-surfaces.md
+    standard_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
+    dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
+    decisions:
+      - ADR-0023
+      - ADR-0024
+      - ADR-0025
+      - ADR-0026
+      - ADR-0027
+      - ADR-0028
+    selected_posture:
+      login_method: device_credential_login
+      token_format: opaque_high_entropy_token
+      token_issuance_carrier: login_command_response_token
+      request_proof_carrier: explicit_request_proof_payload
+      access_token_ttl: 1h
+      refresh_token: not_in_first_implementation
+      renewal_method: reauthenticate_with_device_credential_login
+      logout_scope_first_posture: presented_access_token
+      account_linking: deferred
+    implementation_status:
+      runtime_authentication_implemented: false
+      token_behavior_implemented: false
+      credential_storage_implemented: false
+      token_storage_schema_added: false
+      credential_storage_schema_added: false
+      session_persistence_implemented: false
+      websocket_handshake_authentication_changed: false
+      runtime_player_handlers_added: false
+      websocket_routes_added: false
+      protobuf_envelope_changed: false
+      generated_contract_shapes_added: false
+    commands:
+      - id: AuthenticateWithDeviceCredential
+        path: contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml
+      - id: ValidateAccessToken
+        path: contracts/runtime/authentication/commands/ValidateAccessToken.yaml
+      - id: LogoutAccessToken
+        path: contracts/runtime/authentication/commands/LogoutAccessToken.yaml
+      - id: RefreshAccessToken
+        path: contracts/runtime/authentication/commands/RefreshAccessToken.yaml
+    queries: []
+    events:
+      - id: AuthenticationSucceeded
+        path: contracts/runtime/authentication/events/AuthenticationSucceeded.yaml
+      - id: AuthenticationFailed
+        path: contracts/runtime/authentication/events/AuthenticationFailed.yaml
+      - id: TokenIssued
+        path: contracts/runtime/authentication/events/TokenIssued.yaml
+      - id: TokenValidationFailed
+        path: contracts/runtime/authentication/events/TokenValidationFailed.yaml
+      - id: TokenRevoked
+        path: contracts/runtime/authentication/events/TokenRevoked.yaml
+      - id: LogoutRequested
+        path: contracts/runtime/authentication/events/LogoutRequested.yaml
+    errors:
+      - id: authentication_errors
+        path: contracts/runtime/authentication/errors/authentication_errors.yaml
+    permissions:
+      - id: authentication_permissions
+        path: contracts/runtime/authentication/permissions/authentication_permissions.yaml
+    rule: Authentication semantic contracts are source-level surfaces only. They define future login, token validation, logout, refresh-reservation, audit, error, and permission vocabulary without adding runtime handlers, WebSocket routes, Protobuf wire messages, generated output, credential tables, token tables, session tables, migrations, or token lifecycle behavior.
 
 modules:
   player:

@@ -1,0 +1,63 @@
+schema_version: 0.1
+kind: event
+module: runtime
+family: authentication
+name: AuthenticationFailed
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0023
+  - ADR-0025
+  - ADR-0027
+
+standard_refs:
+  - docs/authentication-contract-error-permission-surfaces.md
+
+summary: Audit-oriented fact that selected login proof failed.
+
+description: >
+  A future authentication boundary rejected or could not validate login proof.
+  The event must remain public-safe and redacted. It does not add runtime audit
+  persistence or event publication.
+
+payload:
+  type: object
+  required:
+    - login_method
+    - failure_class
+    - occurred_at
+  properties:
+    login_method:
+      type: string
+      const: device_credential_login
+    failure_class:
+      type: string
+      enum:
+        - missing_proof
+        - malformed_proof
+        - invalid_proof
+        - actor_disabled
+        - permission_denied
+        - validator_unavailable
+        - not_implemented
+    credential_record_id:
+      type: string
+      description: Audit-safe credential record identifier when known.
+    occurred_at:
+      type: string
+      format: date-time
+
+forbidden_payload_fields:
+  - raw_credentials
+  - raw_tokens
+  - password_hashes
+  - provider_secrets
+  - detailed_secret_validation_reason
+
+visibility:
+  client_visible: false
+  audit_visible: true
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only
