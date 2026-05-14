@@ -108,6 +108,9 @@ documentation_pairs:
   token_format_carrier_options_standard:
     canonical: docs/token-format-carrier-options.md
     zh-CN: docs/token-format-carrier-options.zh-CN.md
+  first_token_format_proof_carrier_posture_standard:
+    canonical: docs/first-token-format-proof-carrier-posture.md
+    zh-CN: docs/first-token-format-proof-carrier-posture.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -152,6 +155,7 @@ templates:
     player_account_postgresql_schema_boundary: ADR-0022
     authentication_token_session_validation_design_boundary: ADR-0023
     login_method_token_format_ratification_boundary: ADR-0024
+    first_token_format_proof_carrier_posture: ADR-0026
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -386,20 +390,25 @@ login_method_token_format_ratification:
   first_login_method_set_translation: docs/first-login-method-set.zh-CN.md
   token_format_carrier_options_standard: docs/token-format-carrier-options.md
   token_format_carrier_options_translation: docs/token-format-carrier-options.zh-CN.md
+  first_token_format_proof_carrier_posture_standard: docs/first-token-format-proof-carrier-posture.md
+  first_token_format_proof_carrier_posture_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
   decision: ADR-0024
   first_login_method_set_decision: ADR-0025
-  status: token_format_and_carrier_options_compared_implementation_deferred
+  first_token_format_proof_carrier_posture_decision: ADR-0026
+  status: first_token_format_proof_carrier_ratified_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0067
-  next_work_item: W-0068
+  latest_completed_work_item: W-0068
+  next_work_item: W-0069
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
   first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
   token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
+  first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
   first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
   token_format_carrier_options_conversation: conversations/2026-05-14-token-format-carrier-comparison.md
+  first_token_format_proof_carrier_posture_conversation: conversations/2026-05-14-first-token-format-proof-carrier-ratification.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -470,14 +479,38 @@ login_method_token_format_ratification:
       - first_system_message_binding
       - websocket_handshake_carrier
     implementation_authorized: false
+  first_token_format_proof_carrier_posture:
+    status: ratified
+    first_access_token_format: opaque_high_entropy_token
+    token_issuance_carrier: login_command_response_token
+    request_proof_carrier: explicit_request_proof_payload
+    issuer: future_application_owned_authentication_boundary
+    verifier: future_application_owned_token_validator_before_domain_dispatch
+    subject: player_account_id_after_credential_and_account_policy_success
+    audience: vibit_gameplay_runtime_requests
+    expiration: required_finite_expiration_exact_policy_deferred_to_W_0069
+    refresh_token: deferred
+    revocation: required_capability_policy_deferred_to_W_0069
+    rotation: required_for_new_issuance_policy_deferred_to_W_0069
+    replay: bearer_token_risk_must_be_controlled_by_lifecycle_policy
+    redaction: raw_token_secret_redacted_everywhere_except_client_presentation
+    storage: lookup_safe_hash_or_equivalent_non_plaintext_verifier_required_before_implementation
+    session_token_vocabulary: deferred_until_session_persistence
+    protobuf_envelope_change: false
+    websocket_handshake_authentication_change: false
+    current_session_metadata_as_proof: false
+    first_system_message_binding: deferred
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: true
     first_login_method_recommended: true
     first_login_method_set_ratified: true
-    token_format_selected: false
+    token_format_selected: true
     first_token_format_recommended: true
-    token_carrier_selected: false
+    first_token_format_ratified: true
+    token_carrier_selected: true
     first_token_carrier_recommended: true
+    first_token_carrier_ratified: true
     token_lifecycle_selected: false
     credential_storage_implemented: false
     external_identity_linking_implemented: false

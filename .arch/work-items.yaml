@@ -1750,7 +1750,7 @@ work_items:
   - id: W-0068
     milestone: M-013
     title: Ratify first token format and proof carrier posture
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
     depends_on:
       - W-0067
@@ -1759,10 +1759,12 @@ work_items:
       - ADR-0018
       - ADR-0023
       - ADR-0024
+      - ADR-0026
     completion:
       - Ratify the first token format and proof carrier posture with issuer, verifier, subject, audience, expiration, refresh, revocation, rotation, replay, redaction, and storage implications.
       - State whether Protobuf envelope behavior, current Session metadata fields, WebSocket handshake behavior, or first-message/system-message behavior remain unchanged or require a future decision.
       - Preserve implementation deferral until lifecycle, storage, contracts, schemas, checks, and tests are planned.
+    completion_summary: Ratified `opaque_high_entropy_token` as the first access-token format, with future application-owned issuer and verifier boundaries, player account subject, vibit gameplay runtime audience, finite-expiration requirement, redaction requirement, and non-plaintext verifier storage requirement. Ratified `login_command_response_token` as the issuance carrier and `explicit_request_proof_payload` as the first request proof carrier. Refresh tokens, session token vocabulary, exact lifecycle, token storage schema, Protobuf envelope changes, WebSocket handshake authentication, first system-message binding, and runtime implementation remain deferred.
     ask_first:
       - Choosing a signed token model that needs key management without a dependency/adoption record.
       - Repurposing existing metadata-only Session fields as authenticated proof.
@@ -1772,7 +1774,7 @@ work_items:
   - id: W-0069
     milestone: M-013
     title: Define token lifecycle and storage implications
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
     depends_on:
       - W-0068
@@ -1780,6 +1782,7 @@ work_items:
       - ADR-0022
       - ADR-0023
       - ADR-0024
+      - ADR-0026
     completion:
       - Define token issuance, expiration, refresh, revocation, rotation, replay, logout, cleanup, redaction, and audit implications for the ratified token posture.
       - Define whether credential, token, external identity, or session storage is required later and what schema gates must exist first.

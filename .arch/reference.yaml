@@ -154,8 +154,12 @@ phase_plan:
     token_format_carrier_options_standard: docs/token-format-carrier-options.md
     token_format_carrier_options_standard_translation: docs/token-format-carrier-options.zh-CN.md
     token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
-    latest_login_token_ratification_work_item: W-0067
-    next_login_token_ratification_work_item: W-0068
+    first_token_format_proof_carrier_posture_standard: docs/first-token-format-proof-carrier-posture.md
+    first_token_format_proof_carrier_posture_standard_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
+    first_token_format_proof_carrier_posture_decision: ADR-0026
+    first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
+    latest_login_token_ratification_work_item: W-0068
+    next_login_token_ratification_work_item: W-0069
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -171,7 +175,12 @@ phase_plan:
     recommended_first_token_format: opaque_high_entropy_token
     recommended_token_issuance_carrier: login_command_response_token
     recommended_request_proof_carrier: explicit_request_proof_payload
-    token_format_carrier_status: recommended_not_ratified
+    token_format_carrier_status: ratified_implementation_deferred
+    ratified_first_access_token_format: opaque_high_entropy_token
+    ratified_token_issuance_carrier: login_command_response_token
+    ratified_request_proof_carrier: explicit_request_proof_payload
+    refresh_token_status: deferred
+    session_token_vocabulary_status: deferred_until_session_persistence
     token_format_carrier_rejections:
       - plain_session_id_as_secret
       - current_session_metadata_as_proof
@@ -227,7 +236,7 @@ phase_plan:
         credential_storage: separated_and_deferred
         external_identity_linking: separated_and_deferred
         session_token_concept: deferred
-        opaque_token_concept: adapted_first_recommendation
+        opaque_token_concept: adapted_first_ratified_access_token
         refresh_token_concept: deferred
         realtime_socket_bound_to_authenticated_session: adapted
         validation_model_selection: deferred
@@ -239,7 +248,7 @@ phase_plan:
         handler_receives_session_context: adapted
         session_binding_vocabulary: adopted_as_vocabulary
         validation_model_selection: deferred
-        explicit_request_proof_payload: adapted_first_recommendation
+        explicit_request_proof_payload: adapted_first_ratified_request_carrier
         websocket_handshake_authentication: deferred
         credential_and_provider_linking_ownership: outside_transport_session_context
         frontend_backend_split: deferred
