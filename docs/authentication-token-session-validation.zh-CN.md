@@ -508,17 +508,39 @@ Session.connection_epoch
 - 声明 metadata-only `player_id` 或 `session_id` 足以获得 production permissions。
 - 复制 Nakama 或 Pitaya public API shape。
 
-## 14. M-011 剩余工作队列
+## 14. Milestone 完成状态与下一确认门
 
-Authentication design milestone 剩余部分应按 bounded steps 推进：
+`M-011 Authentication And Token Session Validation Design` 已作为设计里程碑完成。
+
+已完成的 bounded steps：
 
 1. 添加 architecture checks，用于强制 authentication/token/session design boundary。
 2. Ratify authentication proof 与 token/session validation 的 semantic contract dimensions，但不选择具体 token format。已由 `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/` 完成。
 3. 定义 credential storage 和 external identity linking 边界，但不添加 schema 或 dependencies。已由 `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/` 完成。
 4. 定义 session persistence 和 WebSocket handshake decision gates，但不实现任何路径。已由 `changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates/` 完成。
-5. 关闭该 milestone，或为第一个实现方向创建 confirmation gate。
+5. 关闭该 milestone，并为下一实现方向创建 confirmation gate。已由 `changes/2026-05-14-close-authentication-token-session-validation-design-milestone/` 完成。
 
-每一步都必须保持 metadata-only identity 为 non-authenticated，直到 real validator 被单独 ratify 并实现。
+当前 active continuation gate 是：
+
+```text
+M-012 Next Direction Confirmation Gate
+W-0063 Confirm next milestone direction after authentication design
+```
+
+候选方向会被明确记录，但不会在这里选择：
+
+- Login method 与 token format ratification。
+- Runtime player account handlers 与 WebSocket routes。
+- Session persistence 与 validation model selection。
+- WebSocket handshake authentication design。
+- Credential storage 与 external identity linking implementation design。
+- 参考 Nakama/Pitaya 后扩展更多 game backend modules。
+- Operations、observability 与 admin tooling。
+- Multiplayer、presence 与 matchmaking planning。
+
+Agents 不得隐式选择其中任何方向。Maintainer 必须先选择下一个 bounded milestone，implementation 才能开始。
+
+所有未来工作都必须保持 metadata-only identity 为 non-authenticated，直到 real validator 被单独 ratify 并实现。
 
 ## 15. 验证
 

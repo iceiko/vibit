@@ -419,13 +419,15 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   authentication_token_session_design:
     selected_by_maintainer: ratify_authentication_and_token_session_validation_design
-    status: session_persistence_websocket_handshake_gates_defined_runtime_implementation_deferred
+    status: design_milestone_completed_runtime_implementation_deferred_confirmation_gate_active
     milestone: M-011
     first_work_item: W-0057
-    latest_completed_work_item: W-0061
-    next_work_item: W-0062
+    latest_completed_work_item: W-0062
+    next_direction_gate: M-012
+    blocked_confirmation_work_item: W-0063
     selected_at: 2026-05-14
     change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
+    milestone_close_change: changes/2026-05-14-close-authentication-token-session-validation-design-milestone
     design_standard: docs/authentication-token-session-validation.md
     design_standard_translation: docs/authentication-token-session-validation.zh-CN.md
     contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
@@ -564,9 +566,16 @@ identity_session_boundary:
       protobuf_envelope_changed: false
       runtime_player_handlers_added: false
       websocket_routes_added: false
-    rule: The design standard is ratified, but runtime implementation remains deferred. Do not implement production authentication, choose token format, add credentials, add session persistence, change the envelope, change the WebSocket handshake, or add player handlers/routes until separately ratified.
-    remaining_work_queue:
-      - W-0062 close_authentication_token_session_validation_design_milestone
+    rule: The design milestone is completed, but runtime implementation remains deferred. Do not implement production authentication, choose token format, add credentials, add external identity linking, add session persistence, change the envelope, change the WebSocket handshake, or add player handlers/routes until the maintainer chooses a bounded next milestone.
+    next_direction_candidates:
+      - login_method_and_token_format_ratification
+      - runtime_player_account_handlers_and_websocket_routes
+      - session_persistence_and_validation_model_selection
+      - websocket_handshake_authentication_design
+      - credential_storage_external_identity_linking_implementation_design
+      - additional_game_backend_modules_after_nakama_pitaya_review
+      - operations_observability_admin_tooling
+      - multiplayer_presence_matchmaking_planning
   planned_owner:
     player_identity: modules/player
     player_account_lifecycle: modules/player
@@ -719,11 +728,26 @@ identity_session_boundary:
     - milestone: M-010
       work_item: W-0056
       selected_direction: ratify_authentication_and_token_session_validation_design
+  active_confirmation_gate:
+    milestone: M-012
+    work_item: W-0063
+    status: blocked
+    reason: The authentication/token/session validation design milestone is complete, and the next major direction requires maintainer choice before implementation starts.
+    candidate_directions:
+      - login_method_and_token_format_ratification
+      - runtime_player_account_handlers_and_websocket_routes
+      - session_persistence_and_validation_model_selection
+      - websocket_handshake_authentication_design
+      - credential_storage_external_identity_linking_implementation_design
+      - additional_game_backend_modules_after_nakama_pitaya_review
+      - operations_observability_admin_tooling
+      - multiplayer_presence_matchmaking_planning
+    rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   current_work:
-    milestone: M-011
-    latest_completed_work_item: W-0061
-    next_ready_work_item: W-0062
-    status: close_authentication_token_session_validation_design_milestone_next
+    milestone: M-012
+    latest_completed_work_item: W-0062
+    blocked_work_item: W-0063
+    status: next_direction_confirmation_gate_blocked
 
 persistence_model:
   decision: ADR-0011

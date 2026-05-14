@@ -1,0 +1,112 @@
+schema_version: 0.1
+change_id: close-authentication-token-session-validation-design-milestone
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the authentication and token/session validation design milestone and stop at a maintainer confirmation gate before choosing the next major direction.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0021
+    - ADR-0022
+    - ADR-0023
+
+standards:
+  added: []
+  changed:
+    - docs/authentication-token-session-validation.md
+    - docs/authentication-token-session-validation.zh-CN.md
+    - .arch/work-items.yaml
+    - .arch/conventions.yaml
+    - .arch/runtime.yaml
+    - .arch/reference.yaml
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_design_completed: true
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  external_identity_linking_implemented: false
+  session_persistence_implemented: false
+  protobuf_envelope_behavior_changed: false
+  websocket_handshake_behavior_changed: false
+  runtime_player_handlers_added: false
+  websocket_routes_added: false
+  metadata_only_identity_as_production_permission_basis: false
+
+workflow:
+  completed_milestone: M-011
+  completed_work_item: W-0062
+  confirmation_gate_milestone: M-012
+  blocked_confirmation_work_item: W-0063
+  next_ready_created: false
+  reason_no_next_ready: Next major direction requires maintainer choice.
+  candidate_directions:
+    - login_method_and_token_format_ratification
+    - runtime_player_account_handlers_and_websocket_routes
+    - session_persistence_and_validation_model_selection
+    - websocket_handshake_authentication_design
+    - credential_storage_external_identity_linking_implementation_design
+    - additional_game_backend_modules_after_nakama_pitaya_review
+    - operations_observability_admin_tooling
+    - multiplayer_presence_matchmaking_planning
+  reference_alignment:
+    nakama: account_auth_session_token_refresh_realtime_socket_reference_without_api_compatibility
+    pitaya: session_binding_route_handler_frontend_backend_vocabulary_reference_without_api_compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change close-authentication-token-session-validation-design-milestone --json
+    - node tools/vibit check all --json
+    - node tools/vibit inspect next --json
+    - git diff --check
+  status: Verified

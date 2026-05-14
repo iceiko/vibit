@@ -508,17 +508,39 @@ Ask the maintainer before:
 - Declaring metadata-only `player_id` or `session_id` sufficient for production permissions.
 - Copying Nakama or Pitaya public API shape.
 
-## 14. Remaining M-011 Work Queue
+## 14. Milestone Completion And Next Gate
 
-The remaining authentication design milestone should proceed in bounded steps:
+`M-011 Authentication And Token Session Validation Design` is complete as a design milestone.
+
+Completed bounded steps:
 
 1. Add architecture checks that enforce the authentication/token/session design boundary.
 2. Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format. Completed by `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`.
 3. Define credential storage and external identity linking boundaries without adding schema or dependencies. Completed by `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/`.
 4. Define session persistence and WebSocket handshake decision gates without implementing either path. Completed by `changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates/`.
-5. Close the milestone or create a confirmation gate for the first implementation direction.
+5. Close the milestone and create a confirmation gate for the next implementation direction. Completed by `changes/2026-05-14-close-authentication-token-session-validation-design-milestone/`.
 
-Each step must preserve metadata-only identity as non-authenticated until a real validator is separately ratified and implemented.
+The active continuation gate is:
+
+```text
+M-012 Next Direction Confirmation Gate
+W-0063 Confirm next milestone direction after authentication design
+```
+
+Candidate directions are intentionally recorded but not selected:
+
+- Login method and token format ratification.
+- Runtime player account handlers and WebSocket routes.
+- Session persistence and validation model selection.
+- WebSocket handshake authentication design.
+- Credential storage and external identity linking implementation design.
+- Additional game backend modules after Nakama/Pitaya review.
+- Operations, observability, and admin tooling.
+- Multiplayer, presence, and matchmaking planning.
+
+Agents must not choose one of those directions implicitly. The maintainer must select the next bounded milestone before implementation starts.
+
+All future work must preserve metadata-only identity as non-authenticated until a real validator is separately ratified and implemented.
 
 ## 15. Verification
 

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-011
+current_milestone: M-012
 
 continuation_semantics:
   default_step_unit: work_item
@@ -217,7 +217,7 @@ milestones:
 
   - id: M-011
     title: Authentication And Token Session Validation Design
-    status: active
+    status: completed
     goal: Ratify authentication, token behavior, session validation semantics, and request identity trust boundaries before implementing production authentication, runtime player handlers, WebSocket routes, credential storage, external identity linking, or session persistence.
     completion_criteria:
       - Authentication, token/session validation, credential, external identity, session persistence, WebSocket handshake, and request-level validation responsibilities are separated before implementation.
@@ -236,6 +236,22 @@ milestones:
       - changing WebSocket handshake authentication behavior
       - adding runtime player account handlers or WebSocket routes
       - copying Nakama or Pitaya public APIs directly
+    completion_summary: M-011 completed the authentication and token/session validation design milestone. Authentication proof, login methods, tokens, credentials, external identity links, runtime sessions, request identity, WebSocket handshake authentication, transport metadata, Protobuf envelope metadata, and player account lifecycle are separated in standards, manifests, checks, and agent guides. Nakama account/auth/session token/realtime socket concepts and Pitaya session binding/route/session vocabulary are mapped into vibit adopted, adapted, deferred, or rejected positions. Semantic dimensions, credential/external identity boundaries, and session persistence/WebSocket handshake gates are ratified as design boundaries only. Runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, WebSocket routes, and production permission reliance on metadata-only identity remain deferred behind the next confirmation gate.
+
+  - id: M-012
+    title: Next Direction Confirmation Gate
+    status: active
+    goal: Hold the work queue at an explicit maintainer decision point before choosing the next major implementation or architecture direction after authentication and token/session validation design ratification.
+    completion_criteria:
+      - The maintainer chooses the next major milestone direction.
+      - The chosen direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Ask-first boundaries are preserved for login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake authentication, runtime player handlers, WebSocket routes, major dependencies, production permission, operations posture, multiplayer/presence/matchmaking scope, and major game-domain expansion decisions.
+    non_goals:
+      - implementing production authentication before a direction is selected
+      - choosing login methods, token format, credential schema, external identity linking, session persistence, Protobuf envelope behavior, or WebSocket handshake behavior implicitly
+      - adding runtime player handlers or WebSocket routes without a selected implementation milestone
+      - adding a new game-domain module without a selected milestone
+      - declaring metadata-only identity sufficient for production permissions
 
 work_items:
   - id: W-0001
@@ -1557,7 +1573,7 @@ work_items:
   - id: W-0062
     milestone: M-011
     title: Close authentication and token session validation design milestone
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-close-authentication-token-session-validation-design-milestone
     depends_on:
       - W-0061
@@ -1570,9 +1586,45 @@ work_items:
       - Review M-011 completion criteria against the design standard, checks, semantic dimensions, credential/external identity boundaries, session persistence gates, WebSocket handshake gates, manifests, guides, and repository checks.
       - Mark M-011 completed only if runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, and WebSocket routes remain deferred unless separately ratified.
       - Create a next-direction confirmation gate instead of starting implementation implicitly.
+    completion_summary: Reviewed M-011 against its completion criteria and closed it as a design-only authentication/token/session validation milestone. The design standard, boundary checks, semantic dimensions, credential/external identity boundaries, session persistence and WebSocket handshake gates, manifests, module guidance, runtime guidance, and repository checks are in place. Runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, WebSocket routes, and production permission reliance on metadata-only identity remain deferred. M-012 and W-0063 now hold the queue at an explicit next-direction confirmation gate.
     ask_first:
       - Choosing the next implementation direction instead of creating a confirmation gate.
       - Starting production authentication implementation.
       - Adding runtime player account command/query handlers or WebSocket routes.
       - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope changes, or WebSocket handshake authentication behavior.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0063
+    milestone: M-012
+    title: Confirm next milestone direction after authentication design
+    status: blocked
+    change: changes/2026-05-14-confirm-next-direction-after-authentication-design
+    depends_on:
+      - W-0062
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+      - ADR-0022
+      - ADR-0023
+    block_reason: The next major direction requires maintainer confirmation because each candidate affects long-lived architecture, public behavior, runtime authority, or game-server capability scope.
+    candidate_directions:
+      - login_method_and_token_format_ratification
+      - runtime_player_account_handlers_and_websocket_routes
+      - session_persistence_and_validation_model_selection
+      - websocket_handshake_authentication_design
+      - credential_storage_external_identity_linking_implementation_design
+      - additional_game_backend_modules_after_nakama_pitaya_review
+      - operations_observability_admin_tooling
+      - multiplayer_presence_matchmaking_planning
+    completion:
+      - Choose the next major milestone direction with the maintainer.
+      - Record the chosen direction as a bounded milestone.
+      - Create exactly one next_ready work item for the chosen milestone.
+      - Preserve ask-first boundaries for login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake authentication, runtime player handlers, WebSocket routes, major dependencies, production permission, operations posture, multiplayer/presence/matchmaking scope, and major game-domain expansion decisions.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, or WebSocket handshake authentication behavior.
+      - Adding runtime player account command/query handlers or WebSocket routes.
+      - Adding a new game-domain module or multiplayer/presence/matchmaking milestone.
+      - Introducing a new major dependency or architectural pattern.
       - Declaring metadata-only identity sufficient for production permissions.
