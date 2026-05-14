@@ -251,11 +251,17 @@ phase_plan:
     authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
     authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
     authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
-    authentication_postgresql_adapter_implementation_status: active
+    authentication_postgresql_adapter_implementation_status: completed
     authentication_postgresql_adapter_implementation_decision: ADR-0035
     authentication_postgresql_adapter_implementation_milestone: M-015
     authentication_postgresql_adapter_implementation_next_work_item: W-0083
     authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
+    runtime_authentication_implementation_boundary_defined: true
+    runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
+    runtime_authentication_implementation_boundary_standard_translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
+    runtime_authentication_implementation_boundary_decision: ADR-0036
+    runtime_authentication_implementation_boundary_change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
+    runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary
     external_identity_link_schema_gate_status: deferred_no_schema_added
     runtime_session_record_schema_gate_status: deferred_no_schema_added
     audit_persistence_schema_gate_status: defined_no_schema_added
@@ -363,10 +369,10 @@ phase_plan:
       - handler_identity_handoff_vocabulary
     rule: Use Nakama and Pitaya for capability and vocabulary, but keep vibit-owned PostgreSQL schema boundaries explicit and closed before adapter or runtime authentication behavior.
   phase_2d_authentication_postgresql_adapter_implementation:
-    status: active
+    status: completed
     active_milestone: M-015
     decision: ADR-0035
-    next_work_item: W-0083
+    latest_completed_work_item: W-0085
     focus:
       - authentication_postgresql_adapter_check_refinement
       - authentication_repository_postgresql_adapter
@@ -378,7 +384,34 @@ phase_plan:
     pitaya_reference:
       - handler_session_context_vocabulary
       - persistence_independent_frontend_backend_vocabulary
-    rule: Implement persistence adapter capability only; do not copy Nakama or Pitaya public APIs, and do not implement login, token generation, token validation, protocol carriers, WebSocket routes, or authentication dependencies in this phase.
+    rule: This phase implemented persistence adapter capability only; it did not copy Nakama or Pitaya public APIs and did not implement login, token generation, token validation, protocol carriers, WebSocket routes, or authentication dependencies.
+  phase_2e_runtime_authentication_implementation_boundary:
+    status: active
+    active_milestone: M-016
+    decision: ADR-0036
+    latest_completed_work_item: W-0086
+    next_work_item: W-0087
+    standard: docs/runtime-authentication-implementation-boundary.md
+    translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
+    change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
+    check_rule: runtime.authentication_implementation_boundary
+    focus:
+      - application_owned_authentication_boundary
+      - authentication_repository_usage
+      - request_identity_handoff
+      - token_material_lifecycle_placeholder
+      - verifier_comparison_boundary
+      - error_permission_audit_mapping
+      - separately_gated_implementation_queue
+    nakama_reference:
+      - account_authentication_capability
+      - session_token_issuance_expiration_logout_revocation_vocabulary
+      - realtime_socket_authenticated_actor_binding
+    pitaya_reference:
+      - handler_session_context_vocabulary
+      - route_handler_identity_context
+      - frontend_acceptor_backend_handler_separation
+    rule: Define runtime authentication implementation ownership and sequencing before behavior; do not copy Nakama or Pitaya APIs, and do not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, generated authentication shapes, or authentication dependencies in this phase.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

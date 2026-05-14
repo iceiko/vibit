@@ -2221,7 +2221,7 @@ work_items:
   - id: W-0086
     milestone: M-016
     title: Define runtime authentication implementation boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
     depends_on:
       - W-0085
@@ -2230,11 +2230,30 @@ work_items:
       - ADR-0024
       - ADR-0030
       - ADR-0035
+      - ADR-0036
     completion:
       - Define application service ownership, repository usage, token material lifecycle placeholders, verifier comparison boundaries, request identity handoff, error mapping, and test expectations for future runtime authentication.
       - Preserve separate gates for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, and dependency adoption.
       - Update manifests, standards, and repository checks only as planning artifacts.
+    completion_summary: Defined the runtime authentication implementation boundary with English and Simplified Chinese standards, ADR-0036, manifest and guide references, application-owned future authentication orchestration, storage-neutral repository usage, persistence-only PostgreSQL adapter rules, request identity handoff, error/permission/audit mapping, Nakama/Pitaya alignment, and a separately gated future implementation queue. Runtime authentication, token generation, token validation, verifier comparison, login execution, logout execution, refresh, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, authentication dependencies, authentication repository changes, and migration schema changes remain deferred.
     ask_first:
       - Implementing runtime authentication behavior rather than defining the boundary.
       - Adding token generation, verifier comparison, token validation, login, logout execution, refresh, cleanup jobs, WebSocket routes, Protobuf messages, generated authentication shapes, or authentication dependencies.
       - Changing the authentication.Repository interface or ratified migration schemas.
+
+  - id: W-0087
+    milestone: M-016
+    title: Close runtime authentication implementation boundary planning milestone
+    status: next_ready
+    change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
+    depends_on:
+      - W-0086
+    related_decisions:
+      - ADR-0036
+    completion:
+      - Review M-016 against the runtime authentication implementation boundary standard, manifests, guides, checks, and work queue.
+      - Mark M-016 completed only if runtime authentication, token generation, token validation, verifier comparison, login execution, logout execution, refresh, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, authentication dependencies, authentication repository changes, and migration schema changes remain deferred or are explicitly planned for later gated work.
+      - Open the next bounded implementation-preparation or confirmation milestone without starting runtime authentication behavior implicitly.
+    ask_first:
+      - Starting runtime authentication implementation while closing the boundary planning milestone.
+      - Adding token generation, verifier comparison, token validation, login, logout execution, refresh, cleanup jobs, WebSocket routes, Protobuf messages, generated authentication shapes, authentication dependencies, repository interface changes, or migration schema changes.

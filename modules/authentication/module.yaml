@@ -2,7 +2,7 @@ schema_version: 0.1
 module: authentication
 category: domain
 status: draft
-summary: Owns storage-neutral authentication credential and token verifier repository interfaces for the selected device credential and opaque access-token posture without implementing runtime authentication, PostgreSQL adapters, Protobuf messages, WebSocket behavior, or authentication dependencies.
+summary: Owns storage-neutral authentication credential and token verifier repository interfaces for the selected device credential and opaque access-token posture with a separately implemented PostgreSQL persistence adapter, while runtime authentication, Protobuf messages, WebSocket behavior, and authentication dependencies remain deferred.
 
 decisions:
   - ADR-0029
@@ -10,6 +10,7 @@ decisions:
   - ADR-0032
   - ADR-0033
   - ADR-0034
+  - ADR-0036
 
 owns:
   entities:
@@ -134,6 +135,11 @@ contracts:
   wire_schema_status: deferred_no_authentication_proto
   generated_go_proto: deferred
   runtime_authentication_implemented: false
+  runtime_authentication_implementation_boundary_defined: true
+  runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
+  runtime_authentication_implementation_boundary_translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
+  runtime_authentication_implementation_boundary_decision: ADR-0036
+  runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary
   runtime_lookup_added: false
   token_behavior_implemented: false
   token_generation_added: false
@@ -220,6 +226,9 @@ persistence:
     authentication_postgres_adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
     authentication_postgres_adapter_tests: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
     authentication_postgresql_adapter_checks_refined: true
+    runtime_authentication_implementation_boundary_defined: true
+    runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
+    runtime_authentication_implementation_boundary_decision: ADR-0036
     runtime_authentication_implemented: false
     token_behavior_implemented: false
     token_generation_added: false

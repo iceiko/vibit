@@ -123,6 +123,9 @@ documentation_pairs:
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
+  runtime_authentication_implementation_boundary_standard:
+    canonical: docs/runtime-authentication-implementation-boundary.md
+    zh-CN: docs/runtime-authentication-implementation-boundary.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -772,11 +775,17 @@ runtime_authentication_implementation_boundary_planning:
   status: active
   milestone: M-016
   first_work_item: W-0086
-  next_work_item: W-0086
+  next_work_item: W-0087
   allowed_scope: planning_boundary_only
   previous_milestone: M-015
   previous_closeout_work_item: W-0085
   previous_closeout_change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+  runtime_authentication_implementation_boundary_defined: true
+  runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
+  runtime_authentication_implementation_boundary_translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
+  runtime_authentication_implementation_boundary_decision: ADR-0036
+  runtime_authentication_implementation_boundary_change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
+  runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary
   repository_interface_source: runtime/internal/modules/authentication/repository.go
   adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
   runtime_authentication_implemented: false
@@ -794,12 +803,13 @@ runtime_authentication_implementation_boundary_planning:
   authentication_dependencies_added: false
   work_queue:
     - W-0086 define_runtime_authentication_implementation_boundary
+    - W-0087 close_runtime_authentication_implementation_boundary_planning_milestone
   rule: >
-    The next milestone may define runtime authentication implementation
-    boundaries and planning gates only. It must not implement production
-    authentication behavior, token generation, token validation, login handlers,
-    WebSocket routes, Protobuf messages, generated authentication shapes, or
-    major authentication dependencies.
+    This milestone defines runtime authentication implementation boundaries and
+    planning gates only. It must not implement production authentication
+    behavior, token generation, token validation, login handlers, WebSocket
+    routes, Protobuf messages, generated authentication shapes, or major
+    authentication dependencies.
 
 server_runtime:
   first_reference_language: Go

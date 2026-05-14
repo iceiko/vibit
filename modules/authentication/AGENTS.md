@@ -49,6 +49,8 @@ The repository interface may normalize identifiers, digest byte slices, statuses
 
 The implemented PostgreSQL adapter boundary is `runtime/internal/platform/persistence/postgres/authentication_repository.go`, with focused tests at `runtime/internal/platform/persistence/postgres/authentication_repository_test.go`. It uses `NewAuthenticationRepositoryForUnitOfWork(executor)` and implements `authentication.Repository`; `UnitOfWork.NewAuthenticationRepository` creates it from the caller-owned executor. `M-015` authorizes only platform-owned persistence adapter work; it still does not authorize runtime authentication behavior.
 
+Runtime authentication implementation boundary planning is documented in `docs/runtime-authentication-implementation-boundary.md` and `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`. Future runtime authentication must be application-owned under `runtime/internal/app`, must use this module's `authentication.Repository` through the application unit-of-work boundary, and must convert validated proof into `RequestIdentity` before domain dispatch. This module must not absorb token generation, verifier comparison, login execution, access-token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, or authentication dependencies.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

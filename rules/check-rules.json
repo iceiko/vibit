@@ -460,6 +460,14 @@
       "agent_guidance": "Read `docs/selected-login-token-boundary-checks.md`, `docs/credential-token-session-schema-gates.md`, and `ADR-0030`; do not add login handlers, token validators, token or credential repositories, authentication Protobuf sources, generated authentication shapes, migrations, WebSocket carriers, or auth dependencies until a later bounded implementation work item authorizes them."
     },
     {
+      "rule_id": "runtime.authentication_implementation_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime authentication implementation boundary",
+      "description": "The first runtime authentication implementation path must preserve application ownership, storage-neutral repository usage, persistence-only PostgreSQL adapters, request identity handoff, and separate gates for token generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, generated output, and dependencies.",
+      "agent_guidance": "Read `docs/runtime-authentication-implementation-boundary.md` and `ADR-0036`; do not add runtime authentication behavior until the relevant gate explicitly authorizes that slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

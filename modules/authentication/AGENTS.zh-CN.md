@@ -50,6 +50,8 @@ Repository interface 可以 normalize identifiers、digest byte slices、statuse
 
 已实现的 PostgreSQL adapter boundary 是 `runtime/internal/platform/persistence/postgres/authentication_repository.go`，focused tests 位于 `runtime/internal/platform/persistence/postgres/authentication_repository_test.go`。它使用 `NewAuthenticationRepositoryForUnitOfWork(executor)` 并实现 `authentication.Repository`；`UnitOfWork.NewAuthenticationRepository` 会从 caller-owned executor 创建它。`M-015` 只授权 platform-owned persistence adapter work；它仍不授权 runtime authentication behavior。
 
+Runtime authentication implementation boundary planning 记录在 `docs/runtime-authentication-implementation-boundary.md` 和 `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`。未来 runtime authentication 必须由 `runtime/internal/app` 下的 application boundary 拥有，必须通过 application unit-of-work boundary 使用本模块的 `authentication.Repository`，并在 domain dispatch 前把 validated proof 转换为 `RequestIdentity`。本模块不得吸收 token generation、verifier comparison、login execution、access-token validation、logout execution、cleanup jobs、Protobuf messages、WebSocket proof carriers、generated authentication shapes 或 authentication dependencies。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

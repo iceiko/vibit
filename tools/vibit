@@ -64,6 +64,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.identity_boundary",
   "runtime.authentication_token_session_boundary",
   "runtime.selected_login_token_boundary",
+  "runtime.authentication_implementation_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -7046,6 +7047,190 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
   checkNoForbiddenPatterns(playerPersistenceFiles, selectedMigrationForbiddenPatterns, "player account lifecycle storage separation", { stripComments: true });
 }
 
+function checkRuntimeAuthenticationImplementationBoundary(root, goFiles) {
+  const ruleId = "runtime.authentication_implementation_boundary";
+  const standardPath = "docs/runtime-authentication-implementation-boundary.md";
+  const standardTranslationPath = "docs/runtime-authentication-implementation-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0036-runtime-authentication-implementation-boundary.md";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for runtime authentication implementation boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for runtime authentication implementation boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md"],
+    [".arch/conventions.yaml", "runtime_authentication_implementation_boundary_decision: ADR-0036"],
+    [".arch/conventions.yaml", "runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary"],
+    [".arch/runtime.yaml", "runtime_authentication_implementation_boundary: ADR-0036"],
+    [".arch/runtime.yaml", "runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md"],
+    [".arch/runtime.yaml", "runtime_authentication_implementation_boundary_defined: true"],
+    [".arch/runtime.yaml", "runtime_authentication_implementation_boundary_check_rule: runtime.authentication_implementation_boundary"],
+    [".arch/contracts.yaml", "runtime_authentication_implementation_boundary_defined: true"],
+    [".arch/contracts.yaml", "runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md"],
+    [".arch/reference.yaml", "phase_2e_runtime_authentication_implementation_boundary"],
+    [".arch/reference.yaml", "runtime_authentication_implementation_boundary_decision: ADR-0036"],
+    ["AGENTS.md", "docs/runtime-authentication-implementation-boundary.md"],
+    ["AGENTS.md", "ADR-0036"],
+    ["AGENTS.md", "runtime.authentication_implementation_boundary"],
+    ["AGENTS.zh-CN.md", "docs/runtime-authentication-implementation-boundary.md"],
+    ["AGENTS.zh-CN.md", "ADR-0036"],
+    ["AGENTS.zh-CN.md", "runtime.authentication_implementation_boundary"],
+    ["runtime/AGENTS.md", "../docs/runtime-authentication-implementation-boundary.md"],
+    ["runtime/AGENTS.md", "ADR-0036"],
+    ["runtime/AGENTS.md", "runtime.authentication_implementation_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/runtime-authentication-implementation-boundary.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0036"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authentication_implementation_boundary"],
+    ["modules/authentication/module.yaml", "runtime_authentication_implementation_boundary_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/runtime-authentication-implementation-boundary.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/runtime-authentication-implementation-boundary.md"],
+    ["rules/check-rules.json", "runtime.authentication_implementation_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "Runtime authentication is application-owned."],
+    [standardPath, "runtime/internal/app"],
+    [standardPath, "metadata_only_allowed_as_proof: false"],
+    [standardPath, "separately reviewable gates"],
+    [standardPath, "runtime.authentication_implementation_boundary"],
+    [standardTranslationPath, "Runtime authentication 由 application 拥有"],
+    [standardTranslationPath, "runtime/internal/app"],
+    [standardTranslationPath, "metadata_only_allowed_as_proof: false"],
+    [standardTranslationPath, "可单独 review 的 gates"],
+    [standardTranslationPath, "runtime.authentication_implementation_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "runtime_authentication_implementation_boundary_defined: true",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "generated_authentication_shapes_added: false",
+      "authentication_dependencies_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "runtime_authentication_implementation_boundary_defined: true",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "generated_authentication_shapes_added: false",
+      "authentication_dependencies_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "runtime_authentication_implementation_boundary_defined: true",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "runtime_lookup_added: false",
+      "generated_contract_shapes_added: false",
+    ],
+    "modules/authentication/module.yaml": [
+      "runtime_authentication_implementation_boundary_defined: true",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "generated_authentication_shapes_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing runtime authentication implementation boundary markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves runtime authentication implementation boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing runtime authentication implementation boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier)\b/, label: "runtime authentication service or token component" },
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "runtime login execution" },
+    { pattern: /\bValidateAccessToken\b/, label: "runtime access-token validation" },
+    { pattern: /\bLogoutAccessToken\b/, label: "runtime logout execution" },
+    { pattern: /\bcrypto\/rand\b/, label: "token or credential material generation" },
+    { pattern: /\bBearer\b/, label: "bearer token handling" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement runtime authentication before implementation boundary gates`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses runtime authentication implementation boundary: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -7472,6 +7657,7 @@ function checkRuntime(root) {
   checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles);
   checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles);
   checkRuntimeSelectedLoginTokenBoundaries(root, goFiles);
+  checkRuntimeAuthenticationImplementationBoundary(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {
