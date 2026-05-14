@@ -67,6 +67,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.authentication_implementation_boundary",
   "runtime.application_authentication_service_interface_boundary",
   "runtime.token_credential_verifier_algorithm_redaction_boundary",
+  "runtime.secret_configuration_verifier_key_loading_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -7728,6 +7729,243 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
   }
 }
 
+function checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles) {
+  const ruleId = "runtime.secret_configuration_verifier_key_loading_boundary";
+  const standardPath = "docs/secret-configuration-verifier-key-loading-boundary.md";
+  const standardTranslationPath = "docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0041-secret-configuration-verifier-key-loading-boundary.md";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for secret configuration and verifier key loading boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for secret configuration and verifier key loading boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md"],
+    [".arch/conventions.yaml", "secret_configuration_verifier_key_loading_boundary_decision: ADR-0041"],
+    [".arch/conventions.yaml", "secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary"],
+    [".arch/runtime.yaml", "secret_configuration_verifier_key_loading_boundary: ADR-0041"],
+    [".arch/runtime.yaml", "secret_configuration_verifier_key_loading_boundary_decision: ADR-0041"],
+    [".arch/runtime.yaml", "secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md"],
+    [".arch/runtime.yaml", "secret_configuration_verifier_key_loading_boundary_defined: true"],
+    [".arch/runtime.yaml", "secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary"],
+    [".arch/contracts.yaml", "secret_configuration_verifier_key_loading_boundary_defined: true"],
+    [".arch/contracts.yaml", "secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md"],
+    [".arch/reference.yaml", "phase_2i_secret_configuration_and_verifier_key_loading_boundary"],
+    [".arch/reference.yaml", "secret_configuration_verifier_key_loading_boundary_decision: ADR-0041"],
+    ["AGENTS.md", "docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["AGENTS.md", "ADR-0041"],
+    ["AGENTS.md", "runtime.secret_configuration_verifier_key_loading_boundary"],
+    ["AGENTS.zh-CN.md", "docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["AGENTS.zh-CN.md", "ADR-0041"],
+    ["AGENTS.zh-CN.md", "runtime.secret_configuration_verifier_key_loading_boundary"],
+    ["runtime/AGENTS.md", "../docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["runtime/AGENTS.md", "ADR-0041"],
+    ["runtime/AGENTS.md", "runtime.secret_configuration_verifier_key_loading_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0041"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.secret_configuration_verifier_key_loading_boundary"],
+    ["modules/authentication/module.yaml", "secret_configuration_verifier_key_loading_boundary_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/secret-configuration-verifier-key-loading-boundary.md"],
+    ["rules/check-rules.json", "runtime.secret_configuration_verifier_key_loading_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "first_local_key_source: process_environment_or_explicit_runtime_secret_input"],
+    [standardPath, "external_kms_secret_manager_required_for_first_local_posture: false"],
+    [standardPath, "external_secret_manager_dependency_adoption_record_required: true"],
+    [standardPath, "verifier_key_set_required: true"],
+    [standardPath, "minimum_key_entropy_bits: 256"],
+    [standardPath, "decoded_key_minimum_length_bytes: 32"],
+    [standardPath, "production_missing_key_behavior: fail_closed"],
+    [standardPath, "VIBIT_AUTH_VERIFIER_KEY_SET_ID"],
+    [standardPath, "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY"],
+    [standardPath, "VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY"],
+    [standardPath, "VIBIT_AUTH_TOKEN_LOOKUP_KEY"],
+    [standardPath, "VIBIT_AUTH_TOKEN_VERIFIER_KEY"],
+    [standardPath, "This is a boundary-only standard. It does not add Go code"],
+    [standardPath, "runtime.secret_configuration_verifier_key_loading_boundary"],
+    [standardTranslationPath, "first_local_key_source: process_environment_or_explicit_runtime_secret_input"],
+    [standardTranslationPath, "external_kms_secret_manager_required_for_first_local_posture: false"],
+    [standardTranslationPath, "external_secret_manager_dependency_adoption_record_required: true"],
+    [standardTranslationPath, "verifier_key_set_required: true"],
+    [standardTranslationPath, "minimum_key_entropy_bits: 256"],
+    [standardTranslationPath, "decoded_key_minimum_length_bytes: 32"],
+    [standardTranslationPath, "production_missing_key_behavior: fail_closed"],
+    [standardTranslationPath, "VIBIT_AUTH_VERIFIER_KEY_SET_ID"],
+    [standardTranslationPath, "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_TOKEN_LOOKUP_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_TOKEN_VERIFIER_KEY"],
+    [standardTranslationPath, "这只是 boundary-only standard。它不添加 Go code"],
+    [standardTranslationPath, "runtime.secret_configuration_verifier_key_loading_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "secret_configuration_verifier_key_loading_boundary_defined: true",
+      "first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input",
+      "external_kms_secret_manager_required_for_first_local_posture: false",
+      "verifier_key_set_required: true",
+      "separated_logical_verifier_keys_required: true",
+      "minimum_key_entropy_bits: 256",
+      "decoded_key_minimum_length_bytes: 32",
+      "production_missing_key_behavior: fail_closed",
+      "runtime_authentication_implemented: false",
+      "secret_configuration_loading_added: false",
+      "environment_parsing_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+      "kms_secret_manager_integration_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "secret_configuration_verifier_key_loading_boundary_defined: true",
+      "first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input",
+      "external_kms_secret_manager_required_for_first_local_posture: false",
+      "verifier_key_set_required: true",
+      "separated_logical_verifier_keys_required: true",
+      "minimum_key_entropy_bits: 256",
+      "decoded_key_minimum_length_bytes: 32",
+      "production_missing_key_behavior: fail_closed",
+      "runtime_authentication_implemented: false",
+      "secret_configuration_loading_added: false",
+      "environment_parsing_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+      "kms_secret_manager_integration_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "secret_configuration_verifier_key_loading_boundary_defined: true",
+      "first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input",
+      "external_kms_secret_manager_required_for_first_local_posture: false",
+      "verifier_key_set_required: true",
+      "separated_logical_verifier_keys_required: true",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "runtime_lookup_added: false",
+      "generated_contract_shapes_added: true",
+      "authentication_generated_contract_shapes_added: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "secret_configuration_verifier_key_loading_boundary_defined: true",
+      "first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input",
+      "external_kms_secret_manager_required_for_first_local_posture: false",
+      "verifier_key_set_required: true",
+      "separated_logical_verifier_keys_required: true",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing secret configuration and verifier key loading boundary markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves secret configuration and verifier key loading boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing secret configuration and verifier key loading boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\bos\.Getenv\b/, label: "secret configuration environment parsing before implementation gate" },
+    { pattern: /\bos\.LookupEnv\b/, label: "secret configuration environment parsing before implementation gate" },
+    { pattern: /\bVIBIT_AUTH_(VERIFIER_KEY_SET_ID|CREDENTIAL_LOOKUP_KEY|CREDENTIAL_VERIFIER_KEY|TOKEN_LOOKUP_KEY|TOKEN_VERIFIER_KEY)\b/, label: "authentication verifier key configuration usage before implementation gate" },
+    { pattern: /\b(secretManager|secretmanager|kms|KMS|vault|Vault)\b/, label: "external secret-manager or KMS integration before adoption gate" },
+    { pattern: /\b(verifierKey|verifierSecret|credentialLookupKey|credentialVerifierKey|tokenLookupKey|tokenVerifierKey)\b/, label: "verifier key loading or usage before implementation gate" },
+    { pattern: /\bkeySetID\b/, label: "verifier key set selection before implementation gate" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement secret configuration or verifier key loading behavior before its implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses secret configuration and verifier key loading boundary: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -8157,6 +8395,7 @@ function checkRuntime(root) {
   checkRuntimeAuthenticationImplementationBoundary(root, goFiles);
   checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goFiles);
   checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goFiles);
+  checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

@@ -42,11 +42,12 @@ purpose: >
   authentication_generated_contract_shape_timing: ADR-0038
   application_authentication_service_interface_boundary: ADR-0039
   token_credential_verifier_algorithm_redaction_boundary: ADR-0040
+  secret_configuration_verifier_key_loading_boundary: ADR-0041
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: secret_configuration_and_verifier_key_loading_boundary
+  current_phase: token_credential_material_generation_boundary
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1060,10 +1061,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-020
-    latest_completed_work_item: W-0091
-    next_ready_work_item: W-0092
-    status: secret_configuration_and_verifier_key_loading_boundary_next
+    milestone: M-021
+    latest_completed_work_item: W-0092
+    next_ready_work_item: W-0093
+    status: token_credential_material_generation_boundary_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1361,17 +1362,43 @@ identity_session_boundary:
       - W-0091 define_token_credential_verifier_algorithm_redaction_boundary
     rule: The verifier algorithm and redaction-test boundary is defined. Future first-posture verifier code may use Go standard library HMAC-SHA-256 primitives after a later code gate, but token generation, credential generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, dependency, repository, migration, and secret-loading behavior remain separate gates.
   secret_configuration_and_verifier_key_loading_boundary:
-    status: active
+    status: completed
     milestone: M-020
     first_work_item: W-0092
-    next_work_item: W-0092
+    completed_work_item: W-0092
+    change: changes/2026-05-15-define-secret-configuration-verifier-key-loading-boundary
+    next_milestone: M-021
+    next_work_item: W-0093
+    decision: ADR-0041
+    secret_configuration_verifier_key_loading_boundary_decision: ADR-0041
+    standard: docs/secret-configuration-verifier-key-loading-boundary.md
+    translation: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+    secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md
+    secret_configuration_verifier_key_loading_boundary_translation: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+    secret_configuration_verifier_key_loading_boundary_defined: true
+    secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary
     previous_milestone: M-019
     previous_completed_work_item: W-0091
     planned_owner: runtime/internal/app
+    planned_optional_child_package: runtime/internal/app/authentication
     planned_boundary_type: secret_configuration_and_key_loading_standard_only
     allowed_scope: boundary_standard_and_manifests_only
+    first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input
+    external_kms_secret_manager_required_for_first_local_posture: false
+    external_secret_manager_dependency_adoption_record_required: true
+    operations_boundary_required_for_external_secret_manager: true
+    verifier_key_set_required: true
+    separated_logical_verifier_keys_required: true
+    verifier_key_id_required_for_stored_records: true
+    minimum_key_entropy_bits: 256
+    decoded_key_minimum_length_bytes: 32
+    production_missing_key_behavior: fail_closed
+    development_default_production_keys: forbidden
+    automatic_persistent_random_key_generation: forbidden
+    runtime_secret_values_in_committed_artifacts: forbidden
     runtime_authentication_implemented: false
     secret_configuration_loading_added: false
+    environment_parsing_added: false
     token_generation_added: false
     credential_generation_added: false
     token_validation_added: false
@@ -1385,7 +1412,10 @@ identity_session_boundary:
     authentication_dependencies_added: false
     repository_interface_changed: false
     migration_schemas_changed: false
-    rule: The next slice may define secret configuration ownership, verifier key loading posture, key identifier handling, rotation expectations, development/test posture, and production secret requirements. It must not implement secret loading, token generation, credential generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, dependency, repository, or migration behavior.
+    kms_secret_manager_integration_added: false
+    work_queue:
+      - W-0092 define_secret_configuration_verifier_key_loading_boundary
+    rule: The secret configuration and verifier key loading boundary is defined. Future local verifier key loading may use process environment configuration or explicit runtime secret input after a later code gate, but secret loading, environment parsing, token generation, credential generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, dependency, repository, migration, KMS, secret-manager, and production authentication behavior remain separate gates.
 
 persistence_model:
   decision: ADR-0011

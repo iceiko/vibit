@@ -126,6 +126,9 @@ documentation_pairs:
   runtime_authentication_implementation_boundary_standard:
     canonical: docs/runtime-authentication-implementation-boundary.md
     zh-CN: docs/runtime-authentication-implementation-boundary.zh-CN.md
+  secret_configuration_verifier_key_loading_boundary_standard:
+    canonical: docs/secret-configuration-verifier-key-loading-boundary.md
+    zh-CN: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -972,17 +975,41 @@ token_credential_verifier_algorithm_redaction_boundary:
     secret-loading behavior remain separate gates.
 
 secret_configuration_and_verifier_key_loading_boundary:
-  status: active
+  status: completed
   milestone: M-020
   first_work_item: W-0092
-  next_work_item: W-0092
+  completed_work_item: W-0092
+  change: changes/2026-05-15-define-secret-configuration-verifier-key-loading-boundary
+  decision: ADR-0041
+  secret_configuration_verifier_key_loading_boundary_decision: ADR-0041
+  standard: docs/secret-configuration-verifier-key-loading-boundary.md
+  translation: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+  secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md
+  secret_configuration_verifier_key_loading_boundary_translation: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+  secret_configuration_verifier_key_loading_boundary_defined: true
+  secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary
   previous_milestone: M-019
   previous_completed_work_item: W-0091
   planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
   planned_boundary_type: secret_configuration_and_key_loading_standard_only
   allowed_scope: boundary_standard_and_manifests_only
+  first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input
+  external_kms_secret_manager_required_for_first_local_posture: false
+  external_secret_manager_dependency_adoption_record_required: true
+  operations_boundary_required_for_external_secret_manager: true
+  verifier_key_set_required: true
+  separated_logical_verifier_keys_required: true
+  verifier_key_id_required_for_stored_records: true
+  minimum_key_entropy_bits: 256
+  decoded_key_minimum_length_bytes: 32
+  production_missing_key_behavior: fail_closed
+  development_default_production_keys: forbidden
+  automatic_persistent_random_key_generation: forbidden
+  runtime_secret_values_in_committed_artifacts: forbidden
   runtime_authentication_implemented: false
   secret_configuration_loading_added: false
+  environment_parsing_added: false
   token_generation_added: false
   credential_generation_added: false
   token_validation_added: false
@@ -996,13 +1023,15 @@ secret_configuration_and_verifier_key_loading_boundary:
   authentication_dependencies_added: false
   repository_interface_changed: false
   migration_schemas_changed: false
+  kms_secret_manager_integration_added: false
   rule: >
-    The next slice may define secret configuration ownership, verifier key
-    loading posture, key identifier handling, rotation expectations,
-    development/test posture, and production secret requirements. It must not
-    implement secret loading, token generation, credential generation, verifier
+    The secret configuration and verifier key loading boundary is defined.
+    Future local verifier key loading may use process environment configuration
+    or explicit runtime secret input after a later code gate, but secret loading,
+    environment parsing, token generation, credential generation, verifier
     comparison, login execution, token validation, logout, cleanup, protocol,
-    transport, dependency, repository, or migration behavior.
+    transport, dependency, repository, migration, KMS, secret-manager, and
+    production authentication behavior remain separate gates.
 
 server_runtime:
   first_reference_language: Go

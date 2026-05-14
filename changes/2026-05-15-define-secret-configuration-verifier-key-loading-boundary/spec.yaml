@@ -1,0 +1,133 @@
+schema_version: 0.1
+change_id: define-secret-configuration-verifier-key-loading-boundary
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the secret configuration and verifier key loading boundary without adding runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0041
+  referenced:
+    - ADR-0036
+    - ADR-0039
+    - ADR-0040
+
+standards:
+  added:
+    - docs/secret-configuration-verifier-key-loading-boundary.md
+    - docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  secret_configuration_boundary_defined: true
+  secret_configuration_loading_added: false
+  environment_parsing_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  runtime_authentication_implemented: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+  kms_secret_manager_integration_added: false
+
+secret_configuration_posture:
+  planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
+  first_local_key_source: process_environment_or_explicit_runtime_secret_input
+  external_kms_secret_manager_required_for_first_local_posture: false
+  external_secret_manager_dependency_adoption_record_required: true
+  verifier_key_set_required: true
+  minimum_key_entropy_bits: 256
+  decoded_key_minimum_length_bytes: 32
+  production_missing_key_behavior: fail_closed
+  runtime_secret_values_in_committed_artifacts: forbidden
+  planned_environment_variables:
+    - VIBIT_AUTH_VERIFIER_KEY_SET_ID
+    - VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY
+    - VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY
+    - VIBIT_AUTH_TOKEN_LOOKUP_KEY
+    - VIBIT_AUTH_TOKEN_VERIFIER_KEY
+
+workflow:
+  completed_work_item: W-0092
+  completed_milestone: M-020
+  next_milestone: M-021
+  next_ready_work_item: W-0093
+  next_direction: define_token_credential_material_generation_boundary
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-secret-configuration-verifier-key-loading-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -489,10 +489,14 @@ phase_plan:
       - session_context_boundary
     rule: The verifier algorithm and redaction-test posture is defined before service code. The first planned high-entropy verifier posture is `vibit_hmac_sha256_v1` with Go standard library dependency posture. It does not implement token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or secret loading.
   phase_2i_secret_configuration_and_verifier_key_loading_boundary:
-    status: active
-    active_milestone: M-020
+    status: completed
+    milestone: M-020
     previous_milestone: M-019
-    next_work_item: W-0092
+    completed_work_item: W-0092
+    change: changes/2026-05-15-define-secret-configuration-verifier-key-loading-boundary
+    decision: ADR-0041
+    secret_configuration_verifier_key_loading_boundary_decision: ADR-0041
+    standard: docs/secret-configuration-verifier-key-loading-boundary.md
     focus:
       - secret_configuration_ownership
       - verifier_key_loading_posture
@@ -501,13 +505,34 @@ phase_plan:
       - rotation_expectations
       - development_test_key_posture
       - production_secret_requirements
+      - external_secret_manager_deferral
     nakama_reference:
       - account_authentication_secret_handling
       - session_token_lifecycle_security
     pitaya_reference:
       - route_handler_identity_context
       - session_context_boundary
-    rule: The next phase may define secret configuration and verifier key loading posture before generation or verifier code. It must not implement secret loading, token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, or migration changes.
+    rule: The secret configuration and verifier key loading posture is defined before generation or verifier code. Future local key loading may use process environment configuration or explicit runtime secret input after a later code gate, while KMS and secret-manager integration remain behind dependency and operations gates. It does not implement secret loading, environment parsing, token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+  phase_2j_token_credential_material_generation_boundary:
+    status: active
+    active_milestone: M-021
+    previous_milestone: M-020
+    next_work_item: W-0093
+    focus:
+      - token_material_generation_ownership
+      - credential_material_generation_ownership
+      - raw_material_entropy_enforcement
+      - one_time_client_presentation
+      - storage_prohibition
+      - generation_redaction_tests
+      - standard_library_randomness_posture
+    nakama_reference:
+      - account_authentication_token_issuance_capability
+      - session_token_response_shape_vocabulary
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_context_boundary
+    rule: The next phase may define token and credential material generation posture before generation helpers or authentication service behavior. It must not implement token generation, credential generation, secret loading, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

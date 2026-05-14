@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-020
+current_milestone: M-021
 
 continuation_semantics:
   default_step_unit: work_item
@@ -406,7 +406,7 @@ milestones:
 
   - id: M-020
     title: Secret Configuration And Verifier Key Loading Boundary
-    status: active
+    status: completed
     goal: Define verifier key configuration, key loading, key identifier, rotation, and redaction boundaries before implementing token or credential material generation and verifier comparison.
     completion_criteria:
       - Secret configuration ownership and future key loading posture are documented before implementation.
@@ -417,6 +417,30 @@ milestones:
       - implementing secret loading
       - adding committed secrets or default production keys
       - implementing token generation
+      - implementing verifier comparison
+      - implementing application authentication service code
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-020 defined the secret configuration and verifier key loading boundary. The repository now has an English and Simplified Chinese secret configuration/key loading boundary standard, ADR-0041, a runtime check rule, manifest and guide references, application-owned future key loading posture under runtime/internal/app, first local process-environment or explicit runtime secret input posture, four separated logical verifier keys, verifier key id redaction rules, key-set rotation expectations, fail-closed production behavior, development/test key rules, and external KMS/secret-manager deferral behind dependency and operations gates. No secret loading, environment parsing, token generation, credential generation, verifier comparison, application authentication service code, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, KMS integration, secret-manager integration, or production authentication behavior were added.
+
+  - id: M-021
+    title: Token And Credential Material Generation Boundary
+    status: active
+    goal: Define token and credential material generation ownership, return semantics, entropy enforcement, one-time presentation, redaction, and test expectations before implementing generation helpers or authentication service behavior.
+    completion_criteria:
+      - Token and credential material generation ownership and future helper boundaries are documented before implementation.
+      - Raw material entropy, text encoding, one-time client presentation, non-storage, redaction, and test expectations are defined in a way that is consistent with the verifier algorithm and secret configuration boundaries.
+      - The boundary states whether future generation helpers can use Go standard library randomness and base64 encoding without an external dependency adoption record.
+      - Secret loading, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior remain deferred unless separately gated.
+    non_goals:
+      - implementing token generation
+      - implementing credential generation
+      - implementing secret loading
+      - implementing verifier digest computation
       - implementing verifier comparison
       - implementing application authentication service code
       - executing login, token validation, logout, refresh, or cleanup behavior
@@ -2435,7 +2459,7 @@ work_items:
   - id: W-0092
     milestone: M-020
     title: Define secret configuration and verifier key loading boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-secret-configuration-verifier-key-loading-boundary
     depends_on:
       - W-0091
@@ -2448,6 +2472,26 @@ work_items:
       - Declare whether the first local implementation may use process environment configuration or whether an external KMS/secret-manager dependency adoption record is required before implementation.
       - Define development/test key posture without committing production-like secrets or raw verifier values.
       - Preserve deferral for token generation, credential generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    completion_summary: Defined the secret configuration and verifier key loading boundary in ADR-0041 and the paired boundary standard. Future key loading is application-owned under runtime/internal/app, the first local implementation may use process environment configuration or explicit runtime secret input after a later code gate, external KMS/secret-manager integration remains deferred behind dependency and operations gates, four distinct logical verifier keys are required, verifier_key_id is internal and not log-safe by default, production behavior must fail closed for invalid key configuration, and development/test keys must remain explicit without committed production-like secrets. No secret loading, environment parsing, token generation, credential generation, verifier comparison, application authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, KMS integration, secret-manager integration, or production authentication behavior were added.
     ask_first:
       - Selecting a major external KMS, cloud secret-manager, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or operations dependency.
       - Implementing secret loading, token generation, credential generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
+
+  - id: W-0093
+    milestone: M-021
+    title: Define token and credential material generation boundary
+    status: next_ready
+    change: changes/2026-05-15-define-token-credential-material-generation-boundary
+    depends_on:
+      - W-0092
+    related_decisions:
+      - ADR-0040
+      - ADR-0041
+    completion:
+      - Define future application-owned token and credential material generation boundaries without implementing generation helpers.
+      - Define raw material entropy enforcement, URL-safe text encoding, one-time presentation, storage prohibition, redaction, test fixture posture, and repository interaction expectations.
+      - Declare whether future first-posture generation helpers can use Go standard library `crypto/rand` and `encoding/base64` without an external dependency adoption record.
+      - Preserve deferral for secret loading, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    ask_first:
+      - Selecting a major external randomness, cryptography, password-hashing, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, or operations dependency.
+      - Implementing token generation, credential generation, secret loading, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.

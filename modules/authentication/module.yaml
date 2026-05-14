@@ -12,6 +12,10 @@ decisions:
   - ADR-0034
   - ADR-0036
   - ADR-0037
+  - ADR-0038
+  - ADR-0039
+  - ADR-0040
+  - ADR-0041
 
 owns:
   entities:
@@ -184,7 +188,15 @@ contracts:
   minimum_raw_device_credential_entropy_bits: 256
   external_dependency_adoption_record_required_for_first_posture: false
   secret_configuration_verifier_key_loading_boundary_milestone: M-020
-  secret_configuration_verifier_key_loading_boundary_next_work_item: W-0092
+  secret_configuration_verifier_key_loading_boundary_completed_work_item: W-0092
+  secret_configuration_verifier_key_loading_boundary_decision: ADR-0041
+  secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md
+  secret_configuration_verifier_key_loading_boundary_defined: true
+  secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary
+  first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input
+  external_kms_secret_manager_required_for_first_local_posture: false
+  verifier_key_set_required: true
+  separated_logical_verifier_keys_required: true
   runtime_lookup_added: false
   token_behavior_implemented: false
   token_generation_added: false
@@ -301,7 +313,15 @@ persistence:
     minimum_raw_device_credential_entropy_bits: 256
     external_dependency_adoption_record_required_for_first_posture: false
     secret_configuration_verifier_key_loading_boundary_milestone: M-020
-    secret_configuration_verifier_key_loading_boundary_next_work_item: W-0092
+    secret_configuration_verifier_key_loading_boundary_completed_work_item: W-0092
+    secret_configuration_verifier_key_loading_boundary_decision: ADR-0041
+    secret_configuration_verifier_key_loading_boundary_standard: docs/secret-configuration-verifier-key-loading-boundary.md
+    secret_configuration_verifier_key_loading_boundary_defined: true
+    secret_configuration_verifier_key_loading_boundary_check_rule: runtime.secret_configuration_verifier_key_loading_boundary
+    first_local_secret_key_source: process_environment_or_explicit_runtime_secret_input
+    external_kms_secret_manager_required_for_first_local_posture: false
+    verifier_key_set_required: true
+    separated_logical_verifier_keys_required: true
     runtime_authentication_implemented: false
     token_behavior_implemented: false
     token_generation_added: false
