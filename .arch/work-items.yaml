@@ -1933,7 +1933,7 @@ work_items:
   - id: W-0075
     milestone: M-014
     title: Define token verifier record schema boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-token-verifier-record-schema-boundary
     depends_on:
       - W-0074
@@ -1946,8 +1946,31 @@ work_items:
       - Ratify token verifier record ownership, non-plaintext verifier storage, statuses, expiration, revocation, credential-token linkage, retention, cleanup, replay-sensitive failure classes, redaction rules, and required future migration/repository/adapter gates.
       - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
       - Keep refresh-token storage, runtime session persistence, WebSocket connection binding, and Redis-like token/session stores deferred for the first posture.
+    completion_summary: Ratified the token verifier record schema boundary for the selected opaque access-token posture. Defined runtime.authentication ownership, future logical table authentication_access_tokens, log-safe token_record_id, non-plaintext lookup and verifier semantics, active/expired/revoked lifecycle states, player actor and credential linkage, immutable player and credential relationships, access-token TTL and expiration semantics, presented-token logout and revocation semantics, rotation support for previous active tokens on the same credential, seven-day expired/revoked retention recommendation, cleanup expectations, replay-sensitive failure classes, redaction rules, and future migration/repository/adapter gates. No migration source, table, repository interface, PostgreSQL adapter, runtime token validation, token issuance, logout, refresh, cleanup job, handler, route, generated authentication output, Protobuf message, WebSocket carrier, authentication dependency, or authentication behavior was added.
     ask_first:
       - Adding token verifier migration sources or tables.
       - Adding token repository interfaces or PostgreSQL adapters.
       - Implementing token issuance, validation, logout, refresh, or cleanup behavior.
       - Adding JWT, signing, key-management, Redis-like, OAuth, OIDC, or provider dependencies.
+
+  - id: W-0076
+    milestone: M-014
+    title: Plan authentication schema migration queue
+    status: next_ready
+    change: changes/2026-05-14-plan-authentication-schema-migration-queue
+    depends_on:
+      - W-0075
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0033
+    completion:
+      - Plan the credential and token verifier migration sequence, repository-interface gates, PostgreSQL adapter gates, redaction checks, live PostgreSQL verification expectations, and future work-item ordering now that both schema boundaries are ratified.
+      - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+      - Keep player account lifecycle tables credential-free, token-free, external-identity-free, session-free, WebSocket-state-free, and request-validation-free.
+    ask_first:
+      - Adding authentication migration sources or tables.
+      - Adding authentication repository interfaces or PostgreSQL adapters.
+      - Implementing credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
+      - Adding JWT, signing, key-management, Redis-like, OAuth, OIDC, password-hashing, or provider dependencies.
+      - Changing Protobuf envelope, WebSocket proof carrier, or WebSocket handshake authentication behavior.

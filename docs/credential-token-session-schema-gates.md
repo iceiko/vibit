@@ -62,7 +62,9 @@ credential_record_schema_gate:
   decision: ADR-0032
 token_verifier_record_schema_gate:
   required_for_first_posture: true
-  status: defined_no_schema_added
+  status: ratified_no_schema_added
+  boundary: docs/token-verifier-record-schema-boundary.md
+  decision: ADR-0033
 external_identity_link_schema_gate:
   required_for_first_posture: false
   status: deferred_no_schema_added
@@ -95,7 +97,23 @@ credential_record_schema_boundary:
   runtime_lookup_added_now: false
 ```
 
-The token verifier record schema boundary remains the next required schema ratification work.
+W-0075 has ratified the token verifier record schema boundary without adding schema:
+
+```yaml
+token_verifier_record_schema_boundary:
+  status: ratified_no_schema_added
+  standard: docs/token-verifier-record-schema-boundary.md
+  decision: ADR-0033
+  future_logical_table: authentication_access_tokens
+  migration_added_now: false
+  repository_added_now: false
+  runtime_validation_added_now: false
+  token_issuance_added_now: false
+  logout_added_now: false
+  cleanup_added_now: false
+```
+
+Authentication schema migration planning is now the next required work before any migration source may be added.
 
 ## 4. Credential Record Gate
 
@@ -376,7 +394,7 @@ This standard does not authorize:
 Next work:
 
 ```text
-W-0075 Define token verifier record schema boundary
+W-0076 Plan authentication schema migration queue
 ```
 
-W-0075 should ratify token verifier record semantics without adding migrations, repositories, adapters, runtime token validation, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+W-0076 should plan credential and token verifier migration ordering, repository-interface gates, PostgreSQL adapter gates, redaction checks, and live verification expectations without adding migrations, repositories, adapters, runtime token validation, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.

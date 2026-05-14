@@ -62,7 +62,9 @@ credential_record_schema_gate:
   decision: ADR-0032
 token_verifier_record_schema_gate:
   required_for_first_posture: true
-  status: defined_no_schema_added
+  status: ratified_no_schema_added
+  boundary: docs/token-verifier-record-schema-boundary.md
+  decision: ADR-0033
 external_identity_link_schema_gate:
   required_for_first_posture: false
   status: deferred_no_schema_added
@@ -95,7 +97,23 @@ credential_record_schema_boundary:
   runtime_lookup_added_now: false
 ```
 
-Token verifier record schema boundary 仍然是下一个必需的 schema ratification work。
+W-0075 已经 ratify token verifier record schema boundary，但没有添加 schema：
+
+```yaml
+token_verifier_record_schema_boundary:
+  status: ratified_no_schema_added
+  standard: docs/token-verifier-record-schema-boundary.md
+  decision: ADR-0033
+  future_logical_table: authentication_access_tokens
+  migration_added_now: false
+  repository_added_now: false
+  runtime_validation_added_now: false
+  token_issuance_added_now: false
+  logout_added_now: false
+  cleanup_added_now: false
+```
+
+Authentication schema migration planning 现在是添加任何 migration source 前的下一个必需工作。
 
 ## 4. Credential Record Gate
 
@@ -376,7 +394,7 @@ git diff --check
 下一步工作：
 
 ```text
-W-0075 Define token verifier record schema boundary
+W-0076 Plan authentication schema migration queue
 ```
 
-W-0075 应 ratify token verifier record semantics，但不添加 migrations、repositories、adapters、runtime token validation、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。
+W-0076 应规划 credential 与 token verifier migration ordering、repository-interface gates、PostgreSQL adapter gates、redaction checks 和 live verification expectations，但不添加 migrations、repositories、adapters、runtime token validation、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。

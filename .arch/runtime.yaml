@@ -968,7 +968,11 @@ identity_session_boundary:
       credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
       credential_record_schema_boundary_decision: ADR-0032
       future_credential_logical_table: authentication_device_credentials
-      token_verifier_record_schema_gate_status: defined_no_schema_added
+      token_verifier_record_schema_gate_status: ratified_no_schema_added
+      token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
+      token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
+      token_verifier_record_schema_boundary_decision: ADR-0033
+      future_token_logical_table: authentication_access_tokens
       external_identity_link_schema_gate_status: deferred_no_schema_added
       runtime_session_record_schema_gate_status: deferred_no_schema_added
       audit_persistence_schema_gate_status: defined_no_schema_added
@@ -1000,6 +1004,7 @@ identity_session_boundary:
       authentication_audit_event_surface_defined: true
       credential_token_session_schema_gates_defined: true
       credential_record_schema_boundary_ratified: true
+      token_verifier_record_schema_boundary_ratified: true
       selected_login_token_boundary_checks_added: true
       token_storage_schema_added: false
       credential_storage_schema_added: false
@@ -1025,26 +1030,31 @@ identity_session_boundary:
       - W-0072 add_repository_checks_for_selected_login_token_boundaries
       - W-0073 close_login_method_token_format_ratification_milestone
       - W-0074 define_credential_record_schema_boundary
+      - W-0075 define_token_verifier_record_schema_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-014
-    latest_completed_work_item: W-0074
-    next_ready_work_item: W-0075
-    status: define_token_verifier_record_schema_boundary_next
+    latest_completed_work_item: W-0075
+    next_ready_work_item: W-0076
+    status: plan_authentication_schema_migration_queue_next
   credential_token_schema_ratification:
     status: active
     milestone: M-014
-    selected_by_closeout_decision: ADR-0031
-    first_work_item: W-0074
-    latest_completed_work_item: W-0074
-    next_work_item: W-0075
+  selected_by_closeout_decision: ADR-0031
+  first_work_item: W-0074
+  latest_completed_work_item: W-0075
+  next_work_item: W-0076
     default_durable_target: PostgreSQL
     credential_record_schema_boundary_status: ratified_no_schema_added
     credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
     credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
-    credential_record_schema_boundary_decision: ADR-0032
-    future_credential_logical_table: authentication_device_credentials
-    token_verifier_record_schema_boundary_status: next
+  credential_record_schema_boundary_decision: ADR-0032
+  future_credential_logical_table: authentication_device_credentials
+  token_verifier_record_schema_boundary_status: ratified_no_schema_added
+  token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
+  token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
+  token_verifier_record_schema_boundary_decision: ADR-0033
+  future_token_logical_table: authentication_access_tokens
     migration_sources_added: false
     repository_interfaces_added: false
     postgres_adapters_added: false

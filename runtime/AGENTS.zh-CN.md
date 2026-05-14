@@ -130,7 +130,9 @@ Selected login/token boundary checks 记录在 `../docs/selected-login-token-bou
 
 Credential record schema boundary 记录在 `../docs/credential-record-schema-boundary.md` 和 `../decisions/ADR-0032-credential-record-schema-boundary.md`。它 ratify `device_credential_login` 未来的 `authentication_device_credentials` semantics，但不添加 schema 或 runtime behavior。除非后续 bounded work 明确授权 migrations、repositories、adapters、runtime lookup、handlers、routes、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior，否则 runtime code 必须保持不变。
 
-`M-013 Login Method And Token Format Ratification` 已由 `ADR-0031` 完成。当前 gate 是 `M-014 Credential And Token Verifier Schema Ratification`，`W-0075 Define token verifier record schema boundary` 是下一个 ready work item。
+Token verifier record schema boundary 记录在 `../docs/token-verifier-record-schema-boundary.md` 和 `../decisions/ADR-0033-token-verifier-record-schema-boundary.md`。它 ratify opaque access-token verifier storage 未来的 `authentication_access_tokens` semantics，但不添加 schema 或 runtime behavior。除非后续 bounded work 明确授权 migrations、repositories、adapters、runtime token issuance、validation、logout、refresh、cleanup、handlers、routes、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior，否则 runtime code 必须保持不变。
+
+`M-013 Login Method And Token Format Ratification` 已由 `ADR-0031` 完成。当前 gate 是 `M-014 Credential And Token Verifier Schema Ratification`，`W-0076 Plan authentication schema migration queue` 是下一个 ready work item。
 
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 

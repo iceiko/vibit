@@ -83,7 +83,8 @@ selected_posture:
 schema_gates:
   credential_record_schema_gate_status: ratified_no_schema_added
   credential_record_schema_boundary: docs/credential-record-schema-boundary.md
-  token_verifier_record_schema_gate_status: defined_no_schema_added
+  token_verifier_record_schema_gate_status: ratified_no_schema_added
+  token_verifier_record_schema_boundary: docs/token-verifier-record-schema-boundary.md
   external_identity_link_schema_gate_status: deferred_no_schema_added
   runtime_session_record_schema_gate_status: deferred_no_schema_added
 implementation_status:
@@ -132,6 +133,8 @@ implementation_status:
 - `contracts/runtime/authentication/**`
 - `docs/authentication-contract-error-permission-surfaces.md`
 - `docs/credential-token-session-schema-gates.md`
+- `docs/credential-record-schema-boundary.md`
+- `docs/token-verifier-record-schema-boundary.md`
 - `docs/token-lifecycle-storage-implications.md`
 - `docs/first-login-method-set.md`
 - `docs/first-token-format-proof-carrier-posture.md`

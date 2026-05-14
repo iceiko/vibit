@@ -1,0 +1,110 @@
+schema_version: 0.1
+change_id: define-token-verifier-record-schema-boundary
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Ratify the token verifier record schema boundary for the selected opaque access-token posture without adding schema or runtime behavior.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added:
+    - ADR-0033
+  referenced:
+    - ADR-0026
+    - ADR-0027
+    - ADR-0029
+    - ADR-0030
+    - ADR-0031
+    - ADR-0032
+
+standards:
+  added:
+    - docs/token-verifier-record-schema-boundary.md
+    - docs/token-verifier-record-schema-boundary.zh-CN.md
+  changed:
+    - docs/credential-token-session-schema-gates.md
+    - docs/credential-token-session-schema-gates.zh-CN.md
+    - docs/selected-login-token-boundary-checks.md
+    - docs/selected-login-token-boundary-checks.zh-CN.md
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes:
+    - runtime.authentication owns the future token verifier record boundary
+    - player account lifecycle tables remain token-free
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  token_verifier_schema_boundary_ratified: true
+  token_migration_added: false
+  token_repository_added: false
+  token_postgres_adapter_added: false
+  runtime_token_validation_added: false
+  token_issuance_added: false
+  logout_added: false
+  cleanup_added: false
+  websocket_routes_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_work_item: W-0075
+  next_ready_work_item: W-0076
+  next_direction: authentication_schema_migration_queue
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-token-verifier-record-schema-boundary --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
