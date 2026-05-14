@@ -1,0 +1,134 @@
+schema_version: 0.1
+change_id: define-verifier-digest-computation-comparison-boundary
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the verifier digest computation and comparison boundary without adding runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0043
+  referenced:
+    - ADR-0040
+    - ADR-0041
+    - ADR-0042
+
+standards:
+  added:
+    - docs/verifier-digest-computation-comparison-boundary.md
+    - docs/verifier-digest-computation-comparison-boundary.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  verifier_digest_computation_comparison_boundary_defined: true
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  secret_configuration_loading_added: false
+  application_authentication_service_code_added: false
+  runtime_authentication_implemented: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+verifier_digest_posture:
+  planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  verifier_version: 1
+  digest_size_bytes: 32
+  canonical_input_version: vibit.auth.verifier.input.v1
+  canonical_input_encoding: ascii_header_length_prefixed_purpose_label_length_prefixed_raw_material
+  lookup_digest_database_equality_allowed_for_record_selection: true
+  lookup_digest_database_equality_sufficient_for_authentication: false
+  constant_time_verifier_comparison_required: true
+  missing_lookup_public_failure: invalid_authentication_proof
+  invalid_verifier_public_failure: invalid_authentication_proof
+  unknown_key_id_public_failure: invalid_authentication_proof
+  external_cryptography_dependency_required_for_first_posture: false
+  future_allowed_go_standard_library_packages:
+    - crypto/hmac
+    - crypto/sha256
+    - crypto/subtle
+
+workflow:
+  completed_work_item: W-0094
+  completed_milestone: M-022
+  next_milestone: M-023
+  next_ready_work_item: W-0095
+  next_direction: define_authentication_service_implementation_readiness_gate
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-verifier-digest-computation-comparison-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

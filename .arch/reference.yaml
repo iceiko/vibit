@@ -540,10 +540,16 @@ phase_plan:
       - session_context_boundary
     rule: The token and credential material generation posture is defined before generation helpers or authentication service behavior. Future first-posture raw credential and access-token generation is application-owned, server-issued, 32-byte high-entropy, URL-safe for presentation, one-time client-visible, and digest-only at repository handoff. It does not implement token generation, credential generation, secret loading, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_2k_verifier_digest_computation_and_comparison_boundary:
-    status: active
-    active_milestone: M-022
+    status: completed
+    milestone: M-022
     previous_milestone: M-021
-    next_work_item: W-0094
+    completed_work_item: W-0094
+    change: changes/2026-05-15-define-verifier-digest-computation-comparison-boundary
+    decision: ADR-0043
+    verifier_digest_computation_comparison_boundary_decision: ADR-0043
+    standard: docs/verifier-digest-computation-comparison-boundary.md
+    next_milestone: M-023
+    next_work_item: W-0095
     focus:
       - verifier_digest_computation_ownership
       - constant_time_comparison_boundary
@@ -559,7 +565,27 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_context_boundary
-    rule: The active phase may define verifier digest computation and constant-time comparison posture before digest helpers or authentication service behavior. It must not implement verifier digest computation, verifier comparison, token generation, credential generation, secret loading, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+    rule: The verifier digest computation and constant-time comparison posture is defined before digest helpers or authentication service behavior. Future digest helpers are application-owned, use versioned length-prefixed canonical input, keep lookup digest equality as record selection only, and require constant-time verifier digest comparison with invalid-proof public failure collapse. It does not implement verifier digest computation, verifier comparison, token generation, credential generation, secret loading, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+  phase_2l_authentication_service_implementation_readiness_gate:
+    status: active
+    active_milestone: M-023
+    previous_milestone: M-022
+    next_work_item: W-0095
+    focus:
+      - authentication_service_implementation_entry_criteria
+      - first_code_slice_queue
+      - secret_generation_digest_comparison_sequence
+      - redaction_and_test_requirements
+      - repository_boundary_readiness
+      - protocol_and_websocket_deferral
+      - nakama_pitaya_capability_mapping
+    nakama_reference:
+      - account_authentication_token_issuance_capability
+      - session_token_validation_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+    rule: The active phase may define implementation readiness and the first bounded code queue before service code. It must not implement authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

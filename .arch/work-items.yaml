@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-022
+current_milestone: M-023
 
 continuation_semantics:
   default_step_unit: work_item
@@ -453,7 +453,7 @@ milestones:
 
   - id: M-022
     title: Verifier Digest Computation And Comparison Boundary
-    status: active
+    status: completed
     goal: Define verifier digest computation, canonical byte input, key use, lookup/verifier digest handoff, constant-time comparison, failure behavior, and redaction test expectations before implementing digest helpers or authentication service behavior.
     completion_criteria:
       - Verifier digest computation ownership, canonical input construction, key use, and output handoff are documented before implementation.
@@ -467,6 +467,30 @@ milestones:
       - implementing credential generation
       - implementing secret loading
       - implementing application authentication service code
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-022 defined the verifier digest computation and comparison boundary. The repository now has an English and Simplified Chinese verifier digest boundary standard, ADR-0043, a runtime check rule, manifest and guide references, application-owned future digest posture under runtime/internal/app, canonical HMAC input framing with version header and length prefixes, four digest class mappings, active and accepted-previous key-set lookup posture, lookup digest handoff rules, constant-time verifier digest comparison expectations, invalid-proof public failure collapse, redaction requirements, digest test expectations, and Go standard library HMAC/SHA-256/subtle dependency posture. No verifier digest computation, verifier comparison, token generation, credential generation, secret loading, application authentication service code, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior were added.
+
+  - id: M-023
+    title: Authentication Service Implementation Readiness Gate
+    status: active
+    goal: Consolidate the implementation entry criteria, test expectations, and bounded first authentication service code queue before adding authentication service behavior.
+    completion_criteria:
+      - The first authentication service implementation slice has explicit entry criteria, owned packages, allowed files, required tests, and deferrals.
+      - Secret loading, material generation, digest computation, verifier comparison, login execution, token validation, logout, cleanup, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, and production behavior remain separately gated or explicitly sequenced.
+      - The readiness gate maps Nakama and Pitaya authentication/session capability references into the concrete vibit implementation queue without copying their public APIs.
+      - The next code or planning work item is bounded enough for an agent to implement without changing architecture implicitly.
+    non_goals:
+      - implementing authentication service code
+      - implementing secret loading
+      - implementing token generation
+      - implementing credential generation
+      - implementing verifier digest computation
+      - implementing verifier comparison
       - executing login, token validation, logout, refresh, or cleanup behavior
       - adding authentication Protobuf messages
       - changing the Protobuf envelope or WebSocket handshake
@@ -2524,7 +2548,7 @@ work_items:
   - id: W-0094
     milestone: M-022
     title: Define verifier digest computation and comparison boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-verifier-digest-computation-comparison-boundary
     depends_on:
       - W-0093
@@ -2537,6 +2561,31 @@ work_items:
       - Define canonical byte input construction, purpose-label use, logical key use, key-id selection, lookup digest handoff, verifier digest comparison, and failure redaction expectations.
       - Declare whether future first-posture digest helpers can use Go standard library `crypto/hmac`, `crypto/sha256`, and `crypto/subtle` without an external dependency adoption record.
       - Preserve deferral for token generation, credential generation, secret loading, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    completion_summary: Defined the verifier digest computation and comparison boundary in ADR-0043 and the paired boundary standard. Future digest computation and verifier comparison is application-owned under runtime/internal/app; canonical HMAC input is versioned and length-prefixed; lookup and verifier digest classes remain separated across credential and token proof; validation may compute lookup candidates across active and accepted previous key sets while using stored verifier_key_id for verifier digest computation; lookup digest equality is record selection only; verifier digest comparison must be constant-time; invalid lookup, mismatch, unknown key id, unsupported algorithm, malformed proof, and expired or revoked proof collapse to the same public invalid-proof class; future first-posture helpers may use Go standard library `crypto/hmac`, `crypto/sha256`, and `crypto/subtle` after a later code gate. No verifier digest computation, verifier comparison, token generation, credential generation, secret loading, application authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior were added.
     ask_first:
       - Selecting a major external cryptography, password-hashing, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, or operations dependency.
       - Implementing verifier digest computation, verifier comparison, token generation, credential generation, secret loading, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
+
+  - id: W-0095
+    milestone: M-023
+    title: Define authentication service implementation readiness gate
+    status: next_ready
+    change: changes/2026-05-15-define-authentication-service-implementation-readiness-gate
+    depends_on:
+      - W-0094
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0042
+      - ADR-0043
+    completion:
+      - Consolidate the first authentication service implementation entry criteria across service ownership, secret configuration, material generation, digest computation, verifier comparison, repository usage, redaction, tests, and deferrals.
+      - Define the smallest safe first implementation queue without adding code.
+      - Map Nakama and Pitaya authentication/session references into the readiness checklist.
+      - Preserve deferral for authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    ask_first:
+      - Starting implementation code while defining readiness.
+      - Selecting a major external dependency.
+      - Changing repository interfaces, migration schemas, Protobuf messages, WebSocket proof carriers, or runtime authentication behavior.

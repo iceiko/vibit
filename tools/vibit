@@ -69,6 +69,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.token_credential_verifier_algorithm_redaction_boundary",
   "runtime.secret_configuration_verifier_key_loading_boundary",
   "runtime.token_credential_material_generation_boundary",
+  "runtime.verifier_digest_computation_comparison_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -8189,6 +8190,248 @@ function checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles) {
   }
 }
 
+function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) {
+  const ruleId = "runtime.verifier_digest_computation_comparison_boundary";
+  const standardPath = "docs/verifier-digest-computation-comparison-boundary.md";
+  const standardTranslationPath = "docs/verifier-digest-computation-comparison-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0043-verifier-digest-computation-comparison-boundary.md";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for verifier digest computation and comparison boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for verifier digest computation and comparison boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "verifier_digest_computation_comparison_boundary_standard: docs/verifier-digest-computation-comparison-boundary.md"],
+    [".arch/conventions.yaml", "verifier_digest_computation_comparison_boundary_decision: ADR-0043"],
+    [".arch/conventions.yaml", "verifier_digest_computation_comparison_boundary_check_rule: runtime.verifier_digest_computation_comparison_boundary"],
+    [".arch/runtime.yaml", "verifier_digest_computation_comparison_boundary: ADR-0043"],
+    [".arch/runtime.yaml", "verifier_digest_computation_comparison_boundary_decision: ADR-0043"],
+    [".arch/runtime.yaml", "verifier_digest_computation_comparison_boundary_standard: docs/verifier-digest-computation-comparison-boundary.md"],
+    [".arch/runtime.yaml", "verifier_digest_computation_comparison_boundary_defined: true"],
+    [".arch/runtime.yaml", "verifier_digest_computation_comparison_boundary_check_rule: runtime.verifier_digest_computation_comparison_boundary"],
+    [".arch/contracts.yaml", "verifier_digest_computation_comparison_boundary_defined: true"],
+    [".arch/contracts.yaml", "verifier_digest_computation_comparison_boundary_standard: docs/verifier-digest-computation-comparison-boundary.md"],
+    [".arch/reference.yaml", "phase_2k_verifier_digest_computation_and_comparison_boundary"],
+    [".arch/reference.yaml", "verifier_digest_computation_comparison_boundary_decision: ADR-0043"],
+    ["AGENTS.md", "docs/verifier-digest-computation-comparison-boundary.md"],
+    ["AGENTS.md", "ADR-0043"],
+    ["AGENTS.md", "runtime.verifier_digest_computation_comparison_boundary"],
+    ["AGENTS.zh-CN.md", "docs/verifier-digest-computation-comparison-boundary.md"],
+    ["AGENTS.zh-CN.md", "ADR-0043"],
+    ["AGENTS.zh-CN.md", "runtime.verifier_digest_computation_comparison_boundary"],
+    ["runtime/AGENTS.md", "../docs/verifier-digest-computation-comparison-boundary.md"],
+    ["runtime/AGENTS.md", "ADR-0043"],
+    ["runtime/AGENTS.md", "runtime.verifier_digest_computation_comparison_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/verifier-digest-computation-comparison-boundary.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0043"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.verifier_digest_computation_comparison_boundary"],
+    ["modules/authentication/module.yaml", "verifier_digest_computation_comparison_boundary_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/verifier-digest-computation-comparison-boundary.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/verifier-digest-computation-comparison-boundary.md"],
+    ["rules/check-rules.json", "runtime.verifier_digest_computation_comparison_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "canonical_input_version: vibit.auth.verifier.input.v1"],
+    [standardPath, "uint16be(len(purpose_label))"],
+    [standardPath, "uint16be(len(raw_material))"],
+    [standardPath, "credential_lookup_digest:"],
+    [standardPath, "credential_verifier_digest:"],
+    [standardPath, "token_lookup_digest:"],
+    [standardPath, "token_verifier_digest:"],
+    [standardPath, "lookup_digest_database_equality_sufficient_for_authentication: false"],
+    [standardPath, "constant_time_verifier_comparison_required: true"],
+    [standardPath, "invalid_authentication_proof"],
+    [standardPath, "crypto/hmac"],
+    [standardPath, "crypto/sha256"],
+    [standardPath, "crypto/subtle"],
+    [standardPath, "This is a boundary-only standard. It does not add Go code"],
+    [standardPath, "runtime.verifier_digest_computation_comparison_boundary"],
+    [standardTranslationPath, "canonical_input_version: vibit.auth.verifier.input.v1"],
+    [standardTranslationPath, "uint16be(len(purpose_label))"],
+    [standardTranslationPath, "uint16be(len(raw_material))"],
+    [standardTranslationPath, "credential_lookup_digest:"],
+    [standardTranslationPath, "credential_verifier_digest:"],
+    [standardTranslationPath, "token_lookup_digest:"],
+    [standardTranslationPath, "token_verifier_digest:"],
+    [standardTranslationPath, "lookup_digest_database_equality_sufficient_for_authentication: false"],
+    [standardTranslationPath, "constant_time_verifier_comparison_required: true"],
+    [standardTranslationPath, "invalid_authentication_proof"],
+    [standardTranslationPath, "crypto/hmac"],
+    [standardTranslationPath, "crypto/sha256"],
+    [standardTranslationPath, "crypto/subtle"],
+    [standardTranslationPath, "这只是 boundary-only standard。它不添加 Go code"],
+    [standardTranslationPath, "runtime.verifier_digest_computation_comparison_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "verifier_digest_computation_comparison_boundary_defined: true",
+      "verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "canonical_input_version: vibit.auth.verifier.input.v1",
+      "lookup_digest_database_equality_allowed_for_record_selection: true",
+      "lookup_digest_database_equality_sufficient_for_authentication: false",
+      "constant_time_verifier_comparison_required: true",
+      "missing_lookup_public_failure: invalid_authentication_proof",
+      "invalid_verifier_public_failure: invalid_authentication_proof",
+      "unknown_key_id_public_failure: invalid_authentication_proof",
+      "external_cryptography_dependency_required_for_first_posture: false",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "secret_configuration_loading_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "verifier_digest_computation_comparison_boundary_defined: true",
+      "verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "canonical_input_version: vibit.auth.verifier.input.v1",
+      "lookup_digest_database_equality_allowed_for_record_selection: true",
+      "lookup_digest_database_equality_sufficient_for_authentication: false",
+      "constant_time_verifier_comparison_required: true",
+      "missing_lookup_public_failure: invalid_authentication_proof",
+      "invalid_verifier_public_failure: invalid_authentication_proof",
+      "unknown_key_id_public_failure: invalid_authentication_proof",
+      "external_cryptography_dependency_required_for_first_posture: false",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "secret_configuration_loading_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "verifier_digest_computation_comparison_boundary_defined: true",
+      "canonical_input_version: vibit.auth.verifier.input.v1",
+      "lookup_digest_database_equality_allowed_for_record_selection: true",
+      "lookup_digest_database_equality_sufficient_for_authentication: false",
+      "constant_time_verifier_comparison_required: true",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "runtime_lookup_added: false",
+      "generated_contract_shapes_added: true",
+      "authentication_generated_contract_shapes_added: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "verifier_digest_computation_comparison_boundary_defined: true",
+      "canonical_input_version: vibit.auth.verifier.input.v1",
+      "lookup_digest_database_equality_allowed_for_record_selection: true",
+      "lookup_digest_database_equality_sufficient_for_authentication: false",
+      "constant_time_verifier_comparison_required: true",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing verifier digest computation and comparison boundary markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves verifier digest computation and comparison boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing verifier digest computation and comparison boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\bcrypto\/(hmac|sha256|subtle)\b/, label: "verifier digest computation or comparison import before implementation gate" },
+    { pattern: /\bhmac\.(New|Equal)\b/, label: "HMAC digest computation or comparison before implementation gate" },
+    { pattern: /\bsha256\.(New|Sum256)\b/, label: "SHA-256 digest computation before implementation gate" },
+    { pattern: /\bsubtle\.ConstantTimeCompare\b/, label: "verifier comparison before implementation gate" },
+    { pattern: /\bbytes\.Equal\b/, label: "non-constant-time verifier digest comparison risk before implementation gate" },
+    { pattern: /\breflect\.DeepEqual\b/, label: "non-constant-time verifier digest comparison risk before implementation gate" },
+    { pattern: /\b(Compute|Build|New)(Credential|Token)?(Lookup|Verifier)?Digest\b/, label: "verifier digest helper before implementation gate" },
+    { pattern: /\b(Compare|Verify)(Credential|Token)?Verifier\b/, label: "verifier comparison helper before implementation gate" },
+    { pattern: /\bcanonicalDigestInput\b/, label: "canonical digest input construction before implementation gate" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement verifier digest computation or comparison before its implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses verifier digest computation and comparison boundary: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -8620,6 +8863,7 @@ function checkRuntime(root) {
   checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goFiles);
   checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles);
+  checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

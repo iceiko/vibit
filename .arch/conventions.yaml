@@ -132,6 +132,9 @@ documentation_pairs:
   token_credential_material_generation_boundary_standard:
     canonical: docs/token-credential-material-generation-boundary.md
     zh-CN: docs/token-credential-material-generation-boundary.zh-CN.md
+  verifier_digest_computation_comparison_boundary_standard:
+    canonical: docs/verifier-digest-computation-comparison-boundary.md
+    zh-CN: docs/verifier-digest-computation-comparison-boundary.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -1097,6 +1100,74 @@ token_credential_material_generation_boundary:
     comparison, login execution, token validation, logout, cleanup, protocol,
     transport, dependency, repository, migration, and production authentication
     behavior remain separate gates.
+
+verifier_digest_computation_and_comparison_boundary:
+  status: completed
+  milestone: M-022
+  first_work_item: W-0094
+  completed_work_item: W-0094
+  change: changes/2026-05-15-define-verifier-digest-computation-comparison-boundary
+  next_milestone: M-023
+  next_work_item: W-0095
+  previous_milestone: M-021
+  previous_completed_work_item: W-0093
+  decision: ADR-0043
+  verifier_digest_computation_comparison_boundary_decision: ADR-0043
+  standard: docs/verifier-digest-computation-comparison-boundary.md
+  translation: docs/verifier-digest-computation-comparison-boundary.zh-CN.md
+  verifier_digest_computation_comparison_boundary_standard: docs/verifier-digest-computation-comparison-boundary.md
+  verifier_digest_computation_comparison_boundary_translation: docs/verifier-digest-computation-comparison-boundary.zh-CN.md
+  verifier_digest_computation_comparison_boundary_defined: true
+  verifier_digest_computation_comparison_boundary_check_rule: runtime.verifier_digest_computation_comparison_boundary
+  planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
+  planned_boundary_type: digest_computation_and_comparison_standard_only
+  allowed_scope: boundary_standard_and_manifests_only
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  verifier_version: 1
+  digest_size_bytes: 32
+  canonical_input_version: vibit.auth.verifier.input.v1
+  canonical_input_encoding: ascii_header_length_prefixed_purpose_label_length_prefixed_raw_material
+  credential_lookup_purpose_label: vibit.credential.lookup.v1
+  credential_verifier_purpose_label: vibit.credential.verifier.v1
+  token_lookup_purpose_label: vibit.access_token.lookup.v1
+  token_verifier_purpose_label: vibit.access_token.verifier.v1
+  lookup_digest_database_equality_allowed_for_record_selection: true
+  lookup_digest_database_equality_sufficient_for_authentication: false
+  constant_time_verifier_comparison_required: true
+  missing_lookup_public_failure: invalid_authentication_proof
+  invalid_verifier_public_failure: invalid_authentication_proof
+  unknown_key_id_public_failure: invalid_authentication_proof
+  external_cryptography_dependency_required_for_first_posture: false
+  future_allowed_standard_library_packages:
+    - crypto/hmac
+    - crypto/sha256
+    - crypto/subtle
+  runtime_authentication_implemented: false
+  secret_configuration_loading_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  token_validation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The verifier digest computation and comparison boundary is defined. Future
+    digest helpers are application-owned, use versioned length-prefixed canonical
+    input, keep lookup digest equality as record selection only, and require
+    constant-time verifier digest comparison with invalid-proof public failure
+    collapse. Digest computation, comparison, token generation, credential
+    generation, secret loading, login execution, token validation, logout,
+    cleanup, protocol, transport, dependency, repository, migration, and
+    production authentication behavior remain separate gates.
 
 server_runtime:
   first_reference_language: Go
