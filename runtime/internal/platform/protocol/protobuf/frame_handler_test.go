@@ -95,6 +95,34 @@ func TestFrameHandlerBuildsApplicationErrorFrame(t *testing.T) {
 	}
 }
 
+func TestRequestWithFrameMetadataRefreshesMetadataOnlyIdentity(t *testing.T) {
+	request := app.RouteRequest{
+		Session: app.Session{
+			SessionID: "session-1",
+			PlayerID:  "player-1",
+		},
+		Identity: app.MetadataOnlyIdentityFromSession(app.Session{
+			SessionID: "session-1",
+			PlayerID:  "player-1",
+		}),
+	}
+
+	request = requestWithFrameMetadata(request, FrameRequest{ConnectionID: " ws-1 "})
+
+	if request.Session.ConnectionID != "ws-1" {
+		t.Fatalf("Session.ConnectionID = %q, want ws-1", request.Session.ConnectionID)
+	}
+	if request.Identity.Status != app.IdentityValidationMetadataOnly {
+		t.Fatalf("Identity.Status = %q, want %q", request.Identity.Status, app.IdentityValidationMetadataOnly)
+	}
+	if request.Identity.ConnectionID != "ws-1" || request.Identity.PlayerID != "player-1" || request.Identity.SessionID != "session-1" {
+		t.Fatalf("Identity = %#v, want refreshed metadata-only identity", request.Identity)
+	}
+	if request.Identity.PlayerIDValidated || request.Identity.SessionValidated {
+		t.Fatalf("Identity validation flags = %#v, want metadata-only identity", request.Identity)
+	}
+}
+
 func TestFrameHandlerRejectsMalformedFramePayload(t *testing.T) {
 	fixture := newInventoryRequestLoopFixture(t, true, true)
 	handler := FrameHandler{Dispatcher: fixture.Dispatcher}

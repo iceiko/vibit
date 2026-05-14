@@ -1,0 +1,84 @@
+schema_version: 0.1
+kind: event
+module: runtime
+family: session
+name: SessionValidated
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0018
+  - ADR-0021
+
+summary: Fact emitted conceptually after request session metadata is evaluated into application request identity.
+
+fact: >
+  A decoded request's session metadata was evaluated by the runtime session
+  validation boundary. In the current runtime, metadata-only validation remains
+  a pass-through compatibility behavior and does not authenticate the actor.
+  This event contract records the semantic fact for future generated or
+  observable validation flows; no event bus or durable session store is added by
+  this contract.
+
+version: 1
+
+payload:
+  type: object
+  required:
+    - event_id
+    - occurred_at
+    - request_id
+    - validation_status
+    - valid
+    - actor_kind
+    - session_validated
+    - player_id_validated
+  properties:
+    event_id:
+      type: string
+      minLength: 1
+    occurred_at:
+      type: string
+      format: date-time
+    request_id:
+      type: string
+      minLength: 1
+    validation_status:
+      type: string
+      enum:
+        - metadata_only
+        - validated
+    valid:
+      type: boolean
+    actor_kind:
+      type: string
+      enum:
+        - unknown
+        - player
+        - service
+        - admin
+    actor_id:
+      type: string
+    player_id:
+      type: string
+    session_id:
+      type: string
+    connection_id:
+      type: string
+    session_validated:
+      type: boolean
+    player_id_validated:
+      type: boolean
+    reason:
+      type: string
+
+published_by:
+  command: ValidateSession
+
+subscribers: []
+
+compatibility:
+  breaking_changes_require_new_version: true
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only_no_event_bus_publication

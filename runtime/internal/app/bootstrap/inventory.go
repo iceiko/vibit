@@ -139,5 +139,6 @@ func resultForRequest(request app.RouteRequest) app.ApplicationResult {
 		Route:     request.Route,
 		Target:    request.Target,
 		Session:   request.Session,
+		Identity:  request.Identity,
 	}
 }

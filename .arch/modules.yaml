@@ -34,6 +34,33 @@ expected_module_directories:
   - tests
 
 modules:
+  - name: player
+    category: domain
+    status: draft
+    manifest: modules/player/module.yaml
+    agent_guides:
+      en: modules/player/AGENTS.md
+      zh-CN: modules/player/AGENTS.zh-CN.md
+    boundary:
+      standard: docs/player-identity-session-boundary.md
+      decision: ADR-0021
+      status: repository_interface_and_postgres_adapter_implemented_no_handlers
+      runtime_repository_interface: runtime/internal/modules/player/repository.go
+      postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+      postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+      postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+      postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+      postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    owns:
+      - player_identity
+      - player_account_lifecycle
+    does_not_own:
+      - authentication_scheme
+      - token_format
+      - credential_storage
+      - runtime_session_storage
+      - websocket_connection_mechanics
+      - inventory_state
   - name: inventory
     category: domain
     status: draft
@@ -43,9 +70,6 @@ modules:
       zh-CN: modules/inventory/AGENTS.zh-CN.md
 
 prototype_candidate_modules:
-  - name: player
-    category: domain
-    reason: Owns player identity and account lifecycle.
   - name: inventory
     category: domain
     reason: Proves item ownership, capacity invariants, and event-driven changes.
@@ -78,3 +102,28 @@ rules:
   - id: generated_files_declared
     level: required
     description: Generated files must be declared so agents know not to hand-edit them.
+  - id: player_identity_not_transport_identity
+    level: required
+    description: Player identity, player account lifecycle, authentication, runtime sessions, transport connections, and request identity context must remain separate concerns as defined by docs/player-identity-session-boundary.md.
+
+module_boundaries:
+  - name: player
+    status: repository_interface_and_postgres_adapter_implemented_no_handlers
+    standard: docs/player-identity-session-boundary.md
+    decision: ADR-0021
+    manifest: modules/player/module.yaml
+    runtime_repository_interface: runtime/internal/modules/player/repository.go
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    owns:
+      - player_identity
+      - player_account_lifecycle
+    does_not_own:
+      - websocket_connection_mechanics
+      - inventory_state
+      - token_format_before_authentication_decision
+      - credential_storage_before_authentication_decision
+      - runtime_session_storage_before_session_validation_decision

@@ -1,0 +1,68 @@
+schema_version: 0.1
+change_id: define-player-identity-and-session-boundary
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Define player identity, account, authentication, session, transport connection, request identity context, and inventory player reference boundaries before implementation.
+
+affected_modules:
+  - inventory
+  - player
+
+decisions:
+  added:
+    - ADR-0021
+  referenced:
+    - ADR-0015
+    - ADR-0019
+
+standards:
+  added:
+    - docs/player-identity-session-boundary.md
+    - docs/player-identity-session-boundary.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes:
+    - Planned player module ownership of player identity and player account lifecycle is documented, but no data ownership is moved in implementation.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+
+verification:
+  required:
+    - node tools/vibit check architecture --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-player-identity-and-session-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

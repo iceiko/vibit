@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-002
+current_milestone: M-011
 
 continuation_semantics:
   default_step_unit: work_item
@@ -48,7 +48,7 @@ milestones:
 
   - id: M-002
     title: Durable Inventory Runtime
-    status: active
+    status: completed
     goal: Add PostgreSQL-backed inventory persistence and transaction boundaries after the in-process request loop is proven.
     completion_criteria:
       - PostgreSQL runtime configuration and a pgx-backed transaction runner exist behind declared platform boundaries.
@@ -60,6 +60,182 @@ milestones:
       - object storage
       - cluster runtime
       - multi-module economy behavior
+    completion_summary: The durable inventory runtime is implemented with PostgreSQL configuration, transaction runner, migration tooling, PostgreSQL repository adapter, explicit runtime composition, and live end-to-end PostgreSQL verification on Termux PostgreSQL 18.2.
+
+  - id: M-003
+    title: Player Identity And Session Boundary
+    status: completed
+    goal: Define the player identity, authentication boundary, and WebSocket session lifecycle before inventory, permissions, or future modules rely on ad hoc player context.
+    completion_criteria:
+      - Player identity, account ownership, authentication, and runtime session responsibilities are separated in manifests and standards.
+      - The protocol session model is grounded in explicit player/session ownership without changing the existing envelope shape prematurely.
+      - The first implementation work queue for player/session behavior is planned in bounded, verifiable steps.
+      - Inventory permission policy has a documented path away from bootstrap static allow behavior.
+      - No authentication provider, token format, or credential storage model is implemented before the boundary is ratified.
+    non_goals:
+      - external identity providers
+      - production login security
+      - token signing or cryptography dependencies
+      - player database migrations
+      - matchmaking or presence
+    completion_summary: The player identity and session boundary is complete as a durable boundary milestone. Player identity, account lifecycle, authentication, runtime session validation, transport metadata, envelope session metadata, and request identity context are separated in standards and manifests; the application request identity and session validation hook exists; inventory permission handoff receives request identity without owning authentication or player accounts; metadata-only identity is guarded; and runtime.identity_boundary checks prevent common regressions. No authentication provider, token format, credential storage, player account persistence, Protobuf envelope change, or WebSocket handshake change was implemented.
+
+  - id: M-004
+    title: Next Direction Confirmation Gate
+    status: completed
+    goal: Hold the work queue at an explicit maintainer confirmation point before choosing the next major product or architecture direction.
+    completion_criteria:
+      - The maintainer chooses the next milestone direction.
+      - The chosen direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Ask-first boundaries are preserved for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major external framework dependency, and production permission decisions.
+    non_goals:
+      - implementing authentication before ratification
+      - choosing token or credential design implicitly
+      - adding player account migrations without schema decision
+      - changing Protobuf envelope or WebSocket handshake without confirmation
+      - declaring metadata-only identity sufficient for production permissions
+    completion_summary: The maintainer selected ratify_player_account_and_session_contracts as the next direction, with Nakama and Pitaya remaining active references for capability coverage and server framework vocabulary. M-005 was created as the active contract-first milestone, and no authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major dependency, or production permission decision was made.
+
+  - id: M-005
+    title: Player Account And Session Contracts
+    status: completed
+    goal: Ratify the first player account and session contract standards before implementing production authentication, player persistence, token behavior, session storage, or protocol handshake changes.
+    completion_criteria:
+      - Player account lifecycle commands, queries, events, errors, permissions, invariants, and ownership rules are declared before implementation.
+      - Runtime session validation contracts are separated from authentication providers, token format, credential storage, WebSocket transport, Protobuf framing, and player account persistence.
+      - Nakama account, user, authentication, and session capability coverage is reviewed and either adopted, adapted, deferred, or rejected in vibit terms.
+      - Pitaya session binding, route handler, frontend/backend, and realtime server vocabulary is reviewed and either adopted, adapted, deferred, or rejected in vibit terms.
+      - The first implementation queue after ratification remains bounded, verifiable, and does not rely on metadata-only identity as authenticated proof.
+    non_goals:
+      - implementing production authentication
+      - choosing token signing, refresh, or expiration behavior
+      - choosing credential storage or password hashing behavior
+      - adding player account database migrations
+      - adding session persistence
+      - changing Protobuf envelope shape
+      - changing WebSocket handshake authentication behavior
+      - copying Nakama or Pitaya public APIs directly
+      - adding a major external framework dependency
+    completion_summary: M-005 completed the contract-first player account and runtime session validation milestone. The repository now has a player account/session contract standard with Nakama and Pitaya reference mapping, ratified player account semantic contracts, player account Protobuf wire shape and generated Go output, ratified runtime session validation semantic contracts, runtime-owned contract inspection support, and explicit guards that metadata-only identity is not authenticated proof. No authentication scheme, token behavior, credential storage, player account persistence, session persistence, Protobuf envelope change, WebSocket handshake authentication change, runtime player handler, WebSocket route, direct external API compatibility, or major external dependency was added.
+
+  - id: M-006
+    title: Next Direction Confirmation Gate
+    status: completed
+    goal: Hold the work queue at an explicit maintainer decision point before choosing the next major implementation or architecture direction after player account/session contract ratification.
+    completion_criteria:
+      - The maintainer chooses the next milestone direction.
+      - The chosen direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Ask-first boundaries are preserved for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major external framework dependency, production permission, runtime player handler, and major game-domain expansion decisions.
+    non_goals:
+      - implementing authentication before ratification
+      - choosing token or credential design implicitly
+      - adding player account migrations without schema decision
+      - changing Protobuf envelope or WebSocket handshake without confirmation
+      - adding runtime player handlers or WebSocket routes without a chosen implementation milestone
+      - declaring metadata-only identity sufficient for production permissions
+    completion_summary: The maintainer accepted the recommended direction to improve generators, contract tooling, and architecture checks before adding more runtime features. M-007 was created as the active tooling hardening milestone without choosing authentication, token, credential, player account persistence, session persistence, Protobuf envelope, WebSocket handshake, runtime player handler, or major game-domain implementation behavior.
+
+  - id: M-007
+    title: Agent Tooling And Generator Hardening
+    status: completed
+    goal: Strengthen agent-facing inspection, generation, generated-output drift checks, and continuation intake before adding more runtime features.
+    completion_criteria:
+      - Agents can inspect the next work item, registered contracts, generated output, and reference planning context through narrow JSON commands.
+      - Contract shape generation is reproducible from semantic contract sources.
+      - Generated contract shape output is checked for source trace and drift.
+      - Agent tooling guidance exists in English and Simplified Chinese.
+      - Repository checks include the new tooling standard.
+    non_goals:
+      - implementing authentication
+      - choosing token behavior
+      - adding credential storage
+      - adding player account persistence
+      - adding session persistence
+      - changing Protobuf envelope or WebSocket handshake behavior
+      - adding runtime player handlers or WebSocket routes
+      - adding new game-domain modules
+    completion_summary: M-007 completed the agent tooling and generator hardening milestone. Agents can inspect next work, registered contracts, generated output, and reference planning context through narrow JSON commands; contract shape generation is reproducible from semantic contract sources; generated output checks cover source trace, drift, missing shapes, stale files, and compact status; agent tooling guidance exists in English and Simplified Chinese; and full repository verification passes. No authentication, token behavior, credential storage, player account persistence, session persistence, Protobuf envelope change, WebSocket handshake change, runtime player handler, or new game-domain module was implemented.
+
+  - id: M-008
+    title: Next Direction Confirmation Gate
+    status: completed
+    goal: Hold the work queue at an explicit maintainer decision point before choosing the next major implementation or architecture direction after generator and contract tooling hardening.
+    completion_criteria:
+      - The maintainer chooses the next milestone direction.
+      - The chosen direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Ask-first boundaries are preserved for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major external framework dependency, production permission, runtime player handler, generated file conventions, and major game-domain expansion decisions.
+    non_goals:
+      - implementing authentication before ratification
+      - choosing token or credential design implicitly
+      - adding player account migrations without schema decision
+      - changing Protobuf envelope or WebSocket handshake without confirmation
+      - adding runtime player handlers or WebSocket routes without a chosen implementation milestone
+      - adding a new game-domain module without a chosen milestone
+      - declaring metadata-only identity sufficient for production permissions
+    completion_summary: The maintainer accepted the professional recommendation to select ratify_player_account_postgresql_persistence_schema as the next direction. M-009 was created as the active schema-ratification milestone with a bounded first work item. No authentication, token behavior, credential storage, session persistence, Protobuf envelope change, WebSocket handshake change, runtime player handler, generated file convention change, external API compatibility, production permission decision, or new game-domain module was selected.
+
+  - id: M-009
+    title: Player Account PostgreSQL Persistence Schema
+    status: completed
+    goal: Ratify player account PostgreSQL persistence schema, migration ownership, repository boundary, adapter implementation, indexes, and verification path before adding runtime handlers, authentication, tokens, credentials, or session persistence.
+    completion_criteria:
+      - Player account PostgreSQL table ownership, lifecycle columns, event/audit rows, indexes, constraints, and cross-module data references are documented before migration source exists.
+      - Player module, runtime manifests, persistence boundary standards, and repository checks agree that schema, migration source, repository interface, and PostgreSQL adapter implementation are separate traceable steps.
+      - The first player account migration source follows the ratified schema and SQL-first migration rules.
+      - Player account repository work has a module-owned interface, a PostgreSQL adapter boundary, and a focused PostgreSQL adapter implementation.
+      - Verification records default static checks, fake-executor adapter checks, and any unavailable live PostgreSQL checks explicitly.
+    non_goals:
+      - production authentication
+      - login method selection
+      - token format, signing, refresh, expiration, or revocation behavior
+      - credential storage, password hashing, OAuth, OIDC, or external identity providers
+      - session persistence
+      - Protobuf envelope changes
+      - WebSocket handshake authentication changes
+      - runtime player account handlers or WebSocket routes
+      - direct Nakama or Pitaya public API compatibility
+      - new game-domain modules
+    completion_summary: M-009 completed the player account PostgreSQL persistence milestone. The repository has a ratified player account lifecycle schema boundary, SQL-first migration source, module-owned storage-neutral repository interface, PostgreSQL adapter boundary, focused PostgreSQL adapter implementation, UnitOfWork factory helper, fake-executor adapter tests, and repository checks. Runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake behavior, direct Nakama/Pitaya API compatibility, and new game-domain modules remain deferred behind the next maintainer confirmation gate.
+
+  - id: M-010
+    title: Next Direction Confirmation Gate
+    status: completed
+    goal: Hold the work queue at an explicit maintainer decision point before choosing the next major implementation or architecture direction after player account PostgreSQL persistence.
+    completion_criteria:
+      - The maintainer chooses the next milestone direction.
+      - The chosen direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Ask-first boundaries are preserved for authentication, token, credential, external identity, session persistence, Protobuf envelope, WebSocket handshake, major external framework dependency, production permission, runtime player handler, generated file conventions, operations posture, and major game-domain expansion decisions.
+    non_goals:
+      - implementing authentication before ratification
+      - choosing token or credential design implicitly
+      - adding external identity linking without a selected milestone
+      - adding runtime player handlers or WebSocket routes without a selected implementation milestone
+      - changing Protobuf envelope or WebSocket handshake without confirmation
+      - adding a new game-domain module without a selected milestone
+      - declaring metadata-only identity sufficient for production permissions
+    completion_summary: The maintainer selected ratify_authentication_and_token_session_validation_design as the next direction after player account PostgreSQL persistence. M-011 was created as the active design milestone with a bounded first work item. No login method, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake behavior, runtime player handler, WebSocket route, major dependency, generated file convention, production permission, or game-domain expansion decision was made.
+
+  - id: M-011
+    title: Authentication And Token Session Validation Design
+    status: active
+    goal: Ratify authentication, token behavior, session validation semantics, and request identity trust boundaries before implementing production authentication, runtime player handlers, WebSocket routes, credential storage, external identity linking, or session persistence.
+    completion_criteria:
+      - Authentication, token/session validation, credential, external identity, session persistence, WebSocket handshake, and request-level validation responsibilities are separated before implementation.
+      - Nakama account/auth/session token and realtime socket concepts are reviewed and mapped into adopted, adapted, deferred, or rejected vibit terms.
+      - Pitaya session binding, route handler, frontend/backend, and realtime session vocabulary is reviewed and mapped into adopted, adapted, deferred, or rejected vibit terms.
+      - The first implementation queue after design ratification remains bounded and does not treat metadata-only player_id or session_id as authenticated proof.
+      - Any concrete token format, login method, credential storage, external identity linking, session persistence, Protobuf envelope, or WebSocket handshake choice is explicitly ratified before implementation.
+    non_goals:
+      - implementing production authentication
+      - choosing concrete login methods in the direction-gate step
+      - choosing JWT, opaque token, refresh token, signing, expiration, revocation, or token storage behavior in the direction-gate step
+      - adding credential storage, password hashing, OAuth, OIDC, or external identity-provider dependencies before design ratification
+      - adding external identity linking tables or behavior before design ratification
+      - adding session persistence before design ratification
+      - changing Protobuf envelope behavior
+      - changing WebSocket handshake authentication behavior
+      - adding runtime player account handlers or WebSocket routes
+      - copying Nakama or Pitaya public APIs directly
 
 work_items:
   - id: W-0001
@@ -435,7 +611,965 @@ work_items:
       - Verify migration apply/status behavior against the defined disposable PostgreSQL environment or record explicit unavailability.
       - Verify that domain, application, protocol, transport, persistence, and migration boundaries still pass repository checks.
       - Update M-002 completion status when durable inventory runtime criteria are satisfied.
-    completion_summary: Added an opt-in live PostgreSQL request-loop verification test and recorded that live execution was skipped because no VIBIT_POSTGRES_TEST_DSN was available. M-002 remains active because closing it with unavailable live PostgreSQL verification requires maintainer confirmation.
+    completion_summary: Added an opt-in live PostgreSQL request-loop verification test. The live test later passed on local Termux PostgreSQL 18.2 with VIBIT_POSTGRES_TEST_DSN set, destructive cleanup allowed, and default drop_schema cleanup. M-002 remains active until milestone closure and follow-on planning are handled explicitly.
     ask_first:
       - Closing M-002 with unavailable live PostgreSQL verification.
       - Expanding scope into outbox delivery, auth/session, player accounts, item catalog, currency, rewards, or match sessions.
+
+  - id: W-0022
+    milestone: M-003
+    title: Define player identity and session boundary
+    status: completed
+    change: changes/2026-05-14-define-player-identity-and-session-boundary
+    depends_on:
+      - W-0021
+    related_decisions:
+      - ADR-0015
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Define what owns player identity, player accounts, authentication, WebSocket sessions, and request identity context.
+      - Record how inventory should consume authenticated player context without owning player accounts.
+      - Align the next implementation sequence with Nakama account/session coverage and Pitaya session/route vocabulary while preserving vibit's agent-native boundaries.
+      - Keep protocol envelope changes, token format, credential storage, and migrations out of this boundary step unless separately ratified.
+    completion_summary: Added docs/player-identity-session-boundary.md, the paired Simplified Chinese translation, ADR-0021, architecture manifest references, and inventory guidance that keeps player identity, account lifecycle, authentication, runtime sessions, transport connection metadata, and request identity context separate without implementing authentication.
+    ask_first:
+      - Choosing a concrete authentication scheme, token format, password model, or external identity provider.
+      - Changing the Protobuf envelope or WebSocket handshake contract.
+      - Adding player account database migrations.
+      - Introducing cryptography, JWT, OAuth, OIDC, or password-hashing dependencies.
+      - Moving inventory ownership into a player module.
+
+  - id: W-0023
+    milestone: M-003
+    title: Add player module manifest boundary
+    status: completed
+    change: changes/2026-05-14-add-player-module-manifest-boundary
+    depends_on:
+      - W-0022
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Create modules/player/module.yaml and module-level AGENTS guides as boundary artifacts only.
+      - Declare player identity and player account lifecycle ownership without adding runtime code, migrations, credential storage, or authentication providers.
+      - Register the player module in .arch/modules.yaml after its manifest and guides exist.
+      - Define initial public vocabulary placeholders for player identity and account lifecycle without ratifying concrete authentication commands.
+      - Keep inventory state ownership unchanged and dependency-free unless a later change explicitly allows a dependency.
+    completion_summary: Added modules/player/module.yaml and bilingual module agent guides, registered player as a first-class module, recorded player as boundary-only in the contract registry, and taught repository checks not to force public contracts or Protobuf sources for a boundary-only module.
+    ask_first:
+      - Choosing a concrete authentication scheme, token format, password model, guest login, device login, social login, or external identity provider.
+      - Adding player account database migrations or persistent schema.
+      - Introducing cryptography, JWT, OAuth, OIDC, password-hashing, or credential storage dependencies.
+      - Changing the Protobuf envelope or WebSocket handshake contract.
+      - Moving inventory ownership or inventory data under the player module.
+
+  - id: W-0024
+    milestone: M-003
+    title: Define application request identity handoff boundary
+    status: completed
+    change: changes/2026-05-14-define-application-request-identity-handoff-boundary
+    depends_on:
+      - W-0023
+    related_decisions:
+      - ADR-0018
+      - ADR-0021
+    completion:
+      - Define application-owned request identity and session-validation handoff types in runtime/internal/app without implementing authentication.
+      - Preserve existing Protobuf envelope fields and WebSocket handshake behavior.
+      - Keep client-supplied player_id and session_id as metadata until validation exists.
+      - Document how future session validation will normalize identity before domain handlers receive requests.
+      - Add focused Go tests for normalization and zero-value behavior only if runtime types change.
+    completion_summary: Added application-owned RequestIdentity and SessionValidationResult handoff types, propagated metadata-only request identity through Protobuf envelope decoding, frame metadata refresh, application dispatch, application results, bootstrap, and inventory results, documented that validation flags remain false before real session validation, and verified the change with Go and repository checks.
+    ask_first:
+      - Choosing a concrete authentication scheme, token format, password model, guest login, device login, social login, or external identity provider.
+      - Adding player account database migrations or persistent schema.
+      - Introducing cryptography, JWT, OAuth, OIDC, password-hashing, or credential storage dependencies.
+      - Changing the Protobuf envelope or WebSocket handshake contract.
+      - Making inventory depend directly on the player module.
+
+  - id: W-0025
+    milestone: M-003
+    title: Plan player/session follow-up work queue
+    status: completed
+    change: changes/2026-05-14-plan-player-session-follow-up-work-queue
+    depends_on:
+      - W-0024
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Plan the remaining M-003 work items after the request identity handoff exists.
+      - Keep inventory identity-aware permission work, session validation vocabulary, optional no-op validation boundaries, and M-003 closure as separate bounded steps.
+      - Preserve all ask-first boundaries for authentication schemes, token formats, credential storage, player account persistence, Protobuf envelope changes, and WebSocket handshake changes.
+      - Avoid treating metadata-only request identity as authenticated proof in any planned implementation step.
+    completion_summary: Planned the remaining M-003 player/session boundary queue as bounded work items for a session validator hook, inventory request identity permission handoff, metadata-only identity checks, and milestone closure, while preserving ask-first boundaries for authentication, token, credential, persistence, protocol, handshake, and direct player dependency decisions.
+    ask_first:
+      - Choosing a concrete authentication scheme, token format, password model, guest login, device login, social login, or external identity provider.
+      - Adding player account database migrations or persistent schema.
+      - Introducing cryptography, JWT, OAuth, OIDC, password-hashing, credential storage, or session-store dependencies.
+      - Changing the Protobuf envelope or WebSocket handshake contract.
+      - Making inventory depend directly on the player module.
+
+  - id: W-0026
+    milestone: M-003
+    title: Add session validator hook boundary
+    status: completed
+    change: changes/2026-05-14-add-session-validator-hook-boundary
+    depends_on:
+      - W-0025
+    related_decisions:
+      - ADR-0018
+      - ADR-0021
+    completion:
+      - Add an application-owned session validator interface or wrapper that can normalize request identity before route handlers run.
+      - Provide a metadata-only validator/default path that preserves current behavior without authenticating clients.
+      - Ensure real authentication, token parsing, credential lookup, session persistence, and player account lookup remain unimplemented.
+      - Keep Protobuf envelope fields and WebSocket handshake behavior unchanged.
+      - Add focused Go tests proving the hook can pass through metadata-only identity and replace identity only when an injected validator says it is valid.
+    completion_summary: Added an application-owned SessionValidator hook, metadata-only default validator, SessionValidatingDispatcher wrapper, process composition for the default validator, and focused tests proving metadata-only pass-through, injected validated identity replacement, invalid-session stopping, and missing/errored validator behavior without implementing authentication, tokens, credential lookup, session persistence, player account lookup, Protobuf envelope changes, or WebSocket handshake changes.
+    ask_first:
+      - Choosing a concrete authentication scheme, token format, password model, guest login, device login, social login, or external identity provider.
+      - Adding player account database migrations or persistent schema.
+      - Introducing cryptography, JWT, OAuth, OIDC, password-hashing, credential storage, or session-store dependencies.
+      - Changing the Protobuf envelope or WebSocket handshake contract.
+      - Making inventory depend directly on the player module.
+
+  - id: W-0027
+    milestone: M-003
+    title: Add inventory request identity permission handoff boundary
+    status: completed
+    change: changes/2026-05-14-add-inventory-request-identity-permission-handoff-boundary
+    depends_on:
+      - W-0026
+    related_decisions:
+      - ADR-0014
+      - ADR-0021
+    completion:
+      - Update inventory permission handoff so policies can receive application request identity context without inventory owning authentication or player accounts.
+      - Preserve current static bootstrap permission behavior as an explicit bootstrap policy until real authenticated policies are ratified.
+      - Ensure metadata-only request identity is not treated as authenticated proof for privileged grants.
+      - Keep inventory independent from the player module.
+      - Add focused Go tests for permission handoff behavior and metadata-only denial/neutral semantics where applicable.
+    completion_summary: Added inventory PermissionContext carrying requested actor text, target player_id, and app.RequestIdentity into permission decisions; preserved StaticPermissionPolicy as explicit bootstrap behavior; added MetadataOnlyDenyPermissionPolicy as a guard that refuses metadata-only privileged grants and only permits optional validated self-read; verified route-level identity handoff through bootstrap dispatcher tests without changing Protobuf, WebSocket, authentication, token, credential, session store, player account persistence, or inventory-to-player dependencies.
+    ask_first:
+      - Making metadata-only player_id sufficient for production permission grants.
+      - Choosing service/admin authorization semantics beyond explicit placeholder vocabulary.
+      - Adding player module dependencies to inventory.
+      - Adding authentication, token, credential, or player account persistence dependencies.
+      - Changing inventory public contracts or Protobuf messages.
+
+  - id: W-0028
+    milestone: M-003
+    title: Add metadata-only identity repository checks
+    status: completed
+    change: changes/2026-05-14-add-metadata-only-identity-repository-checks
+    depends_on:
+      - W-0027
+    related_decisions:
+      - ADR-0018
+      - ADR-0021
+    completion:
+      - Add repository checks that protect the current metadata-only identity boundary from common regression paths.
+      - Check that WebSocket transport does not import player, inventory, authentication, generated Protobuf, or domain module packages.
+      - Check that domain modules do not import WebSocket, generated Protobuf, authentication provider, token, or credential dependencies.
+      - Check that player remains boundary-only until public contracts are ratified.
+      - Record any intentionally deferred checks that are too brittle for the current repository shape.
+    completion_summary: Added the runtime.identity_boundary repository check to prevent WebSocket transport, domain modules, dependency declarations, player runtime code, player Protobuf roots, and player/account migrations from crossing the current metadata-only player/session boundary before public contracts, authentication, credentials, tokens, session persistence, player account schemas, Protobuf envelope changes, or WebSocket handshake changes are ratified.
+    ask_first:
+      - Adding broad static analysis dependencies.
+      - Making optional live services mandatory for default repository checks.
+      - Weakening existing runtime, protocol, contract, generated, or work checks.
+      - Changing generated file conventions.
+
+  - id: W-0029
+    milestone: M-003
+    title: Close player identity and session boundary milestone
+    status: completed
+    change: changes/2026-05-14-close-player-identity-and-session-boundary-milestone
+    depends_on:
+      - W-0028
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Review M-003 completion criteria against implemented standards, manifests, handoff code, permission handoff, and checks.
+      - Mark M-003 completed only if the boundary is durable and no authentication, token, credential, player account persistence, Protobuf envelope, or WebSocket handshake decision was crossed.
+      - Record remaining deferred decisions and the recommended next milestone without making a major architectural decision implicitly.
+      - Leave exactly one next_ready work item only if the next milestone is conservative and does not require maintainer confirmation.
+    completion_summary: Reviewed M-003 against its completion criteria and closed it without crossing authentication, token, credential, player account persistence, Protobuf envelope, WebSocket handshake, or production permission boundaries. No next_ready work item was created because the next meaningful milestone requires maintainer confirmation.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing token, credential, player account schema, session persistence, or WebSocket handshake authentication design.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0030
+    milestone: M-004
+    title: Confirm next milestone direction
+    status: completed
+    change: changes/2026-05-14-confirm-next-milestone-direction
+    depends_on:
+      - W-0029
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Choose the next major milestone direction with the maintainer.
+      - Record the chosen direction as a bounded milestone.
+      - Create exactly one next_ready work item for the chosen milestone.
+      - Preserve ask-first boundaries for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major dependency, and production permission decisions.
+    completion_summary: The maintainer selected ratify_player_account_and_session_contracts and explicitly asked agents to keep referencing Nakama and Pitaya. The choice created M-005 as a contract-first milestone and W-0031 as the next ready work item without choosing authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major dependency, or production permission behavior.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing token, credential, player account schema, session persistence, or WebSocket handshake authentication design.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0031
+    milestone: M-005
+    title: Define player account and session contract standard
+    status: completed
+    change: changes/2026-05-14-define-player-account-session-contract-standard
+    depends_on:
+      - W-0030
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Define the contract standard for player account lifecycle and runtime session validation before implementation.
+      - Map Nakama account, user, authentication, and session capability concepts into adopted, adapted, deferred, or rejected vibit terms.
+      - Map Pitaya session binding, route handler, frontend/backend, and realtime server vocabulary into adopted, adapted, deferred, or rejected vibit terms.
+      - Declare which player account commands, queries, events, errors, permissions, invariants, and generated outputs may be ratified next.
+      - Keep authentication scheme, token format, credential storage, player account persistence, session persistence, Protobuf envelope changes, and WebSocket handshake changes out of this standard unless separately confirmed.
+    completion_summary: Added docs/player-account-session-contracts.md and the Simplified Chinese translation, mapped Nakama and Pitaya reference patterns into adopted, adapted, deferred, and rejected vibit positions, and defined the conservative ratification order for player account and runtime session contracts without implementing or choosing authentication, token, credential, persistence, Protobuf envelope, WebSocket handshake, or external API compatibility behavior.
+    ask_first:
+      - Choosing concrete login methods such as guest, device, email/password, social login, custom ID, or external identity providers.
+      - Choosing JWT, opaque token, refresh-token, signing, expiration, or revocation behavior.
+      - Adding credential storage, password hashing, cryptography, OAuth, OIDC, or external auth dependencies.
+      - Adding player account database schema, migrations, or session persistence.
+      - Changing the Protobuf envelope or WebSocket handshake.
+      - Making metadata-only player_id or session_id sufficient for production permission grants.
+      - Copying Nakama or Pitaya public API shape instead of defining vibit-native contracts.
+
+  - id: W-0032
+    milestone: M-005
+    title: Ratify minimal player account semantic contracts
+    status: completed
+    change: changes/2026-05-14-ratify-minimal-player-account-semantic-contracts
+    depends_on:
+      - W-0031
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Add minimal player account semantic contracts for account creation, account lookup, account-created event, account errors, and account permissions.
+      - Update modules/player/module.yaml and .arch/contracts.yaml so the contracts are registered before implementation.
+      - Keep the contracts semantic and storage-independent; do not add player account migrations or database schema.
+      - Keep authentication schemes, token formats, credential storage, and login methods out of the player account lifecycle contracts.
+      - Preserve Nakama/Pitaya reference alignment without copying external API shape.
+    completion_summary: Added semantic player account contracts for CreatePlayerAccount, GetPlayerAccount, PlayerAccountCreated, player_account_errors, and player_account_permissions; registered them in .arch/contracts.yaml and modules/player/module.yaml; and kept runtime implementation, generated output, Protobuf messages, WebSocket routes, authentication, token behavior, credential storage, session persistence, and player account migrations deferred.
+    ask_first:
+      - Choosing concrete login methods such as guest, device, email/password, social login, custom ID, or external identity providers.
+      - Choosing token format, signing, refresh, expiration, revocation, or credential behavior.
+      - Adding player account database schema, migrations, indexes, or PostgreSQL repository implementation.
+      - Adding runtime session persistence.
+      - Changing Protobuf envelope or WebSocket handshake behavior.
+      - Adding runtime player module Go code before semantic contracts are verified.
+
+  - id: W-0033
+    milestone: M-005
+    title: Ratify player account Protobuf and generated shape boundary
+    status: completed
+    change: changes/2026-05-14-ratify-player-account-protobuf-generated-shape-boundary
+    depends_on:
+      - W-0032
+    related_decisions:
+      - ADR-0016
+      - ADR-0017
+      - ADR-0021
+    completion:
+      - Decide whether the ratified player account semantic contracts should receive Protobuf wire messages and generated dispatch shapes now.
+      - If approved, define the Protobuf source and generated output boundary without adding handwritten runtime handlers.
+      - Preserve existing envelope and WebSocket handshake behavior unless separately confirmed.
+      - Keep authentication, token behavior, credential storage, player account persistence, and session persistence deferred.
+    completion_summary: Added proto/vibit/player/v1/player.proto and generated runtime/internal/generated/proto/vibit/player/v1/player.pb.go for CreatePlayerAccount, GetPlayerAccount, and PlayerAccountCreated; updated manifests and runtime identity-boundary checks so ratified player wire shape is allowed while runtime player handlers, WebSocket routes, authentication, token behavior, credential storage, persistence, session storage, envelope changes, and handshake changes remain deferred.
+    ask_first:
+      - Changing generated file conventions.
+      - Changing the Protobuf envelope.
+      - Adding WebSocket routes for player account contracts.
+      - Adding runtime player module Go code.
+      - Choosing authentication, token, credential, persistence, or session storage behavior.
+
+  - id: W-0034
+    milestone: M-005
+    title: Ratify runtime session validation semantic contracts
+    status: completed
+    change: changes/2026-05-14-ratify-runtime-session-validation-semantic-contracts
+    depends_on:
+      - W-0033
+    related_decisions:
+      - ADR-0018
+      - ADR-0021
+    completion:
+      - Ratify minimal runtime session validation semantic contracts and catalogs without implementing authentication, token validation, credential storage, session persistence, or WebSocket handshake authentication.
+      - Define runtime-owned contract source location and registration for ValidateSession, SessionValidated, session_errors, and session_permissions or a narrower justified set.
+      - Preserve the existing metadata-only validation behavior until a real session validator is separately ratified and implemented.
+      - Keep Nakama session and Pitaya session-binding concepts as references without copying public API shape.
+    completion_summary: Added runtime-owned semantic contracts for ValidateSession, SessionValidated, session_errors, and session_permissions under contracts/runtime/session; registered them in .arch/contracts.yaml; updated runtime and account/session standards; and taught contract checks to validate runtime session contracts without treating them as player or inventory module contracts. The existing metadata-only validator remains pass-through behavior only, and no authentication, token behavior, credential storage, session persistence, player account persistence, Protobuf envelope change, WebSocket handshake change, or player runtime handler was added.
+    ask_first:
+      - Choosing token format, signing, refresh, expiration, revocation, or credential behavior.
+      - Choosing concrete login methods such as guest, device, email/password, social login, custom ID, or external identity providers.
+      - Adding session persistence, player account persistence, database schema, migrations, or indexes.
+      - Changing Protobuf envelope or WebSocket handshake behavior.
+      - Adding runtime authentication or player account handler Go code.
+
+  - id: W-0035
+    milestone: M-005
+    title: Add runtime contract inspection support
+    status: completed
+    change: changes/2026-05-14-add-runtime-contract-inspection
+    depends_on:
+      - W-0034
+    related_decisions:
+      - ADR-0018
+      - ADR-0021
+    completion:
+      - Extend `node tools/vibit inspect contract` so agents can inspect runtime-owned contract families.
+      - Preserve existing domain module contract inspection behavior.
+      - Keep the inspect output schema stable while reporting runtime family registry, source, owner, and consistency details.
+    completion_summary: Added runtime contract inspection support for runtime-owned contract families, starting with `runtime:ValidateSession`, while preserving player and inventory contract inspection behavior. This closes an agent tooling gap after runtime session semantic contracts were ratified.
+    ask_first:
+      - Changing inspect output schema compatibility.
+      - Replacing the contract registry structure.
+      - Introducing a new YAML parser or schema validation dependency.
+
+  - id: W-0036
+    milestone: M-005
+    title: Close player account and session contracts milestone
+    status: completed
+    change: changes/2026-05-14-close-player-account-session-contracts-milestone
+    depends_on:
+      - W-0035
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Review M-005 completion criteria against ratified player account contracts, Protobuf wire shape, runtime session validation contracts, tooling support, standards, manifests, and repository checks.
+      - Mark M-005 completed only if no authentication, token, credential, player account persistence, session persistence, Protobuf envelope, WebSocket handshake, runtime player handler, WebSocket route, direct external API compatibility, or major dependency decision was crossed.
+      - Record remaining deferred decisions and next milestone candidates without choosing one implicitly.
+      - Create a blocked confirmation gate for the next major direction.
+    completion_summary: Reviewed M-005 against its completion criteria and closed it as a contract-first milestone. Player account and runtime session validation contracts are ratified and inspectable, while authentication, token, credential, persistence, Protobuf envelope, WebSocket handshake, runtime player handler, WebSocket route, direct external API compatibility, and major dependency decisions remain deferred behind M-006.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing login methods, token format, credential storage, player account schema, session persistence, or WebSocket handshake authentication design.
+      - Adding runtime player account handlers or WebSocket routes.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0037
+    milestone: M-006
+    title: Confirm next milestone direction after account and session contracts
+    status: completed
+    change: changes/2026-05-14-confirm-generator-contract-tooling-direction
+    depends_on:
+      - W-0036
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Choose the next major milestone direction with the maintainer.
+      - Record the chosen direction as a bounded milestone.
+      - Create exactly one next_ready work item for the chosen milestone.
+      - Preserve ask-first boundaries for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major dependency, runtime player handler, and production permission decisions.
+    completion_summary: The maintainer accepted the recommended direction to improve generators, contract tooling, and architecture checks before adding more runtime features. M-007 was created with W-0038 as the first tooling work item, preserving all deferred authentication, token, credential, persistence, protocol handshake, runtime handler, and production permission decisions.
+    selected_direction: improve_generators_and_contract_tooling_before_more_runtime_features
+    candidate_directions:
+      - ratify_authentication_and_token_session_validation_design
+      - ratify_player_account_postgresql_persistence_schema
+      - implement_runtime_player_account_handlers_from_ratified_contracts
+      - expand_core_game_domain_modules_after_nakama_pitaya_review
+      - improve_generators_and_contract_tooling_before_more_runtime_features
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing login methods, token format, credential storage, player account schema, session persistence, or WebSocket handshake authentication design.
+      - Adding runtime player account handlers or WebSocket routes.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0038
+    milestone: M-007
+    title: Add agent tooling inspection standard and commands
+    status: completed
+    change: changes/2026-05-14-add-agent-tooling-inspection-standard
+    depends_on:
+      - W-0037
+    related_decisions:
+      - ADR-0017
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Add an English and Simplified Chinese standard for agent-facing tooling.
+      - Add JSON inspection commands for next work, contract index, generated output, and reference planning context.
+      - Add `check agent-tooling` and include it in `check all`.
+      - Update AGENTS guidance, conventions, runtime, reference, generated-output docs, and rule catalog.
+      - Do not add runtime behavior, authentication, token, persistence, protocol envelope, WebSocket handshake, or new game module decisions.
+    completion_summary: Added docs/agent-tooling.md and the Simplified Chinese translation; added `inspect next`, `inspect contracts`, `inspect generated`, `inspect reference`, and `check agent-tooling`; updated AGENTS guidance, conventions, runtime/reference manifests, generated-output standards, and the rule catalog; and kept the work scoped to agent tooling.
+    ask_first:
+      - Changing generated file conventions beyond contract-shape trace and drift checks.
+      - Replacing the contract registry structure.
+      - Introducing a YAML parser or other major CLI dependency.
+      - Starting authentication, token, credential, persistence, runtime handler, protocol envelope, or WebSocket handshake implementation.
+
+  - id: W-0039
+    milestone: M-007
+    title: Generate reproducible Go contract shapes
+    status: completed
+    change: changes/2026-05-14-generate-reproducible-go-contract-shapes
+    depends_on:
+      - W-0038
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Add `node tools/vibit generate contract-shapes <module|all>`.
+      - Generate Go contract shape files from registered non-runtime semantic contracts.
+      - Add generated marker, source trace, generator trace, and contract trace to each generated file.
+      - Extend `check generated` to require generated contract shapes and detect drift.
+      - Keep generated shapes as inspectable metadata only, not runtime handlers or business logic.
+    completion_summary: Added the contract-shapes generator, generated inventory and player contract shape files under `runtime/internal/generated/contracts/`, and extended `check generated` to verify source traces and generator drift for registered non-runtime semantic contracts.
+    ask_first:
+      - Making generated contract shapes runtime dispatch code.
+      - Adding generated WebSocket route registration.
+      - Adding generated persistence, authentication, token, credential, or session behavior.
+      - Changing generated output roots or package conventions beyond this traceable shape.
+
+  - id: W-0040
+    milestone: M-007
+    title: Verify agent tooling and generated contract shapes
+    status: completed
+    change: changes/2026-05-14-verify-agent-tooling-generated-contract-shapes
+    depends_on:
+      - W-0039
+    related_decisions:
+      - ADR-0017
+      - ADR-0019
+    completion:
+      - Run focused inspections for next work, contracts, generated output, and reference context.
+      - Run focused checks for agent tooling and generated output.
+      - Run repository and Go runtime verification.
+      - Record verification results in the relevant change specs.
+      - Leave the next work item ready only after all checks pass.
+    completion_summary: Verified the new agent tooling intake commands, generated contract shape output, work queue consistency, schema consistency, memory consistency, and Go runtime tests. The generated contract shape drift check passes for inventory and player semantic contracts.
+    ask_first:
+      - Weakening generated drift checks.
+      - Marking generated output verified without running generator and checks.
+
+  - id: W-0041
+    milestone: M-007
+    title: Add generated inspection module and type filters
+    status: completed
+    change: changes/2026-05-14-add-generated-inspection-filters
+    depends_on:
+      - W-0040
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Extend `node tools/vibit inspect generated` with optional `--module <module>` and `--type <contract-type>` filters for generated contract shapes.
+      - Keep the output schema backward-compatible for unfiltered inspection.
+      - Update the agent tooling standard and Simplified Chinese translation.
+      - Add focused verification for filtered inventory and player generated inspections.
+    completion_summary: Added optional `--module <module>` and `--type <contract-type>` filters to generated output inspection, documented the filters in English and Simplified Chinese, and verified filtered generated inspections without changing generated roots or treating generated shapes as runtime handlers.
+    ask_first:
+      - Changing generated output roots.
+      - Replacing the generated inspection output schema instead of adding compatible filter metadata.
+      - Treating generated contract shapes as runtime handlers.
+
+  - id: W-0042
+    milestone: M-007
+    title: Add contract inspection type and status filters
+    status: completed
+    change: changes/2026-05-14-add-contract-inspection-filters
+    depends_on:
+      - W-0041
+    related_decisions:
+      - ADR-0017
+      - ADR-0021
+    completion:
+      - Extend `node tools/vibit inspect contracts` with optional `--type <contract-type>` and `--status <status>` filters.
+      - Preserve existing unfiltered and module-filtered contract inspection behavior.
+      - Document the narrower contract inspection commands in English and Simplified Chinese.
+      - Keep the change limited to agent tooling; do not alter contract semantics or runtime behavior.
+    completion_summary: Added optional `--type <contract-type>` and `--status <status>` filters to contract index inspection, kept unfiltered and module-filtered behavior compatible, documented the commands in English and Simplified Chinese, and verified the focused tooling checks.
+    ask_first:
+      - Replacing the contract registry structure.
+      - Changing contract source format.
+      - Treating inspection filters as permission to cross authentication, persistence, protocol, or runtime handler boundaries.
+
+  - id: W-0043
+    milestone: M-007
+    title: Add contract source field summaries to inspection
+    status: completed
+    change: changes/2026-05-14-add-contract-source-field-summaries
+    depends_on:
+      - W-0042
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Extend contract index inspection output with machine-readable summaries of input, output, and event payload fields when present.
+      - Include required field names and declared property names without replacing full contract source files.
+      - Preserve existing contract inspection filters and output compatibility.
+      - Keep the change limited to inspection; do not alter contract semantics, Protobuf schemas, generated output, or runtime behavior.
+    completion_summary: Added derived `fields` summaries to contract index inspection for command/query input and output fields plus event payload fields, preserving existing filters and keeping contract manifests as the source of truth.
+    ask_first:
+      - Changing contract source format.
+      - Making field summaries authoritative over source contract manifests.
+      - Changing Protobuf schemas or generated output conventions.
+
+  - id: W-0044
+    milestone: M-007
+    title: Add stale generated contract shape detection
+    status: completed
+    change: changes/2026-05-14-add-stale-generated-contract-shape-detection
+    depends_on:
+      - W-0043
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Extend `node tools/vibit check generated` so committed generated contract shape files must correspond to registered non-runtime semantic contracts.
+      - Report stale generated contract shape files as check failures instead of only validating generated markers.
+      - Preserve existing source trace and drift checks.
+      - Keep generated contract shape files as metadata only, not runtime handlers.
+    completion_summary: Extended `check generated` so generated Go contract shape files must correspond to registered non-runtime semantic contracts, preserving source trace and reproducibility checks while failing stale generated outputs.
+    ask_first:
+      - Changing generated output roots.
+      - Deleting generated files without proving they are stale.
+      - Changing generated file conventions beyond stale-file validation.
+
+  - id: W-0045
+    milestone: M-007
+    title: Add generated inspection stale file summaries
+    status: completed
+    change: changes/2026-05-14-add-generated-inspection-stale-file-summaries
+    depends_on:
+      - W-0044
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Extend `node tools/vibit inspect generated` to report stale generated contract shape files derived from the same expected-path model as `check generated`.
+      - Include stale file counts and file paths in JSON inspection output.
+      - Preserve existing module/type filters and summary counts.
+      - Keep the change inspection-only; do not delete files automatically.
+    completion_summary: Added `stale_contract_shape_files` and stale counts to generated output inspection, using the same expected contract shape model as `check generated` while preserving module/type filters and avoiding automatic deletion.
+    ask_first:
+      - Automatically deleting stale generated files.
+      - Changing generated output roots.
+      - Replacing generated inspection output schema instead of adding compatible fields.
+
+  - id: W-0046
+    milestone: M-007
+    title: Add generated inspection drift status summary
+    status: completed
+    change: changes/2026-05-14-add-generated-inspection-drift-status-summary
+    depends_on:
+      - W-0045
+    related_decisions:
+      - ADR-0017
+    completion:
+      - Extend generated output inspection with a compact status derived from missing and stale generated contract shape counts.
+      - Report whether generated contract shapes are complete for the requested filter.
+      - Preserve existing generated inspection fields and filters.
+      - Keep detailed drift validation in `check generated`.
+    completion_summary: Added `missing_contract_shapes`, `contract_shape_status`, and matching summary fields to generated output inspection so agents can quickly determine whether filtered generated contract shape output is complete while leaving detailed drift validation in `check generated`.
+    ask_first:
+      - Weakening `check generated` drift validation.
+      - Replacing existing generated inspection output fields.
+      - Changing generated output roots or generated file conventions.
+
+  - id: W-0047
+    milestone: M-007
+    title: Run M-007 focused repository verification
+    status: completed
+    change: changes/2026-05-14-verify-m007-tooling-hardening-state
+    depends_on:
+      - W-0046
+    related_decisions:
+      - ADR-0017
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Run repository-level checks after the M-007 inspection and generator hardening changes.
+      - Run Go runtime tests and vet checks without adding runtime behavior.
+      - Run whitespace diff validation.
+      - Record failures or unavailable checks explicitly before planning further M-007 work.
+    completion_summary: Verified the accumulated M-007 tooling hardening state with next/contracts/generated/reference inspections, agent-tooling/generated/work/schema/change/all checks, Go tests, Go vet, and diff whitespace validation. The only issue found was the new verification change spec initially using an unsupported `type: verification`; it was corrected to the existing `tooling` type and full checks passed.
+    ask_first:
+      - Weakening repository checks to make verification pass.
+      - Ignoring runtime test failures caused by current tooling changes.
+      - Starting authentication, token, credential, persistence, protocol envelope, WebSocket handshake, runtime player handler, or new game-domain implementation work.
+
+  - id: W-0048
+    milestone: M-007
+    title: Close M-007 tooling hardening milestone
+    status: completed
+    change: changes/2026-05-14-close-m007-tooling-hardening-milestone
+    depends_on:
+      - W-0047
+    related_decisions:
+      - ADR-0017
+      - ADR-0019
+      - ADR-0021
+    completion:
+      - Review M-007 completion criteria against completed work.
+      - Mark M-007 completed if the criteria are met.
+      - Create the next direction confirmation gate without choosing authentication, persistence, protocol, runtime player handler, or new game-domain implementation.
+      - Leave no runtime behavior change in this milestone closeout.
+    completion_summary: Reviewed M-007 against its completion criteria and closed it as a tooling hardening milestone. The next major direction now sits behind M-008 as an explicit maintainer confirmation gate, with authentication, token, credential, persistence, protocol, runtime player handler, generated file convention, and new game-domain decisions still deferred.
+    ask_first:
+      - Choosing the next major implementation direction instead of creating a confirmation gate.
+      - Starting authentication, token, credential, player account persistence, session persistence, Protobuf envelope, WebSocket handshake, runtime player handler, or new game-domain implementation work.
+
+  - id: W-0049
+    milestone: M-008
+    title: Confirm next milestone direction after tooling hardening
+    status: completed
+    change: changes/2026-05-14-confirm-next-direction-after-tooling-hardening
+    depends_on:
+      - W-0048
+    related_decisions:
+      - ADR-0017
+      - ADR-0019
+      - ADR-0021
+    candidate_directions:
+      - ratify_authentication_and_token_session_validation_design
+      - ratify_player_account_postgresql_persistence_schema
+      - implement_runtime_player_account_handlers_from_ratified_contracts
+      - expand_core_game_domain_modules_after_nakama_pitaya_review
+      - expand_generator_runtime_dispatch_and_test_fixture_generation
+      - strengthen_operations_observability_and_admin_tooling
+    selected_direction: ratify_player_account_postgresql_persistence_schema
+    completion:
+      - Choose the next major milestone direction with the maintainer.
+      - Record the chosen direction as a bounded milestone.
+      - Create exactly one next_ready work item for the chosen milestone.
+      - Preserve ask-first boundaries for authentication, token, credential, player account schema, session persistence, Protobuf envelope, WebSocket handshake, major dependency, runtime player handler, generated file conventions, production permission, and major game-domain expansion decisions.
+    completion_summary: The maintainer authorized the professional recommendation to proceed with player account PostgreSQL persistence schema ratification. M-009 was created with W-0050 as the first bounded work item, preserving all deferred authentication, token, credential, session persistence, protocol, runtime handler, generated file convention, production permission, and game-domain expansion decisions.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing login methods, token format, credential storage, player account schema, session persistence, or WebSocket handshake authentication design.
+      - Adding runtime player account handlers or WebSocket routes.
+      - Changing generated file conventions or making generated contract shapes runtime dispatch code.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0050
+    milestone: M-009
+    title: Define player account PostgreSQL persistence schema boundary
+    status: completed
+    change: changes/2026-05-14-define-player-account-postgresql-persistence-schema-boundary
+    depends_on:
+      - W-0049
+    related_decisions:
+      - ADR-0019
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Ratify the player account PostgreSQL schema boundary without adding migration source.
+      - Define player-owned tables, columns, indexes, constraints, event/audit rows, and repository boundaries.
+      - Update manifests, module guides, persistence standards, and repository checks so future migrations can be validated against the ratified boundary.
+      - Keep authentication, token behavior, credentials, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime handlers, and WebSocket routes deferred.
+    completion_summary: Ratified the player account PostgreSQL schema boundary for player_accounts and player_account_events; documented that the schema stores account lifecycle only and excludes credentials, tokens, sessions, external identities, WebSocket state, and inventory ownership; updated manifests, guides, and checks so player account migration source can be added only after schema ratification; and preserved runtime implementation as a later work item.
+    ask_first:
+      - Changing the ratified player account table shape after migration source is added.
+      - Adding authentication, token, credential, password, OAuth, OIDC, or external identity-provider behavior.
+      - Adding session persistence or WebSocket handshake authentication.
+      - Adding runtime player handlers or WebSocket routes.
+      - Adding direct Nakama or Pitaya public API compatibility.
+      - Making metadata-only identity sufficient for production permission grants.
+
+  - id: W-0051
+    milestone: M-009
+    title: Add first player account PostgreSQL migration source
+    status: completed
+    change: changes/2026-05-14-add-first-player-account-postgresql-migration
+    depends_on:
+      - W-0050
+    related_decisions:
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Add SQL-first migration source for the ratified player account schema under runtime/migrations/postgres.
+      - Include goose Up and Down sections, owning module trace, deterministic sequence number, constraints, and indexes.
+      - Update module and runtime manifests with the migration source path.
+      - Verify migration source checks without adding repository adapter, runtime handlers, authentication, tokens, credentials, session persistence, Protobuf envelope changes, or WebSocket handshake changes.
+    completion_summary: Added runtime/migrations/postgres/000002_create_player_account_state.sql as the first SQL-first player account migration source; it creates only player_accounts and player_account_events lifecycle state, records PlayerAccountCreated support, includes explicit constraints and indexes, and keeps repository adapters, runtime handlers, authentication, tokens, credentials, session persistence, Protobuf envelope changes, and WebSocket handshake changes deferred.
+    ask_first:
+      - Changing the ratified table names, credential/session exclusions, or cross-module reference policy.
+      - Adding runtime player repository implementation in the migration step.
+      - Adding authentication, tokens, credentials, session persistence, runtime handlers, WebSocket routes, or protocol handshake behavior.
+
+  - id: W-0052
+    milestone: M-009
+    title: Define player account repository interface boundary
+    status: completed
+    change: changes/2026-05-14-define-player-account-repository-interface-boundary
+    depends_on:
+      - W-0051
+    related_decisions:
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Define the module-owned player account repository interface and storage-neutral mutation/query shapes after the migration source exists.
+      - Update runtime identity checks to allow only this repository boundary without permitting handlers, adapters, authentication, tokens, credentials, session persistence, Protobuf envelope changes, or WebSocket handshake changes.
+      - Update player/runtime manifests and guides so future PostgreSQL adapter work has a declared interface to implement.
+      - Verify repository boundary checks without adding PostgreSQL adapter implementation or runtime player routes.
+    completion_summary: Added the storage-neutral player account repository interface under runtime/internal/modules/player with account lifecycle structs, CreatePlayerAccountMutation metadata, Repository.CreatePlayerAccount, Repository.GetPlayerAccount, and focused Go tests; updated manifests, guides, standards, and runtime identity checks so only this player runtime repository boundary is allowed while PostgreSQL adapters, runtime handlers, authentication, tokens, credentials, session persistence, Protobuf envelope changes, and WebSocket handshake changes remain deferred.
+    ask_first:
+      - Adding PostgreSQL player account adapter implementation instead of only the interface boundary.
+      - Adding runtime player account command/query handlers or WebSocket routes.
+      - Adding authentication, tokens, credentials, session persistence, Protobuf envelope changes, or WebSocket handshake behavior.
+      - Changing the ratified player account migration schema or table ownership.
+
+  - id: W-0053
+    milestone: M-009
+    title: Define player account PostgreSQL adapter boundary
+    status: completed
+    change: changes/2026-05-14-define-player-account-postgresql-adapter-boundary
+    depends_on:
+      - W-0052
+    related_decisions:
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Define the PostgreSQL adapter implementation boundary for the player account repository after the module-owned repository interface exists.
+      - Specify executor ownership, transaction expectations, SQL operation scope, error mapping expectations, and tests needed before adapter implementation.
+      - Update runtime identity and persistence checks so future player account adapter work is allowed only under runtime/internal/platform/persistence/postgres and still forbidden from handlers, authentication, tokens, credentials, session persistence, Protobuf envelope changes, or WebSocket handshake changes.
+      - Verify the adapter boundary without implementing runtime player account command/query handlers or WebSocket routes.
+    completion_summary: Defined the player account PostgreSQL adapter boundary without implementing the adapter. The boundary reserves runtime/internal/platform/persistence/postgres/player_account_repository.go and its focused test file, specifies NewPlayerAccountRepositoryForUnitOfWork, caller-owned executor and no transaction-control rules, first SQL operation scope, error mapping expectations, and required tests; runtime identity checks now require the adapter boundary while preserving handler, route, authentication, token, credential, session, Protobuf envelope, and WebSocket handshake deferrals.
+    ask_first:
+      - Implementing runtime player account command/query handlers or WebSocket routes.
+      - Adding authentication, tokens, credentials, session persistence, Protobuf envelope changes, or WebSocket handshake behavior.
+      - Changing the ratified migration schema, table ownership, repository interface shape, or transaction ownership model.
+      - Making live PostgreSQL verification mandatory in default repository checks.
+
+  - id: W-0054
+    milestone: M-009
+    title: Implement player account PostgreSQL adapter
+    status: completed
+    change: changes/2026-05-14-implement-player-account-postgresql-adapter
+    depends_on:
+      - W-0053
+    related_decisions:
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Implement the player account PostgreSQL adapter only under runtime/internal/platform/persistence/postgres/player_account_repository.go.
+      - Add focused fake-executor tests under runtime/internal/platform/persistence/postgres/player_account_repository_test.go for SQL shape, no transaction-control SQL, mutation normalization, row mapping, missing-row behavior, duplicate/constraint error mapping, and default no-live-PostgreSQL behavior.
+      - Add the PostgreSQL UnitOfWork.NewPlayerAccountRepository helper if needed without exposing pgx to application or domain packages.
+      - Preserve existing repository interface shape, migration schema, transaction ownership model, runtime handler deferral, WebSocket route deferral, authentication/token/credential/session deferral, Protobuf envelope behavior, and WebSocket handshake behavior.
+    completion_summary: Implemented the player account PostgreSQL adapter under runtime/internal/platform/persistence/postgres with fake-executor tests for account/event insert SQL, account lookup SQL, no transaction-control SQL, mutation normalization, UTC and nullable timestamp mapping, missing-row behavior, duplicate/constraint error mapping, and default no-live-PostgreSQL behavior; added UnitOfWork.NewPlayerAccountRepository without exposing pgx outside the PostgreSQL platform package; and kept runtime handlers, WebSocket routes, authentication, tokens, credentials, external identities, session persistence, Protobuf envelope behavior, and WebSocket handshake behavior deferred.
+    ask_first:
+      - Implementing runtime player account command/query handlers or WebSocket routes.
+      - Adding authentication, tokens, credentials, external identity linking, session persistence, Protobuf envelope changes, or WebSocket handshake behavior.
+      - Changing the ratified player account migration schema, repository interface shape, or transaction ownership model.
+      - Making live PostgreSQL verification mandatory in default repository checks.
+
+  - id: W-0055
+    milestone: M-009
+    title: Close player account PostgreSQL persistence milestone
+    status: completed
+    change: changes/2026-05-14-close-player-account-postgresql-persistence-milestone
+    depends_on:
+      - W-0054
+    related_decisions:
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    completion:
+      - Review M-009 completion criteria against the ratified schema, migration source, repository interface, PostgreSQL adapter implementation, manifests, standards, and repository checks.
+      - Mark M-009 completed only if runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, session persistence, Protobuf envelope behavior, and WebSocket handshake behavior remain deferred.
+      - Record remaining deferred decisions and next milestone candidates without choosing one implicitly.
+      - Create or leave a confirmation gate for the next major direction instead of starting runtime player handlers or authentication implicitly.
+    completion_summary: Reviewed M-009 against its completion criteria and closed it as a player account PostgreSQL persistence milestone. Schema, migration source, repository interface, adapter boundary, adapter implementation, manifests, standards, fake-executor tests, and repository checks are in place. Runtime handlers, WebSocket routes, authentication, tokens, credentials, external identity links, session persistence, Protobuf envelope behavior, and WebSocket handshake behavior remain deferred behind M-010.
+    ask_first:
+      - Choosing the next major implementation direction instead of creating or preserving a confirmation gate.
+      - Starting production authentication implementation.
+      - Adding runtime player account command/query handlers or WebSocket routes.
+      - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope changes, or WebSocket handshake authentication behavior.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0056
+    milestone: M-010
+    title: Confirm next milestone direction after player account PostgreSQL persistence
+    status: completed
+    change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
+    depends_on:
+      - W-0055
+    related_decisions:
+      - ADR-0019
+      - ADR-0020
+      - ADR-0021
+      - ADR-0022
+    block_reason: The next major direction requires maintainer confirmation because each candidate affects long-lived architecture.
+    candidate_directions:
+      - ratify_authentication_and_token_session_validation_design
+      - implement_runtime_player_account_handlers_from_ratified_contracts
+      - ratify_external_identity_linking_and_credential_storage
+      - ratify_session_persistence_and_websocket_handshake_authentication
+      - expand_core_game_domain_modules_after_nakama_pitaya_review
+      - strengthen_operations_observability_and_admin_tooling
+    selected_direction: ratify_authentication_and_token_session_validation_design
+    completion:
+      - Choose the next major milestone direction with the maintainer.
+      - Record the chosen direction as a bounded milestone.
+      - Create exactly one next_ready work item for the chosen milestone.
+      - Preserve ask-first boundaries for authentication, token, credential, external identity, session persistence, Protobuf envelope, WebSocket handshake, major dependency, runtime player handler, generated file conventions, operations posture, production permission, and major game-domain expansion decisions.
+    completion_summary: The maintainer selected option 1, ratify_authentication_and_token_session_validation_design. M-011 was created with W-0057 as the first bounded design-standard work item, preserving ask-first boundaries for concrete login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, WebSocket handshake behavior, runtime player handlers, WebSocket routes, major dependencies, generated conventions, operations posture, production permissions, and broader game-domain expansion.
+    ask_first:
+      - Starting production authentication implementation.
+      - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope changes, or WebSocket handshake authentication behavior.
+      - Adding runtime player account command/query handlers or WebSocket routes.
+      - Changing generated file conventions or making generated contract shapes runtime dispatch code.
+      - Introducing a new major milestone that commits to a major external framework dependency or architectural pattern.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0057
+    milestone: M-011
+    title: Define authentication and token session validation design standard
+    status: completed
+    change: changes/2026-05-14-define-authentication-token-session-validation-design-standard
+    depends_on:
+      - W-0056
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+      - ADR-0022
+      - ADR-0023
+    completion:
+      - Define the design standard for authentication, token behavior, session validation, credential storage boundaries, external identity linking boundaries, session persistence boundaries, request identity trust, Protobuf envelope interaction, and WebSocket handshake interaction before implementation.
+      - Map Nakama account, authentication, session token, refresh token, and realtime socket concepts into adopted, adapted, deferred, or rejected vibit terms.
+      - Map Pitaya session binding, route handler, frontend/backend, and realtime session vocabulary into adopted, adapted, deferred, or rejected vibit terms.
+      - Preserve current metadata-only validator behavior as non-authenticated until a real validator is separately ratified and implemented.
+      - Plan the remaining M-011 work queue without adding runtime authentication code, token parsing, credential storage, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    completion_summary: Defined the authentication, token, and session validation design standard and ADR-0023; separated authentication proof, login methods, tokens, credentials, external identity links, runtime sessions, request identity, WebSocket handshake authentication, player account lifecycle, transport metadata, and Protobuf envelope metadata; mapped Nakama and Pitaya reference concepts into vibit adopted/adapted/deferred/rejected positions; preserved metadata-only identity as non-authenticated; and planned the remaining M-011 queue without adding runtime authentication, token parsing, credential storage, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    ask_first:
+      - Choosing a concrete login method such as guest, device, email/password, custom ID, social login, OAuth, OIDC, or external identity provider.
+      - Choosing JWT, opaque token, refresh token, signing, expiration, revocation, or token storage behavior.
+      - Adding credential storage, password hashing, cryptography, OAuth, OIDC, external identity, or session-store dependencies.
+      - Adding authentication, token parsing, credential lookup, external identity linking, or session persistence runtime code.
+      - Changing Protobuf envelope behavior or WebSocket handshake authentication behavior.
+      - Adding runtime player account handlers or WebSocket routes.
+      - Declaring metadata-only player_id or session_id sufficient for production permissions.
+
+  - id: W-0058
+    milestone: M-011
+    title: Add authentication token session boundary architecture checks
+    status: completed
+    change: changes/2026-05-14-add-authentication-token-session-boundary-checks
+    depends_on:
+      - W-0057
+    related_decisions:
+      - ADR-0021
+      - ADR-0022
+      - ADR-0023
+    completion:
+      - Add repository checks that enforce the authentication/token/session design standard in architecture, runtime, player module, PostgreSQL migration, and generated-output boundaries where statically checkable.
+      - Ensure checks keep metadata-only player_id and session_id non-authenticated and prevent credentials, tokens, external identity links, runtime sessions, WebSocket state, and request validation results from being added to player account lifecycle persistence by convenience.
+      - Ensure checks keep WebSocket transport, Protobuf adapters, domain modules, and player repositories from silently owning authentication, token parsing, credential lookup, or session persistence before ratification.
+      - Update rule catalog, manifests, guidance, and change spec verification without adding runtime authentication code, token parsing, credential storage, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    completion_summary: Added the runtime.authentication_token_session_boundary repository check and rule catalog entry. The check verifies authentication/token/session standard and ADR references, manifest and guide markers, metadata-only validator markers, Protobuf source and generated-output boundaries, WebSocket transport boundaries, runtime module and protocol adapter boundaries, player repository boundaries, and player account lifecycle migration boundaries without adding runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, WebSocket routes, or live external-service requirements.
+    ask_first:
+      - Weakening existing identity/authentication/session boundary checks.
+      - Adding runtime authentication, token, credential, external identity, or session persistence implementation while adding checks.
+      - Choosing concrete login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope behavior, or WebSocket handshake authentication behavior.
+      - Making repository checks require live external services by default.
+      - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0059
+    milestone: M-011
+    title: Ratify authentication proof and token session validation contract dimensions
+    status: next_ready
+    change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
+    depends_on:
+      - W-0058
+    related_decisions:
+      - ADR-0021
+      - ADR-0023
+    completion:
+      - Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete login method or token format.
+      - Define required command/query/event/error/permission vocabulary dimensions, actor kinds, validation statuses, failure classes, retryability expectations, and request identity handoff semantics.
+      - Register only design-level or semantic contract artifacts that do not implement token parsing, credential lookup, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    ask_first:
+      - Choosing JWT, opaque tokens, refresh tokens, signing, expiration, revocation, rotation, token storage, or token carrier behavior.
+      - Choosing guest, device, email/password, custom ID, social login, OAuth, OIDC, or external identity provider login.
+      - Adding runtime authentication code or token parsing.
+      - Changing the Protobuf envelope or WebSocket handshake behavior.
+
+  - id: W-0060
+    milestone: M-011
+    title: Define credential storage and external identity linking boundaries
+    status: planned
+    change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
+    depends_on:
+      - W-0059
+    related_decisions:
+      - ADR-0022
+      - ADR-0023
+    completion:
+      - Define credential storage and external identity linking boundaries without adding schema, dependencies, credential records, provider subjects, password hashing, OAuth, OIDC, or runtime lookup code.
+      - Preserve player account lifecycle tables as account lifecycle storage only until credential and external identity schemas are separately ratified.
+      - Map Nakama authentication method coverage into deferred vibit login-method families and keep direct API compatibility rejected unless a future ADR changes it.
+    ask_first:
+      - Choosing a supported login method.
+      - Adding credential tables, external identity tables, password hashing, cryptography, OAuth, OIDC, or provider dependencies.
+      - Adding runtime credential lookup, account linking handlers, recovery flows, or merge behavior.
+      - Changing player account lifecycle table shape.
+
+  - id: W-0061
+    milestone: M-011
+    title: Define session persistence and WebSocket handshake decision gates
+    status: planned
+    change: changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates
+    depends_on:
+      - W-0060
+    related_decisions:
+      - ADR-0015
+      - ADR-0018
+      - ADR-0021
+      - ADR-0023
+    completion:
+      - Define decision gates for session persistence and WebSocket handshake authentication without implementing either path.
+      - Separate request-level validation, first-message validation, handshake validation, every-request validation, and hybrid validation as future choices.
+      - Define what future artifacts are required for session store, expiration, refresh, revocation, reconnect, connection epoch, Protobuf envelope interaction, and WebSocket handshake behavior.
+    ask_first:
+      - Choosing request-level, first-message, handshake-level, every-request, or hybrid validation as the production model.
+      - Choosing a session persistence store or adding session tables.
+      - Changing Protobuf envelope fields or adding handshake/system messages.
+      - Adding WebSocket handshake authentication behavior or route-level auth implementation.
+
+  - id: W-0062
+    milestone: M-011
+    title: Close authentication and token session validation design milestone
+    status: planned
+    change: changes/2026-05-14-close-authentication-token-session-validation-design-milestone
+    depends_on:
+      - W-0061
+    related_decisions:
+      - ADR-0019
+      - ADR-0021
+      - ADR-0022
+      - ADR-0023
+    completion:
+      - Review M-011 completion criteria against the design standard, checks, semantic dimensions, credential/external identity boundaries, session persistence gates, WebSocket handshake gates, manifests, guides, and repository checks.
+      - Mark M-011 completed only if runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, and WebSocket routes remain deferred unless separately ratified.
+      - Create a next-direction confirmation gate instead of starting implementation implicitly.
+    ask_first:
+      - Choosing the next implementation direction instead of creating a confirmation gate.
+      - Starting production authentication implementation.
+      - Adding runtime player account command/query handlers or WebSocket routes.
+      - Choosing login methods, token format, credential storage, external identity linking, session persistence, Protobuf envelope changes, or WebSocket handshake authentication behavior.
+      - Declaring metadata-only identity sufficient for production permissions.

@@ -113,8 +113,15 @@ type GrantItemMutation struct {
 }
 
 type PermissionPolicy interface {
-	CanGrantItem(context.Context, string, string) (bool, error)
-	CanReadInventory(context.Context, string, string) (bool, error)
+	CanGrantItem(context.Context, PermissionContext) (bool, error)
+	CanReadInventory(context.Context, PermissionContext) (bool, error)
+}
+
+type PermissionContext struct {
+	Permission  string
+	RequestedBy string
+	PlayerID    string
+	Identity    app.RequestIdentity
 }
 
 type CapacityPolicy interface {
@@ -212,7 +219,7 @@ func (h Handlers) HandleGrantItemRoute(ctx context.Context, request app.RouteReq
 		return baseResult(request), errors.New("inventory: GrantItem payload must be inventory.GrantItemRequest")
 	}
 
-	response, events, err := h.GrantItem(ctx, payload)
+	response, events, err := h.GrantItem(ctx, payload, request.Identity)
 	if err != nil {
 		return inventoryErrorResult(request, err)
 	}
@@ -243,7 +250,7 @@ func (h Handlers) HandleGetInventoryRoute(ctx context.Context, request app.Route
 		return baseResult(request), errors.New("inventory: GetInventory payload must be inventory.GetInventoryRequest")
 	}
 
-	response, err := h.GetInventory(ctx, payload)
+	response, err := h.GetInventory(ctx, payload, request.Identity)
 	if err != nil {
 		return inventoryErrorResult(request, err)
 	}
@@ -254,7 +261,7 @@ func (h Handlers) HandleGetInventoryRoute(ctx context.Context, request app.Route
 	return result, nil
 }
 
-func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (GrantItemResponse, []ItemGrantedEvent, error) {
+func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest, identity ...app.RequestIdentity) (GrantItemResponse, []ItemGrantedEvent, error) {
 	request = normalizeGrantItemRequest(request)
 	if request.Quantity <= 0 {
 		return GrantItemResponse{}, nil, inventoryError(ErrorCodeInvalidItemQuantity, "item quantity must be positive")
@@ -277,7 +284,12 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 		return GrantItemResponse{}, nil, err
 	}
 
-	allowed, err := permissionPolicy.CanGrantItem(ctx, request.RequestedBy, request.PlayerID)
+	allowed, err := permissionPolicy.CanGrantItem(ctx, PermissionContext{
+		Permission:  PermissionGrantItem,
+		RequestedBy: request.RequestedBy,
+		PlayerID:    request.PlayerID,
+		Identity:    firstIdentity(identity),
+	})
 	if err != nil {
 		return GrantItemResponse{}, nil, err
 	}
@@ -354,7 +366,7 @@ func (h Handlers) GrantItem(ctx context.Context, request GrantItemRequest) (Gran
 	return response, []ItemGrantedEvent{event}, nil
 }
 
-func (h Handlers) GetInventory(ctx context.Context, request GetInventoryRequest) (GetInventoryResponse, error) {
+func (h Handlers) GetInventory(ctx context.Context, request GetInventoryRequest, identity ...app.RequestIdentity) (GetInventoryResponse, error) {
 	request = normalizeGetInventoryRequest(request)
 	if request.PlayerID == "" {
 		return GetInventoryResponse{}, errors.New("inventory: player_id is required")
@@ -368,7 +380,12 @@ func (h Handlers) GetInventory(ctx context.Context, request GetInventoryRequest)
 		return GetInventoryResponse{}, err
 	}
 
-	allowed, err := permissionPolicy.CanReadInventory(ctx, request.RequestedBy, request.PlayerID)
+	allowed, err := permissionPolicy.CanReadInventory(ctx, PermissionContext{
+		Permission:  PermissionRead,
+		RequestedBy: request.RequestedBy,
+		PlayerID:    request.PlayerID,
+		Identity:    firstIdentity(identity),
+	})
 	if err != nil {
 		return GetInventoryResponse{}, err
 	}
@@ -438,6 +455,13 @@ func normalizeGetInventoryRequest(request GetInventoryRequest) GetInventoryReque
 	return request
 }
 
+func firstIdentity(identity []app.RequestIdentity) app.RequestIdentity {
+	if len(identity) == 0 {
+		return app.RequestIdentity{}
+	}
+	return identity[0]
+}
+
 func normalizeItems(items []Item) []Item {
 	normalized := make([]Item, 0, len(items))
 	for _, item := range items {
@@ -484,5 +508,6 @@ func baseResult(request app.RouteRequest) app.ApplicationResult {
 		Route:     request.Route,
 		Target:    request.Target,
 		Session:   request.Session,
+		Identity:  request.Identity,
 	}
 }

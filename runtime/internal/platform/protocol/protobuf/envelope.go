@@ -56,6 +56,13 @@ func RouteRequestFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, 
 		return app.RouteRequest{}, err
 	}
 
+	appSession := app.Session{
+		ConnectionID:    strings.TrimSpace(session.GetConnectionId()),
+		SessionID:       strings.TrimSpace(session.GetSessionId()),
+		PlayerID:        strings.TrimSpace(session.GetPlayerId()),
+		ConnectionEpoch: session.GetConnectionEpoch(),
+	}
+
 	return app.RouteRequest{
 		RequestID: strings.TrimSpace(envelope.GetRequestId()),
 		Route: app.RouteKey{
@@ -67,12 +74,8 @@ func RouteRequestFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, 
 			Scope: appTargetScope(target.GetScope()),
 			ID:    strings.TrimSpace(target.GetId()),
 		},
-		Session: app.Session{
-			ConnectionID:    strings.TrimSpace(session.GetConnectionId()),
-			SessionID:       strings.TrimSpace(session.GetSessionId()),
-			PlayerID:        strings.TrimSpace(session.GetPlayerId()),
-			ConnectionEpoch: session.GetConnectionEpoch(),
-		},
+		Session:      appSession,
+		Identity:     app.MetadataOnlyIdentityFromSession(appSession),
 		PayloadType:  payloadType,
 		Payload:      payload,
 		PayloadBytes: payloadBytes,

@@ -56,6 +56,8 @@ This is the first draft. The files describe expected shape before implementation
 
 `reference.yaml` records the active reference baseline for game server capability planning. It links `docs/reference-game-server-alignment.md` and `ADR-0019`. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. These references guide planning; they do not override vibit's constitution, ADRs, manifests, generated boundaries, or verification commands.
 
+`docs/player-identity-session-boundary.md` records the active boundary standard for player identity, player accounts, authentication, runtime sessions, transport connection metadata, and request identity context. `ADR-0021` governs this boundary. It keeps `player_id` as planned player-domain identity, not authenticated proof from a client envelope, until session validation exists.
+
 `work-items.yaml` records the active work continuation queue. It links `docs/workflow.md` and defines milestones, work items, dependencies, completion traces, and the `next_ready` item that gives maintainer continuation requests a deterministic meaning.
 
 The first accepted Go runtime dependencies are recorded by `ADR-0013`:
@@ -92,9 +94,10 @@ Before changing implementation code, agents should:
 8. Read `.arch/contracts.yaml` before adding or changing public contracts.
 9. Read `.arch/dependencies.yaml` before adding foundational dependencies.
 10. Read `.arch/reference.yaml` and `docs/reference-game-server-alignment.md` before adding new game server capability families, runtime subsystems, social/realtime features, matchmaking, match runtime, cluster/RPC work, or operational surfaces.
-11. Read `.arch/work-items.yaml` and `docs/workflow.md` before interpreting "continue" or multi-step continuation requests.
-12. Read the affected module's `module.yaml`, when it exists.
-13. Update manifests before implementation when public architecture changes.
+11. Read `docs/player-identity-session-boundary.md` before adding player, account, authentication, session, permission, or request identity behavior.
+12. Read `.arch/work-items.yaml` and `docs/workflow.md` before interpreting "continue" or multi-step continuation requests.
+13. Read the affected module's `module.yaml`, when it exists.
+14. Update manifests before implementation when public architecture changes.
 
 If a manifest is missing information needed for a safe change, update the manifest or document the gap.
 

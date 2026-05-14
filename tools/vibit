@@ -25,6 +25,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "module.registry_match",
   "contract.registry_declared",
   "contract.registry_entry",
+  "contract.boundary_only",
   "contract.source_exists",
   "contract.source_field",
   "contract.source_match",
@@ -46,6 +47,8 @@ const KNOWN_CHECK_RULE_IDS = [
   "generated.trace",
   "generated.source_trace",
   "generated.handwritten_forbidden",
+  "generated.contract_shape",
+  "generated.drift",
   "migration.root",
   "migration.file_shape",
   "migration.marker",
@@ -58,6 +61,8 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.skeleton",
   "runtime.boundary",
   "runtime.import_boundary",
+  "runtime.identity_boundary",
+  "runtime.authentication_token_session_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -72,6 +77,8 @@ const KNOWN_CHECK_RULE_IDS = [
   "work.dependency",
   "work.next_ready",
   "work.workflow",
+  "agent_tooling.standard",
+  "docs.translation_pair",
   "operator.guidance",
   "generator.created_artifact",
   "generator.artifact_already_exists",
@@ -107,6 +114,8 @@ Usage:
   vibit check protocol --json
   vibit check generated
   vibit check generated --json
+  vibit check agent-tooling
+  vibit check agent-tooling --json
   vibit check migrations
   vibit check migrations --json
   vibit check postgres-env
@@ -124,6 +133,15 @@ Usage:
   vibit inspect module <module>
   vibit inspect boundary --from <module> --to <module>
   vibit inspect contract --module <module> --type <type> --id <id>
+  vibit inspect contracts
+  vibit inspect contracts --module <module>
+  vibit inspect contracts --type <contract-type>
+  vibit inspect contracts --status <status>
+  vibit inspect generated
+  vibit inspect generated --module <module>
+  vibit inspect generated --type <contract-type>
+  vibit inspect next
+  vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
   vibit inspect work --json
@@ -132,6 +150,7 @@ Usage:
   vibit inspect rules
   vibit inspect rules --category <category>
   vibit generate module <module>
+  vibit generate contract-shapes <module|all>
 
 Commands:
   check all                Run all current repository checks.
@@ -140,6 +159,7 @@ Commands:
   check contracts          Check contract registry and source files.
   check protocol           Check manifest-to-Protobuf alignment.
   check generated          Check generated files declared by module manifests.
+  check agent-tooling      Check agent-native tooling standards and doc pairs.
   check migrations         Check PostgreSQL migration source files.
   check postgres-env       Check disposable PostgreSQL verification environment standards.
   check runtime            Run current runtime checks when implementation exists.
@@ -150,12 +170,17 @@ Commands:
   inspect module <module>  Print module metadata as JSON.
   inspect boundary         Print boundary metadata as JSON.
   inspect contract         Print contract metadata as JSON.
+  inspect contracts        Print registered contract index metadata as JSON.
+  inspect generated        Print generated output metadata as JSON.
+  inspect next             Print the next continuation work item as JSON.
+  inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
   inspect memory           Print project memory indexes as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
   generate module <module> Generate a minimal module skeleton.
+  generate contract-shapes Generate Go contract shape files from semantic contracts.
 `;
 }
 
@@ -178,7 +203,22 @@ function findRepoRoot(startDir) {
 }
 
 function rel(root, target) {
-  return path.relative(root, target) || ".";
+  return toRepoPath(path.relative(root, target) || ".");
+}
+
+function toRepoPath(value) {
+  if (typeof value !== "string") {
+    return value;
+  }
+  return value.replace(/\\/g, "/");
+}
+
+function pathStartsWith(value, prefix) {
+  return toRepoPath(value).startsWith(toRepoPath(prefix));
+}
+
+function normalizeArtifact(value) {
+  return toRepoPath(value);
 }
 
 function exists(root, relativePath) {
@@ -333,7 +373,7 @@ function recordResult(status, severity, message, metadata = {}) {
     status,
     severity,
     rule_id: metadata.rule_id || inferRuleId(message),
-    artifact: Object.prototype.hasOwnProperty.call(metadata, "artifact") ? metadata.artifact : inferArtifact(message),
+    artifact: normalizeArtifact(Object.prototype.hasOwnProperty.call(metadata, "artifact") ? metadata.artifact : inferArtifact(message)),
     message,
   });
 }
@@ -909,6 +949,117 @@ function listAfterPath(text, pathKeys) {
   return values;
 }
 
+function yamlBlockRange(lines, pathKeys) {
+  let startIndex = -1;
+  let currentIndent = -1;
+
+  for (const key of pathKeys) {
+    let found = false;
+    for (let i = startIndex + 1; i < lines.length; i += 1) {
+      const line = lines[i];
+      const match = line.match(/^(\s*)([A-Za-z0-9_-]+):\s*$/);
+      if (!match) {
+        continue;
+      }
+      const indent = match[1].length;
+      const name = match[2];
+      if (indent <= currentIndent && startIndex !== -1) {
+        break;
+      }
+      if (name === key) {
+        startIndex = i;
+        currentIndent = indent;
+        found = true;
+        break;
+      }
+    }
+    if (!found) {
+      return { start: -1, end: -1, indent: -1 };
+    }
+  }
+
+  let end = lines.length;
+  for (let i = startIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) {
+      continue;
+    }
+    const indent = line.match(/^(\s*)/)[1].length;
+    if (indent <= currentIndent && /^[A-Za-z0-9_-]+:/.test(line.trim())) {
+      end = i;
+      break;
+    }
+  }
+  return { start: startIndex, end, indent: currentIndent };
+}
+
+function yamlListValuesAtPath(text, pathKeys) {
+  const lines = text.split(/\r?\n/);
+  const range = yamlBlockRange(lines, pathKeys);
+  if (range.start === -1) {
+    return [];
+  }
+
+  const values = [];
+  const itemIndent = range.indent + 2;
+  for (let i = range.start + 1; i < range.end; i += 1) {
+    const line = lines[i];
+    const match = line.match(/^(\s*)-\s+(.+?)\s*$/);
+    if (match && match[1].length === itemIndent) {
+      values.push(unquoteScalar(match[2]));
+    }
+  }
+  return values;
+}
+
+function yamlMapKeysAtPath(text, pathKeys) {
+  const lines = text.split(/\r?\n/);
+  const range = yamlBlockRange(lines, pathKeys);
+  if (range.start === -1) {
+    return [];
+  }
+
+  const keys = [];
+  const keyIndent = range.indent + 2;
+  for (let i = range.start + 1; i < range.end; i += 1) {
+    const line = lines[i];
+    const match = line.match(/^(\s*)([A-Za-z0-9_]+):/);
+    if (match && match[1].length === keyIndent) {
+      keys.push(match[2]);
+    }
+  }
+  return keys;
+}
+
+function contractSourceFieldSummary(sourceText, contractType) {
+  if (!sourceText) {
+    return {
+      input_required: [],
+      input_properties: [],
+      output_required: [],
+      output_properties: [],
+      payload_required: [],
+      payload_properties: [],
+    };
+  }
+
+  const summary = {
+    input_required: yamlListValuesAtPath(sourceText, ["input", "required"]),
+    input_properties: yamlMapKeysAtPath(sourceText, ["input", "properties"]),
+    output_required: yamlListValuesAtPath(sourceText, ["output", "required"]),
+    output_properties: yamlMapKeysAtPath(sourceText, ["output", "properties"]),
+    payload_required: yamlListValuesAtPath(sourceText, ["payload", "required"]),
+    payload_properties: yamlMapKeysAtPath(sourceText, ["payload", "properties"]),
+  };
+
+  if (contractType === "events" && summary.payload_properties.length === 0) {
+    summary.payload_required = yamlListValuesAtPath(sourceText, ["payload", "required"]);
+    summary.payload_properties = yamlMapKeysAtPath(sourceText, ["payload", "properties"]);
+  }
+
+  return summary;
+}
+
 function parseContractEntries(registry, moduleName, contractType) {
   const lines = registry.split(/\r?\n/);
   const moduleIndex = lines.findIndex((line) => line.trim() === `${moduleName}:`);
@@ -972,6 +1123,375 @@ function parseContractEntries(registry, moduleName, contractType) {
   }
 
   return entries;
+}
+
+function discoverContractRegistryEntries(root) {
+  const registryPath = ".arch/contracts.yaml";
+  if (!isFile(root, registryPath)) {
+    return [];
+  }
+  const registry = readText(path.join(root, registryPath));
+  const entries = [];
+  const contractTypes = ["commands", "queries", "events", "errors", "permissions"];
+
+  for (const moduleName of discoverRegisteredModules(root)) {
+    for (const contractType of contractTypes) {
+      for (const entry of parseContractEntries(registry, moduleName, contractType)) {
+        entries.push({
+          module: moduleName,
+          family: null,
+          type: singularContractType(contractType),
+          normalized_type: contractType,
+          kind: contractKindForType(contractType),
+          id: entry.id,
+          path: entry.path,
+          owner: `modules/${moduleName}`,
+        });
+      }
+    }
+  }
+
+  const runtimeFamilies = [
+    {
+      family: "session",
+      registryFamily: "session_validation",
+      owner: "runtime/internal/app",
+    },
+  ];
+  for (const family of runtimeFamilies) {
+    const familyBlock = runtimeContractFamilyBlock(registry, family.registryFamily);
+    if (!familyBlock) {
+      continue;
+    }
+    for (const contractType of contractTypes) {
+      for (const entry of parseContractEntries(familyBlock, family.registryFamily, contractType)) {
+        entries.push({
+          module: "runtime",
+          family: family.family,
+          registry_family: family.registryFamily,
+          type: singularContractType(contractType),
+          normalized_type: contractType,
+          kind: contractKindForType(contractType),
+          id: entry.id,
+          path: entry.path,
+          owner: family.owner,
+        });
+      }
+    }
+  }
+
+  return entries.sort((left, right) => {
+    const leftKey = `${left.module}:${left.family || ""}:${left.normalized_type}:${left.id}`;
+    const rightKey = `${right.module}:${right.family || ""}:${right.normalized_type}:${right.id}`;
+    return leftKey.localeCompare(rightKey);
+  });
+}
+
+function registryModuleBlock(registry, moduleName) {
+  const lines = registry.split(/\r?\n/);
+  const moduleIndex = lines.findIndex((line) => line.trim() === `${moduleName}:`);
+  if (moduleIndex === -1) {
+    return "";
+  }
+
+  const moduleMatch = lines[moduleIndex].match(/^(\s*)/);
+  const moduleIndent = moduleMatch ? moduleMatch[1].length : 0;
+  const block = [lines[moduleIndex]];
+
+  for (let i = moduleIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) {
+      block.push(line);
+      continue;
+    }
+    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):/);
+    if (keyMatch && keyMatch[1].length <= moduleIndent) {
+      break;
+    }
+    block.push(line);
+  }
+
+  return block.join("\n");
+}
+
+function isBoundaryOnlyContractModule(registry, moduleName, moduleManifest) {
+  const block = registryModuleBlock(registry, moduleName);
+  return block.includes("status: boundary_only_no_public_contracts_yet")
+    || moduleManifest.includes("status: boundary_only_no_public_contracts_yet");
+}
+
+function playerWireContractsAreRatified(root) {
+  const registryPath = ".arch/contracts.yaml";
+  const moduleManifestPath = "modules/player/module.yaml";
+  const playerProtoPath = "proto/vibit/player/v1/player.proto";
+  if (!isFile(root, registryPath) || !isFile(root, moduleManifestPath) || !isFile(root, playerProtoPath)) {
+    return false;
+  }
+
+  const registry = readText(path.join(root, registryPath));
+  const moduleManifest = readText(path.join(root, moduleManifestPath));
+  const protoText = readText(path.join(root, playerProtoPath));
+  const requiredRegistryMarkers = [
+    "CreatePlayerAccount",
+    "GetPlayerAccount",
+    "PlayerAccountCreated",
+  ];
+  const requiredModuleMarkers = [
+    "wire_schema_status: player_account_proto_generated",
+    "runtime_player_handlers_added: false",
+    "authentication_implemented: false",
+    "player_account_persistence_implemented: false",
+  ];
+  const requiredProtoMarkers = [
+    "package vibit.player.v1;",
+    "message CreatePlayerAccountRequest",
+    "message CreatePlayerAccountResponse",
+    "message GetPlayerAccountRequest",
+    "message GetPlayerAccountResponse",
+    "message PlayerAccountCreated",
+  ];
+
+  return requiredRegistryMarkers.every((marker) => registry.includes(marker))
+    && requiredModuleMarkers.every((marker) => moduleManifest.includes(marker))
+    && requiredProtoMarkers.every((marker) => protoText.includes(marker));
+}
+
+function playerAccountPostgresSchemaIsRatified(root) {
+  const runtimePath = ".arch/runtime.yaml";
+  const moduleManifestPath = "modules/player/module.yaml";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  const decisionPath = "decisions/ADR-0022-player-account-postgresql-schema-boundary.md";
+  if (!isFile(root, runtimePath) || !isFile(root, moduleManifestPath) || !isFile(root, standardPath) || !isFile(root, decisionPath)) {
+    return false;
+  }
+
+  const runtimeText = readText(path.join(root, runtimePath));
+  const moduleManifest = readText(path.join(root, moduleManifestPath));
+  const standard = readText(path.join(root, standardPath));
+  const decision = readText(path.join(root, decisionPath));
+  const requiredRuntimeMarkers = [
+    "player_account_postgresql_schema_boundary: ADR-0022",
+    "player_account_schema:",
+    "schema_ratified",
+    "player_accounts",
+    "player_account_events",
+    "authentication_credentials",
+    "runtime_session_rows",
+  ];
+  const requiredModuleMarkers = [
+    "account_persistence_schema_is_ratified_before_migration",
+    "player_account_persistence_schema_ratified: true",
+    "player_accounts",
+    "player_account_events",
+  ];
+  const requiredStandardMarkers = [
+    "## 3.1 Player Account Persistence Schema Boundary",
+    "player_accounts",
+    "player_account_events",
+    "authentication credentials",
+    "runtime session rows",
+  ];
+  const requiredDecisionMarkers = [
+    "# ADR-0022: Player Account PostgreSQL Schema Boundary",
+    "player_accounts",
+    "player_account_events",
+    "The schema must not store credentials",
+  ];
+
+  return requiredRuntimeMarkers.every((marker) => runtimeText.includes(marker))
+    && requiredModuleMarkers.every((marker) => moduleManifest.includes(marker))
+    && requiredStandardMarkers.every((marker) => standard.includes(marker))
+    && requiredDecisionMarkers.every((marker) => decision.includes(marker));
+}
+
+function playerAccountRepositoryInterfaceIsDeclared(root) {
+  const moduleManifestPath = "modules/player/module.yaml";
+  const repositoryPath = "runtime/internal/modules/player/repository.go";
+  const repositoryTestPath = "runtime/internal/modules/player/repository_test.go";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  if (!isFile(root, moduleManifestPath) || !isFile(root, repositoryPath) || !isFile(root, repositoryTestPath) || !isFile(root, standardPath)) {
+    return false;
+  }
+
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const repository = readText(path.join(root, repositoryPath));
+  const standard = readText(path.join(root, standardPath));
+  const requiredManifestMarkers = [
+    "repository_interface_added: true",
+    "runtime_handlers_added: false",
+    "runtime_player_handlers_added: false",
+    "player_account_persistence_implemented: false",
+  ];
+  const requiredRepositoryMarkers = [
+    "type Repository interface",
+    "CreatePlayerAccount(context.Context, CreatePlayerAccountMutation) (Account, error)",
+    "GetPlayerAccount(context.Context, string) (Account, error)",
+    "type CreatePlayerAccountMutation struct",
+    "EventID",
+    "OccurredAt",
+    "PlayerID",
+    "DisplayName",
+    "AccountState",
+    "RequestedBy",
+  ];
+  const requiredStandardMarkers = [
+    "Repository.CreatePlayerAccount(ctx, CreatePlayerAccountMutation)",
+    "Repository.GetPlayerAccount(ctx, player_id)",
+    "runtime/internal/modules/player/repository.go",
+  ];
+
+  return requiredManifestMarkers.every((marker) => manifest.includes(marker))
+    && requiredRepositoryMarkers.every((marker) => repository.includes(marker))
+    && requiredStandardMarkers.every((marker) => standard.includes(marker));
+}
+
+function playerAccountPostgresAdapterBoundaryIsDeclared(root) {
+  const runtimePath = ".arch/runtime.yaml";
+  const conventionsPath = ".arch/conventions.yaml";
+  const contractsPath = ".arch/contracts.yaml";
+  const moduleManifestPath = "modules/player/module.yaml";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  const runtimeGuidePath = "runtime/AGENTS.md";
+  const moduleGuidePath = "modules/player/AGENTS.md";
+  if (!isFile(root, runtimePath)
+    || !isFile(root, conventionsPath)
+    || !isFile(root, contractsPath)
+    || !isFile(root, moduleManifestPath)
+    || !isFile(root, standardPath)
+    || !isFile(root, runtimeGuidePath)
+    || !isFile(root, moduleGuidePath)) {
+    return false;
+  }
+
+  const runtimeText = readText(path.join(root, runtimePath));
+  const conventions = readText(path.join(root, conventionsPath));
+  const contracts = readText(path.join(root, contractsPath));
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const standard = readText(path.join(root, standardPath));
+  const runtimeGuide = readText(path.join(root, runtimeGuidePath));
+  const moduleGuide = readText(path.join(root, moduleGuidePath));
+  const requiredMarkers = [
+    "postgres_adapter_boundary_defined: true",
+    "postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go",
+    "postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go",
+    "postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork",
+    "postgres_unit_of_work_factory_planned: UnitOfWork.NewPlayerAccountRepository",
+  ];
+  const requiredStandardMarkers = [
+    "## 3.2 Player Account PostgreSQL Adapter Boundary",
+    "runtime/internal/platform/persistence/postgres/player_account_repository.go",
+    "runtime/internal/platform/persistence/postgres/player_account_repository_test.go",
+    "NewPlayerAccountRepositoryForUnitOfWork(executor)",
+    "player.Repository",
+    "must not call `BEGIN`, `COMMIT`, or `ROLLBACK`",
+    "`CreatePlayerAccount` inserts one `player_accounts` row",
+    "`CreatePlayerAccount` inserts one `player_account_events` row for `PlayerAccountCreated`",
+    "`GetPlayerAccount` reads the current account lifecycle row from `player_accounts`",
+    "Optional live integration coverage only through `VIBIT_POSTGRES_TEST_DSN`",
+  ];
+
+  return requiredMarkers.every((marker) => runtimeText.includes(marker))
+    && requiredMarkers.every((marker) => conventions.includes(marker))
+    && [
+      "postgres_adapter_boundary_defined: true",
+      "postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go",
+      "postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go",
+      "postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork",
+      "postgres_adapter_added:",
+    ].every((marker) => contracts.includes(marker) && manifest.includes(marker))
+    && requiredStandardMarkers.every((marker) => standard.includes(marker))
+    && runtimeGuide.includes("internal/platform/persistence/postgres/player_account_repository.go")
+    && runtimeGuide.includes("NewPlayerAccountRepositoryForUnitOfWork(executor)")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/player_account_repository.go")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/player_account_repository_test.go");
+}
+
+function playerAccountPostgresAdapterIsImplemented(root) {
+  const runtimePath = ".arch/runtime.yaml";
+  const conventionsPath = ".arch/conventions.yaml";
+  const contractsPath = ".arch/contracts.yaml";
+  const moduleManifestPath = "modules/player/module.yaml";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  const sourcePath = "runtime/internal/platform/persistence/postgres/player_account_repository.go";
+  const testPath = "runtime/internal/platform/persistence/postgres/player_account_repository_test.go";
+  const runnerPath = "runtime/internal/platform/persistence/postgres/runner.go";
+  const runtimeGuidePath = "runtime/AGENTS.md";
+  const moduleGuidePath = "modules/player/AGENTS.md";
+
+  if (![
+    runtimePath,
+    conventionsPath,
+    contractsPath,
+    moduleManifestPath,
+    standardPath,
+    sourcePath,
+    testPath,
+    runnerPath,
+    runtimeGuidePath,
+    moduleGuidePath,
+  ].every((file) => isFile(root, file))) {
+    return false;
+  }
+
+  const runtimeText = readText(path.join(root, runtimePath));
+  const conventions = readText(path.join(root, conventionsPath));
+  const contracts = readText(path.join(root, contractsPath));
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const standard = readText(path.join(root, standardPath));
+  const source = readText(path.join(root, sourcePath));
+  const tests = readText(path.join(root, testPath));
+  const runner = readText(path.join(root, runnerPath));
+  const runtimeGuide = readText(path.join(root, runtimeGuidePath));
+  const moduleGuide = readText(path.join(root, moduleGuidePath));
+
+  const requiredManifestMarkers = [
+    "postgres_adapter_added: true",
+    "runtime_player_handlers_added: false",
+    "websocket_routes_added: false",
+    "authentication_implemented: false",
+    "token_behavior_implemented: false",
+    "credential_storage_implemented: false",
+    "session_persistence_implemented: false",
+    "player_account_persistence_implemented: false",
+  ];
+  const requiredSourceMarkers = [
+    "type PlayerAccountRepository struct",
+    "var _ player.Repository = (*PlayerAccountRepository)(nil)",
+    "func NewPlayerAccountRepositoryForUnitOfWork(executor Executor) *PlayerAccountRepository",
+    "func (r *PlayerAccountRepository) CreatePlayerAccount(ctx context.Context, mutation player.CreatePlayerAccountMutation) (player.Account, error)",
+    "func (r *PlayerAccountRepository) GetPlayerAccount(ctx context.Context, playerID string) (player.Account, error)",
+    "INSERT INTO player_accounts",
+    "INSERT INTO player_account_events",
+    "PlayerAccountCreated",
+    "FROM player_accounts",
+    "ErrPlayerAccountNotFound",
+    "ErrPlayerAccountConflict",
+    "ErrPlayerAccountConstraint",
+  ];
+  const requiredTestMarkers = [
+    "TestPlayerAccountRepositoryCreatePlayerAccountInsertsAccountAndEvent",
+    "TestPlayerAccountRepositoryGetPlayerAccountSelectsAndMapsLifecycleRow",
+    "TestPlayerAccountRepositoryMapsMissingRowToNotFound",
+    "TestPlayerAccountRepositoryMapsDuplicateAccountOrEventToConflict",
+    "TestPlayerAccountRepositoryMapsConstraintViolations",
+    "TestPlayerAccountRepositoryDefaultTestsDoNotRequireLivePostgreSQL",
+    "hasTransactionControlSQL",
+    "VIBIT_POSTGRES_TEST_DSN",
+  ];
+
+  return requiredManifestMarkers.every((marker) => runtimeText.includes(marker))
+    && requiredManifestMarkers.every((marker) => conventions.includes(marker))
+    && requiredManifestMarkers.every((marker) => manifest.includes(marker))
+    && ["postgres_adapter_added: true", "runtime_player_handlers_added: false", "player_account_persistence_implemented: false"].every((marker) => contracts.includes(marker))
+    && standard.includes("The first player account PostgreSQL adapter is implemented")
+    && requiredSourceMarkers.every((marker) => source.includes(marker))
+    && requiredTestMarkers.every((marker) => tests.includes(marker))
+    && runner.includes("func (u UnitOfWork) NewPlayerAccountRepository() (player.Repository, error)")
+    && !/\b(BEGIN|COMMIT|ROLLBACK)\b/.test(source)
+    && runtimeGuide.includes("internal/platform/persistence/postgres/player_account_repository.go")
+    && runtimeGuide.includes("UnitOfWork.NewPlayerAccountRepository")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/player_account_repository.go")
+    && moduleGuide.includes("implemented");
 }
 
 function discoverProtoFiles(root) {
@@ -1544,6 +2064,64 @@ function parseInspectContractArgs(args) {
   return parsed;
 }
 
+function parseInspectContractsArgs(args) {
+  const parsed = { module: null, type: null, status: null };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === "--module") {
+      parsed.module = args[i + 1] || null;
+      i += 1;
+    } else if (arg === "--type") {
+      parsed.type = args[i + 1] || null;
+      i += 1;
+    } else if (arg === "--status") {
+      parsed.status = args[i + 1] || null;
+      i += 1;
+    } else {
+      return null;
+    }
+  }
+  if (parsed.module && !/^[a-z][a-z0-9_]*$/.test(parsed.module)) {
+    return null;
+  }
+  if (parsed.type && !normalizeContractType(parsed.type)) {
+    return null;
+  }
+  if (parsed.type) {
+    parsed.type = normalizeContractType(parsed.type);
+  }
+  if (parsed.status && !/^[a-z][a-z0-9_-]*$/.test(parsed.status)) {
+    return null;
+  }
+  return parsed;
+}
+
+function parseInspectGeneratedArgs(args) {
+  const parsed = { module: null, type: null };
+  for (let i = 0; i < args.length; i += 1) {
+    const arg = args[i];
+    if (arg === "--module") {
+      parsed.module = args[i + 1] || null;
+      i += 1;
+    } else if (arg === "--type") {
+      parsed.type = args[i + 1] || null;
+      i += 1;
+    } else {
+      return null;
+    }
+  }
+  if (parsed.module && !/^[a-z][a-z0-9_]*$/.test(parsed.module)) {
+    return null;
+  }
+  if (parsed.type && !normalizeContractType(parsed.type)) {
+    return null;
+  }
+  if (parsed.type) {
+    parsed.type = normalizeContractType(parsed.type);
+  }
+  return parsed;
+}
+
 function normalizeContractType(value) {
   const normalized = {
     command: "commands",
@@ -1569,6 +2147,17 @@ function singularContractType(contractType) {
     permissions: "permission",
   };
   return singular[contractType] || contractType;
+}
+
+function contractKindForType(contractType) {
+  const kinds = {
+    commands: "command",
+    queries: "query",
+    events: "event",
+    errors: "error_catalog",
+    permissions: "permission_catalog",
+  };
+  return kinds[contractType] || contractType;
 }
 
 function expectedContractKind(contractType) {
@@ -1624,6 +2213,9 @@ function loadContractInspection(root, moduleName, requestedType, contractId) {
   const registryPath = ".arch/contracts.yaml";
   const registryExists = isFile(root, registryPath);
   const registry = registryExists ? readText(path.join(root, registryPath)) : "";
+  if (moduleName === "runtime") {
+    return loadRuntimeContractInspection(root, contractType, contractId, registryPath, registryExists, registry);
+  }
   const entries = registryExists ? parseContractEntries(registry, moduleName, contractType) : [];
   const entry = entries.find((item) => item.id === contractId) || null;
 
@@ -1666,7 +2258,7 @@ function loadContractInspection(root, moduleName, requestedType, contractId) {
   const consistency = {
     registered: Boolean(entry),
     source_exists: sourceExists,
-    source_under_module: Boolean(entry && entry.path && entry.path.startsWith(`contracts/${moduleName}/`)),
+    source_under_module: Boolean(entry && entry.path && pathStartsWith(entry.path, `contracts/${moduleName}/`)),
     kind_matches: sourceExists && source.kind === expectedKind,
     module_matches: sourceExists && source.module === moduleName,
     id_matches: ["commands", "queries", "events"].includes(contractType)
@@ -1705,6 +2297,88 @@ function loadContractInspection(root, moduleName, requestedType, contractId) {
   };
 }
 
+function loadRuntimeContractInspection(root, contractType, contractId, registryPath, registryExists, registry) {
+  const familyName = "session";
+  const registryFamily = "session_validation";
+  const familyBlock = registryExists ? runtimeContractFamilyBlock(registry, registryFamily) : "";
+  const entries = registryExists ? parseContractEntries(familyBlock, registryFamily, contractType) : [];
+  const entry = entries.find((item) => item.id === contractId) || null;
+  const sourceExists = entry && entry.path ? isFile(root, entry.path) : false;
+  const sourceText = sourceExists ? readText(path.join(root, entry.path)) : "";
+  const expectedKind = expectedContractKind(contractType);
+  const expectedOwner = "runtime/internal/app";
+  const sourceFamily = sourceExists ? firstScalar(sourceText, "family") : null;
+  const sourceOwner = sourceExists ? firstScalar(sourceText, "owner") : null;
+
+  const source = {
+    exists: sourceExists,
+    path: entry ? entry.path : null,
+    schema_version: sourceExists ? firstScalar(sourceText, "schema_version") : null,
+    kind: sourceExists ? firstScalar(sourceText, "kind") : null,
+    module: sourceExists ? firstScalar(sourceText, "module") : null,
+    family: sourceFamily,
+    owner: sourceOwner,
+    name: sourceExists ? firstScalar(sourceText, "name") : null,
+    status: sourceExists ? firstScalar(sourceText, "status") : null,
+    summary: sourceExists ? firstScalar(sourceText, "summary") : null,
+    permission: sourceExists ? firstScalar(sourceText, "permission") : null,
+    version: sourceExists ? firstScalar(sourceText, "version") : null,
+    runtime_status: sourceExists ? firstScalar(sourceText, "runtime_status") : null,
+    decision_refs: sourceExists ? listAfterKey(sourceText, "decision_refs") : [],
+    emits: sourceExists ? listAfterKey(sourceText, "emits") : [],
+    errors: sourceExists && contractType === "errors" ? [] : sourceExists ? listAfterKey(sourceText, "errors") : [],
+    error_codes: sourceExists ? listItemFieldAfterKey(sourceText, "errors", "code") : [],
+    permission_ids: sourceExists ? listItemFieldAfterKey(sourceText, "permissions", "id") : [],
+    invariants: sourceExists ? listAfterKey(sourceText, "invariants") : [],
+    generated_outputs: sourceExists ? listAfterPath(sourceText, ["implementation", "generated_outputs"]) : [],
+  };
+
+  const consistency = {
+    registered: Boolean(entry),
+    source_exists: sourceExists,
+    source_under_module: Boolean(entry && entry.path && pathStartsWith(entry.path, `contracts/runtime/${familyName}/`)),
+    kind_matches: sourceExists && source.kind === expectedKind,
+    module_matches: sourceExists && source.module === "runtime",
+    family_matches: sourceExists && sourceFamily === familyName,
+    owner_matches: sourceExists && sourceOwner === expectedOwner,
+    id_matches: ["commands", "queries", "events"].includes(contractType)
+      ? sourceExists && source.name === contractId
+      : Boolean(entry),
+    module_manifest_exists: true,
+    module_manifest_declares_id: Boolean(entry),
+    module_manifest_references_source: Boolean(entry && entry.path && familyBlock.includes(entry.path)),
+  };
+
+  consistency.status = Object.values(consistency).every(Boolean) ? "consistent" : "incomplete";
+
+  return {
+    request: {
+      module: "runtime",
+      type: singularContractType(contractType),
+      normalized_type: contractType,
+      id: contractId,
+    },
+    registry: {
+      exists: registryExists,
+      path: registryPath,
+      family: registryFamily,
+      entry,
+    },
+    source,
+    module_manifest: {
+      exists: true,
+      path: registryPath,
+      declares_id: consistency.module_manifest_declares_id,
+      references_source: consistency.module_manifest_references_source,
+      note: "Runtime session contracts are registered as a runtime contract family, not as a domain module manifest.",
+    },
+    consistency,
+    guidance: consistency.status === "consistent"
+      ? "Runtime contract is registered, sourced, and owned by the declared runtime boundary."
+      : "Run `node tools/vibit check contracts --json` for full consistency failures before generating or implementing this runtime contract.",
+  };
+}
+
 function inspectContract(root, options) {
   const contractType = normalizeContractType(options.type);
   const inspection = loadContractInspection(root, options.module, contractType, options.id);
@@ -1717,6 +2391,187 @@ function inspectContract(root, options) {
     kind: "contract_inspection",
     project: "vibit",
     contract: inspection,
+  });
+}
+
+function inspectContracts(root, options) {
+  const contracts = discoverContractRegistryEntries(root)
+    .filter((entry) => !options.module || entry.module === options.module)
+    .filter((entry) => !options.type || entry.normalized_type === options.type)
+    .map((entry) => {
+      const sourceExists = entry.path ? isFile(root, entry.path) : false;
+      const sourceText = sourceExists ? readText(path.join(root, entry.path)) : "";
+      return {
+        ...entry,
+        source_exists: sourceExists,
+        status: sourceExists ? firstScalar(sourceText, "status") : null,
+        summary: sourceExists ? firstScalar(sourceText, "summary") : null,
+        generated_outputs: sourceExists ? listAfterPath(sourceText, ["implementation", "generated_outputs"]) : [],
+        fields: contractSourceFieldSummary(sourceText, entry.normalized_type),
+      };
+    })
+    .filter((entry) => !options.status || entry.status === options.status);
+
+  const byModule = {};
+  const byType = {};
+  const byStatus = {};
+  for (const entry of contracts) {
+    byModule[entry.module] = (byModule[entry.module] || 0) + 1;
+    byType[entry.normalized_type] = (byType[entry.normalized_type] || 0) + 1;
+    byStatus[entry.status || "unknown"] = (byStatus[entry.status || "unknown"] || 0) + 1;
+  }
+
+  printJson({
+    schema_version: "0.1",
+    kind: "contracts_inspection",
+    project: "vibit",
+    registry: {
+      path: ".arch/contracts.yaml",
+      exists: isFile(root, ".arch/contracts.yaml"),
+    },
+    filter: {
+      module: options.module,
+      type: options.type ? singularContractType(options.type) : null,
+      normalized_type: options.type,
+      status: options.status,
+    },
+    summary: {
+      contracts: contracts.length,
+      by_module: byModule,
+      by_type: byType,
+      by_status: byStatus,
+    },
+    contracts,
+  });
+}
+
+function inspectNext(root) {
+  const state = loadWorkState(root);
+  if (!state.exists) {
+    console.error(".arch/work-items.yaml is missing");
+    process.exit(1);
+  }
+  const nextReady = state.current.next_ready[0] || null;
+  const blocked = state.current.blocked[0] || null;
+  const status = nextReady ? "ready" : blocked ? "blocked" : "empty";
+  printJson({
+    schema_version: "0.1",
+    kind: "next_work_inspection",
+    project: "vibit",
+    status,
+    current_milestone: state.current.milestone,
+    next_ready: nextReady,
+    blocked,
+    continuation: {
+      can_continue: Boolean(nextReady),
+      stop_reason: nextReady ? null : blocked ? "current_work_item_blocked" : "no_next_ready_work_item",
+      command: nextReady
+        ? `Advance ${nextReady.id}: ${nextReady.title}`
+        : "No next_ready work item is available.",
+    },
+  });
+}
+
+function inspectReference(root) {
+  const manifestPath = ".arch/reference.yaml";
+  const text = isFile(root, manifestPath) ? readText(path.join(root, manifestPath)) : "";
+  printJson({
+    schema_version: "0.1",
+    kind: "reference_inspection",
+    project: "vibit",
+    manifest: {
+      path: manifestPath,
+      exists: Boolean(text),
+      standard: text ? firstScalar(text, "standard") : null,
+      decision: text ? firstScalar(text, "decision") : null,
+    },
+    reference_projects: text ? parseYamlListObjects(text, "reference_projects") : [],
+    differentiators: text ? listAfterKey(text, "vibit_differentiators") : [],
+    capability_families: {
+      foundational: text ? listAfterPath(text, ["capability_families", "foundational"]) : [],
+      metagame: text ? listAfterPath(text, ["capability_families", "metagame"]) : [],
+      social_realtime: text ? listAfterPath(text, ["capability_families", "social_realtime"]) : [],
+      multiplayer: text ? listAfterPath(text, ["capability_families", "multiplayer"]) : [],
+      operations: text ? listAfterPath(text, ["capability_families", "operations"]) : [],
+      distributed_runtime: text ? listAfterPath(text, ["capability_families", "distributed_runtime"]) : [],
+    },
+  });
+}
+
+function inspectGenerated(root, options = { module: null, type: null }) {
+  const protoRoot = "runtime/internal/generated/proto";
+  const contractRoot = "runtime/internal/generated/contracts";
+  const protoFiles = isDirectory(root, protoRoot)
+    ? discoverFilesUnder(root, protoRoot).filter((file) => path.basename(file) !== ".gitkeep")
+    : [];
+  const allContractFiles = isDirectory(root, contractRoot)
+    ? discoverFilesUnder(root, contractRoot).filter((file) => path.basename(file) !== ".gitkeep")
+    : [];
+  const contractFiles = allContractFiles.filter((file) => {
+    if (options.module && !pathStartsWith(file, `${contractRoot}/${options.module}/`)) {
+      return false;
+    }
+    if (options.type && !file.includes(`/${options.type}/`)) {
+      return false;
+    }
+    return true;
+  });
+  const expectedContractShapes = discoverContractRegistryEntries(root)
+    .filter((entry) => entry.module !== "runtime")
+    .filter((entry) => !options.module || entry.module === options.module)
+    .filter((entry) => !options.type || entry.normalized_type === options.type)
+    .map((entry) => ({
+      module: entry.module,
+      type: entry.type,
+      normalized_type: entry.normalized_type,
+      id: entry.id,
+      source: entry.path,
+      output: generatedContractShapePath(entry),
+      exists: isFile(root, generatedContractShapePath(entry)),
+    }));
+  const expectedContractShapeOutputs = new Set(expectedContractShapes.map((item) => item.output));
+  const staleContractShapeFiles = contractFiles.filter((file) => !expectedContractShapeOutputs.has(file));
+  const missingContractShapes = expectedContractShapes.filter((item) => !item.exists);
+  const contractShapeStatus = missingContractShapes.length > 0
+    ? "missing"
+    : staleContractShapeFiles.length > 0
+      ? "stale"
+      : "complete";
+
+  printJson({
+    schema_version: "0.1",
+    kind: "generated_inspection",
+    project: "vibit",
+    roots: {
+      proto: {
+        path: protoRoot,
+        exists: isDirectory(root, protoRoot),
+        files: protoFiles,
+      },
+      contracts: {
+        path: contractRoot,
+        exists: isDirectory(root, contractRoot),
+        files: contractFiles,
+      },
+    },
+    filter: {
+      module: options.module,
+      type: options.type ? singularContractType(options.type) : null,
+      normalized_type: options.type,
+    },
+    expected_contract_shapes: expectedContractShapes,
+    missing_contract_shapes: missingContractShapes,
+    stale_contract_shape_files: staleContractShapeFiles,
+    contract_shape_status: contractShapeStatus,
+    summary: {
+      proto_files: protoFiles.length,
+      contract_shape_files: contractFiles.length,
+      all_contract_shape_files: allContractFiles.length,
+      expected_contract_shapes: expectedContractShapes.length,
+      missing_contract_shapes: missingContractShapes.length,
+      stale_contract_shape_files: staleContractShapeFiles.length,
+      contract_shape_status: contractShapeStatus,
+    },
   });
 }
 
@@ -2054,7 +2909,7 @@ function checkAll(root) {
     console.log(`Checking all vibit standards in ${root}`);
   }
 
-  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "migrations"], ["check", "postgres-env"], ["check", "runtime"], ["check", "work"]];
+  const checks = [["check", "architecture"], ["check", "schemas"], ["check", "memory"], ["check", "contracts"], ["check", "protocol"], ["check", "generated"], ["check", "agent-tooling"], ["check", "migrations"], ["check", "postgres-env"], ["check", "runtime"], ["check", "work"]];
 
   for (const changeId of discoverChangeIds(root)) {
     checks.push(["check", "change", changeId]);
@@ -2159,6 +3014,8 @@ function checkArchitecture(root) {
     "docs/game-protocol.zh-CN.md",
     "docs/generated-output.md",
     "docs/generated-output.zh-CN.md",
+    "docs/agent-tooling.md",
+    "docs/agent-tooling.zh-CN.md",
     "docs/runtime-protocol-adapter.md",
     "docs/runtime-protocol-adapter.zh-CN.md",
     "docs/reference-game-server-alignment.md",
@@ -2223,6 +3080,7 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/conventions.yaml", "agent_decision_record: decisions/_template/adr-agent.md");
   checkTextIncludes(root, ".arch/conventions.yaml", "dependency_adoption: docs/_templates/dependency-adoption.md");
   checkTextIncludes(root, ".arch/conventions.yaml", "generated_output_standard:");
+  checkTextIncludes(root, ".arch/conventions.yaml", "agent_tooling_standard:");
   checkTextIncludes(root, ".arch/conventions.yaml", "runtime_protocol_adapter_standard:");
   checkTextIncludes(root, ".arch/conventions.yaml", "immutable_to_non_system_agents: true");
   checkTextIncludes(root, ".arch/conventions.yaml", "standard: docs/generated-output.md");
@@ -2248,22 +3106,33 @@ function checkArchitecture(root) {
   checkTextIncludes(root, ".arch/reference.yaml", "name: Pitaya");
   checkTextIncludes(root, ".arch/reference.yaml", "agent_native_maintainability");
   checkTextIncludes(root, ".arch/reference.yaml", "distributed_runtime_deferred");
+  checkTextIncludes(root, "docs/player-identity-session-boundary.md", "Canonical decision: `ADR-0021`");
+  checkTextIncludes(root, "docs/player-identity-session-boundary.zh-CN.md", "ADR-0021");
+  checkTextIncludes(root, "decisions/ADR-0021-player-identity-and-session-boundary.md", "docs/player-identity-session-boundary.md");
+  checkTextIncludes(root, ".arch/conventions.yaml", "player_identity_session_boundary:");
+  checkTextIncludes(root, ".arch/reference.yaml", "active_boundary_decision: ADR-0021");
   checkTextIncludes(root, ".arch/protocol.yaml", "game_protocol_framework: ADR-0015");
   checkTextIncludes(root, ".arch/protocol.yaml", "generated_output_standard: ADR-0017");
   checkTextIncludes(root, ".arch/protocol.yaml", "runtime_protocol_adapter_boundary: ADR-0018");
+  checkTextIncludes(root, ".arch/protocol.yaml", "player_identity_and_session_boundary: ADR-0021");
+  checkTextIncludes(root, ".arch/protocol.yaml", "standard: docs/player-identity-session-boundary.md");
   checkTextIncludes(root, ".arch/protocol.yaml", "model: websocket_framed_protobuf_envelope");
   checkTextIncludes(root, ".arch/protocol.yaml", "envelope_proto: proto/vibit/protocol/v1/envelope.proto");
   checkTextIncludes(root, ".arch/runtime.yaml", "generated_output_standard: ADR-0017");
   checkTextIncludes(root, ".arch/runtime.yaml", "generated_output_standard: docs/generated-output.md");
   checkTextIncludes(root, ".arch/runtime.yaml", "runtime_protocol_adapter_boundary: ADR-0018");
+  checkTextIncludes(root, ".arch/runtime.yaml", "player_identity_and_session_boundary: ADR-0021");
+  checkTextIncludes(root, ".arch/runtime.yaml", "identity_session_boundary:");
   checkTextIncludes(root, ".arch/runtime.yaml", "runtime_protocol_adapter:");
   checkTextIncludes(root, ".arch/runtime.yaml", "standard: docs/runtime-protocol-adapter.md");
   checkTextIncludes(root, ".arch/modules.yaml", "module_manifest_standard: docs/module-manifest.md");
+  checkTextIncludes(root, ".arch/modules.yaml", "standard: docs/player-identity-session-boundary.md");
   checkTextIncludes(root, "runtime/go.mod", "module github.com/iceiko/vibit/runtime");
   checkTextIncludes(root, "buf.yaml", "path: proto");
   checkTextIncludes(root, "buf.gen.yaml", "out: runtime/internal/generated/proto");
   checkTextIncludes(root, "README.md", "docs/reference-game-server-alignment.md");
   checkTextIncludes(root, "AGENTS.md", ".arch/reference.yaml");
+  checkTextIncludes(root, ".arch/README.md", "docs/player-identity-session-boundary.md");
   checkTextIncludes(root, ".arch/README.md", "reference.yaml");
 
   finish();
@@ -2326,7 +3195,7 @@ function checkSchemas(root) {
     } else {
       fail(`${relativeSpec} change_id does not match ${changeId}`);
     }
-    requireScalarValue(text, relativeSpec, "type", ["feature", "bugfix", "migration", "refactor", "standard", "docs", "tooling"]);
+    requireScalarValue(text, relativeSpec, "type", ["feature", "bugfix", "migration", "refactor", "standard", "contract", "protocol", "docs", "tooling"]);
     requireScalarValue(text, relativeSpec, "status", ["draft", "active", "verified", "accepted", "deprecated"]);
     const verificationStatus = firstScalar(sectionBody(text, "verification").join("\n"), "status");
     if (verificationStatus && ["Verified", "Not verified", "Not applicable"].includes(verificationStatus)) {
@@ -2454,7 +3323,7 @@ function checkContractSource(root, moduleName, contractType, expectedKind, entry
     });
     return;
   }
-  if (!entry.path.startsWith(`contracts/${moduleName}/`)) {
+  if (!pathStartsWith(entry.path, `contracts/${moduleName}/`)) {
     fail(`${entry.path} is outside contracts/${moduleName}/`, {
       rule_id: "contract.registry_entry",
       artifact: entry.path,
@@ -2575,6 +3444,239 @@ function checkContractSource(root, moduleName, contractType, expectedKind, entry
   }
 }
 
+function runtimeContractFamilyBlock(registry, familyName) {
+  const lines = registry.split(/\r?\n/);
+  const familyIndex = lines.findIndex((line) => line.trim() === `${familyName}:`);
+  if (familyIndex === -1) {
+    return "";
+  }
+
+  const familyMatch = lines[familyIndex].match(/^(\s*)/);
+  const familyIndent = familyMatch ? familyMatch[1].length : 0;
+  const block = [lines[familyIndex]];
+
+  for (let i = familyIndex + 1; i < lines.length; i += 1) {
+    const line = lines[i];
+    if (!line.trim()) {
+      block.push(line);
+      continue;
+    }
+    const keyMatch = line.match(/^(\s*)([A-Za-z0-9_-]+):/);
+    if (keyMatch && keyMatch[1].length <= familyIndent) {
+      break;
+    }
+    block.push(line);
+  }
+
+  return block.join("\n");
+}
+
+function checkRuntimeContractSource(root, familyName, contractType, expectedKind, entry, expectedOwner, familyBlock) {
+  const artifact = entry.path || `runtime:${familyName}:${contractType}:${entry.id || "missing-id"}`;
+  if (!entry.id) {
+    fail(`${artifact} runtime contract entry is missing id`, {
+      rule_id: "contract.registry_entry",
+      artifact,
+    });
+    return;
+  }
+  if (!entry.path) {
+    fail(`runtime ${familyName} ${contractType} ${entry.id} contract entry is missing path`, {
+      rule_id: "contract.registry_entry",
+      artifact,
+    });
+    return;
+  }
+  const expectedPrefix = `contracts/runtime/${familyName}/`;
+  if (!pathStartsWith(entry.path, expectedPrefix)) {
+    fail(`${entry.path} is outside ${expectedPrefix}`, {
+      rule_id: "contract.registry_entry",
+      artifact: entry.path,
+    });
+  } else {
+    ok(`${entry.path} is under ${expectedPrefix}`, {
+      rule_id: "contract.registry_entry",
+      artifact: entry.path,
+    });
+  }
+  if (isFile(root, entry.path)) {
+    ok(`${entry.path} exists`, {
+      rule_id: "contract.source_exists",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} is missing`, {
+      rule_id: "contract.source_exists",
+      artifact: entry.path,
+    });
+    return;
+  }
+
+  const text = readText(path.join(root, entry.path));
+  const schemaVersion = firstScalar(text, "schema_version");
+  if (schemaVersion === "0.1") {
+    ok(`${entry.path} declares schema_version: 0.1`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} is missing schema_version: 0.1`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  }
+  const kind = firstScalar(text, "kind");
+  if (kind === expectedKind) {
+    ok(`${entry.path} kind is ${expectedKind}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} kind does not match ${expectedKind}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const module = firstScalar(text, "module");
+  if (module === "runtime") {
+    ok(`${entry.path} module is runtime`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} module does not match runtime`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const family = firstScalar(text, "family");
+  if (family === familyName) {
+    ok(`${entry.path} family is ${familyName}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} family does not match ${familyName}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const owner = firstScalar(text, "owner");
+  if (owner === expectedOwner) {
+    ok(`${entry.path} owner is ${expectedOwner}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} owner does not match ${expectedOwner}`, {
+      rule_id: "contract.source_match",
+      artifact: entry.path,
+    });
+  }
+  const status = firstScalar(text, "status");
+  if (["draft", "active", "deprecated"].includes(status)) {
+    ok(`${entry.path} status is ${status}`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  } else {
+    fail(`${entry.path} status is invalid or missing`, {
+      rule_id: "contract.source_field",
+      artifact: entry.path,
+    });
+  }
+
+  if (["commands", "queries", "events"].includes(contractType)) {
+    const name = firstScalar(text, "name");
+    if (name === entry.id) {
+      ok(`${entry.path} name matches registry id ${entry.id}`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    } else {
+      fail(`${entry.path} name does not match registry id ${entry.id}`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    }
+  }
+
+  if (familyBlock.includes(entry.path)) {
+    ok(`runtime ${familyName} registry references ${entry.path}`, {
+      rule_id: "contract.source_match",
+      artifact: ".arch/contracts.yaml",
+    });
+  } else {
+    fail(`runtime ${familyName} registry does not reference ${entry.path}`, {
+      rule_id: "contract.source_match",
+      artifact: ".arch/contracts.yaml",
+    });
+  }
+}
+
+function checkRuntimeSessionValidationContracts(root, registry, contractTypes) {
+  const familyName = "session";
+  const registryPath = ".arch/contracts.yaml";
+  const familyBlock = runtimeContractFamilyBlock(registry, "session_validation");
+  if (!familyBlock) {
+    fail(`${registryPath} does not register runtime session_validation contracts`, {
+      rule_id: "contract.registry_entry",
+      artifact: registryPath,
+    });
+    return;
+  }
+
+  for (const marker of [
+    "status: semantic_contracts_ratified_metadata_only_runtime_hook_no_authentication",
+    "owner: runtime/internal/app",
+    "metadata_only_validator_exists: true",
+    "real_authentication_implemented: false",
+    "token_behavior_implemented: false",
+    "credential_storage_implemented: false",
+    "session_persistence_implemented: false",
+    "websocket_handshake_authentication_changed: false",
+    "protobuf_envelope_changed: false",
+  ]) {
+    if (familyBlock.includes(marker)) {
+      ok(`${registryPath} runtime session_validation preserves marker ${marker}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+    } else {
+      fail(`${registryPath} runtime session_validation is missing marker ${marker}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+    }
+  }
+
+  for (const [contractType, expectedKind] of contractTypes) {
+    const entries = parseContractEntries(familyBlock, "session_validation", contractType);
+    if (contractType === "queries" && entries.length === 0) {
+      ok(`${registryPath} records no runtime session_validation queries`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+      continue;
+    }
+    if (entries.length > 0) {
+      ok(`${registryPath} registers runtime session_validation ${contractType}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+    } else {
+      fail(`${registryPath} has no runtime session_validation ${contractType}`, {
+        rule_id: "contract.registry_entry",
+        artifact: registryPath,
+      });
+      continue;
+    }
+    for (const entry of entries) {
+      checkRuntimeContractSource(root, familyName, contractType, expectedKind, entry, "runtime/internal/app", familyBlock);
+    }
+  }
+}
+
 function checkContracts(root) {
   resetResults("check contracts");
   if (!jsonOutput) {
@@ -2651,6 +3753,7 @@ function checkContracts(root) {
     const moduleManifest = isFile(root, moduleManifestPath)
       ? readText(path.join(root, moduleManifestPath))
       : "";
+    const boundaryOnlyContracts = isBoundaryOnlyContractModule(registry, moduleName, moduleManifest);
 
     if (registry.includes(`  ${moduleName}:`)) {
       ok(`${registryPath} registers module ${moduleName}`, {
@@ -2672,6 +3775,11 @@ function checkContracts(root) {
           rule_id: "contract.registry_entry",
           artifact: registryPath,
         });
+      } else if (boundaryOnlyContracts) {
+        ok(`${registryPath} records ${moduleName} ${contractType} as boundary-only with no public contracts yet`, {
+          rule_id: "contract.boundary_only",
+          artifact: registryPath,
+        });
       } else {
         fail(`${registryPath} has no ${moduleName} ${contractType}`, {
           rule_id: "contract.registry_entry",
@@ -2683,6 +3791,8 @@ function checkContracts(root) {
       }
     }
   }
+
+  checkRuntimeSessionValidationContracts(root, registry, contractTypes);
 
   finish();
 }
@@ -2718,6 +3828,9 @@ function checkProtocolFrameworkManifest(root) {
     "kind_module_name_dispatch",
     "server_authoritative: true",
     "module_package_pattern: vibit.<module>.v1",
+    "player_identity_and_session_boundary: ADR-0021",
+    "standard: docs/player-identity-session-boundary.md",
+    "client-supplied player_id or session_id",
     "check_command: node tools/vibit check protocol",
   ];
   for (const reference of requiredReferences) {
@@ -2848,6 +3961,21 @@ function checkProtocol(root) {
   const contractTypes = ["commands", "queries", "events"];
   let expectedMessages = 0;
   for (const moduleName of discoverRegisteredModules(root)) {
+    const moduleManifestPath = `modules/${moduleName}/module.yaml`;
+    const moduleManifest = isFile(root, moduleManifestPath)
+      ? readText(path.join(root, moduleManifestPath))
+      : "";
+    const boundaryOnlyContracts = isBoundaryOnlyContractModule(registry, moduleName, moduleManifest);
+    const hasProtocolContracts = contractTypes
+      .some((contractType) => parseContractEntries(registry, moduleName, contractType).length > 0);
+    if (boundaryOnlyContracts && !hasProtocolContracts) {
+      ok(`${moduleName} is boundary-only with no Protobuf source required yet`, {
+        rule_id: "contract.boundary_only",
+        artifact: moduleManifestPath,
+      });
+      continue;
+    }
+
     const protoPath = protoSourcePathForModule(moduleName);
     const packageName = protoPackageForModule(moduleName);
     if (isDirectory(root, `proto/vibit/${moduleName}/v1`)) {
@@ -3082,8 +4210,284 @@ function checkGenerated(root) {
   }
 
   checkGeneratedProtoOutput(root);
+  checkGeneratedContractShapeOutput(root);
 
   finish();
+}
+
+function checkTranslationPair(root, englishPath, chinesePath) {
+  if (isFile(root, englishPath) && isFile(root, chinesePath)) {
+    ok(`${englishPath} has Simplified Chinese translation ${chinesePath}`, {
+      rule_id: "docs.translation_pair",
+      artifact: englishPath,
+    });
+    return;
+  }
+  if (isFile(root, englishPath) && !isFile(root, chinesePath)) {
+    fail(`${englishPath} is missing Simplified Chinese translation ${chinesePath}`, {
+      rule_id: "docs.translation_pair",
+      artifact: englishPath,
+    });
+  }
+}
+
+function checkAgentTooling(root) {
+  resetResults("check agent-tooling");
+  if (!jsonOutput) {
+    console.log(`Checking agent-native tooling in ${root}\n`);
+  }
+
+  requireFiles(root, [
+    "docs/agent-tooling.md",
+    "docs/agent-tooling.zh-CN.md",
+  ]);
+
+  for (const [relativePath, requiredText] of [
+    ["docs/agent-tooling.md", "node tools/vibit inspect contracts --json"],
+    ["docs/agent-tooling.md", "node tools/vibit inspect generated --json"],
+    ["docs/agent-tooling.md", "node tools/vibit inspect contracts --type command --json"],
+    ["docs/agent-tooling.md", "node tools/vibit inspect generated --module inventory --json"],
+    ["docs/agent-tooling.md", "node tools/vibit inspect next --json"],
+    ["docs/agent-tooling.md", "node tools/vibit inspect reference --json"],
+    ["docs/agent-tooling.md", "node tools/vibit generate contract-shapes all"],
+    ["docs/agent-tooling.md", "forward-slash form"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect contracts --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect generated --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect contracts --type command --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect generated --module inventory --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect next --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit inspect reference --json"],
+    ["docs/agent-tooling.zh-CN.md", "node tools/vibit generate contract-shapes all"],
+    ["docs/agent-tooling.zh-CN.md", "forward-slash form"],
+    [".arch/conventions.yaml", "agent_tooling_standard:"],
+    [".arch/conventions.yaml", "Repository-relative paths in JSON tooling output use forward slashes"],
+    [".arch/runtime.yaml", "tooling_runtime:"],
+    [".arch/reference.yaml", "agent_native_maintainability"],
+    ["AGENTS.md", "node tools/vibit inspect work"],
+    ["AGENTS.md", "including Windows"],
+    ["AGENTS.zh-CN.md", "包括 Windows"],
+  ]) {
+    checkRequiredText(root, relativePath, requiredText, "agent_tooling.standard", requiredText);
+  }
+
+  for (const doc of fs.readdirSync(path.join(root, "docs")).sort()) {
+    if (!doc.endsWith(".md") || doc.endsWith(".zh-CN.md")) {
+      continue;
+    }
+    checkTranslationPair(root, `docs/${doc}`, `docs/${doc.replace(/\.md$/, ".zh-CN.md")}`);
+  }
+
+  finish();
+}
+
+function generatedContractShapeRootForModule(moduleName) {
+  return `runtime/internal/generated/contracts/${moduleName}`;
+}
+
+function generatedContractShapePath(entry) {
+  return `${generatedContractShapeRootForModule(entry.module)}/${entry.normalized_type}/${entry.id}.go`;
+}
+
+function goIdentifier(value) {
+  return String(value || "")
+    .replace(/[^A-Za-z0-9_]/g, "_")
+    .replace(/^[^A-Za-z_]+/, "")
+    || "Value";
+}
+
+function goStringSlice(values) {
+  if (!values || values.length === 0) {
+    return "nil";
+  }
+  return `[]string{${values.map((value) => JSON.stringify(value)).join(", ")}}`;
+}
+
+function renderContractShape(root, entry) {
+  const sourceText = entry.path && isFile(root, entry.path) ? readText(path.join(root, entry.path)) : "";
+  const packageName = `${entry.module}contracts`;
+  const variableName = `${goIdentifier(entry.id)}Contract`;
+  const typeName = `${goIdentifier(entry.id)}ContractShape`;
+  const status = sourceText ? firstScalar(sourceText, "status") || "" : "";
+  const summary = sourceText ? firstScalar(sourceText, "summary") || "" : "";
+  const permission = sourceText ? firstScalar(sourceText, "permission") || "" : "";
+  const version = sourceText ? firstScalar(sourceText, "version") || "" : "";
+  const errors = entry.normalized_type === "errors"
+    ? listItemFieldAfterKey(sourceText, "errors", "code")
+    : listAfterKey(sourceText, "errors");
+  const permissions = entry.normalized_type === "permissions"
+    ? listItemFieldAfterKey(sourceText, "permissions", "id")
+    : [];
+  const emits = listAfterKey(sourceText, "emits");
+  const invariants = listAfterKey(sourceText, "invariants");
+  const generatedOutputs = listAfterPath(sourceText, ["implementation", "generated_outputs"]);
+
+  return `// Code generated by vibit generate contract-shapes. DO NOT EDIT.
+// Source: ${entry.path}
+// Generator: tools/vibit generate contract-shapes
+// Contract: ${entry.module}:${entry.type}:${entry.id}
+
+package ${packageName}
+
+// ${typeName} is a generated, inspectable summary of a vibit semantic contract.
+type ${typeName} struct {
+\tModule           string
+\tFamily           string
+\tType             string
+\tID               string
+\tKind             string
+\tStatus           string
+\tSummary          string
+\tSource           string
+\tPermission       string
+\tVersion          string
+\tEmits            []string
+\tErrors           []string
+\tPermissions      []string
+\tInvariants       []string
+\tGeneratedOutputs []string
+}
+
+// ${variableName} traces the semantic contract source into Go without adding runtime behavior.
+var ${variableName} = ${typeName}{
+\tModule:           ${JSON.stringify(entry.module)},
+\tFamily:           ${JSON.stringify(entry.family || "")},
+\tType:             ${JSON.stringify(entry.type)},
+\tID:               ${JSON.stringify(entry.id)},
+\tKind:             ${JSON.stringify(entry.kind)},
+\tStatus:           ${JSON.stringify(status)},
+\tSummary:          ${JSON.stringify(summary)},
+\tSource:           ${JSON.stringify(entry.path || "")},
+\tPermission:       ${JSON.stringify(permission)},
+\tVersion:          ${JSON.stringify(version)},
+\tEmits:            ${goStringSlice(emits)},
+\tErrors:           ${goStringSlice(errors)},
+\tPermissions:      ${goStringSlice(permissions)},
+\tInvariants:       ${goStringSlice(invariants)},
+\tGeneratedOutputs: ${goStringSlice(generatedOutputs)},
+}
+`;
+}
+
+function writeGeneratedContractShape(root, entry) {
+  const outputPath = generatedContractShapePath(entry);
+  const target = path.join(root, outputPath);
+  fs.mkdirSync(path.dirname(target), { recursive: true });
+  const content = renderContractShape(root, entry);
+  const existed = fs.existsSync(target);
+  const previous = existed ? readText(target) : null;
+  if (previous !== content) {
+    fs.writeFileSync(target, content, "utf8");
+  }
+  return {
+    path: outputPath,
+    status: !existed ? "created" : previous === content ? "unchanged" : "updated",
+  };
+}
+
+function checkGeneratedContractShapeOutput(root) {
+  const generatedRoot = "runtime/internal/generated/contracts";
+  if (isDirectory(root, generatedRoot)) {
+    ok(`${generatedRoot}/ exists`, {
+      rule_id: "generated.root",
+      artifact: generatedRoot,
+    });
+  } else {
+    fail(`${generatedRoot}/ is missing`, {
+      rule_id: "generated.root",
+      artifact: generatedRoot,
+    });
+    return;
+  }
+
+  const entries = discoverContractRegistryEntries(root)
+    .filter((entry) => entry.module !== "runtime")
+    .filter((entry) => ["commands", "queries", "events", "errors", "permissions"].includes(entry.normalized_type));
+  const expectedPaths = new Set(entries.map((entry) => generatedContractShapePath(entry)));
+
+  for (const entry of entries) {
+    const outputPath = generatedContractShapePath(entry);
+    if (!isFile(root, outputPath)) {
+      fail(`${outputPath} is missing for ${entry.module}:${entry.id}`, {
+        rule_id: "generated.contract_shape",
+        artifact: outputPath,
+      });
+      continue;
+    }
+
+    ok(`${outputPath} exists`, {
+      rule_id: "generated.contract_shape",
+      artifact: outputPath,
+    });
+
+    const text = readText(path.join(root, outputPath));
+    for (const marker of [
+      "Code generated by vibit generate contract-shapes. DO NOT EDIT.",
+      `Source: ${entry.path}`,
+      "Generator: tools/vibit generate contract-shapes",
+      `Contract: ${entry.module}:${entry.type}:${entry.id}`,
+    ]) {
+      if (text.includes(marker)) {
+        ok(`${outputPath} references ${marker}`, {
+          rule_id: "generated.trace",
+          artifact: outputPath,
+        });
+      } else {
+        fail(`${outputPath} does not reference ${marker}`, {
+          rule_id: "generated.trace",
+          artifact: outputPath,
+        });
+      }
+    }
+
+    const expectedContent = renderContractShape(root, entry);
+    if (text === expectedContent) {
+      ok(`${outputPath} is reproducible from ${entry.path}`, {
+        rule_id: "generated.drift",
+        artifact: outputPath,
+      });
+    } else {
+      fail(`${outputPath} differs from generated output for ${entry.path}`, {
+        rule_id: "generated.drift",
+        artifact: outputPath,
+      });
+    }
+  }
+
+  const files = discoverFilesUnder(root, generatedRoot)
+    .filter((file) => path.basename(file) !== ".gitkeep");
+  for (const file of files) {
+    if (!file.endsWith(".go")) {
+      fail(`${file} is not an allowed generated contract shape file`, {
+        rule_id: "generated.file_shape",
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    if (text.includes("Code generated by vibit generate contract-shapes. DO NOT EDIT.")) {
+      ok(`${file} declares vibit contract-shapes generated marker`, {
+        rule_id: "generated.trace",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing vibit contract-shapes generated marker`, {
+        rule_id: "generated.handwritten_forbidden",
+        artifact: file,
+      });
+    }
+
+    if (expectedPaths.has(file)) {
+      ok(`${file} is registered generated contract shape output`, {
+        rule_id: "generated.contract_shape",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is stale generated contract shape output with no registered semantic contract`, {
+        rule_id: "generated.drift",
+        artifact: file,
+      });
+    }
+  }
 }
 
 function discoverFilesUnder(root, relativeDir) {
@@ -3234,6 +4638,13 @@ function checkMigrationManifestReferences(root) {
     ["docs/postgresql-persistence-boundary.zh-CN.md", "-- +goose Up"],
     ["docs/postgresql-persistence-boundary.zh-CN.md", "-- +goose Down"],
     ["modules/inventory/module.yaml", "runtime/migrations/postgres/000001_create_inventory_state.sql"],
+    [".arch/runtime.yaml", "planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql"],
+    [".arch/conventions.yaml", "planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql"],
+    ["modules/player/module.yaml", "planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql"],
+    ["docs/postgresql-persistence-boundary.md", "player_accounts"],
+    ["docs/postgresql-persistence-boundary.md", "player_account_events"],
+    ["docs/postgresql-persistence-boundary.zh-CN.md", "player_accounts"],
+    ["docs/postgresql-persistence-boundary.zh-CN.md", "player_account_events"],
     ["runtime/AGENTS.md", "node ../tools/vibit check migrations"],
     ["runtime/AGENTS.zh-CN.md", "node ../tools/vibit check migrations"],
   ];
@@ -3388,6 +4799,134 @@ function checkMigrations(root) {
     }
   }
 
+  const playerAccountMigration = `${migrationRoot}/000002_create_player_account_state.sql`;
+  if (isFile(root, playerAccountMigration)) {
+    const text = readText(path.join(root, playerAccountMigration));
+    if (playerAccountPostgresSchemaIsRatified(root)) {
+      ok(`${playerAccountMigration} exists after player account schema ratification`, {
+        rule_id: "migration.root",
+        artifact: playerAccountMigration,
+      });
+    } else {
+      fail(`${playerAccountMigration} exists before player account schema ratification`, {
+        rule_id: "migration.root",
+        artifact: playerAccountMigration,
+      });
+    }
+    const requiredTables = [
+      "player_accounts",
+      "player_account_events",
+    ];
+    for (const table of requiredTables) {
+      if (text.includes(table)) {
+        ok(`${playerAccountMigration} references ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      } else {
+        fail(`${playerAccountMigration} does not reference ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      }
+    }
+    const requiredMarkers = [
+      "-- +goose Up",
+      "-- Module: player",
+      "-- +goose Down",
+      "PlayerAccountCreated",
+    ];
+    const requiredColumns = [
+      "player_id",
+      "display_name",
+      "account_state",
+      "created_at",
+      "updated_at",
+      "disabled_at",
+      "deleted_at",
+      "event_id",
+      "event_type",
+      "occurred_at",
+      "requested_by",
+      "metadata",
+      "recorded_at",
+    ];
+    const requiredIndexes = [
+      "player_accounts_account_state_idx",
+      "player_account_events_player_occurred_at_idx",
+      "player_account_events_event_type_occurred_at_idx",
+    ];
+    const forbiddenPatterns = [
+      { pattern: /\bcredential(s)?\b/i, label: "credentials" },
+      { pattern: /\bpassword(_hash|s|)?\b/i, label: "password storage" },
+      { pattern: /\bauthentication_provider\b/i, label: "authentication provider storage" },
+      { pattern: /\bexternal_identity\b/i, label: "external identity links" },
+      { pattern: /\baccess_token\b/i, label: "access tokens" },
+      { pattern: /\brefresh_token\b/i, label: "refresh tokens" },
+      { pattern: /\bsession(s|_id|_token)?\b/i, label: "runtime sessions" },
+      { pattern: /\bwebsocket\b/i, label: "WebSocket state" },
+      { pattern: /\binventory_(accounts|items|item_grants)\b/i, label: "inventory state" },
+      { pattern: /\bpermission(_grant|s|s_grant)?\b/i, label: "permission grants" },
+    ];
+    for (const marker of requiredMarkers) {
+      if (text.includes(marker)) {
+        ok(`${playerAccountMigration} includes ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: playerAccountMigration,
+        });
+      } else {
+        fail(`${playerAccountMigration} is missing ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: playerAccountMigration,
+        });
+      }
+    }
+    for (const column of requiredColumns) {
+      if (text.includes(column)) {
+        ok(`${playerAccountMigration} references ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      } else {
+        fail(`${playerAccountMigration} does not reference ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      }
+    }
+    for (const indexName of requiredIndexes) {
+      if (text.includes(indexName)) {
+        ok(`${playerAccountMigration} declares ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      } else {
+        fail(`${playerAccountMigration} does not declare ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      }
+    }
+    for (const { pattern, label } of forbiddenPatterns) {
+      if (pattern.test(text)) {
+        fail(`${playerAccountMigration} includes ${label}, which is outside the ratified lifecycle schema`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      } else {
+        ok(`${playerAccountMigration} does not include ${label}`, {
+          rule_id: "migration.ownership",
+          artifact: playerAccountMigration,
+        });
+      }
+    }
+  } else if (playerAccountPostgresSchemaIsRatified(root)) {
+    ok(`${playerAccountMigration} is not added yet; W-0051 remains the migration-source step`, {
+      rule_id: "migration.root",
+      artifact: playerAccountMigration,
+    });
+  }
+
   finish({
     summary_counts: {
       migration_files: files.length,
@@ -3426,7 +4965,7 @@ function checkPostgresEnv(root) {
     [".arch/conventions.yaml", "standard: docs/postgresql-verification-environment.md"],
     [".arch/conventions.yaml", "translation: docs/postgresql-verification-environment.zh-CN.md"],
     [".arch/conventions.yaml", "check_command: node tools/vibit check postgres-env"],
-    [".arch/conventions.yaml", "live_postgresql_integration_status: opt_in_test_created_live_execution_skipped_without_dsn"],
+    [".arch/conventions.yaml", "live_postgresql_integration_status:"],
     [".arch/conventions.yaml", "opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go"],
     [".arch/runtime.yaml", "verification_environment:"],
     [".arch/runtime.yaml", "standard: docs/postgresql-verification-environment.md"],
@@ -3445,6 +4984,25 @@ function checkPostgresEnv(root) {
   ];
   for (const [relativePath, requiredText] of requiredReferences) {
     checkRequiredText(root, relativePath, requiredText, "postgres_env.standard", requiredText);
+  }
+
+  const conventionsPath = ".arch/conventions.yaml";
+  const conventionsText = readText(path.join(root, conventionsPath));
+  const liveIntegrationStatus = firstScalar(conventionsText, "live_postgresql_integration_status");
+  const allowedLiveIntegrationStatuses = new Set([
+    "opt_in_test_created_live_execution_skipped_without_dsn",
+    "opt_in_test_created_live_execution_verified",
+  ]);
+  if (allowedLiveIntegrationStatuses.has(liveIntegrationStatus)) {
+    ok(`${conventionsPath} live_postgresql_integration_status is ${liveIntegrationStatus}`, {
+      rule_id: "postgres_env.standard",
+      artifact: conventionsPath,
+    });
+  } else {
+    fail(`${conventionsPath} live_postgresql_integration_status is invalid or missing`, {
+      rule_id: "postgres_env.standard",
+      artifact: conventionsPath,
+    });
   }
 
   const standardReferences = [
@@ -3556,7 +5114,7 @@ function checkRuntimeImportBoundaries(root, goFiles) {
       if (!text.includes(`"${rule.importPath}`)) {
         continue;
       }
-      const allowed = rule.allowedPrefixes.some((prefix) => file.startsWith(prefix));
+      const allowed = rule.allowedPrefixes.some((prefix) => pathStartsWith(file, prefix));
       if (allowed) {
         ok(`${file} imports ${rule.description} inside allowed boundary`, {
           rule_id: "runtime.import_boundary",
@@ -3570,6 +5128,764 @@ function checkRuntimeImportBoundaries(root, goFiles) {
       }
     }
   }
+}
+
+function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
+  const runtimeModuleRoot = "runtime/internal/modules/";
+  const wsTransportRoot = "runtime/internal/platform/transport/ws/";
+  const runtimePlayerRoot = "runtime/internal/modules/player/";
+  const protoPlayerRoot = "proto/vibit/player/";
+  const playerModuleManifestPath = "modules/player/module.yaml";
+
+  const wsForbiddenImports = [
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/modules/",
+      allowedImportPaths: [],
+      description: "domain module package",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/modules/player",
+      description: "player runtime package",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/modules/inventory",
+      description: "inventory runtime package",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/generated/proto",
+      description: "generated Protobuf package",
+    },
+    {
+      importPath: "google.golang.org/protobuf",
+      description: "Protobuf runtime dependency",
+    },
+  ];
+
+  const domainForbiddenImports = [
+    {
+      importPath: "github.com/coder/websocket",
+      description: "WebSocket dependency",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/platform/transport/ws",
+      description: "WebSocket transport package",
+    },
+    {
+      importPath: "github.com/iceiko/vibit/runtime/internal/generated/proto",
+      description: "generated Protobuf package",
+    },
+    {
+      importPath: "google.golang.org/protobuf",
+      description: "Protobuf runtime dependency",
+    },
+  ];
+
+  const authDependencyMarkers = [
+    { marker: "github.com/golang-jwt/", description: "JWT dependency" },
+    { marker: "github.com/coreos/go-oidc", description: "OIDC dependency" },
+    { marker: "golang.org/x/oauth2", description: "OAuth dependency" },
+    { marker: "golang.org/x/crypto/bcrypt", description: "password hashing dependency" },
+    { marker: "golang.org/x/crypto/argon2", description: "password hashing dependency" },
+  ];
+
+  const authVocabularyPatterns = [
+    { pattern: /\bauthentication provider\b/i, description: "authentication provider dependency" },
+    { pattern: /\bjwt\b/i, description: "token dependency" },
+    { pattern: /\boauth\b/i, description: "OAuth dependency" },
+    { pattern: /\boidc\b/i, description: "OIDC dependency" },
+    { pattern: /\bcredential\b/i, description: "credential dependency" },
+    { pattern: /\bpassword\b/i, description: "password dependency" },
+  ];
+
+  for (const file of goFiles) {
+    const text = readText(path.join(root, file));
+
+    if (pathStartsWith(file, wsTransportRoot)) {
+      for (const rule of wsForbiddenImports) {
+        const forbiddenImports = importsWithPrefix(text, rule.importPath);
+        const allowedImports = rule.allowedImportPaths || [];
+        const violations = forbiddenImports.filter((importPath) => {
+          return !allowedImports.some((allowedImport) => {
+            return importPath === allowedImport || importPath.startsWith(`${allowedImport}/`);
+          });
+        });
+        if (violations.length > 0) {
+          fail(`${file} violates metadata-only identity boundary: WebSocket transport imports ${rule.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        } else {
+          ok(`${file} respects metadata-only identity boundary: WebSocket transport avoids ${rule.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        }
+      }
+    }
+
+    if (pathStartsWith(file, runtimeModuleRoot)) {
+      for (const rule of domainForbiddenImports) {
+        const forbiddenImports = importsWithPrefix(text, rule.importPath);
+        if (forbiddenImports.length > 0) {
+          fail(`${file} violates metadata-only identity boundary: domain module imports ${rule.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        } else {
+          ok(`${file} respects metadata-only identity boundary: domain module avoids ${rule.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        }
+      }
+
+      for (const marker of authDependencyMarkers) {
+        if (text.includes(`"${marker.marker}`)) {
+          fail(`${file} violates metadata-only identity boundary: domain module imports ${marker.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        } else {
+          ok(`${file} respects metadata-only identity boundary: domain module avoids ${marker.description}`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        }
+      }
+    }
+  }
+
+  if (isDirectory(root, runtimePlayerRoot)) {
+    const playerRuntimeFiles = discoverFilesUnder(root, runtimePlayerRoot);
+    const allowedPlayerRuntimeFiles = [
+      "runtime/internal/modules/player/repository.go",
+      "runtime/internal/modules/player/repository_test.go",
+    ];
+    const unexpectedPlayerRuntimeFiles = playerRuntimeFiles.filter((file) => {
+      if (file.endsWith(".gitkeep")) {
+        return false;
+      }
+      return !allowedPlayerRuntimeFiles.includes(file);
+    });
+    if (playerAccountRepositoryInterfaceIsDeclared(root)) {
+      ok("runtime player module contains only the ratified repository interface boundary", {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimePlayerRoot,
+      });
+    } else {
+      fail(`${runtimePlayerRoot} exists without a ratified player account repository interface boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimePlayerRoot,
+      });
+    }
+    for (const file of allowedPlayerRuntimeFiles) {
+      if (isFile(root, file)) {
+        ok(`${file} exists as ratified player account repository boundary source`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing from ratified player account repository boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+    if (unexpectedPlayerRuntimeFiles.length === 0) {
+      ok("runtime player module has no handlers, adapters, auth, session, protocol, or route files beyond the repository boundary", {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimePlayerRoot,
+      });
+    } else {
+      for (const file of unexpectedPlayerRuntimeFiles) {
+        fail(`${file} is outside the ratified player account repository interface boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  } else {
+    ok("runtime player module implementation remains absent until player account repository boundary or later runtime implementation is ratified", {
+      rule_id: "runtime.identity_boundary",
+      artifact: runtimePlayerRoot,
+    });
+  }
+
+  const playerAccountPostgresAdapterSource = "runtime/internal/platform/persistence/postgres/player_account_repository.go";
+  const playerAccountPostgresAdapterTest = "runtime/internal/platform/persistence/postgres/player_account_repository_test.go";
+  const playerAccountPostgresAdapterAllowedFiles = [
+    playerAccountPostgresAdapterSource,
+    playerAccountPostgresAdapterTest,
+  ];
+  const playerAccountPostgresAdapterFiles = discoverFilesUnder(root, "runtime/internal/platform/persistence/postgres")
+    .filter((file) => /player.*account|account.*player/i.test(path.basename(file)));
+  const playerAccountPostgresAdapterBoundaryDeclared = playerAccountPostgresAdapterBoundaryIsDeclared(root);
+  const playerAccountPostgresAdapterImplemented = playerAccountPostgresAdapterIsImplemented(root);
+
+  if (playerAccountPostgresAdapterBoundaryDeclared) {
+    ok("player account PostgreSQL adapter boundary is declared before adapter implementation", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "docs/postgresql-persistence-boundary.md",
+    });
+    ok("player account PostgreSQL adapter is restricted to the PostgreSQL platform package", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (playerAccountRepositoryInterfaceIsDeclared(root)) {
+    fail("player account repository interface exists without a declared PostgreSQL adapter boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "docs/postgresql-persistence-boundary.md",
+    });
+  }
+
+  if (playerAccountPostgresAdapterImplemented) {
+    ok("player account PostgreSQL adapter implementation matches the declared boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: playerAccountPostgresAdapterSource,
+    });
+  } else if (playerAccountPostgresAdapterBoundaryDeclared
+    && isFile(root, playerAccountPostgresAdapterSource)
+    && isFile(root, playerAccountPostgresAdapterTest)) {
+    fail("player account PostgreSQL adapter files exist but do not satisfy the implemented adapter boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: playerAccountPostgresAdapterSource,
+    });
+  }
+
+  if (playerAccountPostgresAdapterImplemented) {
+    for (const file of playerAccountPostgresAdapterAllowedFiles) {
+      if (isFile(root, file)) {
+        ok(`${file} exists as implemented player account PostgreSQL adapter boundary file`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing from implemented player account PostgreSQL adapter boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  for (const file of playerAccountPostgresAdapterFiles) {
+    if (!playerAccountPostgresAdapterAllowedFiles.includes(file)) {
+      fail(`${file} is outside the declared player account PostgreSQL adapter file boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    } else if (playerAccountPostgresAdapterBoundaryDeclared) {
+      ok(`${file} is inside the declared player account PostgreSQL adapter file boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} exists before the player account PostgreSQL adapter boundary is declared`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    }
+  }
+
+  for (const file of discoverFilesUnder(root, "runtime/internal").filter((item) => item.endsWith(".go"))) {
+    if (pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const importsPlayer = importsWithPrefix(text, "github.com/iceiko/vibit/runtime/internal/modules/player").length > 0;
+    const mentionsPlayerAccountPersistence = /\b(player_accounts|player_account_events|CreatePlayerAccountMutation|PlayerAccountCreated)\b/.test(text);
+    if (importsPlayer && mentionsPlayerAccountPersistence) {
+      fail(`${file} contains player account persistence behavior outside the PostgreSQL adapter boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    }
+  }
+
+  if (isDirectory(root, protoPlayerRoot)) {
+    if (playerWireContractsAreRatified(root)) {
+      ok("player Protobuf source root exists only after ratified player wire contracts", {
+        rule_id: "runtime.identity_boundary",
+        artifact: protoPlayerRoot,
+      });
+    } else {
+      fail(`${protoPlayerRoot} exists without ratified player public Protobuf contracts`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: protoPlayerRoot,
+      });
+    }
+  } else {
+    ok("player Protobuf source root remains absent until public contracts are ratified", {
+      rule_id: "runtime.identity_boundary",
+      artifact: protoPlayerRoot,
+    });
+  }
+
+  const migrations = discoverFilesUnder(root, "runtime/migrations/postgres").filter((file) => file.endsWith(".sql"));
+  const playerMigrations = migrations.filter((file) => {
+    const text = readText(path.join(root, file));
+    return /\bplayer(?:s|_account|_accounts|_identity|_identities)?\b/i.test(file) ||
+      /\bplayer(?:s|_account|_accounts|_identity|_identities)?\b/i.test(text);
+  });
+  if (playerMigrations.length > 0) {
+    if (playerAccountPostgresSchemaIsRatified(root)) {
+      ok("player account PostgreSQL schema is ratified before player migration source", {
+        rule_id: "runtime.identity_boundary",
+        artifact: "decisions/ADR-0022-player-account-postgresql-schema-boundary.md",
+      });
+      const requiredMigrationMarkers = [
+        "-- Module: player",
+        "player_accounts",
+        "player_account_events",
+        "PlayerAccountCreated",
+      ];
+      const forbiddenMigrationPatterns = [
+        { pattern: /\bcredential(s)?\b/i, label: "credentials" },
+        { pattern: /\bpassword(_hash|s|)?\b/i, label: "password storage" },
+        { pattern: /\bauthentication_provider\b/i, label: "authentication provider storage" },
+        { pattern: /\bexternal_identity\b/i, label: "external identity links" },
+        { pattern: /\baccess_token\b/i, label: "access tokens" },
+        { pattern: /\brefresh_token\b/i, label: "refresh tokens" },
+        { pattern: /\bsession(s|_id|_token)?\b/i, label: "runtime sessions" },
+        { pattern: /\bwebsocket\b/i, label: "WebSocket state" },
+        { pattern: /\binventory_(accounts|items|item_grants)\b/i, label: "inventory state" },
+        { pattern: /\bpermission(_grant|s|s_grant)?\b/i, label: "permission grants" },
+      ];
+      for (const file of playerMigrations) {
+        const text = readText(path.join(root, file));
+        for (const marker of requiredMigrationMarkers) {
+          if (text.includes(marker)) {
+            ok(`${file} preserves ratified player account migration marker ${marker}`, {
+              rule_id: "runtime.identity_boundary",
+              artifact: file,
+            });
+          } else {
+            fail(`${file} is missing ratified player account migration marker ${marker}`, {
+              rule_id: "runtime.identity_boundary",
+              artifact: file,
+            });
+          }
+        }
+        for (const { pattern, label } of forbiddenMigrationPatterns) {
+          if (pattern.test(text)) {
+            fail(`${file} includes ${label}, which is outside the ratified player account lifecycle schema`, {
+              rule_id: "runtime.identity_boundary",
+              artifact: file,
+            });
+          } else {
+            ok(`${file} does not include ${label}`, {
+              rule_id: "runtime.identity_boundary",
+              artifact: file,
+            });
+          }
+        }
+      }
+    } else {
+      for (const file of playerMigrations) {
+        fail(`${file} introduces player persistence before player account schema ratification`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  } else {
+    ok("PostgreSQL migrations do not introduce player identity or account persistence beyond ratified migration state", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "runtime/migrations/postgres",
+    });
+  }
+
+  if (isFile(root, playerModuleManifestPath)) {
+    const manifest = readText(path.join(root, playerModuleManifestPath));
+    const requiredMarkers = [
+      "subscribes: []",
+      "authentication_scheme_must_be_ratified_before_implementation",
+      "runtime_player_handlers_added: false",
+      "authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "session_persistence_implemented: false",
+      "player_account_persistence_implemented: false",
+      "player_account_persistence_schema_ratified: true",
+      "player_account_migration_added: true",
+      "repository_interface_added: true",
+      "postgres_adapter_boundary_defined: true",
+      "postgres_adapter_added: true",
+    ];
+    for (const marker of requiredMarkers) {
+      if (manifest.includes(marker)) {
+        ok(`${playerModuleManifestPath} preserves player identity/session boundary marker ${marker}`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: playerModuleManifestPath,
+        });
+      } else {
+        fail(`${playerModuleManifestPath} is missing player identity/session boundary marker ${marker}`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: playerModuleManifestPath,
+        });
+      }
+    }
+  } else {
+    fail(`${playerModuleManifestPath} is missing`, {
+      rule_id: "runtime.identity_boundary",
+      artifact: playerModuleManifestPath,
+    });
+  }
+
+  const contractsRegistryPath = ".arch/contracts.yaml";
+  if (isFile(root, contractsRegistryPath)) {
+    const registry = readText(path.join(root, contractsRegistryPath));
+    const requiredRegistryMarkers = [
+      "repository_interface_added: true",
+      "postgres_adapter_boundary_defined: true",
+      "postgres_adapter_added: true",
+      "runtime_player_handlers_added: false",
+    ];
+    for (const marker of requiredRegistryMarkers) {
+      if (registry.includes(marker)) {
+        ok(`${contractsRegistryPath} preserves player repository boundary marker ${marker}`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: contractsRegistryPath,
+        });
+      } else {
+        fail(`${contractsRegistryPath} is missing player repository boundary marker ${marker}`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: contractsRegistryPath,
+        });
+      }
+    }
+  }
+
+  for (const file of [
+    "runtime/go.mod",
+    "runtime/go.sum",
+  ]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of authDependencyMarkers) {
+      if (text.includes(marker.marker)) {
+        fail(`${file} declares ${marker.description} before authentication is ratified`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        ok(`${file} does not declare ${marker.description}`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  for (const relativeDir of [
+    "runtime/internal/platform",
+    "runtime/internal/modules",
+  ]) {
+    for (const file of discoverFilesUnder(root, relativeDir).filter((item) => item.endsWith(".go"))) {
+      const text = readText(path.join(root, file));
+      for (const pattern of authVocabularyPatterns) {
+        if (pattern.pattern.test(text) && !file.includes("_test.go")) {
+          warn(`${file} mentions ${pattern.description}; keep it behind an explicit ratified boundary`, {
+            rule_id: "runtime.identity_boundary",
+            artifact: file,
+          });
+        }
+      }
+    }
+  }
+}
+
+function checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles) {
+  const ruleId = "runtime.authentication_token_session_boundary";
+  const standardPath = "docs/authentication-token-session-validation.md";
+  const standardTranslationPath = "docs/authentication-token-session-validation.zh-CN.md";
+  const decisionPath = "decisions/ADR-0023-authentication-token-session-validation-design-boundary.md";
+
+  function checkNoForbiddenPatterns(files, patterns, context, options = {}) {
+    for (const file of files) {
+      if (!isFile(root, file)) {
+        continue;
+      }
+      const rawText = readText(path.join(root, file));
+      const text = options.stripComments ? sourceWithoutGoComments(rawText) : rawText;
+      const matches = textMatchesAny(text, patterns);
+      if (matches.length === 0) {
+        ok(`${file} preserves authentication/token/session boundary for ${context}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+        continue;
+      }
+      for (const match of matches) {
+        fail(`${file} crosses authentication/token/session boundary: ${context} includes ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for authentication/token/session boundary checks`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for authentication/token/session boundary checks`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "authentication_token_session_validation_design_boundary: ADR-0023"],
+    [".arch/runtime.yaml", "standard: docs/authentication-token-session-validation.md"],
+    [".arch/runtime.yaml", "boundary_check_rule: runtime.authentication_token_session_boundary"],
+    [".arch/runtime.yaml", "boundary_checks_added: true"],
+    [".arch/conventions.yaml", "authentication_token_session_validation:"],
+    [".arch/conventions.yaml", "boundary_check_rule: runtime.authentication_token_session_boundary"],
+    [".arch/conventions.yaml", "boundary_checks_added: true"],
+    [".arch/reference.yaml", "authentication_design_decision: ADR-0023"],
+    ["AGENTS.md", "docs/authentication-token-session-validation.md"],
+    ["AGENTS.md", "runtime.authentication_token_session_boundary"],
+    ["AGENTS.zh-CN.md", "docs/authentication-token-session-validation.md"],
+    ["AGENTS.zh-CN.md", "runtime.authentication_token_session_boundary"],
+    ["runtime/AGENTS.md", "../docs/authentication-token-session-validation.md"],
+    ["runtime/AGENTS.md", "runtime.authentication_token_session_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/authentication-token-session-validation.md"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authentication_token_session_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "metadata_only"],
+    [standardPath, "not authenticated proof"],
+    [standardPath, "No token format is ratified"],
+    [standardPath, "Credential storage is not ratified"],
+    [standardPath, "WebSocket handshake authentication is not ratified"],
+    [standardPath, "runtime.authentication_token_session_boundary"],
+    [standardTranslationPath, "metadata_only"],
+    [standardTranslationPath, "不是 authenticated proof"],
+    [standardTranslationPath, "本标准不 ratify 任何 token format"],
+    [standardTranslationPath, "本标准不 ratify credential storage"],
+    [standardTranslationPath, "本标准不 ratify WebSocket handshake authentication"],
+    [standardTranslationPath, "runtime.authentication_token_session_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/conventions.yaml": [
+      "production_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "external_identity_linking_implemented: false",
+      "session_persistence_implemented: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+    ],
+    ".arch/runtime.yaml": [
+      "authentication_implemented: false",
+      "real_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "external_identity_linking_implemented: false",
+      "session_persistence_implemented: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "real_authentication_implemented: false",
+      "authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "session_persistence_implemented: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+      "runtime_player_handlers_added: false",
+    ],
+    "modules/player/module.yaml": [
+      "authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "session_persistence_implemented: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing authentication/token/session implementation status markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves status marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing status marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  for (const [relativePath, requiredText] of [
+    ["runtime/internal/app/session_validation.go", "MetadataOnlySessionValidator"],
+    ["runtime/internal/app/session_validation.go", "Reason:   \"metadata_only\""],
+    ["runtime/internal/app/handoff.go", "IdentityValidationMetadataOnly IdentityValidationStatus = \"metadata_only\""],
+    ["runtime/internal/app/handoff.go", "PlayerIDValidated bool"],
+    ["runtime/internal/app/handoff.go", "SessionValidated  bool"],
+    ["runtime/internal/platform/protocol/protobuf/envelope.go", "MetadataOnlyIdentityFromSession"],
+  ]) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const authDependencyMarkers = [
+    { marker: "github.com/golang-jwt/", label: "JWT dependency" },
+    { marker: "github.com/coreos/go-oidc", label: "OIDC dependency" },
+    { marker: "golang.org/x/oauth2", label: "OAuth dependency" },
+    { marker: "golang.org/x/crypto/bcrypt", label: "password hashing dependency" },
+    { marker: "golang.org/x/crypto/argon2", label: "password hashing dependency" },
+  ];
+  for (const file of ["runtime/go.mod", "runtime/go.sum"]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of authDependencyMarkers) {
+      if (text.includes(marker.marker)) {
+        fail(`${file} declares ${marker.label} before authentication/token/session design is ratified for implementation`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        ok(`${file} avoids ${marker.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const protoForbiddenPatterns = [
+    { pattern: /\baccess_token\b/i, label: "access_token field" },
+    { pattern: /\brefresh_token\b/i, label: "refresh_token field" },
+    { pattern: /\bcredential(s)?\b/i, label: "credential field" },
+    { pattern: /\bpassword(_hash)?\b/i, label: "password field" },
+    { pattern: /\bexternal_identity\b/i, label: "external_identity field" },
+    { pattern: /\bprovider_subject\b/i, label: "provider_subject field" },
+    { pattern: /\bjwt\b/i, label: "JWT field or vocabulary" },
+    { pattern: /\boauth\b/i, label: "OAuth field or vocabulary" },
+    { pattern: /\boidc\b/i, label: "OIDC field or vocabulary" },
+    { pattern: /\bauthentication_result\b/i, label: "authentication_result field" },
+    { pattern: /\bvalidation_result\b/i, label: "validation_result field" },
+  ];
+  const protoFiles = discoverFilesUnder(root, "proto").filter((file) => file.endsWith(".proto"));
+  checkNoForbiddenPatterns(protoFiles, protoForbiddenPatterns, "Protobuf sources before auth/envelope ratification", { stripComments: true });
+
+  const generatedProtoForbiddenPatterns = [
+    ...protoForbiddenPatterns,
+    { pattern: /\bAccessToken\b/, label: "AccessToken generated field" },
+    { pattern: /\bRefreshToken\b/, label: "RefreshToken generated field" },
+    { pattern: /\bCredential(s)?\b/, label: "Credential generated field" },
+    { pattern: /\bPassword(Hash)?\b/, label: "Password generated field" },
+    { pattern: /\bExternalIdentity\b/, label: "ExternalIdentity generated field" },
+    { pattern: /\bProviderSubject\b/, label: "ProviderSubject generated field" },
+    { pattern: /\b(AuthenticationResult|ValidationResult)\b/, label: "auth validation generated result field" },
+  ];
+  const generatedProtoFiles = discoverFilesUnder(root, "runtime/internal/generated/proto")
+    .filter((file) => file.endsWith(".go"));
+  checkNoForbiddenPatterns(generatedProtoFiles, generatedProtoForbiddenPatterns, "generated Protobuf output before auth/envelope ratification");
+
+  const wsForbiddenPatterns = [
+    { pattern: /\bAuthorization\b/, label: "Authorization header handling" },
+    { pattern: /\bBearer\b/, label: "Bearer token handling" },
+    { pattern: /\bSec-WebSocket-Protocol\b/, label: "WebSocket subprotocol auth carrier" },
+    { pattern: /\bCookie\b/, label: "cookie credential handling" },
+    { pattern: /\br\.Header\b/, label: "request header inspection" },
+    { pattern: /\b(access_token|refresh_token|session_token)\b/i, label: "token handling" },
+    { pattern: /\b(jwt|oauth|oidc)\b/i, label: "external auth/token vocabulary" },
+    { pattern: /\bcredential(s)?\b/i, label: "credential handling" },
+    { pattern: /\bpassword(_hash)?\b/i, label: "password handling" },
+    { pattern: /\bAuthenticate(Player|Session)?\b/, label: "transport authentication behavior" },
+    { pattern: /\bTokenValidator\b/, label: "token validation behavior" },
+  ];
+  const wsFiles = goFiles
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/transport/ws/"))
+    .filter((file) => !file.endsWith("_test.go"));
+  checkNoForbiddenPatterns(wsFiles, wsForbiddenPatterns, "WebSocket transport before handshake auth ratification", { stripComments: true });
+
+  const runtimeForbiddenPatterns = [
+    { pattern: /\b(access_token|refresh_token|session_token)\b/i, label: "token handling" },
+    { pattern: /\b(jwt|oauth|oidc)\b/i, label: "external auth/token vocabulary" },
+    { pattern: /\bcredential(s)?\b/i, label: "credential handling" },
+    { pattern: /\bpassword(_hash)?\b/i, label: "password handling" },
+    { pattern: /\bexternal_identity\b/i, label: "external identity linking" },
+    { pattern: /\bprovider_subject\b/i, label: "provider subject linking" },
+    { pattern: /\bLogin[A-Za-z0-9_]*\b/, label: "login behavior" },
+    { pattern: /\b(Parse|Validate|Sign|Refresh|Revoke)Token\b/, label: "token lifecycle behavior" },
+    { pattern: /\bCredential(Store|Repository|Lookup)\b/, label: "credential storage or lookup" },
+    { pattern: /\bExternalIdentity(Link|Repository|Store)\b/, label: "external identity storage or linking" },
+    { pattern: /\bruntime_sessions\b/i, label: "runtime session persistence" },
+    { pattern: /\bsession_(store|repository)\b/i, label: "session store or repository" },
+  ];
+  const boundedRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/modules/") ||
+      file === "runtime/internal/platform/persistence/postgres/player_account_repository.go");
+  checkNoForbiddenPatterns(boundedRuntimeFiles, runtimeForbiddenPatterns, "runtime/protocol/domain/player persistence before auth implementation ratification", { stripComments: true });
+
+  const playerMigrationFiles = discoverFilesUnder(root, "runtime/migrations/postgres")
+    .filter((file) => file.endsWith(".sql"))
+    .filter((file) => {
+      const text = readText(path.join(root, file));
+      return /\bplayer(_account|_accounts|s)?\b/i.test(file) || /\bplayer(_account|_accounts|s)?\b/i.test(text);
+    });
+  const playerPersistenceForbiddenPatterns = [
+    { pattern: /\bcredential(s)?\b/i, label: "credential columns or tables" },
+    { pattern: /\bpassword(_hash|s)?\b/i, label: "password columns or tables" },
+    { pattern: /\bauthentication_provider\b/i, label: "authentication provider columns or tables" },
+    { pattern: /\bexternal_identity\b/i, label: "external identity columns or tables" },
+    { pattern: /\bprovider_subject\b/i, label: "provider subject columns or tables" },
+    { pattern: /\baccess_token\b/i, label: "access token columns or tables" },
+    { pattern: /\brefresh_token\b/i, label: "refresh token columns or tables" },
+    { pattern: /\bruntime_session(s)?\b/i, label: "runtime session persistence" },
+    { pattern: /\bsession_token\b/i, label: "session token persistence" },
+    { pattern: /\bwebsocket\b/i, label: "WebSocket state persistence" },
+    { pattern: /\brequest_identity\b/i, label: "request identity persistence" },
+    { pattern: /\bvalidation_result\b/i, label: "validation result persistence" },
+  ];
+  checkNoForbiddenPatterns(playerMigrationFiles, playerPersistenceForbiddenPatterns, "player account lifecycle migrations");
+
+  const playerPersistenceGoFiles = [
+    "runtime/internal/modules/player/repository.go",
+    "runtime/internal/platform/persistence/postgres/player_account_repository.go",
+  ];
+  checkNoForbiddenPatterns(playerPersistenceGoFiles, playerPersistenceForbiddenPatterns, "player account lifecycle repositories", { stripComments: true });
 }
 
 function checkRuntimeLayerBoundaries(root, goFiles) {
@@ -3598,7 +5914,7 @@ function checkRuntimeLayerBoundaries(root, goFiles) {
   ];
 
   for (const file of goFiles) {
-    const matchingRules = layerRules.filter((rule) => file.startsWith(rule.ownerPrefix));
+    const matchingRules = layerRules.filter((rule) => pathStartsWith(file, rule.ownerPrefix));
     if (matchingRules.length === 0) {
       continue;
     }
@@ -3638,6 +5954,16 @@ function importsWithPrefix(text, prefix) {
     }
   }
   return imports;
+}
+
+function sourceWithoutGoComments(text) {
+  return text
+    .replace(/\/\*[\s\S]*?\*\//g, "")
+    .replace(/\/\/.*$/gm, "");
+}
+
+function textMatchesAny(text, patterns) {
+  return patterns.filter((item) => item.pattern.test(text));
 }
 
 function checkWork(root) {
@@ -3851,6 +6177,11 @@ function checkWork(root) {
       rule_id: "work.next_ready",
       artifact: ".arch/work-items.yaml",
     });
+  } else if (state.current.blocked.length > 0) {
+    ok(".arch/work-items.yaml has no next_ready work item because current work is blocked", {
+      rule_id: "work.next_ready",
+      artifact: ".arch/work-items.yaml",
+    });
   } else {
     warn(".arch/work-items.yaml has no next_ready work item", {
       rule_id: "work.next_ready",
@@ -3980,6 +6311,8 @@ function checkRuntime(root) {
   }
 
   checkRuntimeImportBoundaries(root, goFiles);
+  checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles);
+  checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {
@@ -4040,6 +6373,9 @@ function checkRuntimeProtocolAdapterBoundary(root) {
   const requiredReferences = [
     [".arch/runtime.yaml", "runtime_protocol_adapter_boundary: ADR-0018"],
     [".arch/runtime.yaml", "standard: docs/runtime-protocol-adapter.md"],
+    [".arch/runtime.yaml", "player_identity_and_session_boundary: ADR-0021"],
+    [".arch/runtime.yaml", "identity_session_boundary:"],
+    [".arch/runtime.yaml", "standard: docs/player-identity-session-boundary.md"],
     [".arch/runtime.yaml", "websocket_frame"],
     [".arch/runtime.yaml", "protocol_envelope"],
     [".arch/runtime.yaml", "route_request"],
@@ -4053,6 +6389,8 @@ function checkRuntimeProtocolAdapterBoundary(root) {
     [".arch/protocol.yaml", "runtime_protocol_adapter_boundary: ADR-0018"],
     [".arch/protocol.yaml", "runtime_adapter_boundary: docs/runtime-protocol-adapter.md"],
     [".arch/protocol.yaml", "Runtime handoff follows docs/runtime-protocol-adapter.md."],
+    [".arch/protocol.yaml", "player_identity_and_session_boundary: ADR-0021"],
+    [".arch/protocol.yaml", "standard: docs/player-identity-session-boundary.md"],
     ["AGENTS.md", "docs/runtime-protocol-adapter.md"],
     ["AGENTS.zh-CN.md", "docs/runtime-protocol-adapter.md"],
     ["runtime/AGENTS.md", "../docs/runtime-protocol-adapter.md"],
@@ -4366,6 +6704,52 @@ function generateModule(root, moduleName) {
   finish();
 }
 
+function generateContractShapes(root, targetModule) {
+  resetResults("generate contract-shapes");
+  if (!/^(all|[a-z][a-z0-9_]*)$/.test(targetModule)) {
+    fail("target must be all or snake_case module", {
+      rule_id: "argument.format",
+      artifact: targetModule,
+    });
+    finish();
+    return;
+  }
+
+  const entries = discoverContractRegistryEntries(root)
+    .filter((entry) => entry.module !== "runtime")
+    .filter((entry) => targetModule === "all" || entry.module === targetModule);
+
+  if (entries.length === 0) {
+    warn(`no contract entries found for ${targetModule}`, {
+      rule_id: "generator.artifact_already_exists",
+      artifact: targetModule,
+    });
+  }
+
+  for (const entry of entries) {
+    if (!entry.path || !isFile(root, entry.path)) {
+      fail(`contract source is missing for ${entry.module}:${entry.id}`, {
+        rule_id: "contract.source_exists",
+        artifact: entry.path || `${entry.module}:${entry.id}`,
+      });
+      continue;
+    }
+    const result = writeGeneratedContractShape(root, entry);
+    const ruleId = result.status === "created" ? "generator.created_artifact" : "generator.artifact_already_exists";
+    ok(`${result.status} ${result.path}`, {
+      rule_id: ruleId,
+      artifact: result.path,
+    });
+  }
+
+  finish({
+    target: targetModule,
+    summary_counts: {
+      generated_contract_shapes: entries.length,
+    },
+  });
+}
+
 function main() {
   let args = process.argv.slice(2);
   const wantsJson = args.includes("--json");
@@ -4424,6 +6808,11 @@ function main() {
     return;
   }
 
+  if (group === "check" && command === "agent-tooling" && !value) {
+    checkAgentTooling(root);
+    return;
+  }
+
   if (group === "check" && command === "migrations" && !value) {
     checkMigrations(root);
     return;
@@ -4469,6 +6858,16 @@ function main() {
     return;
   }
 
+  if (group === "generate" && command === "contract-shapes" && value) {
+    if (extra) {
+      console.error("Too many arguments.\n");
+      process.stderr.write(usage());
+      process.exit(2);
+    }
+    generateContractShapes(root, value);
+    return;
+  }
+
   if (group === "inspect" && command === "module" && value && !extra) {
     inspectModule(root, value);
     return;
@@ -4484,8 +6883,38 @@ function main() {
     return;
   }
 
+  if (group === "inspect" && command === "next" && !value) {
+    inspectNext(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "generated") {
+    const parsed = parseInspectGeneratedArgs(args.slice(2));
+    if (!parsed) {
+      console.error("Usage: vibit inspect generated [--module <module>] [--type <contract-type>]");
+      process.exit(2);
+    }
+    inspectGenerated(root, parsed);
+    return;
+  }
+
+  if (group === "inspect" && command === "reference" && !value) {
+    inspectReference(root);
+    return;
+  }
+
   if (group === "inspect" && command === "memory" && !value) {
     inspectMemory(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "contracts") {
+    const parsed = parseInspectContractsArgs(args.slice(2));
+    if (!parsed) {
+      console.error("Usage: vibit inspect contracts [--module <module>] [--type <contract-type>] [--status <status>]");
+      process.exit(2);
+    }
+    inspectContracts(root, parsed);
     return;
   }
 

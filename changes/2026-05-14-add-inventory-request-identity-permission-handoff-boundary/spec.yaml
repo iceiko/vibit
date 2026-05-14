@@ -1,0 +1,88 @@
+schema_version: 0.1
+change_id: add-inventory-request-identity-permission-handoff-boundary
+date: 2026-05-14
+type: feature
+status: verified
+
+summary: Add an inventory permission handoff context that carries application request identity without implementing authentication or player account ownership.
+
+affected_modules:
+  - inventory
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0014
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - docs/player-identity-session-boundary.md
+    - docs/player-identity-session-boundary.zh-CN.md
+    - modules/inventory/module.yaml
+    - modules/inventory/AGENTS.md
+    - modules/inventory/AGENTS.zh-CN.md
+    - .arch/runtime.yaml
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+runtime:
+  application_types:
+    added: []
+    changed: []
+  inventory_types:
+    added:
+      - PermissionContext
+      - MetadataOnlyDenyPermissionPolicy
+    changed:
+      - PermissionPolicy
+      - StaticPermissionPolicy
+      - Handlers
+  authentication_implemented: false
+  token_parsing_implemented: false
+  credential_lookup_implemented: false
+  session_persistence_implemented: false
+  player_account_lookup_implemented: false
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+
+verification:
+  required:
+    - cd runtime && go test ./...
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change add-inventory-request-identity-permission-handoff-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

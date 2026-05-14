@@ -1,0 +1,78 @@
+schema_version: 0.1
+change_id: confirm-next-milestone-direction
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the next direction confirmation gate and select player account/session contract ratification as the next milestone.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/reference.yaml
+    - conversations/2026-05-14-player-account-session-contract-direction.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+workflow:
+  completed_milestone: M-004
+  completed_work_item: W-0030
+  selected_direction: ratify_player_account_and_session_contracts
+  next_milestone: M-005
+  next_ready_work_item: W-0031
+  reference_alignment:
+    nakama: account_user_authentication_session_capability_reference
+    pitaya: session_route_handler_frontend_backend_vocabulary_reference
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit inspect work --json
+    - node tools/vibit check change confirm-next-milestone-direction --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

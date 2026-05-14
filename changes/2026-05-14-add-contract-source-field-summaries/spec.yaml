@@ -1,0 +1,50 @@
+schema_version: 0.1
+change_id: add-contract-source-field-summaries
+date: 2026-05-14
+type: tooling
+status: verified
+
+summary: Add machine-readable contract source field summaries to contract inspection.
+
+affected_modules: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect contracts --type command --json
+    - node tools/vibit inspect contracts --type event --json
+    - node tools/vibit inspect contracts --module inventory --type query --json
+    - node tools/vibit check change add-contract-source-field-summaries --json
+    - node tools/vibit check work --json
+  status: Verified

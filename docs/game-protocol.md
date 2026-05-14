@@ -197,6 +197,7 @@ The first protocol source files are:
 ```text
 proto/vibit/protocol/v1/envelope.proto
 proto/vibit/inventory/v1/inventory.proto
+proto/vibit/player/v1/player.proto
 ```
 
 The first Buf configuration files are:

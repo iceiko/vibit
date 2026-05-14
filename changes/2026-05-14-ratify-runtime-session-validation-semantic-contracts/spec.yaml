@@ -1,0 +1,89 @@
+schema_version: 0.1
+change_id: ratify-runtime-session-validation-semantic-contracts
+date: 2026-05-14
+type: contract
+status: verified
+
+summary: Ratify runtime session validation semantic contracts without authentication, tokens, persistence, protocol, or handshake changes.
+
+affected_modules:
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0018
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - docs/player-account-session-contracts.md
+    - docs/player-account-session-contracts.zh-CN.md
+    - .arch/contracts.yaml
+    - .arch/runtime.yaml
+    - .arch/work-items.yaml
+
+contracts:
+  commands:
+    added:
+      - ValidateSession
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added:
+      - SessionValidated
+    changed: []
+    removed: []
+  errors:
+    added:
+      - session_errors
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - session_permissions
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  protobuf_messages_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_implemented: false
+  websocket_handshake_authentication_changed: false
+
+workflow:
+  completed_work_item: W-0034
+
+verification:
+  required:
+    - node tools/vibit check contracts --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change ratify-runtime-session-validation-semantic-contracts --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - cd runtime && go vet ./...
+    - git diff --check
+  status: Verified

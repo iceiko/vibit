@@ -176,6 +176,35 @@ Not verified: live PostgreSQL verification skipped because VIBIT_POSTGRES_TEST_D
 
 Agents 可以记录自己实际使用的 local command，但不得 commit local service credentials、socket paths、passwords 或 tokens。
 
+### Termux Local Setup Example
+
+当 Termux on Android 的 package repository 提供 PostgreSQL 时，Termux 可以作为有效的 local PostgreSQL verification environment。
+
+一条已验证可工作的 setup path 是：
+
+```bash
+pkg install postgresql
+initdb -D "$PREFIX/var/lib/postgresql" --auth=trust --username="$(whoami)"
+mkdir -p "$PREFIX/var/run/postgresql" "$PREFIX/var/log"
+pg_ctl -D "$PREFIX/var/lib/postgresql" -l "$PREFIX/var/log/postgresql.log" -o "-h 127.0.0.1 -p 5432 -k $PREFIX/var/run/postgresql" start
+createdb -h 127.0.0.1 -p 5432 vibit_test
+```
+
+运行 live test 时要显式写出 database user：
+
+```bash
+cd runtime
+VIBIT_POSTGRES_TEST_DSN="postgres://$(whoami)@127.0.0.1:5432/vibit_test?sslmode=disable" VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+显式 user 很重要，因为在某些 Android environments 中，如果 DSN 省略 user，client libraries 可能会推断出另一个默认用户名。
+
+停止 local server：
+
+```bash
+pg_ctl -D "$PREFIX/var/lib/postgresql" stop
+```
+
 ## 6. Cleanup Rules
 
 Agents 必须让 environment 处在已知状态。

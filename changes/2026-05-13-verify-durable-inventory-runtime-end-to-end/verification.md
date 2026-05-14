@@ -14,11 +14,14 @@ Verified:
 - `node tools/vibit check all --json`
 - `git diff --check`
 - Secret scan for GitHub token patterns returned no matches.
+- `cd runtime && VIBIT_POSTGRES_TEST_DSN=<local disposable PostgreSQL DSN> VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v`
+
+Live PostgreSQL verification ran successfully against a local Termux PostgreSQL 18.2 server on Android aarch64. Cleanup used the default `drop_schema` behavior, and destructive cleanup was explicitly allowed through `VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1`.
 
 Not verified:
 
-- Live PostgreSQL migration apply/status and persistent request-loop execution against a real database. The opt-in test exists, but it skipped in this environment because `VIBIT_POSTGRES_TEST_DSN` was not set.
-- `M-002` completion. Closing the milestone with unavailable live PostgreSQL verification requires maintainer confirmation.
+- No remaining PostgreSQL live-verification gap is known for this change.
+- `M-002` milestone status was not changed by this verification-record update.
 
 Not applicable:
 

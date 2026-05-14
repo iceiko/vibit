@@ -6,6 +6,8 @@ import (
 	"net/http/httptest"
 	"strings"
 	"testing"
+
+	"github.com/iceiko/vibit/runtime/internal/app"
 )
 
 func TestWebSocketEndpointIsMounted(t *testing.T) {
@@ -68,4 +70,43 @@ func TestHTTPHandlerFromEnvRequiresPostgresDSNForPostgresStore(t *testing.T) {
 	if !strings.Contains(err.Error(), "DSN") {
 		t.Fatalf("newHTTPHandlerFromEnv(postgres) error = %v, want DSN context", err)
 	}
+}
+
+func TestHTTPHandlerWithDispatcherAppliesMetadataOnlySessionValidation(t *testing.T) {
+	frameHandler := newProtocolFrameHandlerWithDispatcher(routeDispatcherFunc(func(_ context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
+		if request.Identity.Status != app.IdentityValidationMetadataOnly {
+			t.Fatalf("request Identity.Status = %q, want %q", request.Identity.Status, app.IdentityValidationMetadataOnly)
+		}
+		if request.Identity.PlayerID != "player-1" || request.Identity.SessionID != "session-1" {
+			t.Fatalf("request Identity = %#v, want normalized player/session metadata", request.Identity)
+		}
+		if request.Identity.PlayerIDValidated || request.Identity.SessionValidated {
+			t.Fatalf("request Identity validation flags = %#v, want metadata-only identity", request.Identity)
+		}
+		return app.ApplicationResult{
+			RequestID: request.RequestID,
+			Route:     request.Route,
+			Target:    request.Target,
+			Session:   request.Session,
+			Identity:  request.Identity,
+		}, nil
+	}))
+
+	result, err := frameHandler.Dispatcher.Dispatch(context.Background(), app.RouteRequest{
+		RequestID: "request-1",
+		Route:     app.RouteKey{Kind: app.MessageKindQuery, Module: "inventory", Name: "GetInventory"},
+		Session:   app.Session{SessionID: "session-1", PlayerID: "player-1"},
+	})
+	if err != nil {
+		t.Fatalf("Dispatch() error = %v, want nil", err)
+	}
+	if result.Identity.Status != app.IdentityValidationMetadataOnly {
+		t.Fatalf("result Identity.Status = %q, want %q", result.Identity.Status, app.IdentityValidationMetadataOnly)
+	}
+}
+
+type routeDispatcherFunc func(context.Context, app.RouteRequest) (app.ApplicationResult, error)
+
+func (f routeDispatcherFunc) Dispatch(ctx context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
+	return f(ctx, request)
 }

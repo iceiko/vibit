@@ -177,6 +177,35 @@ Any setup path is acceptable if it provides:
 
 Agents may document the exact local command they used, but they must not commit local service credentials, socket paths, passwords, or tokens.
 
+### Termux Local Setup Example
+
+Termux on Android can be a valid local PostgreSQL verification environment when the package repository provides PostgreSQL.
+
+One working setup path is:
+
+```bash
+pkg install postgresql
+initdb -D "$PREFIX/var/lib/postgresql" --auth=trust --username="$(whoami)"
+mkdir -p "$PREFIX/var/run/postgresql" "$PREFIX/var/log"
+pg_ctl -D "$PREFIX/var/lib/postgresql" -l "$PREFIX/var/log/postgresql.log" -o "-h 127.0.0.1 -p 5432 -k $PREFIX/var/run/postgresql" start
+createdb -h 127.0.0.1 -p 5432 vibit_test
+```
+
+Run the live test with an explicit database user:
+
+```bash
+cd runtime
+VIBIT_POSTGRES_TEST_DSN="postgres://$(whoami)@127.0.0.1:5432/vibit_test?sslmode=disable" VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+The explicit user is important on some Android environments because client libraries may infer a different default username when the DSN omits it.
+
+Stop the local server with:
+
+```bash
+pg_ctl -D "$PREFIX/var/lib/postgresql" stop
+```
+
 ## 6. Cleanup Rules
 
 Agents must leave the environment in a known state.

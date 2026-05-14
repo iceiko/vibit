@@ -99,7 +99,7 @@ capability_families:
 
 phase_plan:
   phase_0_agent_native_foundation:
-    status: active
+    status: completed
     focus:
       - constitution_guides_change_specs_memory_adrs
       - architecture_manifests_and_checks
@@ -107,7 +107,7 @@ phase_plan:
       - runtime_handoff_protocol_adapter_dispatch_skeleton
       - inventory_contracts
   phase_1_first_vertical_backend_slice:
-    status: next
+    status: completed
     focus:
       - inventory_handler_boundary
       - repository_policy_interfaces
@@ -115,12 +115,74 @@ phase_plan:
       - invariant_error_event_repository_tests
       - protocol_response_mapping
   phase_2_player_session_transport:
-    status: planned
+    status: authentication_token_session_validation_design_active
     focus:
+      - player_identity_session_boundary_standard
+      - player_account_session_contract_ratification
       - player_account_session_modules
       - websocket_transport_adapter
       - session_validation_connection_lifecycle
       - minimal_client_server_request_flow
+    active_boundary_standard: docs/player-identity-session-boundary.md
+    active_boundary_decision: ADR-0021
+    completed_contract_milestone: M-005
+    completed_contract_standard: docs/player-account-session-contracts.md
+    completed_contract_standard_translation: docs/player-account-session-contracts.zh-CN.md
+    latest_contract_work_item: W-0036
+    completed_contract_direction: ratify_player_account_and_session_contracts
+    next_direction_gate: M-006
+    next_direction_work_item: W-0037
+    selected_next_direction: improve_generators_and_contract_tooling_before_more_runtime_features
+    active_tooling_milestone: M-007
+    latest_completed_persistence_milestone: M-009
+    active_authentication_design_milestone: M-011
+    latest_authentication_design_work_item: W-0058
+    next_authentication_design_work_item: W-0059
+    selected_authentication_direction: ratify_authentication_and_token_session_validation_design
+    authentication_direction_change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
+    authentication_design_standard: docs/authentication-token-session-validation.md
+    authentication_design_standard_translation: docs/authentication-token-session-validation.zh-CN.md
+    authentication_design_decision: ADR-0023
+    authentication_design_change: changes/2026-05-14-define-authentication-token-session-validation-design-standard
+    authentication_boundary_checks_change: changes/2026-05-14-add-authentication-token-session-boundary-checks
+    authentication_boundary_check_rule: runtime.authentication_token_session_boundary
+    reference_pull:
+      nakama:
+        - account_user_authentication_session_capability_coverage
+        - session_token_refresh_and_realtime_socket_relationship
+        - token_refresh_expiration_revocation_vocabulary
+        - realtime_socket_bound_to_authenticated_session_vocabulary
+      pitaya:
+        - session_binding
+        - route_handler_vocabulary
+        - frontend_backend_server_role_vocabulary
+        - realtime_connection_session_context_vocabulary
+    mapped_positions:
+      nakama:
+        account_user_as_first_class_capability: adopted
+        multiple_authentication_methods: deferred
+        session_token_concept: deferred
+        refresh_token_concept: deferred
+        realtime_socket_bound_to_authenticated_session: adapted
+        direct_public_api_compatibility: rejected_for_now
+      pitaya:
+        session_object_separate_from_acceptor: adopted
+        handler_receives_session_context: adapted
+        session_binding_vocabulary: adopted_as_vocabulary
+        frontend_backend_split: deferred
+        realtime_session_context: adapted
+        direct_public_api_compatibility: rejected_for_now
+    rule: Authentication and token/session validation design defines vibit-native, agent-readable boundaries before implementation; Nakama and Pitaya are references, not governing API shapes.
+  phase_2b_agent_tooling_and_generator_hardening:
+    status: active
+    focus:
+      - contract_index_inspection
+      - generated_output_inspection
+      - reproducible_generated_contract_shapes
+      - agent_tooling_checks
+      - continuation_intake_commands
+    active_milestone: M-007
+    rule: Strengthen agent intake, generation, and architecture checks before adding more runtime player, authentication, or broader game module behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

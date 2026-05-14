@@ -16,6 +16,22 @@ Every non-trivial feature, bug fix, migration, refactor, or standard change shou
 changes/<date>-<change-id>/
 ```
 
+Allowed `type` values are:
+
+```text
+feature
+bugfix
+migration
+refactor
+standard
+contract
+protocol
+docs
+tooling
+```
+
+Use `contract` when the main change adds or changes public command, query, event, error, permission, or semantic API contracts. Use `protocol` when the main change adds or changes wire schemas, transport-visible protocol shape, generated protocol output, or protocol compatibility rules.
+
 Example:
 
 ```text

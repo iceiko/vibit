@@ -1,0 +1,23 @@
+schema_version: 0.1
+kind: permission_catalog
+module: runtime
+family: session
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0018
+  - ADR-0021
+
+summary: Permission catalog for runtime-owned session validation handoff contracts.
+
+permissions:
+  - id: runtime_session_validate
+    description: Allows runtime application dispatch to evaluate decoded request session metadata before domain handlers run.
+    grants_access_to:
+      commands:
+        - ValidateSession
+      queries: []
+
+implementation:
+  generated_outputs: []
+  runtime_status: semantic_contract_only

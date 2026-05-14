@@ -87,6 +87,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/runtime-protocol-adapter.zh-CN.md`
 - `docs/reference-game-server-alignment.md`
 - `docs/reference-game-server-alignment.zh-CN.md`
+- `docs/authentication-token-session-validation.md`
+- `docs/authentication-token-session-validation.zh-CN.md`
 - `docs/workflow.md`
 - `docs/workflow.zh-CN.md`
 - `schema/`
@@ -106,6 +108,8 @@ Runtime protocol adapter boundary standard 是 `docs/runtime-protocol-adapter.md
 
 Active game server reference alignment standard 是 `docs/reference-game-server-alignment.md`，配套简体中文译本是 `docs/reference-game-server-alignment.zh-CN.md`。`ADR-0019` 记录 Nakama 和 Pitaya 是主动参考基线。在新增 game server capability families、runtime subsystems、social/realtime features、matchmaking、match runtime、cluster/RPC work 或 operational surfaces 前，应阅读 `.arch/reference.yaml` 和该标准。Nakama 和 Pitaya 指导 capability planning；它们不覆盖 vibit 的 constitution、ADRs、manifests、generated boundaries 或 verification commands。
 
+Authentication、token 和 session validation design standard 是 `docs/authentication-token-session-validation.md`，配套简体中文译本是 `docs/authentication-token-session-validation.zh-CN.md`。`ADR-0023` 记录这个 design boundary。在添加 authentication、token behavior、credential storage、external identity linking、session persistence、request identity trust changes、Protobuf envelope authentication changes、WebSocket handshake authentication、runtime player account handlers 或 WebSocket player routes 前，应阅读它。Metadata-only `player_id` 和 `session_id` 不是 authenticated proof。`runtime.authentication_token_session_boundary` 是该边界的 repository check rule。
+
 Work continuation standard 是 `docs/workflow.md`，配套简体中文译本是 `docs/workflow.zh-CN.md`。机器可读 work queue 是 `.arch/work-items.yaml`。当 maintainer 说“continue”或“继续”时，应理解为推进一个 `next_ready` work item，除非当前被 blocked 或需要 confirmation。当 maintainer 要求继续多步时，应按顺序最多推进相应数量的 work items，并在 blockers、verification failures、ask-first boundaries 或 maintainer redirect 处停止。
 
 当前可执行工具：
@@ -124,6 +128,8 @@ node tools/vibit check protocol
 node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check agent-tooling
+node tools/vibit check agent-tooling --json
 node tools/vibit check migrations
 node tools/vibit check migrations --json
 node tools/vibit check postgres-env
@@ -135,6 +141,11 @@ node tools/vibit check work --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
+node tools/vibit inspect contracts
+node tools/vibit inspect contracts --module <module>
+node tools/vibit inspect generated
+node tools/vibit inspect next
+node tools/vibit inspect reference
 node tools/vibit inspect change <change-id>
 node tools/vibit inspect work
 node tools/vibit inspect work --json
@@ -149,6 +160,7 @@ node tools/vibit check change <change-id> --json
 node tools/vibit check module <module>
 node tools/vibit check module <module> --json
 node tools/vibit generate module <module>
+node tools/vibit generate contract-shapes <module|all>
 ```
 
 当 CLI tooling 可用时，默认使用 `node tools/vibit check all` 作为仓库验证命令。
@@ -157,7 +169,7 @@ node tools/vibit generate module <module>
 
 当 agent 在 intake、verification 或 handoff 阶段需要机器可读检查结果时，使用 `--json`。
 
-每条 JSON check result item 都应包含 `rule_id` 和 `artifact`。把 `check all --json` 视为紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
+每条 JSON check result item 都应包含 `rule_id` 和 `artifact`。`artifact`、`path`、`source` 和 `output` 等 JSON fields 中的 repository-relative paths 必须在所有平台使用 forward slash，包括 Windows。把 `check all --json` 视为紧凑总览；需要完整细节时，对具体失败检查单独运行 `--json`。
 
 当新增或修改 conversation logs 或 Agent Decision Records 时，使用 `node tools/vibit check memory`。
 
@@ -167,15 +179,29 @@ node tools/vibit generate module <module>
 
 当新增或修改 generated files、module manifest 中的 `generated` declarations、generated output standards 或 Go Protobuf generated output 时，使用 `node tools/vibit check generated`。
 
+当新增或修改 agent-facing inspection、generation 或 verification commands 时，使用 `docs/agent-tooling.md` 和 `node tools/vibit check agent-tooling`。
+
 当新增或修改 SQL migration sources、migration ownership manifests、migration guidance 或 persistence migration standards 时，使用 `node tools/vibit check migrations`。该检查会验证 PostgreSQL migration naming、goose markers、SQL-first boundaries、owning-module traces，以及第一版 inventory migration 的 table references。
 
 当新增或修改 disposable PostgreSQL verification environment standards、live PostgreSQL verification guidance 或 persistence verification environment manifests 时，使用 `node tools/vibit check postgres-env`。这是静态标准检查；它不得连接 PostgreSQL，也不得要求 Docker、Podman、cloud PostgreSQL 或其他 service manager。
 
 当新增或修改 runtime module behavior、runtime adapter boundaries、runtime guidance 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton 和 ADR-0018 runtime protocol adapter boundary，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
+当 runtime check 在 authentication、token、credential、external identity、session persistence、Protobuf envelope authentication、WebSocket handshake authentication、runtime player handler 或 WebSocket route 边界上失败时，使用 `node tools/vibit inspect rule runtime.authentication_token_session_boundary --json`。
+
 在解释 continuation request 前，使用 `node tools/vibit inspect work`。当 `.arch/work-items.yaml`、workflow docs 或 work item state 发生变化时，使用 `node tools/vibit check work`。默认 continuation unit 是一个 work item。
 
+当 immediate continuation step 不清楚时，使用 `node tools/vibit inspect next --json`。
+
+当 agent 在 contract、generator 或 runtime planning work 前需要完整 registered contract index 时，使用 `node tools/vibit inspect contracts --json`。
+
 当 agent 在 intake 阶段需要以 JSON 读取单个 contract 的 registry entry、source summary、module manifest declaration 和 consistency status 时，使用 `node tools/vibit inspect contract --module <module> --type <type> --id <id>`。
+
+在修改 generated output standards、generated output checks 或 generator behavior 前，使用 `node tools/vibit inspect generated --json`。
+
+在根据 Nakama 或 Pitaya reference context 规划新的 game server capability families 前，使用 `node tools/vibit inspect reference --json`。
+
+使用 `node tools/vibit generate contract-shapes all` 从 semantic contract manifests 重新生成 Go contract shape files。不要手改 `runtime/internal/generated/contracts/` 下的文件。
 
 当 change spec 已存在，并且 agent 在 intake 或 handoff 阶段需要结构化了解它的文件、metadata、affected modules 和 verification state 时，使用 `node tools/vibit inspect change <change-id>`。
 
@@ -200,6 +226,8 @@ node tools/vibit generate module <module>
 在添加 live PostgreSQL migration checks、repository integration tests、transaction-runner integration tests 或 persistent-runtime end-to-end checks 前，使用 `docs/postgresql-verification-environment.md`。Live PostgreSQL verification 通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用；默认 repository checks 不得要求运行中的 database。
 
 使用 `.arch/reference.yaml` 作为 Nakama/Pitaya reference alignment 的机器可读 intake 入口。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。改造 reference patterns 时必须保留 vibit 的 Agent-Native constraints，并记录为什么采纳、改造或拒绝某个 reference pattern。
+
+使用 `docs/authentication-token-session-validation.md`、`ADR-0023` 和 `runtime.authentication_token_session_boundary`，再修改 authentication proof、login methods、token behavior、credential storage、external identity linking、runtime session persistence、request identity trust、Protobuf envelope authentication behavior、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。该设计标准分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、transport metadata、envelope metadata 和 player account lifecycle。
 
 使用 `.arch/work-items.yaml` 作为 continuation 的机器可读 intake 入口。`W-0007` 这样的 Work item IDs 是执行步骤；ADR IDs 仍然是架构决策；change spec IDs 仍然是具体执行记录；Git hashes 仍然是 repository snapshots；versions 仍然是 release identifiers。
 

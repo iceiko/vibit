@@ -68,5 +68,8 @@ func requestWithFrameMetadata(request app.RouteRequest, frame FrameRequest) app.
 	if request.Session.ConnectionID == "" {
 		request.Session.ConnectionID = strings.TrimSpace(frame.ConnectionID)
 	}
+	if request.Identity.Status == "" || request.Identity.Status == app.IdentityValidationMetadataOnly {
+		request.Identity = app.MetadataOnlyIdentityFromSession(request.Session)
+	}
 	return request
 }

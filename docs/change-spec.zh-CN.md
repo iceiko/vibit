@@ -17,6 +17,22 @@ Change spec 是 humans 和 agents 的持久工作上下文。它的存在，是�
 changes/<date>-<change-id>/
 ```
 
+允许的 `type` 值是：
+
+```text
+feature
+bugfix
+migration
+refactor
+standard
+contract
+protocol
+docs
+tooling
+```
+
+当主要变更新增或修改 public command、query、event、error、permission 或 semantic API contracts 时，使用 `contract`。当主要变更新增或修改 wire schemas、transport-visible protocol shape、generated protocol output 或 protocol compatibility rules 时，使用 `protocol`。
+
 示例：
 
 ```text

@@ -189,6 +189,89 @@ func TestGrantItemRejectsPermissionBeforeMutation(t *testing.T) {
 	}
 }
 
+func TestGrantItemPermissionReceivesRequestIdentity(t *testing.T) {
+	repository := newMemoryRepository()
+	policy := &recordingPermissionPolicy{grantAllowed: true, readAllowed: true}
+	handlers := testHandlers(repository)
+	handlers.PermissionPolicy = policy
+	identity := app.ValidatedPlayerIdentity("player-1", app.Session{
+		SessionID: "session-1",
+		PlayerID:  "player-1",
+	})
+
+	_, _, err := handlers.GrantItem(context.Background(), GrantItemRequest{
+		PlayerID:    "player-1",
+		ItemID:      "item-1",
+		Quantity:    1,
+		Reason:      "test",
+		RequestedBy: "actor-1",
+	}, identity)
+	if err != nil {
+		t.Fatalf("GrantItem() error = %v, want nil", err)
+	}
+
+	if policy.lastGrant.Permission != PermissionGrantItem {
+		t.Fatalf("grant Permission = %q, want %q", policy.lastGrant.Permission, PermissionGrantItem)
+	}
+	if policy.lastGrant.RequestedBy != "actor-1" || policy.lastGrant.PlayerID != "player-1" {
+		t.Fatalf("grant permission context = %#v, want requested actor and target player", policy.lastGrant)
+	}
+	if policy.lastGrant.Identity != identity {
+		t.Fatalf("grant Identity = %#v, want %#v", policy.lastGrant.Identity, identity)
+	}
+}
+
+func TestGrantItemMetadataOnlyGuardDeniesPrivilegedGrant(t *testing.T) {
+	repository := newMemoryRepository()
+	handlers := testHandlers(repository)
+	handlers.PermissionPolicy = MetadataOnlyDenyPermissionPolicy{}
+	identity := app.MetadataOnlyIdentityFromSession(app.Session{SessionID: "session-1", PlayerID: "player-1"})
+
+	_, _, err := handlers.GrantItem(context.Background(), GrantItemRequest{
+		PlayerID:    "player-1",
+		ItemID:      "item-1",
+		Quantity:    1,
+		Reason:      "test",
+		RequestedBy: "player-1",
+	}, identity)
+	assertInventoryErrorCode(t, err, ErrorCodeInventoryPermission)
+
+	if repository.lockCalls != 0 {
+		t.Fatalf("repository lock calls = %d, want 0", repository.lockCalls)
+	}
+}
+
+func TestStaticPermissionPolicyRemainsExplicitBootstrapPolicy(t *testing.T) {
+	policy := StaticPermissionPolicy{GrantAllowed: true, ReadAllowed: true}
+	metadataOnly := app.MetadataOnlyIdentityFromSession(app.Session{SessionID: "session-1", PlayerID: "player-1"})
+
+	grantAllowed, err := policy.CanGrantItem(context.Background(), PermissionContext{
+		Permission:  PermissionGrantItem,
+		RequestedBy: "player-1",
+		PlayerID:    "player-1",
+		Identity:    metadataOnly,
+	})
+	if err != nil {
+		t.Fatalf("CanGrantItem() error = %v, want nil", err)
+	}
+	if !grantAllowed {
+		t.Fatal("CanGrantItem() allowed = false, want explicit bootstrap allow")
+	}
+
+	readAllowed, err := policy.CanReadInventory(context.Background(), PermissionContext{
+		Permission:  PermissionRead,
+		RequestedBy: "player-1",
+		PlayerID:    "player-1",
+		Identity:    metadataOnly,
+	})
+	if err != nil {
+		t.Fatalf("CanReadInventory() error = %v, want nil", err)
+	}
+	if !readAllowed {
+		t.Fatal("CanReadInventory() allowed = false, want explicit bootstrap allow")
+	}
+}
+
 func TestGetInventoryReadsWithoutMutation(t *testing.T) {
 	repository := newMemoryRepository()
 	repository.items["player-1"] = map[string]int64{
@@ -232,6 +315,67 @@ func TestGetInventoryRejectsPermission(t *testing.T) {
 		RequestedBy: "user-2",
 	})
 	assertInventoryErrorCode(t, err, ErrorCodeInventoryPermission)
+}
+
+func TestGetInventoryPermissionReceivesRequestIdentity(t *testing.T) {
+	repository := newMemoryRepository()
+	policy := &recordingPermissionPolicy{grantAllowed: true, readAllowed: true}
+	handlers := testHandlers(repository)
+	handlers.PermissionPolicy = policy
+	identity := app.ValidatedPlayerIdentity("player-1", app.Session{
+		SessionID: "session-1",
+		PlayerID:  "player-1",
+	})
+
+	_, err := handlers.GetInventory(context.Background(), GetInventoryRequest{
+		PlayerID:    "player-1",
+		RequestedBy: "actor-1",
+	}, identity)
+	if err != nil {
+		t.Fatalf("GetInventory() error = %v, want nil", err)
+	}
+
+	if policy.lastRead.Permission != PermissionRead {
+		t.Fatalf("read Permission = %q, want %q", policy.lastRead.Permission, PermissionRead)
+	}
+	if policy.lastRead.RequestedBy != "actor-1" || policy.lastRead.PlayerID != "player-1" {
+		t.Fatalf("read permission context = %#v, want requested actor and target player", policy.lastRead)
+	}
+	if policy.lastRead.Identity != identity {
+		t.Fatalf("read Identity = %#v, want %#v", policy.lastRead.Identity, identity)
+	}
+}
+
+func TestMetadataOnlyGuardAllowsOnlyValidatedPlayerSelfRead(t *testing.T) {
+	policy := MetadataOnlyDenyPermissionPolicy{AllowValidatedPlayerSelfRead: true}
+	metadataOnly := app.MetadataOnlyIdentityFromSession(app.Session{SessionID: "session-1", PlayerID: "player-1"})
+
+	allowed, err := policy.CanReadInventory(context.Background(), PermissionContext{
+		Permission:  PermissionRead,
+		RequestedBy: "player-1",
+		PlayerID:    "player-1",
+		Identity:    metadataOnly,
+	})
+	if err != nil {
+		t.Fatalf("CanReadInventory(metadata-only) error = %v, want nil", err)
+	}
+	if allowed {
+		t.Fatal("CanReadInventory(metadata-only) allowed = true, want false")
+	}
+
+	validated := app.ValidatedPlayerIdentity("player-1", app.Session{SessionID: "session-1", PlayerID: "player-1"})
+	allowed, err = policy.CanReadInventory(context.Background(), PermissionContext{
+		Permission:  PermissionRead,
+		RequestedBy: "player-1",
+		PlayerID:    "player-1",
+		Identity:    validated,
+	})
+	if err != nil {
+		t.Fatalf("CanReadInventory(validated) error = %v, want nil", err)
+	}
+	if !allowed {
+		t.Fatal("CanReadInventory(validated self read) allowed = false, want true")
+	}
 }
 
 func TestRegisterRoutesDispatchesInventoryHandlers(t *testing.T) {
@@ -341,11 +485,28 @@ type staticPermissionPolicy struct {
 	readAllowed  bool
 }
 
-func (p staticPermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
+func (p staticPermissionPolicy) CanGrantItem(context.Context, PermissionContext) (bool, error) {
 	return p.grantAllowed, nil
 }
 
-func (p staticPermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
+func (p staticPermissionPolicy) CanReadInventory(context.Context, PermissionContext) (bool, error) {
+	return p.readAllowed, nil
+}
+
+type recordingPermissionPolicy struct {
+	grantAllowed bool
+	readAllowed  bool
+	lastGrant    PermissionContext
+	lastRead     PermissionContext
+}
+
+func (p *recordingPermissionPolicy) CanGrantItem(_ context.Context, ctx PermissionContext) (bool, error) {
+	p.lastGrant = ctx
+	return p.grantAllowed, nil
+}
+
+func (p *recordingPermissionPolicy) CanReadInventory(_ context.Context, ctx PermissionContext) (bool, error) {
+	p.lastRead = ctx
 	return p.readAllowed, nil
 }
 

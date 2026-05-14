@@ -1,0 +1,98 @@
+schema_version: 0.1
+change_id: close-player-account-session-contracts-milestone
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the player account and session contracts milestone and block the next major direction for maintainer choice.
+
+affected_modules:
+  - runtime
+  - player
+  - inventory
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - docs/player-account-session-contracts.md
+    - docs/player-account-session-contracts.zh-CN.md
+    - docs/workflow.md
+    - docs/workflow.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+    - .arch/runtime.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_implemented: false
+  player_runtime_handlers_added: false
+  websocket_routes_added: false
+
+workflow:
+  completed_milestone: M-005
+  completed_work_item: W-0036
+  blocked_confirmation_work_item: W-0037
+  next_ready_created: false
+  reason_no_next_ready: Next major direction requires maintainer choice.
+
+verification:
+  required:
+    - node tools/vibit inspect work --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change add-runtime-contract-inspection --json
+    - node tools/vibit check change close-player-account-session-contracts-milestone --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - cd runtime && go vet ./...
+    - git diff --check
+  status: Verified

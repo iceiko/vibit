@@ -14,6 +14,7 @@ canonical_decisions:
   protobuf_envelope_and_generation: ADR-0016
   generated_output_standard: ADR-0017
   runtime_protocol_adapter_boundary: ADR-0018
+  player_identity_and_session_boundary: ADR-0021
 
 standard:
   document: docs/game-protocol.md
@@ -67,6 +68,8 @@ wire_format:
   format: protobuf
   source_root: proto
   generated_go_output: runtime/internal/generated/proto
+  source_status: envelope_inventory_and_player_sources_created
+  generated_go_output_status: envelope_inventory_and_player_proto_generated
   generated_output_standard: docs/generated-output.md
   generated_output_check: node tools/vibit check generated
   owner: runtime/internal/platform/protocol/protobuf
@@ -126,20 +129,37 @@ message_kinds:
     - State snapshots and patches are reserved for future room or match state synchronization.
 
 session_model:
+  standard: docs/player-identity-session-boundary.md
+  decision: ADR-0021
+  status: boundary_defined_without_authentication_implementation
+  application_handoff:
+    owner: runtime/internal/app
+    request_identity_type: RequestIdentity
+    session_validation_result_type: SessionValidationResult
+    current_identity_status_from_envelope: metadata_only
+    validation_flags_from_envelope:
+      player_id_validated: false
+      session_validated: false
   identities:
     connection_id:
       owner: transport
       stability: transport_local_may_change_after_reconnect
     session_id:
-      owner: authentication_or_session_layer
-      stability: logical_session_when_authentication_exists
+      owner: runtime_session_boundary
+      stability: logical_session_when_session_validation_exists
     player_id:
-      owner: player_domain
-      stability: domain_identity_when_available
+      owner: player_module
+      stability: domain_identity_when_available_and_validated
     connection_epoch:
       owner: protocol
       stability: reserved_for_reconnect_rules
-  rule: Inventory protocol work must not invent an authentication shortcut before an auth or player module exists.
+  rule: Inventory protocol work must not treat client-supplied player_id or session_id as authenticated proof before session validation exists.
+  deferred_decisions:
+    - authentication_scheme
+    - token_format
+    - credential_storage
+    - websocket_handshake_authentication_contract
+    - player_account_database_schema
 
 target_model:
   field_status: reserved_for_envelope_metadata

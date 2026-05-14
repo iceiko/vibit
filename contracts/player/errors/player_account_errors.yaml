@@ -1,0 +1,43 @@
+schema_version: 0.1
+kind: error_catalog
+module: player
+status: draft
+decision_refs:
+  - ADR-0019
+  - ADR-0021
+
+summary: Error catalog for initial player account lifecycle contracts.
+
+errors:
+  - code: PLAYER_ACCOUNT_DISPLAY_NAME_INVALID
+    category: validation
+    retryable: false
+    message: Player account display name is invalid.
+    used_by:
+      commands:
+        - CreatePlayerAccount
+      queries: []
+  - code: PLAYER_ACCOUNT_NOT_FOUND
+    category: not_found
+    retryable: false
+    message: Player account was not found.
+    used_by:
+      commands: []
+      queries:
+        - GetPlayerAccount
+  - code: PLAYER_ACCOUNT_PERMISSION_DENIED
+    category: authorization
+    retryable: false
+    message: Actor does not have permission to perform this player account operation.
+    used_by:
+      commands:
+        - CreatePlayerAccount
+      queries:
+        - GetPlayerAccount
+
+implementation:
+  generated_outputs:
+    - go_typed_error_codes
+    - protobuf_error_mapping
+    - error_test_fixtures
+  runtime_status: not_started

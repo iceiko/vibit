@@ -1,0 +1,41 @@
+schema_version: 0.1
+kind: error_catalog
+module: runtime
+family: session
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0018
+  - ADR-0021
+
+summary: Error catalog for runtime session validation semantic contracts.
+
+errors:
+  - code: SESSION_INVALID
+    category: authorization
+    retryable: false
+    message: Session validation failed.
+    used_by:
+      commands:
+        - ValidateSession
+      queries: []
+  - code: SESSION_VALIDATOR_UNAVAILABLE
+    category: dependency
+    retryable: true
+    message: Session validation could not be completed because the validator was unavailable.
+    used_by:
+      commands:
+        - ValidateSession
+      queries: []
+  - code: SESSION_VALIDATION_NOT_IMPLEMENTED
+    category: not_implemented
+    retryable: false
+    message: Real session validation is not implemented for this runtime boundary.
+    used_by:
+      commands:
+        - ValidateSession
+      queries: []
+
+implementation:
+  generated_outputs: []
+  runtime_status: metadata_only_hook_exists_real_validator_not_started

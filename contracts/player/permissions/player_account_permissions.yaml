@@ -1,0 +1,30 @@
+schema_version: 0.1
+kind: permission_catalog
+module: player
+status: draft
+decision_refs:
+  - ADR-0019
+  - ADR-0021
+
+summary: Permission catalog for initial player account lifecycle contracts.
+
+permissions:
+  - id: player_account_create
+    description: Allows an actor to request creation of a player account lifecycle record.
+    grants_access_to:
+      commands:
+        - CreatePlayerAccount
+      queries: []
+  - id: player_account_read
+    description: Allows an actor to read a player account lifecycle record.
+    grants_access_to:
+      commands: []
+      queries:
+        - GetPlayerAccount
+
+implementation:
+  generated_outputs:
+    - go_typed_permissions
+    - protobuf_permission_mapping
+    - permission_test_fixtures
+  runtime_status: not_started

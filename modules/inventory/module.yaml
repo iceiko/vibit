@@ -14,6 +14,7 @@ decisions:
   - ADR-0009
   - ADR-0011
   - ADR-0020
+  - ADR-0021
 
 owns:
   entities:
@@ -25,15 +26,26 @@ owns:
   permissions:
     - inventory_grant_item
     - inventory_read
+  permission_context:
+    runtime_type: PermissionContext
+    identity_source: app.RequestIdentity
+    identity_owner: runtime/internal/app
+    standard: docs/player-identity-session-boundary.md
+    rule: Permission decisions may inspect request identity context, but metadata-only identity is not authenticated proof and inventory must not own authentication, sessions, player accounts, or the player module.
   does_not_own:
     entities:
       - player_account
+      - player_identity
+      - runtime_session
+      - authentication_credential
       - item_catalog
       - currency_balance
       - reward_claim
       - match_session
     data:
       - player_accounts
+      - authentication_credentials
+      - runtime_sessions
       - item_catalog_entries
       - currency_balances
       - reward_claims
@@ -96,6 +108,12 @@ dependencies:
     - player_id
     - item_id
     - reason
+  external_reference_boundaries:
+    player_id:
+      owner: planned_player_module
+      standard: docs/player-identity-session-boundary.md
+      decision: ADR-0021
+      rule: Inventory may key player-owned inventory state by player_id, but it must not create, authenticate, validate, migrate, or own player accounts or runtime sessions.
 
 invariants:
   - item_quantity_must_be_positive
@@ -103,6 +121,7 @@ invariants:
   - grant_item_must_emit_item_granted_once
   - get_inventory_must_not_mutate_state
   - inventory_item_identity_must_be_stable
+  - metadata_only_identity_must_not_be_privileged_proof
 
 generated:
   files: []
@@ -220,6 +239,12 @@ proof_slice:
       startup_migrations: not_applied_automatically
       live_end_to_end_status: opt_in_test_created_live_execution_skipped_without_dsn
       live_end_to_end_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
+    permission_handoff:
+      runtime_type: runtime/internal/modules/inventory.PermissionContext
+      request_identity_source: runtime/internal/app.RequestIdentity
+      static_bootstrap_policy: runtime/internal/modules/inventory.StaticPermissionPolicy
+      metadata_only_guard_policy: runtime/internal/modules/inventory.MetadataOnlyDenyPermissionPolicy
+      rule: Inventory permission policies can inspect request identity context but must not treat metadata-only identity as authenticated proof for privileged grants.
     status: postgresql_adapter_wired_in_explicit_runtime_path_opt_in_live_test_created_skipped_without_dsn
   protocol_bridge:
     owner: runtime/internal/platform/protocol/protobuf
@@ -231,6 +256,9 @@ proof_slice:
   non_goals:
     - full_item_catalog
     - player_account_lifecycle
+    - player_identity_lifecycle
+    - authentication_or_session_validation
+    - token_format_or_credential_storage
     - currency_transactions
     - reward_claim_flow
     - match_session_inventory_sync

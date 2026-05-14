@@ -68,6 +68,15 @@ func TestBuildEnvelopeAndRouteRequestFromEnvelope(t *testing.T) {
 	if routeRequest.Session.ConnectionID != "connection-1" || routeRequest.Session.SessionID != "session-1" || routeRequest.Session.PlayerID != "player-1" || routeRequest.Session.ConnectionEpoch != 7 {
 		t.Fatalf("Session = %#v, want normalized session", routeRequest.Session)
 	}
+	if routeRequest.Identity.Status != app.IdentityValidationMetadataOnly {
+		t.Fatalf("Identity.Status = %q, want %q", routeRequest.Identity.Status, app.IdentityValidationMetadataOnly)
+	}
+	if routeRequest.Identity.PlayerID != "player-1" || routeRequest.Identity.SessionID != "session-1" || routeRequest.Identity.ConnectionID != "connection-1" {
+		t.Fatalf("Identity = %#v, want normalized metadata-only session identity", routeRequest.Identity)
+	}
+	if routeRequest.Identity.PlayerIDValidated || routeRequest.Identity.SessionValidated {
+		t.Fatalf("Identity validation flags = %#v, want metadata-only identity", routeRequest.Identity)
+	}
 
 	var decoded inventoryv1.GrantItemRequest
 	if err := proto.Unmarshal(routeRequest.PayloadBytes, &decoded); err != nil {

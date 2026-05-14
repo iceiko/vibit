@@ -1,0 +1,48 @@
+syntax = "proto3";
+
+package vibit.player.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/player/v1;playerv1";
+
+// @source contracts/player/commands/CreatePlayerAccount.yaml
+// @source contracts/player/queries/GetPlayerAccount.yaml
+// @source contracts/player/events/PlayerAccountCreated.yaml
+// @source contracts/player/errors/player_account_errors.yaml
+// @source contracts/player/permissions/player_account_permissions.yaml
+// @source decisions/ADR-0016-protobuf-envelope-and-generation.md
+// @source decisions/ADR-0021-player-identity-and-session-boundary.md
+
+message CreatePlayerAccountRequest {
+  string display_name = 1;
+  string requested_by = 2;
+}
+
+message CreatePlayerAccountResponse {
+  string player_id = 1;
+  string display_name = 2;
+  string account_state = 3;
+  string created_at = 4;
+  string event = 5;
+}
+
+message GetPlayerAccountRequest {
+  string player_id = 1;
+  string requested_by = 2;
+}
+
+message GetPlayerAccountResponse {
+  string player_id = 1;
+  string display_name = 2;
+  string account_state = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message PlayerAccountCreated {
+  string event_id = 1;
+  string occurred_at = 2;
+  string player_id = 3;
+  string display_name = 4;
+  string account_state = 5;
+  string requested_by = 6;
+}

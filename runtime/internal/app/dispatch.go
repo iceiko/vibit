@@ -15,6 +15,7 @@ const (
 	ErrorCodeRouteAlreadyRegistered ErrorCode = "ROUTE_ALREADY_REGISTERED"
 	ErrorCodeRouteNotFound          ErrorCode = "ROUTE_NOT_FOUND"
 	ErrorCodeNilHandler             ErrorCode = "NIL_HANDLER"
+	ErrorCodeSessionInvalid         ErrorCode = "SESSION_INVALID"
 )
 
 type ApplicationError struct {
@@ -47,6 +48,7 @@ type ApplicationResult struct {
 	Route       RouteKey
 	Target      Target
 	Session     Session
+	Identity    RequestIdentity
 	PayloadType string
 	Payload     any
 	Events      []ApplicationEvent
@@ -109,6 +111,9 @@ func (d *Dispatcher) Register(route RouteKey, handler Handler) error {
 }
 
 func (d *Dispatcher) Dispatch(ctx context.Context, request RouteRequest) (ApplicationResult, error) {
+	if request.Identity.Status == "" {
+		request.Identity = MetadataOnlyIdentityFromSession(request.Session)
+	}
 	normalizedRoute, err := normalizeDispatchRoute(request.Route)
 	if err != nil {
 		result := resultForRequest(request)
@@ -137,6 +142,7 @@ func (d *Dispatcher) Dispatch(ctx context.Context, request RouteRequest) (Applic
 	handlerResult.Route = normalizedRoute
 	handlerResult.Target = request.Target
 	handlerResult.Session = request.Session
+	handlerResult.Identity = request.Identity
 	if err != nil {
 		if appErr, ok := err.(*ApplicationError); ok {
 			handlerResult.Error = appErr
@@ -153,6 +159,7 @@ func resultForRequest(request RouteRequest) ApplicationResult {
 		Route:     request.Route,
 		Target:    request.Target,
 		Session:   request.Session,
+		Identity:  request.Identity,
 	}
 }
 

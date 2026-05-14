@@ -1,0 +1,85 @@
+schema_version: 0.1
+kind: query
+module: player
+name: GetPlayerAccount
+status: draft
+decision_refs:
+  - ADR-0019
+  - ADR-0021
+
+summary: Read a player account lifecycle record without mutating state.
+
+intent: >
+  Return the current account lifecycle view for a stable player_id. This query
+  does not authenticate the caller, validate sessions, or expose credentials.
+
+permission: player_account_read
+
+input:
+  type: object
+  required:
+    - player_id
+    - requested_by
+  properties:
+    player_id:
+      type: string
+      minLength: 1
+      description: Stable player identity owned by the player module.
+    requested_by:
+      type: string
+      minLength: 1
+      description: Actor requesting the account read.
+
+output:
+  type: object
+  required:
+    - player_id
+    - display_name
+    - account_state
+    - created_at
+    - updated_at
+  properties:
+    player_id:
+      type: string
+      minLength: 1
+    display_name:
+      type: string
+      minLength: 1
+    account_state:
+      type: string
+      enum:
+        - active
+        - disabled
+        - deleted
+    created_at:
+      type: string
+      format: date-time
+    updated_at:
+      type: string
+      format: date-time
+
+emits: []
+
+errors:
+  - PLAYER_ACCOUNT_NOT_FOUND
+  - PLAYER_ACCOUNT_PERMISSION_DENIED
+
+invariants:
+  - get_player_account_must_not_mutate_state
+  - get_player_account_must_not_expose_credentials
+  - player_id_must_be_stable
+
+authorization:
+  requires_permission: player_account_read
+
+implementation:
+  handwritten_extension_point: runtime/internal/modules/player/queries/GetPlayerAccount
+  generated_outputs:
+    - go_typed_contract
+    - protobuf_message_shape
+    - websocket_query_dispatch_shape
+    - test_fixture
+  runtime_status: not_started
+  blocked_until:
+    - player_runtime_module_ratified
+    - generated_shape_ratified

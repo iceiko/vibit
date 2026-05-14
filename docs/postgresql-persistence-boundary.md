@@ -1,12 +1,12 @@
 # PostgreSQL Persistence Boundary Standard
 
-Status: Draft v0.1  
-Last updated: 2026-05-13  
+Status: Draft v0.2
+Last updated: 2026-05-14
 Scope: PostgreSQL repository, transaction, migration, and event-recording boundaries for the first durable Go runtime
 
 This standard defines the implementation boundary that must exist before vibit adds PostgreSQL-backed module state.
 
-Use this standard together with `.arch/runtime.yaml`, `.arch/dependencies.yaml`, `modules/inventory/module.yaml`, `ADR-0011`, `ADR-0013`, `ADR-0014`, and `ADR-0020`.
+Use this standard together with `.arch/runtime.yaml`, `.arch/dependencies.yaml`, `modules/inventory/module.yaml`, `modules/player/module.yaml`, `ADR-0011`, `ADR-0013`, `ADR-0014`, `ADR-0020`, `ADR-0021`, and `ADR-0022`.
 
 ## 1. Purpose
 
@@ -14,7 +14,7 @@ Durable persistence is where long-lived server projects often lose architectural
 
 The main risk is not that a PostgreSQL repository cannot be written. The main risk is that agents hide transactions, SQL ownership, migration semantics, permission checks, event recording, or cross-module data access inside the most convenient package.
 
-This standard prevents that drift by defining ownership before persistent inventory behavior is implemented.
+This standard prevents that drift by defining ownership before persistent inventory behavior is implemented and before later player account persistence adapters are added.
 
 ## 2. Layer Ownership
 
@@ -261,6 +261,231 @@ reason
 
 The domain handler must create this metadata before calling `MutationLock.GrantItem`, so the adapter can record the item quantity change and the `inventory_item_grants` row with the same application-owned executor.
 
+## 3.1 Player Account Persistence Schema Boundary
+
+Player account persistence is ratified as account lifecycle state only.
+
+The player module owns planned PostgreSQL state for:
+
+```text
+player account lifecycle row
+player account lifecycle event/audit row
+```
+
+The first player account persistent schema must model:
+
+- One `player_accounts` row per stable `player_id`.
+- One `player_account_events` row per durable player account lifecycle fact.
+- `PlayerAccountCreated` as the first lifecycle event type that must be recordable.
+
+The planned `player_accounts` table owns these columns:
+
+```text
+player_id
+display_name
+account_state
+created_at
+updated_at
+disabled_at
+deleted_at
+```
+
+Column rules:
+
+- `player_id` is the stable primary key and must be non-blank text.
+- `display_name` must be non-blank text. Uniqueness remains deferred.
+- `account_state` must be constrained to `active`, `disabled`, or `deleted`.
+- `created_at` and `updated_at` are required timestamps.
+- `disabled_at` is nullable and may be set only for disabled or deleted accounts.
+- `deleted_at` is nullable and may be set only for deleted accounts.
+- The first migration should use explicit check constraints for non-blank text and lifecycle state values.
+
+The planned `player_account_events` table owns these columns:
+
+```text
+event_id
+event_type
+occurred_at
+player_id
+requested_by
+account_state
+display_name
+metadata
+recorded_at
+```
+
+Column rules:
+
+- `event_id` is the primary key and must be non-blank text.
+- `event_type` must be non-blank text. The first required value is `PlayerAccountCreated`.
+- `occurred_at` records the domain event time.
+- `player_id` references `player_accounts(player_id)` and must be non-blank text.
+- `requested_by` must be non-blank text but is not authenticated proof by itself.
+- `account_state` records the lifecycle state after the event.
+- `display_name` records the display name after the event when relevant.
+- `metadata` may use `JSONB NOT NULL DEFAULT '{}'::jsonb` for structured non-secret event metadata.
+- `recorded_at` records when PostgreSQL stored the row.
+
+The first player account migration should include indexes for:
+
+```text
+player_accounts(account_state)
+player_account_events(player_id, occurred_at)
+player_account_events(event_type, occurred_at)
+```
+
+The first player account schema must not store:
+
+- authentication credentials
+- password hashes
+- authentication provider names or provider subject IDs
+- external identity links
+- access tokens
+- refresh tokens
+- token signing metadata
+- runtime session rows
+- WebSocket connection state
+- request identity validation results
+- inventory state
+- permission grants
+
+Those concerns require separate standards, contracts, migrations, and verification before implementation.
+
+The first persistent player account creation flow, once runtime implementation is separately ratified, should be atomic:
+
+```text
+application command dispatch
+-> open unit of work
+-> enforce request validation and account creation permission
+-> insert player_accounts row
+-> insert player_account_events row for PlayerAccountCreated
+-> commit unit of work
+-> return application result
+```
+
+The player account repository boundary is module-owned and storage-neutral:
+
+```text
+Repository.CreatePlayerAccount(ctx, CreatePlayerAccountMutation)
+Repository.GetPlayerAccount(ctx, player_id)
+```
+
+The first source for this boundary is:
+
+```text
+runtime/internal/modules/player/repository.go
+```
+
+It defines the account lifecycle view, the `Repository` interface, and the `CreatePlayerAccountMutation` fields required by the durable event record. It must remain free of PostgreSQL, WebSocket, Protobuf, authentication, token, credential, and session dependencies.
+
+`CreatePlayerAccountMutation` must carry the durable event metadata needed by PostgreSQL adapters:
+
+```text
+event_id
+occurred_at
+player_id
+display_name
+account_state
+requested_by
+```
+
+The PostgreSQL adapter must use an executor supplied by the application-owned unit of work. It must not open hidden write transactions, parse credentials, validate tokens, bind sessions, decode Protobuf payloads, or enforce WebSocket behavior.
+
+The first player account migration source is:
+
+```text
+runtime/migrations/postgres/000002_create_player_account_state.sql
+```
+
+It uses the next deterministic SQL migration number after existing migration files and includes:
+
+```text
+-- +goose Up
+-- Module: player
+-- +goose Down
+```
+
+Runtime player account handlers, WebSocket route wiring, authentication, token behavior, credential storage, external identity linking, and session persistence remain deferred until separately ratified.
+
+## 3.2 Player Account PostgreSQL Adapter Boundary
+
+The first player account PostgreSQL adapter is implemented, but it remains a persistence adapter only. It does not authorize runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, or session persistence.
+
+The adapter source path is:
+
+```text
+runtime/internal/platform/persistence/postgres/player_account_repository.go
+```
+
+The focused test path is:
+
+```text
+runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+```
+
+The adapter is constructed with:
+
+```text
+NewPlayerAccountRepositoryForUnitOfWork(executor)
+```
+
+The constructor returns an implementation of:
+
+```text
+player.Repository
+```
+
+The executor must be supplied by the application-owned unit of work, normally from a transaction-bound handle such as `pgx.Tx`. The adapter uses the same small pgx-shaped executor interface as the inventory adapter for testability. It must not call `BEGIN`, `COMMIT`, or `ROLLBACK`; transaction lifetime belongs to the application-owned unit of work.
+
+The adapter must not:
+
+- Call `BEGIN`, `COMMIT`, or `ROLLBACK`.
+- Open its own hidden write transaction.
+- Open a PostgreSQL pool or read PostgreSQL configuration.
+- Apply migrations or inspect migration status.
+- Parse authentication credentials.
+- Validate tokens.
+- Bind or persist runtime sessions.
+- Decode Protobuf payloads.
+- Know WebSocket handshake or connection behavior.
+- Enforce permissions.
+- Import transport, protocol, application bootstrap, authentication, credential, token, session, inventory, S3, or MinIO packages.
+
+The first allowed SQL operation scope is intentionally narrow:
+
+- `CreatePlayerAccount` normalizes `player.CreatePlayerAccountMutation`.
+- `CreatePlayerAccount` inserts one `player_accounts` row.
+- `CreatePlayerAccount` inserts one `player_account_events` row for `PlayerAccountCreated` in the same caller-supplied executor path.
+- `GetPlayerAccount` normalizes `player_id`.
+- `GetPlayerAccount` reads the current account lifecycle row from `player_accounts`.
+- Neither method reads or writes credentials, tokens, external identity links, runtime sessions, WebSocket state, inventory state, or permission grants.
+
+Error mapping expectations:
+
+- Missing rows must map to a stable player account not-found error path before runtime handlers expose the error to clients.
+- Duplicate `player_id` or duplicate `event_id` constraint violations must map to stable duplicate/conflict error paths.
+- Check constraint violations must map to stable invariant or validation error paths.
+- Unexpected PostgreSQL errors may be wrapped with adapter context, but `pgx` or `pgconn` types must not leak into the module-owned repository interface.
+
+The first adapter implementation includes focused tests for:
+
+- Fake-executor SQL shape tests for account creation and account lookup.
+- A no-transaction-control test proving the adapter does not issue `BEGIN`, `COMMIT`, or `ROLLBACK`.
+- Mutation normalization and UTC timestamp tests.
+- Row mapping tests for nullable lifecycle timestamps.
+- Duplicate account, duplicate event, check constraint, and missing-row error mapping tests.
+- Import-boundary tests through `node tools/vibit check runtime`.
+- No live PostgreSQL dependency in default repository checks.
+- Optional live integration coverage only through `VIBIT_POSTGRES_TEST_DSN`.
+
+The PostgreSQL unit-of-work helper constructs this repository from a transaction executor through:
+
+```text
+runtime/internal/platform/persistence/postgres.UnitOfWork.NewPlayerAccountRepository
+```
+
+That helper must stay in the PostgreSQL platform package. It must not change the module-owned `player.Repository` interface, force application or domain packages to import `pgx`, or imply runtime player account handlers, WebSocket routes, authentication, credentials, tokens, external identity links, or session persistence.
+
 ## 4. Repository Rules
 
 Repository interfaces are module-owned. PostgreSQL adapters implement them.
@@ -321,6 +546,7 @@ Rules:
 - Migrations must not be edited after they are treated as applied in a shared environment; add a new migration instead.
 - Every migration that creates module-owned state must name the owning module.
 - Every migration that enforces an invariant should map back to a module invariant or persistence boundary rule.
+- Player account migrations may create only the lifecycle tables ratified in Section 3.1 until authentication, credential, token, external identity, or session persistence standards are separately ratified.
 - Destructive migrations require a change spec with rollback and data compatibility notes.
 - Migration validation must be recorded before a persistent repository is considered verified.
 - Migration execution helpers must be invoked explicitly by an operator, tool, or approved runtime composition path. Normal server startup must not apply migrations unless a later change spec authorizes that behavior.

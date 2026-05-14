@@ -198,6 +198,7 @@ Transport errors、malformed envelopes、permission errors、invariant failures 
 ```text
 proto/vibit/protocol/v1/envelope.proto
 proto/vibit/inventory/v1/inventory.proto
+proto/vibit/player/v1/player.proto
 ```
 
 第一批 Buf configuration files 是：

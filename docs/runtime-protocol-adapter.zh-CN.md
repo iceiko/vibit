@@ -310,9 +310,21 @@ OutboundMessage
 
 - `TransportFrame` 携带 frame bytes 和 connection metadata，但不携带 domain semantics。
 - `ProtocolEnvelope` 表示 decoded envelope metadata 和 payload bytes。
-- `RouteRequest` 携带 `kind`、`module`、`name`、`request_id`、target、session、payload identity 和 decoded command/query payload。
-- `ApplicationResult` 携带 response payloads、emitted events 和 application-level errors。
+- `RouteRequest` 携带 `kind`、`module`、`name`、`request_id`、target、session metadata、request identity context、payload identity 和 decoded command/query payload。
+- `ApplicationResult` 携带 request metadata、request identity context、response payloads、emitted events 和 application-level errors。
 - `OutboundMessage` 携带可由 transport encoding 发送的 protocol-level output。
+
+当前 request identity handoff：
+
+- `RequestIdentity` 由 `runtime/internal/app` 拥有。
+- 从 client-visible envelope session metadata 复制出来的值，其 `IdentityValidationStatus` 从 `metadata_only` 开始。
+- `player_id`、`session_id`、`connection_id` 和 `connection_epoch` 可以被 normalize 到 `RequestIdentity`，但在 session validation 存在前，它们不是 identity proof。
+- Protobuf adapter 可以从现有 envelope `Session` fields 构建 metadata-only identity。
+- 当调用方只提供 `Session` 时，application dispatch 必须补充 metadata-only identity。
+- `SessionValidatingDispatcher` 可以在 protocol decoding 之后、module handlers 收到 request 之前运行注入的 `SessionValidator`。
+- 默认的 `MetadataOnlySessionValidator` 会保留 metadata-only behavior，并且不会认证 clients。
+- 未来 real session validator 可以在 module handlers 收到 request 前，用 validated identity 替换 metadata-only identity。
+- Domain modules 可以读取 request identity 来做 policy decisions，但不得直接解析 credentials、token formats、WebSocket handshake data 或 Protobuf session fields。
 
 ## 5. Routing Rules
 
@@ -372,6 +384,8 @@ Protocol adapter 可以解析 session 和 target metadata，但不得发明 auth
 - `player_id` 可以作为 inventory protocol shape 的 planned context。
 - Authentication/session validation 仍是 deferred explicit module 或 platform decision。
 - Transport connection identity 不得被当作 durable player identity。
+- 仅从 envelope 或 transport metadata 派生出的 identity，`RequestIdentity.Status` 必须保持 `metadata_only`。
+- 在未来 session validator 真正完成验证前，`RequestIdentity.PlayerIDValidated` 和 `RequestIdentity.SessionValidated` 必须保持 false。
 
 `player` 之外的 target scopes 继续 reserved，直到相关 module 和 lifecycle standard 存在。
 

@@ -1,0 +1,57 @@
+schema_version: 0.1
+change_id: verify-agent-tooling-generated-contract-shapes
+date: 2026-05-14
+type: tooling
+status: verified
+
+summary: Verify agent tooling and generated contract shape outputs.
+
+affected_modules:
+  - inventory
+  - player
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect contracts --json
+    - node tools/vibit inspect generated --json
+    - node tools/vibit inspect reference --json
+    - node tools/vibit check agent-tooling --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check work --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - cd runtime && go vet ./...
+    - git diff --check
+  status: Verified

@@ -81,6 +81,7 @@ superseded
 - `next_ready` work item 的所有 dependencies 必须已经 completed。
 - completed work item 应链接 change spec，或解释为什么不需要 change spec。
 - 通常每个 active milestone 应只有一个 `next_ready` item。只有在多个独立工作可以并行推进时，才允许多个 next-ready items。
+- 如果当前唯一工作被明确标为 `blocked` 并写明 `block_reason`，active milestone 没有 `next_ready` item 是有效状态。这代表有意的 maintainer decision gate，不是空队列。
 
 ## 6. Continuation Semantics
 

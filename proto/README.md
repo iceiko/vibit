@@ -18,10 +18,11 @@ Module Protobuf sources should use:
 proto/vibit/<module>/v1/
 ```
 
-The first planned module path is:
+The first module paths are:
 
 ```text
 proto/vibit/inventory/v1/
+proto/vibit/player/v1/
 ```
 
 The first protocol envelope source is:

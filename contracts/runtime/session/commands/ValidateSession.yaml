@@ -1,0 +1,132 @@
+schema_version: 0.1
+kind: command
+module: runtime
+family: session
+name: ValidateSession
+status: draft
+owner: runtime/internal/app
+decision_refs:
+  - ADR-0018
+  - ADR-0021
+
+summary: Validate decoded request session metadata into application request identity before domain dispatch.
+
+intent: >
+  Convert an already-decoded route request and its envelope session metadata into
+  a request identity validation result. This semantic contract defines the
+  application handoff shape only. It does not define token parsing, token
+  signing, refresh behavior, credential lookup, player account lookup, session
+  persistence, WebSocket handshake authentication, or database schema.
+
+permission: runtime_session_validate
+
+input:
+  type: object
+  required:
+    - request_id
+    - route_kind
+    - route_module
+    - route_name
+  properties:
+    request_id:
+      type: string
+      minLength: 1
+    route_kind:
+      type: string
+      enum:
+        - command
+        - query
+    route_module:
+      type: string
+      minLength: 1
+    route_name:
+      type: string
+      minLength: 1
+    connection_id:
+      type: string
+      description: Transport-local connection metadata. It is not authenticated proof.
+    session_id:
+      type: string
+      description: Session metadata from the decoded envelope. It is not authenticated proof before a real validator is ratified.
+    player_id:
+      type: string
+      description: Player identity metadata from the decoded envelope. It is not authenticated proof before a real validator is ratified.
+    connection_epoch:
+      type: integer
+      minimum: 0
+    target_scope:
+      type: string
+    target_id:
+      type: string
+
+output:
+  type: object
+  required:
+    - validation_status
+    - valid
+    - actor_kind
+    - session_validated
+    - player_id_validated
+  properties:
+    validation_status:
+      type: string
+      enum:
+        - metadata_only
+        - validated
+    valid:
+      type: boolean
+    actor_kind:
+      type: string
+      enum:
+        - unknown
+        - player
+        - service
+        - admin
+    actor_id:
+      type: string
+    player_id:
+      type: string
+    session_id:
+      type: string
+    connection_id:
+      type: string
+    connection_epoch:
+      type: integer
+      minimum: 0
+    session_validated:
+      type: boolean
+    player_id_validated:
+      type: boolean
+    reason:
+      type: string
+
+emits:
+  - SessionValidated
+
+errors:
+  - SESSION_INVALID
+  - SESSION_VALIDATOR_UNAVAILABLE
+  - SESSION_VALIDATION_NOT_IMPLEMENTED
+
+invariants:
+  - metadata_only_identity_must_not_be_authenticated_proof
+  - validation_must_run_before_domain_dispatch
+  - runtime_session_validation_must_not_choose_token_format
+  - runtime_session_validation_must_not_lookup_credentials
+  - runtime_session_validation_must_not_create_player_accounts
+  - runtime_session_validation_must_not_write_session_persistence
+  - websocket_transport_must_not_own_session_validation
+
+authorization:
+  requires_permission: runtime_session_validate
+
+implementation:
+  handwritten_extension_point: runtime/internal/app/SessionValidator
+  existing_runtime_hook: runtime/internal/app/session_validation.go
+  generated_outputs: []
+  runtime_status: metadata_only_hook_exists_real_validator_not_started
+  blocked_until:
+    - authentication_scheme_ratified
+    - token_behavior_ratified
+    - session_persistence_ratified_if_needed
+    - websocket_handshake_authentication_ratified_if_needed

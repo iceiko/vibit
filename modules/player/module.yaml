@@ -1,0 +1,325 @@
+schema_version: 0.1
+module: player
+category: domain
+status: draft
+summary: Owns stable player identity, player account lifecycle semantic and wire contracts, ratified PostgreSQL lifecycle schema boundaries, the module-owned storage-neutral repository interface, and the declared PostgreSQL adapter boundary without implementing authentication, credentials, sessions, runtime handlers, or persistence adapters yet.
+
+decisions:
+  - ADR-0019
+  - ADR-0021
+  - ADR-0022
+
+owns:
+  entities:
+    - player_identity
+    - player_account
+  data:
+    - player_account_lifecycle_state
+    - planned_player_accounts_table
+    - planned_player_account_events_table
+  permissions: []
+  does_not_own:
+    entities:
+      - runtime_session
+      - websocket_connection
+      - transport_connection
+      - authentication_credential
+      - inventory
+      - inventory_item
+      - currency_balance
+      - reward_claim
+      - quest_progress
+      - match_session
+    data:
+      - runtime_sessions
+      - transport_connections
+      - authentication_credentials
+      - token_store
+      - inventory_records
+      - inventory_items
+      - currency_balances
+      - reward_claims
+      - quest_progress_records
+      - match_sessions
+
+public_api:
+  status: semantic_wire_repository_and_postgres_adapter_implemented_no_handlers
+  commands:
+    - CreatePlayerAccount
+  queries:
+    - GetPlayerAccount
+  vocabulary_placeholders:
+    player_identity:
+      - player_id
+    player_account_lifecycle:
+      - account_creation
+      - account_lookup
+      - account_linking
+      - account_disabling
+      - account_deletion
+      - account_recovery
+    request_identity_handoff:
+      - authentication_result
+      - session_validation_result
+      - request_identity_context
+    rule: These names are vocabulary placeholders only. They are not public command, query, event, error, permission, token, credential, or database contracts.
+
+events:
+  status: semantic_and_wire_contracts_ratified_repository_and_postgres_adapter_boundary_added_no_runtime_handlers
+  publishes:
+    - PlayerAccountCreated
+  subscribes: []
+
+errors:
+  owns:
+    - player_account_errors
+  schemas:
+    status: ratified_semantic_and_wire_contracts_no_runtime_implementation
+    files:
+      - contracts/player/errors/player_account_errors.yaml
+
+permission_schemas:
+  status: ratified_semantic_and_wire_contracts_no_runtime_implementation
+  files:
+    - contracts/player/permissions/player_account_permissions.yaml
+
+dependencies:
+  allowed: []
+  forbidden:
+    - inventory
+    - currency
+    - reward
+    - quest
+    - match
+    - direct_websocket_library
+    - direct_protobuf_runtime
+    - direct_postgresql_driver
+    - direct_s3_sdk
+    - direct_minio_client
+  external_reference_boundaries:
+    runtime_session:
+      owner: runtime_session_boundary
+      standard: docs/player-identity-session-boundary.md
+      decision: ADR-0021
+      rule: Runtime session validation is not owned by the player module manifest boundary step.
+    request_identity_context:
+      owner: runtime/internal/app
+      standard: docs/player-identity-session-boundary.md
+      decision: ADR-0021
+      rule: Application dispatch owns normalized request identity handoff after session validation exists.
+
+invariants:
+  - player_id_must_be_stable_domain_identity
+  - player_account_lifecycle_must_have_single_owner
+  - player_identity_must_not_be_transport_connection_identity
+  - authentication_scheme_must_be_ratified_before_implementation
+  - account_persistence_schema_is_ratified_before_migration
+  - account_persistence_migration_must_match_ratified_schema_boundary
+  - generated_outputs_must_not_be_hand_edited
+
+generated:
+  files: []
+  directories: []
+  planned_outputs:
+    go_typed_contracts: []
+    protobuf_message_shapes:
+      - CreatePlayerAccountRequest
+      - CreatePlayerAccountResponse
+      - GetPlayerAccountRequest
+      - GetPlayerAccountResponse
+      - PlayerAccountCreated
+    websocket_dispatch_shapes: []
+    test_fixtures: []
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  status: semantic_wire_repository_and_postgres_adapter_implemented_no_handlers
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  wire_schema_status: player_account_proto_generated
+  wire_schema_source: proto/vibit/player/v1/player.proto
+  generated_go_proto: runtime/internal/generated/proto/vibit/player/v1/player.pb.go
+  runtime_player_handlers_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_schema_ratified: true
+  player_account_persistence_implemented: false
+  player_account_migration_added: true
+  player_account_repository_interface_added: true
+  player_account_repository_source: runtime/internal/modules/player/repository.go
+  player_account_postgres_adapter_boundary_defined: true
+  player_account_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+  player_account_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+  player_account_postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+  player_account_postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+  player_account_postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork
+  player_account_postgres_adapter_constructor: NewPlayerAccountRepositoryForUnitOfWork
+  player_account_postgres_adapter_implements: player.Repository
+  player_account_postgres_adapter_added: true
+  commands:
+    CreatePlayerAccount: contracts/player/commands/CreatePlayerAccount.yaml
+  queries:
+    GetPlayerAccount: contracts/player/queries/GetPlayerAccount.yaml
+  events:
+    PlayerAccountCreated: contracts/player/events/PlayerAccountCreated.yaml
+  errors: contracts/player/errors/player_account_errors.yaml
+  permissions: contracts/player/permissions/player_account_permissions.yaml
+  ratification_required_before:
+    - websocket_routes
+    - authentication_provider
+    - credential_storage
+    - runtime_player_module_implementation
+    - session_persistence
+
+persistence:
+  postgresql_schema:
+    decision: ADR-0022
+    standard: docs/postgresql-persistence-boundary.md
+    status: schema_ratified_migration_source_added_repository_interface_and_adapter_implemented_handlers_deferred
+    planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    migration_source_added: true
+    repository_interface_added: true
+    repository_interface_source: runtime/internal/modules/player/repository.go
+    postgres_adapter_boundary_defined: true
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork
+    postgres_adapter_constructor: NewPlayerAccountRepositoryForUnitOfWork
+    postgres_unit_of_work_factory_planned: UnitOfWork.NewPlayerAccountRepository
+    postgres_unit_of_work_factory: UnitOfWork.NewPlayerAccountRepository
+    postgres_adapter_implements: player.Repository
+    postgres_adapter_sql_scope:
+      - insert_player_accounts
+      - insert_player_account_events_for_PlayerAccountCreated
+      - read_player_accounts_current_lifecycle_row
+    postgres_adapter_transaction_rule: caller_supplied_unit_of_work_executor_no_begin_commit_or_rollback
+    postgres_adapter_error_mapping_required:
+      - missing_player_account_to_stable_not_found_error
+      - duplicate_player_id_or_event_id_to_stable_conflict_error
+      - check_constraint_to_stable_validation_or_invariant_error
+      - unexpected_postgresql_errors_wrapped_without_leaking_pgx_types
+    postgres_adapter_tests_required_before_implementation:
+      - fake_executor_sql_shape_tests
+      - no_begin_commit_or_rollback_sql
+      - mutation_normalization_and_utc_timestamp_tests
+      - nullable_lifecycle_timestamp_row_mapping_tests
+      - duplicate_and_constraint_error_mapping_tests
+      - no_live_postgresql_required_by_default
+    postgres_adapter_added: true
+    runtime_handlers_added: false
+    runtime_player_handlers_added: false
+    websocket_routes_added: false
+    authentication_implemented: false
+    token_behavior_implemented: false
+    credential_storage_implemented: false
+    session_persistence_implemented: false
+    player_account_persistence_implemented: false
+    lifecycle_tables:
+      - player_accounts
+      - player_account_events
+    lifecycle_columns:
+      player_accounts:
+        - player_id
+        - display_name
+        - account_state
+        - created_at
+        - updated_at
+        - disabled_at
+        - deleted_at
+      player_account_events:
+        - event_id
+        - event_type
+        - occurred_at
+        - player_id
+        - requested_by
+        - account_state
+        - display_name
+        - metadata
+        - recorded_at
+    required_indexes:
+      - player_accounts(account_state)
+      - player_account_events(player_id, occurred_at)
+      - player_account_events(event_type, occurred_at)
+    first_required_event_type: PlayerAccountCreated
+    forbidden_data:
+      - authentication_credentials
+      - password_hashes
+      - authentication_provider_subjects
+      - external_identity_links
+      - access_tokens
+      - refresh_tokens
+      - token_signing_metadata
+      - runtime_session_rows
+      - websocket_connection_state
+      - request_identity_validation_results
+      - inventory_state
+      - permission_grants
+    repository_boundary:
+      - Repository.CreatePlayerAccount(ctx, CreatePlayerAccountMutation)
+      - Repository.GetPlayerAccount(ctx, player_id)
+    create_mutation_fields:
+      - event_id
+      - occurred_at
+      - player_id
+      - display_name
+      - account_state
+      - requested_by
+
+handwritten:
+  extension_points:
+    command_handlers: []
+    query_handlers: []
+    event_handlers: []
+    policies:
+      - player_identity_policy
+      - player_account_lifecycle_policy
+    repositories:
+      - player_account_repository_interface
+    repository_sources:
+      - runtime/internal/modules/player/repository.go
+    planned_postgresql_adapter_sources:
+      - runtime/internal/platform/persistence/postgres/player_account_repository.go
+    planned_postgresql_adapter_tests:
+      - runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    services: []
+    test_suites:
+      - player_module_boundary_tests
+      - player_identity_invariant_tests
+      - runtime/internal/modules/player/repository_test.go
+
+boundary:
+  standard: docs/player-identity-session-boundary.md
+  decision: ADR-0021
+  reference_alignment:
+    nakama: Account, user, authentication, and session capability family reference.
+    pitaya: Session binding, route handler, and realtime server vocabulary reference.
+  current_status: semantic_wire_repository_and_postgres_adapter_implemented_no_handlers
+  non_goals:
+    - authentication_provider
+    - token_format
+    - password_model
+    - guest_login
+    - device_login
+    - social_login
+    - external_identity_provider
+    - credential_storage
+    - runtime_session_storage
+    - runtime_player_account_handler
+    - protobuf_envelope_change
+    - websocket_handshake_change
+    - inventory_state_ownership
+
+tests:
+  required:
+    - architecture_tests
+    - module_manifest_tests
+    - boundary_tests
+    - contract_registration_tests_before_public_api

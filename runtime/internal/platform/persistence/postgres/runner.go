@@ -7,6 +7,7 @@ import (
 	"reflect"
 
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
+	"github.com/iceiko/vibit/runtime/internal/modules/player"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -105,4 +106,12 @@ func (u UnitOfWork) NewInventoryRepository() (inventory.Repository, error) {
 		return nil, err
 	}
 	return NewInventoryRepositoryForUnitOfWork(executor), nil
+}
+
+func (u UnitOfWork) NewPlayerAccountRepository() (player.Repository, error) {
+	executor, err := u.Executor()
+	if err != nil {
+		return nil, err
+	}
+	return NewPlayerAccountRepositoryForUnitOfWork(executor), nil
 }

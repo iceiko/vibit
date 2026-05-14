@@ -39,10 +39,13 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - `../docs/runtime-protocol-adapter.md`
 - persistence work 前阅读 `../docs/postgresql-persistence-boundary.md`
 - live PostgreSQL verification work 前阅读 `../docs/postgresql-verification-environment.md`
+- authentication、token、credential、external identity、session persistence、request identity trust、WebSocket handshake、player handler 或 player route work 前阅读 `../docs/authentication-token-session-validation.md`
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
 - persistence work 前阅读 `../decisions/ADR-0020-postgresql-persistence-boundary.md`
+- player account persistence work 前阅读 `../decisions/ADR-0022-player-account-postgresql-schema-boundary.md`
+- authentication/session design 或 implementation work 前阅读 `../decisions/ADR-0023-authentication-token-session-validation-design-boundary.md`
 - 受影响的 module manifest，例如 `../modules/inventory/module.yaml`
 - `../changes/` 下相关 change spec
 
@@ -104,7 +107,15 @@ pgx-backed transaction runner 是 `internal/platform/persistence/postgres/runner
 
 `GrantItemMutation` 携带 `event_id`、`occurred_at` 和 `reason`，这样 PostgreSQL adapter 可以在与 item quantity update 相同的 executor path 中持久化 `inventory_item_grants`。
 
-第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。当 migration sources 或 migration guidance 发生变化时，运行 `node ../tools/vibit check migrations`。在 migration tooling 能针对一次性 PostgreSQL environment 运行前，migration apply/rollback verification 仍然 pending。
+第一版 inventory migration source 是 `migrations/postgres/000001_create_inventory_state.sql`。它创建 `inventory_accounts`、`inventory_items` 和 `inventory_item_grants`。当 migration sources 或 migration guidance 发生变化时，运行 `node ../tools/vibit check migrations`。设置 `VIBIT_POSTGRES_TEST_DSN` 后，opt-in live durable inventory request-loop verification 会覆盖 migration status 和 apply behavior。
+
+Ratified player account PostgreSQL schema boundary 已记录在 `../docs/postgresql-persistence-boundary.md` 和 `../decisions/ADR-0022-player-account-postgresql-schema-boundary.md`。第一版 player account migration source 是 `migrations/postgres/000002_create_player_account_state.sql`。该 migration 只创建 `player_accounts` 和 `player_account_events` lifecycle state。它不得添加 credentials、password hashes、external identity links、access tokens、refresh tokens、runtime session rows、WebSocket connection state、request identity validation results、inventory state 或 permission grants。
+
+Player account repository interface boundary 是 `internal/modules/player/repository.go`。它是 storage-neutral domain code，可以定义 account lifecycle structs、`Repository.CreatePlayerAccount`、`Repository.GetPlayerAccount`，以及 persistence adapters 所需的 durable mutation metadata。PostgreSQL adapter 是 `internal/platform/persistence/postgres/player_account_repository.go`，focused tests 位于 `internal/platform/persistence/postgres/player_account_repository_test.go`。它使用 `NewPlayerAccountRepositoryForUnitOfWork(executor)`，实现 `player.Repository`，从 application-owned unit of work 接收 executor，并且不得调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`。`UnitOfWork.NewPlayerAccountRepository` 是 PostgreSQL package helper，不得向 application 或 domain packages 暴露 pgx。
+
+Player account PostgreSQL adapter 不授权 runtime handlers、WebSocket routes、authentication、token behavior、credential storage、external identity linking 或 session persistence。除非后续 change ratify 更多行为，adapter 只能写入 `player_accounts`，为 `PlayerAccountCreated` 写入 `player_account_events`，并从 `player_accounts` 读取当前 lifecycle rows。
+
+Authentication、token 和 session validation design boundary 记录在 `../docs/authentication-token-session-validation.md` 和 `../decisions/ADR-0023-authentication-token-session-validation-design-boundary.md`。它分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、WebSocket handshake authentication、player account lifecycle、transport connection metadata 和 Protobuf envelope metadata。当前 `MetadataOnlySessionValidator` 是 non-authenticated bootstrap path。不要把 metadata-only `player_id`、`session_id` 或 `connection_id` 当作 production proof；未经单独 ratify，不要添加 authentication runtime code、token parsing、credential lookup、external identity linking、session persistence、Protobuf envelope authentication changes、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。`runtime.authentication_token_session_boundary` 是该边界的 repository check rule。
 
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 
@@ -124,7 +135,7 @@ Generated files 对 non-system agents 不可变。
 
 这个 runtime workspace 现在已经有第一批 generated Protobuf output、第一段窄 runtime handoff slice、第一版 WebSocket transport adapter、一个用于 command 和 query routes 的小型 application dispatch skeleton、第一版 transaction boundary skeleton、带 command-safe mutation lock 的第一版 inventory repository/policy/handler runtime boundary、第一版 PostgreSQL configuration parser、第一版 pgx-backed transaction runner adapter、第一版 PostgreSQL inventory repository adapter、第一条 inventory Protobuf/domain payload bridge、第一条 application-error-to-Protobuf-error-envelope mapper、第一版 frame-to-Protobuf-to-application composition adapter、用于 Protobuf command/query tests 的 package-local request-loop test fixture、挂载 `/v1/ws` 的 minimal process wiring、显式 PostgreSQL inventory runtime composition path，以及 opt-in live PostgreSQL durable inventory request-loop verification test。
 
-这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source、第一版显式 migration apply/status runner、第一版 PostgreSQL repository adapter、显式 runtime store selection，以及只有设置 `VIBIT_POSTGRES_TEST_DSN` 才会运行 live branch 的 live verification test。`VIBIT_RUNTIME_STORE=memory` 仍然是默认值。提供 `VIBIT_POSTGRES_DSN` 时，`VIBIT_RUNTIME_STORE=postgres` 会启用 PostgreSQL-backed inventory composition。这个 workspace 仍然没有实现 generated route registration、generated protocol bridge creation、authentication/session validation、automatic startup migrations 或 catalog-driven error retryability。
+这个 workspace 已经有 documented PostgreSQL persistence boundary、transaction skeleton、PostgreSQL configuration parser、pgx-backed transaction runner、第一版 inventory migration source、第一版显式 migration apply/status runner、第一版 PostgreSQL repository adapter、显式 runtime store selection、已添加第一版 migration source、storage-neutral repository interface、focused PostgreSQL adapter implementation 和 PostgreSQL unit-of-work factory helper 的 ratified player account PostgreSQL lifecycle schema boundary，以及已经 ratify 但尚未实现 runtime authentication 的 authentication/token/session validation design boundary，并有只有设置 `VIBIT_POSTGRES_TEST_DSN` 才会运行 live branch 的 live verification test。`VIBIT_RUNTIME_STORE=memory` 仍然是默认值。提供 `VIBIT_POSTGRES_DSN` 时，`VIBIT_RUNTIME_STORE=postgres` 会启用 PostgreSQL-backed inventory composition。这个 workspace 仍然没有实现 generated route registration、generated protocol bridge creation、production authentication/session validation、runtime player account handlers、WebSocket player routes、automatic startup migrations 或 catalog-driven error retryability。
 
 第一版手动 process run path 是：
 
@@ -149,7 +160,7 @@ cd runtime
 VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
 ```
 
-如果未设置 `VIBIT_POSTGRES_TEST_DSN`，该 test 会 skip，并记录 live PostgreSQL verification 不可用。
+如果未设置 `VIBIT_POSTGRES_TEST_DSN`，该 test 会 skip，并记录 live PostgreSQL verification 不可用。第一版 live execution 已经在 local Termux PostgreSQL 18.2 上通过。
 
 ## 8. 验证
 

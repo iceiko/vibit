@@ -72,12 +72,21 @@ documentation_pairs:
   generated_output_standard:
     canonical: docs/generated-output.md
     zh-CN: docs/generated-output.zh-CN.md
+  agent_tooling_standard:
+    canonical: docs/agent-tooling.md
+    zh-CN: docs/agent-tooling.zh-CN.md
   runtime_protocol_adapter_standard:
     canonical: docs/runtime-protocol-adapter.md
     zh-CN: docs/runtime-protocol-adapter.zh-CN.md
   reference_alignment_standard:
     canonical: docs/reference-game-server-alignment.md
     zh-CN: docs/reference-game-server-alignment.zh-CN.md
+  player_identity_session_boundary_standard:
+    canonical: docs/player-identity-session-boundary.md
+    zh-CN: docs/player-identity-session-boundary.zh-CN.md
+  authentication_token_session_validation_standard:
+    canonical: docs/authentication-token-session-validation.md
+    zh-CN: docs/authentication-token-session-validation.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -100,7 +109,7 @@ templates:
   agent_decision_record: decisions/_template/adr-agent.md
   dependency_adoption: docs/_templates/dependency-adoption.md
 
-runtime_readiness:
+  runtime_readiness:
   manifest: .arch/runtime.yaml
   decisions:
     superseded_language_decision: ADR-0003
@@ -118,6 +127,9 @@ runtime_readiness:
     protobuf_envelope_and_generation: ADR-0016
     generated_output_standard: ADR-0017
     runtime_protocol_adapter_boundary: ADR-0018
+    player_identity_and_session_boundary: ADR-0021
+    player_account_postgresql_schema_boundary: ADR-0022
+    authentication_token_session_validation_design_boundary: ADR-0023
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -149,6 +161,116 @@ reference_alignment:
     constitution, ADRs, manifests, generated boundaries, and verification
     commands remain authoritative.
   check_command: node tools/vibit check architecture
+
+agent_tooling_standard:
+  standard: docs/agent-tooling.md
+  translation: docs/agent-tooling.zh-CN.md
+  status: draft
+  role: agent_facing_inspection_generation_and_verification_surface
+  commands:
+    inspect_next: node tools/vibit inspect next --json
+    inspect_contracts: node tools/vibit inspect contracts --json
+    inspect_generated: node tools/vibit inspect generated --json
+    inspect_reference: node tools/vibit inspect reference --json
+    generate_contract_shapes: node tools/vibit generate contract-shapes all
+    check_agent_tooling: node tools/vibit check agent-tooling --json
+  rule: >
+    Prefer small JSON inspection and reproducible generation commands for
+    agent intake. Tooling output does not grant permission to cross ask-first
+    boundaries.
+  path_rule: >
+    Repository-relative paths in JSON tooling output use forward slashes in
+    fields such as artifact, path, source, and output on every platform,
+    including Windows.
+
+player_identity_session_boundary:
+  standard: docs/player-identity-session-boundary.md
+  translation: docs/player-identity-session-boundary.zh-CN.md
+  decision: ADR-0021
+  planned_player_module: modules/player
+  current_status: player_account_postgresql_adapter_implemented_without_authentication_or_runtime_handlers
+  application_handoff:
+    owner: runtime/internal/app
+    request_identity_context: RequestIdentity
+    session_validation_result: SessionValidationResult
+    envelope_metadata_status: metadata_only
+  rule: >
+    Player identity, account lifecycle, authentication, runtime session,
+    transport connection metadata, and request identity context are separate
+    concerns. Client-supplied player_id and session_id metadata is not
+    authenticated proof until session validation exists.
+  ask_first_before:
+    - authentication_scheme
+    - token_format
+    - credential_storage
+    - websocket_handshake_authentication_contract
+    - protobuf_envelope_change
+  player_account_postgresql_schema:
+    decision: ADR-0022
+    standard: docs/postgresql-persistence-boundary.md
+    status: schema_ratified_migration_source_added_repository_interface_and_adapter_implemented_handlers_deferred
+    planned_tables:
+      - player_accounts
+      - player_account_events
+    planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    migration_source_status: added
+    repository_interface_source: runtime/internal/modules/player/repository.go
+    implementation_status:
+      repository_interface_added: true
+      postgres_adapter_boundary_defined: true
+      authentication_implemented: false
+      token_behavior_implemented: false
+      credential_storage_implemented: false
+      session_persistence_implemented: false
+      player_account_persistence_implemented: false
+
+authentication_token_session_validation:
+  standard: docs/authentication-token-session-validation.md
+  translation: docs/authentication-token-session-validation.zh-CN.md
+  decision: ADR-0023
+  status: design_standard_boundary_checks_added_without_runtime_implementation
+  milestone: M-011
+  latest_completed_work_item: W-0058
+  next_work_item: W-0059
+  change: changes/2026-05-14-add-authentication-token-session-boundary-checks
+  conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
+  boundary_check_rule: runtime.authentication_token_session_boundary
+  boundary_checks_added: true
+  check_command: node tools/vibit check runtime
+  rule: >
+    Authentication proof, login methods, tokens, credentials, external identity
+    links, runtime sessions, request identity, WebSocket handshake authentication,
+    transport connection metadata, Protobuf envelope metadata, and player account
+    lifecycle are separate concerns. Metadata-only player_id and session_id are
+    not authenticated proof.
+  trust_states:
+    - anonymous
+    - metadata_only
+    - authentication_proven
+    - session_validated
+    - service_validated
+  current_runtime_status:
+    metadata_only_validator_exists: true
+    production_authentication_implemented: false
+    token_behavior_implemented: false
+    credential_storage_implemented: false
+    external_identity_linking_implemented: false
+    session_persistence_implemented: false
+    websocket_handshake_authentication_changed: false
+    protobuf_envelope_changed: false
+    runtime_player_handlers_added: false
+    websocket_routes_added: false
+  ask_first_before:
+    - login_method_choice
+    - token_format_or_refresh_behavior
+    - credential_storage_or_auth_dependency
+    - external_identity_linking
+    - session_persistence
+    - protobuf_envelope_auth_change
+    - websocket_handshake_authentication
+    - runtime_player_handlers_or_routes
+    - metadata_only_identity_as_production_permission
 
 server_runtime:
   first_reference_language: Go
@@ -213,7 +335,7 @@ persistence:
   migration_default: SQL-first migrations
   migration_root: runtime/migrations/postgres
   migration_check_command: node tools/vibit check migrations
-  migration_root_status: first_inventory_migration_source_created_apply_status_runner_created_live_apply_verification_pending
+  migration_root_status: first_inventory_migration_source_created_apply_status_runner_created_live_apply_verified
   migration_naming_pattern: 000001_create_inventory_state.sql
   migration_required_markers:
     - "-- +goose Up"
@@ -249,11 +371,46 @@ persistence:
     - no_caller_owned_database_handle_close
   first_durable_module_lock: GrantItem calls inventory.Repository.LockInventoryForMutation before capacity-sensitive reads and writes; PostgreSQL adapters implement it with an inventory account row lock by player_id.
   first_durable_grant_recording: GrantItemMutation carries event_id, occurred_at, and reason so PostgreSQL adapters can record inventory_item_grants in the same unit of work as quantity changes.
+  player_account_schema:
+    decision: ADR-0022
+    status: schema_ratified_migration_source_added_repository_interface_and_adapter_implemented
+    planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+    repository_interface_source: runtime/internal/modules/player/repository.go
+    repository_interface_added: true
+    postgres_adapter_boundary_defined: true
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+    postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+    postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork
+    postgres_adapter_constructor: NewPlayerAccountRepositoryForUnitOfWork
+    postgres_unit_of_work_factory_planned: UnitOfWork.NewPlayerAccountRepository
+    postgres_unit_of_work_factory: UnitOfWork.NewPlayerAccountRepository
+    postgres_adapter_transaction_rule: caller_supplied_unit_of_work_executor_no_begin_commit_or_rollback
+    postgres_adapter_sql_scope:
+      - insert_player_accounts
+      - insert_player_account_events_for_PlayerAccountCreated
+      - read_player_accounts_current_lifecycle_row
+    postgres_adapter_added: true
+    planned_tables:
+      - player_accounts
+      - player_account_events
+    forbidden_in_player_account_schema:
+      - authentication_credentials
+      - password_hashes
+      - external_identity_links
+      - access_tokens
+      - refresh_tokens
+      - runtime_sessions
+      - websocket_connection_state
+      - inventory_state
   postgresql_verification_environment:
     standard: docs/postgresql-verification-environment.md
     translation: docs/postgresql-verification-environment.zh-CN.md
     check_command: node tools/vibit check postgres-env
-    status: opt_in_test_created_live_execution_skipped_without_dsn
+    status: opt_in_test_created_live_execution_verified
     opt_in_live_test: runtime/internal/platform/protocol/protobuf/postgres_request_loop_integration_test.go
     opt_in_live_command: cd runtime && VIBIT_POSTGRES_TEST_DSN='...' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
     required_for_live_checks:
@@ -271,7 +428,7 @@ persistence:
     default_live_check_behavior: skip_when_test_dsn_unset
     mandatory_service_manager: none
     cloud_postgresql_assumption: false
-  live_postgresql_integration_status: opt_in_test_created_live_execution_skipped_without_dsn
+  live_postgresql_integration_status: opt_in_test_created_live_execution_verified
   object_storage_interface: s3_compatible
   object_storage_candidate: MinIO
   object_storage_candidate_status: requires_dependency_adoption_before_required_runtime_dependency

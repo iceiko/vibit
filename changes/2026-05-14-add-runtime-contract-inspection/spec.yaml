@@ -1,0 +1,81 @@
+schema_version: 0.1
+change_id: add-runtime-contract-inspection
+date: 2026-05-14
+type: tooling
+status: verified
+
+summary: Extend contract inspection tooling to runtime-owned contract families.
+
+affected_modules:
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0018
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+
+workflow:
+  completed_work_item: W-0035
+
+verification:
+  required:
+    - node tools/vibit inspect contract --module runtime --type command --id ValidateSession
+    - node tools/vibit inspect contract --module runtime --type event --id SessionValidated
+    - node tools/vibit inspect contract --module player --type command --id CreatePlayerAccount
+    - node tools/vibit check contracts --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change add-runtime-contract-inspection --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - cd runtime && go vet ./...
+    - git diff --check
+  status: Verified

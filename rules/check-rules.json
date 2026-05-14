@@ -148,6 +148,14 @@
       "agent_guidance": "Update `.arch/contracts.yaml` so each command, query, event, error catalog, and permission catalog has a valid entry."
     },
     {
+      "rule_id": "contract.boundary_only",
+      "category": "contract",
+      "default_severity": "info",
+      "title": "Boundary-only contract module",
+      "description": "A registered module may intentionally have no public command, query, event, error, or permission contracts while it is only an ownership boundary.",
+      "agent_guidance": "Do not invent contracts just to satisfy checks. Ratify the public API first, then add contract source files and registry entries."
+    },
+    {
       "rule_id": "contract.source_exists",
       "category": "contract",
       "default_severity": "error",
@@ -316,6 +324,22 @@
       "agent_guidance": "Move handwritten code to the correct runtime package and keep generated roots reserved for generated output."
     },
     {
+      "rule_id": "generated.contract_shape",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated contract shape",
+      "description": "Each registered non-runtime semantic contract must have an inspectable generated Go contract shape.",
+      "agent_guidance": "Run `node tools/vibit generate contract-shapes all` and then `node tools/vibit check generated --json`."
+    },
+    {
+      "rule_id": "generated.drift",
+      "category": "generated",
+      "default_severity": "error",
+      "title": "Generated output drift",
+      "description": "Generated output must match the current generator output for its source artifact.",
+      "agent_guidance": "Regenerate the artifact from source; do not hand-edit generated output."
+    },
+    {
       "rule_id": "migration.root",
       "category": "migration",
       "default_severity": "error",
@@ -410,6 +434,22 @@
       "title": "Runtime import boundary",
       "description": "Runtime Go imports for WebSocket, Protobuf, PostgreSQL, migration tooling, and generated Protobuf packages must stay inside their declared owner packages.",
       "agent_guidance": "Move the import behind the appropriate platform adapter or generated package boundary instead of importing foundational dependencies directly from domain or application code."
+    },
+    {
+      "rule_id": "runtime.identity_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Metadata-only identity boundary",
+      "description": "The metadata-only player/session boundary must prevent WebSocket transport, domain modules, and player artifacts from implicitly implementing authentication, tokens, credentials, sessions, unratified player persistence, or cross-module shortcuts.",
+      "agent_guidance": "Keep client-supplied identity metadata unauthenticated until a ratified session validation design exists; keep player account PostgreSQL schema limited to ratified lifecycle tables; move protocol, transport, auth, token, credential, session, and runtime handler behavior behind the declared owner boundary before implementation."
+    },
+    {
+      "rule_id": "runtime.authentication_token_session_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Authentication, token, and session boundary",
+      "description": "The authentication/token/session design boundary must preserve metadata-only identity as unauthenticated and prevent tokens, credentials, external identity links, session persistence, WebSocket handshake auth, Protobuf envelope auth fields, and player routes from appearing before ratification.",
+      "agent_guidance": "Read `docs/authentication-token-session-validation.md` and `ADR-0023`; update standards, manifests, contracts, and checks before adding authentication runtime code, token parsing, credential lookup, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, or WebSocket routes."
     },
     {
       "rule_id": "runtime.layer_boundary",
@@ -512,8 +552,8 @@
       "category": "work",
       "default_severity": "warning",
       "title": "Next ready work",
-      "description": "The work queue should identify the next ready bounded work item for continuation.",
-      "agent_guidance": "Mark exactly one suitable work item as `next_ready`, unless no work is ready or parallel ready work is intentional."
+      "description": "The work queue should identify the next ready bounded work item for continuation, or explicitly block the current work at a maintainer decision gate.",
+      "agent_guidance": "Mark exactly one suitable work item as `next_ready`, unless the current work is intentionally `blocked` with a block reason or parallel ready work is intentional."
     },
     {
       "rule_id": "work.workflow",
@@ -522,6 +562,22 @@
       "title": "Work workflow standard",
       "description": "Work-item manifests and agent guides must reference the workflow standard and inspect command.",
       "agent_guidance": "Update `.arch/work-items.yaml`, `docs/workflow.md`, and AGENTS guides so continuation semantics are discoverable."
+    },
+    {
+      "rule_id": "agent_tooling.standard",
+      "category": "agent_tooling",
+      "default_severity": "error",
+      "title": "Agent tooling standard",
+      "description": "Agent-facing inspection, generation, and verification tooling must be documented and referenced by the repository standards.",
+      "agent_guidance": "Update `docs/agent-tooling.md`, its Simplified Chinese translation, `.arch/conventions.yaml`, and AGENTS guidance."
+    },
+    {
+      "rule_id": "docs.translation_pair",
+      "category": "documentation",
+      "default_severity": "error",
+      "title": "Documentation translation pair",
+      "description": "Public English documentation must have a Simplified Chinese human-readable translation.",
+      "agent_guidance": "Add or update the paired `.zh-CN.md` document in the same change."
     },
     {
       "rule_id": "operator.guidance",

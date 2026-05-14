@@ -1,0 +1,98 @@
+schema_version: 0.1
+change_id: add-first-player-account-postgresql-migration
+date: 2026-05-14
+type: migration
+status: verified
+
+summary: Add the first SQL-first PostgreSQL migration source for ratified player account lifecycle state.
+
+affected_modules:
+  - player
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0020
+    - ADR-0021
+    - ADR-0022
+
+standards:
+  added: []
+  changed:
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/work-items.yaml
+    - modules/player/module.yaml
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - docs/postgresql-persistence-boundary.md
+    - docs/postgresql-persistence-boundary.zh-CN.md
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: true
+  migration_sources:
+    - runtime/migrations/postgres/000002_create_player_account_state.sql
+  ownership_changes:
+    - player_accounts
+    - player_account_events
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_schema_ratified: true
+  player_account_migration_added: true
+  player_account_repository_added: false
+  player_account_persistence_implemented: false
+  player_runtime_handlers_added: false
+  websocket_routes_added: false
+
+verification:
+  required:
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check work --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit check module player --json
+    - node tools/vibit check postgres-env --json
+    - node tools/vibit check change add-first-player-account-postgresql-migration --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

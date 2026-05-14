@@ -1,0 +1,90 @@
+schema_version: 0.1
+kind: command
+module: player
+name: CreatePlayerAccount
+status: draft
+decision_refs:
+  - ADR-0019
+  - ADR-0021
+
+summary: Create a durable player account identity without choosing an authentication method.
+
+intent: >
+  Create a new player account lifecycle record with a stable player_id and
+  initial active account state. This semantic contract does not define login
+  credentials, token behavior, session persistence, or database schema.
+
+permission: player_account_create
+
+input:
+  type: object
+  required:
+    - display_name
+    - requested_by
+  properties:
+    display_name:
+      type: string
+      minLength: 1
+      description: Human-readable player display name. Uniqueness rules are deferred until the account schema is ratified.
+    requested_by:
+      type: string
+      minLength: 1
+      description: Actor requesting account creation. Authentication semantics are not selected by this contract.
+
+output:
+  type: object
+  required:
+    - player_id
+    - display_name
+    - account_state
+    - created_at
+    - event
+  properties:
+    player_id:
+      type: string
+      minLength: 1
+    display_name:
+      type: string
+      minLength: 1
+    account_state:
+      type: string
+      enum:
+        - active
+    created_at:
+      type: string
+      format: date-time
+    event:
+      const: PlayerAccountCreated
+
+emits:
+  - PlayerAccountCreated
+
+errors:
+  - PLAYER_ACCOUNT_DISPLAY_NAME_INVALID
+  - PLAYER_ACCOUNT_PERMISSION_DENIED
+
+invariants:
+  - player_id_must_be_stable
+  - player_account_creation_must_emit_player_account_created_once
+  - player_account_must_start_active
+  - player_account_creation_must_not_create_credentials
+  - player_account_creation_must_not_create_runtime_session
+
+idempotency:
+  required: false
+  note: Idempotent account creation requires a separate request id or external identity decision.
+
+authorization:
+  requires_permission: player_account_create
+
+implementation:
+  handwritten_extension_point: runtime/internal/modules/player/commands/CreatePlayerAccount
+  generated_outputs:
+    - go_typed_contract
+    - protobuf_message_shape
+    - websocket_command_dispatch_shape
+    - test_fixture
+  runtime_status: not_started
+  blocked_until:
+    - player_runtime_module_ratified
+    - generated_shape_ratified

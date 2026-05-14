@@ -19,10 +19,11 @@ Module Protobuf sources 应使用：
 proto/vibit/<module>/v1/
 ```
 
-第一版计划 module path 是：
+第一批 module paths 是：
 
 ```text
 proto/vibit/inventory/v1/
+proto/vibit/player/v1/
 ```
 
 第一版 protocol envelope source 是：

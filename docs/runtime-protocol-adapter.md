@@ -309,9 +309,21 @@ Required concepts:
 
 - `TransportFrame` carries frame bytes and connection metadata, but no domain semantics.
 - `ProtocolEnvelope` represents decoded envelope metadata and payload bytes.
-- `RouteRequest` carries `kind`, `module`, `name`, `request_id`, target, session, payload identity, and decoded command/query payload.
-- `ApplicationResult` carries response payloads, emitted events, and application-level errors.
+- `RouteRequest` carries `kind`, `module`, `name`, `request_id`, target, session metadata, request identity context, payload identity, and decoded command/query payload.
+- `ApplicationResult` carries request metadata, request identity context, response payloads, emitted events, and application-level errors.
 - `OutboundMessage` carries protocol-level output ready for transport encoding.
+
+Current request identity handoff:
+
+- `RequestIdentity` is owned by `runtime/internal/app`.
+- `IdentityValidationStatus` starts as `metadata_only` for values copied from client-visible envelope session metadata.
+- `player_id`, `session_id`, `connection_id`, and `connection_epoch` may be normalized into `RequestIdentity`, but they are not proof of identity before session validation exists.
+- The Protobuf adapter may construct metadata-only identity from the existing envelope `Session` fields.
+- Application dispatch must populate metadata-only identity when a caller provides only `Session`.
+- `SessionValidatingDispatcher` may run an injected `SessionValidator` after protocol decoding and before module handlers receive the request.
+- The default `MetadataOnlySessionValidator` preserves metadata-only behavior and does not authenticate clients.
+- A future real session validator may replace metadata-only identity with validated identity before module handlers receive the request.
+- Domain modules may read request identity for policy decisions, but they must not parse credentials, token formats, WebSocket handshake data, or Protobuf session fields directly.
 
 ## 5. Routing Rules
 
@@ -371,6 +383,8 @@ Until player or auth modules exist:
 - `player_id` can be treated as planned context for inventory protocol shape.
 - Authentication/session validation remains a deferred explicit module or platform decision.
 - Transport connection identity must not be treated as a durable player identity.
+- `RequestIdentity.Status` must remain `metadata_only` for identity derived only from envelope or transport metadata.
+- `RequestIdentity.PlayerIDValidated` and `RequestIdentity.SessionValidated` must remain false until a future session validator has actually validated them.
 
 Target scopes beyond `player` remain reserved until the relevant module and lifecycle standard exists.
 

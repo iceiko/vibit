@@ -1,0 +1,95 @@
+schema_version: 0.1
+change_id: close-m007-tooling-hardening-milestone
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the agent tooling and generator hardening milestone and block the next major direction for maintainer choice.
+
+affected_modules:
+  - inventory
+  - player
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0017
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - docs/agent-tooling.md
+    - docs/agent-tooling.zh-CN.md
+    - docs/generated-output.md
+    - docs/generated-output.zh-CN.md
+    - docs/workflow.md
+    - docs/workflow.zh-CN.md
+    - .arch/work-items.yaml
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_implemented: false
+  player_runtime_handlers_added: false
+  websocket_routes_added: false
+
+workflow:
+  completed_milestone: M-007
+  completed_work_item: W-0048
+  blocked_confirmation_work_item: W-0049
+  next_ready_created: false
+  reason_no_next_ready: Next major direction requires maintainer choice.
+
+verification:
+  required:
+    - node tools/vibit inspect work --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change close-m007-tooling-hardening-milestone --json
+    - node tools/vibit check agent-tooling --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

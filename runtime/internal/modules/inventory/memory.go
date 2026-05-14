@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"sync"
+
+	"github.com/iceiko/vibit/runtime/internal/app"
 )
 
 type MemoryRepository struct {
@@ -98,10 +100,31 @@ type StaticPermissionPolicy struct {
 	ReadAllowed  bool
 }
 
-func (p StaticPermissionPolicy) CanGrantItem(context.Context, string, string) (bool, error) {
+func (p StaticPermissionPolicy) CanGrantItem(context.Context, PermissionContext) (bool, error) {
 	return p.GrantAllowed, nil
 }
 
-func (p StaticPermissionPolicy) CanReadInventory(context.Context, string, string) (bool, error) {
+func (p StaticPermissionPolicy) CanReadInventory(context.Context, PermissionContext) (bool, error) {
 	return p.ReadAllowed, nil
+}
+
+type MetadataOnlyDenyPermissionPolicy struct {
+	AllowValidatedPlayerSelfRead bool
+}
+
+func (p MetadataOnlyDenyPermissionPolicy) CanGrantItem(_ context.Context, ctx PermissionContext) (bool, error) {
+	if !ctx.Identity.PlayerIDValidated || ctx.Identity.Status != app.IdentityValidationValidated {
+		return false, nil
+	}
+	return false, nil
+}
+
+func (p MetadataOnlyDenyPermissionPolicy) CanReadInventory(_ context.Context, ctx PermissionContext) (bool, error) {
+	if !p.AllowValidatedPlayerSelfRead {
+		return false, nil
+	}
+	if ctx.Identity.Status != app.IdentityValidationValidated || !ctx.Identity.PlayerIDValidated {
+		return false, nil
+	}
+	return ctx.Identity.PlayerID == ctx.PlayerID && ctx.PlayerID != "", nil
 }

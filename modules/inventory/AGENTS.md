@@ -15,11 +15,15 @@ The first proof-slice capability is intentionally narrow:
 
 This module owns inventory records and inventory items. It may reference `player_id` and `item_id`, but it does not own player accounts or the item catalog.
 
+`player_id` is an external reference governed by `docs/player-identity-session-boundary.md` and `ADR-0021`. Until session validation exists, a `player_id` supplied through a request or envelope is metadata, not authenticated proof. Inventory may use `player_id` to key inventory state, but it must not create, authenticate, validate, migrate, or own player accounts or runtime sessions.
+
 ## When Not To Use This Module
 
 Do not use this module for:
 
 - Player account lifecycle.
+- Player identity lifecycle.
+- Authentication, token formats, credential storage, or session validation.
 - Item catalog definitions or item balancing.
 - Currency balances or purchases.
 - Reward claim eligibility.
@@ -58,8 +62,11 @@ The first handwritten runtime path now starts under `runtime/internal/modules/in
 - `GetInventoryHandler`
 - Inventory repository interface behind the module boundary
 - Inventory capacity and permission policy interfaces
+- `PermissionContext`, which carries requested actor text, target `player_id`, and `app.RequestIdentity`
 - `RegisterRoutes` for `runtime/internal/app.Dispatcher`
 - Tests for command, query, event, permission, capacity, and dispatcher integration behavior
+
+Inventory permission policies may inspect application-owned request identity context. They must not validate tokens, query player accounts, own sessions, or import the player module. `metadata_only` identity is not authenticated proof. `StaticPermissionPolicy` exists only as an explicit bootstrap/local proof-slice policy; identity-aware production policy remains deferred until authentication and session validation are ratified.
 
 The first inventory Protobuf/domain bridge lives under `runtime/internal/platform/protocol/protobuf/inventory_bridge.go`. It maps generated inventory wire payloads into inventory runtime request structs and maps inventory runtime results/events back into generated Protobuf payloads.
 
@@ -95,6 +102,9 @@ For the first durable implementation:
 - Do not hand-edit generated files. If generated output is wrong, change the source contract, template, or generator.
 - Do not invent payload fields in implementation. Update the relevant contract source file first.
 - Do not introduce a dependency on player, currency, reward, quest, or match modules without updating the manifest and change spec first.
+- Do not treat client-supplied `player_id` or `session_id` metadata as authenticated proof before the player/session boundary has a real validation implementation.
+- Do not treat `RequestIdentity.Status == metadata_only` as sufficient for privileged inventory grants.
+- Do not add player account migrations, token parsing, credential storage, or authentication provider code to inventory.
 - Do not use negative or zero item quantities in grant flows.
 
 ## Required Tests

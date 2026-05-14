@@ -122,6 +122,73 @@ func TestInventoryDispatcherUsesQueryRepositoryWithoutUnitOfWork(t *testing.T) {
 	}
 }
 
+func TestInventoryDispatcherPassesRequestIdentityToPermissionPolicy(t *testing.T) {
+	repository := inventory.NewMemoryRepository()
+	provider := &recordingInventoryRepositoryProvider{
+		commandRepository: repository,
+		queryRepository:   repository,
+	}
+	policy := &recordingInventoryPermissionPolicy{grantAllowed: true, readAllowed: true}
+	dispatcher, err := NewInventoryDispatcher(InventoryOptions{
+		Repositories:     provider,
+		PermissionPolicy: policy,
+		CapacityPolicy:   inventory.MaxUniqueItemsCapacityPolicy{MaxUniqueItems: 256},
+		EventIDs:         &inventory.IncrementingEventIDGenerator{Prefix: "test-event"},
+		Clock:            fixedInventoryClock{},
+	})
+	if err != nil {
+		t.Fatalf("NewInventoryDispatcher() error = %v, want nil", err)
+	}
+
+	identity := app.ValidatedPlayerIdentity("player-1", app.Session{
+		SessionID: "session-1",
+		PlayerID:  "player-1",
+	})
+	_, err = dispatcher.Dispatch(context.Background(), app.RouteRequest{
+		RequestID: "request-1",
+		Route:     inventory.GrantItemRoute(),
+		Session:   app.Session{SessionID: "session-1", PlayerID: "player-1"},
+		Identity:  identity,
+		Payload: inventory.GrantItemRequest{
+			PlayerID:    "player-1",
+			ItemID:      "item-1",
+			Quantity:    1,
+			Reason:      "test",
+			RequestedBy: "actor-1",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Dispatch(GrantItem) error = %v, want nil", err)
+	}
+
+	if policy.lastGrant.Identity != identity {
+		t.Fatalf("grant Identity = %#v, want %#v", policy.lastGrant.Identity, identity)
+	}
+	if policy.lastGrant.Permission != inventory.PermissionGrantItem {
+		t.Fatalf("grant Permission = %q, want %q", policy.lastGrant.Permission, inventory.PermissionGrantItem)
+	}
+
+	_, err = dispatcher.Dispatch(context.Background(), app.RouteRequest{
+		RequestID: "request-2",
+		Route:     inventory.GetInventoryRoute(),
+		Session:   app.Session{SessionID: "session-1", PlayerID: "player-1"},
+		Identity:  identity,
+		Payload: inventory.GetInventoryRequest{
+			PlayerID:    "player-1",
+			RequestedBy: "actor-1",
+		},
+	})
+	if err != nil {
+		t.Fatalf("Dispatch(GetInventory) error = %v, want nil", err)
+	}
+	if policy.lastRead.Identity != identity {
+		t.Fatalf("read Identity = %#v, want %#v", policy.lastRead.Identity, identity)
+	}
+	if policy.lastRead.Permission != inventory.PermissionRead {
+		t.Fatalf("read Permission = %q, want %q", policy.lastRead.Permission, inventory.PermissionRead)
+	}
+}
+
 func TestPostgresInventoryRepositoryProviderRequiresRepositoryFactoryForCommands(t *testing.T) {
 	provider := PostgresInventoryRepositoryProvider{
 		QueryRepository: inventory.NewMemoryRepository(),
@@ -180,6 +247,23 @@ type recordingInventoryRepositoryProvider struct {
 	commandCalls      int
 	queryCalls        int
 	lastCommandUnit   tx.UnitOfWork
+}
+
+type recordingInventoryPermissionPolicy struct {
+	grantAllowed bool
+	readAllowed  bool
+	lastGrant    inventory.PermissionContext
+	lastRead     inventory.PermissionContext
+}
+
+func (p *recordingInventoryPermissionPolicy) CanGrantItem(_ context.Context, ctx inventory.PermissionContext) (bool, error) {
+	p.lastGrant = ctx
+	return p.grantAllowed, nil
+}
+
+func (p *recordingInventoryPermissionPolicy) CanReadInventory(_ context.Context, ctx inventory.PermissionContext) (bool, error) {
+	p.lastRead = ctx
+	return p.readAllowed, nil
 }
 
 func (p *recordingInventoryRepositoryProvider) ForCommand(_ context.Context, unit tx.UnitOfWork) (inventory.Repository, error) {

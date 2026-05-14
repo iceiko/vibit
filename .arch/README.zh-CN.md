@@ -57,6 +57,8 @@
 
 `reference.yaml` 记录 game server capability planning 的主动参考基线。它链接 `docs/reference-game-server-alignment.md` 和 `ADR-0019`。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。这些 reference 用于指导规划；它们不覆盖 vibit 的 constitution、ADRs、manifests、generated boundaries 或 verification commands。
 
+`docs/player-identity-session-boundary.md` 记录 player identity、player accounts、authentication、runtime sessions、transport connection metadata 和 request identity context 的 active boundary standard。`ADR-0021` 约束这个边界。在 session validation 存在前，它把 `player_id` 保持为计划中的 player-domain identity，而不是 client envelope 提供的 authenticated proof。
+
 `work-items.yaml` 记录 active work continuation queue。它链接 `docs/workflow.md`，并定义 milestones、work items、dependencies、completion traces，以及让 maintainer continuation requests 具有确定含义的 `next_ready` item。
 
 第一批已接受的 Go runtime dependencies 由 `ADR-0013` 记录：
@@ -93,9 +95,10 @@ S3 client tooling、MinIO deployment、observability 和外部 Go test framework
 8. 在新增或修改 public contracts 前，阅读 `.arch/contracts.yaml`。
 9. 在添加 foundational dependencies 前，阅读 `.arch/dependencies.yaml`。
 10. 在新增 game server capability families、runtime subsystems、social/realtime features、matchmaking、match runtime、cluster/RPC work 或 operational surfaces 前，阅读 `.arch/reference.yaml` 和 `docs/reference-game-server-alignment.md`。
-11. 在解释“continue”或多步 continuation requests 前，阅读 `.arch/work-items.yaml` 和 `docs/workflow.md`。
-12. 在相关 module 存在时，阅读其 `module.yaml`。
-13. 当 public architecture 变化时，先更新 manifests，再实现。
+11. 在添加 player、account、authentication、session、permission 或 request identity behavior 前，阅读 `docs/player-identity-session-boundary.md`。
+12. 在解释“continue”或多步 continuation requests 前，阅读 `.arch/work-items.yaml` 和 `docs/workflow.md`。
+13. 在相关 module 存在时，阅读其 `module.yaml`。
+14. 当 public architecture 变化时，先更新 manifests，再实现。
 
 如果 manifest 缺少安全变更所需的信息，应更新 manifest 或记录这个缺口。
 

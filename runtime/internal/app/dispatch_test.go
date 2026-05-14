@@ -53,6 +53,15 @@ func TestDispatcherDispatchesRegisteredCommand(t *testing.T) {
 	if received.Payload != "payload" {
 		t.Fatalf("handler received payload = %#v, want payload", received.Payload)
 	}
+	if received.Identity.Status != IdentityValidationMetadataOnly {
+		t.Fatalf("handler received identity status = %q, want %q", received.Identity.Status, IdentityValidationMetadataOnly)
+	}
+	if received.Identity.PlayerID != "player-1" || received.Identity.SessionID != "session-1" || received.Identity.ConnectionID != "connection-1" {
+		t.Fatalf("handler received identity = %#v, want normalized metadata-only session identity", received.Identity)
+	}
+	if received.Identity.PlayerIDValidated || received.Identity.SessionValidated {
+		t.Fatalf("handler received identity validation flags = %#v, want metadata-only identity", received.Identity)
+	}
 	if result.RequestID != request.RequestID {
 		t.Fatalf("result RequestID = %q, want %q", result.RequestID, request.RequestID)
 	}
@@ -64,6 +73,9 @@ func TestDispatcherDispatchesRegisteredCommand(t *testing.T) {
 	}
 	if result.Session != request.Session {
 		t.Fatalf("result Session = %#v, want %#v", result.Session, request.Session)
+	}
+	if result.Identity != received.Identity {
+		t.Fatalf("result Identity = %#v, want %#v", result.Identity, received.Identity)
 	}
 	if result.Payload != "ok" {
 		t.Fatalf("result Payload = %#v, want ok", result.Payload)

@@ -16,11 +16,15 @@
 
 本模块拥有 inventory records 和 inventory items。它可以引用 `player_id` 和 `item_id`，但不拥有 player accounts 或 item catalog。
 
+`player_id` 是由 `docs/player-identity-session-boundary.md` 和 `ADR-0021` 约束的 external reference。在 session validation 存在之前，请求或 envelope 中携带的 `player_id` 只是 metadata，不是 authenticated proof。Inventory 可以用 `player_id` 作为 inventory state 的 key，但不得创建、认证、验证、迁移或拥有 player accounts 或 runtime sessions。
+
 ## 何时不要使用本模块
 
 不要把以下需求放入本模块：
 
 - Player account lifecycle。
+- Player identity lifecycle。
+- Authentication、token formats、credential storage 或 session validation。
 - Item catalog definitions 或 item balancing。
 - Currency balances 或 purchases。
 - Reward claim eligibility。
@@ -59,8 +63,11 @@ Generated contract shapes：
 - `GetInventoryHandler`
 - 位于 module boundary 后面的 inventory repository interface
 - Inventory capacity 和 permission policy interfaces
+- `PermissionContext`，它携带 requested actor text、目标 `player_id` 和 `app.RequestIdentity`
 - 面向 `runtime/internal/app.Dispatcher` 的 `RegisterRoutes`
 - 覆盖 command、query、event、permission、capacity 和 dispatcher integration behavior 的 tests
+
+Inventory permission policies 可以检查 application-owned request identity context。它们不得验证 tokens、查询 player accounts、拥有 sessions，或 import player module。`metadata_only` identity 不是 authenticated proof。`StaticPermissionPolicy` 只作为显式 bootstrap/local proof-slice policy 存在；identity-aware production policy 要等 authentication 和 session validation 被确认后再实现。
 
 第一条 inventory Protobuf/domain bridge 位于 `runtime/internal/platform/protocol/protobuf/inventory_bridge.go`。它把 generated inventory wire payloads 映射为 inventory runtime request structs，也把 inventory runtime results/events 映射回 generated Protobuf payloads。
 
@@ -96,6 +103,9 @@ PostgreSQL persistence work 必须遵循 `docs/postgresql-persistence-boundary.m
 - 不要手工编辑 generated files。如果 generated output 错了，应修改 source contract、template 或 generator。
 - 不要在实现中临时发明 payload fields。必须先更新对应 contract source file。
 - 未先更新 manifest 和 change spec，不要引入对 player、currency、reward、quest 或 match modules 的 dependency。
+- 在 player/session boundary 存在真实 validation implementation 前，不要把 client-supplied `player_id` 或 `session_id` metadata 当作 authenticated proof。
+- 不要把 `RequestIdentity.Status == metadata_only` 当作 privileged inventory grants 的充分条件。
+- 不要在 inventory 中添加 player account migrations、token parsing、credential storage 或 authentication provider code。
 - Grant flows 中不要使用负数或零数量。
 
 ## Required Tests

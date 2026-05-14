@@ -1,0 +1,62 @@
+schema_version: 0.1
+kind: event
+module: player
+name: PlayerAccountCreated
+status: draft
+decision_refs:
+  - ADR-0019
+  - ADR-0021
+
+summary: Fact emitted after a player account lifecycle record is created.
+
+fact: >
+  A stable player account identity was created by the player module. This event
+  does not imply that any credential, login method, token, runtime session, or
+  transport connection was created.
+
+version: 1
+
+payload:
+  type: object
+  required:
+    - event_id
+    - occurred_at
+    - player_id
+    - display_name
+    - account_state
+    - requested_by
+  properties:
+    event_id:
+      type: string
+      minLength: 1
+    occurred_at:
+      type: string
+      format: date-time
+    player_id:
+      type: string
+      minLength: 1
+    display_name:
+      type: string
+      minLength: 1
+    account_state:
+      type: string
+      enum:
+        - active
+    requested_by:
+      type: string
+      minLength: 1
+
+published_by:
+  command: CreatePlayerAccount
+
+subscribers: []
+
+compatibility:
+  breaking_changes_require_new_version: true
+
+implementation:
+  generated_outputs:
+    - go_typed_event
+    - protobuf_event_message
+    - event_fixture
+  runtime_status: not_started

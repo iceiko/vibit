@@ -1,0 +1,108 @@
+schema_version: 0.1
+change_id: ratify-player-account-protobuf-generated-shape-boundary
+date: 2026-05-14
+type: protocol
+status: verified
+
+summary: Ratify player account Protobuf source and generated Go Protobuf shape without runtime handlers, authentication, persistence, or envelope changes.
+
+affected_modules:
+  - player
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0016
+    - ADR-0017
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - docs/player-account-session-contracts.md
+    - docs/player-account-session-contracts.zh-CN.md
+    - docs/player-identity-session-boundary.md
+    - docs/player-identity-session-boundary.zh-CN.md
+    - docs/game-protocol.md
+    - docs/game-protocol.zh-CN.md
+    - proto/README.md
+    - proto/README.zh-CN.md
+    - modules/player/AGENTS.md
+    - modules/player/AGENTS.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - CreatePlayerAccount
+    removed: []
+  queries:
+    added: []
+    changed:
+      - GetPlayerAccount
+    removed: []
+  events:
+    added: []
+    changed:
+      - PlayerAccountCreated
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  proto_sources_added:
+    - proto/vibit/player/v1/player.proto
+  generated_go_added:
+    - runtime/internal/generated/proto/vibit/player/v1/player.pb.go
+  envelope_changed: false
+  websocket_handshake_changed: false
+  websocket_routes_added: false
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  protobuf_messages_added: true
+
+runtime:
+  go_code_added: false
+  generated_code_added: true
+  runtime_player_handlers_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_implemented: false
+
+workflow:
+  completed_work_item: W-0033
+  next_work_item: W-0034
+
+verification:
+  required:
+    - buf lint
+    - buf generate
+    - node tools/vibit check protocol --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change ratify-player-account-protobuf-generated-shape-boundary --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - cd runtime && go vet ./...
+    - git diff --check
+  status: Verified

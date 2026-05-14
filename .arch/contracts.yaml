@@ -10,12 +10,13 @@ contract_source_format:
   payload_shape: json_schema_like
   source_root: contracts
   semantic_source_of_truth: true
+  status: player_account_and_runtime_session_semantic_contracts_ratified
 
 wire_schema_format:
   format: protobuf
   decision: ADR-0009
   source_root: proto
-  status: first_sources_created
+  status: player_account_wire_shape_added
   role: client_server_wire_messages
   source_of_truth_for_wire_shape: true
   envelope_source: proto/vibit/protocol/v1/envelope.proto
@@ -45,7 +46,101 @@ rules:
     level: required_when_proto_exists
     description: Protobuf wire messages must align with registered commands, queries, events, errors, permissions, and module ownership.
 
+runtime_contracts:
+  session_validation:
+    status: semantic_contracts_ratified_metadata_only_runtime_hook_no_authentication
+    owner: runtime/internal/app
+    standard: docs/player-account-session-contracts.md
+    decisions:
+      - ADR-0018
+      - ADR-0021
+    implementation_status:
+      existing_hook: runtime/internal/app/session_validation.go
+      metadata_only_validator_exists: true
+      real_authentication_implemented: false
+      token_behavior_implemented: false
+      credential_storage_implemented: false
+      session_persistence_implemented: false
+      websocket_handshake_authentication_changed: false
+      player_account_persistence_implemented: false
+      protobuf_envelope_changed: false
+    commands:
+      - id: ValidateSession
+        path: contracts/runtime/session/commands/ValidateSession.yaml
+    queries: []
+    events:
+      - id: SessionValidated
+        path: contracts/runtime/session/events/SessionValidated.yaml
+    errors:
+      - id: session_errors
+        path: contracts/runtime/session/errors/session_errors.yaml
+    permissions:
+      - id: session_permissions
+        path: contracts/runtime/session/permissions/session_permissions.yaml
+    rule: Runtime session validation semantic contracts are ratified for the application handoff only. They do not choose token format, login methods, credential storage, real authentication, session persistence, player account persistence, Protobuf envelope changes, WebSocket handshake authentication, or runtime player handlers.
+
 modules:
+  player:
+    status: semantic_wire_repository_and_postgres_adapter_implemented_no_handlers
+    module_manifest: modules/player/module.yaml
+    decisions:
+      - ADR-0019
+      - ADR-0021
+    wire_schema:
+      source: proto/vibit/player/v1/player.proto
+      generated_go: runtime/internal/generated/proto/vibit/player/v1/player.pb.go
+      status: player_account_proto_generated
+      runtime_player_handlers_added: false
+      authentication_implemented: false
+      token_behavior_implemented: false
+      credential_storage_implemented: false
+      session_persistence_implemented: false
+      player_account_persistence_implemented: false
+    persistence_schema:
+      decision: ADR-0022
+      standard: docs/postgresql-persistence-boundary.md
+      status: postgresql_schema_ratified_migration_source_added_repository_interface_and_adapter_implemented_handlers_deferred
+      planned_tables:
+        - player_accounts
+        - player_account_events
+      planned_migration_source: runtime/migrations/postgres/000002_create_player_account_state.sql
+      migration_source_added: true
+      repository_interface_added: true
+      repository_interface_source: runtime/internal/modules/player/repository.go
+      postgres_adapter_boundary_defined: true
+      postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/player_account_repository.go
+      postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+      postgres_adapter_source: runtime/internal/platform/persistence/postgres/player_account_repository.go
+      postgres_adapter_test: runtime/internal/platform/persistence/postgres/player_account_repository_test.go
+      postgres_adapter_constructor_planned: NewPlayerAccountRepositoryForUnitOfWork
+      postgres_adapter_constructor: NewPlayerAccountRepositoryForUnitOfWork
+      postgres_adapter_implements: player.Repository
+      postgres_adapter_added: true
+      forbidden_in_schema:
+        - authentication_credentials
+        - password_hashes
+        - external_identity_links
+        - access_tokens
+        - refresh_tokens
+        - runtime_sessions
+        - websocket_connection_state
+        - inventory_state
+    commands:
+      - id: CreatePlayerAccount
+        path: contracts/player/commands/CreatePlayerAccount.yaml
+    queries:
+      - id: GetPlayerAccount
+        path: contracts/player/queries/GetPlayerAccount.yaml
+    events:
+      - id: PlayerAccountCreated
+        path: contracts/player/events/PlayerAccountCreated.yaml
+    errors:
+      - id: player_account_errors
+        path: contracts/player/errors/player_account_errors.yaml
+    permissions:
+      - id: player_account_permissions
+        path: contracts/player/permissions/player_account_permissions.yaml
+    rule: Player account semantic and Protobuf wire contracts are ratified, the first player account migration source exists, and the storage-neutral repository interface plus focused PostgreSQL adapter implementation are in place. Do not add WebSocket routes, authentication providers, token behavior, credential storage, runtime player handlers, session persistence, additional repository adapter behavior, or additional player account migrations before separate ratified changes.
   inventory:
     status: draft
     module_manifest: modules/inventory/module.yaml

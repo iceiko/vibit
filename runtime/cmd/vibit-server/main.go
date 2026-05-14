@@ -111,12 +111,19 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 }
 
 func newHTTPHandlerWithDispatcher(dispatcher vibitprotobuf.ApplicationDispatcher) http.Handler {
-	protocolHandler := vibitprotobuf.FrameHandler{Dispatcher: dispatcher}
+	protocolHandler := newProtocolFrameHandlerWithDispatcher(dispatcher)
 	mux := http.NewServeMux()
 	mux.Handle(websocketPath, &ws.Server{
 		Handler: websocketProtocolHandler{handler: protocolHandler},
 	})
 	return mux
+}
+
+func newProtocolFrameHandlerWithDispatcher(dispatcher vibitprotobuf.ApplicationDispatcher) vibitprotobuf.FrameHandler {
+	return vibitprotobuf.FrameHandler{Dispatcher: app.SessionValidatingDispatcher{
+		Dispatcher: dispatcher,
+		Validator:  app.MetadataOnlySessionValidator{},
+	}}
 }
 
 func runtimeStoreFromEnv(lookup func(string) (string, bool)) string {

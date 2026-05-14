@@ -1,0 +1,90 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-tooling-hardening
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the post-tooling direction gate and select player account PostgreSQL persistence schema ratification as the next milestone.
+
+affected_modules:
+  - player
+  - runtime
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0017
+    - ADR-0019
+    - ADR-0021
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - conversations/2026-05-14-player-account-postgresql-persistence-direction.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protocol_envelope_changed: false
+  websocket_handshake_changed: false
+  external_api_compatibility_adopted: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  session_persistence_implemented: false
+  player_account_persistence_schema_selected: true
+  player_account_persistence_implemented: false
+  player_runtime_handlers_added: false
+  websocket_routes_added: false
+
+workflow:
+  completed_milestone: M-008
+  completed_work_item: W-0049
+  selected_direction: ratify_player_account_postgresql_persistence_schema
+  next_milestone: M-009
+  next_ready_work_item: W-0050
+  reference_alignment:
+    nakama: account_user_persistence_capability_reference_without_api_compatibility
+    pitaya: server_framework_boundary_vocabulary_reference_without_api_compatibility
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change confirm-next-direction-after-tooling-hardening --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

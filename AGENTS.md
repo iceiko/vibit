@@ -86,6 +86,8 @@ Existing foundation:
 - `docs/runtime-protocol-adapter.zh-CN.md`
 - `docs/reference-game-server-alignment.md`
 - `docs/reference-game-server-alignment.zh-CN.md`
+- `docs/authentication-token-session-validation.md`
+- `docs/authentication-token-session-validation.zh-CN.md`
 - `docs/workflow.md`
 - `docs/workflow.zh-CN.md`
 - `schema/`
@@ -105,6 +107,8 @@ The runtime protocol adapter boundary standard is `docs/runtime-protocol-adapter
 
 The active game server reference alignment standard is `docs/reference-game-server-alignment.md`, with `docs/reference-game-server-alignment.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0019` records Nakama and Pitaya as active reference baselines. Read `.arch/reference.yaml` and the standard before adding new game server capability families, runtime subsystems, social/realtime features, matchmaking, match runtime, cluster/RPC work, or operational surfaces. Nakama and Pitaya guide capability planning; they do not override vibit's constitution, ADRs, manifests, generated boundaries, or verification commands.
 
+The authentication, token, and session validation design standard is `docs/authentication-token-session-validation.md`, with `docs/authentication-token-session-validation.zh-CN.md` as the paired Simplified Chinese translation. `ADR-0023` records the design boundary. Read it before adding authentication, token behavior, credential storage, external identity linking, session persistence, request identity trust changes, Protobuf envelope authentication changes, WebSocket handshake authentication, runtime player account handlers, or WebSocket player routes. Metadata-only `player_id` and `session_id` are not authenticated proof. `runtime.authentication_token_session_boundary` is the repository check rule for this boundary.
+
 The work continuation standard is `docs/workflow.md`, with `docs/workflow.zh-CN.md` as the paired Simplified Chinese translation. The machine-readable work queue is `.arch/work-items.yaml`. When the maintainer says "continue" or "继续", interpret that as advancing one `next_ready` work item unless blocked or confirmation is required. When the maintainer asks to continue multiple steps, advance up to that many work items in order, stopping at blockers, verification failures, ask-first boundaries, or maintainer redirection.
 
 Current executable tooling:
@@ -123,6 +127,8 @@ node tools/vibit check protocol
 node tools/vibit check protocol --json
 node tools/vibit check generated
 node tools/vibit check generated --json
+node tools/vibit check agent-tooling
+node tools/vibit check agent-tooling --json
 node tools/vibit check migrations
 node tools/vibit check migrations --json
 node tools/vibit check postgres-env
@@ -134,6 +140,11 @@ node tools/vibit check work --json
 node tools/vibit inspect module <module>
 node tools/vibit inspect boundary --from <module> --to <module>
 node tools/vibit inspect contract --module <module> --type <type> --id <id>
+node tools/vibit inspect contracts
+node tools/vibit inspect contracts --module <module>
+node tools/vibit inspect generated
+node tools/vibit inspect next
+node tools/vibit inspect reference
 node tools/vibit inspect change <change-id>
 node tools/vibit inspect work
 node tools/vibit inspect work --json
@@ -148,6 +159,7 @@ node tools/vibit check change <change-id> --json
 node tools/vibit check module <module>
 node tools/vibit check module <module> --json
 node tools/vibit generate module <module>
+node tools/vibit generate contract-shapes <module|all>
 ```
 
 Use `node tools/vibit check all` as the default repository verification command when CLI tooling is available.
@@ -156,7 +168,7 @@ The current CLI is Node.js standard-library tooling only. Do not treat CLI imple
 
 Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
-Every JSON check result item should include `rule_id` and `artifact`. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
+Every JSON check result item should include `rule_id` and `artifact`. Repository-relative JSON paths in fields such as `artifact`, `path`, `source`, and `output` must use forward slashes on every platform, including Windows. Treat `check all --json` as a compact overview, then run the specific failing check with `--json` for full detail.
 
 Use `node tools/vibit check memory` when conversation logs or Agent Decision Records are added or changed.
 
@@ -166,15 +178,29 @@ Use `node tools/vibit check protocol` before creating or changing `.proto` files
 
 Use `node tools/vibit check generated` when generated files, module manifest `generated` declarations, generated output standards, or Go Protobuf generated output are added or changed.
 
+Use `docs/agent-tooling.md` and `node tools/vibit check agent-tooling` when agent-facing inspection, generation, or verification commands are added or changed.
+
 Use `node tools/vibit check migrations` when SQL migration sources, migration ownership manifests, migration guidance, or persistence migration standards are added or changed. This check validates PostgreSQL migration naming, goose markers, SQL-first boundaries, owning-module traces, and first inventory migration table references.
 
 Use `node tools/vibit check postgres-env` when disposable PostgreSQL verification environment standards, live PostgreSQL verification guidance, or persistence verification environment manifests are added or changed. This is a static standards check; it must not connect to PostgreSQL or require Docker, Podman, cloud PostgreSQL, or another service manager.
 
 Use `node tools/vibit check runtime` when runtime module behavior, runtime adapter boundaries, runtime guidance, or tests are added or changed. Before the Go runtime exists, this check should pass as not applicable because runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, this check should verify the ADR-0014 skeleton and the ADR-0018 runtime protocol adapter boundary, and pass without running `go test`. Once Go source files exist, runtime checks require Go test files and a local Go toolchain.
 
+Use `node tools/vibit inspect rule runtime.authentication_token_session_boundary --json` when a runtime check fails on authentication, token, credential, external identity, session persistence, Protobuf envelope authentication, WebSocket handshake authentication, runtime player handler, or WebSocket route boundaries.
+
 Use `node tools/vibit inspect work` before interpreting a continuation request. Use `node tools/vibit check work` when `.arch/work-items.yaml`, workflow docs, or work item state changes. The default continuation unit is one work item.
 
+Use `node tools/vibit inspect next --json` when the immediate continuation step is unclear.
+
+Use `node tools/vibit inspect contracts --json` when an agent needs the full registered contract index before contract, generator, or runtime planning work.
+
 Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` during intake when an agent needs one contract's registry entry, source summary, module manifest declaration, and consistency status as JSON.
+
+Use `node tools/vibit inspect generated --json` before editing generated output standards, generated output checks, or generator behavior.
+
+Use `node tools/vibit inspect reference --json` before planning new game server capability families from Nakama or Pitaya reference context.
+
+Use `node tools/vibit generate contract-shapes all` to regenerate Go contract shape files from semantic contract manifests. Do not hand-edit files under `runtime/internal/generated/contracts/`.
 
 Use `node tools/vibit inspect change <change-id>` during intake or handoff when a change spec exists and an agent needs a structured summary of its files, metadata, affected modules, and verification state.
 
@@ -199,6 +225,8 @@ Use `.arch/dependencies.yaml` as the machine-readable intake point before adding
 Use `docs/postgresql-verification-environment.md` before adding live PostgreSQL migration checks, repository integration tests, transaction-runner integration tests, or persistent-runtime end-to-end checks. Live PostgreSQL verification is opt-in through `VIBIT_POSTGRES_TEST_DSN`; default repository checks must not require a running database.
 
 Use `.arch/reference.yaml` as the machine-readable intake point for Nakama/Pitaya reference alignment. Nakama is the primary reference for broad game backend product capability surface. Pitaya is the primary reference for Go game server framework architecture vocabulary. Preserve vibit's Agent-Native constraints when adapting reference patterns, and record why a reference pattern is adopted, adapted, or rejected.
+
+Use `docs/authentication-token-session-validation.md`, `ADR-0023`, and `runtime.authentication_token_session_boundary` before changing authentication proof, login methods, token behavior, credential storage, external identity linking, runtime session persistence, request identity trust, Protobuf envelope authentication behavior, WebSocket handshake authentication, runtime player handlers, or WebSocket routes. The design standard separates authentication proof, login methods, tokens, credentials, external identity links, runtime sessions, request identity, transport metadata, envelope metadata, and player account lifecycle.
 
 Use `.arch/work-items.yaml` as the machine-readable intake point for continuation. Work item IDs such as `W-0007` are execution steps; ADR IDs remain architectural decisions; change spec IDs remain concrete execution records; Git hashes remain repository snapshots; versions remain release identifiers.
 

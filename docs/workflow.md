@@ -82,6 +82,7 @@ Rules:
 - A `next_ready` work item must have all dependencies completed.
 - A completed work item should link to a change spec or explain why no change spec was needed.
 - There should normally be one `next_ready` item per active milestone. Multiple next-ready items are allowed only when independent work can proceed in parallel.
+- It is valid for an active milestone to have no `next_ready` item when the only current work is explicitly `blocked` with a `block_reason`. This represents a deliberate maintainer decision gate, not an empty queue.
 
 ## 6. Continuation Semantics
 
