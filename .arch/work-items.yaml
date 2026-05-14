@@ -1774,7 +1774,7 @@ work_items:
   - id: W-0069
     milestone: M-013
     title: Define token lifecycle and storage implications
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
     depends_on:
       - W-0068
@@ -1783,10 +1783,12 @@ work_items:
       - ADR-0023
       - ADR-0024
       - ADR-0026
+      - ADR-0027
     completion:
       - Define token issuance, expiration, refresh, revocation, rotation, replay, logout, cleanup, redaction, and audit implications for the ratified token posture.
       - Define whether credential, token, external identity, or session storage is required later and what schema gates must exist first.
       - Preserve player account lifecycle tables as credential-free, token-free, external-identity-free, and session-free.
+    completion_summary: Defined the first opaque access-token lifecycle posture with at least 256 bits of entropy, URL-safe unpadded Base64 or equivalent encoding, one-hour TTL, renewal by reauthenticating with the selected login method, refresh tokens excluded from the first implementation, revocation, rotation, replay controls, logout, cleanup, redaction, and audit required before implementation. Defined that credential storage and token verifier storage are required behind future schema gates, PostgreSQL is the default future durable token-verifier target, external identity and session storage are not required for the first posture, and player account lifecycle tables remain credential-free, token-free, external-identity-free, and session-free. No schema, migration, dependency, or runtime token behavior was added.
     ask_first:
       - Adding credential, token, external identity, or session tables.
       - Adding migrations.
@@ -1796,7 +1798,7 @@ work_items:
   - id: W-0070
     milestone: M-013
     title: Define authentication contract error permission surfaces
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
     depends_on:
       - W-0069
@@ -1804,6 +1806,8 @@ work_items:
       - ADR-0021
       - ADR-0023
       - ADR-0024
+      - ADR-0026
+      - ADR-0027
     completion:
       - Define planned semantic contract surfaces for selected login methods, token issuance, token refresh, logout, token validation, and any account-linking behavior in scope.
       - Define required error and permission catalog surfaces before implementation.

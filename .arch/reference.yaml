@@ -158,8 +158,12 @@ phase_plan:
     first_token_format_proof_carrier_posture_standard_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
     first_token_format_proof_carrier_posture_decision: ADR-0026
     first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
-    latest_login_token_ratification_work_item: W-0068
-    next_login_token_ratification_work_item: W-0069
+    token_lifecycle_storage_implications_standard: docs/token-lifecycle-storage-implications.md
+    token_lifecycle_storage_implications_standard_translation: docs/token-lifecycle-storage-implications.zh-CN.md
+    token_lifecycle_storage_implications_decision: ADR-0027
+    token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
+    latest_login_token_ratification_work_item: W-0069
+    next_login_token_ratification_work_item: W-0070
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -179,7 +183,15 @@ phase_plan:
     ratified_first_access_token_format: opaque_high_entropy_token
     ratified_token_issuance_carrier: login_command_response_token
     ratified_request_proof_carrier: explicit_request_proof_payload
-    refresh_token_status: deferred
+    token_lifecycle_status: defined_implementation_deferred
+    access_token_ttl: 1h
+    minimum_entropy_bits: 256
+    refresh_token_status: not_in_first_implementation
+    token_renewal_method: reauthenticate_with_selected_login_method
+    token_verifier_storage_required: true
+    token_storage_default_target: postgresql_schema_gate
+    credential_storage_required_for_device_credential_login: true
+    session_storage_required_for_first_posture: false
     session_token_vocabulary_status: deferred_until_session_persistence
     token_format_carrier_rejections:
       - plain_session_id_as_secret

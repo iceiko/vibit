@@ -28,11 +28,12 @@ purpose: >
   authentication_token_session_validation_design_boundary: ADR-0023
   login_method_token_format_ratification_boundary: ADR-0024
   first_token_format_proof_carrier_posture: ADR-0026
+  token_lifecycle_storage_implications: ADR-0027
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: first_token_format_proof_carrier_ratified
+  current_phase: token_lifecycle_storage_implications_defined
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -752,11 +753,11 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   login_method_token_format_ratification:
     selected_by_maintainer: login_method_and_token_format_ratification
-    status: first_token_format_proof_carrier_ratified_implementation_deferred
+    status: token_lifecycle_storage_implications_defined_implementation_deferred
     milestone: M-013
     first_work_item: W-0064
-    latest_completed_work_item: W-0068
-    next_work_item: W-0069
+    latest_completed_work_item: W-0069
+    next_work_item: W-0070
     selected_at: 2026-05-14
     direction_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
     standard: docs/login-method-token-format-ratification.md
@@ -769,19 +770,24 @@ identity_session_boundary:
     token_format_carrier_options_translation: docs/token-format-carrier-options.zh-CN.md
     first_token_format_proof_carrier_posture_standard: docs/first-token-format-proof-carrier-posture.md
     first_token_format_proof_carrier_posture_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
+    token_lifecycle_storage_implications_standard: docs/token-lifecycle-storage-implications.md
+    token_lifecycle_storage_implications_translation: docs/token-lifecycle-storage-implications.zh-CN.md
     decision: ADR-0024
     first_login_method_set_decision: ADR-0025
     first_token_format_proof_carrier_posture_decision: ADR-0026
+    token_lifecycle_storage_implications_decision: ADR-0027
     change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
     first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
     token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
     first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
+    token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
     conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
     first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
     first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
     token_format_carrier_options_conversation: conversations/2026-05-14-token-format-carrier-comparison.md
     first_token_format_proof_carrier_posture_conversation: conversations/2026-05-14-first-token-format-proof-carrier-ratification.md
+    token_lifecycle_storage_implications_conversation: conversations/2026-05-14-token-lifecycle-storage-implications.md
     reference_alignment:
       nakama:
         account_authentication_methods: capability_reference
@@ -869,6 +875,30 @@ identity_session_boundary:
       current_session_metadata_as_proof: false
       first_system_message_binding: deferred
       implementation_authorized: false
+    token_lifecycle_storage_implications:
+      status: defined
+      minimum_entropy_bits: 256
+      token_text_encoding: url_safe_unpadded_base64_or_equivalent
+      access_token_ttl: 1h
+      refresh_token: not_in_first_implementation
+      renewal_method: reauthenticate_with_selected_login_method
+      revocation_required: true
+      rotation_required: true
+      replay_control_required: true
+      logout_required: true
+      cleanup_required: true
+      audit_required: true
+      raw_token_storage: forbidden
+      verifier_storage_required: true
+      token_storage_default_target: postgresql_schema_gate
+      credential_storage_required_for_device_credential_login: true
+      external_identity_storage_required_for_first_posture: false
+      session_storage_required_for_first_posture: false
+      player_account_lifecycle_tables_remain_credential_free: true
+      player_account_lifecycle_tables_remain_token_free: true
+      player_account_lifecycle_tables_remain_external_identity_free: true
+      player_account_lifecycle_tables_remain_session_free: true
+      implementation_authorized: false
     implementation_status:
       login_methods_selected: true
       first_login_method_recommended: true
@@ -879,6 +909,11 @@ identity_session_boundary:
       token_carrier_selected: true
       first_token_carrier_recommended: true
       first_token_carrier_ratified: true
+      token_lifecycle_selected: true
+      token_lifecycle_defined: true
+      token_storage_schema_added: false
+      credential_storage_schema_added: false
+      session_storage_schema_added: false
       credential_storage_implemented: false
       external_identity_linking_implemented: false
       session_persistence_implemented: false
@@ -900,9 +935,9 @@ identity_session_boundary:
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-013
-    latest_completed_work_item: W-0068
-    next_ready_work_item: W-0069
-    status: define_token_lifecycle_and_storage_implications_next
+    latest_completed_work_item: W-0069
+    next_ready_work_item: W-0070
+    status: define_authentication_contract_error_permission_surfaces_next
 
 persistence_model:
   decision: ADR-0011

@@ -111,6 +111,9 @@ documentation_pairs:
   first_token_format_proof_carrier_posture_standard:
     canonical: docs/first-token-format-proof-carrier-posture.md
     zh-CN: docs/first-token-format-proof-carrier-posture.zh-CN.md
+  token_lifecycle_storage_implications_standard:
+    canonical: docs/token-lifecycle-storage-implications.md
+    zh-CN: docs/token-lifecycle-storage-implications.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -156,6 +159,7 @@ templates:
     authentication_token_session_validation_design_boundary: ADR-0023
     login_method_token_format_ratification_boundary: ADR-0024
     first_token_format_proof_carrier_posture: ADR-0026
+    token_lifecycle_storage_implications: ADR-0027
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -392,23 +396,28 @@ login_method_token_format_ratification:
   token_format_carrier_options_translation: docs/token-format-carrier-options.zh-CN.md
   first_token_format_proof_carrier_posture_standard: docs/first-token-format-proof-carrier-posture.md
   first_token_format_proof_carrier_posture_translation: docs/first-token-format-proof-carrier-posture.zh-CN.md
+  token_lifecycle_storage_implications_standard: docs/token-lifecycle-storage-implications.md
+  token_lifecycle_storage_implications_translation: docs/token-lifecycle-storage-implications.zh-CN.md
   decision: ADR-0024
   first_login_method_set_decision: ADR-0025
   first_token_format_proof_carrier_posture_decision: ADR-0026
-  status: first_token_format_proof_carrier_ratified_implementation_deferred
+  token_lifecycle_storage_implications_decision: ADR-0027
+  status: token_lifecycle_storage_implications_defined_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0068
-  next_work_item: W-0069
+  latest_completed_work_item: W-0069
+  next_work_item: W-0070
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
   first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
   token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
   first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
+  token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
   first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
   token_format_carrier_options_conversation: conversations/2026-05-14-token-format-carrier-comparison.md
   first_token_format_proof_carrier_posture_conversation: conversations/2026-05-14-first-token-format-proof-carrier-ratification.md
+  token_lifecycle_storage_implications_conversation: conversations/2026-05-14-token-lifecycle-storage-implications.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -501,6 +510,30 @@ login_method_token_format_ratification:
     current_session_metadata_as_proof: false
     first_system_message_binding: deferred
     implementation_authorized: false
+  token_lifecycle_storage_implications:
+    status: defined
+    minimum_entropy_bits: 256
+    token_text_encoding: url_safe_unpadded_base64_or_equivalent
+    access_token_ttl: 1h
+    refresh_token: not_in_first_implementation
+    renewal_method: reauthenticate_with_selected_login_method
+    revocation_required: true
+    rotation_required: true
+    replay_control_required: true
+    logout_required: true
+    cleanup_required: true
+    audit_required: true
+    raw_token_storage: forbidden
+    verifier_storage_required: true
+    token_storage_default_target: postgresql_schema_gate
+    credential_storage_required_for_device_credential_login: true
+    external_identity_storage_required_for_first_posture: false
+    session_storage_required_for_first_posture: false
+    player_account_lifecycle_tables_remain_credential_free: true
+    player_account_lifecycle_tables_remain_token_free: true
+    player_account_lifecycle_tables_remain_external_identity_free: true
+    player_account_lifecycle_tables_remain_session_free: true
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: true
     first_login_method_recommended: true
@@ -511,7 +544,11 @@ login_method_token_format_ratification:
     token_carrier_selected: true
     first_token_carrier_recommended: true
     first_token_carrier_ratified: true
-    token_lifecycle_selected: false
+    token_lifecycle_selected: true
+    token_lifecycle_defined: true
+    token_storage_schema_added: false
+    credential_storage_schema_added: false
+    session_storage_schema_added: false
     credential_storage_implemented: false
     external_identity_linking_implemented: false
     session_persistence_implemented: false
