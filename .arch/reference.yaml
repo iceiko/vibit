@@ -151,8 +151,11 @@ phase_plan:
     first_login_method_set_standard_translation: docs/first-login-method-set.zh-CN.md
     first_login_method_set_decision: ADR-0025
     first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
-    latest_login_token_ratification_work_item: W-0066
-    next_login_token_ratification_work_item: W-0067
+    token_format_carrier_options_standard: docs/token-format-carrier-options.md
+    token_format_carrier_options_standard_translation: docs/token-format-carrier-options.zh-CN.md
+    token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
+    latest_login_token_ratification_work_item: W-0067
+    next_login_token_ratification_work_item: W-0068
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -165,6 +168,13 @@ phase_plan:
     first_login_method_candidate_status: completed
     first_login_method_set_status: ratified_implementation_deferred
     first_login_method_credential_posture: high_entropy_installation_secret_not_raw_device_id
+    recommended_first_token_format: opaque_high_entropy_token
+    recommended_token_issuance_carrier: login_command_response_token
+    recommended_request_proof_carrier: explicit_request_proof_payload
+    token_format_carrier_status: recommended_not_ratified
+    token_format_carrier_rejections:
+      - plain_session_id_as_secret
+      - current_session_metadata_as_proof
     selected_authentication_direction: ratify_authentication_and_token_session_validation_design
     authentication_direction_change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     authentication_design_standard: docs/authentication-token-session-validation.md
@@ -217,6 +227,7 @@ phase_plan:
         credential_storage: separated_and_deferred
         external_identity_linking: separated_and_deferred
         session_token_concept: deferred
+        opaque_token_concept: adapted_first_recommendation
         refresh_token_concept: deferred
         realtime_socket_bound_to_authenticated_session: adapted
         validation_model_selection: deferred
@@ -228,6 +239,7 @@ phase_plan:
         handler_receives_session_context: adapted
         session_binding_vocabulary: adopted_as_vocabulary
         validation_model_selection: deferred
+        explicit_request_proof_payload: adapted_first_recommendation
         websocket_handshake_authentication: deferred
         credential_and_provider_linking_ownership: outside_transport_session_context
         frontend_backend_split: deferred

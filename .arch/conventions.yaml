@@ -105,6 +105,9 @@ documentation_pairs:
   first_login_method_set_standard:
     canonical: docs/first-login-method-set.md
     zh-CN: docs/first-login-method-set.zh-CN.md
+  token_format_carrier_options_standard:
+    canonical: docs/token-format-carrier-options.md
+    zh-CN: docs/token-format-carrier-options.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -381,18 +384,22 @@ login_method_token_format_ratification:
   first_login_method_candidates_translation: docs/first-login-method-candidates.zh-CN.md
   first_login_method_set_standard: docs/first-login-method-set.md
   first_login_method_set_translation: docs/first-login-method-set.zh-CN.md
+  token_format_carrier_options_standard: docs/token-format-carrier-options.md
+  token_format_carrier_options_translation: docs/token-format-carrier-options.zh-CN.md
   decision: ADR-0024
   first_login_method_set_decision: ADR-0025
-  status: first_login_method_set_ratified_implementation_deferred
+  status: token_format_and_carrier_options_compared_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0066
-  next_work_item: W-0067
+  latest_completed_work_item: W-0067
+  next_work_item: W-0068
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
   first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
+  token_format_carrier_options_change: changes/2026-05-14-compare-token-format-and-carrier-options
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
   first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
+  token_format_carrier_options_conversation: conversations/2026-05-14-token-format-carrier-comparison.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -443,12 +450,34 @@ login_method_token_format_ratification:
       - service_authentication
       - metadata_only_player_id_or_session_id
     implementation_authorized: false
+  token_format_carrier_options:
+    recommendation_status: recommended_not_ratified
+    recommended_first_token_format: opaque_high_entropy_token
+    recommended_token_issuance_carrier: login_command_response_token
+    recommended_request_proof_carrier: explicit_request_proof_payload
+    refresh_token: deferred
+    session_token_vocabulary: deferred_until_session_persistence
+    protobuf_envelope_change: false
+    websocket_handshake_authentication_change: false
+    current_session_metadata_as_proof: false
+    rejected:
+      - plain_session_id_as_secret
+      - current_session_metadata_as_proof
+    deferred:
+      - signed_structured_token
+      - external_provider_token
+      - protobuf_envelope_extension
+      - first_system_message_binding
+      - websocket_handshake_carrier
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: true
     first_login_method_recommended: true
     first_login_method_set_ratified: true
     token_format_selected: false
+    first_token_format_recommended: true
     token_carrier_selected: false
+    first_token_carrier_recommended: true
     token_lifecycle_selected: false
     credential_storage_implemented: false
     external_identity_linking_implemented: false

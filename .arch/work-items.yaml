@@ -1727,7 +1727,7 @@ work_items:
   - id: W-0067
     milestone: M-013
     title: Compare token format and carrier options
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-compare-token-format-and-carrier-options
     depends_on:
       - W-0066
@@ -1740,6 +1740,7 @@ work_items:
       - Compare opaque high-entropy tokens, signed structured tokens, external provider tokens, and plain session-ID-as-secret posture.
       - Compare login command payload, per-request payload, Protobuf envelope extension, current Session metadata fields, WebSocket handshake carriers, and first system-message carriers.
       - Recommend first token format and carrier posture for W-0068 without changing Protobuf, WebSocket handshake, or runtime code.
+    completion_summary: Compared opaque high-entropy tokens, signed structured tokens, external provider tokens, and plain session-ID-as-secret posture, plus login command response, explicit request proof payload, Protobuf envelope extension, current Session metadata, WebSocket handshake, and first system-message carriers. Recommended `opaque_high_entropy_token` with `login_command_response_token` issuance and `explicit_request_proof_payload` request proof for W-0068, rejected current Session metadata as proof, and preserved implementation, Protobuf, and WebSocket handshake deferral.
     ask_first:
       - Adding JWT, signing, cryptography, OAuth, OIDC, provider SDK, key-management, or session-store dependencies.
       - Changing Protobuf envelope fields or using metadata-only session fields as proof.
@@ -1749,7 +1750,7 @@ work_items:
   - id: W-0068
     milestone: M-013
     title: Ratify first token format and proof carrier posture
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
     depends_on:
       - W-0067
