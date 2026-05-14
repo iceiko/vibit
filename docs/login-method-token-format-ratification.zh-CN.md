@@ -315,3 +315,31 @@ M-013 只有在满足以下条件时才能关闭：
 - 必需的 contracts、schemas、dependency records、checks 和 tests 已规划。
 - 没有意外跨过 implementation boundary。
 - `node tools/vibit check all --json` 通过。
+
+## 14. M-013 Completion
+
+M-013 已完成。
+
+Completion record：
+
+- Closeout decision：`ADR-0031`
+- Closeout change：`changes/2026-05-14-close-login-method-token-format-ratification-milestone`
+- Completed work item：`W-0073`
+- Next milestone：`M-014 Credential And Token Verifier Schema Ratification`
+- Next ready work item：`W-0074 Define credential record schema boundary`
+
+已完成的 milestone ratify 了：
+
+- `device_credential_login` 作为第一批 login-method set。
+- Opaque high-entropy access tokens 作为第一版 access-token format。
+- Login-command token issuance。
+- Explicit request proof payloads 作为第一版 proof carrier posture。
+- 第一版 implementation 不支持 refresh token。
+- Token lifecycle 和 storage implications。
+- Authentication contract、error、permission 和 audit-event surfaces。
+- Credential、token verifier、external identity、runtime session 和 audit schema gates。
+- 用于保护 selected login/token boundary 的 repository checks。
+
+完成该 milestone 不授权 authentication implementation。
+
+M-014 是 schema-ratification gate。它可以定义 credential record 和 token verifier record boundaries、ownership、lifecycle states、redaction rules、未来 migration prerequisites、repository prerequisites、adapter prerequisites 和 verification expectations。除非后续 bounded work item 明确授权，否则它不得添加 migrations、repositories、PostgreSQL adapters、runtime lookup、handlers、routes、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。

@@ -128,6 +128,8 @@ Login method 与 token format ratification standard 是 `docs/login-method-token
 
 Selected login/token boundary check standard 是 `docs/selected-login-token-boundary-checks.md`，配套简体中文译本是 `docs/selected-login-token-boundary-checks.zh-CN.md`。`ADR-0030` 记录 repository check decision。在添加 runtime authentication、token validation、token issuance、logout、refresh behavior、credential 或 token repositories、authentication Protobuf sources、generated authentication contract shapes、WebSocket proof carriers、authentication migrations、authentication dependencies，或改变已选 `device_credential_login` 加 opaque access-token 姿态前，应阅读它。`runtime.selected_login_token_boundary` 是该已选姿态的 repository check rule。
 
+`M-013 Login Method And Token Format Ratification` 已由 `ADR-0031` 完成。当前 authentication-adjacent milestone 是 `M-014 Credential And Token Verifier Schema Ratification`，`W-0074 Define credential record schema boundary` 是下一个 ready work item。这个 next gate 只能 ratify credential 和 token verifier schema boundaries；它不授权 migrations、repositories、PostgreSQL adapters、runtime lookup、handlers、routes、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
+
 Work continuation standard 是 `docs/workflow.md`，配套简体中文译本是 `docs/workflow.zh-CN.md`。机器可读 work queue 是 `.arch/work-items.yaml`。当 maintainer 说“continue”或“继续”时，应理解为推进一个 `next_ready` work item，除非当前被 blocked 或需要 confirmation。当 maintainer 要求继续多步时，应按顺序最多推进相应数量的 work items，并在 blockers、verification failures、ask-first boundaries 或 maintainer redirect 处停止。
 
 当前可执行工具：

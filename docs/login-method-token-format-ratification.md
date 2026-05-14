@@ -315,3 +315,31 @@ M-013 can close only when:
 - Required contracts, schemas, dependency records, checks, and tests are planned.
 - No implementation boundary was crossed accidentally.
 - `node tools/vibit check all --json` passes.
+
+## 14. M-013 Completion
+
+M-013 is completed.
+
+Completion record:
+
+- Closeout decision: `ADR-0031`
+- Closeout change: `changes/2026-05-14-close-login-method-token-format-ratification-milestone`
+- Completed work item: `W-0073`
+- Next milestone: `M-014 Credential And Token Verifier Schema Ratification`
+- Next ready work item: `W-0074 Define credential record schema boundary`
+
+The completed milestone ratified:
+
+- `device_credential_login` as the first login-method set.
+- Opaque high-entropy access tokens as the first access-token format.
+- Login-command token issuance.
+- Explicit request proof payloads as the first proof carrier posture.
+- No refresh token in the first implementation.
+- Token lifecycle and storage implications.
+- Authentication contract, error, permission, and audit-event surfaces.
+- Credential, token verifier, external identity, runtime session, and audit schema gates.
+- Repository checks for selected login/token boundary protection.
+
+Completion does not authorize authentication implementation.
+
+M-014 is a schema-ratification gate. It may define credential record and token verifier record boundaries, ownership, lifecycle states, redaction rules, future migration prerequisites, repository prerequisites, adapter prerequisites, and verification expectations. It must not add migrations, repositories, PostgreSQL adapters, runtime lookup, handlers, routes, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, or production authentication behavior unless a later bounded work item explicitly authorizes those steps.

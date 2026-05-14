@@ -32,11 +32,12 @@ purpose: >
   authentication_contract_error_permission_surfaces: ADR-0028
   credential_token_session_schema_gates: ADR-0029
   selected_login_token_boundary_checks: ADR-0030
+  close_login_token_ratification_and_open_schema_gate: ADR-0031
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: selected_login_token_boundary_checks_added
+  current_phase: credential_and_token_verifier_schema_ratification
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -756,11 +757,16 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   login_method_token_format_ratification:
     selected_by_maintainer: login_method_and_token_format_ratification
-    status: authentication_contract_error_permission_surfaces_defined_implementation_deferred
+    status: completed_implementation_deferred
     milestone: M-013
     first_work_item: W-0064
-    latest_completed_work_item: W-0070
-    next_work_item: W-0071
+    latest_completed_work_item: W-0073
+    closeout_work_item: W-0073
+    closeout_change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
+    closeout_decision: ADR-0031
+    next_milestone: M-014
+    next_work_item: W-0074
+    next_direction: credential_and_token_verifier_schema_ratification
     selected_at: 2026-05-14
     direction_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
     standard: docs/login-method-token-format-ratification.md
@@ -808,6 +814,7 @@ identity_session_boundary:
     authentication_contract_error_permission_surfaces_conversation: conversations/2026-05-14-authentication-contract-error-permission-surfaces.md
     credential_token_session_schema_gates_conversation: conversations/2026-05-14-credential-token-session-schema-gates.md
     selected_login_token_boundary_checks_conversation: conversations/2026-05-14-selected-login-token-boundary-checks.md
+    closeout_conversation: conversations/2026-05-14-login-method-token-format-ratification-closeout.md
     reference_alignment:
       nakama:
         account_authentication_methods: capability_reference
@@ -1009,10 +1016,28 @@ identity_session_boundary:
       - W-0073 close_login_method_token_format_ratification_milestone
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-013
-    latest_completed_work_item: W-0072
-    next_ready_work_item: W-0073
-    status: close_login_method_token_format_ratification_milestone_next
+    milestone: M-014
+    latest_completed_work_item: W-0073
+    next_ready_work_item: W-0074
+    status: define_credential_record_schema_boundary_next
+  credential_token_schema_ratification:
+    status: active
+    milestone: M-014
+    selected_by_closeout_decision: ADR-0031
+    first_work_item: W-0074
+    next_work_item: W-0074
+    default_durable_target: PostgreSQL
+    credential_record_schema_boundary_status: next
+    token_verifier_record_schema_boundary_status: planned
+    migration_sources_added: false
+    repository_interfaces_added: false
+    postgres_adapters_added: false
+    runtime_lookup_added: false
+    generated_authentication_shapes_added: false
+    protobuf_authentication_messages_added: false
+    websocket_proof_carrier_implemented: false
+    runtime_authentication_implemented: false
+    rule: Schema boundaries for credential records and token verifier records must be ratified before migrations, repositories, adapters, runtime lookup, generated authentication output, Protobuf messages, WebSocket proof carriers, handlers, routes, or authentication behavior.
 
 persistence_model:
   decision: ADR-0011

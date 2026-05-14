@@ -139,7 +139,7 @@ phase_plan:
     latest_authentication_design_work_item: W-0062
     completed_next_direction_gate: M-012
     selected_post_authentication_design_direction: login_method_and_token_format_ratification
-    active_login_token_ratification_milestone: M-013
+    completed_login_token_ratification_milestone: M-013
     login_method_token_format_ratification_standard: docs/login-method-token-format-ratification.md
     login_method_token_format_ratification_standard_translation: docs/login-method-token-format-ratification.zh-CN.md
     login_method_token_format_ratification_decision: ADR-0024
@@ -175,8 +175,11 @@ phase_plan:
     selected_login_token_boundary_checks_decision: ADR-0030
     selected_login_token_boundary_checks_change: changes/2026-05-14-add-selected-login-token-boundary-checks
     selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary
-    latest_login_token_ratification_work_item: W-0072
-    next_login_token_ratification_work_item: W-0073
+    close_login_token_ratification_decision: ADR-0031
+    close_login_token_ratification_change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
+    latest_login_token_ratification_work_item: W-0073
+    next_schema_ratification_milestone: M-014
+    next_schema_ratification_work_item: W-0074
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -214,6 +217,8 @@ phase_plan:
       - RefreshAccessToken
     credential_token_session_schema_gates_status: defined_implementation_deferred
     selected_login_token_boundary_checks_status: active_implementation_deferred
+    login_token_ratification_status: completed_implementation_deferred
+    credential_token_schema_ratification_status: active
     credential_record_schema_gate_status: defined_no_schema_added
     token_verifier_record_schema_gate_status: defined_no_schema_added
     external_identity_link_schema_gate_status: deferred_no_schema_added
@@ -299,7 +304,7 @@ phase_plan:
     rule: Authentication and token/session validation design defines vibit-native, agent-readable boundaries before implementation; Nakama and Pitaya are references, not governing API shapes.
     login_token_ratification_rule: Login-method and token-format ratification must compare Nakama capability coverage and Pitaya session vocabulary while preserving vibit-native contracts, generated boundaries, and verification commands.
   phase_2b_agent_tooling_and_generator_hardening:
-    status: active
+    status: completed
     focus:
       - contract_index_inspection
       - generated_output_inspection
@@ -308,6 +313,20 @@ phase_plan:
       - continuation_intake_commands
     active_milestone: M-007
     rule: Strengthen agent intake, generation, and architecture checks before adding more runtime player, authentication, or broader game module behavior.
+  phase_2c_credential_and_token_schema_ratification:
+    status: active
+    active_milestone: M-014
+    focus:
+      - credential_record_schema_boundary
+      - token_verifier_record_schema_boundary
+      - authentication_schema_migration_queue
+    nakama_reference:
+      - device_authentication_capability
+      - session_token_expiration_logout_revocation_vocabulary
+    pitaya_reference:
+      - session_context_vocabulary
+      - handler_identity_handoff_vocabulary
+    rule: Use Nakama and Pitaya for capability and vocabulary, but ratify vibit-owned PostgreSQL schema boundaries before migrations, repositories, adapters, or runtime authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

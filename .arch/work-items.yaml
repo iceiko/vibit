@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-013
+current_milestone: M-014
 
 continuation_semantics:
   default_step_unit: work_item
@@ -256,7 +256,7 @@ milestones:
 
   - id: M-013
     title: Login Method And Token Format Ratification
-    status: active
+    status: completed
     goal: Ratify the first production authentication entry points, token model, proof carrier boundaries, token lifecycle semantics, and implementation queue before adding login handlers, token parsing, credential storage, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, or WebSocket routes.
     completion_criteria:
       - Candidate first login methods are compared against Nakama capability coverage and vibit security/agent-native constraints.
@@ -271,6 +271,26 @@ milestones:
       - changing Protobuf envelope behavior before protocol impact is ratified
       - changing WebSocket handshake authentication behavior before handshake impact is ratified
       - adding runtime player account handlers or WebSocket routes
+      - copying Nakama or Pitaya public APIs directly
+    completion_summary: M-013 completed the login method and token format ratification milestone. It compared login-method candidates against Nakama capability coverage and vibit security constraints, ratified device_credential_login as the first login method, compared token format and carrier options, ratified opaque high-entropy access tokens with login-command issuance and explicit request proof payloads, defined token lifecycle and storage implications, defined runtime authentication semantic contract/error/permission/audit surfaces, defined credential/token/session schema gates, and added selected login/token repository checks. No runtime authentication, token behavior, credential storage, token storage, session persistence, external identity linking, generated authentication output, Protobuf messages, WebSocket routes, WebSocket handshake authentication, migrations, repositories, adapters, or major authentication dependencies were added.
+
+  - id: M-014
+    title: Credential And Token Verifier Schema Ratification
+    status: active
+    goal: Ratify credential record and token verifier record schema boundaries for the selected device credential and opaque access-token posture before adding migrations, repositories, adapters, runtime lookup, generated authentication shapes, Protobuf messages, WebSocket proof carriers, handlers, routes, or authentication behavior.
+    completion_criteria:
+      - Credential record semantics, ownership, identifiers, verifier storage, uniqueness, lifecycle states, account relationship, rotation, revocation, disabled-credential behavior, and redaction rules are ratified before migration source exists.
+      - Token verifier record semantics, ownership, non-plaintext verifier storage, statuses, expiration, revocation, credential-token linkage, retention, cleanup, replay-sensitive failure classes, and redaction rules are ratified before migration source exists.
+      - PostgreSQL remains the default durable target unless a later explicit dependency or storage decision changes it.
+      - Player account lifecycle tables remain credential-free, token-free, external-identity-free, session-free, WebSocket-state-free, and request-validation-free.
+      - Future migration, repository, adapter, generated output, protocol, WebSocket carrier, runtime lookup, handler, route, and live verification work is split into later bounded work items.
+    non_goals:
+      - adding credential, token, external identity, runtime session, or audit migrations in the schema-ratification step
+      - implementing credential lookup or token validation
+      - adding runtime authentication handlers or WebSocket routes
+      - changing Protobuf envelope or WebSocket handshake behavior
+      - adding generated authentication contract shapes
+      - adding password hashing, JWT, OAuth, OIDC, provider SDK, key-management, Redis-like, or other major authentication dependencies
       - copying Nakama or Pitaya public APIs directly
 
 work_items:
@@ -1868,7 +1888,7 @@ work_items:
   - id: W-0073
     milestone: M-013
     title: Close login method token format ratification milestone
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
     depends_on:
       - W-0072
@@ -1876,12 +1896,35 @@ work_items:
       - ADR-0019
       - ADR-0023
       - ADR-0024
+      - ADR-0031
     completion:
       - Review M-013 completion criteria against the standard, comparison artifacts, ratified login-method set, ratified token posture, lifecycle/storage implications, contract/error/permission surfaces, schema gates, checks, manifests, and guides.
       - Mark M-013 completed only if implementation boundaries remain deferred or explicitly planned for the next milestone.
       - Create the next implementation or confirmation gate rather than starting runtime authentication implicitly.
+    completion_summary: Reviewed M-013 against its exit criteria, marked the login method and token format ratification milestone completed, and opened M-014 as the next credential/token schema ratification gate. Preserved implementation deferral for runtime authentication, handlers, routes, Protobuf changes, WebSocket changes, migrations, repositories, adapters, generated authentication shapes, and major authentication dependencies.
     ask_first:
       - Starting production authentication implementation while closing the milestone.
       - Adding runtime player handlers or WebSocket routes.
       - Changing Protobuf envelope or WebSocket handshake behavior.
       - Adding new major dependencies or data migrations.
+
+  - id: W-0074
+    milestone: M-014
+    title: Define credential record schema boundary
+    status: next_ready
+    change: changes/2026-05-14-define-credential-record-schema-boundary
+    depends_on:
+      - W-0073
+    related_decisions:
+      - ADR-0025
+      - ADR-0029
+      - ADR-0031
+    completion:
+      - Ratify credential record ownership, lifecycle states, verifier semantics, uniqueness rules, player account relationship, disabled/revoked credential behavior, rotation/replacement semantics, redaction rules, and required future migration/repository/adapter gates.
+      - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime lookup, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+      - Keep player account lifecycle tables credential-free and provider-subject-free.
+    ask_first:
+      - Adding credential migration sources or tables.
+      - Adding credential repository interfaces or PostgreSQL adapters.
+      - Implementing credential lookup or login behavior.
+      - Adding password hashing, OAuth, OIDC, provider SDK, key-management, or Redis-like dependencies.
