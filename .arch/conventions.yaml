@@ -96,6 +96,9 @@ documentation_pairs:
   session_persistence_websocket_handshake_decision_gates_standard:
     canonical: docs/session-persistence-websocket-handshake-decision-gates.md
     zh-CN: docs/session-persistence-websocket-handshake-decision-gates.zh-CN.md
+  login_method_token_format_ratification_standard:
+    canonical: docs/login-method-token-format-ratification.md
+    zh-CN: docs/login-method-token-format-ratification.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -139,6 +142,7 @@ templates:
     player_identity_and_session_boundary: ADR-0021
     player_account_postgresql_schema_boundary: ADR-0022
     authentication_token_session_validation_design_boundary: ADR-0023
+    login_method_token_format_ratification_boundary: ADR-0024
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -363,6 +367,56 @@ authentication_token_session_validation:
     - websocket_handshake_authentication
     - runtime_player_handlers_or_routes
     - metadata_only_identity_as_production_permission
+
+login_method_token_format_ratification:
+  standard: docs/login-method-token-format-ratification.md
+  translation: docs/login-method-token-format-ratification.zh-CN.md
+  decision: ADR-0024
+  status: standard_defined_implementation_deferred
+  milestone: M-013
+  latest_completed_work_item: W-0064
+  next_work_item: W-0065
+  change: changes/2026-05-14-define-login-method-token-format-ratification-standard
+  conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
+  rule: >
+    First login methods, token model, proof carrier posture, token lifecycle,
+    storage implications, and implementation gates must be ratified before
+    runtime authentication code, token parsing, credential storage, external
+    identity linking, session persistence, Protobuf envelope changes,
+    WebSocket handshake authentication, runtime player handlers, or WebSocket
+    routes are added.
+  reference_alignment:
+    nakama:
+      authentication_methods: capability_coverage_reference
+      session_tokens_refresh_logout_expiration: token_lifecycle_reference
+      direct_public_api_compatibility: rejected_for_now
+    pitaya:
+      session_binding: vocabulary_reference
+      handler_session_context: vocabulary_reference
+      direct_public_api_compatibility: rejected_for_now
+  implementation_status:
+    login_methods_selected: false
+    token_format_selected: false
+    token_carrier_selected: false
+    token_lifecycle_selected: false
+    credential_storage_implemented: false
+    external_identity_linking_implemented: false
+    session_persistence_implemented: false
+    protobuf_envelope_changed: false
+    websocket_handshake_authentication_changed: false
+    runtime_authentication_implemented: false
+    runtime_player_handlers_added: false
+    websocket_routes_added: false
+  next_steps:
+    - compare_first_login_method_candidates
+    - ratify_first_login_method_set
+    - compare_token_format_and_carrier_options
+    - ratify_first_token_format_and_carrier_posture
+    - define_token_lifecycle_and_storage_implications
+    - define_authentication_contract_error_permission_surfaces
+    - define_credential_token_session_schema_gates
+    - add_selected_login_token_boundary_checks
+    - close_login_token_ratification_milestone
 
 server_runtime:
   first_reference_language: Go

@@ -26,6 +26,7 @@ purpose: >
   player_identity_and_session_boundary: ADR-0021
   player_account_postgresql_schema_boundary: ADR-0022
   authentication_token_session_validation_design_boundary: ADR-0023
+  login_method_token_format_ratification_boundary: ADR-0024
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -750,13 +751,18 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   login_method_token_format_ratification:
     selected_by_maintainer: login_method_and_token_format_ratification
-    status: selected_standard_work_next
+    status: standard_defined_implementation_deferred
     milestone: M-013
     first_work_item: W-0064
-    latest_completed_work_item: W-0063
-    next_work_item: W-0064
+    latest_completed_work_item: W-0064
+    next_work_item: W-0065
     selected_at: 2026-05-14
-    change: changes/2026-05-14-confirm-next-direction-after-authentication-design
+    direction_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
+    standard: docs/login-method-token-format-ratification.md
+    translation: docs/login-method-token-format-ratification.zh-CN.md
+    decision: ADR-0024
+    change: changes/2026-05-14-define-login-method-token-format-ratification-standard
+    conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
     reference_alignment:
       nakama:
         account_authentication_methods: capability_reference
@@ -778,12 +784,22 @@ identity_session_boundary:
       runtime_authentication_implemented: false
       runtime_player_handlers_added: false
       websocket_routes_added: false
+    ratification_queue:
+      - W-0065 compare_first_login_method_candidates
+      - W-0066 ratify_first_login_method_set
+      - W-0067 compare_token_format_and_carrier_options
+      - W-0068 ratify_first_token_format_and_proof_carrier_posture
+      - W-0069 define_token_lifecycle_and_storage_implications
+      - W-0070 define_authentication_contract_error_permission_surfaces
+      - W-0071 define_credential_token_session_schema_gates
+      - W-0072 add_repository_checks_for_selected_login_token_boundaries
+      - W-0073 close_login_method_token_format_ratification_milestone
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-013
-    latest_completed_work_item: W-0063
-    next_ready_work_item: W-0064
-    status: define_login_method_token_format_ratification_standard_next
+    latest_completed_work_item: W-0064
+    next_ready_work_item: W-0065
+    status: compare_first_login_method_candidates_next
 
 persistence_model:
   decision: ADR-0011

@@ -140,7 +140,12 @@ phase_plan:
     completed_next_direction_gate: M-012
     selected_post_authentication_design_direction: login_method_and_token_format_ratification
     active_login_token_ratification_milestone: M-013
-    next_login_token_ratification_work_item: W-0064
+    login_method_token_format_ratification_standard: docs/login-method-token-format-ratification.md
+    login_method_token_format_ratification_standard_translation: docs/login-method-token-format-ratification.zh-CN.md
+    login_method_token_format_ratification_decision: ADR-0024
+    login_method_token_format_ratification_standard_change: changes/2026-05-14-define-login-method-token-format-ratification-standard
+    latest_login_token_ratification_work_item: W-0064
+    next_login_token_ratification_work_item: W-0065
     selected_authentication_direction: ratify_authentication_and_token_session_validation_design
     authentication_direction_change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     authentication_design_standard: docs/authentication-token-session-validation.md
@@ -169,6 +174,7 @@ phase_plan:
       - operations_observability_admin_tooling
       - multiplayer_presence_matchmaking_planning
     login_method_token_format_ratification_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
+    login_method_token_format_ratification_standard_change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     reference_pull:
       nakama:
         - account_user_authentication_session_capability_coverage
@@ -205,6 +211,7 @@ phase_plan:
         realtime_session_context: adapted
         direct_public_api_compatibility: rejected_for_now
     rule: Authentication and token/session validation design defines vibit-native, agent-readable boundaries before implementation; Nakama and Pitaya are references, not governing API shapes.
+    login_token_ratification_rule: Login-method and token-format ratification must compare Nakama capability coverage and Pitaya session vocabulary while preserving vibit-native contracts, generated boundaries, and verification commands.
   phase_2b_agent_tooling_and_generator_hardening:
     status: active
     focus:

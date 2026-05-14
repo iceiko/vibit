@@ -1654,7 +1654,7 @@ work_items:
   - id: W-0064
     milestone: M-013
     title: Define login method and token format ratification standard
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     depends_on:
       - W-0063
@@ -1663,10 +1663,12 @@ work_items:
       - ADR-0021
       - ADR-0022
       - ADR-0023
+      - ADR-0024
     completion:
       - Define the ratification standard for first login methods, token model, proof carrier boundaries, lifecycle semantics, storage implications, and implementation gates before code.
       - Compare Nakama authentication/session token capability coverage and Pitaya session binding vocabulary against vibit-native choices.
       - Plan the remaining M-013 work queue without adding runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
+    completion_summary: Defined the login method and token format ratification standard with English and Simplified Chinese documentation; created ADR-0024; mapped Nakama authentication/session-token capability coverage and Pitaya session-binding/handler vocabulary into vibit-native ratification inputs; registered the standard in manifests and agent guides; and planned the remaining M-013 queue without adding runtime authentication, token parsing, credential storage, external identity linking, session persistence, Protobuf envelope changes, WebSocket handshake authentication, runtime player handlers, or WebSocket routes.
     ask_first:
       - Implementing production authentication while defining the standard.
       - Adding credential tables, external identity tables, token tables, session tables, or migrations.
@@ -1674,3 +1676,195 @@ work_items:
       - Changing Protobuf envelope behavior or WebSocket handshake authentication behavior.
       - Adding runtime player account handlers or WebSocket routes.
       - Declaring metadata-only identity sufficient for production permissions.
+
+  - id: W-0065
+    milestone: M-013
+    title: Compare first login method candidates
+    status: next_ready
+    change: changes/2026-05-14-compare-first-login-method-candidates
+    depends_on:
+      - W-0064
+    related_decisions:
+      - ADR-0019
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Compare device credential, guest/anonymous, custom ID, email/password, external provider, and service-auth login families against vibit production safety, game-server ergonomics, Nakama capability coverage, and Pitaya session vocabulary.
+      - Record benefits, risks, required artifacts, security concerns, abuse concerns, contract impact, storage impact, dependency impact, and implementation complexity for each candidate.
+      - Recommend a first login-method set for W-0066 without implementing authentication, adding credential storage, adding dependencies, changing Protobuf/WebSocket behavior, or adding runtime player routes.
+    ask_first:
+      - Implementing any login method.
+      - Adding credential tables, external identity tables, token tables, session tables, or migrations.
+      - Adding password hashing, JWT, OAuth, OIDC, provider SDK, cryptography, key-management, Redis-like, or other major dependencies.
+      - Changing Protobuf envelope behavior or WebSocket handshake authentication behavior.
+      - Adding runtime player account handlers or WebSocket routes.
+
+  - id: W-0066
+    milestone: M-013
+    title: Ratify first login method set
+    status: planned
+    change: changes/2026-05-14-ratify-first-login-method-set
+    depends_on:
+      - W-0065
+    related_decisions:
+      - ADR-0019
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Ratify the first login-method set with public rationale, rejected alternatives, decision weights, confidence, known gaps, and implementation gates.
+      - State whether each selected method is production-capable, bootstrap-only, or local-development-only.
+      - State whether each selected method creates player accounts, links existing accounts, or authenticates existing accounts only.
+      - Preserve implementation deferral until contracts, schemas, dependencies, tests, checks, and runtime ownership are planned.
+    ask_first:
+      - Selecting a login method that requires a major dependency before a dependency adoption record exists.
+      - Treating metadata-only identity as production proof.
+      - Implementing login handlers while ratifying the set.
+      - Adding runtime player routes or WebSocket routes.
+
+  - id: W-0067
+    milestone: M-013
+    title: Compare token format and carrier options
+    status: planned
+    change: changes/2026-05-14-compare-token-format-and-carrier-options
+    depends_on:
+      - W-0066
+    related_decisions:
+      - ADR-0015
+      - ADR-0018
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Compare opaque high-entropy tokens, signed structured tokens, external provider tokens, and plain session-ID-as-secret posture.
+      - Compare login command payload, per-request payload, Protobuf envelope extension, current Session metadata fields, WebSocket handshake carriers, and first system-message carriers.
+      - Recommend first token format and carrier posture for W-0068 without changing Protobuf, WebSocket handshake, or runtime code.
+    ask_first:
+      - Adding JWT, signing, cryptography, OAuth, OIDC, provider SDK, key-management, or session-store dependencies.
+      - Changing Protobuf envelope fields or using metadata-only session fields as proof.
+      - Changing WebSocket handshake authentication behavior.
+      - Implementing token parsing or validation.
+
+  - id: W-0068
+    milestone: M-013
+    title: Ratify first token format and proof carrier posture
+    status: planned
+    change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
+    depends_on:
+      - W-0067
+    related_decisions:
+      - ADR-0015
+      - ADR-0018
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Ratify the first token format and proof carrier posture with issuer, verifier, subject, audience, expiration, refresh, revocation, rotation, replay, redaction, and storage implications.
+      - State whether Protobuf envelope behavior, current Session metadata fields, WebSocket handshake behavior, or first-message/system-message behavior remain unchanged or require a future decision.
+      - Preserve implementation deferral until lifecycle, storage, contracts, schemas, checks, and tests are planned.
+    ask_first:
+      - Choosing a signed token model that needs key management without a dependency/adoption record.
+      - Repurposing existing metadata-only Session fields as authenticated proof.
+      - Changing Protobuf envelope or WebSocket handshake behavior in this step.
+      - Implementing token parsing, signing, validation, refresh, or revocation.
+
+  - id: W-0069
+    milestone: M-013
+    title: Define token lifecycle and storage implications
+    status: planned
+    change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
+    depends_on:
+      - W-0068
+    related_decisions:
+      - ADR-0022
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Define token issuance, expiration, refresh, revocation, rotation, replay, logout, cleanup, redaction, and audit implications for the ratified token posture.
+      - Define whether credential, token, external identity, or session storage is required later and what schema gates must exist first.
+      - Preserve player account lifecycle tables as credential-free, token-free, external-identity-free, and session-free.
+    ask_first:
+      - Adding credential, token, external identity, or session tables.
+      - Adding migrations.
+      - Adding password hashing, token signing, key-management, Redis-like, OAuth, OIDC, or provider dependencies.
+      - Implementing token lifecycle behavior.
+
+  - id: W-0070
+    milestone: M-013
+    title: Define authentication contract error permission surfaces
+    status: planned
+    change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
+    depends_on:
+      - W-0069
+    related_decisions:
+      - ADR-0021
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Define planned semantic contract surfaces for selected login methods, token issuance, token refresh, logout, token validation, and any account-linking behavior in scope.
+      - Define required error and permission catalog surfaces before implementation.
+      - Preserve current runtime code and Protobuf behavior unless a later implementation work item separately ratifies changes.
+    ask_first:
+      - Adding runtime handlers or WebSocket routes.
+      - Adding Protobuf wire messages or generated output before the contract/protocol boundary is selected.
+      - Weakening existing session validation or permission boundaries.
+
+  - id: W-0071
+    milestone: M-013
+    title: Define credential token session schema gates
+    status: planned
+    change: changes/2026-05-14-define-credential-token-session-schema-gates
+    depends_on:
+      - W-0070
+    related_decisions:
+      - ADR-0020
+      - ADR-0022
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Define the future schema gates for credential records, external identity links, token records, and session records required by the selected posture.
+      - Separate schema ratification, migration sources, repository interfaces, adapters, live verification, and runtime wiring into future bounded work.
+      - Preserve player account lifecycle schema without adding credential, provider subject, token, session, or WebSocket state columns.
+    ask_first:
+      - Adding migration sources.
+      - Changing existing player account lifecycle tables.
+      - Choosing a new durable store or Redis-like dependency.
+      - Implementing repositories or runtime lookup code.
+
+  - id: W-0072
+    milestone: M-013
+    title: Add repository checks for selected login token boundaries
+    status: planned
+    change: changes/2026-05-14-add-selected-login-token-boundary-checks
+    depends_on:
+      - W-0071
+    related_decisions:
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Add or update repository checks that enforce selected login/token boundaries and prevent shortcut implementations where statically checkable.
+      - Keep checks machine-readable and narrow enough for agents to act on.
+      - Preserve existing runtime, generated, migration, protocol, and identity checks without requiring live external services by default.
+    ask_first:
+      - Weakening existing architecture checks.
+      - Making live PostgreSQL or external provider services mandatory for default checks.
+      - Adding broad static-analysis dependencies.
+      - Implementing authentication behavior while adding checks.
+
+  - id: W-0073
+    milestone: M-013
+    title: Close login method token format ratification milestone
+    status: planned
+    change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
+    depends_on:
+      - W-0072
+    related_decisions:
+      - ADR-0019
+      - ADR-0023
+      - ADR-0024
+    completion:
+      - Review M-013 completion criteria against the standard, comparison artifacts, ratified login-method set, ratified token posture, lifecycle/storage implications, contract/error/permission surfaces, schema gates, checks, manifests, and guides.
+      - Mark M-013 completed only if implementation boundaries remain deferred or explicitly planned for the next milestone.
+      - Create the next implementation or confirmation gate rather than starting runtime authentication implicitly.
+    ask_first:
+      - Starting production authentication implementation while closing the milestone.
+      - Adding runtime player handlers or WebSocket routes.
+      - Changing Protobuf envelope or WebSocket handshake behavior.
+      - Adding new major dependencies or data migrations.

@@ -124,6 +124,8 @@ Credential storage 与 external identity linking boundaries 记录在 `../docs/c
 
 Session persistence 与 WebSocket handshake decision gates 记录在 `../docs/session-persistence-websocket-handshake-decision-gates.md`。在添加 session persistence、WebSocket handshake authentication、reconnect behavior、connection epoch behavior、token/session carriers、session-related Protobuf envelope changes、handshake/system messages 或 route-level authentication 前，应使用该标准。它不选择 request-level、first-message、handshake-level、every-request 或 hybrid validation 作为 production model。它不授权 session tables、session store、envelope changes 或 handshake authentication behavior。
 
+Login method 与 token format ratification 记录在 `../docs/login-method-token-format-ratification.md` 和 `../decisions/ADR-0024-login-method-token-format-ratification-boundary.md`。在选择第一批 login methods、token model、token format、proof carrier posture、token lifecycle semantics、credential/token/session schema gates 或 implementation queue 前，应使用该标准。它不授权 runtime authentication、token parsing、credential lookup、external identity linking、session persistence、Protobuf envelope changes、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。
+
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 
 Live PostgreSQL verification 受 `../docs/postgresql-verification-environment.md` 约束。它通过 `VIBIT_POSTGRES_TEST_DSN` 选择性启用；普通 unit tests、`node ../tools/vibit check runtime` 和默认 repository checks 不得要求运行中的 PostgreSQL server。当 live PostgreSQL check 因为没有 disposable DSN 而跳过时，必须显式记录。
