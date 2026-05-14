@@ -724,12 +724,15 @@ credential_token_schema_ratification:
     remain deferred.
 
 authentication_postgresql_adapter_implementation:
-  status: active
+  status: completed
   milestone: M-015
   decision: ADR-0035
   first_work_item: W-0083
-  latest_completed_work_item: W-0084
-  next_work_item: W-0085
+  latest_completed_work_item: W-0085
+  closeout_work_item: W-0085
+  closeout_change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+  next_milestone: M-016
+  next_work_item_after_closeout: W-0086
   repository_interface_source: runtime/internal/modules/authentication/repository.go
   adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
   adapter_test: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
@@ -759,10 +762,44 @@ authentication_postgresql_adapter_implementation:
     - W-0084 implement_authentication_postgresql_adapter
     - W-0085 close_authentication_postgresql_adapter_implementation_milestone
   rule: >
-    The active authentication implementation milestone is persistence-adapter
-    only. It may not add production authentication behavior, token generation,
-    token validation, login handlers, WebSocket routes, Protobuf messages,
-    generated authentication shapes, or major authentication dependencies.
+    The authentication PostgreSQL adapter implementation milestone is complete.
+    It implemented persistence-adapter behavior only and did not add production
+    authentication behavior, token generation, token validation, login handlers,
+    WebSocket routes, Protobuf messages, generated authentication shapes, or
+    major authentication dependencies.
+
+runtime_authentication_implementation_boundary_planning:
+  status: active
+  milestone: M-016
+  first_work_item: W-0086
+  next_work_item: W-0086
+  allowed_scope: planning_boundary_only
+  previous_milestone: M-015
+  previous_closeout_work_item: W-0085
+  previous_closeout_change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+  repository_interface_source: runtime/internal/modules/authentication/repository.go
+  adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  bearer_parsing_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_routes_added: false
+  websocket_proof_carrier_implemented: false
+  generated_authentication_shapes_added: false
+  authentication_dependencies_added: false
+  work_queue:
+    - W-0086 define_runtime_authentication_implementation_boundary
+  rule: >
+    The next milestone may define runtime authentication implementation
+    boundaries and planning gates only. It must not implement production
+    authentication behavior, token generation, token validation, login handlers,
+    WebSocket routes, Protobuf messages, generated authentication shapes, or
+    major authentication dependencies.
 
 server_runtime:
   first_reference_language: Go

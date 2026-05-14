@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-015
+current_milestone: M-016
 
 continuation_semantics:
   default_step_unit: work_item
@@ -296,7 +296,7 @@ milestones:
 
   - id: M-015
     title: Authentication PostgreSQL Adapter Implementation
-    status: active
+    status: completed
     goal: Implement the PostgreSQL persistence adapter for the already-ratified authentication repository interface and migration sources without adding runtime authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or authentication dependencies.
     completion_criteria:
       - Repository checks distinguish allowed authentication persistence-adapter vocabulary from forbidden runtime authentication behavior.
@@ -304,6 +304,30 @@ milestones:
       - Credential and token verifier rows map to module-owned records with redaction-safe error paths and no raw secret exposure.
       - Focused fake-executor tests cover credential storage/lookup, token storage/lookup, revocation, cleanup eligibility, error mapping, UTC normalization, and absence of transaction-control SQL.
       - Runtime authentication, protocol, WebSocket, generated output, login, token issuance, token validation, logout execution, refresh, cleanup jobs, and major dependencies remain deferred.
+    non_goals:
+      - implementing AuthenticateWithDeviceCredential
+      - implementing ValidateAccessToken
+      - implementing LogoutAccessToken runtime behavior
+      - generating raw access tokens or credential material
+      - comparing credential or token verifier digests
+      - parsing bearer tokens
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding JWT, OAuth, OIDC, password-hashing, key-management, Redis-like, provider SDK, or cryptography dependencies
+      - adding external identity, runtime session, audit, or refresh-token persistence
+    completion_summary: M-015 completed the authentication PostgreSQL adapter implementation path. Repository checks now distinguish allowed persistence-adapter vocabulary from forbidden runtime authentication behavior, and the PostgreSQL adapter implements authentication.Repository through a caller-supplied executor with focused fake-executor tests for credential storage/lookup, token storage/lookup, revocation, cleanup eligibility, error mapping, UTC normalization, and absence of transaction-control SQL. Runtime authentication, token generation, token validation, login handlers, logout execution, refresh, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, major authentication dependencies, external identity storage, runtime session persistence, and production authentication behavior remain deferred.
+
+  - id: M-016
+    title: Runtime Authentication Implementation Boundary Planning
+    status: active
+    goal: Plan the first runtime authentication implementation boundary after the persistence adapter without implementing login, token generation, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, or authentication dependencies.
+    completion_criteria:
+      - Runtime authentication responsibilities are split between application services, module-owned persistence interfaces, PostgreSQL adapters, request identity handoff, protocol adapters, and transport boundaries before implementation.
+      - The first runtime authentication implementation queue is ordered so token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, and dependency adoption remain separately gated.
+      - Required contracts, error mappings, permission surfaces, tests, and repository checks are identified before runtime behavior is added.
+      - Nakama and Pitaya authentication/session concepts are referenced for capability coverage without copying public APIs or bypassing vibit boundaries.
+      - No production authentication behavior is implemented in the planning step.
     non_goals:
       - implementing AuthenticateWithDeviceCredential
       - implementing ValidateAccessToken
@@ -2179,7 +2203,7 @@ work_items:
   - id: W-0085
     milestone: M-015
     title: Close authentication PostgreSQL adapter implementation milestone
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
     depends_on:
       - W-0084
@@ -2189,6 +2213,28 @@ work_items:
       - Review M-015 against adapter implementation, tests, manifests, standards, and repository checks.
       - Mark M-015 completed only if runtime authentication, protocol, WebSocket, generated output, login, token generation, token validation, logout execution, refresh, cleanup jobs, and major dependencies remain deferred or are explicitly planned for a later milestone.
       - Open the next bounded planning or implementation gate.
+    completion_summary: Reviewed M-015 against the implemented authentication PostgreSQL adapter, focused tests, module manifest, persistence boundary standard, selected login/token boundary checks, runtime checks, work queue, and repository verification. Marked M-015 completed and opened M-016 as the runtime authentication implementation boundary planning milestone. Runtime authentication, login execution, token generation, token validation, verifier comparison, logout execution, refresh, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, major authentication dependencies, external identity storage, runtime session persistence, audit persistence, and production authentication behavior remain deferred.
     ask_first:
       - Starting runtime authentication implementation while closing the adapter milestone.
       - Adding Protobuf messages, WebSocket routes, WebSocket proof carriers, generated authentication shapes, token generation, token validation, or authentication dependencies.
+
+  - id: W-0086
+    milestone: M-016
+    title: Define runtime authentication implementation boundary
+    status: next_ready
+    change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
+    depends_on:
+      - W-0085
+    related_decisions:
+      - ADR-0023
+      - ADR-0024
+      - ADR-0030
+      - ADR-0035
+    completion:
+      - Define application service ownership, repository usage, token material lifecycle placeholders, verifier comparison boundaries, request identity handoff, error mapping, and test expectations for future runtime authentication.
+      - Preserve separate gates for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, and dependency adoption.
+      - Update manifests, standards, and repository checks only as planning artifacts.
+    ask_first:
+      - Implementing runtime authentication behavior rather than defining the boundary.
+      - Adding token generation, verifier comparison, token validation, login, logout execution, refresh, cleanup jobs, WebSocket routes, Protobuf messages, generated authentication shapes, or authentication dependencies.
+      - Changing the authentication.Repository interface or ratified migration schemas.

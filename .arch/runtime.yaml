@@ -41,7 +41,7 @@ purpose: >
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: authentication_postgresql_adapter_implementation
+  current_phase: runtime_authentication_implementation_boundary_planning
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1054,10 +1054,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-015
-    latest_completed_work_item: W-0084
-    next_ready_work_item: W-0085
-    status: close_authentication_postgresql_adapter_implementation_milestone_next
+    milestone: M-016
+    latest_completed_work_item: W-0085
+    next_ready_work_item: W-0086
+    status: runtime_authentication_implementation_boundary_planning_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1111,12 +1111,15 @@ identity_session_boundary:
     runtime_authentication_implemented: false
     rule: Schema boundaries for credential records and token verifier records are ratified and closed. Runtime authentication, generated output, Protobuf messages, WebSocket proof carriers, handlers, routes, and authentication behavior remain deferred.
   authentication_postgresql_adapter_implementation:
-    status: active
+    status: completed
     milestone: M-015
     decision: ADR-0035
     first_work_item: W-0083
-    latest_completed_work_item: W-0084
-    next_work_item: W-0085
+    latest_completed_work_item: W-0085
+    closeout_work_item: W-0085
+    closeout_change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+    next_milestone: M-016
+    next_work_item_after_closeout: W-0086
     repository_interface_source: runtime/internal/modules/authentication/repository.go
     adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
     adapter_test: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
@@ -1146,6 +1149,33 @@ identity_session_boundary:
       - W-0084 implement_authentication_postgresql_adapter
       - W-0085 close_authentication_postgresql_adapter_implementation_milestone
     rule: The milestone may implement PostgreSQL persistence for ratified authentication records only. It must not implement production authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or major authentication dependencies.
+  runtime_authentication_implementation_boundary_planning:
+    status: active
+    milestone: M-016
+    first_work_item: W-0086
+    next_work_item: W-0086
+    allowed_scope: planning_boundary_only
+    previous_milestone: M-015
+    previous_closeout_work_item: W-0085
+    previous_closeout_change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+    repository_interface_source: runtime/internal/modules/authentication/repository.go
+    adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+    runtime_authentication_implemented: false
+    token_generation_added: false
+    token_validation_added: false
+    verifier_comparison_added: false
+    bearer_parsing_added: false
+    login_handlers_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    protobuf_authentication_messages_added: false
+    websocket_routes_added: false
+    websocket_proof_carrier_implemented: false
+    generated_authentication_shapes_added: false
+    authentication_dependencies_added: false
+    work_queue:
+      - W-0086 define_runtime_authentication_implementation_boundary
+    rule: The next milestone may define runtime authentication implementation boundaries and planning gates only. It must not implement production authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or major authentication dependencies.
 
 persistence_model:
   decision: ADR-0011
