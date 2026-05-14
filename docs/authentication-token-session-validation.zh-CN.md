@@ -32,6 +32,7 @@ vibit 现在已经有 player account lifecycle persistence 和 application-owned
 
 - `docs/authentication-proof-token-session-contract-dimensions.md`
 - `docs/credential-storage-external-identity-linking-boundaries.md`
+- `docs/session-persistence-websocket-handshake-decision-gates.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -401,6 +402,10 @@ Credential 和 external identity storage 需要单独边界，之后才允许出
 
 Session persistence 继续 deferred。
 
+Session persistence 与 WebSocket handshake decision gates 现在由 `docs/session-persistence-websocket-handshake-decision-gates.md` 定义。
+
+该标准把 request-level validation、first-message validation、handshake-level validation、every-request validation 和 hybrid validation 分离为未来选择。它不选择生产模型、session store、token/session carrier、Protobuf envelope change、handshake/system message 或 route-level authentication behavior。
+
 未来 session persistence work 必须决定：
 
 - Sessions 是否 server-side persisted。
@@ -415,6 +420,14 @@ Session persistence 继续 deferred。
 - Opt-in live verification requirements。
 
 在 ratify 前，runtime 必须保持 `session_id` 和 `player_id` 为 metadata-only，除非未来 validator 显式校验它们。
+
+在 decision-gate standard 存在后，同一规则仍然适用，直到未来 implementation standard ratify 具体 validation model、storage model、protocol impact 和 verification path：
+
+- WebSocket transport 保持 credential-neutral。
+- 当前 envelope session fields 仍然只是 metadata carriers。
+- `connection_epoch` 仍然只是 metadata。
+- Session persistence 仍未实现。
+- WebSocket handshake authentication 仍未实现。
 
 ## 10. Protobuf Envelope 与 WebSocket Handshake 交互
 
@@ -436,6 +449,7 @@ Session.connection_epoch
 - 未来 token carrier 可以是 envelope metadata、system message、first request payload、WebSocket subprotocol/header pattern 或其他被 ratify 的设计。本标准不选择其中任何一种。
 - 除非未来 handshake standard 赋予 WebSocket transport 狭窄的 transport-level responsibility，否则 WebSocket transport 不得 parse 或 validate credentials。
 - 即使未来采用 handshake authentication，application dispatch 仍必须收到可供 domain permissions 检查的 normalized request identity。
+- 选择 request-level、first-message、handshake-level、every-request 或 hybrid validation 需要未来 ask-first decision。
 
 ## 11. 参考模式映射
 
@@ -501,7 +515,7 @@ Authentication design milestone 剩余部分应按 bounded steps 推进：
 1. 添加 architecture checks，用于强制 authentication/token/session design boundary。
 2. Ratify authentication proof 与 token/session validation 的 semantic contract dimensions，但不选择具体 token format。已由 `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/` 完成。
 3. 定义 credential storage 和 external identity linking 边界，但不添加 schema 或 dependencies。已由 `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/` 完成。
-4. 定义 session persistence 和 WebSocket handshake decision gates，但不实现任何路径。
+4. 定义 session persistence 和 WebSocket handshake decision gates，但不实现任何路径。已由 `changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates/` 完成。
 5. 关闭该 milestone，或为第一个实现方向创建 confirmation gate。
 
 每一步都必须保持 metadata-only identity 为 non-authenticated，直到 real validator 被单独 ratify 并实现。

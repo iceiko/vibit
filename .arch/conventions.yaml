@@ -93,6 +93,9 @@ documentation_pairs:
   credential_storage_external_identity_linking_boundaries_standard:
     canonical: docs/credential-storage-external-identity-linking-boundaries.md
     zh-CN: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
+  session_persistence_websocket_handshake_decision_gates_standard:
+    canonical: docs/session-persistence-websocket-handshake-decision-gates.md
+    zh-CN: docs/session-persistence-websocket-handshake-decision-gates.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -238,14 +241,17 @@ authentication_token_session_validation:
   contract_dimensions_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
   credential_external_identity_boundaries_standard: docs/credential-storage-external-identity-linking-boundaries.md
   credential_external_identity_boundaries_translation: docs/credential-storage-external-identity-linking-boundaries.zh-CN.md
+  session_persistence_websocket_handshake_decision_gates_standard: docs/session-persistence-websocket-handshake-decision-gates.md
+  session_persistence_websocket_handshake_decision_gates_translation: docs/session-persistence-websocket-handshake-decision-gates.zh-CN.md
   decision: ADR-0023
-  status: credential_external_identity_boundaries_defined_without_runtime_implementation
+  status: session_persistence_websocket_handshake_gates_defined_without_runtime_implementation
   milestone: M-011
-  latest_completed_work_item: W-0060
-  next_work_item: W-0061
-  change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
+  latest_completed_work_item: W-0061
+  next_work_item: W-0062
+  change: changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates
   contract_dimensions_change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
   credential_external_identity_boundaries_change: changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries
+  session_persistence_websocket_handshake_decision_gates_change: changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates
   conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
   boundary_check_rule: runtime.authentication_token_session_boundary
   boundary_checks_added: true
@@ -315,6 +321,22 @@ authentication_token_session_validation:
     player_account_lifecycle_tables_remain_provider_subject_free: true
     nakama_login_method_coverage: deferred_capability_families
     pitaya_session_binding_vocabulary: adopted_as_vocabulary_without_api_compatibility
+  session_persistence_websocket_handshake_decision_gates:
+    decision_gates_defined: true
+    validation_model_selected: false
+    request_level_validation_selected: false
+    first_message_validation_selected: false
+    handshake_level_validation_selected: false
+    every_request_validation_selected: false
+    hybrid_validation_selected: false
+    session_store_selected: false
+    session_tables_added: false
+    token_session_carrier_selected: false
+    reconnect_behavior_selected: false
+    connection_epoch_behavior_selected: false
+    websocket_handshake_authentication_implemented: false
+    websocket_transport_remains_credential_neutral: true
+    current_envelope_session_fields_remain_metadata_only: true
   current_runtime_status:
     metadata_only_validator_exists: true
     production_authentication_implemented: false

@@ -32,6 +32,7 @@ Read this standard together with:
 
 - `docs/authentication-proof-token-session-contract-dimensions.md`
 - `docs/credential-storage-external-identity-linking-boundaries.md`
+- `docs/session-persistence-websocket-handshake-decision-gates.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -401,6 +402,10 @@ After the boundary standard exists, the same rule still applies until a future i
 
 Session persistence is deferred.
 
+Session persistence and WebSocket handshake decision gates are now defined by `docs/session-persistence-websocket-handshake-decision-gates.md`.
+
+That standard separates request-level validation, first-message validation, handshake-level validation, every-request validation, and hybrid validation as future choices. It does not select a production model, session store, token/session carrier, Protobuf envelope change, handshake/system message, or route-level authentication behavior.
+
 Future session persistence work must decide:
 
 - Whether sessions are persisted server-side.
@@ -415,6 +420,14 @@ Future session persistence work must decide:
 - Opt-in live verification requirements.
 
 Until ratified, the runtime must keep `session_id` and `player_id` metadata-only unless a future validator explicitly validates them.
+
+After the decision-gate standard exists, the same rule still applies until a future implementation standard ratifies a concrete validation model, storage model, protocol impact, and verification path:
+
+- WebSocket transport remains credential-neutral.
+- Current envelope session fields remain metadata carriers only.
+- `connection_epoch` remains metadata only.
+- Session persistence remains unimplemented.
+- WebSocket handshake authentication remains unimplemented.
 
 ## 10. Protobuf Envelope And WebSocket Handshake Interaction
 
@@ -436,6 +449,7 @@ Rules:
 - A future token carrier may be envelope metadata, a system message, a first request payload, a WebSocket subprotocol/header pattern, or another ratified design. This standard does not choose one.
 - WebSocket transport must not parse or validate credentials unless a future handshake standard gives it a narrow transport-level responsibility.
 - Even if handshake authentication is later adopted, application dispatch must still receive a normalized request identity that domain permissions can inspect.
+- Choosing request-level, first-message, handshake-level, every-request, or hybrid validation requires a future ask-first decision.
 
 ## 11. Reference Pattern Map
 
@@ -501,7 +515,7 @@ The remaining authentication design milestone should proceed in bounded steps:
 1. Add architecture checks that enforce the authentication/token/session design boundary.
 2. Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format. Completed by `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`.
 3. Define credential storage and external identity linking boundaries without adding schema or dependencies. Completed by `changes/2026-05-14-define-credential-storage-external-identity-linking-boundaries/`.
-4. Define session persistence and WebSocket handshake decision gates without implementing either path.
+4. Define session persistence and WebSocket handshake decision gates without implementing either path. Completed by `changes/2026-05-14-define-session-persistence-websocket-handshake-decision-gates/`.
 5. Close the milestone or create a confirmation gate for the first implementation direction.
 
 Each step must preserve metadata-only identity as non-authenticated until a real validator is separately ratified and implemented.

@@ -1,0 +1,55 @@
+schema_version: 0.1
+change_id: define-session-persistence-websocket-handshake-decision-gates
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Define session persistence and WebSocket handshake decision gates without implementation.
+
+affected_modules:
+  - runtime
+  - player
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-session-persistence-websocket-handshake-decision-gates --json
+    - node tools/vibit check all --json
+    - node tools/vibit inspect next --json
+    - git diff --check
+  status: Verified
