@@ -8,6 +8,12 @@ owner: runtime/internal/app
 decision_refs:
   - ADR-0018
   - ADR-0021
+  - ADR-0023
+
+standard_refs:
+  - docs/player-account-session-contracts.md
+  - docs/authentication-token-session-validation.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
 
 summary: Fact emitted conceptually after request session metadata is evaluated into application request identity.
 
@@ -70,6 +76,33 @@ payload:
       type: boolean
     reason:
       type: string
+
+event_dimensions:
+  fact_class: runtime_observation_fact
+  public_client_event: false
+  audit_persistence_added: false
+  event_bus_publication_added: false
+  forbidden_payload_material:
+    - raw_credentials
+    - token_strings
+    - password_hashes
+    - provider_secrets
+    - full_external_identity_payloads
+  allowed_identifier_material:
+    - request_id
+    - actor_id
+    - player_id
+    - session_id
+    - connection_id
+  validation_statuses:
+    - metadata_only
+    - validated
+  future_statuses:
+    - anonymous
+    - authentication_proven
+    - session_validated
+    - service_validated
+    - rejected
 
 published_by:
   command: ValidateSession

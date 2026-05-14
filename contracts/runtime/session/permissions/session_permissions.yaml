@@ -7,16 +7,32 @@ owner: runtime/internal/app
 decision_refs:
   - ADR-0018
   - ADR-0021
+  - ADR-0023
+
+standard_refs:
+  - docs/player-account-session-contracts.md
+  - docs/authentication-token-session-validation.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
 
 summary: Permission catalog for runtime-owned session validation handoff contracts.
 
 permissions:
   - id: runtime_session_validate
     description: Allows runtime application dispatch to evaluate decoded request session metadata before domain handlers run.
+    dimension: validation_infrastructure_permission
+    grants_player_domain_authority: false
+    metadata_only_is_sufficient: false
     grants_access_to:
       commands:
         - ValidateSession
       queries: []
+
+permission_dimensions:
+  validation_infrastructure_permission: runtime_session_validate
+  gameplay_permission: false
+  service_permission_catalog_ratified: false
+  admin_permission_catalog_ratified: false
+  domain_modules_must_not_treat_metadata_only_as_proof: true
 
 implementation:
   generated_outputs: []

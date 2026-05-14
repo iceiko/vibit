@@ -3,7 +3,7 @@
 状态：Draft v0.2
 最后更新：2026-05-14
 范围：玩家账号生命周期契约与运行时 session validation 契约
-依赖：`docs/player-identity-session-boundary.md`
+依赖：`docs/player-identity-session-boundary.md`、`docs/authentication-proof-token-session-contract-dimensions.md`
 
 配套英文文档是 `docs/player-account-session-contracts.md`。英文文件是权威版本。
 
@@ -233,6 +233,8 @@ contracts/runtime/session/
 ```
 
 它们描述现有 application-owned session validation handoff，并保留当前 metadata-only validator behavior。它们不实现 real authentication、token validation、credential lookup、session persistence、player account lookup、Protobuf envelope changes 或 WebSocket handshake authentication。
+
+未来 authentication proof 与 token/session validation contracts 所需的 semantic dimensions 已在 `docs/authentication-proof-token-session-contract-dimensions.md` 中 ratify。后续变更必须使用该标准来描述 actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session error dimensions、session permission dimensions 和 validation event dimensions。
 
 已 ratify 的第一批 player account Protobuf messages：
 

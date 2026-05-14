@@ -8,6 +8,12 @@ owner: runtime/internal/app
 decision_refs:
   - ADR-0018
   - ADR-0021
+  - ADR-0023
+
+standard_refs:
+  - docs/player-account-session-contracts.md
+  - docs/authentication-token-session-validation.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
 
 summary: Validate decoded request session metadata into application request identity before domain dispatch.
 
@@ -99,6 +105,73 @@ output:
       type: boolean
     reason:
       type: string
+
+contract_dimensions:
+  actor_kinds:
+    - unknown
+    - anonymous
+    - player
+    - service
+    - admin
+  current_runtime_actor_kinds:
+    - unknown
+    - player
+    - service
+    - admin
+  validation_statuses:
+    - unknown
+    - anonymous
+    - metadata_only
+    - authentication_proven
+    - session_validated
+    - service_validated
+    - rejected
+  current_runtime_statuses:
+    - metadata_only
+    - validated
+  proof_statuses_for_future_contracts:
+    - not_present
+    - present_unverified
+    - proven
+    - rejected
+    - expired
+    - revoked
+    - unsupported
+    - unavailable
+  failure_classes:
+    - missing_proof
+    - malformed_proof
+    - unsupported_proof
+    - invalid_proof
+    - expired_proof
+    - revoked_proof
+    - session_not_found
+    - session_expired
+    - session_revoked
+    - actor_disabled
+    - permission_denied
+    - validator_unavailable
+    - not_implemented
+  request_identity_handoff:
+    owner: runtime/internal/app
+    fields:
+      - validation_status
+      - actor_kind
+      - actor_id
+      - player_id
+      - session_id
+      - connection_id
+      - connection_epoch
+      - session_validated
+      - player_id_validated
+      - reason
+    metadata_only_is_production_permission_basis: false
+    player_id_validated_requires_real_proof: true
+    session_validated_requires_real_session_binding: true
+  token_behavior_chosen: false
+  login_method_chosen: false
+  credential_lookup_chosen: false
+  session_persistence_chosen: false
 
 emits:
   - SessionValidated

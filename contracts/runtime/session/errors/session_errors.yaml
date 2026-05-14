@@ -7,34 +7,66 @@ owner: runtime/internal/app
 decision_refs:
   - ADR-0018
   - ADR-0021
+  - ADR-0023
+
+standard_refs:
+  - docs/player-account-session-contracts.md
+  - docs/authentication-token-session-validation.md
+  - docs/authentication-proof-token-session-contract-dimensions.md
 
 summary: Error catalog for runtime session validation semantic contracts.
 
 errors:
   - code: SESSION_INVALID
     category: authorization
+    failure_class: invalid_proof_or_session_not_found
     retryable: false
     message: Session validation failed.
+    public_safe: true
+    internal_detail_allowed: true
     used_by:
       commands:
         - ValidateSession
       queries: []
   - code: SESSION_VALIDATOR_UNAVAILABLE
     category: dependency
+    failure_class: validator_unavailable
     retryable: true
     message: Session validation could not be completed because the validator was unavailable.
+    public_safe: true
+    internal_detail_allowed: true
     used_by:
       commands:
         - ValidateSession
       queries: []
   - code: SESSION_VALIDATION_NOT_IMPLEMENTED
     category: not_implemented
+    failure_class: not_implemented
     retryable: false
     message: Real session validation is not implemented for this runtime boundary.
+    public_safe: true
+    internal_detail_allowed: false
     used_by:
       commands:
         - ValidateSession
       queries: []
+
+failure_class_catalog:
+  adopted_from: docs/authentication-proof-token-session-contract-dimensions.md
+  values:
+    - missing_proof
+    - malformed_proof
+    - unsupported_proof
+    - invalid_proof
+    - expired_proof
+    - revoked_proof
+    - session_not_found
+    - session_expired
+    - session_revoked
+    - actor_disabled
+    - permission_denied
+    - validator_unavailable
+    - not_implemented
 
 implementation:
   generated_outputs: []

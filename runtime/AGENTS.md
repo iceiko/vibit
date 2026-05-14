@@ -41,6 +41,7 @@ Before changing files under `runtime/`, read:
 - `../docs/postgresql-persistence-boundary.md`, before persistence work
 - `../docs/postgresql-verification-environment.md`, before live PostgreSQL verification work
 - `../docs/authentication-token-session-validation.md`, before authentication, token, credential, external identity, session persistence, request identity trust, WebSocket handshake, player handler, or player route work
+- `../docs/authentication-proof-token-session-contract-dimensions.md`, before authentication proof, token/session validation, session error, session permission, or validation event contract work
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
@@ -117,6 +118,8 @@ The player account repository interface boundary is `internal/modules/player/rep
 The player account PostgreSQL adapter does not authorize runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, or session persistence. The adapter may only write `player_accounts`, write `player_account_events` for `PlayerAccountCreated`, and read current lifecycle rows from `player_accounts` until a later change ratifies more behavior.
 
 The authentication, token, and session validation design boundary is documented in `../docs/authentication-token-session-validation.md` and `../decisions/ADR-0023-authentication-token-session-validation-design-boundary.md`. It separates authentication proof, login methods, tokens, credentials, external identity links, runtime sessions, request identity, WebSocket handshake authentication, player account lifecycle, transport connection metadata, and Protobuf envelope metadata. The current `MetadataOnlySessionValidator` is a non-authenticated bootstrap path. Do not treat metadata-only `player_id`, `session_id`, or `connection_id` as production proof, and do not add authentication runtime code, token parsing, credential lookup, external identity linking, session persistence, Protobuf envelope authentication changes, WebSocket handshake authentication, runtime player handlers, or WebSocket routes until separately ratified. `runtime.authentication_token_session_boundary` is the repository check rule for this boundary.
+
+Authentication proof and token/session contract dimensions are documented in `../docs/authentication-proof-token-session-contract-dimensions.md`. Use that standard for actor kinds, validation statuses, proof statuses, failure classes, retryability, request identity handoff, session error metadata, session permission metadata, and validation event metadata. These dimensions are semantic vocabulary only and do not grant permission to implement login methods, token formats, credential lookup, session persistence, Protobuf envelope changes, WebSocket handshake changes, runtime player handlers, or WebSocket routes.
 
 The first explicit PostgreSQL migration runner is `internal/platform/migrations/postgres.go`. It owns `github.com/pressly/goose/v3`, accepts a caller-supplied `*sql.DB` and migration source filesystem or directory, lists SQL migration sources, reports structured status, and applies pending migrations only when explicitly invoked. Do not wire it into normal `cmd/vibit-server` startup without a change spec.
 

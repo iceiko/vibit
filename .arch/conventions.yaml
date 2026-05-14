@@ -87,6 +87,9 @@ documentation_pairs:
   authentication_token_session_validation_standard:
     canonical: docs/authentication-token-session-validation.md
     zh-CN: docs/authentication-token-session-validation.zh-CN.md
+  authentication_proof_token_session_contract_dimensions_standard:
+    canonical: docs/authentication-proof-token-session-contract-dimensions.md
+    zh-CN: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -228,12 +231,14 @@ player_identity_session_boundary:
 authentication_token_session_validation:
   standard: docs/authentication-token-session-validation.md
   translation: docs/authentication-token-session-validation.zh-CN.md
+  contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
+  contract_dimensions_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
   decision: ADR-0023
-  status: design_standard_boundary_checks_added_without_runtime_implementation
+  status: contract_dimensions_ratified_without_runtime_implementation
   milestone: M-011
-  latest_completed_work_item: W-0058
-  next_work_item: W-0059
-  change: changes/2026-05-14-add-authentication-token-session-boundary-checks
+  latest_completed_work_item: W-0059
+  next_work_item: W-0060
+  change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
   conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
   boundary_check_rule: runtime.authentication_token_session_boundary
   boundary_checks_added: true
@@ -250,6 +255,46 @@ authentication_token_session_validation:
     - authentication_proven
     - session_validated
     - service_validated
+  contract_dimensions:
+    actor_kinds:
+      - unknown
+      - anonymous
+      - player
+      - service
+      - admin
+    validation_statuses:
+      - unknown
+      - anonymous
+      - metadata_only
+      - authentication_proven
+      - session_validated
+      - service_validated
+      - rejected
+    proof_statuses:
+      - not_present
+      - present_unverified
+      - proven
+      - rejected
+      - expired
+      - revoked
+      - unsupported
+      - unavailable
+    failure_classes:
+      - missing_proof
+      - malformed_proof
+      - unsupported_proof
+      - invalid_proof
+      - expired_proof
+      - revoked_proof
+      - session_not_found
+      - session_expired
+      - session_revoked
+      - actor_disabled
+      - permission_denied
+      - validator_unavailable
+      - not_implemented
+    request_identity_handoff_owner: runtime/internal/app
+    metadata_only_is_production_permission_basis: false
   current_runtime_status:
     metadata_only_validator_exists: true
     production_authentication_implemented: false

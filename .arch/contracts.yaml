@@ -48,12 +48,54 @@ rules:
 
 runtime_contracts:
   session_validation:
-    status: semantic_contracts_ratified_metadata_only_runtime_hook_no_authentication
+    status: semantic_contracts_and_dimensions_ratified_metadata_only_runtime_hook_no_authentication
     owner: runtime/internal/app
     standard: docs/player-account-session-contracts.md
+    dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
     decisions:
       - ADR-0018
       - ADR-0021
+      - ADR-0023
+    contract_dimensions:
+      actor_kinds:
+        - unknown
+        - anonymous
+        - player
+        - service
+        - admin
+      validation_statuses:
+        - unknown
+        - anonymous
+        - metadata_only
+        - authentication_proven
+        - session_validated
+        - service_validated
+        - rejected
+      proof_statuses:
+        - not_present
+        - present_unverified
+        - proven
+        - rejected
+        - expired
+        - revoked
+        - unsupported
+        - unavailable
+      failure_classes:
+        - missing_proof
+        - malformed_proof
+        - unsupported_proof
+        - invalid_proof
+        - expired_proof
+        - revoked_proof
+        - session_not_found
+        - session_expired
+        - session_revoked
+        - actor_disabled
+        - permission_denied
+        - validator_unavailable
+        - not_implemented
+      request_identity_handoff_owner: runtime/internal/app
+      metadata_only_is_production_permission_basis: false
     implementation_status:
       existing_hook: runtime/internal/app/session_validation.go
       metadata_only_validator_exists: true

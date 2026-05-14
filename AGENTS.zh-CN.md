@@ -89,6 +89,8 @@ vibit is an open-source agent-native server framework for building backends that
 - `docs/reference-game-server-alignment.zh-CN.md`
 - `docs/authentication-token-session-validation.md`
 - `docs/authentication-token-session-validation.zh-CN.md`
+- `docs/authentication-proof-token-session-contract-dimensions.md`
+- `docs/authentication-proof-token-session-contract-dimensions.zh-CN.md`
 - `docs/workflow.md`
 - `docs/workflow.zh-CN.md`
 - `schema/`
@@ -109,6 +111,8 @@ Runtime protocol adapter boundary standard 是 `docs/runtime-protocol-adapter.md
 Active game server reference alignment standard 是 `docs/reference-game-server-alignment.md`，配套简体中文译本是 `docs/reference-game-server-alignment.zh-CN.md`。`ADR-0019` 记录 Nakama 和 Pitaya 是主动参考基线。在新增 game server capability families、runtime subsystems、social/realtime features、matchmaking、match runtime、cluster/RPC work 或 operational surfaces 前，应阅读 `.arch/reference.yaml` 和该标准。Nakama 和 Pitaya 指导 capability planning；它们不覆盖 vibit 的 constitution、ADRs、manifests、generated boundaries 或 verification commands。
 
 Authentication、token 和 session validation design standard 是 `docs/authentication-token-session-validation.md`，配套简体中文译本是 `docs/authentication-token-session-validation.zh-CN.md`。`ADR-0023` 记录这个 design boundary。在添加 authentication、token behavior、credential storage、external identity linking、session persistence、request identity trust changes、Protobuf envelope authentication changes、WebSocket handshake authentication、runtime player account handlers 或 WebSocket player routes 前，应阅读它。Metadata-only `player_id` 和 `session_id` 不是 authenticated proof。`runtime.authentication_token_session_boundary` 是该边界的 repository check rule。
+
+Authentication proof 与 token/session contract dimensions standard 是 `docs/authentication-proof-token-session-contract-dimensions.md`，配套简体中文译本是 `docs/authentication-proof-token-session-contract-dimensions.zh-CN.md`。在定义或修改 authentication proof、token/session validation、actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session errors、session permissions 或 validation events 前，应阅读它。它只 ratify semantic vocabulary；不选择 login methods、token formats、credential storage、session persistence、Protobuf envelope behavior、WebSocket handshake behavior、runtime player handlers 或 WebSocket routes。
 
 Work continuation standard 是 `docs/workflow.md`，配套简体中文译本是 `docs/workflow.zh-CN.md`。机器可读 work queue 是 `.arch/work-items.yaml`。当 maintainer 说“continue”或“继续”时，应理解为推进一个 `next_ready` work item，除非当前被 blocked 或需要 confirmation。当 maintainer 要求继续多步时，应按顺序最多推进相应数量的 work items，并在 blockers、verification failures、ask-first boundaries 或 maintainer redirect 处停止。
 
@@ -227,7 +231,7 @@ node tools/vibit generate contract-shapes <module|all>
 
 使用 `.arch/reference.yaml` 作为 Nakama/Pitaya reference alignment 的机器可读 intake 入口。Nakama 是 broad game backend product capability surface 的主要参考。Pitaya 是 Go game server framework architecture vocabulary 的主要参考。改造 reference patterns 时必须保留 vibit 的 Agent-Native constraints，并记录为什么采纳、改造或拒绝某个 reference pattern。
 
-使用 `docs/authentication-token-session-validation.md`、`ADR-0023` 和 `runtime.authentication_token_session_boundary`，再修改 authentication proof、login methods、token behavior、credential storage、external identity linking、runtime session persistence、request identity trust、Protobuf envelope authentication behavior、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。该设计标准分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、transport metadata、envelope metadata 和 player account lifecycle。
+使用 `docs/authentication-token-session-validation.md`、`docs/authentication-proof-token-session-contract-dimensions.md`、`ADR-0023` 和 `runtime.authentication_token_session_boundary`，再修改 authentication proof、login methods、token behavior、credential storage、external identity linking、runtime session persistence、request identity trust、Protobuf envelope authentication behavior、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。该设计标准分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、transport metadata、envelope metadata 和 player account lifecycle。该 dimensions standard ratify actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session error dimensions、session permission dimensions 和 validation event dimensions。
 
 使用 `.arch/work-items.yaml` 作为 continuation 的机器可读 intake 入口。`W-0007` 这样的 Work item IDs 是执行步骤；ADR IDs 仍然是架构决策；change spec IDs 仍然是具体执行记录；Git hashes 仍然是 repository snapshots；versions 仍然是 release identifiers。
 

@@ -3,7 +3,7 @@
 Status: Draft v0.2
 Last updated: 2026-05-14
 Scope: Player account lifecycle contracts and runtime session validation contracts
-Depends on: `docs/player-identity-session-boundary.md`
+Depends on: `docs/player-identity-session-boundary.md`, `docs/authentication-proof-token-session-contract-dimensions.md`
 
 The paired Simplified Chinese translation is `docs/player-account-session-contracts.zh-CN.md`. The English file is authoritative.
 
@@ -233,6 +233,8 @@ contracts/runtime/session/
 ```
 
 They describe the existing application-owned session validation handoff and preserve the current metadata-only validator behavior. They do not implement real authentication, token validation, credential lookup, session persistence, player account lookup, Protobuf envelope changes, or WebSocket handshake authentication.
+
+The required semantic dimensions for future authentication proof and token/session validation contracts are ratified in `docs/authentication-proof-token-session-contract-dimensions.md`. Future changes must use that standard for actor kinds, validation statuses, proof statuses, failure classes, retryability, request identity handoff, session error dimensions, session permission dimensions, and validation event dimensions.
 
 Ratified first player account Protobuf messages:
 

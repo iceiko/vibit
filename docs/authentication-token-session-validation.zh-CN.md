@@ -30,6 +30,7 @@ vibit 现在已经有 player account lifecycle persistence 和 application-owned
 
 本标准应与以下文件一起阅读：
 
+- `docs/authentication-proof-token-session-contract-dimensions.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -353,6 +354,8 @@ websocket frame
 
 本标准有意不决定这些维度。
 
+这些未来选择所需的 semantic vocabulary 已在 `docs/authentication-proof-token-session-contract-dimensions.md` 中 ratify。未来 token/session contracts 在实现前，必须把 actor kinds、validation statuses、proof statuses、failure classes、retryability 和 request identity handoff semantics 映射回该标准。
+
 ## 8. Credential 与 External Identity 边界
 
 Credential 和 external identity storage 需要后续标准，之后才能出现 schema 或 code。
@@ -464,6 +467,8 @@ Session.connection_epoch
 - Runtime tests 和 repository checks。
 - 英文文档和简体中文译本。
 
+未来 authentication proof 或 token/session validation contract artifacts 在定义 actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、error semantics、permission semantics 或 events 时，也必须引用 `docs/authentication-proof-token-session-contract-dimensions.md`。
+
 ## 13. Ask-First 边界
 
 在以下操作前询问 maintainer：
@@ -483,7 +488,7 @@ Session.connection_epoch
 Authentication design milestone 剩余部分应按 bounded steps 推进：
 
 1. 添加 architecture checks，用于强制 authentication/token/session design boundary。
-2. Ratify authentication proof 与 token/session validation 的 semantic contract dimensions，但不选择具体 token format。
+2. Ratify authentication proof 与 token/session validation 的 semantic contract dimensions，但不选择具体 token format。已由 `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/` 完成。
 3. 定义 credential storage 和 external identity linking 边界，但不添加 schema 或 dependencies。
 4. 定义 session persistence 和 WebSocket handshake decision gates，但不实现任何路径。
 5. 关闭该 milestone，或为第一个实现方向创建 confirmation gate。

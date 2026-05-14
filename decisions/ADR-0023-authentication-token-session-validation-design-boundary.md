@@ -7,6 +7,7 @@ Related changes:
 
 - `changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence/`
 - `changes/2026-05-14-define-authentication-token-session-validation-design-standard/`
+- `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`
 
 Related conversations:
 
@@ -17,6 +18,8 @@ Related artifacts:
 
 - `docs/authentication-token-session-validation.md`
 - `docs/authentication-token-session-validation.zh-CN.md`
+- `docs/authentication-proof-token-session-contract-dimensions.md`
+- `docs/authentication-proof-token-session-contract-dimensions.zh-CN.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `.arch/runtime.yaml`
@@ -112,7 +115,7 @@ Revisit this decision if:
 ## Follow-Up
 
 - Add architecture checks enforcing the authentication/token/session design boundary.
-- Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format.
+- Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format. Completed by `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`.
 - Define credential storage and external identity linking boundaries.
 - Define session persistence and WebSocket handshake decision gates.
 - Create the next implementation confirmation gate after M-011 is complete.

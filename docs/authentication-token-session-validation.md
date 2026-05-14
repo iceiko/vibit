@@ -30,6 +30,7 @@ This standard does not choose:
 
 Read this standard together with:
 
+- `docs/authentication-proof-token-session-contract-dimensions.md`
 - `docs/player-identity-session-boundary.md`
 - `docs/player-account-session-contracts.md`
 - `docs/game-protocol.md`
@@ -353,6 +354,8 @@ Future token work must decide and record the following before implementation:
 
 This standard intentionally leaves those dimensions undecided.
 
+The semantic vocabulary for these future choices is ratified in `docs/authentication-proof-token-session-contract-dimensions.md`. Future token/session contracts must map actor kinds, validation statuses, proof statuses, failure classes, retryability, and request identity handoff semantics back to that standard before implementation.
+
 ## 8. Credential And External Identity Boundaries
 
 Credential and external identity storage require a later standard before schema or code exists.
@@ -464,6 +467,8 @@ Before implementing production authentication, future work must add or update th
 - Runtime tests and repository checks.
 - English documentation and Simplified Chinese translation.
 
+Future authentication proof or token/session validation contract artifacts must also reference `docs/authentication-proof-token-session-contract-dimensions.md` when they define actor kinds, validation statuses, proof statuses, failure classes, retryability, request identity handoff, error semantics, permission semantics, or events.
+
 ## 13. Ask-First Boundaries
 
 Ask the maintainer before:
@@ -483,7 +488,7 @@ Ask the maintainer before:
 The remaining authentication design milestone should proceed in bounded steps:
 
 1. Add architecture checks that enforce the authentication/token/session design boundary.
-2. Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format.
+2. Ratify semantic contract dimensions for authentication proof and token/session validation without choosing a concrete token format. Completed by `changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions/`.
 3. Define credential storage and external identity linking boundaries without adding schema or dependencies.
 4. Define session persistence and WebSocket handshake decision gates without implementing either path.
 5. Close the milestone or create a confirmation gate for the first implementation direction.

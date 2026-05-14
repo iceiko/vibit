@@ -419,18 +419,21 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   authentication_token_session_design:
     selected_by_maintainer: ratify_authentication_and_token_session_validation_design
-    status: design_standard_defined_runtime_implementation_deferred
+    status: contract_dimensions_ratified_runtime_implementation_deferred
     milestone: M-011
     first_work_item: W-0057
-    latest_completed_work_item: W-0058
-    next_work_item: W-0059
+    latest_completed_work_item: W-0059
+    next_work_item: W-0060
     selected_at: 2026-05-14
     change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     design_standard: docs/authentication-token-session-validation.md
     design_standard_translation: docs/authentication-token-session-validation.zh-CN.md
+    contract_dimensions_standard: docs/authentication-proof-token-session-contract-dimensions.md
+    contract_dimensions_standard_translation: docs/authentication-proof-token-session-contract-dimensions.zh-CN.md
     design_decision: ADR-0023
     design_change: changes/2026-05-14-define-authentication-token-session-validation-design-standard
     boundary_checks_change: changes/2026-05-14-add-authentication-token-session-boundary-checks
+    contract_dimensions_change: changes/2026-05-14-ratify-authentication-proof-token-session-contract-dimensions
     boundary_check_rule: runtime.authentication_token_session_boundary
     boundary_checks_added: true
     conversation: conversations/2026-05-14-authentication-token-session-validation-design-standard.md
@@ -455,6 +458,46 @@ identity_session_boundary:
       authentication_proven: future_ratified_authenticator_verified_actor
       session_validated: future_ratified_session_validator_bound_request_identity
       service_validated: future_ratified_service_auth_verified_authority
+    contract_dimensions:
+      actor_kinds:
+        - unknown
+        - anonymous
+        - player
+        - service
+        - admin
+      validation_statuses:
+        - unknown
+        - anonymous
+        - metadata_only
+        - authentication_proven
+        - session_validated
+        - service_validated
+        - rejected
+      proof_statuses:
+        - not_present
+        - present_unverified
+        - proven
+        - rejected
+        - expired
+        - revoked
+        - unsupported
+        - unavailable
+      failure_classes:
+        - missing_proof
+        - malformed_proof
+        - unsupported_proof
+        - invalid_proof
+        - expired_proof
+        - revoked_proof
+        - session_not_found
+        - session_expired
+        - session_revoked
+        - actor_disabled
+        - permission_denied
+        - validator_unavailable
+        - not_implemented
+      request_identity_handoff_owner: runtime/internal/app
+      metadata_only_is_production_permission_basis: false
     separated_concerns:
       - authentication_proof
       - login_method
@@ -479,8 +522,6 @@ identity_session_boundary:
       websocket_routes_added: false
     rule: The design standard is ratified, but runtime implementation remains deferred. Do not implement production authentication, choose token format, add credentials, add session persistence, change the envelope, change the WebSocket handshake, or add player handlers/routes until separately ratified.
     remaining_work_queue:
-      - W-0058 add_authentication_token_session_boundary_architecture_checks
-      - W-0059 ratify_authentication_proof_and_token_session_validation_contract_dimensions
       - W-0060 define_credential_storage_and_external_identity_linking_boundaries
       - W-0061 define_session_persistence_and_websocket_handshake_decision_gates
       - W-0062 close_authentication_token_session_validation_design_milestone
@@ -512,7 +553,7 @@ identity_session_boundary:
     player_account_persistence_schema_ratified: true
     player_account_migration_added: true
   semantic_contracts:
-    status: runtime_session_validation_semantic_contracts_ratified_metadata_only_hook
+    status: runtime_session_validation_semantic_contracts_and_dimensions_ratified_metadata_only_hook
     registry: .arch/contracts.yaml
     source_root: contracts/runtime/session
     owner: runtime/internal/app
@@ -638,9 +679,9 @@ identity_session_boundary:
       selected_direction: ratify_authentication_and_token_session_validation_design
   current_work:
     milestone: M-011
-    latest_completed_work_item: W-0058
-    next_ready_work_item: W-0059
-    status: authentication_proof_token_session_contract_dimensions_next
+    latest_completed_work_item: W-0059
+    next_ready_work_item: W-0060
+    status: credential_storage_external_identity_boundaries_next
 
 persistence_model:
   decision: ADR-0011

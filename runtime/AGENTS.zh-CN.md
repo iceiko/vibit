@@ -40,6 +40,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 - persistence work 前阅读 `../docs/postgresql-persistence-boundary.md`
 - live PostgreSQL verification work 前阅读 `../docs/postgresql-verification-environment.md`
 - authentication、token、credential、external identity、session persistence、request identity trust、WebSocket handshake、player handler 或 player route work 前阅读 `../docs/authentication-token-session-validation.md`
+- authentication proof、token/session validation、session error、session permission 或 validation event contract work 前阅读 `../docs/authentication-proof-token-session-contract-dimensions.md`
 - `../docs/runtime-runbook.md`
 - `../decisions/ADR-0014-go-runtime-layout-and-boundaries.md`
 - `../decisions/ADR-0018-runtime-protocol-adapter-boundary.md`
@@ -116,6 +117,8 @@ Player account repository interface boundary 是 `internal/modules/player/reposi
 Player account PostgreSQL adapter 不授权 runtime handlers、WebSocket routes、authentication、token behavior、credential storage、external identity linking 或 session persistence。除非后续 change ratify 更多行为，adapter 只能写入 `player_accounts`，为 `PlayerAccountCreated` 写入 `player_account_events`，并从 `player_accounts` 读取当前 lifecycle rows。
 
 Authentication、token 和 session validation design boundary 记录在 `../docs/authentication-token-session-validation.md` 和 `../decisions/ADR-0023-authentication-token-session-validation-design-boundary.md`。它分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、WebSocket handshake authentication、player account lifecycle、transport connection metadata 和 Protobuf envelope metadata。当前 `MetadataOnlySessionValidator` 是 non-authenticated bootstrap path。不要把 metadata-only `player_id`、`session_id` 或 `connection_id` 当作 production proof；未经单独 ratify，不要添加 authentication runtime code、token parsing、credential lookup、external identity linking、session persistence、Protobuf envelope authentication changes、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。`runtime.authentication_token_session_boundary` 是该边界的 repository check rule。
+
+Authentication proof 与 token/session contract dimensions 记录在 `../docs/authentication-proof-token-session-contract-dimensions.md`。Actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session error metadata、session permission metadata 和 validation event metadata 应使用该标准。这些 dimensions 只是 semantic vocabulary，不授予实现 login methods、token formats、credential lookup、session persistence、Protobuf envelope changes、WebSocket handshake changes、runtime player handlers 或 WebSocket routes 的权限。
 
 第一版显式 PostgreSQL migration runner 是 `internal/platform/migrations/postgres.go`。它拥有 `github.com/pressly/goose/v3`，接收调用方提供的 `*sql.DB` 和 migration source filesystem 或 directory，列出 SQL migration sources，报告结构化 status，并且只在被显式调用时应用 pending migrations。未经 change spec 授权，不要把它接入普通 `cmd/vibit-server` startup。
 
