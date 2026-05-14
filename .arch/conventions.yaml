@@ -99,6 +99,9 @@ documentation_pairs:
   login_method_token_format_ratification_standard:
     canonical: docs/login-method-token-format-ratification.md
     zh-CN: docs/login-method-token-format-ratification.zh-CN.md
+  first_login_method_candidates_standard:
+    canonical: docs/first-login-method-candidates.md
+    zh-CN: docs/first-login-method-candidates.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -371,13 +374,17 @@ authentication_token_session_validation:
 login_method_token_format_ratification:
   standard: docs/login-method-token-format-ratification.md
   translation: docs/login-method-token-format-ratification.zh-CN.md
+  first_login_method_candidates_standard: docs/first-login-method-candidates.md
+  first_login_method_candidates_translation: docs/first-login-method-candidates.zh-CN.md
   decision: ADR-0024
-  status: standard_defined_implementation_deferred
+  status: first_login_method_candidates_compared_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0064
-  next_work_item: W-0065
+  latest_completed_work_item: W-0065
+  next_work_item: W-0066
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
+  first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
+  first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -394,8 +401,24 @@ login_method_token_format_ratification:
       session_binding: vocabulary_reference
       handler_session_context: vocabulary_reference
       direct_public_api_compatibility: rejected_for_now
+  first_login_method_candidates:
+    recommendation_status: recommended_not_ratified
+    recommended_first_login_method_set:
+      - device_credential_login
+    deferred_login_method_families:
+      - guest_anonymous_login
+      - custom_id_login
+      - email_password_login
+      - external_provider_login
+      - service_authentication
+    recommended_first_carrier_posture: login_command_payload_before_normal_gameplay_routes
+    nakama_mapping: device_style_low_friction_login_adapted_without_public_api_compatibility
+    pitaya_mapping: session_binding_vocabulary_adapted_without_transport_authentication
+    credential_posture: high_entropy_secret_proof_material_not_raw_os_device_id
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: false
+    first_login_method_recommended: true
     token_format_selected: false
     token_carrier_selected: false
     token_lifecycle_selected: false

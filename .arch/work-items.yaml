@@ -1680,7 +1680,7 @@ work_items:
   - id: W-0065
     milestone: M-013
     title: Compare first login method candidates
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-compare-first-login-method-candidates
     depends_on:
       - W-0064
@@ -1692,6 +1692,7 @@ work_items:
       - Compare device credential, guest/anonymous, custom ID, email/password, external provider, and service-auth login families against vibit production safety, game-server ergonomics, Nakama capability coverage, and Pitaya session vocabulary.
       - Record benefits, risks, required artifacts, security concerns, abuse concerns, contract impact, storage impact, dependency impact, and implementation complexity for each candidate.
       - Recommend a first login-method set for W-0066 without implementing authentication, adding credential storage, adding dependencies, changing Protobuf/WebSocket behavior, or adding runtime player routes.
+    completion_summary: Compared device credential, guest/anonymous, custom ID, email/password, external provider, and service-auth login families against production safety, game-server ergonomics, agent readability, Nakama capability coverage, and Pitaya session vocabulary. Recommended `device_credential_login` as the first login-method set for W-0066, with the credential treated as high-entropy secret proof material rather than a raw OS device ID, and deferred all other candidate families. No authentication implementation, credential storage, dependency, Protobuf/WebSocket behavior change, runtime player handler, or WebSocket route was added.
     ask_first:
       - Implementing any login method.
       - Adding credential tables, external identity tables, token tables, session tables, or migrations.
@@ -1702,7 +1703,7 @@ work_items:
   - id: W-0066
     milestone: M-013
     title: Ratify first login method set
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-ratify-first-login-method-set
     depends_on:
       - W-0065
