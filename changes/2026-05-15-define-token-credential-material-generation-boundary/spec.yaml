@@ -1,0 +1,130 @@
+schema_version: 0.1
+change_id: define-token-credential-material-generation-boundary
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the token and credential material generation boundary without adding runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0042
+  referenced:
+    - ADR-0040
+    - ADR-0041
+
+standards:
+  added:
+    - docs/token-credential-material-generation-boundary.md
+    - docs/token-credential-material-generation-boundary.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  material_generation_boundary_defined: true
+  token_generation_added: false
+  credential_generation_added: false
+  secret_configuration_loading_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  runtime_authentication_implemented: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+material_generation_posture:
+  planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
+  first_device_credential_source: server_issued_application_generated
+  first_access_token_source: server_issued_application_generated
+  minimum_raw_device_credential_entropy_bits: 256
+  minimum_raw_access_token_entropy_bits: 256
+  raw_material_size_bytes: 32
+  text_encoding: url_safe_unpadded_base64_or_equivalent
+  one_time_client_visible_presentation_required: true
+  raw_credential_storage: forbidden
+  raw_token_storage: forbidden
+  external_randomness_dependency_required_for_first_posture: false
+  future_allowed_go_standard_library_packages:
+    - crypto/rand
+    - encoding/base64
+
+workflow:
+  completed_work_item: W-0093
+  completed_milestone: M-021
+  next_milestone: M-022
+  next_ready_work_item: W-0094
+  next_direction: define_verifier_digest_computation_comparison_boundary
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-token-credential-material-generation-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

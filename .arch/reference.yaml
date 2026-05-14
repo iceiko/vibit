@@ -514,10 +514,16 @@ phase_plan:
       - session_context_boundary
     rule: The secret configuration and verifier key loading posture is defined before generation or verifier code. Future local key loading may use process environment configuration or explicit runtime secret input after a later code gate, while KMS and secret-manager integration remain behind dependency and operations gates. It does not implement secret loading, environment parsing, token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_2j_token_credential_material_generation_boundary:
-    status: active
-    active_milestone: M-021
+    status: completed
+    milestone: M-021
     previous_milestone: M-020
-    next_work_item: W-0093
+    completed_work_item: W-0093
+    change: changes/2026-05-15-define-token-credential-material-generation-boundary
+    decision: ADR-0042
+    token_credential_material_generation_boundary_decision: ADR-0042
+    standard: docs/token-credential-material-generation-boundary.md
+    next_milestone: M-022
+    next_work_item: W-0094
     focus:
       - token_material_generation_ownership
       - credential_material_generation_ownership
@@ -532,7 +538,28 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_context_boundary
-    rule: The next phase may define token and credential material generation posture before generation helpers or authentication service behavior. It must not implement token generation, credential generation, secret loading, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+    rule: The token and credential material generation posture is defined before generation helpers or authentication service behavior. Future first-posture raw credential and access-token generation is application-owned, server-issued, 32-byte high-entropy, URL-safe for presentation, one-time client-visible, and digest-only at repository handoff. It does not implement token generation, credential generation, secret loading, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+  phase_2k_verifier_digest_computation_and_comparison_boundary:
+    status: active
+    active_milestone: M-022
+    previous_milestone: M-021
+    next_work_item: W-0094
+    focus:
+      - verifier_digest_computation_ownership
+      - constant_time_comparison_boundary
+      - canonical_byte_input_construction
+      - purpose_label_and_logical_key_use
+      - key_id_selection
+      - lookup_digest_handoff
+      - failure_redaction_expectations
+      - standard_library_hmac_sha256_posture
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_lifecycle_security
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_context_boundary
+    rule: The active phase may define verifier digest computation and constant-time comparison posture before digest helpers or authentication service behavior. It must not implement verifier digest computation, verifier comparison, token generation, credential generation, secret loading, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

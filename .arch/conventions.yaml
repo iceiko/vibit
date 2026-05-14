@@ -129,6 +129,9 @@ documentation_pairs:
   secret_configuration_verifier_key_loading_boundary_standard:
     canonical: docs/secret-configuration-verifier-key-loading-boundary.md
     zh-CN: docs/secret-configuration-verifier-key-loading-boundary.zh-CN.md
+  token_credential_material_generation_boundary_standard:
+    canonical: docs/token-credential-material-generation-boundary.md
+    zh-CN: docs/token-credential-material-generation-boundary.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -1032,6 +1035,68 @@ secret_configuration_and_verifier_key_loading_boundary:
     comparison, login execution, token validation, logout, cleanup, protocol,
     transport, dependency, repository, migration, KMS, secret-manager, and
     production authentication behavior remain separate gates.
+
+token_credential_material_generation_boundary:
+  status: completed
+  milestone: M-021
+  first_work_item: W-0093
+  completed_work_item: W-0093
+  change: changes/2026-05-15-define-token-credential-material-generation-boundary
+  next_milestone: M-022
+  next_work_item: W-0094
+  previous_milestone: M-020
+  previous_completed_work_item: W-0092
+  decision: ADR-0042
+  token_credential_material_generation_boundary_decision: ADR-0042
+  standard: docs/token-credential-material-generation-boundary.md
+  translation: docs/token-credential-material-generation-boundary.zh-CN.md
+  token_credential_material_generation_boundary_standard: docs/token-credential-material-generation-boundary.md
+  token_credential_material_generation_boundary_translation: docs/token-credential-material-generation-boundary.zh-CN.md
+  token_credential_material_generation_boundary_defined: true
+  token_credential_material_generation_boundary_check_rule: runtime.token_credential_material_generation_boundary
+  planned_owner: runtime/internal/app
+  planned_optional_child_package: runtime/internal/app/authentication
+  planned_boundary_type: material_generation_standard_only
+  allowed_scope: boundary_standard_and_manifests_only
+  first_device_credential_source: server_issued_application_generated
+  first_access_token_source: server_issued_application_generated
+  minimum_raw_device_credential_entropy_bits: 256
+  minimum_raw_access_token_entropy_bits: 256
+  raw_material_size_bytes: 32
+  text_encoding: url_safe_unpadded_base64_or_equivalent
+  one_time_client_visible_presentation_required: true
+  raw_credential_storage: forbidden
+  raw_token_storage: forbidden
+  raw_material_in_repository: forbidden
+  external_randomness_dependency_required_for_first_posture: false
+  future_allowed_standard_library_packages:
+    - crypto/rand
+    - encoding/base64
+  runtime_authentication_implemented: false
+  secret_configuration_loading_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  token_validation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The token and credential material generation boundary is defined. Future
+    first-posture raw credential and access-token generation is application-owned,
+    server-issued, 32-byte high-entropy, URL-safe for presentation, one-time
+    client-visible, and never repository-stored as raw material. Token generation,
+    credential generation, secret loading, verifier digest computation, verifier
+    comparison, login execution, token validation, logout, cleanup, protocol,
+    transport, dependency, repository, migration, and production authentication
+    behavior remain separate gates.
 
 server_runtime:
   first_reference_language: Go
