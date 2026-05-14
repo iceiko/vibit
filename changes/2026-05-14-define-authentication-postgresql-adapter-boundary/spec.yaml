@@ -1,0 +1,111 @@
+schema_version: 0.1
+change_id: define-authentication-postgresql-adapter-boundary
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Define the authentication PostgreSQL adapter boundary without adding adapter implementation, runtime authentication behavior, protocol behavior, or dependencies.
+
+affected_modules:
+  - authentication
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0029
+    - ADR-0032
+    - ADR-0033
+    - ADR-0034
+
+standards:
+  added: []
+  changed:
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - docs/postgresql-persistence-boundary.md
+    - docs/postgresql-persistence-boundary.zh-CN.md
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_repository_interface_added: false
+  authentication_repository_interface_source: runtime/internal/modules/authentication/repository.go
+  authentication_postgres_adapter_boundary_defined: true
+  authentication_postgres_adapter_added: false
+  authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+  authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+  authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
+  runtime_authentication_implemented: false
+  token_behavior_implemented: false
+  runtime_lookup_added: false
+  runtime_token_validation_added: false
+  token_issuance_added: false
+  logout_added: false
+  cleanup_added: false
+  websocket_routes_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_work_item: W-0081
+  next_ready_work_item: W-0082
+  next_direction: close_credential_token_verifier_schema_ratification_milestone
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-authentication-postgresql-adapter-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

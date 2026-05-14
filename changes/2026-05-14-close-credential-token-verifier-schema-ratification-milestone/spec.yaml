@@ -1,0 +1,109 @@
+schema_version: 0.1
+change_id: close-credential-token-verifier-schema-ratification-milestone
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the credential and token verifier schema ratification milestone and open the bounded authentication PostgreSQL adapter implementation milestone.
+
+affected_modules:
+  - authentication
+  - runtime
+  - player
+
+decisions:
+  added:
+    - ADR-0035
+  referenced:
+    - ADR-0029
+    - ADR-0032
+    - ADR-0033
+    - ADR-0034
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - docs/authentication-schema-migration-queue.md
+    - docs/authentication-schema-migration-queue.zh-CN.md
+    - docs/postgresql-persistence-boundary.md
+    - docs/postgresql-persistence-boundary.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_postgres_adapter_added: false
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  websocket_routes_added: false
+  protobuf_authentication_messages_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_milestone: M-014
+  completed_work_item: W-0082
+  next_milestone: M-015
+  next_ready_work_item: W-0083
+  next_direction: authentication_postgresql_adapter_implementation
+  implementation_authorized: persistence_adapter_only
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check migrations --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change close-credential-token-verifier-schema-ratification-milestone --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

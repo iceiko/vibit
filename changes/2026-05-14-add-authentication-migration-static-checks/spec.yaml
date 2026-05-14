@@ -1,0 +1,114 @@
+schema_version: 0.1
+change_id: add-authentication-migration-static-checks
+date: 2026-05-14
+type: tooling
+status: verified
+
+summary: Harden local repository checks for the ratified authentication migration sources.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0029
+    - ADR-0032
+    - ADR-0033
+    - ADR-0034
+
+standards:
+  added: []
+  changed:
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - docs/credential-token-session-schema-gates.md
+    - docs/credential-token-session-schema-gates.zh-CN.md
+    - docs/selected-login-token-boundary-checks.md
+    - docs/selected-login-token-boundary-checks.zh-CN.md
+    - docs/authentication-schema-migration-queue.md
+    - docs/authentication-schema-migration-queue.zh-CN.md
+    - docs/token-verifier-record-schema-boundary.md
+    - docs/token-verifier-record-schema-boundary.zh-CN.md
+    - docs/postgresql-persistence-boundary.md
+    - docs/postgresql-persistence-boundary.zh-CN.md
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_storage_implemented: false
+  credential_migration_added: false
+  token_migration_added: false
+  authentication_repository_added: false
+  authentication_postgres_adapter_added: false
+  runtime_lookup_added: false
+  runtime_token_validation_added: false
+  token_issuance_added: false
+  logout_added: false
+  cleanup_added: false
+  websocket_routes_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_work_item: W-0079
+  next_ready_work_item: W-0080
+  next_direction: authentication_repository_interface_boundary
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit check migrations --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change add-authentication-migration-static-checks --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

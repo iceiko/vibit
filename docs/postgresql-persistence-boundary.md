@@ -415,6 +415,14 @@ runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
 
 It is owned by `runtime.authentication`, creates only `authentication_device_credentials`, references `player_accounts(player_id)` without changing player lifecycle tables, and does not authorize token storage, repository interfaces, PostgreSQL adapters, runtime authentication, Protobuf messages, or WebSocket behavior.
 
+The first token verifier migration source is:
+
+```text
+runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+```
+
+It is owned by `runtime.authentication`, creates only `authentication_access_tokens`, references `player_accounts(player_id)` and `authentication_device_credentials(credential_record_id)` without changing those tables, and does not authorize repository interfaces, PostgreSQL adapters, runtime authentication, Protobuf messages, or WebSocket behavior.
+
 ## 3.2 Player Account PostgreSQL Adapter Boundary
 
 The first player account PostgreSQL adapter is implemented, but it remains a persistence adapter only. It does not authorize runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, or session persistence.
@@ -493,6 +501,93 @@ runtime/internal/platform/persistence/postgres.UnitOfWork.NewPlayerAccountReposi
 ```
 
 That helper must stay in the PostgreSQL platform package. It must not change the module-owned `player.Repository` interface, force application or domain packages to import `pgx`, or imply runtime player account handlers, WebSocket routes, authentication, credentials, tokens, external identity links, or session persistence.
+
+## 3.3 Authentication PostgreSQL Adapter Boundary
+
+The first authentication PostgreSQL adapter is implemented. It is a persistence adapter only. It does not authorize runtime authentication, token issuance, token validation, logout execution, refresh behavior, cleanup jobs, handlers, WebSocket routes, Protobuf messages, generated authentication shapes, authentication dependencies, or production authentication behavior.
+
+The adapter source path is:
+
+```text
+runtime/internal/platform/persistence/postgres/authentication_repository.go
+```
+
+The focused test path is:
+
+```text
+runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+```
+
+The adapter constructor is:
+
+```text
+NewAuthenticationRepositoryForUnitOfWork(executor)
+```
+
+The constructor returns an implementation of:
+
+```text
+authentication.Repository
+```
+
+The executor must be supplied by the application-owned unit of work, normally from a transaction-bound handle such as `pgx.Tx`. The adapter may use a small pgx-shaped executor interface for testability. It must not call `BEGIN`, `COMMIT`, or `ROLLBACK`; transaction lifetime belongs to the application-owned unit of work.
+
+The adapter must not:
+
+- Call `BEGIN`, `COMMIT`, or `ROLLBACK`.
+- Open its own hidden write transaction.
+- Open a PostgreSQL pool or read PostgreSQL configuration.
+- Apply migrations or inspect migration status.
+- Generate credential material or tokens.
+- Compare credential or token verifiers.
+- Parse bearer tokens.
+- Validate access tokens.
+- Execute login, logout, refresh, or cleanup behavior.
+- Decode Protobuf payloads.
+- Know WebSocket handshake or connection behavior.
+- Enforce permissions.
+- Import transport, protocol, application bootstrap, player, inventory, S3, or MinIO packages.
+
+The first allowed SQL operation scope is intentionally limited to persistence operations for the already-ratified repository interface:
+
+- `StoreCredential` may insert `authentication_device_credentials` rows.
+- `FindCredentialByLookupDigest` may read one `authentication_device_credentials` row by `credential_lookup_digest`.
+- `StoreToken` may insert `authentication_access_tokens` rows.
+- `FindTokenByLookupDigest` may read one `authentication_access_tokens` row by `token_lookup_digest`.
+- `RevokeCredential` may update credential terminal-state columns on `authentication_device_credentials`.
+- `RevokeToken` may update token terminal-state and cleanup columns on `authentication_access_tokens`.
+- `ListTokensEligibleForCleanup` may read token records whose `cleanup_after` is due.
+- The adapter may reference `player_accounts(player_id)` through already-ratified foreign keys, but it must not read or write player account lifecycle columns.
+- The adapter must not read or write external identity, runtime session, WebSocket state, inventory state, or audit persistence tables.
+
+Error mapping expectations:
+
+- Missing credential lookup rows must map to a stable credential not-found error path before runtime handlers expose the error to clients.
+- Missing token lookup rows must map to a stable token not-found error path before runtime handlers expose the error to clients.
+- Duplicate credential or token digest constraint violations must map to stable duplicate/conflict error paths.
+- Foreign-key violations for `player_id`, `credential_record_id`, or replacement links must map to stable validation or invariant error paths.
+- Check constraint violations must map to stable validation or invariant error paths.
+- Unexpected PostgreSQL errors may be wrapped with adapter context, but `pgx` or `pgconn` types must not leak into the module-owned repository interface.
+
+The implementation includes focused tests for:
+
+- Fake-executor SQL shape tests for credential create/lookup/revocation.
+- Fake-executor SQL shape tests for token create/lookup/revocation/cleanup eligibility.
+- A no-transaction-control test proving the adapter does not issue `BEGIN`, `COMMIT`, or `ROLLBACK`.
+- Mutation normalization and UTC timestamp tests.
+- Row mapping tests for nullable terminal-state and cleanup timestamps.
+- Missing row, duplicate, foreign-key, and check-constraint error mapping tests.
+- Import-boundary tests through `node tools/vibit check runtime`.
+- No live PostgreSQL dependency in default repository checks.
+- Optional live integration coverage only through `VIBIT_POSTGRES_TEST_DSN`.
+
+The PostgreSQL unit-of-work helper is:
+
+```text
+runtime/internal/platform/persistence/postgres.UnitOfWork.NewAuthenticationRepository
+```
+
+That helper must stay in the PostgreSQL platform package. It must not change the module-owned `authentication.Repository` interface, force application or domain packages to import `pgx`, or imply runtime authentication handlers, WebSocket routes, Protobuf messages, generated authentication shapes, authentication dependencies, or production authentication behavior.
 
 ## 4. Repository Rules
 
@@ -607,7 +702,7 @@ The current migration source check is:
 node tools/vibit check migrations
 ```
 
-It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, the first inventory table references, the player account lifecycle migration shape, and the credential migration source shape. It does not apply or roll back migrations against PostgreSQL yet.
+It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, the first inventory table references, the player account lifecycle migration shape, the credential migration source shape, and the token verifier migration source shape. It does not apply or roll back migrations against PostgreSQL yet.
 
 The current migration apply/status API is:
 

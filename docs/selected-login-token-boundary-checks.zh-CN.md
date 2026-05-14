@@ -1,6 +1,6 @@
 # Selected Login And Token Boundary Checks
 
-状态：Draft v0.1
+状态：Draft v0.2
 最后更新：2026-05-14
 范围：针对第一版已选 login method、opaque token 姿态、schema gates、dependency deferral、generated output deferral、protocol deferral 与 runtime implementation deferral 的 repository checks
 依赖：`docs/login-method-token-format-ratification.md`、`docs/token-lifecycle-storage-implications.md`、`docs/authentication-contract-error-permission-surfaces.md`、`docs/credential-token-session-schema-gates.md`
@@ -20,12 +20,21 @@ request_proof_carrier: explicit_request_proof_payload
 refresh_token: not_in_first_implementation
 renewal_method: reauthenticate_with_device_credential_login
 default_durable_target: PostgreSQL
-implementation_authorized: false
+implementation_authorized: persistence_adapter_checks_refined
 ```
 
 这些检查存在的原因是：姿态已经选定，但 runtime behavior 仍未授权。选择不等于实现。
 
-本标准不添加 runtime authentication、login handlers、token generation、token parsing、token validation、logout behavior、refresh behavior、credential lookup、credential storage、token storage、session persistence、external identity linking、Protobuf messages、generated Go contract shapes、WebSocket route behavior、WebSocket handshake authentication、migrations、repositories、PostgreSQL adapters、audit persistence、provider dependencies、signing dependencies、password-hashing dependencies、key-management dependencies 或 Redis-like dependencies。
+本标准不添加 runtime authentication、login handlers、token generation、token parsing、token validation、logout execution、refresh behavior、credential lookup behavior、session persistence、external identity linking、Protobuf messages、generated Go contract shapes、WebSocket route behavior、WebSocket handshake authentication、audit persistence、provider dependencies、signing dependencies、password-hashing dependencies、key-management dependencies 或 Redis-like dependencies。
+
+Authentication PostgreSQL adapter persistence files 是唯一 selected exception，可从 broad credential/token vocabulary ban 中豁免，而且只能位于已声明的 platform boundary：
+
+```text
+runtime/internal/platform/persistence/postgres/authentication_repository.go
+runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+```
+
+该 exception 只允许为已 ratified 的 `authentication_device_credentials` 和 `authentication_access_tokens` tables 使用 persistence vocabulary。它不允许 token generation、token validation、verifier comparison、bearer parsing、transport behavior、Protobuf behavior、transaction ownership、generated authentication shapes 或 major authentication dependencies。
 
 ## 2. 规则
 
@@ -83,24 +92,28 @@ selected_posture:
 schema_gates:
   credential_record_schema_gate_status: migration_source_added
   credential_record_schema_boundary: docs/credential-record-schema-boundary.md
-  token_verifier_record_schema_gate_status: ratified_no_schema_added
+  token_verifier_record_schema_gate_status: migration_source_added
   token_verifier_record_schema_boundary: docs/token-verifier-record-schema-boundary.md
   credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
   credential_migration_source_added: true
-  token_verifier_migration_source_added: false
+  token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  token_verifier_migration_source_added: true
   external_identity_link_schema_gate_status: deferred_no_schema_added
   runtime_session_record_schema_gate_status: deferred_no_schema_added
 implementation_status:
   runtime_authentication_implemented: false
   token_behavior_implemented: false
   credential_storage_implemented: false
-  token_storage_schema_added: false
+  token_storage_schema_added: true
   credential_storage_schema_added: true
   external_identity_storage_schema_added: false
   session_storage_schema_added: false
-  migration_sources_added: partial_credential_only
-  repository_interfaces_added: false
-  postgres_adapters_added: false
+  migration_sources_added: credential_and_token_verifier
+  repository_interfaces_added: true
+  repository_interface_source: runtime/internal/modules/authentication/repository.go
+  postgres_adapters_added: true
+  authentication_postgres_adapter_added: true
+  authentication_postgresql_adapter_checks_refined: true
   runtime_lookup_added: false
   websocket_handshake_authentication_changed: false
   runtime_player_handlers_added: false
@@ -111,7 +124,7 @@ implementation_status:
 
 这些信号不能替代 schemas 或 tests。它们是 tripwires，用来迫使未来 implementation work 明确改变 architecture state。
 
-`credential_storage_schema_added: true` 只表示 SQL migration source 已存在。它不授权 credential lookup、login、token behavior、repositories、adapters、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。
+`credential_storage_schema_added: true` 和 `token_storage_schema_added: true` 只表示 SQL migration sources 已存在。`repository_interfaces_added: true` 只表示 storage-neutral interface boundary 已存在。`postgres_adapters_added: true` 和 `authentication_postgres_adapter_added: true` 只表示 bounded PostgreSQL persistence adapter 已存在于 platform package 下。`authentication_postgresql_adapter_checks_refined: true` 只表示 checks 已能区分 persistence-adapter vocabulary 与 runtime authentication behavior。这些信号不授权 runtime credential lookup behavior、login、token behavior、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。
 
 ## 5. 禁止的捷径
 
@@ -121,13 +134,13 @@ implementation_status:
 - `ValidateAccessToken` runtime behavior。
 - `LogoutAccessToken` runtime behavior。
 - `RefreshAccessToken` runtime behavior。
-- `AuthService`、`Authenticator`、`TokenValidator`、`TokenIssuer`、`TokenVerifier`、`TokenRepository` 或 `CredentialRepository` runtime implementation。
+- `AuthService`、`Authenticator`、`TokenValidator`、`TokenIssuer` 或 `TokenVerifier` runtime implementation。`runtime/internal/modules/authentication/repository.go` 下已批准的 storage-neutral `Repository` interface，以及 `runtime/internal/platform/persistence/postgres/authentication_repository.go` 下单独 gated 的 PostgreSQL adapter，是当前仅有的例外。
 - Token 或 credential random generation code。
 - Runtime code 中的 bearer-token parsing 或 acceptance。
 - WebSocket `Authorization`、`Bearer`、`Cookie`、`Sec-WebSocket-Protocol` 或 handshake header authentication behavior。
 - `proto/vibit/runtime/` 下的 runtime authentication Protobuf source。
 - `runtime/internal/generated/contracts/runtime/authentication/` 下的 generated Go authentication contract shapes。
-- Credential、token、refresh-token、runtime-session、external-identity、provider-subject 或 authentication-audit migrations。
+- 除已 ratified 的 credential 与 token verifier sources 之外的额外 credential、token、refresh-token、runtime-session、external-identity、provider-subject 或 authentication-audit migrations。
 - 在 player account lifecycle tables 中存储 credential、token、external identity、session、request validation 或 WebSocket state 的变更。
 - 用于 authentication 的 JWT、OAuth、OIDC、password-hashing、provider SDK、key-management 或 Redis-like dependencies。
 
@@ -143,10 +156,13 @@ implementation_status:
 - `docs/token-lifecycle-storage-implications.md`
 - `docs/first-login-method-set.md`
 - `docs/first-token-format-proof-carrier-posture.md`
+- `runtime/internal/modules/authentication/repository.go`
+- `runtime/internal/platform/persistence/postgres/authentication_repository.go`，仅当 `W-0084` 实现 declared persistence adapter 之后。
+- `runtime/internal/platform/persistence/postgres/authentication_repository_test.go`，仅用于 persistence-adapter tests。
 - 标记 implementation is deferred 的 architecture manifest markers。
 - 解释边界的 agent-facing guides。
 
-Generated Go contract shapes 仍然 deferred。Protobuf wire messages 仍然 deferred。Runtime handlers 仍然 deferred。
+Generated Go contract shapes 仍然 deferred。Protobuf wire messages 仍然 deferred。Runtime handlers 仍然 deferred。Runtime token validation 仍然 deferred。
 
 ## 7. 机器可读输出
 

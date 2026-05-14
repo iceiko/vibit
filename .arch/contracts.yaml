@@ -154,16 +154,29 @@ runtime_contracts:
       future_credential_logical_table: authentication_device_credentials
       credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
       credential_migration_source_added: true
-      token_verifier_record_schema_gate_status: ratified_no_schema_added
+      token_verifier_record_schema_gate_status: migration_source_added
       token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
       token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
       token_verifier_record_schema_boundary_decision: ADR-0033
       future_token_logical_table: authentication_access_tokens
+      token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+      token_verifier_migration_source_added: true
       authentication_schema_migration_queue_standard: docs/authentication-schema-migration-queue.md
       authentication_schema_migration_queue_translation: docs/authentication-schema-migration-queue.zh-CN.md
       authentication_schema_migration_queue_decision: ADR-0034
       planned_credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
       planned_token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+      authentication_migration_static_checks_added: true
+      repository_interface_added: true
+      repository_interface_source: runtime/internal/modules/authentication/repository.go
+      authentication_postgres_adapter_boundary_defined: true
+      authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+      authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+      authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+      authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
+      authentication_postgresql_adapter_implementation_decision: ADR-0035
+      authentication_postgresql_adapter_implementation_milestone: M-015
+      authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
       external_identity_link_schema_gate_status: deferred_no_schema_added
       runtime_session_record_schema_gate_status: deferred_no_schema_added
       audit_persistence_schema_gate_status: defined_no_schema_added
@@ -177,16 +190,30 @@ runtime_contracts:
       runtime_authentication_implemented: false
       token_behavior_implemented: false
       credential_storage_implemented: false
-      token_storage_schema_added: false
+      token_storage_schema_added: true
       credential_storage_schema_added: true
       external_identity_storage_schema_added: false
       session_persistence_implemented: false
       session_storage_schema_added: false
       audit_storage_schema_added: false
-      migration_sources_added: partial_credential_only
-      token_verifier_migration_source_added: false
-      repository_interfaces_added: false
-      postgres_adapters_added: false
+      migration_sources_added: credential_and_token_verifier
+      token_verifier_migration_source_added: true
+      authentication_migration_static_checks_added: true
+      repository_interfaces_added: true
+      repository_interface_source: runtime/internal/modules/authentication/repository.go
+      authentication_postgres_adapter_boundary_defined: true
+      authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+      authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+      authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+      authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
+      postgres_adapters_added: true
+      authentication_postgres_adapter_added: true
+      authentication_postgres_adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+      authentication_postgres_adapter_test: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+      authentication_postgresql_adapter_implementation_decision: ADR-0035
+      authentication_postgresql_adapter_implementation_milestone: M-015
+      authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
+      authentication_postgresql_adapter_checks_refined: true
       runtime_lookup_added: false
       websocket_handshake_authentication_changed: false
       runtime_player_handlers_added: false

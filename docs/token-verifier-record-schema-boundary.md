@@ -17,10 +17,10 @@ access_token_format: opaque_high_entropy_token
 token_issuance_carrier: login_command_response_token
 request_proof_carrier: explicit_request_proof_payload
 default_durable_target: PostgreSQL
-schema_boundary_status: ratified_no_schema_added
+schema_boundary_status: migration_source_added
 ```
 
-This document defines future record semantics. It does not add SQL migration source, tables, repository interfaces, PostgreSQL adapters, runtime token validation, token issuance, logout behavior, refresh behavior, cleanup jobs, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, or production authentication behavior.
+This document defines token verifier record semantics. W-0078 adds the SQL migration source for that schema. It does not add repository interfaces, PostgreSQL adapters, runtime token validation, token issuance, logout behavior, refresh behavior, cleanup jobs, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, or production authentication behavior.
 
 ## 2. Required Reading
 
@@ -60,11 +60,12 @@ The token verifier record boundary is ratified as a schema boundary only:
 
 ```yaml
 token_verifier_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   default_durable_target: PostgreSQL
   future_logical_table: authentication_access_tokens
   owner: runtime.authentication
-  migration_source_added: false
+  migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  migration_source_added: true
   repository_interface_added: false
   postgres_adapter_added: false
   runtime_validation_added: false
@@ -74,7 +75,7 @@ token_verifier_record_schema_boundary:
   authentication_implemented: false
 ```
 
-The future logical table name is ratified so agents have a stable target during migration planning. No table exists until a later migration work item creates SQL source under `runtime/migrations/postgres/`.
+The logical table name and SQL migration source are ratified so agents have a stable target before repository and adapter work begins. The table exists only when `runtime/migrations/postgres/000004_create_authentication_access_tokens.sql` is applied.
 
 ## 4. Ownership
 
@@ -363,7 +364,7 @@ Test fixtures must use synthetic values and must not contain real tokens, creden
 
 Agents must not:
 
-- Add `authentication_access_tokens` SQL migration source from this standard alone.
+- Add or change `authentication_access_tokens` SQL migration source outside `W-0078` or a later explicit migration work item.
 - Add token repository interfaces from this standard alone.
 - Add PostgreSQL token adapters from this standard alone.
 - Add runtime token issuance, validation, logout, refresh, or cleanup from this standard alone.
@@ -383,7 +384,7 @@ Before token storage can be implemented, future work must complete these gates:
 credential_record_schema_boundary: completed_by_W_0074
 token_verifier_record_schema_boundary: completed_by_W_0075
 authentication_schema_migration_queue: required_before_migration
-token_verifier_migration_source: separate_future_work
+token_verifier_migration_source: completed_by_W_0078
 authentication_repository_interface: separate_future_work
 token_postgres_adapter: separate_future_work
 verifier_algorithm_and_secret_configuration: separate_future_work
@@ -425,7 +426,7 @@ node tools/vibit check all --json
 git diff --check
 ```
 
-Live PostgreSQL verification is not required because this work does not add migration source, tables, repositories, adapters, or runtime behavior.
+Live PostgreSQL verification is optional for the source-only migration and should be recorded by the migration work item. It is not required by default because repository and adapter behavior remain deferred.
 
 Go tests are not required because no Go runtime behavior changes.
 
@@ -434,7 +435,7 @@ Go tests are not required because no Go runtime behavior changes.
 Next work:
 
 ```text
-W-0076 Plan authentication schema migration queue
+W-0079 Add authentication migration static checks
 ```
 
-The migration queue must plan credential and token verifier migration order, repository-interface gates, PostgreSQL adapter gates, redaction checks, and live verification expectations before any authentication migration source is added.
+The next gate should harden local checks for the ratified credential and token verifier migration sources before repository interfaces or adapters are defined.

@@ -189,9 +189,9 @@ phase_plan:
     authentication_schema_migration_queue_standard_translation: docs/authentication-schema-migration-queue.zh-CN.md
     authentication_schema_migration_queue_decision: ADR-0034
     authentication_schema_migration_queue_change: changes/2026-05-14-plan-authentication-schema-migration-queue
-    latest_schema_ratification_work_item: W-0077
+    latest_schema_ratification_work_item: W-0081
     next_schema_ratification_milestone: M-014
-    next_schema_ratification_work_item: W-0078
+    next_schema_ratification_work_item: W-0082
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -230,18 +230,32 @@ phase_plan:
     credential_token_session_schema_gates_status: defined_implementation_deferred
     selected_login_token_boundary_checks_status: active_implementation_deferred
     login_token_ratification_status: completed_implementation_deferred
-    credential_token_schema_ratification_status: active
+    credential_token_schema_ratification_status: completed
     credential_record_schema_gate_status: migration_source_added
     credential_record_schema_boundary_status: migration_source_added
     future_credential_logical_table: authentication_device_credentials
     credential_migration_source_status: added
     credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
-    token_verifier_record_schema_gate_status: ratified_no_schema_added
-    token_verifier_record_schema_boundary_status: ratified_no_schema_added
+    token_verifier_record_schema_gate_status: migration_source_added
+    token_verifier_record_schema_boundary_status: migration_source_added
     future_token_logical_table: authentication_access_tokens
+    token_verifier_migration_source_status: added
+    token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
     authentication_schema_migration_queue_status: planned
     planned_credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
     planned_token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+    authentication_migration_static_checks_status: added
+    authentication_repository_interface_status: added
+    authentication_repository_interface_source: runtime/internal/modules/authentication/repository.go
+    authentication_postgres_adapter_boundary_status: defined
+    authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+    authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+    authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+    authentication_postgresql_adapter_implementation_status: active
+    authentication_postgresql_adapter_implementation_decision: ADR-0035
+    authentication_postgresql_adapter_implementation_milestone: M-015
+    authentication_postgresql_adapter_implementation_next_work_item: W-0083
+    authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
     external_identity_link_schema_gate_status: deferred_no_schema_added
     runtime_session_record_schema_gate_status: deferred_no_schema_added
     audit_persistence_schema_gate_status: defined_no_schema_added
@@ -335,7 +349,7 @@ phase_plan:
     active_milestone: M-007
     rule: Strengthen agent intake, generation, and architecture checks before adding more runtime player, authentication, or broader game module behavior.
   phase_2c_credential_and_token_schema_ratification:
-    status: active
+    status: completed
     active_milestone: M-014
     focus:
       - credential_record_schema_boundary
@@ -347,7 +361,24 @@ phase_plan:
     pitaya_reference:
       - session_context_vocabulary
       - handler_identity_handoff_vocabulary
-    rule: Use Nakama and Pitaya for capability and vocabulary, but ratify vibit-owned PostgreSQL schema boundaries before migrations, repositories, adapters, or runtime authentication behavior.
+    rule: Use Nakama and Pitaya for capability and vocabulary, but keep vibit-owned PostgreSQL schema boundaries explicit and closed before adapter or runtime authentication behavior.
+  phase_2d_authentication_postgresql_adapter_implementation:
+    status: active
+    active_milestone: M-015
+    decision: ADR-0035
+    next_work_item: W-0083
+    focus:
+      - authentication_postgresql_adapter_check_refinement
+      - authentication_repository_postgresql_adapter
+      - fake_executor_adapter_tests
+      - transaction_boundary_preservation
+    nakama_reference:
+      - account_authentication_storage_capability
+      - session_logout_revocation_vocabulary
+    pitaya_reference:
+      - handler_session_context_vocabulary
+      - persistence_independent_frontend_backend_vocabulary
+    rule: Implement persistence adapter capability only; do not copy Nakama or Pitaya public APIs, and do not implement login, token generation, token validation, protocol carriers, WebSocket routes, or authentication dependencies in this phase.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

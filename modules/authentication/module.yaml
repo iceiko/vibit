@@ -1,0 +1,246 @@
+schema_version: 0.1
+module: authentication
+category: domain
+status: draft
+summary: Owns storage-neutral authentication credential and token verifier repository interfaces for the selected device credential and opaque access-token posture without implementing runtime authentication, PostgreSQL adapters, Protobuf messages, WebSocket behavior, or authentication dependencies.
+
+decisions:
+  - ADR-0029
+  - ADR-0030
+  - ADR-0032
+  - ADR-0033
+  - ADR-0034
+
+owns:
+  entities:
+    - authentication_credential_record
+    - authentication_token_record
+  data:
+    - authentication_device_credentials
+    - authentication_access_tokens
+  permissions:
+    - authentication_access_token_validate
+  does_not_own:
+    entities:
+      - player_account
+      - runtime_session
+      - websocket_connection
+      - transport_connection
+      - external_identity
+      - inventory
+      - currency_balance
+      - reward_claim
+      - quest_progress
+      - match_session
+    data:
+      - player_accounts
+      - player_account_events
+      - runtime_sessions
+      - transport_connections
+      - external_identity_links
+      - inventory_records
+      - inventory_items
+      - currency_balances
+      - reward_claims
+      - quest_progress_records
+      - match_sessions
+
+public_api:
+  status: repository_interface_boundary_only_no_runtime_behavior
+  commands:
+    - AuthenticateWithDeviceCredential
+    - ValidateAccessToken
+    - LogoutAccessToken
+    - RefreshAccessToken
+  queries: []
+  vocabulary_placeholders:
+    credential_records:
+      - credential_record_id
+      - credential_lookup_digest
+      - credential_verifier_digest
+      - credential_status
+    token_records:
+      - token_record_id
+      - token_lookup_digest
+      - token_verifier_digest
+      - token_status
+      - cleanup_after
+    rule: These names are repository boundary vocabulary only. They do not authorize token generation, token validation, login handlers, runtime lookup, or public wire behavior.
+
+events:
+  status: semantic_contracts_only_no_runtime_publication
+  publishes:
+    - AuthenticationSucceeded
+    - AuthenticationFailed
+    - TokenIssued
+    - TokenValidationFailed
+    - TokenRevoked
+    - LogoutRequested
+  subscribes: []
+
+errors:
+  owns:
+    - authentication_errors
+  schemas:
+    status: ratified_semantic_contracts_no_runtime_implementation
+    files:
+      - contracts/runtime/authentication/errors/authentication_errors.yaml
+
+permission_schemas:
+  status: ratified_semantic_contracts_no_runtime_implementation
+  files:
+    - contracts/runtime/authentication/permissions/authentication_permissions.yaml
+
+dependencies:
+  allowed: []
+  forbidden:
+    - direct_websocket_library
+    - direct_protobuf_runtime
+    - direct_postgresql_driver
+    - jwt
+    - oauth
+    - oidc
+    - password_hashing
+    - redis_like_session_or_token_store
+    - provider_sdk
+    - direct_s3_sdk
+    - direct_minio_client
+
+invariants:
+  - repository_interface_must_remain_storage_neutral
+  - raw_credential_material_must_not_be_stored
+  - raw_token_material_must_not_be_stored
+  - player_account_lifecycle_tables_must_not_store_authentication_state
+  - postgres_adapters_must_be_separate_future_work
+  - runtime_authentication_behavior_must_be_separate_future_work
+  - generated_outputs_must_not_be_hand_edited
+
+generated:
+  files: []
+  directories: []
+  planned_outputs:
+    go_typed_contracts: []
+    protobuf_message_shapes: []
+    websocket_dispatch_shapes: []
+    test_fixtures: []
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  status: repository_interface_boundary_only_no_runtime_behavior
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: deferred
+  wire_schema_status: deferred_no_authentication_proto
+  generated_go_proto: deferred
+  runtime_authentication_implemented: false
+  runtime_lookup_added: false
+  token_behavior_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  bearer_parsing_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  token_issuance_added: false
+  runtime_token_validation_added: false
+  logout_added: false
+  cleanup_added: false
+  websocket_routes_added: false
+  websocket_handshake_authentication_changed: false
+  protobuf_authentication_messages_added: false
+  generated_authentication_shapes_added: false
+  authentication_dependencies_added: false
+  authentication_repository_interface_added: true
+  authentication_repository_interface_source: runtime/internal/modules/authentication/repository.go
+  authentication_repository_interface_tests: runtime/internal/modules/authentication/repository_test.go
+  authentication_postgres_adapter_boundary_defined: true
+  authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+  authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+  authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
+  authentication_postgresql_adapter_implementation_decision: ADR-0035
+  authentication_postgresql_adapter_implementation_milestone: M-015
+  authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
+  authentication_postgres_adapter_added: true
+  authentication_postgres_adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  authentication_postgres_adapter_tests: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+  authentication_postgresql_adapter_checks_refined: true
+  credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  commands:
+    AuthenticateWithDeviceCredential: contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml
+    ValidateAccessToken: contracts/runtime/authentication/commands/ValidateAccessToken.yaml
+    LogoutAccessToken: contracts/runtime/authentication/commands/LogoutAccessToken.yaml
+    RefreshAccessToken: contracts/runtime/authentication/commands/RefreshAccessToken.yaml
+  events:
+    AuthenticationSucceeded: contracts/runtime/authentication/events/authentication_events.yaml
+    AuthenticationFailed: contracts/runtime/authentication/events/authentication_events.yaml
+    TokenIssued: contracts/runtime/authentication/events/authentication_events.yaml
+    TokenValidationFailed: contracts/runtime/authentication/events/authentication_events.yaml
+    TokenRevoked: contracts/runtime/authentication/events/authentication_events.yaml
+    LogoutRequested: contracts/runtime/authentication/events/authentication_events.yaml
+  errors: contracts/runtime/authentication/errors/authentication_errors.yaml
+  permissions: contracts/runtime/authentication/permissions/authentication_permissions.yaml
+  ratification_required_before:
+    - postgres_adapters
+    - runtime_login_handlers
+    - runtime_token_validation
+    - token_issuance
+    - logout_behavior
+    - cleanup_jobs
+    - websocket_routes
+    - websocket_proof_carriers
+    - protobuf_messages
+    - generated_authentication_shapes
+    - authentication_dependencies
+
+persistence:
+  postgresql_schema:
+    decision: ADR-0034
+    standard: docs/authentication-schema-migration-queue.md
+    status: migration_sources_static_checks_and_repository_interface_boundary_added_adapters_deferred
+    credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+    token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+    migration_sources_added: credential_and_token_verifier
+    static_checks_added: true
+    repository_interface_added: true
+    repository_interface_source: runtime/internal/modules/authentication/repository.go
+    authentication_postgres_adapter_boundary_defined: true
+    authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+    authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+    authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+    authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
+    authentication_postgresql_adapter_implementation_decision: ADR-0035
+    authentication_postgresql_adapter_implementation_milestone: M-015
+    authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
+    postgres_adapter_added: true
+    authentication_postgres_adapter_added: true
+    authentication_postgres_adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+    authentication_postgres_adapter_tests: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+    authentication_postgresql_adapter_checks_refined: true
+    runtime_authentication_implemented: false
+    token_behavior_implemented: false
+    token_generation_added: false
+    token_validation_added: false
+    verifier_comparison_added: false
+    bearer_parsing_added: false
+    login_handlers_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    authentication_dependencies_added: false
+    websocket_routes_added: false
+    protobuf_authentication_messages_added: false
+    generated_authentication_shapes_added: false
+    tables:
+      - authentication_device_credentials
+      - authentication_access_tokens
+
+tests:
+  required:
+    - runtime/internal/modules/authentication/repository_test.go
+    - node tools/vibit check runtime --json
+    - node tools/vibit check migrations --json
+    - node tools/vibit check work --json
+    - node tools/vibit check all --json

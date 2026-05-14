@@ -1,8 +1,8 @@
 # Authentication Schema Migration Queue
 
-Status: Draft v0.1
+Status: Draft v0.2
 Last updated: 2026-05-14
-Scope: credential 与 token verifier schema boundaries 之后的 authentication schema migration、repository、adapter、redaction 与 verification 计划队列
+Scope: credential 与 token verifier schema boundaries 之后已经完成的 authentication schema migration、repository、adapter-boundary、redaction 与 verification 队列
 Depends on: `docs/credential-record-schema-boundary.md`, `docs/token-verifier-record-schema-boundary.md`, `docs/postgresql-persistence-boundary.md`, `docs/postgresql-verification-environment.md`
 Canonical decision: `ADR-0034`
 
@@ -15,14 +15,17 @@ Canonical decision: `ADR-0034`
 ```yaml
 credential_record_schema_boundary: migration_source_added
 credential_migration_source_added: true
-token_verifier_record_schema_boundary: ratified_no_schema_added
+token_verifier_record_schema_boundary: migration_source_added
+token_verifier_migration_source_added: true
 default_durable_target: PostgreSQL
 implementation_authorized_now: false
+milestone_status: completed
+next_milestone: M-015
 ```
 
 目标是让未来 authentication storage path 可确定地推进，而不是从 schema ratification 直接跳到宽泛的 authentication implementation。
 
-本文规划 migration order、repository-interface gates、PostgreSQL adapter gates、redaction checks、live PostgreSQL verification expectations 和 milestone closeout。它不添加 SQL migration source、tables、repository interfaces、PostgreSQL adapters、runtime credential lookup、token issuance、token validation、logout、refresh、cleanup、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
+本文记录 migration order、repository-interface gates、PostgreSQL adapter gates、redaction checks、live PostgreSQL verification expectations 和 milestone closeout。`M-014` queue 现在已经完成 migration sources、static checks、storage-neutral repository interface，以及 PostgreSQL adapter boundary。它不授权 runtime credential lookup、token issuance、token validation、logout execution、refresh、cleanup jobs、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
 
 ## 2. Required Reading
 
@@ -64,18 +67,18 @@ schema_boundary:
 migration_queue_planning:
   completed_by: W_0076
 migration_sources:
-  credential: separate_future_work
-  token_verifier: separate_future_work
+  credential: completed_by_W_0077
+  token_verifier: completed_by_W_0078
 schema_static_checks:
-  separate_future_work_or_migration_work
+  completed_by_W_0079
 repository_interfaces:
-  separate_future_work_after_migrations
+  completed_by_W_0080
 postgres_adapters:
-  separate_future_work_after_repository_interfaces
+  boundary_defined_by_W_0081
 redaction_and_live_verification:
-  separate_future_work_after_adapters
+  separate_future_work_after_adapter_implementation
 milestone_closeout:
-  separate_future_work
+  completed_by_W_0082
 runtime_authentication:
   blocked_until_later_milestone
 ```
@@ -89,13 +92,13 @@ Agents 不得在一个宽泛 change 中合并 migration source creation、reposi
 | Work item | Title | Scope |
 | --- | --- | --- |
 | `W-0077` | Add credential PostgreSQL migration source | 已完成。只创建已 ratified 的 `authentication_device_credentials` SQL source。 |
-| `W-0078` | Add token verifier PostgreSQL migration source | Credential migration 存在之后，只创建已 ratified 的 `authentication_access_tokens` SQL source。 |
-| `W-0079` | Add authentication migration static checks | 强化 authentication migration naming、ownership、forbidden raw secret columns 和 player lifecycle table separation 的 repository checks。 |
-| `W-0080` | Define authentication repository interface boundary | 为 credential 与 token verifier storage 定义 storage-neutral interfaces 和 mutations，不加 adapters 或 runtime behavior。 |
-| `W-0081` | Define authentication PostgreSQL adapter boundary | 预留 adapter source paths、transaction expectations、SQL operation scope 和 focused tests，不实现 adapter。 |
-| `W-0082` | Close credential and token verifier schema ratification milestone | 按 exit criteria 回顾 M-014，并打开下一个 confirmation 或 implementation gate。 |
+| `W-0078` | Add token verifier PostgreSQL migration source | 已完成。Credential migration 存在之后，只创建已 ratified 的 `authentication_access_tokens` SQL source。 |
+| `W-0079` | Add authentication migration static checks | 已完成。强化 authentication migration naming、ownership、forbidden raw secret columns 和 player lifecycle table separation 的 repository checks。 |
+| `W-0080` | Define authentication repository interface boundary | 已完成。为 credential 与 token verifier storage 定义 storage-neutral interfaces 和 mutations，不加 adapters 或 runtime behavior。 |
+| `W-0081` | Define authentication PostgreSQL adapter boundary | 已完成。预留 adapter source paths、transaction expectations、SQL operation scope 和 focused tests，不实现 adapter。 |
+| `W-0082` | Close credential and token verifier schema ratification milestone | 已完成。按 exit criteria 回顾 M-014，并打开 `M-015` 作为 bounded authentication PostgreSQL adapter implementation gate。 |
 
-这个 queue 有意不包含 runtime login、token issuance、token validation、logout、cleanup、Protobuf、WebSocket 或 dependency implementation work。
+这个 queue 有意不包含 runtime login、token issuance、token validation、logout execution、cleanup jobs、Protobuf、WebSocket 或 dependency implementation work。
 
 ## 5. Migration Order
 
@@ -141,7 +144,7 @@ Forbidden scope：
 
 ## 7. Token Verifier Migration Gate
 
-`W-0078` 只能添加一个 SQL-first migration source：
+`W-0078` 已只添加一个 SQL-first migration source：
 
 ```text
 runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
@@ -164,7 +167,7 @@ Forbidden scope：
 
 ## 8. Static Check Gate
 
-`W-0079` 应更新 repository checks，使 authentication migrations 在 repositories 和 adapters 存在前就可检查。
+`W-0079` 已更新 repository checks，使 authentication migrations 在 adapters 存在前就可检查。
 
 Expected checks：
 
@@ -181,7 +184,7 @@ Expected checks：
 
 ## 9. Repository Interface Gate
 
-`W-0080` 只能在 migration sources 和 static checks 存在之后定义 storage-neutral interfaces。
+`W-0080` 已在 migration sources 和 static checks 存在之后定义 storage-neutral interfaces。
 
 Expected ownership：
 
@@ -194,6 +197,12 @@ Expected interface families：
 - Credential lookup and mutation repository boundary。
 - Token verifier creation、lookup、revocation、expiration query 和 cleanup eligibility boundary。
 - Unit-of-work expectations，确保未来 implementation 授权后 credential、player account 与 token mutations 可以保持 atomic。
+
+当前已批准 source：
+
+```text
+runtime/internal/modules/authentication/repository.go
+```
 
 Forbidden scope：
 
@@ -208,7 +217,7 @@ Forbidden scope：
 
 ## 10. PostgreSQL Adapter Boundary Gate
 
-`W-0081` 可以在 storage-neutral interfaces 存在之后定义 adapter boundaries。
+`W-0081` 已经在 storage-neutral interfaces 存在之后定义 adapter boundaries。
 
 Expected ownership：
 
@@ -289,14 +298,15 @@ W-0076 不需要 live PostgreSQL verification，因为本 planning step 不添�
 
 ## 13. Non-Authorization
 
-本标准不授权：
+本标准记录已经完成的 `M-014` queue。它只授权 `W-0077` 到 `W-0082` 明确命名的 bounded artifacts：credential 与 token verifier migration sources、static checks、storage-neutral repository interface、PostgreSQL adapter boundary，以及 milestone closeout。
 
-- Authentication migration source。
-- Credential 或 token tables。
-- Authentication repository interfaces。
-- PostgreSQL authentication adapters。
-- Runtime credential lookup。
-- Token generation、issuance、parsing、validation、refresh、revocation、rotation、replay handling、cleanup 或 storage behavior。
+它仍然不授权：
+
+- 超出已 ratified credential 与 token verifier migrations 的 additional authentication migration sources。
+- External identity、runtime session、audit 或 refresh-token tables。
+- 在单独打开的 `M-015` gate 之外实现 PostgreSQL authentication adapter。
+- Runtime credential lookup behavior。
+- Token generation、issuance、parsing、validation、refresh、rotation、replay handling、cleanup jobs 或 production token behavior。
 - Login handlers。
 - Runtime player handlers。
 - WebSocket routes。
@@ -311,13 +321,7 @@ W-0076 不需要 live PostgreSQL verification，因为本 planning step 不添�
 下一步工作：
 
 ```text
-W-0077 Add credential PostgreSQL migration source
+W-0083 Refine authentication adapter implementation checks
 ```
 
-下一项工作是：
-
-```text
-W-0078 Add token verifier PostgreSQL migration source
-```
-
-它只能在声明边界内添加 token verifier migration source 和相关 static manifest/check updates。
+它可以细化 repository checks，让后续 declared PostgreSQL adapter boundary 可以被实现，同时不弱化 runtime authentication、protocol、WebSocket、generated-output 和 dependency deferrals。

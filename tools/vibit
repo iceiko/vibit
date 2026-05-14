@@ -1354,6 +1354,60 @@ function playerAccountRepositoryInterfaceIsDeclared(root) {
     && requiredStandardMarkers.every((marker) => standard.includes(marker));
 }
 
+function authenticationRepositoryInterfaceIsDeclared(root) {
+  const moduleManifestPath = "modules/authentication/module.yaml";
+  const repositoryPath = "runtime/internal/modules/authentication/repository.go";
+  const repositoryTestPath = "runtime/internal/modules/authentication/repository_test.go";
+  const moduleGuidePath = "modules/authentication/AGENTS.md";
+  const standardPath = "docs/authentication-schema-migration-queue.md";
+  if (!isFile(root, moduleManifestPath)
+    || !isFile(root, repositoryPath)
+    || !isFile(root, repositoryTestPath)
+    || !isFile(root, moduleGuidePath)
+    || !isFile(root, standardPath)) {
+    return false;
+  }
+
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const repository = readText(path.join(root, repositoryPath));
+  const guide = readText(path.join(root, moduleGuidePath));
+  const standard = readText(path.join(root, standardPath));
+  const requiredManifestMarkers = [
+    "authentication_repository_interface_added: true",
+    "authentication_repository_interface_source: runtime/internal/modules/authentication/repository.go",
+    "authentication_postgres_adapter_added:",
+    "runtime_authentication_implemented: false",
+    "token_behavior_implemented: false",
+    "websocket_routes_added: false",
+  ];
+  const requiredRepositoryMarkers = [
+    "type Repository interface",
+    "StoreCredential(context.Context, StoreCredentialMutation) (CredentialRecord, error)",
+    "FindCredentialByLookupDigest(context.Context, []byte) (CredentialRecord, error)",
+    "StoreToken(context.Context, StoreTokenMutation) (TokenRecord, error)",
+    "FindTokenByLookupDigest(context.Context, []byte) (TokenRecord, error)",
+    "RevokeCredential(context.Context, RevokeCredentialMutation) error",
+    "RevokeToken(context.Context, RevokeTokenMutation) error",
+    "ListTokensEligibleForCleanup(context.Context, TokenCleanupQuery) ([]TokenRecord, error)",
+    "NormalizeStoreCredentialMutation",
+    "NormalizeStoreTokenMutation",
+  ];
+  const requiredGuideMarkers = [
+    "runtime/internal/modules/authentication/repository.go",
+    "It must not create credential material, generate tokens, compare verifiers, parse bearer tokens, validate access tokens",
+  ];
+  const requiredStandardMarkers = [
+    "runtime/internal/modules/authentication/",
+    "Credential lookup and mutation repository boundary.",
+    "Token verifier creation, lookup, revocation, expiration query, and cleanup eligibility boundary.",
+  ];
+
+  return requiredManifestMarkers.every((marker) => manifest.includes(marker))
+    && requiredRepositoryMarkers.every((marker) => repository.includes(marker))
+    && requiredGuideMarkers.every((marker) => guide.includes(marker))
+    && requiredStandardMarkers.every((marker) => standard.includes(marker));
+}
+
 function playerAccountPostgresAdapterBoundaryIsDeclared(root) {
   const runtimePath = ".arch/runtime.yaml";
   const conventionsPath = ".arch/conventions.yaml";
@@ -1413,6 +1467,203 @@ function playerAccountPostgresAdapterBoundaryIsDeclared(root) {
     && runtimeGuide.includes("NewPlayerAccountRepositoryForUnitOfWork(executor)")
     && moduleGuide.includes("runtime/internal/platform/persistence/postgres/player_account_repository.go")
     && moduleGuide.includes("runtime/internal/platform/persistence/postgres/player_account_repository_test.go");
+}
+
+function authenticationPostgresAdapterBoundaryIsDeclared(root) {
+  const runtimePath = ".arch/runtime.yaml";
+  const conventionsPath = ".arch/conventions.yaml";
+  const contractsPath = ".arch/contracts.yaml";
+  const moduleManifestPath = "modules/authentication/module.yaml";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  const runtimeGuidePath = "runtime/AGENTS.md";
+  const moduleGuidePath = "modules/authentication/AGENTS.md";
+  if (!isFile(root, runtimePath)
+    || !isFile(root, conventionsPath)
+    || !isFile(root, contractsPath)
+    || !isFile(root, moduleManifestPath)
+    || !isFile(root, standardPath)
+    || !isFile(root, runtimeGuidePath)
+    || !isFile(root, moduleGuidePath)) {
+    return false;
+  }
+
+  const runtimeText = readText(path.join(root, runtimePath));
+  const conventions = readText(path.join(root, conventionsPath));
+  const contracts = readText(path.join(root, contractsPath));
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const standard = readText(path.join(root, standardPath));
+  const runtimeGuide = readText(path.join(root, runtimeGuidePath));
+  const moduleGuide = readText(path.join(root, moduleGuidePath));
+  const requiredMarkers = [
+    "authentication_postgres_adapter_boundary_defined: true",
+    "authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go",
+    "authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go",
+    "authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork",
+    "authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository",
+  ];
+  const requiredStandardMarkers = [
+    "## 3.3 Authentication PostgreSQL Adapter Boundary",
+    "runtime/internal/platform/persistence/postgres/authentication_repository.go",
+    "runtime/internal/platform/persistence/postgres/authentication_repository_test.go",
+    "NewAuthenticationRepositoryForUnitOfWork(executor)",
+    "authentication.Repository",
+    "must not call `BEGIN`, `COMMIT`, or `ROLLBACK`",
+    "`StoreCredential` may insert `authentication_device_credentials` rows",
+    "`StoreToken` may insert `authentication_access_tokens` rows",
+    "Optional live integration coverage only through `VIBIT_POSTGRES_TEST_DSN`",
+  ];
+
+  return requiredMarkers.every((marker) => runtimeText.includes(marker))
+    && requiredMarkers.every((marker) => conventions.includes(marker))
+    && requiredMarkers.every((marker) => contracts.includes(marker))
+    && requiredMarkers.every((marker) => manifest.includes(marker))
+    && requiredStandardMarkers.every((marker) => standard.includes(marker))
+    && runtimeGuide.includes("internal/platform/persistence/postgres/authentication_repository.go")
+    && runtimeGuide.includes("NewAuthenticationRepositoryForUnitOfWork(executor)")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/authentication_repository.go")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/authentication_repository_test.go");
+}
+
+function authenticationPostgresAdapterChecksAreRefined(root) {
+  const requiredMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "authentication_postgresql_adapter_checks_refined: true",
+      "authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only",
+    ],
+    ".arch/conventions.yaml": [
+      "authentication_postgresql_adapter_checks_refined: true",
+      "allowed_scope: persistence_adapter_only",
+    ],
+    ".arch/contracts.yaml": [
+      "authentication_postgresql_adapter_checks_refined: true",
+      "authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only",
+    ],
+    "modules/authentication/module.yaml": [
+      "authentication_postgresql_adapter_checks_refined: true",
+      "authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only",
+    ],
+    "docs/selected-login-token-boundary-checks.md": [
+      "Authentication PostgreSQL adapter persistence files are the only selected exception",
+      "runtime/internal/platform/persistence/postgres/authentication_repository.go",
+    ],
+    "docs/selected-login-token-boundary-checks.zh-CN.md": [
+      "Authentication PostgreSQL adapter persistence files 是唯一 selected exception",
+      "runtime/internal/platform/persistence/postgres/authentication_repository.go",
+    ],
+  };
+
+  return Object.entries(requiredMarkersByFile).every(([relativePath, markers]) => {
+    if (!isFile(root, relativePath)) {
+      return false;
+    }
+    const text = readText(path.join(root, relativePath));
+    return markers.every((marker) => text.includes(marker));
+  });
+}
+
+function authenticationPostgresAdapterIsImplemented(root) {
+  const runtimePath = ".arch/runtime.yaml";
+  const conventionsPath = ".arch/conventions.yaml";
+  const contractsPath = ".arch/contracts.yaml";
+  const moduleManifestPath = "modules/authentication/module.yaml";
+  const standardPath = "docs/postgresql-persistence-boundary.md";
+  const sourcePath = "runtime/internal/platform/persistence/postgres/authentication_repository.go";
+  const testPath = "runtime/internal/platform/persistence/postgres/authentication_repository_test.go";
+  const runnerPath = "runtime/internal/platform/persistence/postgres/runner.go";
+  const runtimeGuidePath = "runtime/AGENTS.md";
+  const moduleGuidePath = "modules/authentication/AGENTS.md";
+
+  if (![
+    runtimePath,
+    conventionsPath,
+    contractsPath,
+    moduleManifestPath,
+    standardPath,
+    sourcePath,
+    testPath,
+    runnerPath,
+    runtimeGuidePath,
+    moduleGuidePath,
+  ].every((file) => isFile(root, file))) {
+    return false;
+  }
+
+  const runtimeText = readText(path.join(root, runtimePath));
+  const conventions = readText(path.join(root, conventionsPath));
+  const contracts = readText(path.join(root, contractsPath));
+  const manifest = readText(path.join(root, moduleManifestPath));
+  const standard = readText(path.join(root, standardPath));
+  const source = readText(path.join(root, sourcePath));
+  const tests = readText(path.join(root, testPath));
+  const runner = readText(path.join(root, runnerPath));
+  const runtimeGuide = readText(path.join(root, runtimeGuidePath));
+  const moduleGuide = readText(path.join(root, moduleGuidePath));
+
+  const requiredManifestMarkers = [
+    "authentication_postgres_adapter_added: true",
+    "runtime_authentication_implemented: false",
+    "token_generation_added: false",
+    "token_validation_added: false",
+    "verifier_comparison_added: false",
+    "bearer_parsing_added: false",
+    "login_handlers_added: false",
+    "logout_execution_added: false",
+    "cleanup_jobs_added: false",
+    "protobuf_authentication_messages_added: false",
+    "websocket_routes_added: false",
+    "authentication_dependencies_added: false",
+  ];
+  const requiredSourceMarkers = [
+    "type AuthenticationRepository struct",
+    "var _ authentication.Repository = (*AuthenticationRepository)(nil)",
+    "func NewAuthenticationRepositoryForUnitOfWork(executor Executor) *AuthenticationRepository",
+    "func (r *AuthenticationRepository) StoreCredential(ctx context.Context, mutation authentication.StoreCredentialMutation) (authentication.CredentialRecord, error)",
+    "func (r *AuthenticationRepository) FindCredentialByLookupDigest(ctx context.Context, digest []byte) (authentication.CredentialRecord, error)",
+    "func (r *AuthenticationRepository) StoreToken(ctx context.Context, mutation authentication.StoreTokenMutation) (authentication.TokenRecord, error)",
+    "func (r *AuthenticationRepository) FindTokenByLookupDigest(ctx context.Context, digest []byte) (authentication.TokenRecord, error)",
+    "func (r *AuthenticationRepository) RevokeCredential(ctx context.Context, mutation authentication.RevokeCredentialMutation) error",
+    "func (r *AuthenticationRepository) RevokeToken(ctx context.Context, mutation authentication.RevokeTokenMutation) error",
+    "func (r *AuthenticationRepository) ListTokensEligibleForCleanup(ctx context.Context, query authentication.TokenCleanupQuery) ([]authentication.TokenRecord, error)",
+    "INSERT INTO authentication_device_credentials",
+    "FROM authentication_device_credentials",
+    "INSERT INTO authentication_access_tokens",
+    "FROM authentication_access_tokens",
+    "ErrAuthenticationRecordNotFound",
+    "ErrAuthenticationRecordConflict",
+    "ErrAuthenticationRecordConstraint",
+  ];
+  const requiredTestMarkers = [
+    "TestAuthenticationRepositoryStoreCredentialInsertsRecord",
+    "TestAuthenticationRepositoryFindCredentialByLookupDigestSelectsRecord",
+    "TestAuthenticationRepositoryStoreTokenInsertsRecord",
+    "TestAuthenticationRepositoryFindTokenByLookupDigestSelectsRecord",
+    "TestAuthenticationRepositoryRevokeCredentialUpdatesTerminalState",
+    "TestAuthenticationRepositoryRevokeTokenUpdatesTerminalStateAndCleanup",
+    "TestAuthenticationRepositoryListTokensEligibleForCleanup",
+    "TestAuthenticationRepositoryMapsErrors",
+    "TestAuthenticationRepositoryDefaultTestsDoNotRequireLivePostgreSQL",
+    "TestPostgresUnitOfWorkCreatesAuthenticationRepository",
+    "hasTransactionControlSQL",
+    "VIBIT_POSTGRES_TEST_DSN",
+  ];
+
+  return requiredManifestMarkers.every((marker) => runtimeText.includes(marker))
+    && requiredManifestMarkers.every((marker) => conventions.includes(marker))
+    && requiredManifestMarkers.every((marker) => manifest.includes(marker))
+    && [
+      "postgres_adapters_added: true",
+      "authentication_postgres_adapter_added: true",
+      "runtime_authentication_implemented: false",
+    ].every((marker) => contracts.includes(marker))
+    && standard.includes("The first authentication PostgreSQL adapter is implemented")
+    && requiredSourceMarkers.every((marker) => source.includes(marker))
+    && requiredTestMarkers.every((marker) => tests.includes(marker))
+    && runner.includes("func (u UnitOfWork) NewAuthenticationRepository() (authentication.Repository, error)")
+    && !/\b(BEGIN|COMMIT|ROLLBACK)\b/.test(source)
+    && runtimeGuide.includes("internal/platform/persistence/postgres/authentication_repository.go")
+    && runtimeGuide.includes("UnitOfWork.NewAuthenticationRepository")
+    && moduleGuide.includes("runtime/internal/platform/persistence/postgres/authentication_repository.go")
+    && moduleGuide.includes("implemented");
 }
 
 function playerAccountPostgresAdapterIsImplemented(root) {
@@ -5113,6 +5364,140 @@ function checkMigrations(root) {
     });
   }
 
+  const tokenVerifierMigration = `${migrationRoot}/000004_create_authentication_access_tokens.sql`;
+  if (isFile(root, tokenVerifierMigration)) {
+    const text = readText(path.join(root, tokenVerifierMigration));
+    const requiredMarkers = [
+      "-- +goose Up",
+      "-- Module: runtime.authentication",
+      "-- +goose Down",
+    ];
+    const requiredTables = [
+      "authentication_access_tokens",
+      "player_accounts",
+      "authentication_device_credentials",
+    ];
+    const requiredColumns = [
+      "token_record_id",
+      "token_kind",
+      "token_status",
+      "actor_kind",
+      "player_id",
+      "credential_record_id",
+      "token_lookup_digest",
+      "token_verifier_digest",
+      "verifier_algorithm",
+      "verifier_version",
+      "verifier_key_id",
+      "audience",
+      "issued_at",
+      "expires_at",
+      "revoked_at",
+      "revoked_reason",
+      "replaced_by_token_record_id",
+      "last_validated_at",
+      "last_failed_validation_at",
+      "cleanup_after",
+      "created_at",
+      "updated_at",
+    ];
+    const requiredIndexes = [
+      "authentication_access_tokens_lookup_digest_uq",
+      "authentication_access_tokens_player_status_idx",
+      "authentication_access_tokens_credential_status_idx",
+      "authentication_access_tokens_status_expires_at_idx",
+      "authentication_access_tokens_cleanup_after_idx",
+      "authentication_access_tokens_replaced_by_idx",
+    ];
+    const forbiddenPatterns = [
+      { pattern: /\braw_/i, label: "raw secret material columns" },
+      { pattern: /\bmetadata\b/i, label: "generic metadata columns" },
+      { pattern: /\brefresh_token\b/i, label: "refresh token schema" },
+      { pattern: /\bruntime_session(s)?\b/i, label: "runtime session schema" },
+      { pattern: /\bexternal_identity\b/i, label: "external identity schema" },
+      { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
+      { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
+      { pattern: /\bwebsocket\b/i, label: "WebSocket state schema" },
+      { pattern: /\brequest_identity\b/i, label: "request identity persistence" },
+      { pattern: /\bpassword(_hash|s)?\b/i, label: "password storage" },
+      { pattern: /\bjwt\b/i, label: "JWT vocabulary" },
+      { pattern: /\boauth\b/i, label: "OAuth vocabulary" },
+      { pattern: /\boidc\b/i, label: "OIDC vocabulary" },
+      { pattern: /\bplayer_account_events\b/i, label: "player lifecycle event table changes" },
+    ];
+    for (const marker of requiredMarkers) {
+      if (text.includes(marker)) {
+        ok(`${tokenVerifierMigration} includes ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: tokenVerifierMigration,
+        });
+      } else {
+        fail(`${tokenVerifierMigration} is missing ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: tokenVerifierMigration,
+        });
+      }
+    }
+    for (const table of requiredTables) {
+      if (text.includes(table)) {
+        ok(`${tokenVerifierMigration} references ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      } else {
+        fail(`${tokenVerifierMigration} does not reference ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      }
+    }
+    for (const column of requiredColumns) {
+      if (text.includes(column)) {
+        ok(`${tokenVerifierMigration} references ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      } else {
+        fail(`${tokenVerifierMigration} does not reference ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      }
+    }
+    for (const indexName of requiredIndexes) {
+      if (text.includes(indexName)) {
+        ok(`${tokenVerifierMigration} declares ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      } else {
+        fail(`${tokenVerifierMigration} does not declare ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      }
+    }
+    for (const { pattern, label } of forbiddenPatterns) {
+      if (pattern.test(text)) {
+        fail(`${tokenVerifierMigration} includes ${label}, which is outside the ratified token verifier schema`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      } else {
+        ok(`${tokenVerifierMigration} does not include ${label}`, {
+          rule_id: "migration.ownership",
+          artifact: tokenVerifierMigration,
+        });
+      }
+    }
+  } else if (isFile(root, ".arch/runtime.yaml") &&
+    readText(path.join(root, ".arch/runtime.yaml")).includes("token_verifier_migration_source_added: true")) {
+    fail(`${tokenVerifierMigration} is missing after token verifier migration source is marked added`, {
+      rule_id: "migration.root",
+      artifact: tokenVerifierMigration,
+    });
+  }
+
   finish({
     summary_counts: {
       migration_files: files.length,
@@ -5497,6 +5882,63 @@ function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
     });
   }
 
+  const runtimeAuthenticationRoot = "runtime/internal/modules/authentication";
+  if (isDirectory(root, runtimeAuthenticationRoot)) {
+    const authenticationRuntimeFiles = discoverFilesUnder(root, runtimeAuthenticationRoot);
+    const allowedAuthenticationRuntimeFiles = [
+      "runtime/internal/modules/authentication/repository.go",
+      "runtime/internal/modules/authentication/repository_test.go",
+    ];
+    const unexpectedAuthenticationRuntimeFiles = authenticationRuntimeFiles.filter((file) => {
+      if (file.endsWith(".gitkeep")) {
+        return false;
+      }
+      return !allowedAuthenticationRuntimeFiles.includes(file);
+    });
+    if (authenticationRepositoryInterfaceIsDeclared(root)) {
+      ok("runtime authentication module contains only the ratified repository interface boundary", {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimeAuthenticationRoot,
+      });
+    } else {
+      fail(`${runtimeAuthenticationRoot} exists without a ratified authentication repository interface boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimeAuthenticationRoot,
+      });
+    }
+    for (const file of allowedAuthenticationRuntimeFiles) {
+      if (isFile(root, file)) {
+        ok(`${file} exists as ratified authentication repository boundary source`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing from ratified authentication repository boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+    if (unexpectedAuthenticationRuntimeFiles.length === 0) {
+      ok("runtime authentication module has no handlers, adapters, token behavior, protocol, or route files beyond the repository boundary", {
+        rule_id: "runtime.identity_boundary",
+        artifact: runtimeAuthenticationRoot,
+      });
+    } else {
+      for (const file of unexpectedAuthenticationRuntimeFiles) {
+        fail(`${file} is outside the ratified authentication repository interface boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  } else {
+    ok("runtime authentication module implementation remains absent until authentication repository boundary or later runtime implementation is ratified", {
+      rule_id: "runtime.identity_boundary",
+      artifact: runtimeAuthenticationRoot,
+    });
+  }
+
   const playerAccountPostgresAdapterSource = "runtime/internal/platform/persistence/postgres/player_account_repository.go";
   const playerAccountPostgresAdapterTest = "runtime/internal/platform/persistence/postgres/player_account_repository_test.go";
   const playerAccountPostgresAdapterAllowedFiles = [
@@ -5547,6 +5989,82 @@ function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
         });
       } else {
         fail(`${file} is missing from implemented player account PostgreSQL adapter boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const authenticationPostgresAdapterSource = "runtime/internal/platform/persistence/postgres/authentication_repository.go";
+  const authenticationPostgresAdapterTest = "runtime/internal/platform/persistence/postgres/authentication_repository_test.go";
+  const authenticationPostgresAdapterAllowedFiles = [
+    authenticationPostgresAdapterSource,
+    authenticationPostgresAdapterTest,
+  ];
+  const authenticationPostgresAdapterFiles = discoverFilesUnder(root, "runtime/internal/platform/persistence/postgres")
+    .filter((file) => /authentication/i.test(path.basename(file)));
+  const authenticationPostgresAdapterBoundaryDeclared = authenticationPostgresAdapterBoundaryIsDeclared(root);
+  const authenticationPostgresAdapterImplemented = authenticationPostgresAdapterIsImplemented(root);
+
+  if (authenticationPostgresAdapterBoundaryDeclared) {
+    ok("authentication PostgreSQL adapter boundary is declared before adapter implementation", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "docs/postgresql-persistence-boundary.md",
+    });
+    ok("authentication PostgreSQL adapter is restricted to the PostgreSQL platform package", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (authenticationRepositoryInterfaceIsDeclared(root)) {
+    fail("authentication repository interface exists without a declared PostgreSQL adapter boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: "docs/postgresql-persistence-boundary.md",
+    });
+  }
+
+  for (const file of authenticationPostgresAdapterFiles) {
+    if (!authenticationPostgresAdapterAllowedFiles.includes(file)) {
+      fail(`${file} is outside the declared authentication PostgreSQL adapter file boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    } else if (authenticationPostgresAdapterBoundaryDeclared) {
+      ok(`${file} is inside the declared authentication PostgreSQL adapter file boundary`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    } else {
+      fail(`${file} exists before the authentication PostgreSQL adapter boundary is declared`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+    }
+  }
+
+  if (authenticationPostgresAdapterImplemented) {
+    ok("authentication PostgreSQL adapter implementation matches the declared boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: authenticationPostgresAdapterSource,
+    });
+  } else if (authenticationPostgresAdapterBoundaryDeclared
+    && isFile(root, authenticationPostgresAdapterSource)
+    && isFile(root, authenticationPostgresAdapterTest)) {
+    fail("authentication PostgreSQL adapter files exist but do not satisfy the implemented adapter boundary", {
+      rule_id: "runtime.identity_boundary",
+      artifact: authenticationPostgresAdapterSource,
+    });
+  }
+
+  if (authenticationPostgresAdapterImplemented) {
+    for (const file of authenticationPostgresAdapterAllowedFiles) {
+      if (isFile(root, file)) {
+        ok(`${file} exists as implemented authentication PostgreSQL adapter boundary file`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing from implemented authentication PostgreSQL adapter boundary`, {
           rule_id: "runtime.identity_boundary",
           artifact: file,
         });
@@ -6038,8 +6556,33 @@ function checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles) {
     .filter((file) => !file.endsWith("_test.go"))
     .filter((file) => pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
       pathStartsWith(file, "runtime/internal/modules/") ||
-      file === "runtime/internal/platform/persistence/postgres/player_account_repository.go");
+      file === "runtime/internal/platform/persistence/postgres/player_account_repository.go")
+    .filter((file) => file !== "runtime/internal/modules/authentication/repository.go");
   checkNoForbiddenPatterns(boundedRuntimeFiles, runtimeForbiddenPatterns, "runtime/protocol/domain/player persistence before auth implementation ratification", { stripComments: true });
+
+  const authenticationRepositoryFiles = [
+    "runtime/internal/modules/authentication/repository.go",
+  ];
+  const authenticationRepositoryForbiddenPatterns = [
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier)\b/, label: "authentication service or runtime validator implementation" },
+    { pattern: /\bcrypto\/rand\b/, label: "credential or token generation" },
+    { pattern: /\bBearer\b/, label: "bearer token handling" },
+    { pattern: /\b(Parse|Validate|Sign|Issue|Generate|Refresh)Token\b/, label: "token runtime behavior" },
+    { pattern: /\bCompare[A-Za-z0-9_]*(Digest|Verifier|Token|Credential)\b/, label: "verifier comparison behavior" },
+    { pattern: /\bBEGIN\b|\bCOMMIT\b|\bROLLBACK\b/i, label: "transaction control" },
+    { pattern: /\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b/i, label: "SQL execution" },
+    { pattern: /\bpgx\b|\bpgconn\b|\bgoose\b/i, label: "PostgreSQL adapter dependency" },
+    { pattern: /\bwebsocket\b/i, label: "WebSocket behavior" },
+    { pattern: /\bprotobuf\b|\bproto\.\b/i, label: "Protobuf behavior" },
+  ];
+  if (authenticationRepositoryInterfaceIsDeclared(root)) {
+    checkNoForbiddenPatterns(
+      authenticationRepositoryFiles,
+      authenticationRepositoryForbiddenPatterns,
+      "authentication repository interface boundary",
+      { stripComments: true }
+    );
+  }
 
   const playerMigrationFiles = discoverFilesUnder(root, "runtime/migrations/postgres")
     .filter((file) => file === "runtime/migrations/postgres/000002_create_player_account_state.sql");
@@ -6193,20 +6736,22 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "request_proof_carrier: explicit_request_proof_payload",
       "refresh_token: not_in_first_implementation",
       "credential_record_schema_gate_status: migration_source_added",
-      "token_verifier_record_schema_gate_status: ratified_no_schema_added",
+      "token_verifier_record_schema_gate_status: migration_source_added",
       "renewal_method: reauthenticate_with_device_credential_login",
       "runtime_authentication_implemented: false",
       "token_behavior_implemented: false",
       "credential_storage_implemented: false",
-      "token_storage_schema_added: false",
+      "token_storage_schema_added: true",
       "credential_storage_schema_added: true",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
-      "migration_sources_added: partial_credential_only",
+      "migration_sources_added: credential_and_token_verifier",
       "credential_migration_source_added: true",
-      "token_verifier_migration_source_added: false",
-      "repository_interfaces_added: false",
-      "postgres_adapters_added: false",
+      "token_verifier_migration_source_added: true",
+      "repository_interfaces_added: true",
+      "repository_interface_source: runtime/internal/modules/authentication/repository.go",
+      "postgres_adapters_added: true",
+      "authentication_postgres_adapter_added: true",
       "runtime_lookup_added: false",
       "websocket_handshake_authentication_changed: false",
       "runtime_player_handlers_added: false",
@@ -6222,7 +6767,7 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "credential_record_schema_boundary_ratified: true",
       "token_verifier_record_schema_boundary_ratified: true",
       "credential_storage_schema_added: true",
-      "token_storage_schema_added: false",
+      "token_storage_schema_added: true",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
       "audit_storage_schema_added: false",
@@ -6238,9 +6783,9 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "credential_record_schema_boundary_ratified: true",
       "token_verifier_record_schema_boundary_ratified: true",
       "credential_migration_source_added: true",
-      "token_verifier_migration_source_added: false",
+      "token_verifier_migration_source_added: true",
       "credential_storage_schema_added: true",
-      "token_storage_schema_added: false",
+      "token_storage_schema_added: true",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
       "audit_storage_schema_added: false",
@@ -6351,7 +6896,9 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       pathStartsWith(file, "runtime/internal/modules/") ||
       pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
       pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
-      pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"));
+      pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => file !== "runtime/internal/modules/authentication/repository.go")
+    .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go");
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -6364,6 +6911,71 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     { pattern: /\braw_token\b/i, label: "raw token handling" },
   ];
   checkNoForbiddenPatterns(authRuntimeFiles, selectedRuntimeForbiddenPatterns, "runtime code before selected implementation gates", { stripComments: true });
+
+  if (authenticationPostgresAdapterBoundaryIsDeclared(root)) {
+    const authenticationPostgresAdapterSource = "runtime/internal/platform/persistence/postgres/authentication_repository.go";
+    const authenticationPostgresAdapterFiles = [
+      authenticationPostgresAdapterSource,
+      "runtime/internal/platform/persistence/postgres/authentication_repository_test.go",
+    ].filter((file) => isFile(root, file));
+    const adapterForbiddenPatterns = [
+      { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
+      { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
+      { pattern: /\bLogoutAccessToken\b/, label: "selected logout implementation" },
+      { pattern: /\bRefreshAccessToken\b/, label: "refresh-token implementation" },
+      { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier)\b/, label: "authentication service or runtime validator implementation" },
+      { pattern: /\bcrypto\/rand\b/, label: "token or credential random generation" },
+      { pattern: /\bBearer\b/, label: "bearer token handling" },
+      { pattern: /\braw_(token|credential)\b/i, label: "raw token or credential handling" },
+      { pattern: /\bCompare[A-Za-z0-9_]*(Digest|Verifier|Token|Credential)\b/, label: "verifier comparison behavior" },
+      { pattern: /\bBEGIN\b|\bCOMMIT\b|\bROLLBACK\b/i, label: "transaction ownership" },
+      { pattern: /\bwebsocket\b|\bAuthorization\b|\bCookie\b|\bSec-WebSocket-Protocol\b/i, label: "transport authentication behavior" },
+      { pattern: /\bprotobuf\b|\bproto\.\b/i, label: "Protobuf behavior" },
+    ];
+    checkNoForbiddenPatterns(
+      authenticationPostgresAdapterFiles,
+      adapterForbiddenPatterns,
+      "authentication PostgreSQL adapter persistence-only boundary",
+      { stripComments: true }
+    );
+
+    if (authenticationPostgresAdapterChecksAreRefined(root)) {
+      ok("authentication PostgreSQL adapter checks distinguish persistence vocabulary from runtime authentication behavior", {
+        rule_id: ruleId,
+        artifact: "tools/vibit",
+      });
+    } else {
+      fail("authentication PostgreSQL adapter checks are missing refined persistence-only markers", {
+        rule_id: ruleId,
+        artifact: "tools/vibit",
+      });
+    }
+  }
+
+  const authenticationRepositoryFiles = [
+    "runtime/internal/modules/authentication/repository.go",
+  ];
+  const authenticationRepositoryForbiddenPatterns = [
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
+    { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
+    { pattern: /\bLogoutAccessToken\b/, label: "selected logout implementation" },
+    { pattern: /\bRefreshAccessToken\b/, label: "refresh-token implementation" },
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier)\b/, label: "authentication service or runtime validator implementation" },
+    { pattern: /\bcrypto\/rand\b/, label: "token or credential random generation" },
+    { pattern: /\bBearer\b/, label: "bearer token handling" },
+    { pattern: /\braw_token\b/i, label: "raw token handling" },
+    { pattern: /\bBEGIN\b|\bCOMMIT\b|\bROLLBACK\b/i, label: "transaction control" },
+    { pattern: /\bSELECT\b|\bINSERT\b|\bUPDATE\b|\bDELETE\b/i, label: "SQL execution" },
+    { pattern: /\bpgx\b|\bpgconn\b|\bgoose\b/i, label: "PostgreSQL adapter dependency" },
+  ];
+  if (authenticationRepositoryInterfaceIsDeclared(root)) {
+    checkNoForbiddenPatterns(
+      authenticationRepositoryFiles,
+      authenticationRepositoryForbiddenPatterns,
+      "authentication repository interface boundary",
+      { stripComments: true }
+    );
+  }
 
   const wsFiles = goFiles
     .filter((file) => !file.endsWith("_test.go"))
@@ -6392,7 +7004,8 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
   ];
   const credentialMigrationFile = "runtime/migrations/postgres/000003_create_authentication_device_credentials.sql";
-  const migrationFilesBeforeCredentialGate = migrationFiles.filter((file) => file !== credentialMigrationFile);
+  const tokenMigrationFile = "runtime/migrations/postgres/000004_create_authentication_access_tokens.sql";
+  const migrationFilesBeforeCredentialGate = migrationFiles.filter((file) => file !== credentialMigrationFile && file !== tokenMigrationFile);
   checkNoForbiddenPatterns(migrationFilesBeforeCredentialGate, selectedMigrationForbiddenPatterns, "PostgreSQL migrations before schema ratification gates");
 
   const credentialMigrationForbiddenPatterns = [
@@ -6408,6 +7021,21 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     migrationFiles.filter((file) => file === credentialMigrationFile),
     credentialMigrationForbiddenPatterns,
     "credential migration before token/session/external-identity gates"
+  );
+
+  const tokenMigrationForbiddenPatterns = [
+    { pattern: /\braw_/i, label: "raw secret material columns" },
+    { pattern: /\bmetadata\b/i, label: "generic metadata columns" },
+    { pattern: /\brefresh_token\b/i, label: "refresh token schema" },
+    { pattern: /\bruntime_session(s)?\b/i, label: "runtime session schema" },
+    { pattern: /\bexternal_identity\b/i, label: "external identity schema" },
+    { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
+    { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
+  ];
+  checkNoForbiddenPatterns(
+    migrationFiles.filter((file) => file === tokenMigrationFile),
+    tokenMigrationForbiddenPatterns,
+    "token verifier migration before session/external-identity/audit gates"
   );
 
   const playerPersistenceFiles = [

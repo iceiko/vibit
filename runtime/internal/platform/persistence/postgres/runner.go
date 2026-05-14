@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"reflect"
 
+	"github.com/iceiko/vibit/runtime/internal/modules/authentication"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/modules/player"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
@@ -114,4 +115,12 @@ func (u UnitOfWork) NewPlayerAccountRepository() (player.Repository, error) {
 		return nil, err
 	}
 	return NewPlayerAccountRepositoryForUnitOfWork(executor), nil
+}
+
+func (u UnitOfWork) NewAuthenticationRepository() (authentication.Repository, error) {
+	executor, err := u.Executor()
+	if err != nil {
+		return nil, err
+	}
+	return NewAuthenticationRepositoryForUnitOfWork(executor), nil
 }

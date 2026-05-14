@@ -219,22 +219,26 @@ type recordedCall struct {
 }
 
 type recordingExecutor struct {
-	execs         []recordedCall
-	queries       []recordedCall
-	queryRowCalls []recordedCall
-	rowsErr       error
-	rowsResponses []pgx.Rows
-	rowsIdx       int
-	rowResponses  []pgx.Row
-	rowIdx        int
-	execErr       error
-	queryErr      error
+	execs          []recordedCall
+	queries        []recordedCall
+	queryRowCalls  []recordedCall
+	rowsErr        error
+	rowsResponses  []pgx.Rows
+	rowsIdx        int
+	rowResponses   []pgx.Row
+	rowIdx         int
+	execErr        error
+	queryErr       error
+	execCommandTag string
 }
 
 func (e *recordingExecutor) Exec(_ context.Context, sql string, args ...any) (pgconn.CommandTag, error) {
 	e.execs = append(e.execs, recordedCall{sql: sql, args: append([]any(nil), args...)})
 	if e.execErr != nil {
 		return pgconn.CommandTag{}, e.execErr
+	}
+	if e.execCommandTag != "" {
+		return pgconn.NewCommandTag(e.execCommandTag), nil
 	}
 	return pgconn.NewCommandTag("INSERT 1"), nil
 }

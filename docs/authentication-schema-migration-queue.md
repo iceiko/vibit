@@ -1,8 +1,8 @@
 # Authentication Schema Migration Queue
 
-Status: Draft v0.1
+Status: Draft v0.2
 Last updated: 2026-05-14
-Scope: Planned authentication schema migration, repository, adapter, redaction, and verification queue after credential and token verifier schema boundaries
+Scope: Completed authentication schema migration, repository, adapter-boundary, redaction, and verification queue after credential and token verifier schema boundaries
 Depends on: `docs/credential-record-schema-boundary.md`, `docs/token-verifier-record-schema-boundary.md`, `docs/postgresql-persistence-boundary.md`, `docs/postgresql-verification-environment.md`
 Canonical decision: `ADR-0034`
 
@@ -15,14 +15,17 @@ This standard defines the next bounded work queue after both required authentica
 ```yaml
 credential_record_schema_boundary: migration_source_added
 credential_migration_source_added: true
-token_verifier_record_schema_boundary: ratified_no_schema_added
+token_verifier_record_schema_boundary: migration_source_added
+token_verifier_migration_source_added: true
 default_durable_target: PostgreSQL
 implementation_authorized_now: false
+milestone_status: completed
+next_milestone: M-015
 ```
 
 The goal is to make the future authentication storage path deterministic without jumping directly from schema ratification into broad authentication implementation.
 
-This document plans migration order, repository-interface gates, PostgreSQL adapter gates, redaction checks, live PostgreSQL verification expectations, and milestone closeout. It does not add SQL migration source, tables, repository interfaces, PostgreSQL adapters, runtime credential lookup, token issuance, token validation, logout, refresh, cleanup, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, or production authentication behavior.
+This document records migration order, repository-interface gates, PostgreSQL adapter gates, redaction checks, live PostgreSQL verification expectations, and milestone closeout. The `M-014` queue has now completed migration sources, static checks, the storage-neutral repository interface, and the PostgreSQL adapter boundary. It does not authorize runtime credential lookup, token issuance, token validation, logout execution, refresh, cleanup jobs, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, or production authentication behavior.
 
 ## 2. Required Reading
 
@@ -64,18 +67,18 @@ schema_boundary:
 migration_queue_planning:
   completed_by: W_0076
 migration_sources:
-  credential: separate_future_work
-  token_verifier: separate_future_work
+  credential: completed_by_W_0077
+  token_verifier: completed_by_W_0078
 schema_static_checks:
-  separate_future_work_or_migration_work
+  completed_by_W_0079
 repository_interfaces:
-  separate_future_work_after_migrations
+  completed_by_W_0080
 postgres_adapters:
-  separate_future_work_after_repository_interfaces
+  boundary_defined_by_W_0081
 redaction_and_live_verification:
-  separate_future_work_after_adapters
+  separate_future_work_after_adapter_implementation
 milestone_closeout:
-  separate_future_work
+  completed_by_W_0082
 runtime_authentication:
   blocked_until_later_milestone
 ```
@@ -89,13 +92,13 @@ The planned M-014 queue after this planning step is:
 | Work item | Title | Scope |
 | --- | --- | --- |
 | `W-0077` | Add credential PostgreSQL migration source | Completed. Creates only the ratified `authentication_device_credentials` SQL source. |
-| `W-0078` | Add token verifier PostgreSQL migration source | Create only the ratified `authentication_access_tokens` SQL source after the credential migration exists. |
-| `W-0079` | Add authentication migration static checks | Harden repository checks for authentication migration naming, ownership, forbidden raw secret columns, and player lifecycle table separation. |
-| `W-0080` | Define authentication repository interface boundary | Define storage-neutral interfaces and mutations for credential and token verifier storage without adapters or runtime behavior. |
-| `W-0081` | Define authentication PostgreSQL adapter boundary | Reserve adapter source paths, transaction expectations, SQL operation scope, and focused tests without implementing the adapter. |
-| `W-0082` | Close credential and token verifier schema ratification milestone | Review M-014 against exit criteria and open the next confirmation or implementation gate. |
+| `W-0078` | Add token verifier PostgreSQL migration source | Completed. Creates only the ratified `authentication_access_tokens` SQL source after the credential migration exists. |
+| `W-0079` | Add authentication migration static checks | Completed. Hardened repository checks for authentication migration naming, ownership, forbidden raw secret columns, and player lifecycle table separation. |
+| `W-0080` | Define authentication repository interface boundary | Completed. Defines storage-neutral interfaces and mutations for credential and token verifier storage without adapters or runtime behavior. |
+| `W-0081` | Define authentication PostgreSQL adapter boundary | Completed. Reserved adapter source paths, transaction expectations, SQL operation scope, and focused tests without implementing the adapter. |
+| `W-0082` | Close credential and token verifier schema ratification milestone | Completed. Reviewed M-014 against exit criteria and opened `M-015` as the bounded authentication PostgreSQL adapter implementation gate. |
 
-This queue intentionally does not include runtime login, token issuance, token validation, logout, cleanup, Protobuf, WebSocket, or dependency implementation work.
+This queue intentionally does not include runtime login, token issuance, token validation, logout execution, cleanup jobs, Protobuf, WebSocket, or dependency implementation work.
 
 ## 5. Migration Order
 
@@ -141,7 +144,7 @@ Forbidden scope:
 
 ## 7. Token Verifier Migration Gate
 
-`W-0078` may add only one SQL-first migration source:
+`W-0078` has added only one SQL-first migration source:
 
 ```text
 runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
@@ -164,7 +167,7 @@ Forbidden scope:
 
 ## 8. Static Check Gate
 
-`W-0079` should update repository checks so authentication migrations become checkable before repositories and adapters exist.
+`W-0079` has updated repository checks so authentication migrations are checkable before adapters exist.
 
 Expected checks:
 
@@ -181,7 +184,7 @@ This check gate must remain static and local by default.
 
 ## 9. Repository Interface Gate
 
-`W-0080` may define storage-neutral interfaces only after the migration sources and static checks exist.
+`W-0080` has defined storage-neutral interfaces after the migration sources and static checks exist.
 
 Expected ownership:
 
@@ -194,6 +197,12 @@ Expected interface families:
 - Credential lookup and mutation repository boundary.
 - Token verifier creation, lookup, revocation, expiration query, and cleanup eligibility boundary.
 - Unit-of-work expectations that keep credential, player account, and token mutations atomic when implementation later authorizes them.
+
+Current approved source:
+
+```text
+runtime/internal/modules/authentication/repository.go
+```
 
 Forbidden scope:
 
@@ -208,7 +217,7 @@ Forbidden scope:
 
 ## 10. PostgreSQL Adapter Boundary Gate
 
-`W-0081` may define adapter boundaries after storage-neutral interfaces exist.
+`W-0081` has defined adapter boundaries after storage-neutral interfaces exist.
 
 Expected ownership:
 
@@ -289,14 +298,15 @@ Allowed with care:
 
 ## 13. Non-Authorization
 
-This standard does not authorize:
+This standard records the completed `M-014` queue. It authorized only the bounded artifacts named by `W-0077` through `W-0082`: credential and token verifier migration sources, static checks, a storage-neutral repository interface, a PostgreSQL adapter boundary, and milestone closeout.
 
-- Authentication migration source.
-- Credential or token tables.
-- Authentication repository interfaces.
-- PostgreSQL authentication adapters.
-- Runtime credential lookup.
-- Token generation, issuance, parsing, validation, refresh, revocation, rotation, replay handling, cleanup, or storage behavior.
+It still does not authorize:
+
+- Additional authentication migration sources beyond the ratified credential and token verifier migrations.
+- External identity, runtime session, audit, or refresh-token tables.
+- PostgreSQL authentication adapter implementation outside the separately opened `M-015` gate.
+- Runtime credential lookup behavior.
+- Token generation, issuance, parsing, validation, refresh, rotation, replay handling, cleanup jobs, or production token behavior.
 - Login handlers.
 - Runtime player handlers.
 - WebSocket routes.
@@ -311,13 +321,7 @@ This standard does not authorize:
 Next work:
 
 ```text
-W-0077 Add credential PostgreSQL migration source
+W-0083 Refine authentication adapter implementation checks
 ```
 
-The next work item is:
-
-```text
-W-0078 Add token verifier PostgreSQL migration source
-```
-
-It may add only the token verifier migration source and related static manifest/check updates within its declared boundary.
+It may refine repository checks so the declared PostgreSQL adapter boundary can be implemented later without weakening runtime authentication, protocol, WebSocket, generated-output, and dependency deferrals.

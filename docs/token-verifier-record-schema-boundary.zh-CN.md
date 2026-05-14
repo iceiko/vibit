@@ -17,10 +17,10 @@ access_token_format: opaque_high_entropy_token
 token_issuance_carrier: login_command_response_token
 request_proof_carrier: explicit_request_proof_payload
 default_durable_target: PostgreSQL
-schema_boundary_status: ratified_no_schema_added
+schema_boundary_status: migration_source_added
 ```
 
-本文定义未来 record semantics。它不添加 SQL migration source、tables、repository interfaces、PostgreSQL adapters、runtime token validation、token issuance、logout behavior、refresh behavior、cleanup jobs、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
+本文定义 token verifier record semantics。W-0078 已为该 schema 添加 SQL migration source。它不添加 repository interfaces、PostgreSQL adapters、runtime token validation、token issuance、logout behavior、refresh behavior、cleanup jobs、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
 
 ## 2. Required Reading
 
@@ -60,11 +60,12 @@ Token verifier record boundary 只作为 schema boundary 被 ratify：
 
 ```yaml
 token_verifier_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   default_durable_target: PostgreSQL
   future_logical_table: authentication_access_tokens
   owner: runtime.authentication
-  migration_source_added: false
+  migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  migration_source_added: true
   repository_interface_added: false
   postgres_adapter_added: false
   runtime_validation_added: false
@@ -74,7 +75,7 @@ token_verifier_record_schema_boundary:
   authentication_implemented: false
 ```
 
-未来 logical table name 已 ratify，目的是让 agents 在 migration planning 阶段有稳定目标。除非后续 migration work item 在 `runtime/migrations/postgres/` 下创建 SQL source，否则该 table 不存在。
+Logical table name 和 SQL migration source 已 ratify，目的是让 agents 在 repository 与 adapter work 开始前有稳定目标。只有应用 `runtime/migrations/postgres/000004_create_authentication_access_tokens.sql` 后，该 table 才会在数据库中存在。
 
 ## 4. Ownership
 
@@ -363,7 +364,7 @@ Test fixtures 必须使用 synthetic values，不得包含真实 tokens、creden
 
 Agents must not：
 
-- 仅凭本标准添加 `authentication_access_tokens` SQL migration source。
+- 在 `W-0078` 或后续明确 migration work item 之外添加或修改 `authentication_access_tokens` SQL migration source。
 - 仅凭本标准添加 token repository interfaces。
 - 仅凭本标准添加 PostgreSQL token adapters。
 - 仅凭本标准添加 runtime token issuance、validation、logout、refresh 或 cleanup。
@@ -383,7 +384,7 @@ Agents must not：
 credential_record_schema_boundary: completed_by_W_0074
 token_verifier_record_schema_boundary: completed_by_W_0075
 authentication_schema_migration_queue: required_before_migration
-token_verifier_migration_source: separate_future_work
+token_verifier_migration_source: completed_by_W_0078
 authentication_repository_interface: separate_future_work
 token_postgres_adapter: separate_future_work
 verifier_algorithm_and_secret_configuration: separate_future_work
@@ -425,7 +426,7 @@ node tools/vibit check all --json
 git diff --check
 ```
 
-由于本工作不添加 migration source、tables、repositories、adapters 或 runtime behavior，因此不需要 live PostgreSQL verification。
+对于 source-only migration，live PostgreSQL verification 是可选的，并应由 migration work item 记录。默认不强制要求它，因为 repository 与 adapter behavior 仍然 deferred。
 
 由于没有 Go runtime behavior changes，因此不需要 Go tests。
 
@@ -434,7 +435,7 @@ git diff --check
 Next work：
 
 ```text
-W-0076 Plan authentication schema migration queue
+W-0079 Add authentication migration static checks
 ```
 
-Migration queue 必须在任何 authentication migration source 被添加前，规划 credential 和 token verifier migration order、repository-interface gates、PostgreSQL adapter gates、redaction checks 和 live verification expectations。
+下一个 gate 应先强化已 ratified 的 credential 与 token verifier migration sources 的本地 checks，然后再定义 repository interfaces 或 adapters。

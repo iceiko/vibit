@@ -1,0 +1,113 @@
+schema_version: 0.1
+change_id: define-authentication-repository-interface-boundary
+date: 2026-05-14
+type: feature
+status: verified
+
+summary: Define the storage-neutral authentication repository interface boundary without adding adapters, runtime authentication behavior, protocol behavior, or dependencies.
+
+affected_modules:
+  - authentication
+  - runtime
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0029
+    - ADR-0032
+    - ADR-0033
+    - ADR-0034
+
+standards:
+  added:
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+  changed:
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - docs/authentication-schema-migration-queue.md
+    - docs/authentication-schema-migration-queue.zh-CN.md
+    - docs/selected-login-token-boundary-checks.md
+    - docs/selected-login-token-boundary-checks.zh-CN.md
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - authentication module owns storage-neutral credential and token verifier repository interfaces
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  authentication_repository_interface_added: true
+  authentication_repository_interface_source: runtime/internal/modules/authentication/repository.go
+  authentication_repository_tests_added: true
+  authentication_postgres_adapter_added: false
+  runtime_authentication_implemented: false
+  token_behavior_implemented: false
+  runtime_lookup_added: false
+  runtime_token_validation_added: false
+  token_issuance_added: false
+  logout_added: false
+  cleanup_added: false
+  websocket_routes_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_work_item: W-0080
+  next_ready_work_item: W-0081
+  next_direction: authentication_postgresql_adapter_boundary
+
+verification:
+  required:
+    - go test ./internal/modules/authentication
+    - node -c tools/vibit
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-authentication-repository-interface-boundary --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

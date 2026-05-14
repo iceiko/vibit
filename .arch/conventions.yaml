@@ -603,20 +603,22 @@ login_method_token_format_ratification:
     future_credential_logical_table: authentication_device_credentials
     credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
     credential_migration_source_added: true
-    token_verifier_record_schema_gate_status: ratified_no_schema_added
+    token_verifier_record_schema_gate_status: migration_source_added
     token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
     token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
     token_verifier_record_schema_boundary_decision: ADR-0033
     future_token_logical_table: authentication_access_tokens
+    token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+    token_verifier_migration_source_added: true
     external_identity_link_schema_gate_status: deferred_no_schema_added
     runtime_session_record_schema_gate_status: deferred_no_schema_added
     audit_persistence_schema_gate_status: defined_no_schema_added
     credential_tables_added: true
-    token_tables_added: false
+    token_tables_added: true
     external_identity_tables_added: false
     session_tables_added: false
     audit_tables_added: false
-    migration_sources_added: partial_credential_only
+    migration_sources_added: credential_and_token_verifier
     repository_interfaces_added: false
     postgres_adapters_added: false
     runtime_lookup_added: false
@@ -642,8 +644,8 @@ login_method_token_format_ratification:
     token_verifier_record_schema_boundary_ratified: true
     selected_login_token_boundary_checks_added: true
     credential_migration_source_added: true
-    token_verifier_migration_source_added: false
-    token_storage_schema_added: false
+    token_verifier_migration_source_added: true
+    token_storage_schema_added: true
     credential_storage_schema_added: true
     external_identity_storage_schema_added: false
     session_storage_schema_added: false
@@ -665,12 +667,16 @@ login_method_token_format_ratification:
     - close_credential_token_verifier_schema_ratification_milestone
 
 credential_token_schema_ratification:
-  status: active
+  status: completed
   milestone: M-014
   selected_by_closeout_decision: ADR-0031
   first_work_item: W-0074
-  latest_completed_work_item: W-0077
-  next_work_item: W-0078
+  latest_completed_work_item: W-0082
+  closeout_work_item: W-0082
+  closeout_decision: ADR-0035
+  closeout_change: changes/2026-05-14-close-credential-token-verifier-schema-ratification-milestone
+  next_milestone: M-015
+  next_work_item_after_closeout: W-0083
   default_durable_target: PostgreSQL
   credential_record_schema_boundary_status: migration_source_added
   credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
@@ -679,23 +685,32 @@ credential_token_schema_ratification:
   future_credential_logical_table: authentication_device_credentials
   credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
   credential_migration_source_added: true
-  token_verifier_record_schema_boundary_status: ratified_no_schema_added
+  token_verifier_record_schema_boundary_status: migration_source_added
   token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
   token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
   token_verifier_record_schema_boundary_decision: ADR-0033
   future_token_logical_table: authentication_access_tokens
+  token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  token_verifier_migration_source_added: true
   authentication_schema_migration_queue_standard: docs/authentication-schema-migration-queue.md
   authentication_schema_migration_queue_translation: docs/authentication-schema-migration-queue.zh-CN.md
   authentication_schema_migration_queue_decision: ADR-0034
   authentication_schema_migration_queue_change: changes/2026-05-14-plan-authentication-schema-migration-queue
   planned_credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
   planned_token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  authentication_migration_static_checks_added: true
+  repository_interface_added: true
+  repository_interface_source: runtime/internal/modules/authentication/repository.go
+  authentication_postgres_adapter_boundary_defined: true
+  authentication_postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  authentication_postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+  authentication_postgres_adapter_constructor_planned: NewAuthenticationRepositoryForUnitOfWork
+  authentication_postgres_unit_of_work_factory_planned: UnitOfWork.NewAuthenticationRepository
   planned_repository_interface_boundary: W-0080
   planned_postgres_adapter_boundary: W-0081
   planned_closeout_work_item: W-0082
-  migration_sources_added: partial_credential_only
-  token_verifier_migration_source_added: false
-  repository_interfaces_added: false
+  migration_sources_added: credential_and_token_verifier
+  repository_interfaces_added: true
   postgres_adapters_added: false
   runtime_lookup_added: false
   generated_authentication_shapes_added: false
@@ -703,10 +718,51 @@ credential_token_schema_ratification:
   websocket_proof_carrier_implemented: false
   runtime_authentication_implemented: false
   rule: >
-    Credential and token verifier schema boundaries must be ratified before
-    migrations, repositories, adapters, runtime lookup, generated authentication
-    output, Protobuf messages, WebSocket proof carriers, handlers, routes, or
-    authentication behavior.
+    Credential and token verifier schema boundaries are ratified and closed.
+    Runtime authentication, generated authentication output, Protobuf messages,
+    WebSocket proof carriers, handlers, routes, and authentication behavior
+    remain deferred.
+
+authentication_postgresql_adapter_implementation:
+  status: active
+  milestone: M-015
+  decision: ADR-0035
+  first_work_item: W-0083
+  latest_completed_work_item: W-0084
+  next_work_item: W-0085
+  repository_interface_source: runtime/internal/modules/authentication/repository.go
+  adapter_source: runtime/internal/platform/persistence/postgres/authentication_repository.go
+  adapter_test: runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+  constructor: NewAuthenticationRepositoryForUnitOfWork
+  unit_of_work_factory: UnitOfWork.NewAuthenticationRepository
+  allowed_scope: persistence_adapter_only
+  authentication_postgresql_adapter_implementation_allowed_scope: persistence_adapter_only
+  checks_refined: true
+  authentication_postgresql_adapter_checks_refined: true
+  postgres_adapter_added: true
+  authentication_postgres_adapter_added: true
+  implementation_change: changes/2026-05-14-implement-authentication-postgresql-adapter
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  bearer_parsing_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_routes_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  work_queue:
+    - W-0083 refine_authentication_adapter_implementation_checks
+    - W-0084 implement_authentication_postgresql_adapter
+    - W-0085 close_authentication_postgresql_adapter_implementation_milestone
+  rule: >
+    The active authentication implementation milestone is persistence-adapter
+    only. It may not add production authentication behavior, token generation,
+    token validation, login handlers, WebSocket routes, Protobuf messages,
+    generated authentication shapes, or major authentication dependencies.
 
 server_runtime:
   first_reference_language: Go

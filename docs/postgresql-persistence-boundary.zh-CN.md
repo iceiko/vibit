@@ -416,6 +416,14 @@ runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
 
 它由 `runtime.authentication` 拥有，只创建 `authentication_device_credentials`，引用 `player_accounts(player_id)` 但不改变 player lifecycle tables，并且不授权 token storage、repository interfaces、PostgreSQL adapters、runtime authentication、Protobuf messages 或 WebSocket behavior。
 
+第一版 token verifier migration source 是：
+
+```text
+runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+```
+
+它由 `runtime.authentication` 拥有，只创建 `authentication_access_tokens`，引用 `player_accounts(player_id)` 和 `authentication_device_credentials(credential_record_id)` 但不改变这些 tables，并且不授权 repository interfaces、PostgreSQL adapters、runtime authentication、Protobuf messages 或 WebSocket behavior。
+
 ## 3.2 Player Account PostgreSQL Adapter Boundary
 
 第一版 player account PostgreSQL adapter 已经实现，但它仍然只是 persistence adapter。它不授权 runtime handlers、WebSocket routes、authentication、token behavior、credential storage、external identity linking 或 session persistence。
@@ -494,6 +502,93 @@ runtime/internal/platform/persistence/postgres.UnitOfWork.NewPlayerAccountReposi
 ```
 
 这个 helper 必须留在 PostgreSQL platform package 中。它不得改变 module-owned `player.Repository` interface，不得迫使 application 或 domain packages import `pgx`，也不意味着 runtime player account handlers、WebSocket routes、authentication、credentials、tokens、external identity links 或 session persistence 已经被允许。
+
+## 3.3 Authentication PostgreSQL Adapter Boundary
+
+The first authentication PostgreSQL adapter is implemented。它只是 persistence adapter。它不授权 runtime authentication、token issuance、token validation、logout execution、refresh behavior、cleanup jobs、handlers、WebSocket routes、Protobuf messages、generated authentication shapes、authentication dependencies 或 production authentication behavior。
+
+Adapter source path 是：
+
+```text
+runtime/internal/platform/persistence/postgres/authentication_repository.go
+```
+
+Focused test path 是：
+
+```text
+runtime/internal/platform/persistence/postgres/authentication_repository_test.go
+```
+
+Adapter constructor 是：
+
+```text
+NewAuthenticationRepositoryForUnitOfWork(executor)
+```
+
+该 constructor 返回以下 interface 的 implementation：
+
+```text
+authentication.Repository
+```
+
+Executor 必须由 application-owned unit of work 提供，通常来自 transaction-bound handle，例如 `pgx.Tx`。Adapter 可以为了 testability 使用小型 pgx-shaped executor interface。它不得调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`；transaction lifetime 属于 application-owned unit of work。
+
+Adapter 不得：
+
+- 调用 `BEGIN`、`COMMIT` 或 `ROLLBACK`。
+- 开启自己的隐藏 write transaction。
+- 打开 PostgreSQL pool 或读取 PostgreSQL configuration。
+- Apply migrations 或 inspect migration status。
+- 生成 credential material 或 tokens。
+- 比较 credential 或 token verifiers。
+- 解析 bearer tokens。
+- Validate access tokens。
+- 执行 login、logout、refresh 或 cleanup behavior。
+- 解码 Protobuf payloads。
+- 知道 WebSocket handshake 或 connection behavior。
+- 执行 permissions。
+- Import transport、protocol、application bootstrap、player、inventory、S3 或 MinIO packages。
+
+第一版允许的 SQL operation scope 有意限制为已 ratified repository interface 的 persistence operations：
+
+- `StoreCredential` 可以 insert `authentication_device_credentials` rows。
+- `FindCredentialByLookupDigest` 可以通过 `credential_lookup_digest` 读取一条 `authentication_device_credentials` row。
+- `StoreToken` 可以 insert `authentication_access_tokens` rows。
+- `FindTokenByLookupDigest` 可以通过 `token_lookup_digest` 读取一条 `authentication_access_tokens` row。
+- `RevokeCredential` 可以 update `authentication_device_credentials` 上的 credential terminal-state columns。
+- `RevokeToken` 可以 update `authentication_access_tokens` 上的 token terminal-state 和 cleanup columns。
+- `ListTokensEligibleForCleanup` 可以读取 `cleanup_after` 到期的 token records。
+- Adapter 可以通过已 ratified foreign keys 引用 `player_accounts(player_id)`，但不得读取或写入 player account lifecycle columns。
+- Adapter 不得读取或写入 external identity、runtime session、WebSocket state、inventory state 或 audit persistence tables。
+
+Error mapping expectations：
+
+- Missing credential lookup rows 在 runtime handlers 把 error 暴露给 clients 前，必须映射到稳定的 credential not-found error path。
+- Missing token lookup rows 在 runtime handlers 把 error 暴露给 clients 前，必须映射到稳定的 token not-found error path。
+- Duplicate credential 或 token digest constraint violations 必须映射到稳定的 duplicate/conflict error paths。
+- `player_id`、`credential_record_id` 或 replacement links 的 foreign-key violations 必须映射到稳定的 validation 或 invariant error paths。
+- Check constraint violations 必须映射到稳定的 validation 或 invariant error paths。
+- Unexpected PostgreSQL errors 可以带 adapter context wrap，但 `pgx` 或 `pgconn` types 不得泄露到 module-owned repository interface。
+
+该 implementation 包含以下 focused tests：
+
+- Credential create/lookup/revocation 的 fake-executor SQL shape tests。
+- Token create/lookup/revocation/cleanup eligibility 的 fake-executor SQL shape tests。
+- 证明 adapter 不发出 `BEGIN`、`COMMIT` 或 `ROLLBACK` 的 no-transaction-control test。
+- Mutation normalization 和 UTC timestamp tests。
+- Nullable terminal-state 与 cleanup timestamps 的 row mapping tests。
+- Missing row、duplicate、foreign-key 和 check-constraint error mapping tests。
+- 通过 `node tools/vibit check runtime` 执行 import-boundary tests。
+- Default repository checks 不依赖 live PostgreSQL。
+- Optional live integration coverage 只能通过 `VIBIT_POSTGRES_TEST_DSN` 启用。
+
+PostgreSQL unit-of-work helper 是：
+
+```text
+runtime/internal/platform/persistence/postgres.UnitOfWork.NewAuthenticationRepository
+```
+
+这个 helper 必须留在 PostgreSQL platform package 中。它不得改变 module-owned `authentication.Repository` interface，不得迫使 application 或 domain packages import `pgx`，也不意味着 runtime authentication handlers、WebSocket routes、Protobuf messages、generated authentication shapes、authentication dependencies 或 production authentication behavior 已经被允许。
 
 ## 4. Repository Rules
 
@@ -608,7 +703,7 @@ node tools/vibit check all
 node tools/vibit check migrations
 ```
 
-它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references、第一版 inventory table references、player account lifecycle migration shape 以及 credential migration source shape。它还不会针对 PostgreSQL 执行 apply 或 rollback。
+它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references、第一版 inventory table references、player account lifecycle migration shape、credential migration source shape 以及 token verifier migration source shape。它还不会针对 PostgreSQL 执行 apply 或 rollback。
 
 当前 migration apply/status API 是：
 

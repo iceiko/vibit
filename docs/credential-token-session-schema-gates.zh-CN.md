@@ -98,15 +98,16 @@ credential_record_schema_boundary:
   runtime_lookup_added_now: false
 ```
 
-W-0075 已经 ratify token verifier record schema boundary，但没有添加 schema：
+W-0075 已经 ratify token verifier record schema boundary，W-0078 已添加它的 migration source：
 
 ```yaml
 token_verifier_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   standard: docs/token-verifier-record-schema-boundary.md
   decision: ADR-0033
   future_logical_table: authentication_access_tokens
-  migration_added_now: false
+  migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  migration_added_now: true
   repository_added_now: false
   runtime_validation_added_now: false
   token_issuance_added_now: false
@@ -114,7 +115,7 @@ token_verifier_record_schema_boundary:
   cleanup_added_now: false
 ```
 
-W-0077 已添加 credential migration source。Token verifier migration source 仍是在添加 repository interfaces、adapters 或 runtime authentication behavior 前的下一个必需 schema step。
+W-0077 与 W-0078 已添加 credential 与 token verifier migration sources。Authentication migration static checks 仍然是在添加 repository interfaces、adapters 或 runtime authentication behavior 前的下一个必需 step。
 
 ## 4. Credential Record Gate
 
@@ -325,7 +326,7 @@ player_account_events
 ```yaml
 credential_schema_ratification: separate_work
 token_verifier_schema_ratification: separate_work
-credential_and_token_migration_sources: separate_work
+credential_and_token_migration_sources: completed_by_W_0077_and_W_0078
 repository_interfaces: separate_work
 postgres_adapters: separate_work
 redaction_and_schema_tests: separate_work
@@ -395,7 +396,7 @@ git diff --check
 下一步工作：
 
 ```text
-W-0076 Plan authentication schema migration queue
+W-0079 Add authentication migration static checks
 ```
 
-W-0076 应规划 credential 与 token verifier migration ordering、repository-interface gates、PostgreSQL adapter gates、redaction checks 和 live verification expectations，但不添加 migrations、repositories、adapters、runtime token validation、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。
+W-0079 应强化已 ratified 的 authentication migration sources 的本地 checks，且不添加 repositories、adapters、runtime token validation、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。

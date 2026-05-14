@@ -98,15 +98,16 @@ credential_record_schema_boundary:
   runtime_lookup_added_now: false
 ```
 
-W-0075 has ratified the token verifier record schema boundary without adding schema:
+W-0075 ratified the token verifier record schema boundary, and W-0078 has added its migration source:
 
 ```yaml
 token_verifier_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   standard: docs/token-verifier-record-schema-boundary.md
   decision: ADR-0033
   future_logical_table: authentication_access_tokens
-  migration_added_now: false
+  migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  migration_added_now: true
   repository_added_now: false
   runtime_validation_added_now: false
   token_issuance_added_now: false
@@ -114,7 +115,7 @@ token_verifier_record_schema_boundary:
   cleanup_added_now: false
 ```
 
-W-0077 has added the credential migration source. The token verifier migration source remains the next required schema step before repository interfaces, adapters, or runtime authentication behavior may be added.
+W-0077 and W-0078 have added the credential and token verifier migration sources. Authentication migration static checks remain the next required step before repository interfaces, adapters, or runtime authentication behavior may be added.
 
 ## 4. Credential Record Gate
 
@@ -325,7 +326,7 @@ Future implementation must be split at least this way:
 ```yaml
 credential_schema_ratification: separate_work
 token_verifier_schema_ratification: separate_work
-credential_and_token_migration_sources: separate_work
+credential_and_token_migration_sources: completed_by_W_0077_and_W_0078
 repository_interfaces: separate_work
 postgres_adapters: separate_work
 redaction_and_schema_tests: separate_work
@@ -395,7 +396,7 @@ This standard does not authorize:
 Next work:
 
 ```text
-W-0076 Plan authentication schema migration queue
+W-0079 Add authentication migration static checks
 ```
 
-W-0076 should plan credential and token verifier migration ordering, repository-interface gates, PostgreSQL adapter gates, redaction checks, and live verification expectations without adding migrations, repositories, adapters, runtime token validation, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+W-0079 should harden local checks for the ratified authentication migration sources without adding repositories, adapters, runtime token validation, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-014
+current_milestone: M-015
 
 continuation_semantics:
   default_step_unit: work_item
@@ -276,7 +276,7 @@ milestones:
 
   - id: M-014
     title: Credential And Token Verifier Schema Ratification
-    status: active
+    status: completed
     goal: Ratify credential record and token verifier record schema boundaries for the selected device credential and opaque access-token posture before adding migrations, repositories, adapters, runtime lookup, generated authentication shapes, Protobuf messages, WebSocket proof carriers, handlers, routes, or authentication behavior.
     completion_criteria:
       - Credential record semantics, ownership, identifiers, verifier storage, uniqueness, lifecycle states, account relationship, rotation, revocation, disabled-credential behavior, and redaction rules are ratified before migration source exists.
@@ -292,6 +292,30 @@ milestones:
       - adding generated authentication contract shapes
       - adding password hashing, JWT, OAuth, OIDC, provider SDK, key-management, Redis-like, or other major authentication dependencies
       - copying Nakama or Pitaya public APIs directly
+    completion_summary: M-014 completed the credential and token verifier schema ratification path. It ratified credential and token verifier record boundaries, added SQL-first PostgreSQL migration sources for authentication_device_credentials and authentication_access_tokens, added local static migration checks, added a storage-neutral authentication repository interface boundary, and defined the authentication PostgreSQL adapter boundary. Runtime authentication, credential lookup behavior, token issuance, token validation, logout execution, refresh, cleanup jobs, handlers, routes, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, authentication dependencies, external identity storage, runtime session persistence, and production authentication behavior remain deferred to later bounded milestones.
+
+  - id: M-015
+    title: Authentication PostgreSQL Adapter Implementation
+    status: active
+    goal: Implement the PostgreSQL persistence adapter for the already-ratified authentication repository interface and migration sources without adding runtime authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or authentication dependencies.
+    completion_criteria:
+      - Repository checks distinguish allowed authentication persistence-adapter vocabulary from forbidden runtime authentication behavior.
+      - The PostgreSQL adapter implements authentication.Repository through a caller-supplied executor and does not own transaction lifetime.
+      - Credential and token verifier rows map to module-owned records with redaction-safe error paths and no raw secret exposure.
+      - Focused fake-executor tests cover credential storage/lookup, token storage/lookup, revocation, cleanup eligibility, error mapping, UTC normalization, and absence of transaction-control SQL.
+      - Runtime authentication, protocol, WebSocket, generated output, login, token issuance, token validation, logout execution, refresh, cleanup jobs, and major dependencies remain deferred.
+    non_goals:
+      - implementing AuthenticateWithDeviceCredential
+      - implementing ValidateAccessToken
+      - implementing LogoutAccessToken runtime behavior
+      - generating raw access tokens or credential material
+      - comparing credential or token verifier digests
+      - parsing bearer tokens
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding JWT, OAuth, OIDC, password-hashing, key-management, Redis-like, provider SDK, or cryptography dependencies
+      - adding external identity, runtime session, audit, or refresh-token persistence
 
 work_items:
   - id: W-0001
@@ -2002,7 +2026,7 @@ work_items:
   - id: W-0078
     milestone: M-014
     title: Add token verifier PostgreSQL migration source
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-add-token-verifier-postgresql-migration-source
     depends_on:
       - W-0077
@@ -2014,6 +2038,7 @@ work_items:
       - Add SQL-first migration source for the ratified authentication_access_tokens schema under runtime/migrations/postgres.
       - Include goose Up and Down sections, owning module trace, deterministic sequence number, constraints, indexes, redaction-safe column names, credential-token linkage, expiration, revocation, retention, and cleanup eligibility semantics.
       - Preserve PostgreSQL as the default durable target without adding repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    completion_summary: Added runtime/migrations/postgres/000004_create_authentication_access_tokens.sql as the SQL-first opaque access-token verifier migration source for the selected token posture. It creates only authentication_access_tokens, records runtime.authentication ownership, stores non-plaintext token lookup and verifier digests, links tokens to player_accounts and authentication_device_credentials without modifying those tables, preserves expiration, revocation, rotation lineage, retention, and cleanup eligibility semantics, and keeps repository interfaces, PostgreSQL adapters, runtime credential lookup, token issuance, token validation, logout, refresh, cleanup, handlers, routes, generated authentication output, Protobuf messages, WebSocket behavior, authentication dependencies, and production authentication behavior deferred.
     ask_first:
       - Changing the ratified credential migration schema.
       - Adding authentication repository interfaces or PostgreSQL adapters.
@@ -2024,7 +2049,7 @@ work_items:
   - id: W-0079
     milestone: M-014
     title: Add authentication migration static checks
-    status: planned
+    status: completed
     change: changes/2026-05-14-add-authentication-migration-static-checks
     depends_on:
       - W-0078
@@ -2037,6 +2062,7 @@ work_items:
       - Add static repository checks for authentication migration sequence, owning module trace, goose sections, table names, forbidden raw secret columns, forbidden generic metadata columns, and player account lifecycle table separation.
       - Preserve JSON check output with forward-slash repository-relative paths on every platform.
       - Keep checks local by default without requiring live PostgreSQL, runtime authentication, repository interfaces, adapters, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    completion_summary: Hardened local migration checks for the ratified authentication migration sources. The check now validates the credential and token verifier migration sequence, owning module traces, goose sections, table references, required columns, required indexes, raw secret exclusions, generic metadata exclusions, and player account lifecycle table separation while keeping live PostgreSQL, repositories, adapters, runtime authentication, generated output, Protobuf, WebSocket behavior, and authentication dependencies deferred.
     ask_first:
       - Weakening existing migration, runtime, or selected login/token checks.
       - Making live PostgreSQL mandatory for default checks.
@@ -2046,7 +2072,7 @@ work_items:
   - id: W-0080
     milestone: M-014
     title: Define authentication repository interface boundary
-    status: planned
+    status: completed
     change: changes/2026-05-14-define-authentication-repository-interface-boundary
     depends_on:
       - W-0079
@@ -2059,6 +2085,7 @@ work_items:
       - Define storage-neutral authentication repository interface boundaries for credential and token verifier records after migrations and static checks exist.
       - Define mutation/query shapes, unit-of-work expectations, redaction rules, and future test expectations without adding PostgreSQL adapters or runtime authentication behavior.
       - Preserve selected login/token implementation deferral for handlers, routes, generated output, Protobuf messages, WebSocket behavior, and authentication dependencies.
+    completion_summary: Added the storage-neutral authentication repository interface boundary under runtime/internal/modules/authentication with credential and token verifier record shapes, mutation/query shapes, repository methods, normalization helpers, focused tests, and module guides. PostgreSQL adapters, runtime credential lookup, token issuance, token validation, logout, refresh, cleanup jobs, handlers, routes, generated authentication output, Protobuf messages, WebSocket behavior, authentication dependencies, and production authentication behavior remain deferred.
     ask_first:
       - Implementing PostgreSQL authentication adapters in the repository-interface step.
       - Implementing credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
@@ -2068,7 +2095,7 @@ work_items:
   - id: W-0081
     milestone: M-014
     title: Define authentication PostgreSQL adapter boundary
-    status: planned
+    status: completed
     change: changes/2026-05-14-define-authentication-postgresql-adapter-boundary
     depends_on:
       - W-0080
@@ -2080,6 +2107,7 @@ work_items:
     completion:
       - Define PostgreSQL adapter source/test paths, constructors, executor ownership, transaction expectations, SQL operation scope, error mapping expectations, fake-executor tests, and optional live PostgreSQL verification expectations for authentication repositories.
       - Preserve runtime authentication implementation deferral and keep adapter implementation separate unless a later work item explicitly authorizes it.
+    completion_summary: Defined the authentication PostgreSQL adapter boundary without implementing the adapter. The boundary reserves runtime/internal/platform/persistence/postgres/authentication_repository.go and its focused test file, specifies NewAuthenticationRepositoryForUnitOfWork, caller-owned executor and no transaction-control rules, first SQL operation scope for credential and token verifier persistence, error mapping expectations, and required tests while preserving runtime authentication, token issuance, token validation, logout, refresh, cleanup, handlers, routes, generated authentication output, Protobuf, WebSocket, dependency, and production behavior deferrals.
     ask_first:
       - Implementing adapter behavior in the boundary step.
       - Implementing runtime credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
@@ -2089,7 +2117,7 @@ work_items:
   - id: W-0082
     milestone: M-014
     title: Close credential and token verifier schema ratification milestone
-    status: planned
+    status: completed
     change: changes/2026-05-14-close-credential-token-verifier-schema-ratification-milestone
     depends_on:
       - W-0081
@@ -2102,8 +2130,65 @@ work_items:
       - Review M-014 completion criteria against credential schema, token verifier schema, migration queue, migration sources, static checks, repository boundary, adapter boundary, manifests, standards, and repository checks.
       - Mark M-014 completed only if runtime authentication, handlers, routes, generated output, Protobuf changes, WebSocket changes, production token validation, credential lookup, logout, refresh, cleanup, and major authentication dependencies remain deferred or are explicitly planned for a later milestone.
       - Create the next confirmation or implementation gate rather than starting runtime authentication implicitly.
+    completion_summary: Reviewed M-014 against credential schema, token verifier schema, migration queue, migration sources, static checks, repository interface boundary, PostgreSQL adapter boundary, manifests, standards, and repository checks. Marked M-014 completed and opened M-015 as the bounded authentication PostgreSQL adapter implementation milestone. Runtime authentication, token issuance, token validation, logout execution, refresh, cleanup jobs, handlers, routes, generated authentication shapes, Protobuf messages, WebSocket proof carriers, WebSocket handshake authentication, major authentication dependencies, external identity storage, runtime session persistence, and production authentication behavior remain deferred.
     ask_first:
       - Starting production authentication implementation while closing the milestone.
       - Adding runtime player handlers or WebSocket routes.
       - Changing Protobuf envelope or WebSocket handshake behavior.
       - Adding new major dependencies or data migrations.
+
+  - id: W-0083
+    milestone: M-015
+    title: Refine authentication adapter implementation checks
+    status: completed
+    change: changes/2026-05-14-refine-authentication-adapter-implementation-checks
+    depends_on:
+      - W-0082
+    related_decisions:
+      - ADR-0035
+    completion:
+      - Update repository checks so authentication PostgreSQL adapter files may use ratified credential and token verifier persistence vocabulary only inside the declared PostgreSQL platform boundary.
+      - Preserve checks that forbid runtime authentication, token generation, token validation, verifier comparison, bearer parsing, WebSocket behavior, Protobuf behavior, generated authentication shapes, transaction ownership, and major authentication dependencies.
+      - Keep JSON check output machine-readable and path-normalized for agents across platforms.
+    completion_summary: Refined selected login/token boundary checks so declared authentication PostgreSQL adapter files can use ratified credential and token verifier persistence vocabulary inside the PostgreSQL platform package. Added adapter-only static checks that still forbid token generation, token validation, verifier comparison, bearer parsing, WebSocket behavior, Protobuf behavior, generated authentication shapes, transaction ownership, and major authentication dependencies. Runtime authentication and adapter implementation remain deferred.
+    ask_first:
+      - Weakening selected login/token boundary checks for runtime, protocol, transport, generated output, or domain-module code.
+      - Authorizing token generation, verifier comparison, login, token validation, logout execution, refresh, cleanup jobs, WebSocket routes, Protobuf messages, or authentication dependencies while refining checks.
+
+  - id: W-0084
+    milestone: M-015
+    title: Implement authentication PostgreSQL adapter
+    status: completed
+    change: changes/2026-05-14-implement-authentication-postgresql-adapter
+    depends_on:
+      - W-0083
+    related_decisions:
+      - ADR-0035
+    completion:
+      - Add runtime/internal/platform/persistence/postgres/authentication_repository.go implementing authentication.Repository with a caller-supplied executor.
+      - Add focused fake-executor tests at runtime/internal/platform/persistence/postgres/authentication_repository_test.go.
+      - Add UnitOfWork.NewAuthenticationRepository without exposing pgx to domain modules.
+      - Preserve runtime authentication, token generation, token validation, logout execution, refresh, cleanup jobs, protocol, WebSocket, generated output, and dependency deferrals.
+    completion_summary: Implemented the authentication PostgreSQL adapter under runtime/internal/platform/persistence/postgres with fake-executor tests for credential storage/lookup, token storage/lookup, credential and token revocation, cleanup eligibility, error mapping, UTC timestamp mapping, no transaction-control SQL, and default no-live-PostgreSQL behavior; added UnitOfWork.NewAuthenticationRepository without exposing pgx outside the PostgreSQL platform package; and kept runtime authentication, token generation, token validation, login, logout execution, refresh, cleanup jobs, protocol, WebSocket, generated authentication output, and authentication dependencies deferred.
+    ask_first:
+      - Implementing token generation, credential generation, verifier comparison, token validation, login, logout execution, refresh, or cleanup jobs.
+      - Changing the authentication.Repository interface while implementing the adapter.
+      - Changing migration schemas or transaction ownership.
+      - Making live PostgreSQL mandatory in default checks.
+
+  - id: W-0085
+    milestone: M-015
+    title: Close authentication PostgreSQL adapter implementation milestone
+    status: next_ready
+    change: changes/2026-05-14-close-authentication-postgresql-adapter-implementation-milestone
+    depends_on:
+      - W-0084
+    related_decisions:
+      - ADR-0035
+    completion:
+      - Review M-015 against adapter implementation, tests, manifests, standards, and repository checks.
+      - Mark M-015 completed only if runtime authentication, protocol, WebSocket, generated output, login, token generation, token validation, logout execution, refresh, cleanup jobs, and major dependencies remain deferred or are explicitly planned for a later milestone.
+      - Open the next bounded planning or implementation gate.
+    ask_first:
+      - Starting runtime authentication implementation while closing the adapter milestone.
+      - Adding Protobuf messages, WebSocket routes, WebSocket proof carriers, generated authentication shapes, token generation, token validation, or authentication dependencies.
