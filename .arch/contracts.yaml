@@ -133,6 +133,7 @@ runtime_contracts:
       - ADR-0026
       - ADR-0027
       - ADR-0028
+      - ADR-0029
     selected_posture:
       login_method: device_credential_login
       token_format: opaque_high_entropy_token
@@ -143,13 +144,29 @@ runtime_contracts:
       renewal_method: reauthenticate_with_device_credential_login
       logout_scope_first_posture: presented_access_token
       account_linking: deferred
+    schema_gates:
+      standard: docs/credential-token-session-schema-gates.md
+      decision: ADR-0029
+      credential_record_schema_gate_status: defined_no_schema_added
+      token_verifier_record_schema_gate_status: defined_no_schema_added
+      external_identity_link_schema_gate_status: deferred_no_schema_added
+      runtime_session_record_schema_gate_status: deferred_no_schema_added
+      audit_persistence_schema_gate_status: defined_no_schema_added
+      default_durable_target: PostgreSQL
     implementation_status:
       runtime_authentication_implemented: false
       token_behavior_implemented: false
       credential_storage_implemented: false
       token_storage_schema_added: false
       credential_storage_schema_added: false
+      external_identity_storage_schema_added: false
       session_persistence_implemented: false
+      session_storage_schema_added: false
+      audit_storage_schema_added: false
+      migration_sources_added: false
+      repository_interfaces_added: false
+      postgres_adapters_added: false
+      runtime_lookup_added: false
       websocket_handshake_authentication_changed: false
       runtime_player_handlers_added: false
       websocket_routes_added: false

@@ -1822,7 +1822,7 @@ work_items:
   - id: W-0071
     milestone: M-013
     title: Define credential token session schema gates
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-credential-token-session-schema-gates
     depends_on:
       - W-0070
@@ -1831,10 +1831,12 @@ work_items:
       - ADR-0022
       - ADR-0023
       - ADR-0024
+      - ADR-0029
     completion:
       - Define the future schema gates for credential records, external identity links, token records, and session records required by the selected posture.
       - Separate schema ratification, migration sources, repository interfaces, adapters, live verification, and runtime wiring into future bounded work.
       - Preserve player account lifecycle schema without adding credential, provider subject, token, session, or WebSocket state columns.
+    completion_summary: Defined schema gates for credential records, token verifier records, external identity links, runtime session records, audit persistence, and player account lifecycle preservation. Required future credential and token verifier schema ratification for the selected device credential and opaque access-token posture while deferring external identity storage, runtime session persistence, refresh-token storage, session-token vocabulary, WebSocket binding, migrations, repositories, adapters, runtime lookup, handlers, routes, Protobuf changes, and authentication implementation.
     ask_first:
       - Adding migration sources.
       - Changing existing player account lifecycle tables.
@@ -1844,7 +1846,7 @@ work_items:
   - id: W-0072
     milestone: M-013
     title: Add repository checks for selected login token boundaries
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-add-selected-login-token-boundary-checks
     depends_on:
       - W-0071

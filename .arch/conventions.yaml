@@ -117,6 +117,9 @@ documentation_pairs:
   authentication_contract_error_permission_surfaces_standard:
     canonical: docs/authentication-contract-error-permission-surfaces.md
     zh-CN: docs/authentication-contract-error-permission-surfaces.zh-CN.md
+  credential_token_session_schema_gates_standard:
+    canonical: docs/credential-token-session-schema-gates.md
+    zh-CN: docs/credential-token-session-schema-gates.zh-CN.md
   postgresql_verification_environment_standard:
     canonical: docs/postgresql-verification-environment.md
     zh-CN: docs/postgresql-verification-environment.zh-CN.md
@@ -164,6 +167,7 @@ templates:
     first_token_format_proof_carrier_posture: ADR-0026
     token_lifecycle_storage_implications: ADR-0027
     authentication_contract_error_permission_surfaces: ADR-0028
+    credential_token_session_schema_gates: ADR-0029
 
 protocol_framework:
   manifest: .arch/protocol.yaml
@@ -404,15 +408,18 @@ login_method_token_format_ratification:
   token_lifecycle_storage_implications_translation: docs/token-lifecycle-storage-implications.zh-CN.md
   authentication_contract_error_permission_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
   authentication_contract_error_permission_surfaces_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
+  credential_token_session_schema_gates_standard: docs/credential-token-session-schema-gates.md
+  credential_token_session_schema_gates_translation: docs/credential-token-session-schema-gates.zh-CN.md
   decision: ADR-0024
   first_login_method_set_decision: ADR-0025
   first_token_format_proof_carrier_posture_decision: ADR-0026
   token_lifecycle_storage_implications_decision: ADR-0027
   authentication_contract_error_permission_surfaces_decision: ADR-0028
-  status: authentication_contract_error_permission_surfaces_defined_implementation_deferred
+  credential_token_session_schema_gates_decision: ADR-0029
+  status: credential_token_session_schema_gates_defined_implementation_deferred
   milestone: M-013
-  latest_completed_work_item: W-0070
-  next_work_item: W-0071
+  latest_completed_work_item: W-0071
+  next_work_item: W-0072
   change: changes/2026-05-14-define-login-method-token-format-ratification-standard
   first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
   first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
@@ -420,6 +427,7 @@ login_method_token_format_ratification:
   first_token_format_proof_carrier_posture_change: changes/2026-05-14-ratify-first-token-format-and-proof-carrier-posture
   token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
   authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
+  credential_token_session_schema_gates_change: changes/2026-05-14-define-credential-token-session-schema-gates
   conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
   first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
   first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
@@ -427,6 +435,7 @@ login_method_token_format_ratification:
   first_token_format_proof_carrier_posture_conversation: conversations/2026-05-14-first-token-format-proof-carrier-ratification.md
   token_lifecycle_storage_implications_conversation: conversations/2026-05-14-token-lifecycle-storage-implications.md
   authentication_contract_error_permission_surfaces_conversation: conversations/2026-05-14-authentication-contract-error-permission-surfaces.md
+  credential_token_session_schema_gates_conversation: conversations/2026-05-14-credential-token-session-schema-gates.md
   rule: >
     First login methods, token model, proof carrier posture, token lifecycle,
     storage implications, and implementation gates must be ratified before
@@ -566,6 +575,30 @@ login_method_token_format_ratification:
     refresh_token: not_in_first_implementation
     generated_contract_shapes_added: false
     implementation_authorized: false
+  credential_token_session_schema_gates:
+    status: defined
+    standard: docs/credential-token-session-schema-gates.md
+    required_for_first_posture:
+      credential_record_schema_gate: true
+      token_verifier_record_schema_gate: true
+      external_identity_link_schema_gate: false
+      runtime_session_record_schema_gate: false
+    default_durable_target: PostgreSQL
+    credential_record_schema_gate_status: defined_no_schema_added
+    token_verifier_record_schema_gate_status: defined_no_schema_added
+    external_identity_link_schema_gate_status: deferred_no_schema_added
+    runtime_session_record_schema_gate_status: deferred_no_schema_added
+    audit_persistence_schema_gate_status: defined_no_schema_added
+    credential_tables_added: false
+    token_tables_added: false
+    external_identity_tables_added: false
+    session_tables_added: false
+    audit_tables_added: false
+    migration_sources_added: false
+    repository_interfaces_added: false
+    postgres_adapters_added: false
+    runtime_lookup_added: false
+    implementation_authorized: false
   implementation_status:
     login_methods_selected: true
     first_login_method_recommended: true
@@ -582,9 +615,12 @@ login_method_token_format_ratification:
     authentication_error_surface_defined: true
     authentication_permission_surface_defined: true
     authentication_audit_event_surface_defined: true
+    credential_token_session_schema_gates_defined: true
     token_storage_schema_added: false
     credential_storage_schema_added: false
+    external_identity_storage_schema_added: false
     session_storage_schema_added: false
+    audit_storage_schema_added: false
     credential_storage_implemented: false
     external_identity_linking_implemented: false
     session_persistence_implemented: false

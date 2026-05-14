@@ -1,10 +1,10 @@
 schema_version: 0.1
-change_id: define-authentication-contract-error-permission-surfaces
+change_id: define-credential-token-session-schema-gates
 date: 2026-05-14
-type: contract
+type: standard
 status: verified
 
-summary: Define semantic authentication command, event, error, and permission surfaces for the selected first login/token posture while deferring implementation.
+summary: Define future schema gates for credential records, token verifier records, external identity links, runtime session records, and audit persistence while deferring schema and implementation.
 
 affected_modules:
   - runtime
@@ -12,11 +12,7 @@ affected_modules:
 
 contracts:
   commands:
-    added:
-      - AuthenticateWithDeviceCredential
-      - ValidateAccessToken
-      - LogoutAccessToken
-      - RefreshAccessToken
+    added: []
     changed: []
     removed: []
   queries:
@@ -24,30 +20,22 @@ contracts:
     changed: []
     removed: []
   events:
-    added:
-      - AuthenticationSucceeded
-      - AuthenticationFailed
-      - TokenIssued
-      - TokenValidationFailed
-      - TokenRevoked
-      - LogoutRequested
+    added: []
     changed: []
     removed: []
   errors:
-    added:
-      - authentication_errors
+    added: []
     changed: []
     removed: []
   permissions:
-    added:
-      - authentication_permissions
+    added: []
     changed: []
     removed: []
 
 data:
   migrations_required: false
   ownership_changes:
-    - Runtime authentication semantic surfaces are owned by runtime/internal/app.
+    - Future credential and token verifier schema gates are defined, but no schema ownership is implemented.
 
 compatibility:
   breaking_api: false
@@ -59,14 +47,12 @@ compatibility:
 verification:
   required:
     - node tools/vibit inspect next --json
-    - node tools/vibit check contracts --json
-    - node tools/vibit inspect contracts --module runtime --json
     - node tools/vibit check runtime --json
     - node tools/vibit check architecture --json
     - node tools/vibit check agent-tooling --json
     - node tools/vibit check memory --json
     - node tools/vibit check work --json
-    - node tools/vibit check change define-authentication-contract-error-permission-surfaces --json
+    - node tools/vibit check change define-credential-token-session-schema-gates --json
     - node tools/vibit check all --json
     - git diff --check
   status: Verified

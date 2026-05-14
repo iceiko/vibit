@@ -166,8 +166,12 @@ phase_plan:
     authentication_contract_error_permission_surfaces_standard_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
     authentication_contract_error_permission_surfaces_decision: ADR-0028
     authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
-    latest_login_token_ratification_work_item: W-0070
-    next_login_token_ratification_work_item: W-0071
+    credential_token_session_schema_gates_standard: docs/credential-token-session-schema-gates.md
+    credential_token_session_schema_gates_standard_translation: docs/credential-token-session-schema-gates.zh-CN.md
+    credential_token_session_schema_gates_decision: ADR-0029
+    credential_token_session_schema_gates_change: changes/2026-05-14-define-credential-token-session-schema-gates
+    latest_login_token_ratification_work_item: W-0071
+    next_login_token_ratification_work_item: W-0072
     ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
@@ -203,6 +207,12 @@ phase_plan:
       - ValidateAccessToken
       - LogoutAccessToken
       - RefreshAccessToken
+    credential_token_session_schema_gates_status: defined_implementation_deferred
+    credential_record_schema_gate_status: defined_no_schema_added
+    token_verifier_record_schema_gate_status: defined_no_schema_added
+    external_identity_link_schema_gate_status: deferred_no_schema_added
+    runtime_session_record_schema_gate_status: deferred_no_schema_added
+    audit_persistence_schema_gate_status: defined_no_schema_added
     session_token_vocabulary_status: deferred_until_session_persistence
     token_format_carrier_rejections:
       - plain_session_id_as_secret
@@ -260,6 +270,7 @@ phase_plan:
         external_identity_linking: separated_and_deferred
         session_token_concept: deferred
         opaque_token_concept: adapted_first_ratified_access_token
+        token_verifier_schema_gate: adapted_without_copying_storage_shape
         refresh_token_concept: deferred
         realtime_socket_bound_to_authenticated_session: adapted
         validation_model_selection: deferred
@@ -270,6 +281,7 @@ phase_plan:
         session_object_separate_from_acceptor: adopted
         handler_receives_session_context: adapted
         session_binding_vocabulary: adopted_as_vocabulary
+        runtime_session_schema_gate: deferred
         validation_model_selection: deferred
         explicit_request_proof_payload: adapted_first_ratified_request_carrier
         websocket_handshake_authentication: deferred
