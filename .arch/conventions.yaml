@@ -819,17 +819,27 @@ authentication_generated_contract_shape_gate:
   status: active
   milestone: M-017
   first_work_item: W-0088
-  next_work_item: W-0088
+  latest_completed_work_item: W-0088
+  next_work_item: W-0089
   selected_by_closeout_decision: ADR-0037
+  timing_decision: ADR-0038
+  timing_standard: docs/authentication-generated-contract-shape-timing.md
+  timing_translation: docs/authentication-generated-contract-shape-timing.zh-CN.md
   previous_milestone: M-016
   previous_closeout_work_item: W-0087
   previous_closeout_change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
-  allowed_scope: generated_shape_timing_decision_only
+  allowed_scope: generated_shape_generator_support_and_metadata_output_next
   generated_output_standard: docs/generated-output.md
   generated_output_decision: ADR-0017
   authentication_contract_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
   runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
   runtime_authentication_implementation_boundary_decision: ADR-0036
+  timing_decision_status: accepted
+  recommended_timing: before_application_service_interfaces_and_runtime_authentication_behavior
+  source_family: contracts/runtime/authentication
+  planned_output_root: runtime/internal/generated/contracts/runtime/authentication
+  planned_file_shape: runtime/internal/generated/contracts/runtime/authentication/<contract-type>/<ContractID>.go
+  planned_package_name: runtimeauthenticationcontracts
   generated_authentication_shapes_added: false
   runtime_authentication_implemented: false
   token_generation_added: false
@@ -845,13 +855,13 @@ authentication_generated_contract_shape_gate:
   migration_schemas_changed: false
   work_queue:
     - W-0088 decide_authentication_generated_contract_shape_timing
+    - W-0089 add_runtime_authentication_contract_shape_generator_support_and_output
   rule: >
-    This milestone may decide generated authentication contract shape timing
-    and boundaries only. It must not generate authentication shapes, implement
-    runtime authentication behavior, add Protobuf messages, add WebSocket
-    carriers, add authentication dependencies, change authentication.Repository,
-    or change migration schemas unless a later gated work item explicitly
-    authorizes that exact slice.
+    The timing decision is accepted. The next slice may add generator/check
+    support and metadata-only generated authentication shapes under the
+    ADR-0038 path, but it must not implement runtime authentication behavior,
+    add Protobuf messages, add WebSocket carriers, add authentication
+    dependencies, change authentication.Repository, or change migration schemas.
 
 server_runtime:
   first_reference_language: Go

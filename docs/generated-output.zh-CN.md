@@ -1,7 +1,7 @@
 # Generated Output Standard 中文版
 
 状态：Draft v0.1
-最后更新：2026-05-13
+最后更新：2026-05-14
 范围：`runtime/internal/generated/` 下的 generated files
 说明：本文件是 `docs/generated-output.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
@@ -103,11 +103,25 @@ Output root：
 runtime/internal/generated/contracts/
 ```
 
-`runtime/internal/generated/contracts/` 下允许的文件形态：
+`runtime/internal/generated/contracts/` 下非 runtime modules 允许的文件形态：
 
 ```text
 <module>/<contract-type>/<ContractID>.go
 ```
+
+Runtime contract families 需要 family-aware path：
+
+```text
+runtime/<family>/<contract-type>/<ContractID>.go
+```
+
+第一条计划中的 runtime family-aware path 是：
+
+```text
+runtime/authentication/<contract-type>/<ContractID>.go
+```
+
+Authentication family 的 timing 与 boundary 定义在 `docs/authentication-generated-contract-shape-timing.md` 和 `ADR-0038` 中。Runtime authentication shape files 仍然 deferred，直到后续 work item 明确更新 generator/check support 并生成这些文件。
 
 Generated contract shape files 是可检查的 summary。它们不实现 command handlers、query handlers、event publication、persistence、authentication、WebSocket routing 或 Protobuf envelope behavior。
 
@@ -119,6 +133,8 @@ Source: <contract source path>
 Generator: tools/vibit generate contract-shapes
 Contract: <module>:<type>:<id>
 ```
+
+Runtime family-aware generated contract shapes 还必须暴露 runtime family，可以放在 contract trace 中，也可以放在独立 generated field 中。第一批 authentication family 的 family value 是 `authentication`。
 
 ## 6. Trace Requirements
 
@@ -180,6 +196,8 @@ node tools/vibit check all
 `check generated` 会验证 module-declared generated files 和 Go Protobuf output root。对于 `runtime/internal/generated/proto/`，它允许空的 planned directory，允许 `.gitkeep`，要求 generated Protobuf Go files 使用 `*.pb.go` 后缀，要求 `protoc-gen-go` generated-code marker，并要求 source trace 能解析到 `proto/` 下的现有文件。
 
 对于 `runtime/internal/generated/contracts/`，`check generated` 会验证每个已注册的非 runtime semantic contract 都有 generated Go contract shape，验证 shape 声明 source 和 generator traces，并验证已提交文件与当前 generator output 一致。
+
+Runtime family-aware contract shapes 必须先有 generator 和 check support，之后才能提交。第一条计划中的 family 是 `runtime/authentication`，所需 checks 定义在 `docs/authentication-generated-contract-shape-timing.md`。
 
 未来 verification 应增加：
 

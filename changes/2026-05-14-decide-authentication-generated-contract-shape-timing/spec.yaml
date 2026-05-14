@@ -1,0 +1,118 @@
+schema_version: 0.1
+change_id: decide-authentication-generated-contract-shape-timing
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Decide that generated Go authentication contract shapes should be introduced before application service interfaces and runtime authentication behavior, without generating files yet.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0038
+  referenced:
+    - ADR-0017
+    - ADR-0028
+    - ADR-0036
+    - ADR-0037
+
+standards:
+  added:
+    - docs/authentication-generated-contract-shape-timing.md
+    - docs/authentication-generated-contract-shape-timing.zh-CN.md
+  changed:
+    - docs/generated-output.md
+    - docs/generated-output.zh-CN.md
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generator_code_changed: false
+  generated_code_added: false
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  generated_authentication_shapes_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+generated_output:
+  authentication_generated_contract_shape_timing_decided: true
+  recommended_before_application_service_interfaces: true
+  source_family: contracts/runtime/authentication
+  planned_output_root: runtime/internal/generated/contracts/runtime/authentication
+  planned_file_shape: runtime/internal/generated/contracts/runtime/authentication/<contract-type>/<ContractID>.go
+  generated_files_added: false
+
+workflow:
+  completed_work_item: W-0088
+  next_ready_work_item: W-0089
+  next_direction: add_runtime_authentication_contract_shape_generator_support_and_output
+  implementation_authorized: timing_decision_only
+
+verification:
+  required:
+    - node tools/vibit check contracts --json
+    - node tools/vibit inspect generated --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change decide-authentication-generated-contract-shape-timing --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -51,7 +51,7 @@ The implemented PostgreSQL adapter boundary is `runtime/internal/platform/persis
 
 Runtime authentication implementation boundary planning is documented in `docs/runtime-authentication-implementation-boundary.md` and `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`. Future runtime authentication must be application-owned under `runtime/internal/app`, must use this module's `authentication.Repository` through the application unit-of-work boundary, and must convert validated proof into `RequestIdentity` before domain dispatch. This module must not absorb token generation, verifier comparison, login execution, access-token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, or authentication dependencies.
 
-The active authentication-adjacent milestone is `M-017 Authentication Generated Contract Shape Gate`. `W-0088` may decide whether generated Go authentication contract shapes should be introduced before application service interfaces. It must not generate authentication shapes or implement runtime authentication behavior unless a later work item explicitly authorizes that exact slice.
+The active authentication-adjacent milestone is `M-017 Authentication Generated Contract Shape Gate`. `W-0088` decided that generated Go authentication contract shapes should be introduced before application service interfaces and runtime authentication behavior. `W-0089` may add generator/check support and metadata-only generated authentication shape files under `runtime/internal/generated/contracts/runtime/authentication/`. It must not implement runtime authentication behavior unless a later work item explicitly authorizes that exact slice.
 
 ## Forbidden Shortcuts
 

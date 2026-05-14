@@ -2283,7 +2283,7 @@ work_items:
   - id: W-0088
     milestone: M-017
     title: Decide authentication generated contract shape timing
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-decide-authentication-generated-contract-shape-timing
     depends_on:
       - W-0087
@@ -2292,10 +2292,33 @@ work_items:
       - ADR-0028
       - ADR-0036
       - ADR-0037
+      - ADR-0038
     completion:
       - Decide whether generated Go authentication contract shapes should be introduced before application service interfaces and runtime authentication behavior.
       - Define the allowed generated shape source, output path, immutable status, check requirements, and relationship to semantic authentication contracts if generation is recommended.
       - Preserve deferral for actual generated authentication shape files unless a later work item explicitly authorizes generation.
+    completion_summary: Decided that generated Go authentication contract shapes should be introduced after the runtime authentication implementation boundary and before application authentication service interfaces or runtime authentication behavior. Recorded the source family `contracts/runtime/authentication`, planned family-aware output root `runtime/internal/generated/contracts/runtime/authentication`, immutability rules, check requirements, Nakama/Pitaya reference alignment, and next gated generation path in ADR-0038 and the paired timing standard. No generated authentication shape files, runtime authentication behavior, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, or migration schema changes were added.
     ask_first:
       - Generating authentication contract shape files rather than deciding timing and boundary.
       - Adding application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes.
+
+  - id: W-0089
+    milestone: M-017
+    title: Add runtime authentication contract shape generator support and output
+    status: next_ready
+    change: changes/2026-05-14-add-runtime-authentication-contract-shape-generator-support-and-output
+    depends_on:
+      - W-0088
+    related_decisions:
+      - ADR-0017
+      - ADR-0028
+      - ADR-0036
+      - ADR-0038
+    completion:
+      - Extend generated contract shape generation, inspection, and generated-output checks for the runtime authentication family-aware output path defined by ADR-0038.
+      - Generate metadata-only Go authentication contract shape files from `contracts/runtime/authentication/**` under `runtime/internal/generated/contracts/runtime/authentication/`.
+      - Update runtime authentication boundary checks so only source-traced metadata-only generated authentication shapes are allowed while runtime behavior remains deferred.
+      - Verify that no application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes are added.
+    ask_first:
+      - Changing the ADR-0038 source family or planned output root.
+      - Adding application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.

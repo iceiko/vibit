@@ -416,21 +416,25 @@ phase_plan:
   phase_2f_authentication_generated_contract_shape_gate:
     status: active
     active_milestone: M-017
-    decision: ADR-0037
-    next_work_item: W-0088
+    opening_decision: ADR-0037
+    timing_decision: ADR-0038
+    timing_standard: docs/authentication-generated-contract-shape-timing.md
+    latest_completed_work_item: W-0088
+    next_work_item: W-0089
     focus:
       - generated_authentication_contract_shape_timing
       - semantic_authentication_contract_trace
       - generated_output_standard_alignment
       - immutable_generated_output_boundary
-      - pre_runtime_authentication_shape_decision
+      - runtime_family_aware_generated_output_path
+      - metadata_only_generated_authentication_shape_output
     nakama_reference:
       - account_authentication_request_response_shape_capability
       - session_token_response_shape_vocabulary
     pitaya_reference:
       - route_payload_shape_vocabulary
       - handler_context_separation
-    rule: Decide generated authentication contract shape timing before runtime behavior; do not generate shapes, implement authentication behavior, add protocol messages, add WebSocket carriers, or add dependencies in the timing decision step.
+    rule: Generated authentication contract shapes should be introduced before application service interfaces and runtime behavior. The next slice may add generator/check support and metadata-only generated shapes; protocol messages, WebSocket carriers, dependencies, and runtime authentication behavior remain separate gates.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
