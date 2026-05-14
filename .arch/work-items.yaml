@@ -1703,7 +1703,7 @@ work_items:
   - id: W-0066
     milestone: M-013
     title: Ratify first login method set
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-ratify-first-login-method-set
     depends_on:
       - W-0065
@@ -1711,11 +1711,13 @@ work_items:
       - ADR-0019
       - ADR-0023
       - ADR-0024
+      - ADR-0025
     completion:
       - Ratify the first login-method set with public rationale, rejected alternatives, decision weights, confidence, known gaps, and implementation gates.
       - State whether each selected method is production-capable, bootstrap-only, or local-development-only.
       - State whether each selected method creates player accounts, links existing accounts, or authenticates existing accounts only.
       - Preserve implementation deferral until contracts, schemas, dependencies, tests, checks, and runtime ownership are planned.
+    completion_summary: Ratified `device_credential_login` as the only first login-method set, defined it as proof of possession of a high-entropy installation credential rather than a raw device ID or metadata-only value, recorded rejected alternatives, decision weights, known gaps, account creation/authentication posture, and implementation gates, and added ADR-0025 plus bilingual documentation. No authentication implementation, credential storage, dependency, Protobuf/WebSocket behavior change, runtime player handler, or WebSocket route was added.
     ask_first:
       - Selecting a login method that requires a major dependency before a dependency adoption record exists.
       - Treating metadata-only identity as production proof.
@@ -1725,7 +1727,7 @@ work_items:
   - id: W-0067
     milestone: M-013
     title: Compare token format and carrier options
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-compare-token-format-and-carrier-options
     depends_on:
       - W-0066

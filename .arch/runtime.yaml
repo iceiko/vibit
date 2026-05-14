@@ -751,22 +751,27 @@ identity_session_boundary:
     rule: Agents must not choose one of these directions implicitly when the maintainer says continue.
   login_method_token_format_ratification:
     selected_by_maintainer: login_method_and_token_format_ratification
-    status: first_login_method_candidates_compared_implementation_deferred
+    status: first_login_method_set_ratified_implementation_deferred
     milestone: M-013
     first_work_item: W-0064
-    latest_completed_work_item: W-0065
-    next_work_item: W-0066
+    latest_completed_work_item: W-0066
+    next_work_item: W-0067
     selected_at: 2026-05-14
     direction_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
     standard: docs/login-method-token-format-ratification.md
     translation: docs/login-method-token-format-ratification.zh-CN.md
     first_login_method_candidates_standard: docs/first-login-method-candidates.md
     first_login_method_candidates_translation: docs/first-login-method-candidates.zh-CN.md
+    first_login_method_set_standard: docs/first-login-method-set.md
+    first_login_method_set_translation: docs/first-login-method-set.zh-CN.md
     decision: ADR-0024
+    first_login_method_set_decision: ADR-0025
     change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
+    first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
     conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
     first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
+    first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
     reference_alignment:
       nakama:
         account_authentication_methods: capability_reference
@@ -792,9 +797,29 @@ identity_session_boundary:
       nakama_mapping: device_style_low_friction_login_adapted_without_public_api_compatibility
       pitaya_mapping: session_binding_vocabulary_adapted_without_transport_authentication
       implementation_authorized: false
+    first_login_method_set:
+      status: ratified
+      selected:
+        - device_credential_login
+      production_classification: production_capable_after_required_gates
+      credential_posture: high_entropy_installation_secret_not_raw_device_id
+      creates_player_account: allowed_after_account_creation_policy
+      authenticates_existing_account: allowed_after_credential_lookup_policy
+      links_existing_account: deferred
+      recovers_account: deferred
+      upgrades_anonymous_account: deferred
+      rejected:
+        - guest_anonymous_login
+        - custom_id_login
+        - email_password_login
+        - external_provider_login
+        - service_authentication
+        - metadata_only_player_id_or_session_id
+      implementation_authorized: false
     implementation_status:
-      login_methods_selected: false
+      login_methods_selected: true
       first_login_method_recommended: true
+      first_login_method_set_ratified: true
       token_format_selected: false
       token_carrier_selected: false
       credential_storage_implemented: false
@@ -818,9 +843,9 @@ identity_session_boundary:
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-013
-    latest_completed_work_item: W-0065
-    next_ready_work_item: W-0066
-    status: ratify_first_login_method_set_next
+    latest_completed_work_item: W-0066
+    next_ready_work_item: W-0067
+    status: compare_token_format_and_carrier_options_next
 
 persistence_model:
   decision: ADR-0011

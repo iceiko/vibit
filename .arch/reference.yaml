@@ -147,9 +147,13 @@ phase_plan:
     first_login_method_candidates_standard: docs/first-login-method-candidates.md
     first_login_method_candidates_standard_translation: docs/first-login-method-candidates.zh-CN.md
     first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
-    latest_login_token_ratification_work_item: W-0065
-    next_login_token_ratification_work_item: W-0066
-    recommended_first_login_method_set:
+    first_login_method_set_standard: docs/first-login-method-set.md
+    first_login_method_set_standard_translation: docs/first-login-method-set.zh-CN.md
+    first_login_method_set_decision: ADR-0025
+    first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
+    latest_login_token_ratification_work_item: W-0066
+    next_login_token_ratification_work_item: W-0067
+    ratified_first_login_method_set:
       - device_credential_login
     deferred_login_method_families:
       - guest_anonymous_login
@@ -158,7 +162,9 @@ phase_plan:
       - external_provider_login
       - service_authentication
     recommended_first_carrier_posture: login_command_payload_before_normal_gameplay_routes
-    first_login_method_candidate_status: recommended_not_ratified
+    first_login_method_candidate_status: completed
+    first_login_method_set_status: ratified_implementation_deferred
+    first_login_method_credential_posture: high_entropy_installation_secret_not_raw_device_id
     selected_authentication_direction: ratify_authentication_and_token_session_validation_design
     authentication_direction_change: changes/2026-05-14-confirm-next-direction-after-player-account-postgresql-persistence
     authentication_design_standard: docs/authentication-token-session-validation.md
@@ -205,8 +211,8 @@ phase_plan:
       nakama:
         account_user_as_first_class_capability: adopted
         multiple_authentication_methods: deferred
-        login_method_families: deferred_capability_coverage
-        device_credential_login: adapted_first_recommendation
+        login_method_families: first_set_selected_with_other_families_deferred
+        device_credential_login: adapted_first_ratified_method
         direct_device_auth_compatibility: rejected_for_now
         credential_storage: separated_and_deferred
         external_identity_linking: separated_and_deferred
