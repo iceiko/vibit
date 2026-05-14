@@ -1846,17 +1846,19 @@ work_items:
   - id: W-0072
     milestone: M-013
     title: Add repository checks for selected login token boundaries
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-add-selected-login-token-boundary-checks
     depends_on:
       - W-0071
     related_decisions:
       - ADR-0023
       - ADR-0024
+      - ADR-0030
     completion:
       - Add or update repository checks that enforce selected login/token boundaries and prevent shortcut implementations where statically checkable.
       - Keep checks machine-readable and narrow enough for agents to act on.
       - Preserve existing runtime, generated, migration, protocol, and identity checks without requiring live external services by default.
+    completion_summary: Added the runtime.selected_login_token_boundary repository check and rule catalog entry. The check verifies selected device credential login and opaque access-token posture markers, semantic-contract-only blocked-until markers, refresh-token deferral, generated authentication contract shape deferral, authentication Protobuf source deferral, WebSocket proof carrier deferral, credential/token/session/external-identity/audit migration deferral, player account lifecycle storage separation, forbidden authentication dependency additions, and stable machine-readable rule metadata without adding runtime authentication, token behavior, credential storage, token storage, session persistence, external identity linking, generated output, Protobuf messages, WebSocket routes, WebSocket handshake authentication, repositories, adapters, or live external-service requirements.
     ask_first:
       - Weakening existing architecture checks.
       - Making live PostgreSQL or external provider services mandatory for default checks.
@@ -1866,7 +1868,7 @@ work_items:
   - id: W-0073
     milestone: M-013
     title: Close login method token format ratification milestone
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
     depends_on:
       - W-0072

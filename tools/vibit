@@ -63,6 +63,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.import_boundary",
   "runtime.identity_boundary",
   "runtime.authentication_token_session_boundary",
+  "runtime.selected_login_token_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -5944,6 +5945,319 @@ function checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles) {
   checkNoForbiddenPatterns(playerPersistenceGoFiles, playerPersistenceForbiddenPatterns, "player account lifecycle repositories", { stripComments: true });
 }
 
+function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
+  const ruleId = "runtime.selected_login_token_boundary";
+  const standardPath = "docs/selected-login-token-boundary-checks.md";
+  const standardTranslationPath = "docs/selected-login-token-boundary-checks.zh-CN.md";
+  const decisionPath = "decisions/ADR-0030-selected-login-token-boundary-checks.md";
+
+  function checkNoForbiddenPatterns(files, patterns, context, options = {}) {
+    for (const file of files) {
+      if (!isFile(root, file)) {
+        continue;
+      }
+      const rawText = readText(path.join(root, file));
+      const text = options.stripComments ? sourceWithoutGoComments(rawText) : rawText;
+      const matches = textMatchesAny(text, patterns);
+      if (matches.length === 0) {
+        ok(`${file} preserves selected login/token boundary for ${context}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+        continue;
+      }
+      for (const match of matches) {
+        fail(`${file} crosses selected login/token boundary: ${context} includes ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for selected login/token boundary checks`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for selected login/token boundary checks`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "selected_login_token_boundary_checks_standard: docs/selected-login-token-boundary-checks.md"],
+    [".arch/conventions.yaml", "selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary"],
+    [".arch/conventions.yaml", "selected_login_token_boundary_checks_added: true"],
+    [".arch/runtime.yaml", "selected_login_token_boundary_checks_standard: docs/selected-login-token-boundary-checks.md"],
+    [".arch/runtime.yaml", "selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary"],
+    [".arch/runtime.yaml", "selected_login_token_boundary_checks_added: true"],
+    [".arch/reference.yaml", "selected_login_token_boundary_checks_standard: docs/selected-login-token-boundary-checks.md"],
+    [".arch/reference.yaml", "selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary"],
+    [".arch/contracts.yaml", "selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary"],
+    ["AGENTS.md", "docs/selected-login-token-boundary-checks.md"],
+    ["AGENTS.md", "runtime.selected_login_token_boundary"],
+    ["AGENTS.zh-CN.md", "docs/selected-login-token-boundary-checks.md"],
+    ["AGENTS.zh-CN.md", "runtime.selected_login_token_boundary"],
+    ["runtime/AGENTS.md", "../docs/selected-login-token-boundary-checks.md"],
+    ["runtime/AGENTS.md", "runtime.selected_login_token_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/selected-login-token-boundary-checks.md"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.selected_login_token_boundary"],
+    ["rules/check-rules.json", "runtime.selected_login_token_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "login_method: device_credential_login"],
+    [standardPath, "access_token_format: opaque_high_entropy_token"],
+    [standardPath, "request_proof_carrier: explicit_request_proof_payload"],
+    [standardPath, "refresh_token: not_in_first_implementation"],
+    [standardPath, "Generated Go contract shapes remain deferred"],
+    [standardPath, "runtime.selected_login_token_boundary"],
+    [standardTranslationPath, "login_method: device_credential_login"],
+    [standardTranslationPath, "access_token_format: opaque_high_entropy_token"],
+    [standardTranslationPath, "request_proof_carrier: explicit_request_proof_payload"],
+    [standardTranslationPath, "refresh_token: not_in_first_implementation"],
+    [standardTranslationPath, "Generated Go contract shapes 仍然 deferred"],
+    [standardTranslationPath, "runtime.selected_login_token_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredContractMarkers = [
+    ["contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml", "runtime_status: semantic_contract_only"],
+    ["contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml", "blocked_until:"],
+    ["contracts/runtime/authentication/commands/AuthenticateWithDeviceCredential.yaml", "credential_schema_gate_defined"],
+    ["contracts/runtime/authentication/commands/ValidateAccessToken.yaml", "access_token_must_be_explicit_request_proof_payload"],
+    ["contracts/runtime/authentication/commands/ValidateAccessToken.yaml", "runtime_status: semantic_contract_only"],
+    ["contracts/runtime/authentication/commands/LogoutAccessToken.yaml", "logout_scope_first_posture_is_presented_access_token"],
+    ["contracts/runtime/authentication/commands/LogoutAccessToken.yaml", "runtime_status: semantic_contract_only"],
+    ["contracts/runtime/authentication/commands/RefreshAccessToken.yaml", "refresh_token_not_in_first_implementation"],
+    ["contracts/runtime/authentication/commands/RefreshAccessToken.yaml", "runtime_status: semantic_contract_only_deferred"],
+    ["contracts/runtime/authentication/errors/authentication_errors.yaml", "AUTHENTICATION_REFRESH_NOT_SUPPORTED"],
+    ["contracts/runtime/authentication/permissions/authentication_permissions.yaml", "authentication_access_token_validate"],
+  ];
+  for (const [relativePath, requiredText] of requiredContractMarkers) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/contracts.yaml": [
+      "login_method: device_credential_login",
+      "token_format: opaque_high_entropy_token",
+      "token_issuance_carrier: login_command_response_token",
+      "request_proof_carrier: explicit_request_proof_payload",
+      "refresh_token: not_in_first_implementation",
+      "renewal_method: reauthenticate_with_device_credential_login",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "token_storage_schema_added: false",
+      "credential_storage_schema_added: false",
+      "external_identity_storage_schema_added: false",
+      "session_storage_schema_added: false",
+      "migration_sources_added: false",
+      "repository_interfaces_added: false",
+      "postgres_adapters_added: false",
+      "runtime_lookup_added: false",
+      "websocket_handshake_authentication_changed: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+      "protobuf_envelope_changed: false",
+      "generated_contract_shapes_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "first_login_method_set_ratified: true",
+      "first_token_format_ratified: true",
+      "first_token_carrier_ratified: true",
+      "credential_token_session_schema_gates_defined: true",
+      "credential_storage_schema_added: false",
+      "token_storage_schema_added: false",
+      "external_identity_storage_schema_added: false",
+      "session_storage_schema_added: false",
+      "audit_storage_schema_added: false",
+      "runtime_authentication_implemented: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+    ],
+    ".arch/runtime.yaml": [
+      "first_login_method_set_ratified: true",
+      "first_token_format_ratified: true",
+      "first_token_carrier_ratified: true",
+      "credential_token_session_schema_gates_defined: true",
+      "credential_storage_schema_added: false",
+      "token_storage_schema_added: false",
+      "external_identity_storage_schema_added: false",
+      "session_storage_schema_added: false",
+      "audit_storage_schema_added: false",
+      "runtime_authentication_implemented: false",
+      "runtime_player_handlers_added: false",
+      "websocket_routes_added: false",
+    ],
+    "modules/player/module.yaml": [
+      "runtime_player_handlers_added: false",
+      "authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "credential_storage_implemented: false",
+      "external_identity_linking_implemented: false",
+      "credential_tables_added: false",
+      "external_identity_tables_added: false",
+      "session_persistence_implemented: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing selected login/token status markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves selected login/token status marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing selected login/token status marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenDependencyMarkers = [
+    { marker: "github.com/golang-jwt/", label: "JWT dependency" },
+    { marker: "github.com/lestrrat-go/jwx", label: "JWT/JWK dependency" },
+    { marker: "github.com/coreos/go-oidc", label: "OIDC dependency" },
+    { marker: "golang.org/x/oauth2", label: "OAuth dependency" },
+    { marker: "golang.org/x/crypto/bcrypt", label: "password hashing dependency" },
+    { marker: "golang.org/x/crypto/argon2", label: "password hashing dependency" },
+    { marker: "github.com/redis/go-redis", label: "Redis-like token/session store dependency" },
+    { marker: "github.com/redis/rueidis", label: "Redis-like token/session store dependency" },
+  ];
+  for (const file of ["runtime/go.mod", "runtime/go.sum"]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of forbiddenDependencyMarkers) {
+      if (text.includes(marker.marker)) {
+        fail(`${file} declares ${marker.label} before selected login/token implementation gates authorize it`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        ok(`${file} avoids ${marker.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const generatedContractFiles = discoverFilesUnder(root, "runtime/internal/generated/contracts/runtime/authentication")
+    .filter((file) => file.endsWith(".go"));
+  if (generatedContractFiles.length === 0) {
+    ok("runtime authentication generated contract shapes remain deferred", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated/contracts/runtime/authentication",
+    });
+  } else {
+    for (const file of generatedContractFiles) {
+      fail(`${file} adds runtime authentication generated contract shapes before selected boundary checks authorize generation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const protoAuthFiles = discoverFilesUnder(root, "proto/vibit/runtime")
+    .filter((file) => file.endsWith(".proto"));
+  if (protoAuthFiles.length === 0) {
+    ok("runtime authentication Protobuf source remains deferred", {
+      rule_id: ruleId,
+      artifact: "proto/vibit/runtime",
+    });
+  } else {
+    for (const file of protoAuthFiles) {
+      fail(`${file} adds runtime authentication Protobuf source before protocol impact is ratified`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const authRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/modules/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"));
+  const selectedRuntimeForbiddenPatterns = [
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
+    { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
+    { pattern: /\bLogoutAccessToken\b/, label: "selected logout implementation" },
+    { pattern: /\bRefreshAccessToken\b/, label: "refresh-token implementation" },
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier|TokenRepository|CredentialRepository)\b/, label: "authentication service or repository implementation" },
+    { pattern: /\bcrypto\/rand\b/, label: "token or credential random generation" },
+    { pattern: /\bBearer\b/, label: "bearer token handling" },
+    { pattern: /\b(access_token|refresh_token|token_verifier|credential_proof|device_credential|runtime_session)\b/i, label: "selected login/token runtime vocabulary" },
+    { pattern: /\braw_token\b/i, label: "raw token handling" },
+  ];
+  checkNoForbiddenPatterns(authRuntimeFiles, selectedRuntimeForbiddenPatterns, "runtime code before selected implementation gates", { stripComments: true });
+
+  const wsFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/transport/ws/"));
+  const selectedWsForbiddenPatterns = [
+    { pattern: /\bAuthorization\b/, label: "Authorization header carrier" },
+    { pattern: /\bBearer\b/, label: "Bearer token carrier" },
+    { pattern: /\bCookie\b/, label: "cookie token carrier" },
+    { pattern: /\bSec-WebSocket-Protocol\b/, label: "WebSocket subprotocol token carrier" },
+    { pattern: /\br\.Header\b/, label: "handshake header auth inspection" },
+    { pattern: /\bAuthenticate[A-Za-z0-9_]*\b/, label: "transport-owned authentication" },
+  ];
+  checkNoForbiddenPatterns(wsFiles, selectedWsForbiddenPatterns, "WebSocket transport before selected carrier implementation gates", { stripComments: true });
+
+  const migrationFiles = discoverFilesUnder(root, "runtime/migrations/postgres")
+    .filter((file) => file.endsWith(".sql"));
+  const selectedMigrationForbiddenPatterns = [
+    { pattern: /\bcredential(s)?\b/i, label: "credential schema" },
+    { pattern: /\bcredential_verifier\b/i, label: "credential verifier schema" },
+    { pattern: /\btoken(s|_verifier|_record|_hash)?\b/i, label: "token schema" },
+    { pattern: /\baccess_token\b/i, label: "access token schema" },
+    { pattern: /\brefresh_token\b/i, label: "refresh token schema" },
+    { pattern: /\bruntime_session(s)?\b/i, label: "runtime session schema" },
+    { pattern: /\bexternal_identity\b/i, label: "external identity schema" },
+    { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
+    { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
+  ];
+  checkNoForbiddenPatterns(migrationFiles, selectedMigrationForbiddenPatterns, "PostgreSQL migrations before schema ratification gates");
+
+  const playerPersistenceFiles = [
+    "runtime/migrations/postgres/000002_create_player_account_state.sql",
+    "runtime/internal/modules/player/repository.go",
+    "runtime/internal/platform/persistence/postgres/player_account_repository.go",
+  ];
+  checkNoForbiddenPatterns(playerPersistenceFiles, selectedMigrationForbiddenPatterns, "player account lifecycle storage separation", { stripComments: true });
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -6369,6 +6683,7 @@ function checkRuntime(root) {
   checkRuntimeImportBoundaries(root, goFiles);
   checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles);
   checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles);
+  checkRuntimeSelectedLoginTokenBoundaries(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

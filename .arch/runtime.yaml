@@ -31,11 +31,12 @@ purpose: >
   token_lifecycle_storage_implications: ADR-0027
   authentication_contract_error_permission_surfaces: ADR-0028
   credential_token_session_schema_gates: ADR-0029
+  selected_login_token_boundary_checks: ADR-0030
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: credential_token_session_schema_gates_defined
+  current_phase: selected_login_token_boundary_checks_added
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -778,12 +779,17 @@ identity_session_boundary:
     authentication_contract_error_permission_surfaces_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
     credential_token_session_schema_gates_standard: docs/credential-token-session-schema-gates.md
     credential_token_session_schema_gates_translation: docs/credential-token-session-schema-gates.zh-CN.md
+    selected_login_token_boundary_checks_standard: docs/selected-login-token-boundary-checks.md
+    selected_login_token_boundary_checks_translation: docs/selected-login-token-boundary-checks.zh-CN.md
+    selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary
+    selected_login_token_boundary_checks_added: true
     decision: ADR-0024
     first_login_method_set_decision: ADR-0025
     first_token_format_proof_carrier_posture_decision: ADR-0026
     token_lifecycle_storage_implications_decision: ADR-0027
     authentication_contract_error_permission_surfaces_decision: ADR-0028
     credential_token_session_schema_gates_decision: ADR-0029
+    selected_login_token_boundary_checks_decision: ADR-0030
     change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
     first_login_method_set_change: changes/2026-05-14-ratify-first-login-method-set
@@ -792,6 +798,7 @@ identity_session_boundary:
     token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
     authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
     credential_token_session_schema_gates_change: changes/2026-05-14-define-credential-token-session-schema-gates
+    selected_login_token_boundary_checks_change: changes/2026-05-14-add-selected-login-token-boundary-checks
     conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
     first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
     first_login_method_set_conversation: conversations/2026-05-14-first-login-method-set-ratification.md
@@ -800,6 +807,7 @@ identity_session_boundary:
     token_lifecycle_storage_implications_conversation: conversations/2026-05-14-token-lifecycle-storage-implications.md
     authentication_contract_error_permission_surfaces_conversation: conversations/2026-05-14-authentication-contract-error-permission-surfaces.md
     credential_token_session_schema_gates_conversation: conversations/2026-05-14-credential-token-session-schema-gates.md
+    selected_login_token_boundary_checks_conversation: conversations/2026-05-14-selected-login-token-boundary-checks.md
     reference_alignment:
       nakama:
         account_authentication_methods: capability_reference
@@ -975,6 +983,7 @@ identity_session_boundary:
       authentication_permission_surface_defined: true
       authentication_audit_event_surface_defined: true
       credential_token_session_schema_gates_defined: true
+      selected_login_token_boundary_checks_added: true
       token_storage_schema_added: false
       credential_storage_schema_added: false
       external_identity_storage_schema_added: false
@@ -1001,9 +1010,9 @@ identity_session_boundary:
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-013
-    latest_completed_work_item: W-0071
-    next_ready_work_item: W-0072
-    status: add_selected_login_token_boundary_checks_next
+    latest_completed_work_item: W-0072
+    next_ready_work_item: W-0073
+    status: close_login_method_token_format_ratification_milestone_next
 
 persistence_model:
   decision: ADR-0011

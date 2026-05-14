@@ -126,6 +126,8 @@ Session persistence 与 WebSocket handshake decision-gates standard 是 `docs/se
 
 Login method 与 token format ratification standard 是 `docs/login-method-token-format-ratification.md`，配套简体中文译本是 `docs/login-method-token-format-ratification.zh-CN.md`。`ADR-0024` 记录该 ratification boundary。在选择第一批 login methods、token model、token format、proof carrier posture、token lifecycle semantics、credential/token/session schema gates 或 implementation queue 前，应阅读它。它只指导 comparison 与 ratification；不授权 runtime authentication、token parsing、credential storage、external identity linking、session persistence、Protobuf envelope changes、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。
 
+Selected login/token boundary check standard 是 `docs/selected-login-token-boundary-checks.md`，配套简体中文译本是 `docs/selected-login-token-boundary-checks.zh-CN.md`。`ADR-0030` 记录 repository check decision。在添加 runtime authentication、token validation、token issuance、logout、refresh behavior、credential 或 token repositories、authentication Protobuf sources、generated authentication contract shapes、WebSocket proof carriers、authentication migrations、authentication dependencies，或改变已选 `device_credential_login` 加 opaque access-token 姿态前，应阅读它。`runtime.selected_login_token_boundary` 是该已选姿态的 repository check rule。
+
 Work continuation standard 是 `docs/workflow.md`，配套简体中文译本是 `docs/workflow.zh-CN.md`。机器可读 work queue 是 `.arch/work-items.yaml`。当 maintainer 说“continue”或“继续”时，应理解为推进一个 `next_ready` work item，除非当前被 blocked 或需要 confirmation。当 maintainer 要求继续多步时，应按顺序最多推进相应数量的 work items，并在 blockers、verification failures、ask-first boundaries 或 maintainer redirect 处停止。
 
 当前可执行工具：
@@ -204,6 +206,8 @@ node tools/vibit generate contract-shapes <module|all>
 当新增或修改 runtime module behavior、runtime adapter boundaries、runtime guidance 或 tests 时，使用 `node tools/vibit check runtime`。在 Go runtime 尚不存在前，该检查应以 not applicable 的方式通过，因为 runtime implementation 尚未开始。当 `runtime/go.mod` 已存在但 Go source files 尚不存在时，该检查应验证 ADR-0014 skeleton 和 ADR-0018 runtime protocol adapter boundary，并且不运行 `go test` 也可以通过。一旦 Go source files 存在，runtime checks 必须要求 Go test files 和本地 Go toolchain。
 
 当 runtime check 在 authentication、token、credential、external identity、session persistence、Protobuf envelope authentication、WebSocket handshake authentication、runtime player handler 或 WebSocket route 边界上失败时，使用 `node tools/vibit inspect rule runtime.authentication_token_session_boundary --json`。
+
+当 runtime check 在已选 `device_credential_login`、opaque access-token、explicit request proof payload、refresh-token deferral、generated authentication shape deferral、authentication Protobuf deferral、WebSocket carrier deferral、schema-gate、migration、repository、adapter 或 dependency boundary 上失败时，使用 `node tools/vibit inspect rule runtime.selected_login_token_boundary --json`。
 
 在解释 continuation request 前，使用 `node tools/vibit inspect work`。当 `.arch/work-items.yaml`、workflow docs 或 work item state 发生变化时，使用 `node tools/vibit check work`。默认 continuation unit 是一个 work item。
 
