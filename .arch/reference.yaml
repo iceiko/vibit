@@ -462,10 +462,16 @@ phase_plan:
       - route_handler_identity_context
     rule: The application-owned service-interface boundary is defined before behavior. It documents future interface ownership, DTO vocabulary, redaction expectations, unit-of-work repository usage, error/permission/audit mapping, and request identity handoff, but it does not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, or authentication dependencies.
   phase_2h_token_credential_verifier_algorithm_redaction_boundary:
-    status: active
-    active_milestone: M-019
+    status: completed
+    milestone: M-019
     previous_milestone: M-018
-    next_work_item: W-0091
+    completed_work_item: W-0091
+    change: changes/2026-05-15-define-token-credential-verifier-algorithm-redaction-boundary
+    decision: ADR-0040
+    token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040
+    standard: docs/token-credential-verifier-algorithm-redaction-boundary.md
+    next_milestone: M-020
+    next_work_item: W-0092
     focus:
       - verifier_algorithm_posture
       - credential_lookup_digest_classification
@@ -481,7 +487,27 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_context_boundary
-    rule: The next phase may define algorithm and redaction-test posture before service code. It must not implement token generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, or migration changes.
+    rule: The verifier algorithm and redaction-test posture is defined before service code. The first planned high-entropy verifier posture is `vibit_hmac_sha256_v1` with Go standard library dependency posture. It does not implement token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or secret loading.
+  phase_2i_secret_configuration_and_verifier_key_loading_boundary:
+    status: active
+    active_milestone: M-020
+    previous_milestone: M-019
+    next_work_item: W-0092
+    focus:
+      - secret_configuration_ownership
+      - verifier_key_loading_posture
+      - verifier_key_identifier_handling
+      - key_set_separation
+      - rotation_expectations
+      - development_test_key_posture
+      - production_secret_requirements
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_lifecycle_security
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_context_boundary
+    rule: The next phase may define secret configuration and verifier key loading posture before generation or verifier code. It must not implement secret loading, token generation, credential generation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, or migration changes.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

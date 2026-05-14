@@ -41,11 +41,12 @@ purpose: >
   close_runtime_authentication_boundary_and_open_generated_shape_gate: ADR-0037
   authentication_generated_contract_shape_timing: ADR-0038
   application_authentication_service_interface_boundary: ADR-0039
+  token_credential_verifier_algorithm_redaction_boundary: ADR-0040
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: token_credential_verifier_algorithm_redaction_boundary
+  current_phase: secret_configuration_and_verifier_key_loading_boundary
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1059,10 +1060,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-018
-    latest_completed_work_item: W-0089
-    next_ready_work_item: W-0090
-    status: application_authentication_service_interface_boundary_next
+    milestone: M-020
+    latest_completed_work_item: W-0091
+    next_ready_work_item: W-0092
+    status: secret_configuration_and_verifier_key_loading_boundary_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1306,19 +1307,47 @@ identity_session_boundary:
       - W-0090 define_application_authentication_service_interface_boundary
     rule: The service-interface boundary is defined. Future application authentication services must stay application-owned, map generated contract vocabulary through application DTOs, use authentication.Repository through the application unit-of-work boundary, and hand off validated proof as RequestIdentity before domain dispatch. This boundary does not implement authentication behavior.
   token_credential_verifier_algorithm_redaction_boundary:
-    status: active
+    status: completed
     milestone: M-019
     first_work_item: W-0091
-    next_work_item: W-0091
+    completed_work_item: W-0091
+    change: changes/2026-05-15-define-token-credential-verifier-algorithm-redaction-boundary
+    next_milestone: M-020
+    next_work_item: W-0092
     previous_milestone: M-018
     previous_completed_work_item: W-0090
+    decision: ADR-0040
+    token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040
+    standard: docs/token-credential-verifier-algorithm-redaction-boundary.md
+    translation: docs/token-credential-verifier-algorithm-redaction-boundary.zh-CN.md
+    token_credential_verifier_algorithm_redaction_boundary_standard: docs/token-credential-verifier-algorithm-redaction-boundary.md
+    token_credential_verifier_algorithm_redaction_boundary_translation: docs/token-credential-verifier-algorithm-redaction-boundary.zh-CN.md
+    token_credential_verifier_algorithm_redaction_boundary_defined: true
+    token_credential_verifier_algorithm_redaction_boundary_check_rule: runtime.token_credential_verifier_algorithm_redaction_boundary
     planned_owner: runtime/internal/app
     planned_boundary_type: verifier_algorithm_and_redaction_standard_only
     allowed_scope: boundary_standard_and_manifests_only
+    planned_verifier_algorithm_family: vibit_hmac_sha256_v1
+    planned_verifier_version: 1
+    digest_size_bytes: 32
+    minimum_raw_token_entropy_bits: 256
+    minimum_raw_device_credential_entropy_bits: 256
+    token_text_encoding: url_safe_unpadded_base64_or_equivalent
+    future_allowed_standard_library_packages:
+      - crypto/hmac
+      - crypto/sha256
+      - crypto/subtle
+      - crypto/rand
+      - encoding/base64
+    external_dependency_adoption_record_required_for_first_posture: false
+    constant_time_verifier_comparison_required: true
+    redaction_test_expectations_defined: true
     runtime_authentication_implemented: false
     token_generation_added: false
+    credential_generation_added: false
     token_validation_added: false
     verifier_comparison_added: false
+    application_authentication_service_code_added: false
     login_handlers_added: false
     logout_execution_added: false
     cleanup_jobs_added: false
@@ -1327,7 +1356,36 @@ identity_session_boundary:
     authentication_dependencies_added: false
     repository_interface_changed: false
     migration_schemas_changed: false
-    rule: The next slice may define verifier algorithm posture, entropy, encoding, digest classification, constant-time comparison, and redaction test expectations. It must not implement token generation, verifier comparison, login execution, token validation, logout execution, cleanup, protocol, transport, dependency, repository, or migration behavior.
+    secret_configuration_loading_added: false
+    work_queue:
+      - W-0091 define_token_credential_verifier_algorithm_redaction_boundary
+    rule: The verifier algorithm and redaction-test boundary is defined. Future first-posture verifier code may use Go standard library HMAC-SHA-256 primitives after a later code gate, but token generation, credential generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, dependency, repository, migration, and secret-loading behavior remain separate gates.
+  secret_configuration_and_verifier_key_loading_boundary:
+    status: active
+    milestone: M-020
+    first_work_item: W-0092
+    next_work_item: W-0092
+    previous_milestone: M-019
+    previous_completed_work_item: W-0091
+    planned_owner: runtime/internal/app
+    planned_boundary_type: secret_configuration_and_key_loading_standard_only
+    allowed_scope: boundary_standard_and_manifests_only
+    runtime_authentication_implemented: false
+    secret_configuration_loading_added: false
+    token_generation_added: false
+    credential_generation_added: false
+    token_validation_added: false
+    verifier_comparison_added: false
+    application_authentication_service_code_added: false
+    login_handlers_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    protobuf_authentication_messages_added: false
+    websocket_proof_carrier_implemented: false
+    authentication_dependencies_added: false
+    repository_interface_changed: false
+    migration_schemas_changed: false
+    rule: The next slice may define secret configuration ownership, verifier key loading posture, key identifier handling, rotation expectations, development/test posture, and production secret requirements. It must not implement secret loading, token generation, credential generation, verifier comparison, login execution, token validation, logout, cleanup, protocol, transport, dependency, repository, or migration behavior.
 
 persistence_model:
   decision: ADR-0011

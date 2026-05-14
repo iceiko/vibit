@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-019
+current_milestone: M-020
 
 continuation_semantics:
   default_step_unit: work_item
@@ -385,7 +385,7 @@ milestones:
 
   - id: M-019
     title: Token And Credential Verifier Algorithm Redaction Boundary
-    status: active
+    status: completed
     goal: Define verifier algorithm posture and redaction test expectations before adding application authentication service code, token material generation, or verifier comparison.
     completion_criteria:
       - Credential verifier, token lookup digest, token verifier digest, entropy, encoding, key identifier, and constant-time comparison requirements are documented before implementation.
@@ -393,6 +393,29 @@ milestones:
       - The boundary explains which future code may use Go standard cryptography packages or whether an external dependency adoption record is required.
       - Runtime behavior, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes remain deferred unless separately gated.
     non_goals:
+      - implementing token generation
+      - implementing verifier comparison
+      - implementing application authentication service code
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-019 defined the first token and credential verifier algorithm redaction boundary. The repository now has an English and Simplified Chinese verifier algorithm/redaction boundary standard, ADR-0040, a runtime check rule, manifest and guide references, `vibit_hmac_sha256_v1` as the first planned high-entropy HMAC-SHA-256 verifier algorithm family, digest classification for credential and token lookup/verifier material, purpose-label domain separation, minimum 256-bit raw credential and token entropy expectations, constant-time verifier comparison requirements, Go standard library dependency posture, and redaction test expectations. No token generation, credential generation, verifier comparison, application authentication service code, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, secret configuration loading, or production authentication behavior were added.
+
+  - id: M-020
+    title: Secret Configuration And Verifier Key Loading Boundary
+    status: active
+    goal: Define verifier key configuration, key loading, key identifier, rotation, and redaction boundaries before implementing token or credential material generation and verifier comparison.
+    completion_criteria:
+      - Secret configuration ownership and future key loading posture are documented before implementation.
+      - Verifier key identifiers, key set separation, fallback behavior, rotation posture, development defaults, and production requirements are defined without storing secret values in committed artifacts.
+      - The boundary states whether the first local implementation can use process environment configuration or requires an external secret manager adoption record.
+      - Token generation, credential generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior remain deferred unless separately gated.
+    non_goals:
+      - implementing secret loading
+      - adding committed secrets or default production keys
       - implementing token generation
       - implementing verifier comparison
       - implementing application authentication service code
@@ -2391,7 +2414,7 @@ work_items:
   - id: W-0091
     milestone: M-019
     title: Define token and credential verifier algorithm redaction boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-token-credential-verifier-algorithm-redaction-boundary
     depends_on:
       - W-0090
@@ -2404,6 +2427,27 @@ work_items:
       - Define minimum entropy, token encoding, digest classification, key identifier, constant-time comparison, and redaction test expectations for later application service code.
       - Declare whether the first planned algorithms can use the Go standard library or whether an external dependency adoption record is required before implementation.
       - Preserve deferral for token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes.
+    completion_summary: Defined `vibit_hmac_sha256_v1` as the first planned high-entropy verifier algorithm family in ADR-0040 and the paired verifier algorithm/redaction boundary standard. Classified credential and token lookup digests as secret-adjacent index material, credential and token verifier digests as secret verifier material, and required purpose-label domain separation, minimum 256-bit raw credential/token entropy, URL-safe token encoding, constant-time verifier digest comparison, Go standard library dependency posture, and future redaction tests. No Go code, token generation, credential generation, verifier comparison, application authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, secret loading, or production authentication behavior were added.
     ask_first:
       - Selecting a major external cryptography, password-hashing, JWT, OAuth, OIDC, KMS, or provider dependency.
       - Implementing token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.
+
+  - id: W-0092
+    milestone: M-020
+    title: Define secret configuration and verifier key loading boundary
+    status: next_ready
+    change: changes/2026-05-15-define-secret-configuration-verifier-key-loading-boundary
+    depends_on:
+      - W-0091
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+    completion:
+      - Define secret configuration ownership, key loading posture, verifier key separation, key identifier handling, rotation expectations, and redaction requirements without implementing secret loading.
+      - Declare whether the first local implementation may use process environment configuration or whether an external KMS/secret-manager dependency adoption record is required before implementation.
+      - Define development/test key posture without committing production-like secrets or raw verifier values.
+      - Preserve deferral for token generation, credential generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    ask_first:
+      - Selecting a major external KMS, cloud secret-manager, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or operations dependency.
+      - Implementing secret loading, token generation, credential generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, application authentication service code, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior.

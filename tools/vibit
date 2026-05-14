@@ -66,6 +66,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.selected_login_token_boundary",
   "runtime.authentication_implementation_boundary",
   "runtime.application_authentication_service_interface_boundary",
+  "runtime.token_credential_verifier_algorithm_redaction_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -7499,6 +7500,234 @@ function checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goF
   }
 }
 
+function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goFiles) {
+  const ruleId = "runtime.token_credential_verifier_algorithm_redaction_boundary";
+  const standardPath = "docs/token-credential-verifier-algorithm-redaction-boundary.md";
+  const standardTranslationPath = "docs/token-credential-verifier-algorithm-redaction-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0040-token-credential-verifier-algorithm-redaction-boundary.md";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for token and credential verifier algorithm redaction boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for token and credential verifier algorithm redaction boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "token_credential_verifier_algorithm_redaction_boundary_standard: docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    [".arch/conventions.yaml", "token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040"],
+    [".arch/conventions.yaml", "token_credential_verifier_algorithm_redaction_boundary_check_rule: runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    [".arch/runtime.yaml", "token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040"],
+    [".arch/runtime.yaml", "token_credential_verifier_algorithm_redaction_boundary_standard: docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    [".arch/runtime.yaml", "token_credential_verifier_algorithm_redaction_boundary_defined: true"],
+    [".arch/runtime.yaml", "token_credential_verifier_algorithm_redaction_boundary_check_rule: runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    [".arch/contracts.yaml", "token_credential_verifier_algorithm_redaction_boundary_defined: true"],
+    [".arch/contracts.yaml", "token_credential_verifier_algorithm_redaction_boundary_standard: docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    [".arch/reference.yaml", "phase_2h_token_credential_verifier_algorithm_redaction_boundary"],
+    [".arch/reference.yaml", "token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040"],
+    ["AGENTS.md", "docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["AGENTS.md", "ADR-0040"],
+    ["AGENTS.md", "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    ["AGENTS.zh-CN.md", "docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["AGENTS.zh-CN.md", "ADR-0040"],
+    ["AGENTS.zh-CN.md", "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    ["runtime/AGENTS.md", "../docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["runtime/AGENTS.md", "ADR-0040"],
+    ["runtime/AGENTS.md", "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0040"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    ["modules/authentication/module.yaml", "token_credential_verifier_algorithm_redaction_boundary_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/token-credential-verifier-algorithm-redaction-boundary.md"],
+    ["rules/check-rules.json", "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "verifier_algorithm_family: vibit_hmac_sha256_v1"],
+    [standardPath, "minimum_raw_token_entropy_bits: 256"],
+    [standardPath, "minimum_raw_device_credential_entropy_bits: 256"],
+    [standardPath, "credential_lookup_digest:"],
+    [standardPath, "credential_verifier_digest:"],
+    [standardPath, "token_lookup_digest:"],
+    [standardPath, "token_verifier_digest:"],
+    [standardPath, "constant_time_verifier_comparison_required: true"],
+    [standardPath, "external_dependency_adoption_record_required_for_first_posture: false"],
+    [standardPath, "preferred_go_comparison: crypto/hmac.Equal"],
+    [standardPath, "This is a boundary-only standard. It does not add Go code"],
+    [standardPath, "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+    [standardTranslationPath, "verifier_algorithm_family: vibit_hmac_sha256_v1"],
+    [standardTranslationPath, "minimum_raw_token_entropy_bits: 256"],
+    [standardTranslationPath, "minimum_raw_device_credential_entropy_bits: 256"],
+    [standardTranslationPath, "credential_lookup_digest:"],
+    [standardTranslationPath, "credential_verifier_digest:"],
+    [standardTranslationPath, "token_lookup_digest:"],
+    [standardTranslationPath, "token_verifier_digest:"],
+    [standardTranslationPath, "constant_time_verifier_comparison_required: true"],
+    [standardTranslationPath, "external_dependency_adoption_record_required_for_first_posture: false"],
+    [standardTranslationPath, "preferred_go_comparison: crypto/hmac.Equal"],
+    [standardTranslationPath, "这只是 boundary-only standard。它不添加 Go code"],
+    [standardTranslationPath, "runtime.token_credential_verifier_algorithm_redaction_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "token_credential_verifier_algorithm_redaction_boundary_defined: true",
+      "planned_verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "minimum_raw_token_entropy_bits: 256",
+      "minimum_raw_device_credential_entropy_bits: 256",
+      "external_dependency_adoption_record_required_for_first_posture: false",
+      "constant_time_verifier_comparison_required: true",
+      "redaction_test_expectations_defined: true",
+      "runtime_authentication_implemented: false",
+      "secret_configuration_loading_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "token_credential_verifier_algorithm_redaction_boundary_defined: true",
+      "planned_verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "minimum_raw_token_entropy_bits: 256",
+      "minimum_raw_device_credential_entropy_bits: 256",
+      "external_dependency_adoption_record_required_for_first_posture: false",
+      "constant_time_verifier_comparison_required: true",
+      "redaction_test_expectations_defined: true",
+      "runtime_authentication_implemented: false",
+      "secret_configuration_loading_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "token_credential_verifier_algorithm_redaction_boundary_defined: true",
+      "planned_verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "minimum_raw_token_entropy_bits: 256",
+      "minimum_raw_device_credential_entropy_bits: 256",
+      "external_dependency_adoption_record_required_for_first_posture: false",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "runtime_lookup_added: false",
+      "generated_contract_shapes_added: true",
+      "authentication_generated_contract_shapes_added: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "token_credential_verifier_algorithm_redaction_boundary_defined: true",
+      "planned_verifier_algorithm_family: vibit_hmac_sha256_v1",
+      "minimum_raw_token_entropy_bits: 256",
+      "minimum_raw_device_credential_entropy_bits: 256",
+      "external_dependency_adoption_record_required_for_first_posture: false",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing token and credential verifier algorithm redaction boundary markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves token and credential verifier algorithm redaction boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing token and credential verifier algorithm redaction boundary marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\bcrypto\/(hmac|sha256|subtle|rand)\b/, label: "verifier algorithm or token material generation implementation" },
+    { pattern: /\bencoding\/base64\b/, label: "token or credential material text encoding implementation" },
+    { pattern: /\bhmac\.(New|Equal)\b/, label: "HMAC verifier digest implementation" },
+    { pattern: /\bsubtle\.ConstantTimeCompare\b/, label: "verifier comparison implementation" },
+    { pattern: /\brand\.(Reader|Read)\b/, label: "token or credential material generation" },
+    { pattern: /\bRawURLEncoding\b/, label: "token or credential material encoding" },
+    { pattern: /\bbytes\.Equal\b/, label: "non-constant-time verifier digest comparison risk" },
+    { pattern: /\b(verifierKey|verifierSecret|credentialLookupKey|credentialVerifierKey|tokenLookupKey|tokenVerifierKey)\b/, label: "verifier secret loading or usage" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement token or credential verifier algorithm behavior before its implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses token and credential verifier algorithm redaction boundary: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -7927,6 +8156,7 @@ function checkRuntime(root) {
   checkRuntimeSelectedLoginTokenBoundaries(root, goFiles);
   checkRuntimeAuthenticationImplementationBoundary(root, goFiles);
   checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goFiles);
+  checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

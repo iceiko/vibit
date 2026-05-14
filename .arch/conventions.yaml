@@ -919,19 +919,75 @@ application_authentication_service_interface_boundary:
     authentication behavior.
 
 token_credential_verifier_algorithm_redaction_boundary:
-  status: active
+  status: completed
   milestone: M-019
   first_work_item: W-0091
-  next_work_item: W-0091
+  completed_work_item: W-0091
+  change: changes/2026-05-15-define-token-credential-verifier-algorithm-redaction-boundary
+  next_milestone: M-020
+  next_work_item: W-0092
   previous_milestone: M-018
   previous_completed_work_item: W-0090
+  decision: ADR-0040
+  token_credential_verifier_algorithm_redaction_boundary_decision: ADR-0040
+  standard: docs/token-credential-verifier-algorithm-redaction-boundary.md
+  translation: docs/token-credential-verifier-algorithm-redaction-boundary.zh-CN.md
+  token_credential_verifier_algorithm_redaction_boundary_standard: docs/token-credential-verifier-algorithm-redaction-boundary.md
+  token_credential_verifier_algorithm_redaction_boundary_translation: docs/token-credential-verifier-algorithm-redaction-boundary.zh-CN.md
+  token_credential_verifier_algorithm_redaction_boundary_defined: true
+  token_credential_verifier_algorithm_redaction_boundary_check_rule: runtime.token_credential_verifier_algorithm_redaction_boundary
   planned_owner: runtime/internal/app
   planned_boundary_type: verifier_algorithm_and_redaction_standard_only
   allowed_scope: boundary_standard_and_manifests_only
+  planned_verifier_algorithm_family: vibit_hmac_sha256_v1
+  planned_verifier_version: 1
+  digest_size_bytes: 32
+  minimum_raw_token_entropy_bits: 256
+  minimum_raw_device_credential_entropy_bits: 256
+  token_text_encoding: url_safe_unpadded_base64_or_equivalent
+  external_dependency_adoption_record_required_for_first_posture: false
+  constant_time_verifier_comparison_required: true
+  redaction_test_expectations_defined: true
   runtime_authentication_implemented: false
   token_generation_added: false
+  credential_generation_added: false
   token_validation_added: false
   verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  secret_configuration_loading_added: false
+  rule: >
+    The verifier algorithm and redaction-test boundary is defined. Future
+    first-posture verifier code may use Go standard library HMAC-SHA-256
+    primitives after a later code gate, but token generation, credential
+    generation, verifier comparison, login execution, token validation, logout,
+    cleanup, protocol, transport, dependency, repository, migration, and
+    secret-loading behavior remain separate gates.
+
+secret_configuration_and_verifier_key_loading_boundary:
+  status: active
+  milestone: M-020
+  first_work_item: W-0092
+  next_work_item: W-0092
+  previous_milestone: M-019
+  previous_completed_work_item: W-0091
+  planned_owner: runtime/internal/app
+  planned_boundary_type: secret_configuration_and_key_loading_standard_only
+  allowed_scope: boundary_standard_and_manifests_only
+  runtime_authentication_implemented: false
+  secret_configuration_loading_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
   login_handlers_added: false
   logout_execution_added: false
   cleanup_jobs_added: false
@@ -941,10 +997,11 @@ token_credential_verifier_algorithm_redaction_boundary:
   repository_interface_changed: false
   migration_schemas_changed: false
   rule: >
-    The next slice may define verifier algorithm posture, entropy, encoding,
-    digest classification, constant-time comparison, and redaction test
-    expectations. It must not implement token generation, verifier comparison,
-    login execution, token validation, logout execution, cleanup, protocol,
+    The next slice may define secret configuration ownership, verifier key
+    loading posture, key identifier handling, rotation expectations,
+    development/test posture, and production secret requirements. It must not
+    implement secret loading, token generation, credential generation, verifier
+    comparison, login execution, token validation, logout, cleanup, protocol,
     transport, dependency, repository, or migration behavior.
 
 server_runtime:
