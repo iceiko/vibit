@@ -57,7 +57,9 @@ The W-0071 gate status is:
 ```yaml
 credential_record_schema_gate:
   required_for_first_posture: true
-  status: defined_no_schema_added
+  status: ratified_no_schema_added
+  boundary: docs/credential-record-schema-boundary.md
+  decision: ADR-0032
 token_verifier_record_schema_gate:
   required_for_first_posture: true
   status: defined_no_schema_added
@@ -79,6 +81,21 @@ player_account_lifecycle_schema:
 ```
 
 The first implementation may not begin until the required credential and token verifier schema gates are turned into explicit schema ratification work, followed by migrations, repositories, adapters, tests, and runtime wiring.
+
+W-0074 has ratified the credential record schema boundary without adding schema:
+
+```yaml
+credential_record_schema_boundary:
+  status: ratified_no_schema_added
+  standard: docs/credential-record-schema-boundary.md
+  decision: ADR-0032
+  future_logical_table: authentication_device_credentials
+  migration_added_now: false
+  repository_added_now: false
+  runtime_lookup_added_now: false
+```
+
+The token verifier record schema boundary remains the next required schema ratification work.
 
 ## 4. Credential Record Gate
 
@@ -359,7 +376,7 @@ This standard does not authorize:
 Next work:
 
 ```text
-W-0072 Add repository checks for selected login token boundaries
+W-0075 Define token verifier record schema boundary
 ```
 
-W-0072 should add narrow machine-checkable repository checks for the selected login/token boundaries without implementing authentication behavior.
+W-0075 should ratify token verifier record semantics without adding migrations, repositories, adapters, runtime token validation, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.

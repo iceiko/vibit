@@ -57,7 +57,9 @@ W-0071 的 gate 状态是：
 ```yaml
 credential_record_schema_gate:
   required_for_first_posture: true
-  status: defined_no_schema_added
+  status: ratified_no_schema_added
+  boundary: docs/credential-record-schema-boundary.md
+  decision: ADR-0032
 token_verifier_record_schema_gate:
   required_for_first_posture: true
   status: defined_no_schema_added
@@ -79,6 +81,21 @@ player_account_lifecycle_schema:
 ```
 
 在 required credential 与 token verifier schema gates 被转化为明确的 schema ratification work，并继续完成 migrations、repositories、adapters、tests 和 runtime wiring 之前，第一版实现不得开始。
+
+W-0074 已经 ratify credential record schema boundary，但没有添加 schema：
+
+```yaml
+credential_record_schema_boundary:
+  status: ratified_no_schema_added
+  standard: docs/credential-record-schema-boundary.md
+  decision: ADR-0032
+  future_logical_table: authentication_device_credentials
+  migration_added_now: false
+  repository_added_now: false
+  runtime_lookup_added_now: false
+```
+
+Token verifier record schema boundary 仍然是下一个必需的 schema ratification work。
 
 ## 4. Credential Record Gate
 
@@ -359,7 +376,7 @@ git diff --check
 下一步工作：
 
 ```text
-W-0072 Add repository checks for selected login token boundaries
+W-0075 Define token verifier record schema boundary
 ```
 
-W-0072 应添加针对 selected login/token boundaries 的窄范围、机器可检查 repository checks，不实现 authentication behavior。
+W-0075 应 ratify token verifier record semantics，但不添加 migrations、repositories、adapters、runtime token validation、generated output、Protobuf messages、WebSocket behavior 或 authentication dependencies。

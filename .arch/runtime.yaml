@@ -33,6 +33,7 @@ purpose: >
   credential_token_session_schema_gates: ADR-0029
   selected_login_token_boundary_checks: ADR-0030
   close_login_token_ratification_and_open_schema_gate: ADR-0031
+  credential_record_schema_boundary: ADR-0032
 
 architecture_scope:
   framework_standard: agent_native_language_portable
@@ -765,7 +766,7 @@ identity_session_boundary:
     closeout_change: changes/2026-05-14-close-login-method-token-format-ratification-milestone
     closeout_decision: ADR-0031
     next_milestone: M-014
-    next_work_item: W-0074
+    next_work_item_after_closeout: W-0074
     next_direction: credential_and_token_verifier_schema_ratification
     selected_at: 2026-05-14
     direction_change: changes/2026-05-14-confirm-next-direction-after-authentication-design
@@ -785,6 +786,8 @@ identity_session_boundary:
     authentication_contract_error_permission_surfaces_translation: docs/authentication-contract-error-permission-surfaces.zh-CN.md
     credential_token_session_schema_gates_standard: docs/credential-token-session-schema-gates.md
     credential_token_session_schema_gates_translation: docs/credential-token-session-schema-gates.zh-CN.md
+    credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
+    credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
     selected_login_token_boundary_checks_standard: docs/selected-login-token-boundary-checks.md
     selected_login_token_boundary_checks_translation: docs/selected-login-token-boundary-checks.zh-CN.md
     selected_login_token_boundary_check_rule: runtime.selected_login_token_boundary
@@ -795,6 +798,7 @@ identity_session_boundary:
     token_lifecycle_storage_implications_decision: ADR-0027
     authentication_contract_error_permission_surfaces_decision: ADR-0028
     credential_token_session_schema_gates_decision: ADR-0029
+    credential_record_schema_boundary_decision: ADR-0032
     selected_login_token_boundary_checks_decision: ADR-0030
     change: changes/2026-05-14-define-login-method-token-format-ratification-standard
     first_login_method_candidates_change: changes/2026-05-14-compare-first-login-method-candidates
@@ -804,6 +808,7 @@ identity_session_boundary:
     token_lifecycle_storage_implications_change: changes/2026-05-14-define-token-lifecycle-and-storage-implications
     authentication_contract_error_permission_surfaces_change: changes/2026-05-14-define-authentication-contract-error-permission-surfaces
     credential_token_session_schema_gates_change: changes/2026-05-14-define-credential-token-session-schema-gates
+    credential_record_schema_boundary_change: changes/2026-05-14-define-credential-record-schema-boundary
     selected_login_token_boundary_checks_change: changes/2026-05-14-add-selected-login-token-boundary-checks
     conversation: conversations/2026-05-14-login-method-token-format-ratification-standard.md
     first_login_method_candidates_conversation: conversations/2026-05-14-first-login-method-candidate-comparison.md
@@ -958,7 +963,11 @@ identity_session_boundary:
         external_identity_link_schema_gate: false
         runtime_session_record_schema_gate: false
       default_durable_target: PostgreSQL
-      credential_record_schema_gate_status: defined_no_schema_added
+      credential_record_schema_gate_status: ratified_no_schema_added
+      credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
+      credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
+      credential_record_schema_boundary_decision: ADR-0032
+      future_credential_logical_table: authentication_device_credentials
       token_verifier_record_schema_gate_status: defined_no_schema_added
       external_identity_link_schema_gate_status: deferred_no_schema_added
       runtime_session_record_schema_gate_status: deferred_no_schema_added
@@ -990,6 +999,7 @@ identity_session_boundary:
       authentication_permission_surface_defined: true
       authentication_audit_event_surface_defined: true
       credential_token_session_schema_gates_defined: true
+      credential_record_schema_boundary_ratified: true
       selected_login_token_boundary_checks_added: true
       token_storage_schema_added: false
       credential_storage_schema_added: false
@@ -1014,21 +1024,27 @@ identity_session_boundary:
       - W-0071 define_credential_token_session_schema_gates
       - W-0072 add_repository_checks_for_selected_login_token_boundaries
       - W-0073 close_login_method_token_format_ratification_milestone
+      - W-0074 define_credential_record_schema_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
     milestone: M-014
-    latest_completed_work_item: W-0073
-    next_ready_work_item: W-0074
-    status: define_credential_record_schema_boundary_next
+    latest_completed_work_item: W-0074
+    next_ready_work_item: W-0075
+    status: define_token_verifier_record_schema_boundary_next
   credential_token_schema_ratification:
     status: active
     milestone: M-014
     selected_by_closeout_decision: ADR-0031
     first_work_item: W-0074
-    next_work_item: W-0074
+    latest_completed_work_item: W-0074
+    next_work_item: W-0075
     default_durable_target: PostgreSQL
-    credential_record_schema_boundary_status: next
-    token_verifier_record_schema_boundary_status: planned
+    credential_record_schema_boundary_status: ratified_no_schema_added
+    credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
+    credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
+    credential_record_schema_boundary_decision: ADR-0032
+    future_credential_logical_table: authentication_device_credentials
+    token_verifier_record_schema_boundary_status: next
     migration_sources_added: false
     repository_interfaces_added: false
     postgres_adapters_added: false

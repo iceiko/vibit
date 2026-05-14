@@ -1,0 +1,105 @@
+schema_version: 0.1
+change_id: define-credential-record-schema-boundary
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Ratify the credential record schema boundary for the selected device credential login posture without adding schema or runtime behavior.
+
+affected_modules:
+  - runtime
+  - player
+
+decisions:
+  added:
+    - ADR-0032
+  referenced:
+    - ADR-0025
+    - ADR-0029
+    - ADR-0030
+    - ADR-0031
+
+standards:
+  added:
+    - docs/credential-record-schema-boundary.md
+    - docs/credential-record-schema-boundary.zh-CN.md
+  changed:
+    - docs/credential-token-session-schema-gates.md
+    - docs/credential-token-session-schema-gates.zh-CN.md
+    - docs/selected-login-token-boundary-checks.md
+    - docs/selected-login-token-boundary-checks.zh-CN.md
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - .arch/work-items.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes:
+    - runtime.authentication owns the future credential record boundary
+    - player account lifecycle tables remain credential-free
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_implemented: false
+  token_behavior_implemented: false
+  credential_schema_boundary_ratified: true
+  credential_migration_added: false
+  credential_repository_added: false
+  credential_postgres_adapter_added: false
+  runtime_lookup_added: false
+  websocket_routes_added: false
+  authentication_dependencies_added: false
+
+workflow:
+  completed_work_item: W-0074
+  next_ready_work_item: W-0075
+  next_direction: token_verifier_record_schema_boundary
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check architecture --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-credential-record-schema-boundary --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

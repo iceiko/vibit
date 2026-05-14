@@ -1911,7 +1911,7 @@ work_items:
   - id: W-0074
     milestone: M-014
     title: Define credential record schema boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-define-credential-record-schema-boundary
     depends_on:
       - W-0073
@@ -1923,8 +1923,31 @@ work_items:
       - Ratify credential record ownership, lifecycle states, verifier semantics, uniqueness rules, player account relationship, disabled/revoked credential behavior, rotation/replacement semantics, redaction rules, and required future migration/repository/adapter gates.
       - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime lookup, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
       - Keep player account lifecycle tables credential-free and provider-subject-free.
+    completion_summary: Ratified the credential record schema boundary for the selected device_credential_login posture. Defined runtime.authentication ownership, future logical table authentication_device_credentials, log-safe credential_record_id, non-plaintext lookup and verifier semantics, active/disabled/revoked/replaced lifecycle states, immutable player relationship, at most one active device credential per player for the first posture, rotation/replacement lineage, redaction rules, and future migration/repository/adapter gates. No migration source, table, repository interface, PostgreSQL adapter, runtime lookup, handler, route, generated authentication output, Protobuf message, WebSocket carrier, authentication dependency, or authentication behavior was added.
     ask_first:
       - Adding credential migration sources or tables.
       - Adding credential repository interfaces or PostgreSQL adapters.
       - Implementing credential lookup or login behavior.
       - Adding password hashing, OAuth, OIDC, provider SDK, key-management, or Redis-like dependencies.
+
+  - id: W-0075
+    milestone: M-014
+    title: Define token verifier record schema boundary
+    status: next_ready
+    change: changes/2026-05-14-define-token-verifier-record-schema-boundary
+    depends_on:
+      - W-0074
+    related_decisions:
+      - ADR-0026
+      - ADR-0027
+      - ADR-0029
+      - ADR-0032
+    completion:
+      - Ratify token verifier record ownership, non-plaintext verifier storage, statuses, expiration, revocation, credential-token linkage, retention, cleanup, replay-sensitive failure classes, redaction rules, and required future migration/repository/adapter gates.
+      - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+      - Keep refresh-token storage, runtime session persistence, WebSocket connection binding, and Redis-like token/session stores deferred for the first posture.
+    ask_first:
+      - Adding token verifier migration sources or tables.
+      - Adding token repository interfaces or PostgreSQL adapters.
+      - Implementing token issuance, validation, logout, refresh, or cleanup behavior.
+      - Adding JWT, signing, key-management, Redis-like, OAuth, OIDC, or provider dependencies.

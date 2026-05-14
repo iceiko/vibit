@@ -81,7 +81,8 @@ selected_posture:
   renewal_method: reauthenticate_with_device_credential_login
   logout_scope_first_posture: presented_access_token
 schema_gates:
-  credential_record_schema_gate_status: defined_no_schema_added
+  credential_record_schema_gate_status: ratified_no_schema_added
+  credential_record_schema_boundary: docs/credential-record-schema-boundary.md
   token_verifier_record_schema_gate_status: defined_no_schema_added
   external_identity_link_schema_gate_status: deferred_no_schema_added
   runtime_session_record_schema_gate_status: deferred_no_schema_added
