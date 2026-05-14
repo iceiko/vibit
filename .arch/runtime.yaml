@@ -38,11 +38,12 @@ purpose: >
   authentication_schema_migration_queue: ADR-0034
   authentication_postgresql_adapter_implementation_gate: ADR-0035
   runtime_authentication_implementation_boundary: ADR-0036
+  close_runtime_authentication_boundary_and_open_generated_shape_gate: ADR-0037
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: runtime_authentication_implementation_boundary_planning
+  current_phase: authentication_generated_contract_shape_gate
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1055,10 +1056,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-016
-    latest_completed_work_item: W-0086
-    next_ready_work_item: W-0087
-    status: runtime_authentication_implementation_boundary_defined_closeout_next
+    milestone: M-017
+    latest_completed_work_item: W-0087
+    next_ready_work_item: W-0088
+    status: authentication_generated_contract_shape_timing_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1151,10 +1152,14 @@ identity_session_boundary:
       - W-0085 close_authentication_postgresql_adapter_implementation_milestone
     rule: The milestone may implement PostgreSQL persistence for ratified authentication records only. It must not implement production authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or major authentication dependencies.
   runtime_authentication_implementation_boundary_planning:
-    status: active
+    status: completed
     milestone: M-016
     first_work_item: W-0086
-    next_work_item: W-0087
+    closeout_work_item: W-0087
+    closeout_change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
+    closeout_decision: ADR-0037
+    next_milestone: M-017
+    next_work_item_after_closeout: W-0088
     allowed_scope: planning_boundary_only
     previous_milestone: M-015
     previous_closeout_work_item: W-0085
@@ -1206,6 +1211,37 @@ identity_session_boundary:
       - W-0086 define_runtime_authentication_implementation_boundary
       - W-0087 close_runtime_authentication_implementation_boundary_planning_milestone
     rule: The milestone may define runtime authentication implementation boundaries and planning gates only. It must not implement production authentication behavior, token generation, token validation, login handlers, WebSocket routes, Protobuf messages, generated authentication shapes, or major authentication dependencies.
+  authentication_generated_contract_shape_gate:
+    status: active
+    milestone: M-017
+    first_work_item: W-0088
+    next_work_item: W-0088
+    selected_by_closeout_decision: ADR-0037
+    previous_milestone: M-016
+    previous_closeout_work_item: W-0087
+    previous_closeout_change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
+    allowed_scope: generated_shape_timing_decision_only
+    generated_output_standard: docs/generated-output.md
+    generated_output_decision: ADR-0017
+    authentication_contract_surfaces_standard: docs/authentication-contract-error-permission-surfaces.md
+    runtime_authentication_implementation_boundary_standard: docs/runtime-authentication-implementation-boundary.md
+    runtime_authentication_implementation_boundary_decision: ADR-0036
+    generated_authentication_shapes_added: false
+    runtime_authentication_implemented: false
+    token_generation_added: false
+    token_validation_added: false
+    verifier_comparison_added: false
+    login_handlers_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    protobuf_authentication_messages_added: false
+    websocket_proof_carrier_implemented: false
+    authentication_dependencies_added: false
+    repository_interface_changed: false
+    migration_schemas_changed: false
+    work_queue:
+      - W-0088 decide_authentication_generated_contract_shape_timing
+    rule: The milestone may decide generated authentication contract shape timing and boundaries only. It must not generate authentication shapes, implement runtime authentication behavior, add Protobuf messages, add WebSocket carriers, add authentication dependencies, change authentication.Repository, or change migration schemas unless a later gated work item explicitly authorizes that exact slice.
 
 persistence_model:
   decision: ADR-0011

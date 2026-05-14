@@ -1,0 +1,106 @@
+schema_version: 0.1
+change_id: close-runtime-authentication-implementation-boundary-planning-milestone
+date: 2026-05-14
+type: standard
+status: verified
+
+summary: Close the runtime authentication implementation boundary planning milestone and open the authentication generated contract shape gate.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0037
+  referenced:
+    - ADR-0030
+    - ADR-0035
+    - ADR-0036
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  token_validation_added: false
+  verifier_comparison_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  generated_authentication_shapes_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  completed_milestone: M-016
+  completed_work_item: W-0087
+  next_milestone: M-017
+  next_ready_work_item: W-0088
+  next_direction: authentication_generated_contract_shape_gate
+  implementation_authorized: generated_shape_timing_decision_only
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check change close-runtime-authentication-implementation-boundary-planning-milestone --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

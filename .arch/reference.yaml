@@ -386,11 +386,12 @@ phase_plan:
       - persistence_independent_frontend_backend_vocabulary
     rule: This phase implemented persistence adapter capability only; it did not copy Nakama or Pitaya public APIs and did not implement login, token generation, token validation, protocol carriers, WebSocket routes, or authentication dependencies.
   phase_2e_runtime_authentication_implementation_boundary:
-    status: active
-    active_milestone: M-016
+    status: completed
+    milestone: M-016
     decision: ADR-0036
-    latest_completed_work_item: W-0086
-    next_work_item: W-0087
+    latest_completed_work_item: W-0087
+    closeout_decision: ADR-0037
+    closeout_change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
     standard: docs/runtime-authentication-implementation-boundary.md
     translation: docs/runtime-authentication-implementation-boundary.zh-CN.md
     change: changes/2026-05-14-define-runtime-authentication-implementation-boundary
@@ -411,7 +412,25 @@ phase_plan:
       - handler_session_context_vocabulary
       - route_handler_identity_context
       - frontend_acceptor_backend_handler_separation
-    rule: Define runtime authentication implementation ownership and sequencing before behavior; do not copy Nakama or Pitaya APIs, and do not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, generated authentication shapes, or authentication dependencies in this phase.
+    rule: This phase defined runtime authentication implementation ownership and sequencing before behavior; it did not copy Nakama or Pitaya APIs and did not implement login, token generation, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, generated authentication shapes, or authentication dependencies.
+  phase_2f_authentication_generated_contract_shape_gate:
+    status: active
+    active_milestone: M-017
+    decision: ADR-0037
+    next_work_item: W-0088
+    focus:
+      - generated_authentication_contract_shape_timing
+      - semantic_authentication_contract_trace
+      - generated_output_standard_alignment
+      - immutable_generated_output_boundary
+      - pre_runtime_authentication_shape_decision
+    nakama_reference:
+      - account_authentication_request_response_shape_capability
+      - session_token_response_shape_vocabulary
+    pitaya_reference:
+      - route_payload_shape_vocabulary
+      - handler_context_separation
+    rule: Decide generated authentication contract shape timing before runtime behavior; do not generate shapes, implement authentication behavior, add protocol messages, add WebSocket carriers, or add dependencies in the timing decision step.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

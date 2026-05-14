@@ -52,6 +52,8 @@ Repository interface 可以 normalize identifiers、digest byte slices、statuse
 
 Runtime authentication implementation boundary planning 记录在 `docs/runtime-authentication-implementation-boundary.md` 和 `decisions/ADR-0036-runtime-authentication-implementation-boundary.md`。未来 runtime authentication 必须由 `runtime/internal/app` 下的 application boundary 拥有，必须通过 application unit-of-work boundary 使用本模块的 `authentication.Repository`，并在 domain dispatch 前把 validated proof 转换为 `RequestIdentity`。本模块不得吸收 token generation、verifier comparison、login execution、access-token validation、logout execution、cleanup jobs、Protobuf messages、WebSocket proof carriers、generated authentication shapes 或 authentication dependencies。
 
+当前 authentication-adjacent milestone 是 `M-017 Authentication Generated Contract Shape Gate`。`W-0088` 可以决定 generated Go authentication contract shapes 是否应在 application service interfaces 之前引入。除非后续 work item 明确授权该具体 slice，否则它不得生成 authentication shapes 或实现 runtime authentication behavior。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

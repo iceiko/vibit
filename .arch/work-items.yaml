@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-016
+current_milestone: M-017
 
 continuation_semantics:
   default_step_unit: work_item
@@ -320,7 +320,7 @@ milestones:
 
   - id: M-016
     title: Runtime Authentication Implementation Boundary Planning
-    status: active
+    status: completed
     goal: Plan the first runtime authentication implementation boundary after the persistence adapter without implementing login, token generation, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, or authentication dependencies.
     completion_criteria:
       - Runtime authentication responsibilities are split between application services, module-owned persistence interfaces, PostgreSQL adapters, request identity handoff, protocol adapters, and transport boundaries before implementation.
@@ -340,6 +340,26 @@ milestones:
       - adding WebSocket proof carriers or routes
       - adding JWT, OAuth, OIDC, password-hashing, key-management, Redis-like, provider SDK, or cryptography dependencies
       - adding external identity, runtime session, audit, or refresh-token persistence
+    completion_summary: M-016 completed the runtime authentication implementation boundary planning gate. The repository now has an English and Simplified Chinese runtime authentication implementation boundary standard, ADR-0036, manifest and guide references, repository checks for the runtime authentication implementation boundary, an application-owned future authentication orchestration boundary, persistence-only authentication PostgreSQL adapter rules, request identity handoff expectations, error/permission/audit mapping expectations, Nakama/Pitaya capability alignment, and a separately gated future implementation queue. Runtime authentication behavior, token generation, token validation, verifier comparison, login execution, logout execution, refresh, cleanup jobs, Protobuf authentication messages, WebSocket proof carriers, generated authentication shapes, authentication dependencies, authentication repository changes, and migration schema changes remain deferred.
+
+  - id: M-017
+    title: Authentication Generated Contract Shape Gate
+    status: active
+    goal: Decide whether and when generated Go authentication contract shapes should be introduced before application service interfaces or runtime authentication behavior.
+    completion_criteria:
+      - Generated authentication contract shape timing is decided before runtime authentication service code starts.
+      - The generated-shape decision references semantic authentication contracts and the generated-output standard.
+      - If generated shapes are later authorized, their source trace, owner, output path, immutable status, and repository checks are defined before generation.
+      - Runtime authentication behavior, token generation, token validation, verifier comparison, login execution, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, and migration schema changes remain deferred unless separately gated.
+    non_goals:
+      - generating authentication contract shapes in the direction step
+      - implementing application authentication services
+      - implementing token generation or verifier comparison
+      - implementing login, token validation, logout, refresh, or cleanup
+      - adding authentication Protobuf messages
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
 
 work_items:
   - id: W-0001
@@ -2244,16 +2264,38 @@ work_items:
   - id: W-0087
     milestone: M-016
     title: Close runtime authentication implementation boundary planning milestone
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-close-runtime-authentication-implementation-boundary-planning-milestone
     depends_on:
       - W-0086
     related_decisions:
       - ADR-0036
+      - ADR-0037
     completion:
       - Review M-016 against the runtime authentication implementation boundary standard, manifests, guides, checks, and work queue.
       - Mark M-016 completed only if runtime authentication, token generation, token validation, verifier comparison, login execution, logout execution, refresh, cleanup jobs, Protobuf messages, WebSocket proof carriers, generated authentication shapes, authentication dependencies, authentication repository changes, and migration schema changes remain deferred or are explicitly planned for later gated work.
       - Open the next bounded implementation-preparation or confirmation milestone without starting runtime authentication behavior implicitly.
+    completion_summary: Reviewed M-016 against the runtime authentication implementation boundary standard, ADR-0036, manifests, guides, runtime boundary checks, and work queue. Marked M-016 and W-0087 completed, opened M-017 Authentication Generated Contract Shape Gate, and made W-0088 Decide authentication generated contract shape timing the next ready work item. Runtime authentication behavior, token generation, token validation, verifier comparison, login execution, logout execution, refresh, cleanup jobs, Protobuf authentication messages, WebSocket proof carriers, generated authentication shapes, authentication dependencies, repository interface changes, and migration schema changes remain deferred.
     ask_first:
       - Starting runtime authentication implementation while closing the boundary planning milestone.
       - Adding token generation, verifier comparison, token validation, login, logout execution, refresh, cleanup jobs, WebSocket routes, Protobuf messages, generated authentication shapes, authentication dependencies, repository interface changes, or migration schema changes.
+
+  - id: W-0088
+    milestone: M-017
+    title: Decide authentication generated contract shape timing
+    status: next_ready
+    change: changes/2026-05-14-decide-authentication-generated-contract-shape-timing
+    depends_on:
+      - W-0087
+    related_decisions:
+      - ADR-0017
+      - ADR-0028
+      - ADR-0036
+      - ADR-0037
+    completion:
+      - Decide whether generated Go authentication contract shapes should be introduced before application service interfaces and runtime authentication behavior.
+      - Define the allowed generated shape source, output path, immutable status, check requirements, and relationship to semantic authentication contracts if generation is recommended.
+      - Preserve deferral for actual generated authentication shape files unless a later work item explicitly authorizes generation.
+    ask_first:
+      - Generating authentication contract shape files rather than deciding timing and boundary.
+      - Adding application authentication service code, token generation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, or migration schema changes.
