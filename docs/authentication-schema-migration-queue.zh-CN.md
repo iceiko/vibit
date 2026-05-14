@@ -13,7 +13,8 @@ Canonical decision: `ADR-0034`
 本标准定义两个必需 authentication schema boundaries 都 ratify 之后的下一个 bounded work queue：
 
 ```yaml
-credential_record_schema_boundary: ratified_no_schema_added
+credential_record_schema_boundary: migration_source_added
+credential_migration_source_added: true
 token_verifier_record_schema_boundary: ratified_no_schema_added
 default_durable_target: PostgreSQL
 implementation_authorized_now: false
@@ -87,7 +88,7 @@ Agents 不得在一个宽泛 change 中合并 migration source creation、reposi
 
 | Work item | Title | Scope |
 | --- | --- | --- |
-| `W-0077` | Add credential PostgreSQL migration source | 只创建已 ratified 的 `authentication_device_credentials` SQL source。 |
+| `W-0077` | Add credential PostgreSQL migration source | 已完成。只创建已 ratified 的 `authentication_device_credentials` SQL source。 |
 | `W-0078` | Add token verifier PostgreSQL migration source | Credential migration 存在之后，只创建已 ratified 的 `authentication_access_tokens` SQL source。 |
 | `W-0079` | Add authentication migration static checks | 强化 authentication migration naming、ownership、forbidden raw secret columns 和 player lifecycle table separation 的 repository checks。 |
 | `W-0080` | Define authentication repository interface boundary | 为 credential 与 token verifier storage 定义 storage-neutral interfaces 和 mutations，不加 adapters 或 runtime behavior。 |
@@ -116,7 +117,7 @@ Rationale：
 
 ## 6. Credential Migration Gate
 
-`W-0077` 只能添加一个 SQL-first migration source：
+`W-0077` 已只添加一个 SQL-first migration source：
 
 ```text
 runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
@@ -313,4 +314,10 @@ W-0076 不需要 live PostgreSQL verification，因为本 planning step 不添�
 W-0077 Add credential PostgreSQL migration source
 ```
 
-下一项工作只能在声明边界内添加 credential migration source 和相关 static manifest/check updates。
+下一项工作是：
+
+```text
+W-0078 Add token verifier PostgreSQL migration source
+```
+
+它只能在声明边界内添加 token verifier migration source 和相关 static manifest/check updates。

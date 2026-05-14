@@ -81,10 +81,13 @@ selected_posture:
   renewal_method: reauthenticate_with_device_credential_login
   logout_scope_first_posture: presented_access_token
 schema_gates:
-  credential_record_schema_gate_status: ratified_no_schema_added
+  credential_record_schema_gate_status: migration_source_added
   credential_record_schema_boundary: docs/credential-record-schema-boundary.md
   token_verifier_record_schema_gate_status: ratified_no_schema_added
   token_verifier_record_schema_boundary: docs/token-verifier-record-schema-boundary.md
+  credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  credential_migration_source_added: true
+  token_verifier_migration_source_added: false
   external_identity_link_schema_gate_status: deferred_no_schema_added
   runtime_session_record_schema_gate_status: deferred_no_schema_added
 implementation_status:
@@ -92,10 +95,10 @@ implementation_status:
   token_behavior_implemented: false
   credential_storage_implemented: false
   token_storage_schema_added: false
-  credential_storage_schema_added: false
+  credential_storage_schema_added: true
   external_identity_storage_schema_added: false
   session_storage_schema_added: false
-  migration_sources_added: false
+  migration_sources_added: partial_credential_only
   repository_interfaces_added: false
   postgres_adapters_added: false
   runtime_lookup_added: false
@@ -107,6 +110,8 @@ implementation_status:
 ```
 
 These signals are not a substitute for schemas or tests. They are tripwires that force later implementation work to explicitly change the architecture state.
+
+`credential_storage_schema_added: true` means only that the SQL migration source exists. It does not authorize credential lookup, login, token behavior, repositories, adapters, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
 
 ## 5. Forbidden Shortcuts
 

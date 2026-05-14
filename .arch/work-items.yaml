@@ -1979,7 +1979,7 @@ work_items:
   - id: W-0077
     milestone: M-014
     title: Add credential PostgreSQL migration source
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-add-credential-postgresql-migration-source
     depends_on:
       - W-0076
@@ -1991,6 +1991,7 @@ work_items:
       - Add SQL-first migration source for the ratified authentication_device_credentials schema under runtime/migrations/postgres.
       - Include goose Up and Down sections, owning module trace, deterministic sequence number, constraints, indexes, redaction-safe column names, and player account lifecycle separation.
       - Preserve PostgreSQL as the default durable target without adding token verifier tables, repository interfaces, adapters, runtime lookup, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    completion_summary: Added runtime/migrations/postgres/000003_create_authentication_device_credentials.sql as the SQL-first credential verifier migration source for the selected device_credential_login posture. It creates only authentication_device_credentials, records runtime.authentication ownership, stores non-plaintext credential lookup and verifier digests, enforces ratified lifecycle and at-most-one-active-per-player constraints, references player_accounts without modifying player lifecycle tables, and keeps token verifier tables, repository interfaces, PostgreSQL adapters, runtime credential lookup, login, token issuance, token validation, logout, refresh, cleanup, handlers, routes, generated authentication output, Protobuf messages, WebSocket behavior, authentication dependencies, and production authentication behavior deferred.
     ask_first:
       - Adding token verifier migration source in the credential migration step.
       - Adding authentication repository interfaces or PostgreSQL adapters.
@@ -2001,7 +2002,7 @@ work_items:
   - id: W-0078
     milestone: M-014
     title: Add token verifier PostgreSQL migration source
-    status: planned
+    status: next_ready
     change: changes/2026-05-14-add-token-verifier-postgresql-migration-source
     depends_on:
       - W-0077

@@ -88,11 +88,12 @@ W-0074 已经 ratify credential record schema boundary，但没有添加 schema�
 
 ```yaml
 credential_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   standard: docs/credential-record-schema-boundary.md
   decision: ADR-0032
   future_logical_table: authentication_device_credentials
-  migration_added_now: false
+  migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  migration_added_now: true
   repository_added_now: false
   runtime_lookup_added_now: false
 ```
@@ -113,7 +114,7 @@ token_verifier_record_schema_boundary:
   cleanup_added_now: false
 ```
 
-Authentication schema migration planning 现在是添加任何 migration source 前的下一个必需工作。
+W-0077 已添加 credential migration source。Token verifier migration source 仍是在添加 repository interfaces、adapters 或 runtime authentication behavior 前的下一个必需 schema step。
 
 ## 4. Credential Record Gate
 

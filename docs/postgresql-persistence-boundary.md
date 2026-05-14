@@ -407,6 +407,14 @@ It uses the next deterministic SQL migration number after existing migration fil
 
 Runtime player account handlers, WebSocket route wiring, authentication, token behavior, credential storage, external identity linking, and session persistence remain deferred until separately ratified.
 
+The first credential migration source is:
+
+```text
+runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+```
+
+It is owned by `runtime.authentication`, creates only `authentication_device_credentials`, references `player_accounts(player_id)` without changing player lifecycle tables, and does not authorize token storage, repository interfaces, PostgreSQL adapters, runtime authentication, Protobuf messages, or WebSocket behavior.
+
 ## 3.2 Player Account PostgreSQL Adapter Boundary
 
 The first player account PostgreSQL adapter is implemented, but it remains a persistence adapter only. It does not authorize runtime handlers, WebSocket routes, authentication, token behavior, credential storage, external identity linking, or session persistence.
@@ -599,7 +607,7 @@ The current migration source check is:
 node tools/vibit check migrations
 ```
 
-It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, and the first inventory table references. It does not apply or roll back migrations against PostgreSQL yet.
+It validates SQL migration naming, `goose` Up/Down markers, absence of unapproved Go migrations, owning-module traces, architecture manifest references, the first inventory table references, the player account lifecycle migration shape, and the credential migration source shape. It does not apply or roll back migrations against PostgreSQL yet.
 
 The current migration apply/status API is:
 

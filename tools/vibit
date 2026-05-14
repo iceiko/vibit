@@ -4821,7 +4821,7 @@ function checkMigrations(root) {
       });
     }
 
-    if (/^--\s*Module:\s*[a-z][a-z0-9_]*\s*$/m.test(text)) {
+    if (/^--\s*Module:\s*[a-z][a-z0-9_]*(?:\.[a-z][a-z0-9_]*)*\s*$/m.test(text)) {
       ok(`${file} declares owning module`, {
         rule_id: "migration.ownership",
         artifact: file,
@@ -4981,6 +4981,135 @@ function checkMigrations(root) {
     ok(`${playerAccountMigration} is not added yet; W-0051 remains the migration-source step`, {
       rule_id: "migration.root",
       artifact: playerAccountMigration,
+    });
+  }
+
+  const credentialMigration = `${migrationRoot}/000003_create_authentication_device_credentials.sql`;
+  if (isFile(root, credentialMigration)) {
+    const text = readText(path.join(root, credentialMigration));
+    const requiredMarkers = [
+      "-- +goose Up",
+      "-- Module: runtime.authentication",
+      "-- +goose Down",
+    ];
+    const requiredTables = [
+      "authentication_device_credentials",
+      "player_accounts",
+    ];
+    const requiredColumns = [
+      "credential_record_id",
+      "player_id",
+      "credential_kind",
+      "credential_status",
+      "credential_lookup_digest",
+      "credential_verifier_digest",
+      "verifier_algorithm",
+      "verifier_version",
+      "verifier_key_id",
+      "client_instance_id_digest",
+      "created_at",
+      "updated_at",
+      "last_verified_at",
+      "disabled_at",
+      "disabled_reason",
+      "revoked_at",
+      "revoked_reason",
+      "replaced_at",
+      "replaced_by_credential_record_id",
+    ];
+    const requiredIndexes = [
+      "authentication_device_credentials_lookup_digest_uq",
+      "authentication_device_credentials_one_active_per_player_uq",
+      "authentication_device_credentials_player_status_idx",
+      "authentication_device_credentials_status_updated_at_idx",
+      "authentication_device_credentials_replaced_by_idx",
+    ];
+    const forbiddenPatterns = [
+      { pattern: /\braw_/i, label: "raw secret material columns" },
+      { pattern: /\bmetadata\b/i, label: "generic metadata columns" },
+      { pattern: /\baccess_token\b/i, label: "access token schema" },
+      { pattern: /\brefresh_token\b/i, label: "refresh token schema" },
+      { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
+      { pattern: /\bexternal_identity\b/i, label: "external identity schema" },
+      { pattern: /\bruntime_session(s)?\b/i, label: "runtime session schema" },
+      { pattern: /\bwebsocket\b/i, label: "WebSocket state schema" },
+      { pattern: /\brequest_identity\b/i, label: "request identity persistence" },
+      { pattern: /\bpassword(_hash|s)?\b/i, label: "password storage" },
+      { pattern: /\bjwt\b/i, label: "JWT vocabulary" },
+      { pattern: /\boauth\b/i, label: "OAuth vocabulary" },
+      { pattern: /\boidc\b/i, label: "OIDC vocabulary" },
+      { pattern: /\bplayer_account_events\b/i, label: "player lifecycle event table changes" },
+    ];
+    for (const marker of requiredMarkers) {
+      if (text.includes(marker)) {
+        ok(`${credentialMigration} includes ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: credentialMigration,
+        });
+      } else {
+        fail(`${credentialMigration} is missing ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: credentialMigration,
+        });
+      }
+    }
+    for (const table of requiredTables) {
+      if (text.includes(table)) {
+        ok(`${credentialMigration} references ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      } else {
+        fail(`${credentialMigration} does not reference ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      }
+    }
+    for (const column of requiredColumns) {
+      if (text.includes(column)) {
+        ok(`${credentialMigration} references ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      } else {
+        fail(`${credentialMigration} does not reference ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      }
+    }
+    for (const indexName of requiredIndexes) {
+      if (text.includes(indexName)) {
+        ok(`${credentialMigration} declares ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      } else {
+        fail(`${credentialMigration} does not declare ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      }
+    }
+    for (const { pattern, label } of forbiddenPatterns) {
+      if (pattern.test(text)) {
+        fail(`${credentialMigration} includes ${label}, which is outside the ratified credential schema`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      } else {
+        ok(`${credentialMigration} does not include ${label}`, {
+          rule_id: "migration.ownership",
+          artifact: credentialMigration,
+        });
+      }
+    }
+  } else if (isFile(root, ".arch/runtime.yaml") &&
+    readText(path.join(root, ".arch/runtime.yaml")).includes("credential_migration_source_added: true")) {
+    fail(`${credentialMigration} is missing after credential migration source is marked added`, {
+      rule_id: "migration.root",
+      artifact: credentialMigration,
     });
   }
 
@@ -5479,11 +5608,7 @@ function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
   }
 
   const migrations = discoverFilesUnder(root, "runtime/migrations/postgres").filter((file) => file.endsWith(".sql"));
-  const playerMigrations = migrations.filter((file) => {
-    const text = readText(path.join(root, file));
-    return /\bplayer(?:s|_account|_accounts|_identity|_identities)?\b/i.test(file) ||
-      /\bplayer(?:s|_account|_accounts|_identity|_identities)?\b/i.test(text);
-  });
+  const playerMigrations = migrations.filter((file) => file === "runtime/migrations/postgres/000002_create_player_account_state.sql");
   if (playerMigrations.length > 0) {
     if (playerAccountPostgresSchemaIsRatified(root)) {
       ok("player account PostgreSQL schema is ratified before player migration source", {
@@ -5917,11 +6042,7 @@ function checkRuntimeAuthenticationTokenSessionBoundaries(root, goFiles) {
   checkNoForbiddenPatterns(boundedRuntimeFiles, runtimeForbiddenPatterns, "runtime/protocol/domain/player persistence before auth implementation ratification", { stripComments: true });
 
   const playerMigrationFiles = discoverFilesUnder(root, "runtime/migrations/postgres")
-    .filter((file) => file.endsWith(".sql"))
-    .filter((file) => {
-      const text = readText(path.join(root, file));
-      return /\bplayer(_account|_accounts|s)?\b/i.test(file) || /\bplayer(_account|_accounts|s)?\b/i.test(text);
-    });
+    .filter((file) => file === "runtime/migrations/postgres/000002_create_player_account_state.sql");
   const playerPersistenceForbiddenPatterns = [
     { pattern: /\bcredential(s)?\b/i, label: "credential columns or tables" },
     { pattern: /\bpassword(_hash|s)?\b/i, label: "password columns or tables" },
@@ -6071,17 +6192,19 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "token_issuance_carrier: login_command_response_token",
       "request_proof_carrier: explicit_request_proof_payload",
       "refresh_token: not_in_first_implementation",
-      "credential_record_schema_gate_status: ratified_no_schema_added",
+      "credential_record_schema_gate_status: migration_source_added",
       "token_verifier_record_schema_gate_status: ratified_no_schema_added",
       "renewal_method: reauthenticate_with_device_credential_login",
       "runtime_authentication_implemented: false",
       "token_behavior_implemented: false",
       "credential_storage_implemented: false",
       "token_storage_schema_added: false",
-      "credential_storage_schema_added: false",
+      "credential_storage_schema_added: true",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
-      "migration_sources_added: false",
+      "migration_sources_added: partial_credential_only",
+      "credential_migration_source_added: true",
+      "token_verifier_migration_source_added: false",
       "repository_interfaces_added: false",
       "postgres_adapters_added: false",
       "runtime_lookup_added: false",
@@ -6098,7 +6221,7 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "credential_token_session_schema_gates_defined: true",
       "credential_record_schema_boundary_ratified: true",
       "token_verifier_record_schema_boundary_ratified: true",
-      "credential_storage_schema_added: false",
+      "credential_storage_schema_added: true",
       "token_storage_schema_added: false",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
@@ -6114,7 +6237,9 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       "credential_token_session_schema_gates_defined: true",
       "credential_record_schema_boundary_ratified: true",
       "token_verifier_record_schema_boundary_ratified: true",
-      "credential_storage_schema_added: false",
+      "credential_migration_source_added: true",
+      "token_verifier_migration_source_added: false",
+      "credential_storage_schema_added: true",
       "token_storage_schema_added: false",
       "external_identity_storage_schema_added: false",
       "session_storage_schema_added: false",
@@ -6266,7 +6391,24 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
     { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
   ];
-  checkNoForbiddenPatterns(migrationFiles, selectedMigrationForbiddenPatterns, "PostgreSQL migrations before schema ratification gates");
+  const credentialMigrationFile = "runtime/migrations/postgres/000003_create_authentication_device_credentials.sql";
+  const migrationFilesBeforeCredentialGate = migrationFiles.filter((file) => file !== credentialMigrationFile);
+  checkNoForbiddenPatterns(migrationFilesBeforeCredentialGate, selectedMigrationForbiddenPatterns, "PostgreSQL migrations before schema ratification gates");
+
+  const credentialMigrationForbiddenPatterns = [
+    { pattern: /\btoken(s|_verifier|_record|_hash)?\b/i, label: "token schema" },
+    { pattern: /\baccess_token\b/i, label: "access token schema" },
+    { pattern: /\brefresh_token\b/i, label: "refresh token schema" },
+    { pattern: /\bruntime_session(s)?\b/i, label: "runtime session schema" },
+    { pattern: /\bexternal_identity\b/i, label: "external identity schema" },
+    { pattern: /\bprovider_subject\b/i, label: "provider subject schema" },
+    { pattern: /\bauthentication_(audit|event|events|log)\b/i, label: "authentication audit schema" },
+  ];
+  checkNoForbiddenPatterns(
+    migrationFiles.filter((file) => file === credentialMigrationFile),
+    credentialMigrationForbiddenPatterns,
+    "credential migration before token/session/external-identity gates"
+  );
 
   const playerPersistenceFiles = [
     "runtime/migrations/postgres/000002_create_player_account_state.sql",

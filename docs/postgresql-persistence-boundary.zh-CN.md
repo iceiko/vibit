@@ -408,6 +408,14 @@ runtime/migrations/postgres/000002_create_player_account_state.sql
 
 Runtime player account handlers、WebSocket route wiring、authentication、token behavior、credential storage、external identity linking 和 session persistence 继续 deferred，直到分别被 ratify。
 
+第一版 credential migration source 是：
+
+```text
+runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+```
+
+它由 `runtime.authentication` 拥有，只创建 `authentication_device_credentials`，引用 `player_accounts(player_id)` 但不改变 player lifecycle tables，并且不授权 token storage、repository interfaces、PostgreSQL adapters、runtime authentication、Protobuf messages 或 WebSocket behavior。
+
 ## 3.2 Player Account PostgreSQL Adapter Boundary
 
 第一版 player account PostgreSQL adapter 已经实现，但它仍然只是 persistence adapter。它不授权 runtime handlers、WebSocket routes、authentication、token behavior、credential storage、external identity linking 或 session persistence。
@@ -600,7 +608,7 @@ node tools/vibit check all
 node tools/vibit check migrations
 ```
 
-它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references，以及第一版 inventory table references。它还不会针对 PostgreSQL 执行 apply 或 rollback。
+它验证 SQL migration naming、`goose` Up/Down markers、没有未批准的 Go migrations、owning-module traces、architecture manifest references、第一版 inventory table references、player account lifecycle migration shape 以及 credential migration source shape。它还不会针对 PostgreSQL 执行 apply 或 rollback。
 
 当前 migration apply/status API 是：
 

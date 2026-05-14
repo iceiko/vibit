@@ -13,7 +13,8 @@ The paired Simplified Chinese translation is `docs/authentication-schema-migrati
 This standard defines the next bounded work queue after both required authentication schema boundaries are ratified:
 
 ```yaml
-credential_record_schema_boundary: ratified_no_schema_added
+credential_record_schema_boundary: migration_source_added
+credential_migration_source_added: true
 token_verifier_record_schema_boundary: ratified_no_schema_added
 default_durable_target: PostgreSQL
 implementation_authorized_now: false
@@ -87,7 +88,7 @@ The planned M-014 queue after this planning step is:
 
 | Work item | Title | Scope |
 | --- | --- | --- |
-| `W-0077` | Add credential PostgreSQL migration source | Create only the ratified `authentication_device_credentials` SQL source. |
+| `W-0077` | Add credential PostgreSQL migration source | Completed. Creates only the ratified `authentication_device_credentials` SQL source. |
 | `W-0078` | Add token verifier PostgreSQL migration source | Create only the ratified `authentication_access_tokens` SQL source after the credential migration exists. |
 | `W-0079` | Add authentication migration static checks | Harden repository checks for authentication migration naming, ownership, forbidden raw secret columns, and player lifecycle table separation. |
 | `W-0080` | Define authentication repository interface boundary | Define storage-neutral interfaces and mutations for credential and token verifier storage without adapters or runtime behavior. |
@@ -116,7 +117,7 @@ Future migration work may adjust exact sequence numbers only if existing migrati
 
 ## 6. Credential Migration Gate
 
-`W-0077` may add only one SQL-first migration source:
+`W-0077` has added only one SQL-first migration source:
 
 ```text
 runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
@@ -313,4 +314,10 @@ Next work:
 W-0077 Add credential PostgreSQL migration source
 ```
 
-The next work item may add only the credential migration source and related static manifest/check updates within its declared boundary.
+The next work item is:
+
+```text
+W-0078 Add token verifier PostgreSQL migration source
+```
+
+It may add only the token verifier migration source and related static manifest/check updates within its declared boundary.

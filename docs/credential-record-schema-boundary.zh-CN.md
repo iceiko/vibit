@@ -16,7 +16,8 @@ Canonical decision: `ADR-0032`
 login_method: device_credential_login
 credential_kind: high_entropy_installation_credential
 default_durable_target: PostgreSQL
-schema_boundary_status: ratified_no_schema_added
+schema_boundary_status: migration_source_added
+credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
 ```
 
 本文定义未来 record semantics。它不添加 SQL migration source、tables、repository interfaces、PostgreSQL adapters、runtime lookup、login handlers、token behavior、generated authentication shapes、Protobuf messages、WebSocket proof carriers、WebSocket handshake authentication、authentication dependencies 或 production authentication behavior。
@@ -57,18 +58,19 @@ Credential record boundary 只作为 schema boundary 被 ratify：
 
 ```yaml
 credential_record_schema_boundary:
-  status: ratified_no_schema_added
+  status: migration_source_added
   default_durable_target: PostgreSQL
   future_logical_table: authentication_device_credentials
   owner: runtime.authentication
-  migration_source_added: false
+  migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  migration_source_added: true
   repository_interface_added: false
   postgres_adapter_added: false
   runtime_lookup_added: false
   authentication_implemented: false
 ```
 
-未来 logical table name 已 ratify，目的是让 agents 在 migration planning 阶段有稳定目标。除非后续 migration work item 在 `runtime/migrations/postgres/` 下创建 SQL source，否则该 table 不存在。
+Logical table name 已 ratify，并且 SQL source 现在存在于 `runtime/migrations/postgres/` 下。该 migration source 不授权 repositories、adapters、runtime lookup、handlers、routes、generated authentication output、Protobuf messages、WebSocket behavior、authentication dependencies 或 production authentication behavior。
 
 ## 4. Ownership
 
@@ -281,7 +283,8 @@ Agents 不得：
 credential_record_schema_boundary: completed_by_W_0074
 token_verifier_record_schema_boundary: required_before_authentication_implementation
 authentication_schema_migration_queue: required_before_migration
-credential_migration_source: separate_future_work
+credential_migration_source: completed_by_W_0077
+credential_migration_source_path: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
 credential_repository_interface: separate_future_work
 credential_postgres_adapter: separate_future_work
 redaction_tests: separate_future_or_implementation_work

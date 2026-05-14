@@ -596,11 +596,13 @@ login_method_token_format_ratification:
       external_identity_link_schema_gate: false
       runtime_session_record_schema_gate: false
     default_durable_target: PostgreSQL
-    credential_record_schema_gate_status: ratified_no_schema_added
+    credential_record_schema_gate_status: migration_source_added
     credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
     credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
     credential_record_schema_boundary_decision: ADR-0032
     future_credential_logical_table: authentication_device_credentials
+    credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+    credential_migration_source_added: true
     token_verifier_record_schema_gate_status: ratified_no_schema_added
     token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
     token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
@@ -609,12 +611,12 @@ login_method_token_format_ratification:
     external_identity_link_schema_gate_status: deferred_no_schema_added
     runtime_session_record_schema_gate_status: deferred_no_schema_added
     audit_persistence_schema_gate_status: defined_no_schema_added
-    credential_tables_added: false
+    credential_tables_added: true
     token_tables_added: false
     external_identity_tables_added: false
     session_tables_added: false
     audit_tables_added: false
-    migration_sources_added: false
+    migration_sources_added: partial_credential_only
     repository_interfaces_added: false
     postgres_adapters_added: false
     runtime_lookup_added: false
@@ -639,8 +641,10 @@ login_method_token_format_ratification:
     credential_record_schema_boundary_ratified: true
     token_verifier_record_schema_boundary_ratified: true
     selected_login_token_boundary_checks_added: true
+    credential_migration_source_added: true
+    token_verifier_migration_source_added: false
     token_storage_schema_added: false
-    credential_storage_schema_added: false
+    credential_storage_schema_added: true
     external_identity_storage_schema_added: false
     session_storage_schema_added: false
     audit_storage_schema_added: false
@@ -665,14 +669,16 @@ credential_token_schema_ratification:
   milestone: M-014
   selected_by_closeout_decision: ADR-0031
   first_work_item: W-0074
-  latest_completed_work_item: W-0076
-  next_work_item: W-0077
+  latest_completed_work_item: W-0077
+  next_work_item: W-0078
   default_durable_target: PostgreSQL
-  credential_record_schema_boundary_status: ratified_no_schema_added
+  credential_record_schema_boundary_status: migration_source_added
   credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
   credential_record_schema_boundary_translation: docs/credential-record-schema-boundary.zh-CN.md
   credential_record_schema_boundary_decision: ADR-0032
   future_credential_logical_table: authentication_device_credentials
+  credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  credential_migration_source_added: true
   token_verifier_record_schema_boundary_status: ratified_no_schema_added
   token_verifier_record_schema_boundary_standard: docs/token-verifier-record-schema-boundary.md
   token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
@@ -687,7 +693,8 @@ credential_token_schema_ratification:
   planned_repository_interface_boundary: W-0080
   planned_postgres_adapter_boundary: W-0081
   planned_closeout_work_item: W-0082
-  migration_sources_added: false
+  migration_sources_added: partial_credential_only
+  token_verifier_migration_source_added: false
   repository_interfaces_added: false
   postgres_adapters_added: false
   runtime_lookup_added: false
