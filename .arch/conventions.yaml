@@ -653,15 +653,20 @@ login_method_token_format_ratification:
     runtime_player_handlers_added: false
     websocket_routes_added: false
   next_steps:
-    - plan_authentication_schema_migration_queue
+    - add_credential_postgresql_migration_source
+    - add_token_verifier_postgresql_migration_source
+    - add_authentication_migration_static_checks
+    - define_authentication_repository_interface_boundary
+    - define_authentication_postgresql_adapter_boundary
+    - close_credential_token_verifier_schema_ratification_milestone
 
 credential_token_schema_ratification:
   status: active
   milestone: M-014
   selected_by_closeout_decision: ADR-0031
   first_work_item: W-0074
-  latest_completed_work_item: W-0075
-  next_work_item: W-0076
+  latest_completed_work_item: W-0076
+  next_work_item: W-0077
   default_durable_target: PostgreSQL
   credential_record_schema_boundary_status: ratified_no_schema_added
   credential_record_schema_boundary_standard: docs/credential-record-schema-boundary.md
@@ -673,6 +678,15 @@ credential_token_schema_ratification:
   token_verifier_record_schema_boundary_translation: docs/token-verifier-record-schema-boundary.zh-CN.md
   token_verifier_record_schema_boundary_decision: ADR-0033
   future_token_logical_table: authentication_access_tokens
+  authentication_schema_migration_queue_standard: docs/authentication-schema-migration-queue.md
+  authentication_schema_migration_queue_translation: docs/authentication-schema-migration-queue.zh-CN.md
+  authentication_schema_migration_queue_decision: ADR-0034
+  authentication_schema_migration_queue_change: changes/2026-05-14-plan-authentication-schema-migration-queue
+  planned_credential_migration_source: runtime/migrations/postgres/000003_create_authentication_device_credentials.sql
+  planned_token_verifier_migration_source: runtime/migrations/postgres/000004_create_authentication_access_tokens.sql
+  planned_repository_interface_boundary: W-0080
+  planned_postgres_adapter_boundary: W-0081
+  planned_closeout_work_item: W-0082
   migration_sources_added: false
   repository_interfaces_added: false
   postgres_adapters_added: false

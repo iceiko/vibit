@@ -1956,7 +1956,7 @@ work_items:
   - id: W-0076
     milestone: M-014
     title: Plan authentication schema migration queue
-    status: next_ready
+    status: completed
     change: changes/2026-05-14-plan-authentication-schema-migration-queue
     depends_on:
       - W-0075
@@ -1968,9 +1968,141 @@ work_items:
       - Plan the credential and token verifier migration sequence, repository-interface gates, PostgreSQL adapter gates, redaction checks, live PostgreSQL verification expectations, and future work-item ordering now that both schema boundaries are ratified.
       - Preserve PostgreSQL as the default durable target without adding migration source, repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
       - Keep player account lifecycle tables credential-free, token-free, external-identity-free, session-free, WebSocket-state-free, and request-validation-free.
+    completion_summary: Planned the remaining M-014 authentication schema migration queue. Established credential migration before token verifier migration, followed by authentication migration static checks, authentication repository interface boundary, authentication PostgreSQL adapter boundary, and M-014 closeout. Recorded docs/authentication-schema-migration-queue.md and ADR-0034. No migration source, table, repository interface, PostgreSQL adapter, runtime credential lookup, token issuance, token validation, logout, refresh, cleanup job, handler, route, generated authentication output, Protobuf message, WebSocket carrier, authentication dependency, or authentication behavior was added.
     ask_first:
       - Adding authentication migration sources or tables.
       - Adding authentication repository interfaces or PostgreSQL adapters.
       - Implementing credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
       - Adding JWT, signing, key-management, Redis-like, OAuth, OIDC, password-hashing, or provider dependencies.
       - Changing Protobuf envelope, WebSocket proof carrier, or WebSocket handshake authentication behavior.
+
+  - id: W-0077
+    milestone: M-014
+    title: Add credential PostgreSQL migration source
+    status: next_ready
+    change: changes/2026-05-14-add-credential-postgresql-migration-source
+    depends_on:
+      - W-0076
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0034
+    completion:
+      - Add SQL-first migration source for the ratified authentication_device_credentials schema under runtime/migrations/postgres.
+      - Include goose Up and Down sections, owning module trace, deterministic sequence number, constraints, indexes, redaction-safe column names, and player account lifecycle separation.
+      - Preserve PostgreSQL as the default durable target without adding token verifier tables, repository interfaces, adapters, runtime lookup, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    ask_first:
+      - Adding token verifier migration source in the credential migration step.
+      - Adding authentication repository interfaces or PostgreSQL adapters.
+      - Implementing credential lookup, login, token issuance, token validation, logout, refresh, or cleanup behavior.
+      - Adding password hashing, JWT, signing, key-management, Redis-like, OAuth, OIDC, or provider dependencies.
+      - Adding generic metadata columns or storing raw credential material.
+
+  - id: W-0078
+    milestone: M-014
+    title: Add token verifier PostgreSQL migration source
+    status: planned
+    change: changes/2026-05-14-add-token-verifier-postgresql-migration-source
+    depends_on:
+      - W-0077
+    related_decisions:
+      - ADR-0029
+      - ADR-0033
+      - ADR-0034
+    completion:
+      - Add SQL-first migration source for the ratified authentication_access_tokens schema under runtime/migrations/postgres.
+      - Include goose Up and Down sections, owning module trace, deterministic sequence number, constraints, indexes, redaction-safe column names, credential-token linkage, expiration, revocation, retention, and cleanup eligibility semantics.
+      - Preserve PostgreSQL as the default durable target without adding repository interfaces, adapters, runtime validation, handlers, routes, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    ask_first:
+      - Changing the ratified credential migration schema.
+      - Adding authentication repository interfaces or PostgreSQL adapters.
+      - Implementing token issuance, validation, logout, refresh, cleanup, or credential lookup behavior.
+      - Adding JWT, signing, key-management, Redis-like, OAuth, OIDC, password-hashing, or provider dependencies.
+      - Adding generic metadata columns or storing raw token material.
+
+  - id: W-0079
+    milestone: M-014
+    title: Add authentication migration static checks
+    status: planned
+    change: changes/2026-05-14-add-authentication-migration-static-checks
+    depends_on:
+      - W-0078
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0033
+      - ADR-0034
+    completion:
+      - Add static repository checks for authentication migration sequence, owning module trace, goose sections, table names, forbidden raw secret columns, forbidden generic metadata columns, and player account lifecycle table separation.
+      - Preserve JSON check output with forward-slash repository-relative paths on every platform.
+      - Keep checks local by default without requiring live PostgreSQL, runtime authentication, repository interfaces, adapters, generated output, Protobuf messages, WebSocket behavior, or authentication dependencies.
+    ask_first:
+      - Weakening existing migration, runtime, or selected login/token checks.
+      - Making live PostgreSQL mandatory for default checks.
+      - Adding broad static-analysis dependencies.
+      - Implementing authentication behavior while adding checks.
+
+  - id: W-0080
+    milestone: M-014
+    title: Define authentication repository interface boundary
+    status: planned
+    change: changes/2026-05-14-define-authentication-repository-interface-boundary
+    depends_on:
+      - W-0079
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0033
+      - ADR-0034
+    completion:
+      - Define storage-neutral authentication repository interface boundaries for credential and token verifier records after migrations and static checks exist.
+      - Define mutation/query shapes, unit-of-work expectations, redaction rules, and future test expectations without adding PostgreSQL adapters or runtime authentication behavior.
+      - Preserve selected login/token implementation deferral for handlers, routes, generated output, Protobuf messages, WebSocket behavior, and authentication dependencies.
+    ask_first:
+      - Implementing PostgreSQL authentication adapters in the repository-interface step.
+      - Implementing credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
+      - Changing ratified migration schemas or table ownership.
+      - Adding authentication dependencies or WebSocket/Protobuf behavior.
+
+  - id: W-0081
+    milestone: M-014
+    title: Define authentication PostgreSQL adapter boundary
+    status: planned
+    change: changes/2026-05-14-define-authentication-postgresql-adapter-boundary
+    depends_on:
+      - W-0080
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0033
+      - ADR-0034
+    completion:
+      - Define PostgreSQL adapter source/test paths, constructors, executor ownership, transaction expectations, SQL operation scope, error mapping expectations, fake-executor tests, and optional live PostgreSQL verification expectations for authentication repositories.
+      - Preserve runtime authentication implementation deferral and keep adapter implementation separate unless a later work item explicitly authorizes it.
+    ask_first:
+      - Implementing adapter behavior in the boundary step.
+      - Implementing runtime credential lookup, token issuance, token validation, logout, refresh, or cleanup behavior.
+      - Changing ratified repository interface shape, migration schemas, table ownership, or transaction ownership model.
+      - Making live PostgreSQL mandatory in default repository checks.
+
+  - id: W-0082
+    milestone: M-014
+    title: Close credential and token verifier schema ratification milestone
+    status: planned
+    change: changes/2026-05-14-close-credential-token-verifier-schema-ratification-milestone
+    depends_on:
+      - W-0081
+    related_decisions:
+      - ADR-0029
+      - ADR-0032
+      - ADR-0033
+      - ADR-0034
+    completion:
+      - Review M-014 completion criteria against credential schema, token verifier schema, migration queue, migration sources, static checks, repository boundary, adapter boundary, manifests, standards, and repository checks.
+      - Mark M-014 completed only if runtime authentication, handlers, routes, generated output, Protobuf changes, WebSocket changes, production token validation, credential lookup, logout, refresh, cleanup, and major authentication dependencies remain deferred or are explicitly planned for a later milestone.
+      - Create the next confirmation or implementation gate rather than starting runtime authentication implicitly.
+    ask_first:
+      - Starting production authentication implementation while closing the milestone.
+      - Adding runtime player handlers or WebSocket routes.
+      - Changing Protobuf envelope or WebSocket handshake behavior.
+      - Adding new major dependencies or data migrations.
