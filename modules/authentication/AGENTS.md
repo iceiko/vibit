@@ -65,6 +65,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-026 Environment Verifier Key Loader Gate` is completed. `W-0098` defined the gate in `docs/environment-verifier-key-loader-gate.md` and `ADR-0046` without adding service code or runtime authentication behavior. Future process environment verifier key loading belongs under `runtime/internal/app/authentication`, not this module, and must call `NewVerifierKeySet` there. This module remains storage-neutral and may store already-computed verifier metadata only. It must not parse environment variables, decode key text, hold key material, validate key sets, read local secret files, parse `.env` files, rotate keys, compute digests, compare verifiers, or decide authentication outcomes. `runtime.environment_verifier_key_loader_gate` is the repository check rule for this gate.
 
+`M-027 Environment Verifier Key Loader Implementation` is completed. `W-0099` implemented process environment verifier key loading under `runtime/internal/app/authentication`, not in this module. The authentication module remains storage-neutral and must not parse environment variables, decode key text, hold key material, validate key sets, read local secret files, parse `.env` files, rotate keys, compute digests, compare verifiers, wire startup, or decide authentication outcomes.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

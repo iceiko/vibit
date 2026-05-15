@@ -6972,7 +6972,8 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
     .filter((file) => file !== "runtime/internal/modules/authentication/repository.go")
     .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go")
-    .filter((file) => !isExplicitVerifierKeySetValidatorFile(file));
+    .filter((file) => !isExplicitVerifierKeySetValidatorFile(file))
+    .filter((file) => !isEnvironmentVerifierKeyLoaderFile(file));
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -7296,6 +7297,13 @@ function checkRuntimeAuthenticationImplementationBoundary(root, goFiles) {
       });
       continue;
     }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not implement runtime authentication behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -7497,6 +7505,13 @@ function checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goF
     }
     if (isExplicitVerifierKeySetValidatorFile(file)) {
       ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not load environment secret configuration`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not implement authentication service behavior`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -7732,6 +7747,13 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
     }
     if (isExplicitVerifierKeySetValidatorFile(file)) {
       ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement token or credential verifier algorithm behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not implement token or credential verifier algorithms`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -7981,6 +8003,13 @@ function checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles
       });
       continue;
     }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and keeps secret configuration loading inside the application adapter`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8201,6 +8230,13 @@ function checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles) {
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not generate token or credential material`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const rawText = readText(path.join(root, file));
@@ -8445,6 +8481,13 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8676,6 +8719,13 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const rawText = readText(path.join(root, file));
@@ -8951,6 +9001,13 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -9088,7 +9145,10 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
       "required_environment_variables: 5",
       "environment_values_log_safe: false",
       "full_key_set_id_log_safe: false",
-      "environment_loader_implemented: false",
+      "environment_loader_implemented: true",
+      "environment_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "environment_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "process_environment_adapter_added: true",
       "environment_parsing_added: false",
       "base64_text_decoding_added: false",
       "local_secret_file_reading_added: false",
@@ -9126,7 +9186,10 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
       "required_environment_variables: 5",
       "environment_values_log_safe: false",
       "full_key_set_id_log_safe: false",
-      "environment_loader_implemented: false",
+      "environment_loader_implemented: true",
+      "environment_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "environment_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "process_environment_adapter_added: true",
       "environment_parsing_added: false",
       "base64_text_decoding_added: false",
       "local_secret_file_reading_added: false",
@@ -9156,8 +9219,10 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
       "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
       "environment_variable_contract_declared: true",
       "base64_text_decoding_posture_declared: true",
-      "environment_loader_implemented: false",
-      "recommended_next_gate: environment_verifier_key_loader_implementation",
+      "environment_loader_implemented: true",
+      "environment_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "environment_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "recommended_next_gate: token_credential_material_generation_implementation_gate",
       "runtime_lookup_added: false",
       "websocket_handshake_authentication_changed: false",
       "protobuf_envelope_changed: false",
@@ -9174,8 +9239,10 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
       "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
       "environment_variable_contract_declared: true",
       "base64_text_decoding_posture_declared: true",
-      "environment_loader_implemented: false",
-      "recommended_next_gate: environment_verifier_key_loader_implementation",
+      "environment_loader_implemented: true",
+      "environment_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "environment_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "recommended_next_gate: token_credential_material_generation_implementation_gate",
       "runtime_lookup_added: false",
       "token_behavior_implemented: false",
       "token_generation_added: false",
@@ -9213,27 +9280,100 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
   }
 
   if (isFile(root, futureLoaderSource)) {
-    fail(`${futureLoaderSource} exists before W-0099 authorizes environment loader implementation`, {
+    ok(`${futureLoaderSource} exists for the W-0099-authorized environment verifier key loader implementation`, {
       rule_id: ruleId,
       artifact: futureLoaderSource,
     });
   } else {
-    ok(`${futureLoaderSource} is not implemented by this gate-only change`, {
+    fail(`${futureLoaderSource} is missing after W-0099 authorized environment loader implementation`, {
       rule_id: ruleId,
       artifact: futureLoaderSource,
     });
   }
 
   if (isFile(root, futureLoaderTests)) {
-    fail(`${futureLoaderTests} exists before W-0099 authorizes environment loader implementation tests`, {
+    ok(`${futureLoaderTests} exists for the W-0099-authorized environment verifier key loader tests`, {
       rule_id: ruleId,
       artifact: futureLoaderTests,
     });
   } else {
-    ok(`${futureLoaderTests} is not implemented by this gate-only change`, {
+    fail(`${futureLoaderTests} is missing after W-0099 authorized environment loader implementation tests`, {
       rule_id: ruleId,
       artifact: futureLoaderTests,
     });
+  }
+
+  if (isFile(root, futureLoaderSource)) {
+    const sourceText = readText(path.join(root, futureLoaderSource));
+    const requiredSourceMarkers = [
+      "const (",
+      "EnvVerifierKeySetID",
+      "VIBIT_AUTH_VERIFIER_KEY_SET_ID",
+      "EnvCredentialLookupKey",
+      "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY",
+      "EnvCredentialVerifierKey",
+      "VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY",
+      "EnvTokenLookupKey",
+      "VIBIT_AUTH_TOKEN_LOOKUP_KEY",
+      "EnvTokenVerifierKey",
+      "VIBIT_AUTH_TOKEN_VERIFIER_KEY",
+      "type EnvLookup func(name string) (string, bool)",
+      "func LoadVerifierKeySetFromEnvironment(lookup EnvLookup) (VerifierKeySet, error)",
+      "func LoadVerifierKeySetFromProcessEnvironment() (VerifierKeySet, error)",
+      "os.LookupEnv",
+      "base64.RawURLEncoding.DecodeString",
+      "base64.StdEncoding.DecodeString",
+      "NewVerifierKeySet(config)",
+      "ErrMissingEnvironmentVariable",
+      "ErrInvalidEnvironmentKeyText",
+      "ErrInvalidEnvironmentKeySet",
+      "VerifierKeyEnvironmentError",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${futureLoaderSource} includes W-0099 environment loader marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureLoaderSource,
+        });
+      } else {
+        fail(`${futureLoaderSource} is missing W-0099 environment loader marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureLoaderSource,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureLoaderTests)) {
+    const testText = readText(path.join(root, futureLoaderTests));
+    const requiredTestMarkers = [
+      "TestLoadVerifierKeySetFromEnvironmentAcceptsBase64URLUnpaddedKeySet",
+      "TestLoadVerifierKeySetFromEnvironmentAcceptsStandardBase64PaddedKeySet",
+      "TestLoadVerifierKeySetFromEnvironmentRequiresLookup",
+      "TestLoadVerifierKeySetFromEnvironmentMissingEachVariableFailsClosed",
+      "TestLoadVerifierKeySetFromEnvironmentInvalidEachEncodedKeyFailsClosed",
+      "TestLoadVerifierKeySetFromEnvironmentDecodedShortKeyFailsThroughValidator",
+      "TestLoadVerifierKeySetFromEnvironmentDuplicateDecodedKeysFailThroughValidator",
+      "TestLoadVerifierKeySetFromEnvironmentAllZeroKeyFailsThroughValidator",
+      "TestLoadVerifierKeySetFromEnvironmentRepeatedSingleByteKeyFailsThroughValidator",
+      "TestLoadVerifierKeySetFromEnvironmentEmptyKeySetIDFailsThroughValidator",
+      "TestLoadVerifierKeySetFromEnvironmentErrorsDoNotIncludeSecretValues",
+      "TestLoadVerifierKeySetFromProcessEnvironmentReadsRequiredEnvironmentOnly",
+      "assertEnvironmentError",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${futureLoaderTests} includes W-0099 environment loader test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureLoaderTests,
+        });
+      } else {
+        fail(`${futureLoaderTests} is missing W-0099 environment loader test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureLoaderTests,
+        });
+      }
+    }
   }
 
   const behaviorFiles = goFiles
@@ -9263,6 +9403,13 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
     }
     if (isExplicitVerifierKeySetValidatorFile(file)) {
       ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement process environment loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isEnvironmentVerifierKeyLoaderFile(file)) {
+      ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9367,6 +9514,10 @@ function textMatchesAny(text, patterns) {
 
 function isExplicitVerifierKeySetValidatorFile(file) {
   return file === "runtime/internal/app/authentication/verifier_key_config.go";
+}
+
+function isEnvironmentVerifierKeyLoaderFile(file) {
+  return file === "runtime/internal/app/authentication/verifier_key_env.go";
 }
 
 function checkWork(root) {

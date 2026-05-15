@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-027
+current_milestone: M-028
 
 continuation_semantics:
   default_step_unit: work_item
@@ -576,7 +576,7 @@ milestones:
 
   - id: M-027
     title: Environment Verifier Key Loader Implementation
-    status: active
+    status: completed
     goal: Implement the narrow process environment verifier key loader adapter that decodes required environment values and hands them to the explicit in-memory validator.
     completion_criteria:
       - The loader is implemented under runtime/internal/app/authentication using the file boundaries defined by ADR-0046.
@@ -599,6 +599,24 @@ milestones:
       - adding WebSocket proof carriers or routes
       - adding authentication dependencies
       - changing authentication.Repository or migration schemas
+    completion_summary: M-027 implemented the narrow process environment verifier key loader under runtime/internal/app/authentication. The loader accepts an explicit EnvLookup function, exposes a small process environment adapter using os.LookupEnv, reads the five required VIBIT_AUTH verifier key variables, decodes Base64URL unpadded and standard padded Base64 key text, calls NewVerifierKeySet for invariant validation, and returns redacted typed errors. Focused tests cover complete Base64URL and standard Base64 key sets, nil lookup, missing variables, invalid encoded keys, validator handoff failures for short, duplicate, all-zero, repeated-byte, and missing key-set-id inputs, redaction, and the process environment adapter. Startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, authentication dependencies, and production authentication behavior remain deferred.
+
+  - id: M-028
+    title: Token And Credential Material Generation Implementation Gate
+    status: active
+    goal: Define the next bounded implementation gate for token and credential material generation helpers before adding generation code.
+    completion_criteria:
+      - The gate names the exact helper ownership, file boundaries, entropy source, encoding posture, redaction requirements, tests, and deferrals.
+      - The gate preserves deferrals for verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+      - No token or credential generation code is added by the gate itself.
+    non_goals:
+      - generating tokens or credentials
+      - computing lookup or verifier digests
+      - comparing verifier material
+      - implementing authentication service behavior
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
 
 work_items:
   - id: W-0001
@@ -2762,7 +2780,7 @@ work_items:
   - id: W-0099
     milestone: M-027
     title: Implement environment verifier key loader
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-implement-environment-verifier-key-loader
     depends_on:
       - W-0098
@@ -2775,8 +2793,28 @@ work_items:
       - Decode supported Base64 key text and call NewVerifierKeySet instead of duplicating key-set validation logic.
       - Add focused tests for complete key sets, missing variables, invalid encoded keys, validator handoff failures, redaction, and unwired process adapter behavior.
       - Preserve deferral for startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, authentication dependencies, and production authentication behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_key_env.go and verifier_key_env_test.go. The loader defines the required VIBIT_AUTH environment variable names, accepts an EnvLookup for tests, exposes LoadVerifierKeySetFromEnvironment and LoadVerifierKeySetFromProcessEnvironment, decodes Base64URL unpadded and standard padded Base64 key text, calls NewVerifierKeySet instead of duplicating key validation, wraps missing variable, invalid encoding, and invalid key set failures in redacted typed errors, and keeps the process environment adapter unwired from startup. Tests cover valid Base64URL and standard Base64 key sets, nil lookup, missing variables, invalid encoded key text, short decoded key, duplicate decoded keys, all-zero key, repeated-byte key, empty key set id, error redaction, and the process environment adapter.
     ask_first:
       - Wiring the loader into process startup.
       - Reading local secret files, adding dotenv behavior, or accepting CLI secret input.
       - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
       - Implementing token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.
+
+  - id: W-0100
+    milestone: M-028
+    title: Define token and credential material generation implementation gate
+    status: next_ready
+    change: changes/2026-05-15-define-token-credential-material-generation-implementation-gate
+    depends_on:
+      - W-0099
+    related_decisions:
+      - ADR-0042
+      - ADR-0044
+    completion:
+      - Define the implementation gate for token and credential material generation helpers without adding generation code.
+      - Name future helper files, function boundaries, entropy source, URL-safe encoding posture, redaction rules, and test requirements.
+      - Preserve deferral for verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing token or credential generation code instead of only defining the gate.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external randomness, cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or dotenv dependency.

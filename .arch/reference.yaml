@@ -666,10 +666,11 @@ phase_plan:
       - session_binding_lifecycle
     rule: The process environment verifier key loader gate is defined before implementation. It specifies owner package, environment variable names, Base64 decoding posture, validation handoff to NewVerifierKeySet, redaction behavior, tests, and file boundaries while preserving deferrals for startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, dependencies, and production authentication behavior.
   phase_2p_environment_verifier_key_loader_implementation:
-    status: active
-    active_milestone: M-027
+    status: completed
+    completed_milestone: M-027
     previous_milestone: M-026
-    next_work_item: W-0099
+    completed_work_item: W-0099
+    change: changes/2026-05-15-implement-environment-verifier-key-loader
     focus:
       - environment_verifier_key_loader_implementation
       - lookup_function_loader
@@ -684,7 +685,28 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_binding_lifecycle
-    rule: The active phase may implement the environment verifier key loader as a narrow adapter under runtime/internal/app/authentication. It must not wire startup, read local secret files, parse dotenv files, accept CLI secret input, integrate KMS or cloud secret managers, generate tokens or credentials, compute digests, compare verifiers, implement authentication service behavior, expose protocol carriers, change repositories, change migrations, add authentication dependencies, or add production authentication behavior.
+    rule: The process environment verifier key loader is implemented as a narrow adapter under runtime/internal/app/authentication. It reads required environment values through an explicit lookup function or a tiny os.LookupEnv adapter, decodes supported Base64 key text, calls NewVerifierKeySet, and returns redacted errors. It does not wire startup, read local secret files, parse dotenv files, accept CLI secret input, integrate KMS or cloud secret managers, generate tokens or credentials, compute digests, compare verifiers, implement authentication service behavior, expose protocol carriers, change repositories, change migrations, add authentication dependencies, or add production authentication behavior.
+  phase_2q_token_credential_material_generation_implementation_gate:
+    status: active
+    active_milestone: M-028
+    previous_milestone: M-027
+    next_work_item: W-0100
+    focus:
+      - token_credential_material_generation_implementation_gate
+      - helper_file_boundaries
+      - entropy_source
+      - url_safe_encoding
+      - one_time_client_visibility
+      - redaction
+      - no_digest_helpers
+      - no_authentication_service_behavior
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_issuance_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+    rule: The active phase should define the token and credential material generation implementation gate before adding generation code. It must preserve deferrals for verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
