@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-026
+current_milestone: M-027
 
 continuation_semantics:
   default_step_unit: work_item
@@ -551,7 +551,7 @@ milestones:
 
   - id: M-026
     title: Environment Verifier Key Loader Gate
-    status: active
+    status: completed
     goal: Define the environment verifier key loader gate before adding process environment parsing or Base64 key text decoding.
     completion_criteria:
       - The environment loader gate declares exact owner package, environment variable contract, decoding posture, validation handoff to the explicit in-memory validator, redaction behavior, test cases, and file boundaries before implementation.
@@ -562,6 +562,33 @@ milestones:
       - decoding Base64 key text
       - reading local secret files
       - wiring process startup
+      - implementing token generation
+      - implementing credential generation
+      - implementing verifier digest computation
+      - implementing verifier comparison
+      - implementing authentication service behavior
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-026 defined the environment verifier key loader gate in ADR-0046 and the paired gate standard. The future loader is application-owned under runtime/internal/app/authentication, uses verifier_key_env.go and verifier_key_env_test.go, declares the required process environment variable contract, prefers Base64URL unpadded key text while allowing standard padded Base64 for compatibility, requires handoff to NewVerifierKeySet, preserves redaction expectations, and keeps startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, dependencies, and production authentication behavior deferred. No Go code, process environment parsing, Base64 text decoding, secret loading, startup wiring, token behavior, digest helpers, service behavior, protocol carriers, repository changes, migration changes, external dependencies, or production authentication behavior were added.
+
+  - id: M-027
+    title: Environment Verifier Key Loader Implementation
+    status: active
+    goal: Implement the narrow process environment verifier key loader adapter that decodes required environment values and hands them to the explicit in-memory validator.
+    completion_criteria:
+      - The loader is implemented under runtime/internal/app/authentication using the file boundaries defined by ADR-0046.
+      - The loader accepts an explicit lookup function for tests and may expose a tiny process environment adapter.
+      - The loader decodes supported Base64 key text, calls NewVerifierKeySet, preserves redaction, and adds focused tests.
+      - Startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, dependencies, and production authentication behavior remain deferred unless separately gated.
+    non_goals:
+      - wiring process startup
+      - reading local secret files
+      - parsing dotenv files
+      - accepting CLI secret input
+      - integrating KMS or cloud secret managers
       - implementing token generation
       - implementing credential generation
       - implementing verifier digest computation
@@ -2713,7 +2740,7 @@ work_items:
   - id: W-0098
     milestone: M-026
     title: Define environment verifier key loader gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-environment-verifier-key-loader-gate
     depends_on:
       - W-0097
@@ -2725,8 +2752,31 @@ work_items:
       - Declare the environment variable names, decoding posture, redaction rules, test cases, package ownership, file boundaries, and failure behavior for the future loader.
       - Require the future loader to call the explicit in-memory validator instead of duplicating key-set validation logic.
       - Preserve deferral for startup wiring, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, authentication dependencies, and production authentication behavior.
+    completion_summary: Defined the environment verifier key loader gate in docs/environment-verifier-key-loader-gate.md, docs/environment-verifier-key-loader-gate.zh-CN.md, and ADR-0046. The gate declares the future process environment variables VIBIT_AUTH_VERIFIER_KEY_SET_ID, VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY, VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY, VIBIT_AUTH_TOKEN_LOOKUP_KEY, and VIBIT_AUTH_TOKEN_VERIFIER_KEY; sets Base64URL unpadded as preferred encoding with standard padded Base64 compatibility; requires future handoff to NewVerifierKeySet; defines future files verifier_key_env.go and verifier_key_env_test.go; requires redacted loader errors and focused tests; and preserves deferrals for startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, dependencies, and production behavior. No environment parsing, Base64 decoding, Go loader code, startup wiring, external dependency, or runtime authentication behavior was added.
     ask_first:
       - Implementing process environment parsing while defining the gate.
       - Reading local secret files or adding dotenv behavior.
       - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
       - Implementing startup wiring, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.
+
+  - id: W-0099
+    milestone: M-027
+    title: Implement environment verifier key loader
+    status: next_ready
+    change: changes/2026-05-15-implement-environment-verifier-key-loader
+    depends_on:
+      - W-0098
+    related_decisions:
+      - ADR-0045
+      - ADR-0046
+    completion:
+      - Implement the environment verifier key loader under runtime/internal/app/authentication without startup wiring or runtime authentication behavior.
+      - Add a testable lookup-function loader and, if still small, a tiny process environment adapter.
+      - Decode supported Base64 key text and call NewVerifierKeySet instead of duplicating key-set validation logic.
+      - Add focused tests for complete key sets, missing variables, invalid encoded keys, validator handoff failures, redaction, and unwired process adapter behavior.
+      - Preserve deferral for startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Wiring the loader into process startup.
+      - Reading local secret files, adding dotenv behavior, or accepting CLI secret input.
+      - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
+      - Implementing token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.

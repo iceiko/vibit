@@ -1,0 +1,146 @@
+schema_version: 0.1
+change_id: define-environment-verifier-key-loader-gate
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the environment verifier key loader gate without adding environment parsing or runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0046
+  referenced:
+    - ADR-0041
+    - ADR-0045
+
+standards:
+  added:
+    - docs/environment-verifier-key-loader-gate.md
+    - docs/environment-verifier-key-loader-gate.zh-CN.md
+    - decisions/ADR-0046-environment-verifier-key-loader-gate.md
+    - conversations/2026-05-15-environment-verifier-key-loader-gate.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  environment_verifier_key_loader_gate_defined: true
+  environment_loader_implemented: false
+  secret_configuration_loading_added: false
+  environment_parsing_added: false
+  base64_text_decoding_added: false
+  local_secret_file_reading_added: false
+  dotenv_behavior_added: false
+  startup_wiring_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  kms_secret_manager_integration_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+readiness_posture:
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  future_loader_slice: process_environment_verifier_key_loader
+  required_validator_handoff: NewVerifierKeySet
+  future_loader_source: runtime/internal/app/authentication/verifier_key_env.go
+  future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go
+  recommended_next_gate: environment_verifier_key_loader_implementation
+
+workflow:
+  completed_work_item: W-0098
+  completed_milestone: M-026
+  next_milestone: M-027
+  next_ready_work_item: W-0099
+  next_direction: implement_environment_verifier_key_loader
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-environment-verifier-key-loader-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  verified:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json passed 1909/0/0
+    - node tools/vibit check memory --json passed 1350/0/0
+    - node tools/vibit check contracts --json passed 291/0/0
+    - node tools/vibit check generated --json passed 205/0/0
+    - node tools/vibit check runtime --json passed 1873/1/0
+    - node tools/vibit check module authentication --json passed 23/0/0
+    - node tools/vibit check work --json passed 605/0/0
+    - node tools/vibit check change define-environment-verifier-key-loader-gate --json passed 13/0/0
+    - node tools/vibit check all --json passed 150/1/0
+    - git diff --check
+    - secret scan passed with no token matches outside ignored local files
+  warning:
+    - runtime.identity_boundary warning remains for runtime/internal/platform/persistence/postgres/authentication_repository.go credential dependency; this warning is known from earlier runtime checks.

@@ -72,6 +72,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.verifier_digest_computation_comparison_boundary",
   "runtime.authentication_service_implementation_readiness_gate",
   "runtime.local_verifier_key_configuration_loading_gate",
+  "runtime.environment_verifier_key_loader_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -8876,7 +8877,7 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "explicit_in_memory_validator_implemented: true",
       "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
       "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
-      "recommended_next_gate: environment_verifier_key_loader_gate",
+      "next_gate_after_explicit_in_memory_validator: environment_verifier_key_loader_gate",
       "runtime_authentication_implemented: false",
       "token_behavior_implemented: false",
       "runtime_lookup_added: false",
@@ -8893,7 +8894,7 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "explicit_in_memory_validator_implemented: true",
       "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
       "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
-      "recommended_next_gate: environment_verifier_key_loader_gate",
+      "next_gate_after_explicit_in_memory_validator: environment_verifier_key_loader_gate",
       "runtime_authentication_implemented: false",
       "token_generation_added: false",
       "token_validation_added: false",
@@ -8962,6 +8963,323 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
     }
     for (const match of matches) {
       fail(`${file} crosses local verifier key configuration loading gate: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
+function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
+  const ruleId = "runtime.environment_verifier_key_loader_gate";
+  const standardPath = "docs/environment-verifier-key-loader-gate.md";
+  const standardTranslationPath = "docs/environment-verifier-key-loader-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0046-environment-verifier-key-loader-gate.md";
+  const futureLoaderSource = "runtime/internal/app/authentication/verifier_key_env.go";
+  const futureLoaderTests = "runtime/internal/app/authentication/verifier_key_env_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for environment verifier key loader gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for environment verifier key loader gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md"],
+    [".arch/conventions.yaml", "environment_verifier_key_loader_gate_decision: ADR-0046"],
+    [".arch/conventions.yaml", "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate"],
+    [".arch/runtime.yaml", "environment_verifier_key_loader_gate: ADR-0046"],
+    [".arch/runtime.yaml", "environment_verifier_key_loader_gate_decision: ADR-0046"],
+    [".arch/runtime.yaml", "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md"],
+    [".arch/runtime.yaml", "environment_verifier_key_loader_gate_defined: true"],
+    [".arch/runtime.yaml", "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate"],
+    [".arch/contracts.yaml", "environment_verifier_key_loader_gate_defined: true"],
+    [".arch/contracts.yaml", "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md"],
+    [".arch/reference.yaml", "phase_2o_environment_verifier_key_loader_gate"],
+    [".arch/reference.yaml", "environment_verifier_key_loader_gate_decision: ADR-0046"],
+    ["AGENTS.md", "docs/environment-verifier-key-loader-gate.md"],
+    ["AGENTS.md", "ADR-0046"],
+    ["AGENTS.md", "runtime.environment_verifier_key_loader_gate"],
+    ["AGENTS.zh-CN.md", "docs/environment-verifier-key-loader-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0046"],
+    ["AGENTS.zh-CN.md", "runtime.environment_verifier_key_loader_gate"],
+    ["runtime/AGENTS.md", "../docs/environment-verifier-key-loader-gate.md"],
+    ["runtime/AGENTS.md", "ADR-0046"],
+    ["runtime/AGENTS.md", "runtime.environment_verifier_key_loader_gate"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/environment-verifier-key-loader-gate.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0046"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.environment_verifier_key_loader_gate"],
+    ["modules/authentication/module.yaml", "environment_verifier_key_loader_gate_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/environment-verifier-key-loader-gate.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/environment-verifier-key-loader-gate.md"],
+    ["rules/check-rules.json", "runtime.environment_verifier_key_loader_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "environment_verifier_key_loader_gate: defined"],
+    [standardPath, "future_loader_slice: process_environment_verifier_key_loader"],
+    [standardPath, "required_validator_handoff: NewVerifierKeySet"],
+    [standardPath, "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go"],
+    [standardPath, "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go"],
+    [standardPath, "VIBIT_AUTH_VERIFIER_KEY_SET_ID"],
+    [standardPath, "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY"],
+    [standardPath, "VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY"],
+    [standardPath, "VIBIT_AUTH_TOKEN_LOOKUP_KEY"],
+    [standardPath, "VIBIT_AUTH_TOKEN_VERIFIER_KEY"],
+    [standardPath, "preferred_encoding: base64url_unpadded"],
+    [standardPath, "compatibility_encoding: standard_base64_padded"],
+    [standardPath, "raw_unencoded_key_text: forbidden"],
+    [standardPath, "partial_key_set: forbidden"],
+    [standardPath, "runtime.environment_verifier_key_loader_gate"],
+    [standardPath, "This is an implementation-gate standard. It does not add Go code"],
+    [standardTranslationPath, "environment_verifier_key_loader_gate: defined"],
+    [standardTranslationPath, "future_loader_slice: process_environment_verifier_key_loader"],
+    [standardTranslationPath, "required_validator_handoff: NewVerifierKeySet"],
+    [standardTranslationPath, "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go"],
+    [standardTranslationPath, "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go"],
+    [standardTranslationPath, "VIBIT_AUTH_VERIFIER_KEY_SET_ID"],
+    [standardTranslationPath, "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_TOKEN_LOOKUP_KEY"],
+    [standardTranslationPath, "VIBIT_AUTH_TOKEN_VERIFIER_KEY"],
+    [standardTranslationPath, "preferred_encoding: base64url_unpadded"],
+    [standardTranslationPath, "compatibility_encoding: standard_base64_padded"],
+    [standardTranslationPath, "raw_unencoded_key_text: forbidden"],
+    [standardTranslationPath, "partial_key_set: forbidden"],
+    [standardTranslationPath, "runtime.environment_verifier_key_loader_gate"],
+    [standardTranslationPath, "这只是 implementation-gate standard。它不添加 Go code"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "environment_verifier_key_loader_gate_defined: true",
+      "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md",
+      "environment_verifier_key_loader_gate_decision: ADR-0046",
+      "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate",
+      "planned_package: runtime/internal/app/authentication",
+      "future_loader_slice: process_environment_verifier_key_loader",
+      "required_validator_handoff: NewVerifierKeySet",
+      "explicit_in_memory_validator_required: true",
+      "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "input_source: process_environment",
+      "environment_variable_contract_declared: true",
+      "base64_text_decoding_posture_declared: true",
+      "preferred_encoding: base64url_unpadded",
+      "compatibility_encoding: standard_base64_padded",
+      "required_environment_variables: 5",
+      "environment_values_log_safe: false",
+      "full_key_set_id_log_safe: false",
+      "environment_loader_implemented: false",
+      "environment_parsing_added: false",
+      "base64_text_decoding_added: false",
+      "local_secret_file_reading_added: false",
+      "dotenv_behavior_added: false",
+      "cli_secret_input_added: false",
+      "startup_wiring_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "kms_secret_manager_integration_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "environment_verifier_key_loader_gate_defined: true",
+      "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md",
+      "environment_verifier_key_loader_gate_decision: ADR-0046",
+      "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate",
+      "planned_package: runtime/internal/app/authentication",
+      "future_loader_slice: process_environment_verifier_key_loader",
+      "required_validator_handoff: NewVerifierKeySet",
+      "explicit_in_memory_validator_required: true",
+      "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "input_source: process_environment",
+      "environment_variable_contract_declared: true",
+      "base64_text_decoding_posture_declared: true",
+      "preferred_encoding: base64url_unpadded",
+      "compatibility_encoding: standard_base64_padded",
+      "required_environment_variables: 5",
+      "environment_values_log_safe: false",
+      "full_key_set_id_log_safe: false",
+      "environment_loader_implemented: false",
+      "environment_parsing_added: false",
+      "base64_text_decoding_added: false",
+      "local_secret_file_reading_added: false",
+      "dotenv_behavior_added: false",
+      "cli_secret_input_added: false",
+      "startup_wiring_added: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "kms_secret_manager_integration_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "environment_verifier_key_loader_gate_defined: true",
+      "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md",
+      "environment_verifier_key_loader_gate_decision: ADR-0046",
+      "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate",
+      "future_loader_slice: process_environment_verifier_key_loader",
+      "required_validator_handoff: NewVerifierKeySet",
+      "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "environment_variable_contract_declared: true",
+      "base64_text_decoding_posture_declared: true",
+      "environment_loader_implemented: false",
+      "recommended_next_gate: environment_verifier_key_loader_implementation",
+      "runtime_lookup_added: false",
+      "websocket_handshake_authentication_changed: false",
+      "protobuf_envelope_changed: false",
+      "generated_contract_shapes_added: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "environment_verifier_key_loader_gate_defined: true",
+      "environment_verifier_key_loader_gate_standard: docs/environment-verifier-key-loader-gate.md",
+      "environment_verifier_key_loader_gate_decision: ADR-0046",
+      "environment_verifier_key_loader_gate_check_rule: runtime.environment_verifier_key_loader_gate",
+      "future_loader_slice: process_environment_verifier_key_loader",
+      "required_validator_handoff: NewVerifierKeySet",
+      "future_loader_source: runtime/internal/app/authentication/verifier_key_env.go",
+      "future_loader_tests: runtime/internal/app/authentication/verifier_key_env_test.go",
+      "environment_variable_contract_declared: true",
+      "base64_text_decoding_posture_declared: true",
+      "environment_loader_implemented: false",
+      "recommended_next_gate: environment_verifier_key_loader_implementation",
+      "runtime_lookup_added: false",
+      "token_behavior_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing environment verifier key loader gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves environment verifier key loader gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing environment verifier key loader gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureLoaderSource)) {
+    fail(`${futureLoaderSource} exists before W-0099 authorizes environment loader implementation`, {
+      rule_id: ruleId,
+      artifact: futureLoaderSource,
+    });
+  } else {
+    ok(`${futureLoaderSource} is not implemented by this gate-only change`, {
+      rule_id: ruleId,
+      artifact: futureLoaderSource,
+    });
+  }
+
+  if (isFile(root, futureLoaderTests)) {
+    fail(`${futureLoaderTests} exists before W-0099 authorizes environment loader implementation tests`, {
+      rule_id: ruleId,
+      artifact: futureLoaderTests,
+    });
+  } else {
+    ok(`${futureLoaderTests} is not implemented by this gate-only change`, {
+      rule_id: ruleId,
+      artifact: futureLoaderTests,
+    });
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\bVIBIT_AUTH_(VERIFIER_KEY_SET_ID|CREDENTIAL_LOOKUP_KEY|CREDENTIAL_VERIFIER_KEY|TOKEN_LOOKUP_KEY|TOKEN_VERIFIER_KEY)\b/, label: "environment variable use before environment loader implementation" },
+    { pattern: /\bos\.(Getenv|LookupEnv|Environ)\b/, label: "process environment parsing before environment loader implementation" },
+    { pattern: /\bencoding\/base64\b/, label: "Base64 key text decoding before environment loader implementation" },
+    { pattern: /\bbase64\.(RawURLEncoding|URLEncoding|StdEncoding|RawStdEncoding)\b/, label: "Base64 key text decoding before environment loader implementation" },
+    { pattern: /\bLoadVerifierKeySetFrom(Environment|ProcessEnvironment)\b/, label: "environment verifier key loader before implementation work item" },
+    { pattern: /\b(godotenv|dotenv|DotEnv|\.env)\b/, label: "dotenv behavior before separate authorization" },
+    { pattern: /\b(localSecret|secretFile|secretPath)\b/, label: "local secret file behavior before separate authorization" },
+    { pattern: /\b(secretManager|secretmanager|kms|KMS|vault|Vault)\b/, label: "external secret-manager or KMS integration before adoption gate" },
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|CredentialIssuer)\b/, label: "authentication service behavior before implementation gate" },
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "device credential authentication behavior before implementation gate" },
+    { pattern: /\bValidateAccessToken\b/, label: "access-token validation behavior before implementation gate" },
+    { pattern: /\bLogoutAccessToken\b/, label: "logout behavior before implementation gate" },
+    { pattern: /\bRefreshAccessToken\b/, label: "refresh behavior before implementation gate" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isExplicitVerifierKeySetValidatorFile(file)) {
+      ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement process environment loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement environment verifier key loading before W-0099`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses environment verifier key loader gate: ${match.label}`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9407,6 +9725,7 @@ function checkRuntime(root) {
   checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles);
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
+  checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

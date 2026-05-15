@@ -64,6 +64,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-024 Local Verifier Key Configuration Loading Gate` 已完成。`W-0096` 已在 `docs/local-verifier-key-configuration-loading-gate.md` 和 `ADR-0045` 中定义该 gate，且没有添加 service code 或 runtime authentication behavior。`W-0097` 已在 `runtime/internal/app/authentication` 下实现 explicit in-memory verifier key set validation，不属于本模块。本模块仍是 storage-neutral，只能存储 already-computed verifier metadata。它不得 load verifier keys、parse environment variables、decode key text、hold key material、validate key sets、rotate keys、compute digests、compare verifiers，或决定 authentication outcomes。`runtime.local_verifier_key_configuration_loading_gate` 是该 gate 的 repository check rule。
 
+`M-026 Environment Verifier Key Loader Gate` 已完成。`W-0098` 已在 `docs/environment-verifier-key-loader-gate.md` 和 `ADR-0046` 中定义该 gate，且没有添加 service code 或 runtime authentication behavior。Future process environment verifier key loading 属于 `runtime/internal/app/authentication`，不属于本模块，并且必须在该 package 调用 `NewVerifierKeySet`。本模块仍是 storage-neutral，只能存储 already-computed verifier metadata。它不得 parse environment variables、decode key text、hold key material、validate key sets、读取 local secret files、parse `.env` files、rotate keys、compute digests、compare verifiers，或决定 authentication outcomes。`runtime.environment_verifier_key_loader_gate` 是该 gate 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。
