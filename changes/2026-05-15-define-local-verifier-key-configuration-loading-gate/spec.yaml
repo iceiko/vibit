@@ -1,0 +1,127 @@
+schema_version: 0.1
+change_id: define-local-verifier-key-configuration-loading-gate
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the local verifier key configuration loading gate without adding secret-loading code or runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0045
+  referenced:
+    - ADR-0041
+    - ADR-0043
+    - ADR-0044
+
+standards:
+  added:
+    - docs/local-verifier-key-configuration-loading-gate.md
+    - docs/local-verifier-key-configuration-loading-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/module.yaml
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  local_verifier_key_configuration_loading_gate_defined: true
+  explicit_in_memory_validator_implemented: false
+  secret_configuration_loading_added: false
+  environment_parsing_added: false
+  base64_text_decoding_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  kms_secret_manager_integration_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+readiness_posture:
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  first_implementation_slice: explicit_in_memory_verifier_key_set_validation
+  first_environment_loader_status: deferred_to_follow_up_gate
+  required_logical_keys: 4
+  decoded_key_minimum_length_bytes: 32
+  minimum_key_entropy_bits: 256
+  recommended_next_gate: explicit_in_memory_verifier_key_set_validator_implementation
+
+workflow:
+  completed_work_item: W-0096
+  completed_milestone: M-024
+  next_milestone: M-025
+  next_ready_work_item: W-0097
+  next_direction: implement_explicit_in_memory_verifier_key_set_validator
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-local-verifier-key-configuration-loading-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

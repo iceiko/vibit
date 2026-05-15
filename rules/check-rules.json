@@ -516,6 +516,14 @@
       "agent_guidance": "Read `docs/authentication-service-implementation-readiness-gate.md` and `ADR-0044`; do not add authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login execution, token validation, logout execution, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.local_verifier_key_configuration_loading_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Local verifier key configuration loading gate",
+      "description": "The local verifier key configuration loading gate must define the first explicit in-memory verifier key set validation slice, package ownership, file boundaries, validation rules, redaction rules, tests, dependency posture, and deferrals before key loading code exists.",
+      "agent_guidance": "Read `docs/local-verifier-key-configuration-loading-gate.md` and `ADR-0045`; do not parse process environment variables, read local secret files, wire startup, integrate KMS or cloud secret managers, generate tokens or credentials, compute digests, compare verifiers, implement authentication service behavior, expose protocol carriers, change repositories, change migrations, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

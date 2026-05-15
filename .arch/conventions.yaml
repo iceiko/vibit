@@ -138,6 +138,9 @@ documentation_pairs:
   authentication_service_implementation_readiness_gate_standard:
     canonical: docs/authentication-service-implementation-readiness-gate.md
     zh-CN: docs/authentication-service-implementation-readiness-gate.zh-CN.md
+  local_verifier_key_configuration_loading_gate_standard:
+    canonical: docs/local-verifier-key-configuration-loading-gate.md
+    zh-CN: docs/local-verifier-key-configuration-loading-gate.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -1233,6 +1236,68 @@ authentication_service_implementation_readiness_gate:
     package boundaries, redaction, tests, protocol deferrals, dependency
     deferrals, repository boundaries, migration boundaries, and production
     behavior deferrals.
+
+local_verifier_key_configuration_loading_gate:
+  status: completed
+  milestone: M-024
+  first_work_item: W-0096
+  completed_work_item: W-0096
+  change: changes/2026-05-15-define-local-verifier-key-configuration-loading-gate
+  next_milestone: M-025
+  next_work_item: W-0097
+  previous_milestone: M-023
+  previous_completed_work_item: W-0095
+  decision: ADR-0045
+  local_verifier_key_configuration_loading_gate_decision: ADR-0045
+  standard: docs/local-verifier-key-configuration-loading-gate.md
+  translation: docs/local-verifier-key-configuration-loading-gate.zh-CN.md
+  local_verifier_key_configuration_loading_gate_standard: docs/local-verifier-key-configuration-loading-gate.md
+  local_verifier_key_configuration_loading_gate_translation: docs/local-verifier-key-configuration-loading-gate.zh-CN.md
+  local_verifier_key_configuration_loading_gate_defined: true
+  local_verifier_key_configuration_loading_gate_check_rule: runtime.local_verifier_key_configuration_loading_gate
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  planned_boundary_type: implementation_gate_standard_only
+  allowed_scope: gate_standard_and_manifests_only
+  first_implementation_slice: explicit_in_memory_verifier_key_set_validation
+  first_environment_loader_status: deferred_to_follow_up_gate
+  required_logical_keys: 4
+  decoded_key_minimum_length_bytes: 32
+  minimum_key_entropy_bits: 256
+  input_copying_required: true
+  immutable_key_accessors_required: true
+  duplicate_logical_keys_fail_closed: true
+  all_zero_key_bytes_fail_closed: true
+  repeated_single_byte_key_fail_closed: true
+  redacted_errors_required: true
+  recommended_next_gate: explicit_in_memory_verifier_key_set_validator_implementation
+  explicit_in_memory_validator_implemented: false
+  secret_configuration_loading_added: false
+  environment_parsing_added: false
+  base64_text_decoding_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  token_validation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  kms_secret_manager_integration_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The local verifier key configuration loading gate is defined. Future first
+    implementation should validate explicit in-memory verifier key sets under
+    runtime/internal/app/authentication, while environment parsing, Base64
+    decoding, startup wiring, KMS, secret-manager integration, token generation,
+    credential generation, digest helpers, verifier comparison, authentication
+    service behavior, protocol, transport, dependency, repository, migration,
+    and production authentication behavior remain separate gates.
 
 server_runtime:
   first_reference_language: Go

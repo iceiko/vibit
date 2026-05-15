@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-024
+current_milestone: M-025
 
 continuation_semantics:
   default_step_unit: work_item
@@ -501,7 +501,7 @@ milestones:
 
   - id: M-024
     title: Local Verifier Key Configuration Loading Gate
-    status: active
+    status: completed
     goal: Define the first bounded local verifier key configuration loading implementation gate before adding secret-loading code.
     completion_criteria:
       - The local verifier key configuration loading code gate declares exact owner package, input posture, validation rules, redaction rules, test cases, and file boundaries before implementation.
@@ -518,6 +518,32 @@ milestones:
       - executing login, token validation, logout, refresh, or cleanup behavior
       - adding authentication Protobuf messages
       - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-024 defined the local verifier key configuration loading gate. The repository now has an English and Simplified Chinese gate standard, ADR-0045, a runtime check rule, manifest and guide references, explicit in-memory verifier key set validation as the first future implementation slice, runtime/internal/app/authentication as the owner package, expected future files, validation requirements, redaction requirements, required unit tests, dependency posture, and Nakama/Pitaya capability mapping. Environment parsing, Base64 text decoding, startup wiring, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository changes, migration changes, and production authentication behavior remain deferred.
+
+  - id: M-025
+    title: Explicit In-Memory Verifier Key Set Validator
+    status: active
+    goal: Implement the explicit in-memory verifier key set validator as the first narrow local verifier key configuration code slice.
+    completion_criteria:
+      - The validator is implemented under runtime/internal/app/authentication using the file boundaries defined by ADR-0045.
+      - The validator accepts already-decoded explicit in-memory key material, copies input bytes, avoids mutable internal slice exposure, rejects invalid key sets, and keeps errors redacted.
+      - Focused unit tests cover accepted complete input, copying, immutable accessors, missing key set id, missing keys, short keys, duplicate logical keys, all-zero keys, repeated single-byte keys, and redaction.
+      - Environment parsing, Base64 text decoding, startup wiring, external KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, and production authentication behavior remain deferred unless separately gated.
+    non_goals:
+      - parsing process environment variables
+      - decoding Base64 key text
+      - reading local secret files
+      - wiring process startup
+      - implementing token generation
+      - implementing credential generation
+      - implementing verifier digest computation
+      - implementing verifier comparison
+      - implementing authentication service behavior
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
       - adding WebSocket proof carriers or routes
       - adding authentication dependencies
       - changing authentication.Repository or migration schemas
@@ -2618,7 +2644,7 @@ work_items:
   - id: W-0096
     milestone: M-024
     title: Define local verifier key configuration loading gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-local-verifier-key-configuration-loading-gate
     depends_on:
       - W-0095
@@ -2631,7 +2657,29 @@ work_items:
       - Choose whether the first implementation gate accepts explicit in-memory configuration, process environment configuration, or a sequenced combination.
       - Define validation, redaction, tests, package ownership, file boundaries, and failure behavior for the future code slice.
       - Preserve deferral for token generation, credential generation, verifier digest computation, verifier comparison, authentication service code, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, external secret-manager integrations, and production authentication behavior.
+    completion_summary: Defined the local verifier key configuration loading gate in ADR-0045 and the paired gate standard. The first future implementation slice is explicit in-memory verifier key set validation with already-decoded key bytes; process environment parsing and Base64 text decoding are deferred to a follow-up adapter gate. The future owner is runtime/internal/app/authentication; expected future files are verifier_key_config.go and verifier_key_config_test.go. The gate defines required logical keys, key length, duplicate-key rejection, all-zero rejection, repeated-byte rejection, input copying, immutable accessor expectations, redacted errors, required tests, dependency posture, and Nakama/Pitaya mapping. No Go code, environment parsing, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, KMS integration, secret-manager integration, or production authentication behavior were added.
     ask_first:
       - Implementing secret loading while defining the gate.
       - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, or provider dependency.
       - Changing repository interfaces, migration schemas, Protobuf messages, WebSocket proof carriers, or runtime authentication behavior.
+
+  - id: W-0097
+    milestone: M-025
+    title: Implement explicit in-memory verifier key set validator
+    status: next_ready
+    change: changes/2026-05-15-implement-explicit-in-memory-verifier-key-set-validator
+    depends_on:
+      - W-0096
+    related_decisions:
+      - ADR-0041
+      - ADR-0043
+      - ADR-0044
+      - ADR-0045
+    completion:
+      - Implement the explicit in-memory verifier key set validator under runtime/internal/app/authentication without adding environment parsing or runtime authentication behavior.
+      - Add tests for accepted complete distinct key sets, input copying, immutable accessors, missing key set id, missing keys, short keys, duplicate logical keys, all-zero keys, repeated single-byte keys, and redacted errors.
+      - Adjust runtime checks only as needed to permit the ADR-0045-authorized validator while preserving deferrals for environment parsing, token generation, credential generation, digest helpers, verifier comparison, service behavior, protocol carriers, repository changes, migrations, external secret managers, and production behavior.
+    ask_first:
+      - Parsing process environment variables or reading local secret files.
+      - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
+      - Implementing token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.
