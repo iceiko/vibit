@@ -247,6 +247,7 @@ runtime_contracts:
       authentication_service_implementation_readiness_gate_check_rule: runtime.authentication_service_implementation_readiness_gate
       planned_package_candidate: runtime/internal/app/authentication
       first_code_slice_must_be_separately_authorized: true
+      authentication_service_readiness_recommended_next_gate: local_verifier_key_configuration_loading_gate
       local_verifier_key_configuration_loading_gate_milestone: M-024
       local_verifier_key_configuration_loading_gate_completed_work_item: W-0096
       local_verifier_key_configuration_loading_gate_decision: ADR-0045
@@ -257,8 +258,12 @@ runtime_contracts:
       first_environment_loader_status: deferred_to_follow_up_gate
       required_logical_keys: 4
       decoded_key_minimum_length_bytes: 32
-      next_gate_after_local_verifier_key_configuration_loading: explicit_in_memory_verifier_key_set_validator_implementation
-      recommended_next_gate: local_verifier_key_configuration_loading_gate
+      completed_gate_after_local_verifier_key_configuration_loading: explicit_in_memory_verifier_key_set_validator_implementation
+      explicit_in_memory_validator_implemented: true
+      explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go
+      explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go
+      next_gate_after_explicit_in_memory_validator: environment_verifier_key_loader_gate
+      recommended_next_gate: environment_verifier_key_loader_gate
       external_identity_link_schema_gate_status: deferred_no_schema_added
       runtime_session_record_schema_gate_status: deferred_no_schema_added
       audit_persistence_schema_gate_status: defined_no_schema_added
@@ -364,6 +369,7 @@ runtime_contracts:
       authentication_service_implementation_readiness_gate_check_rule: runtime.authentication_service_implementation_readiness_gate
       planned_package_candidate: runtime/internal/app/authentication
       first_code_slice_must_be_separately_authorized: true
+      authentication_service_readiness_recommended_next_gate: local_verifier_key_configuration_loading_gate
       local_verifier_key_configuration_loading_gate_milestone: M-024
       local_verifier_key_configuration_loading_gate_completed_work_item: W-0096
       local_verifier_key_configuration_loading_gate_decision: ADR-0045
@@ -374,8 +380,12 @@ runtime_contracts:
       first_environment_loader_status: deferred_to_follow_up_gate
       required_logical_keys: 4
       decoded_key_minimum_length_bytes: 32
-      next_gate_after_local_verifier_key_configuration_loading: explicit_in_memory_verifier_key_set_validator_implementation
-      recommended_next_gate: local_verifier_key_configuration_loading_gate
+      completed_gate_after_local_verifier_key_configuration_loading: explicit_in_memory_verifier_key_set_validator_implementation
+      explicit_in_memory_validator_implemented: true
+      explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go
+      explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go
+      next_gate_after_explicit_in_memory_validator: environment_verifier_key_loader_gate
+      recommended_next_gate: environment_verifier_key_loader_gate
       runtime_lookup_added: false
       websocket_handshake_authentication_changed: false
       runtime_player_handlers_added: false

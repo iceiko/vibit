@@ -6970,7 +6970,8 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
       pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
       pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
     .filter((file) => file !== "runtime/internal/modules/authentication/repository.go")
-    .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go");
+    .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go")
+    .filter((file) => !isExplicitVerifierKeySetValidatorFile(file));
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -7287,6 +7288,13 @@ function checkRuntimeAuthenticationImplementationBoundary(root, goFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isExplicitVerifierKeySetValidatorFile(file)) {
+      ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement verifier algorithm behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -7484,6 +7492,13 @@ function checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goF
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isExplicitVerifierKeySetValidatorFile(file)) {
+      ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not load environment secret configuration`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const rawText = readText(path.join(root, file));
@@ -7712,6 +7727,13 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isExplicitVerifierKeySetValidatorFile(file)) {
+      ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement token or credential verifier algorithm behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const rawText = readText(path.join(root, file));
@@ -7949,6 +7971,13 @@ function checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isExplicitVerifierKeySetValidatorFile(file)) {
+      ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not parse environment secret configuration`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const rawText = readText(path.join(root, file));
@@ -8583,7 +8612,7 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
       "authentication_service_implementation_readiness_gate_defined: true",
       "planned_package_candidate: runtime/internal/app/authentication",
       "first_code_slice_must_be_separately_authorized: true",
-      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "authentication_service_readiness_recommended_next_gate: local_verifier_key_configuration_loading_gate",
       "runtime_authentication_implemented: false",
       "token_behavior_implemented: false",
       "runtime_lookup_added: false",
@@ -8594,7 +8623,7 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
       "authentication_service_implementation_readiness_gate_defined: true",
       "planned_package_candidate: runtime/internal/app/authentication",
       "first_code_slice_must_be_separately_authorized: true",
-      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "authentication_service_readiness_recommended_next_gate: local_verifier_key_configuration_loading_gate",
       "runtime_authentication_implemented: false",
       "token_generation_added: false",
       "token_validation_added: false",
@@ -8753,6 +8782,23 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
     checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
   }
 
+  for (const validatorFile of [
+    "runtime/internal/app/authentication/verifier_key_config.go",
+    "runtime/internal/app/authentication/verifier_key_config_test.go",
+  ]) {
+    if (isFile(root, validatorFile)) {
+      ok(`${validatorFile} exists for the ADR-0045-authorized explicit verifier key set validator`, {
+        rule_id: ruleId,
+        artifact: validatorFile,
+      });
+    } else {
+      fail(`${validatorFile} is missing for the ADR-0045-authorized explicit verifier key set validator`, {
+        rule_id: ruleId,
+        artifact: validatorFile,
+      });
+    }
+  }
+
   const statusMarkersByFile = {
     ".arch/runtime.yaml": [
       "local_verifier_key_configuration_loading_gate_defined: true",
@@ -8768,8 +8814,10 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "all_zero_key_bytes_fail_closed: true",
       "repeated_single_byte_key_fail_closed: true",
       "redacted_errors_required: true",
-      "recommended_next_gate: explicit_in_memory_verifier_key_set_validator_implementation",
-      "explicit_in_memory_validator_implemented: false",
+      "explicit_in_memory_validator_implemented: true",
+      "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
+      "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
+      "recommended_next_gate: environment_verifier_key_loader_gate",
       "secret_configuration_loading_added: false",
       "environment_parsing_added: false",
       "base64_text_decoding_added: false",
@@ -8799,8 +8847,10 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "all_zero_key_bytes_fail_closed: true",
       "repeated_single_byte_key_fail_closed: true",
       "redacted_errors_required: true",
-      "recommended_next_gate: explicit_in_memory_verifier_key_set_validator_implementation",
-      "explicit_in_memory_validator_implemented: false",
+      "explicit_in_memory_validator_implemented: true",
+      "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
+      "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
+      "recommended_next_gate: environment_verifier_key_loader_gate",
       "secret_configuration_loading_added: false",
       "environment_parsing_added: false",
       "base64_text_decoding_added: false",
@@ -8823,6 +8873,10 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "first_environment_loader_status: deferred_to_follow_up_gate",
       "required_logical_keys: 4",
       "decoded_key_minimum_length_bytes: 32",
+      "explicit_in_memory_validator_implemented: true",
+      "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
+      "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
+      "recommended_next_gate: environment_verifier_key_loader_gate",
       "runtime_authentication_implemented: false",
       "token_behavior_implemented: false",
       "runtime_lookup_added: false",
@@ -8836,6 +8890,10 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
       "first_environment_loader_status: deferred_to_follow_up_gate",
       "required_logical_keys: 4",
       "decoded_key_minimum_length_bytes: 32",
+      "explicit_in_memory_validator_implemented: true",
+      "explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go",
+      "explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go",
+      "recommended_next_gate: environment_verifier_key_loader_gate",
       "runtime_authentication_implemented: false",
       "token_generation_added: false",
       "token_validation_added: false",
@@ -8987,6 +9045,10 @@ function sourceWithoutGoComments(text) {
 
 function textMatchesAny(text, patterns) {
   return patterns.filter((item) => item.pattern.test(text));
+}
+
+function isExplicitVerifierKeySetValidatorFile(file) {
+  return file === "runtime/internal/app/authentication/verifier_key_config.go";
 }
 
 function checkWork(root) {

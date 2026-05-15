@@ -51,7 +51,7 @@ purpose: >
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: explicit_in_memory_verifier_key_set_validator
+  current_phase: environment_verifier_key_loader_gate
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1065,10 +1065,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-025
-    latest_completed_work_item: W-0096
-    next_ready_work_item: W-0097
-    status: explicit_in_memory_verifier_key_set_validator_next
+    milestone: M-026
+    latest_completed_work_item: W-0097
+    next_ready_work_item: W-0098
+    status: environment_verifier_key_loader_gate_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1599,8 +1599,8 @@ identity_session_boundary:
     first_work_item: W-0096
     completed_work_item: W-0096
     change: changes/2026-05-15-define-local-verifier-key-configuration-loading-gate
-    next_milestone: M-025
-    next_work_item: W-0097
+    next_milestone: M-026
+    next_work_item: W-0098
     previous_milestone: M-023
     previous_completed_work_item: W-0095
     decision: ADR-0045
@@ -1626,8 +1626,10 @@ identity_session_boundary:
     all_zero_key_bytes_fail_closed: true
     repeated_single_byte_key_fail_closed: true
     redacted_errors_required: true
-    recommended_next_gate: explicit_in_memory_verifier_key_set_validator_implementation
-    explicit_in_memory_validator_implemented: false
+    explicit_in_memory_validator_implemented: true
+    explicit_in_memory_validator_source: runtime/internal/app/authentication/verifier_key_config.go
+    explicit_in_memory_validator_tests: runtime/internal/app/authentication/verifier_key_config_test.go
+    recommended_next_gate: environment_verifier_key_loader_gate
     secret_configuration_loading_added: false
     environment_parsing_added: false
     base64_text_decoding_added: false
@@ -1648,7 +1650,8 @@ identity_session_boundary:
     migration_schemas_changed: false
     work_queue:
       - W-0096 define_local_verifier_key_configuration_loading_gate
-    rule: The local verifier key configuration loading gate is defined. Future first implementation should validate explicit in-memory verifier key sets under runtime/internal/app/authentication, while environment parsing, Base64 decoding, startup wiring, KMS, secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol, transport, dependency, repository, migration, and production authentication behavior remain separate gates.
+      - W-0097 implement_explicit_in_memory_verifier_key_set_validator
+    rule: The local verifier key configuration loading gate is defined and the explicit in-memory verifier key set validator is implemented under runtime/internal/app/authentication. Environment parsing, Base64 decoding, startup wiring, KMS, secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol, transport, dependency, repository, migration, and production authentication behavior remain separate gates.
 
 persistence_model:
   decision: ADR-0011

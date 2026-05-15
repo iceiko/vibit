@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-025
+current_milestone: M-026
 
 continuation_semantics:
   default_step_unit: work_item
@@ -525,7 +525,7 @@ milestones:
 
   - id: M-025
     title: Explicit In-Memory Verifier Key Set Validator
-    status: active
+    status: completed
     goal: Implement the explicit in-memory verifier key set validator as the first narrow local verifier key configuration code slice.
     completion_criteria:
       - The validator is implemented under runtime/internal/app/authentication using the file boundaries defined by ADR-0045.
@@ -534,6 +534,31 @@ milestones:
       - Environment parsing, Base64 text decoding, startup wiring, external KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, and production authentication behavior remain deferred unless separately gated.
     non_goals:
       - parsing process environment variables
+      - decoding Base64 key text
+      - reading local secret files
+      - wiring process startup
+      - implementing token generation
+      - implementing credential generation
+      - implementing verifier digest computation
+      - implementing verifier comparison
+      - implementing authentication service behavior
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-025 implemented the explicit in-memory verifier key set validator under runtime/internal/app/authentication. The validator accepts already-decoded in-memory key material, requires a key set id and four distinct logical keys, enforces 32-byte minimum key length, rejects missing, short, duplicate, all-zero, and repeated single-byte keys, copies input key bytes, returns copies from accessors, and keeps validation errors redacted. Focused tests cover accepted input, key set id trimming, input copying, immutable accessors, missing key set id, missing keys, short keys, duplicate keys, all-zero keys, repeated-byte keys, and redaction. Environment parsing, Base64 text decoding, startup wiring, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository changes, migration changes, and production authentication behavior remain deferred.
+
+  - id: M-026
+    title: Environment Verifier Key Loader Gate
+    status: active
+    goal: Define the environment verifier key loader gate before adding process environment parsing or Base64 key text decoding.
+    completion_criteria:
+      - The environment loader gate declares exact owner package, environment variable contract, decoding posture, validation handoff to the explicit in-memory validator, redaction behavior, test cases, and file boundaries before implementation.
+      - The gate preserves deferrals for startup wiring, KMS, cloud secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol carriers, repository changes, migration changes, dependencies, and production authentication behavior.
+      - The next work item is either a narrow environment loader implementation slice or another explicit preparation gate.
+    non_goals:
+      - implementing process environment parsing
       - decoding Base64 key text
       - reading local secret files
       - wiring process startup
@@ -2666,7 +2691,7 @@ work_items:
   - id: W-0097
     milestone: M-025
     title: Implement explicit in-memory verifier key set validator
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-implement-explicit-in-memory-verifier-key-set-validator
     depends_on:
       - W-0096
@@ -2679,7 +2704,29 @@ work_items:
       - Implement the explicit in-memory verifier key set validator under runtime/internal/app/authentication without adding environment parsing or runtime authentication behavior.
       - Add tests for accepted complete distinct key sets, input copying, immutable accessors, missing key set id, missing keys, short keys, duplicate logical keys, all-zero keys, repeated single-byte keys, and redacted errors.
       - Adjust runtime checks only as needed to permit the ADR-0045-authorized validator while preserving deferrals for environment parsing, token generation, credential generation, digest helpers, verifier comparison, service behavior, protocol carriers, repository changes, migrations, external secret managers, and production behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_key_config.go and verifier_key_config_test.go. The new VerifierKeySetConfig and VerifierKeySet validate explicit in-memory, already-decoded key bytes; require a non-empty key set id; require four logical keys; enforce a 32-byte minimum; reject missing, short, duplicate, all-zero, and repeated single-byte keys; copy input key material; return copies from accessors; and expose redacted validation errors. Tests cover accepted complete distinct key sets, key set id trimming, input copying, immutable accessors, missing key set id, missing keys, short keys, duplicate keys, all-zero keys, repeated-byte keys, and redaction. Runtime checks now allow only the ADR-0045-authorized validator file while preserving deferrals for environment parsing, Base64 text decoding, startup wiring, token generation, credential generation, digest helpers, verifier comparison, service behavior, protocol carriers, repository changes, migrations, external secret managers, dependencies, and production behavior.
     ask_first:
       - Parsing process environment variables or reading local secret files.
       - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
       - Implementing token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.
+
+  - id: W-0098
+    milestone: M-026
+    title: Define environment verifier key loader gate
+    status: next_ready
+    change: changes/2026-05-15-define-environment-verifier-key-loader-gate
+    depends_on:
+      - W-0097
+    related_decisions:
+      - ADR-0041
+      - ADR-0045
+    completion:
+      - Define the process environment verifier key loader gate without implementing environment parsing or Base64 text decoding.
+      - Declare the environment variable names, decoding posture, redaction rules, test cases, package ownership, file boundaries, and failure behavior for the future loader.
+      - Require the future loader to call the explicit in-memory validator instead of duplicating key-set validation logic.
+      - Preserve deferral for startup wiring, KMS, cloud secret-manager integration, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing process environment parsing while defining the gate.
+      - Reading local secret files or adding dotenv behavior.
+      - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, provider, or dotenv dependency.
+      - Implementing startup wiring, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, repository changes, migration changes, or production authentication behavior.

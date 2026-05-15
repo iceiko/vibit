@@ -1,0 +1,119 @@
+schema_version: 0.1
+change_id: implement-explicit-in-memory-verifier-key-set-validator
+date: 2026-05-15
+type: feature
+status: verified
+
+summary: Implement the explicit in-memory verifier key set validator without adding environment loading or runtime authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0041
+    - ADR-0043
+    - ADR-0044
+    - ADR-0045
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - tools/vibit
+    - conversations/2026-05-15-explicit-in-memory-verifier-key-set-validator.md
+
+implementation:
+  added:
+    - runtime/internal/app/authentication/verifier_key_config.go
+    - runtime/internal/app/authentication/verifier_key_config_test.go
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  explicit_in_memory_validator_implemented: true
+  secret_configuration_loading_added: false
+  environment_parsing_added: false
+  base64_text_decoding_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  authentication_dependencies_added: false
+  kms_secret_manager_integration_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  completed_work_item: W-0097
+  completed_milestone: M-025
+  next_milestone: M-026
+  next_ready_work_item: W-0098
+  next_direction: define_environment_verifier_key_loader_gate
+
+verification:
+  required:
+    - cd runtime && go test ./internal/app/authentication
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-explicit-in-memory-verifier-key-set-validator --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
