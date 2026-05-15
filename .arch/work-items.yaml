@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-029
+current_milestone: M-030
 
 continuation_semantics:
   default_step_unit: work_item
@@ -621,13 +621,32 @@ milestones:
 
   - id: M-029
     title: Token And Credential Material Generation Helper Implementation
-    status: active
+    status: completed
     goal: Implement the narrow token and credential material generation helpers authorized by the implementation gate.
     completion_criteria:
       - The helpers are implemented only under runtime/internal/app/authentication/material_generation.go.
       - The helpers generate 32 bytes of random material through an explicit io.Reader handoff and encode URL-safe unpadded Base64 presentation text.
       - Focused tests cover raw length, encoding shape, round-trip, material kind, copying, nil/random error/short read failure, weak generated material rejection, non-constant output, and redaction.
       - Digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior remain deferred.
+    non_goals:
+      - computing lookup or verifier digests
+      - comparing verifier material
+      - implementing authentication service behavior
+      - executing login or token validation
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
+      - adding authentication dependencies
+    completion_summary: Implemented runtime/internal/app/authentication/material_generation.go and material_generation_test.go. The helpers expose distinct device credential and access-token material generation functions, accept an explicit io.Reader entropy source, read exactly 32 bytes with io.ReadFull, reject nil readers, read errors, short reads, all-zero material, and repeated-single-byte material, encode URL-safe unpadded Base64 presentation text, preserve MaterialKind, copy raw bytes on return, and use redacted typed errors. Tests cover the required material size, encoding shape, 43-character text length, round-trip decoding, kind preservation, copied raw accessors, fail-closed reader behavior, weak material rejection, non-constant progressing-source output, redaction, and the absence of digest/comparison behavior. Digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior remain deferred.
+
+  - id: M-030
+    title: Verifier Digest Helper Implementation Gate
+    status: active
+    goal: Define the next bounded implementation gate for verifier digest computation helpers before adding digest code.
+    completion_criteria:
+      - The gate names exact helper ownership, file boundaries, canonical input posture, logical key handoff, redaction requirements, tests, and deferrals.
+      - The gate preserves deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+      - No verifier digest computation code is added by the gate itself.
     non_goals:
       - computing lookup or verifier digests
       - comparing verifier material
@@ -2843,7 +2862,7 @@ work_items:
   - id: W-0101
     milestone: M-029
     title: Implement token and credential material generation helpers
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-implement-token-credential-material-generation-helpers
     depends_on:
       - W-0100
@@ -2855,9 +2874,33 @@ work_items:
       - Add focused tests under runtime/internal/app/authentication/material_generation_test.go.
       - Use explicit io.Reader handoff, 32-byte raw material, URL-safe unpadded Base64 text, copied raw bytes, redacted errors, and weak generated material rejection.
       - Preserve deferral for digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/material_generation.go and runtime/internal/app/authentication/material_generation_test.go. The helper-only slice adds MaterialKind, GeneratedSecretMaterial, GenerateDeviceCredentialMaterial, GenerateAccessTokenMaterial, and redacted MaterialGenerationError classes. Generation uses an explicit io.Reader, io.ReadFull, 32 raw bytes, URL-safe unpadded Base64 text, copied raw bytes, and weak repeated-byte rejection. Tests cover byte length, encoding, round-trip, 43-character presentation, kind preservation, copy safety, nil/error/short-read failure, all-zero and repeated-byte failure, progressing-source non-constant output, redaction, and no digest/comparison behavior. No digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, startup wiring, dependencies, or production authentication behavior was added.
     ask_first:
       - Computing lookup or verifier digests.
       - Comparing verifier material.
       - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external randomness, cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+
+  - id: W-0102
+    milestone: M-030
+    title: Define verifier digest helper implementation gate
+    status: next_ready
+    change: changes/2026-05-15-define-verifier-digest-helper-implementation-gate
+    depends_on:
+      - W-0101
+    related_decisions:
+      - ADR-0040
+      - ADR-0041
+      - ADR-0043
+      - ADR-0047
+    completion:
+      - Define the implementation gate for lookup and verifier digest helpers without adding digest code.
+      - Name future helper files, canonical input construction boundaries, verifier key handoff, redaction rules, and focused tests.
+      - Preserve deferral for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing verifier digest computation code instead of only defining the gate.
+      - Comparing verifier material.
+      - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.

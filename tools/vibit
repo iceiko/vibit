@@ -6974,7 +6974,8 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     .filter((file) => file !== "runtime/internal/modules/authentication/repository.go")
     .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go")
     .filter((file) => !isExplicitVerifierKeySetValidatorFile(file))
-    .filter((file) => !isEnvironmentVerifierKeyLoaderFile(file));
+    .filter((file) => !isEnvironmentVerifierKeyLoaderFile(file))
+    .filter((file) => !isMaterialGenerationHelperFile(file));
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -7305,6 +7306,13 @@ function checkRuntimeAuthenticationImplementationBoundary(root, goFiles) {
       });
       continue;
     }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not implement runtime authentication behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -7513,6 +7521,13 @@ function checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goF
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not implement authentication service behavior`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -7755,6 +7770,13 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not implement token or credential verifier algorithms`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not compute verifier digests or compare verifiers`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -8240,6 +8262,13 @@ function checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles) {
       });
       continue;
     }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and stays inside the application-owned helper boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8489,6 +8518,13 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
       });
       continue;
     }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8724,6 +8760,13 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not cross local verifier key configuration loading gate deferrals`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9004,6 +9047,13 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not implement environment verifier key loading`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9418,6 +9468,13 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
       });
       continue;
     }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not implement environment verifier key loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -9619,27 +9676,101 @@ function checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, g
   }
 
   if (isFile(root, futureSource)) {
-    fail(`${futureSource} exists before W-0101 authorizes token and credential material generation helpers`, {
+    ok(`${futureSource} exists for the W-0101-authorized token and credential material generation helpers`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   } else {
-    ok(`${futureSource} is not implemented by this gate-only change`, {
+    fail(`${futureSource} is missing after W-0101 authorized token and credential material generation helpers`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   }
 
   if (isFile(root, futureTests)) {
-    fail(`${futureTests} exists before W-0101 authorizes token and credential material generation helper tests`, {
+    ok(`${futureTests} exists for the W-0101-authorized token and credential material generation helper tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
   } else {
-    ok(`${futureTests} is not implemented by this gate-only change`, {
+    fail(`${futureTests} is missing after W-0101 authorized token and credential material generation helper tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
+  }
+
+  if (isFile(root, futureSource)) {
+    const sourceText = readText(path.join(root, futureSource));
+    const requiredSourceMarkers = [
+      "const (",
+      "RawSecretMaterialBytes",
+      "EncodedSecretMaterialChars = 43",
+      "type MaterialKind string",
+      "MaterialKindDeviceCredential MaterialKind = \"device_credential\"",
+      "MaterialKindAccessToken      MaterialKind = \"access_token\"",
+      "ErrMissingRandomSource",
+      "ErrRandomReadFailed",
+      "ErrInvalidGeneratedMaterial",
+      "type MaterialGenerationError struct",
+      "type GeneratedSecretMaterial struct",
+      "func (m GeneratedSecretMaterial) Kind() MaterialKind",
+      "func (m GeneratedSecretMaterial) RawBytes() []byte",
+      "func (m GeneratedSecretMaterial) Text() string",
+      "func GenerateDeviceCredentialMaterial(random io.Reader) (GeneratedSecretMaterial, error)",
+      "func GenerateAccessTokenMaterial(random io.Reader) (GeneratedSecretMaterial, error)",
+      "io.ReadFull(random, raw)",
+      "base64.RawURLEncoding.EncodeToString(raw)",
+      "isWeakRepeatedKey(raw)",
+      "cloneBytes(raw)",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${futureSource} includes W-0101 material generation marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      } else {
+        fail(`${futureSource} is missing W-0101 material generation marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureTests)) {
+    const testText = readText(path.join(root, futureTests));
+    const requiredTestMarkers = [
+      "TestGenerateDeviceCredentialMaterialUses32RandomBytes",
+      "TestGenerateAccessTokenMaterialUses32RandomBytes",
+      "TestGeneratedMaterialTextIsBase64URLUnpadded",
+      "TestGeneratedMaterialTextLengthIs43Characters",
+      "TestGeneratedMaterialTextRoundTripsToRawBytes",
+      "TestGeneratedMaterialKindIsPreserved",
+      "TestGeneratedMaterialRawBytesAreCopiedOnReturn",
+      "TestGenerateMaterialNilRandomSourceFailsClosed",
+      "TestGenerateMaterialRandomSourceErrorFailsClosed",
+      "TestGenerateMaterialShortRandomReadFailsClosed",
+      "TestGenerateMaterialAllZeroGeneratedMaterialFailsClosed",
+      "TestGenerateMaterialRepeatedSingleByteGeneratedMaterialFailsClosed",
+      "TestGeneratedMaterialsAreNotConstantWithProgressingSource",
+      "TestMaterialGenerationErrorsDoNotIncludeRawOrEncodedMaterial",
+      "TestMaterialGenerationHelperDoesNotComputeDigestsOrCompareVerifiers",
+      "assertMaterialGenerationError",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${futureTests} includes W-0101 material generation test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      } else {
+        fail(`${futureTests} is missing W-0101 material generation test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      }
+    }
   }
 
   const behaviorFiles = goFiles
@@ -9663,6 +9794,13 @@ function checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, g
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not generate token or credential material`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isMaterialGenerationHelperFile(file)) {
+      ok(`${file} is the W-0101-authorized material generation helper and does not cross its helper-only implementation gate`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9771,6 +9909,10 @@ function isExplicitVerifierKeySetValidatorFile(file) {
 
 function isEnvironmentVerifierKeyLoaderFile(file) {
   return file === "runtime/internal/app/authentication/verifier_key_env.go";
+}
+
+function isMaterialGenerationHelperFile(file) {
+  return file === "runtime/internal/app/authentication/material_generation.go";
 }
 
 function checkWork(root) {
