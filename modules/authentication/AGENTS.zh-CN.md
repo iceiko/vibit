@@ -68,6 +68,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-027 Environment Verifier Key Loader Implementation` 已完成。`W-0099` 已在 `runtime/internal/app/authentication` 下实现 process environment verifier key loading，而不是在本模块中实现。本 authentication module 仍是 storage-neutral，不得 parse environment variables、decode key text、hold key material、validate key sets、读取 local secret files、parse `.env` files、rotate keys、compute digests、compare verifiers、wire startup 或决定 authentication outcomes。
 
+`M-028 Token And Credential Material Generation Implementation Gate` 已完成。`W-0100` 已在 `docs/token-credential-material-generation-implementation-gate.md` 和 `ADR-0047` 中定义该 gate，且没有添加 service code 或 runtime authentication behavior。Future token and credential material helpers 属于 `runtime/internal/app/authentication`，不属于本模块。本模块仍是 storage-neutral，只能存储 already-computed digest material。它不得 generate raw token 或 credential material、encode raw material、hold raw material、accept raw material for storage、compute digests、compare verifiers、wire startup 或决定 authentication outcomes。`runtime.token_credential_material_generation_implementation_gate` 是该 gate 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

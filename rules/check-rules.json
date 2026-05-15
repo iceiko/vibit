@@ -532,6 +532,14 @@
       "agent_guidance": "Read `docs/environment-verifier-key-loader-gate.md` and `ADR-0046`; do not parse process environment variables, decode Base64 key text, wire startup, read local secret files, parse dotenv files, accept CLI secret input, integrate KMS or cloud secret managers, generate tokens or credentials, compute digests, compare verifiers, implement authentication service behavior, expose protocol carriers, change repositories, change migrations, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.token_credential_material_generation_implementation_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Token and credential material generation implementation gate",
+      "description": "The token and credential material generation implementation gate must define future helper ownership, file boundaries, entropy source handoff, encoding posture, redaction rules, tests, dependency posture, and deferrals before material generation code exists.",
+      "agent_guidance": "Read `docs/token-credential-material-generation-implementation-gate.md` and `ADR-0047`; do not implement token or credential material generation outside the authorized future helper files, and do not compute digests, compare verifiers, implement authentication service behavior, expose protocol carriers, change repositories, change migrations, wire startup, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

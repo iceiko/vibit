@@ -1,0 +1,190 @@
+schema_version: 0.1
+change_id: define-token-credential-material-generation-implementation-gate
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the token and credential material generation implementation gate without adding generation code.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0047
+  referenced:
+    - ADR-0042
+    - ADR-0043
+    - ADR-0044
+    - ADR-0046
+
+standards:
+  added:
+    - docs/token-credential-material-generation-implementation-gate.md
+    - docs/token-credential-material-generation-implementation-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+    - conversations/2026-05-15-token-credential-material-generation-implementation-gate.md
+
+implementation:
+  added: []
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  token_credential_material_generation_implementation_gate_defined: true
+  token_credential_material_generation_implementation_gate_standard: docs/token-credential-material-generation-implementation-gate.md
+  token_credential_material_generation_implementation_gate_decision: ADR-0047
+  token_credential_material_generation_implementation_gate_check_rule: runtime.token_credential_material_generation_implementation_gate
+  future_source: runtime/internal/app/authentication/material_generation.go
+  future_tests: runtime/internal/app/authentication/material_generation_test.go
+  implementation_authorized_by_this_standard: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+readiness_posture:
+  package: runtime/internal/app/authentication
+  future_source: runtime/internal/app/authentication/material_generation.go
+  future_tests: runtime/internal/app/authentication/material_generation_test.go
+  production_entropy_source: crypto/rand.Reader
+  testable_entropy_handoff: io.Reader
+  raw_material_size_bytes: 32
+  encoded_text_shape: url_safe_unpadded_base64
+  next_gate: token_credential_material_generation_helper_implementation
+
+workflow:
+  completed_work_item: W-0100
+  completed_milestone: M-028
+  next_milestone: M-029
+  next_ready_work_item: W-0101
+  next_direction: implement_token_credential_material_generation_helpers
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-token-credential-material-generation-implementation-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  results:
+    - command: node -c tools/vibit
+      status: passed
+    - command: node tools/vibit check schemas --json
+      status: passed
+      passed: 1937
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check memory --json
+      status: passed
+      passed: 1383
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check contracts --json
+      status: passed
+      passed: 291
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check generated --json
+      status: passed
+      passed: 205
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check runtime --json
+      status: passed
+      passed: 2066
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: node tools/vibit check module authentication --json
+      status: passed
+      passed: 23
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check work --json
+      status: passed
+      passed: 617
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check change define-token-credential-material-generation-implementation-gate --json
+      status: passed
+      passed: 13
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check all --json
+      status: passed
+      passed: 152
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: git diff --check
+      status: passed
+    - command: "secret scan for GitHub tokens excluding .git and .vibit.local.env"
+      status: passed

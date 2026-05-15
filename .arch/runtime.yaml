@@ -48,11 +48,12 @@ purpose: >
   authentication_service_implementation_readiness_gate: ADR-0044
   local_verifier_key_configuration_loading_gate: ADR-0045
   environment_verifier_key_loader_gate: ADR-0046
+  token_credential_material_generation_implementation_gate: ADR-0047
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: token_credential_material_generation_implementation_gate
+  current_phase: token_credential_material_generation_helper_implementation
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -1066,10 +1067,10 @@ identity_session_boundary:
       - W-0081 define_authentication_postgresql_adapter_boundary
     rule: The milestone may ratify login methods and token format, but implementation remains deferred until the required contracts, dependency adoption records, schemas, migrations, checks, and tests are explicitly planned.
   current_work:
-    milestone: M-028
-    latest_completed_work_item: W-0099
-    next_ready_work_item: W-0100
-    status: token_credential_material_generation_implementation_gate_next
+    milestone: M-029
+    latest_completed_work_item: W-0100
+    next_ready_work_item: W-0101
+    status: token_credential_material_generation_helper_implementation_next
   credential_token_schema_ratification:
     status: completed
     milestone: M-014
@@ -1715,6 +1716,63 @@ identity_session_boundary:
     work_queue:
       - W-0098 define_environment_verifier_key_loader_gate
     rule: The environment verifier key loader gate is defined. Future environment loader implementation remains an application-owned adapter under runtime/internal/app/authentication, must decode required process environment key text and call NewVerifierKeySet, and must preserve startup wiring, local secret files, dotenv behavior, CLI secret input, KMS, secret-manager integration, token generation, credential generation, digest helpers, verifier comparison, authentication service behavior, protocol, transport, dependency, repository, migration, and production authentication behavior as separate gates.
+  token_credential_material_generation_implementation_gate:
+    status: completed
+    milestone: M-028
+    first_work_item: W-0100
+    completed_work_item: W-0100
+    change: changes/2026-05-15-define-token-credential-material-generation-implementation-gate
+    next_milestone: M-029
+    next_work_item: W-0101
+    previous_milestone: M-027
+    previous_completed_work_item: W-0099
+    decision: ADR-0047
+    token_credential_material_generation_implementation_gate_decision: ADR-0047
+    standard: docs/token-credential-material-generation-implementation-gate.md
+    translation: docs/token-credential-material-generation-implementation-gate.zh-CN.md
+    token_credential_material_generation_implementation_gate_standard: docs/token-credential-material-generation-implementation-gate.md
+    token_credential_material_generation_implementation_gate_translation: docs/token-credential-material-generation-implementation-gate.zh-CN.md
+    token_credential_material_generation_implementation_gate_defined: true
+    token_credential_material_generation_implementation_gate_check_rule: runtime.token_credential_material_generation_implementation_gate
+    implementation_authorized_by_this_standard: false
+    future_implementation_work_item: W-0101
+    planned_owner: runtime/internal/app
+    planned_package: runtime/internal/app/authentication
+    future_slice: raw_device_credential_and_access_token_material_helpers
+    future_source: runtime/internal/app/authentication/material_generation.go
+    future_tests: runtime/internal/app/authentication/material_generation_test.go
+    production_entropy_source: crypto/rand.Reader
+    testable_entropy_handoff: io.Reader
+    random_read_primitive: io.ReadFull
+    raw_material_size_bytes: 32
+    minimum_entropy_bits: 256
+    text_encoding: base64.RawURLEncoding
+    encoded_text_shape: url_safe_unpadded_base64
+    encoded_text_length_chars: 43
+    raw_material_copying_required: true
+    all_zero_material_fails_closed: true
+    repeated_single_byte_material_fails_closed: true
+    one_time_client_visible_presentation_required: true
+    raw_material_storage: forbidden
+    raw_material_repository_handoff: forbidden
+    token_generation_added: false
+    credential_generation_added: false
+    verifier_digest_computation_added: false
+    verifier_comparison_added: false
+    application_authentication_service_code_added: false
+    login_handlers_added: false
+    token_validation_added: false
+    logout_execution_added: false
+    cleanup_jobs_added: false
+    protobuf_authentication_messages_added: false
+    websocket_proof_carrier_implemented: false
+    startup_wiring_added: false
+    authentication_dependencies_added: false
+    repository_interface_changed: false
+    migration_schemas_changed: false
+    work_queue:
+      - W-0100 define_token_credential_material_generation_implementation_gate
+    rule: The token and credential material generation implementation gate is defined. Future helper implementation remains a narrow application-owned helper under runtime/internal/app/authentication, must use 32 random bytes, URL-safe unpadded Base64 presentation, explicit entropy-source handoff, copied raw bytes, redacted errors, and focused tests. Digest helpers, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior remain separate gates.
 
 persistence_model:
   decision: ADR-0011

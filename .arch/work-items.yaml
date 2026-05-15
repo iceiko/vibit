@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-028
+current_milestone: M-029
 
 continuation_semantics:
   default_step_unit: work_item
@@ -603,7 +603,7 @@ milestones:
 
   - id: M-028
     title: Token And Credential Material Generation Implementation Gate
-    status: active
+    status: completed
     goal: Define the next bounded implementation gate for token and credential material generation helpers before adding generation code.
     completion_criteria:
       - The gate names the exact helper ownership, file boundaries, entropy source, encoding posture, redaction requirements, tests, and deferrals.
@@ -617,6 +617,26 @@ milestones:
       - wiring process startup
       - adding protocol carriers
       - changing repositories or migrations
+    completion_summary: M-028 defined the token and credential material generation implementation gate in ADR-0047 and the paired gate standard. The future helper implementation is constrained to runtime/internal/app/authentication/material_generation.go and material_generation_test.go. It must use 32 random bytes, URL-safe unpadded Base64 presentation, explicit io.Reader entropy-source handoff for tests, copied raw bytes, redacted errors, all-zero and repeated-single-byte rejection, and focused tests. Digest helpers, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior remain deferred. No token generation code or credential generation code was added by this gate.
+
+  - id: M-029
+    title: Token And Credential Material Generation Helper Implementation
+    status: active
+    goal: Implement the narrow token and credential material generation helpers authorized by the implementation gate.
+    completion_criteria:
+      - The helpers are implemented only under runtime/internal/app/authentication/material_generation.go.
+      - The helpers generate 32 bytes of random material through an explicit io.Reader handoff and encode URL-safe unpadded Base64 presentation text.
+      - Focused tests cover raw length, encoding shape, round-trip, material kind, copying, nil/random error/short read failure, weak generated material rejection, non-constant output, and redaction.
+      - Digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior remain deferred.
+    non_goals:
+      - computing lookup or verifier digests
+      - comparing verifier material
+      - implementing authentication service behavior
+      - executing login or token validation
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
+      - adding authentication dependencies
 
 work_items:
   - id: W-0001
@@ -2803,7 +2823,7 @@ work_items:
   - id: W-0100
     milestone: M-028
     title: Define token and credential material generation implementation gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-token-credential-material-generation-implementation-gate
     depends_on:
       - W-0099
@@ -2814,7 +2834,30 @@ work_items:
       - Define the implementation gate for token and credential material generation helpers without adding generation code.
       - Name future helper files, function boundaries, entropy source, URL-safe encoding posture, redaction rules, and test requirements.
       - Preserve deferral for verifier digest computation, verifier comparison, authentication service behavior, protocol carriers, repository changes, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Defined the token and credential material generation implementation gate in docs/token-credential-material-generation-implementation-gate.md, docs/token-credential-material-generation-implementation-gate.zh-CN.md, and ADR-0047. The gate names future helper files runtime/internal/app/authentication/material_generation.go and material_generation_test.go, requires explicit io.Reader entropy-source handoff, crypto/rand.Reader production posture, io.ReadFull, 32-byte raw material, URL-safe unpadded Base64 presentation, 43-character encoded text, copied raw bytes, redacted errors, all-zero and repeated-single-byte rejection, and focused tests. It preserves deferrals for digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior. No generation code was added.
     ask_first:
       - Implementing token or credential generation code instead of only defining the gate.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external randomness, cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or dotenv dependency.
+
+  - id: W-0101
+    milestone: M-029
+    title: Implement token and credential material generation helpers
+    status: next_ready
+    change: changes/2026-05-15-implement-token-credential-material-generation-helpers
+    depends_on:
+      - W-0100
+    related_decisions:
+      - ADR-0042
+      - ADR-0047
+    completion:
+      - Implement helper-only token and credential material generation under runtime/internal/app/authentication/material_generation.go.
+      - Add focused tests under runtime/internal/app/authentication/material_generation_test.go.
+      - Use explicit io.Reader handoff, 32-byte raw material, URL-safe unpadded Base64 text, copied raw bytes, redacted errors, and weak generated material rejection.
+      - Preserve deferral for digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Computing lookup or verifier digests.
+      - Comparing verifier material.
+      - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external randomness, cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
