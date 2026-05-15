@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-033
+current_milestone: M-034
 
 continuation_semantics:
   default_step_unit: work_item
@@ -698,7 +698,7 @@ milestones:
 
   - id: M-033
     title: Verifier Digest Comparison Helper Implementation
-    status: active
+    status: completed
     goal: Implement the verifier digest comparison helpers as a narrow application-owned code slice.
     completion_criteria:
       - The verifier digest comparison helpers are implemented only under runtime/internal/app/authentication/verifier_comparison.go.
@@ -712,6 +712,22 @@ milestones:
       - wiring process startup
       - adding protocol carriers
       - changing repositories or migrations
+      - adding authentication dependencies
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_comparison.go and verifier_comparison_test.go. The helper-only slice adds VerifierComparisonResult, VerifierComparisonError, class-specific CompareCredentialVerifierDigest and CompareTokenVerifierDigest helpers, and constant-time comparison with crypto/hmac.Equal. It compares only ComputedDigest verifier bytes to stored verifier digest bytes, rejects lookup classes, wrong verifier classes, missing input, malformed stored input, and malformed computed input with redacted typed errors, returns mismatch as a redacted non-match result, and keeps authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior deferred.
+
+  - id: M-034
+    title: Authentication Service Behavior Implementation Gate
+    status: active
+    goal: Define the bounded gate for future authentication service behavior before adding login execution, token validation, protocol carriers, repository orchestration, startup wiring, or production authentication behavior.
+    completion_criteria:
+      - The gate names exact service behavior ownership, input/output boundaries, repository handoff, proof validation flow, error collapse posture, tests, and deferrals.
+      - The gate maps existing helper slices into a future service orchestration plan without adding service code.
+      - The gate preserves deferrals for Protobuf authentication messages, WebSocket proof carriers, startup wiring, authentication dependencies, and production authentication behavior unless explicitly authorized later.
+    non_goals:
+      - implementing authentication service behavior in the gate-only work item
+      - executing login or token validation
+      - changing public contracts, repositories, migrations, or protocol carriers
+      - wiring process startup
       - adding authentication dependencies
 
 
@@ -3016,7 +3032,7 @@ work_items:
   - id: W-0105
     milestone: M-033
     title: Implement verifier digest comparison helpers
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-implement-verifier-digest-comparison-helpers
     depends_on:
       - W-0104
@@ -3031,7 +3047,33 @@ work_items:
       - Compare only computed credential/token verifier digests against stored verifier digest bytes with crypto/hmac.Equal or an equivalent constant-time primitive.
       - Reject lookup digest classes, wrong verifier classes, missing input, malformed stored digest bytes, and invalid comparison input with redacted errors.
       - Preserve deferral for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_comparison.go and verifier_comparison_test.go. The helpers expose VerifierComparisonResult, VerifierComparisonError, CompareCredentialVerifierDigest, and CompareTokenVerifierDigest. They use crypto/hmac.Equal to compare ComputedDigest verifier bytes with stored verifier digest bytes, reject lookup digest classes, wrong verifier classes, missing computed input, malformed computed input, missing stored input, and malformed stored input with redacted typed errors, and return mismatch as a redacted non-match result. Tests cover credential and token matches and mismatches, hmac.Equal usage, lookup and wrong-class rejection, missing and malformed input, raw-material API exclusion, redaction, and absence of authentication service behavior. Authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior remain deferred.
     ask_first:
       - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+
+  - id: W-0106
+    milestone: M-034
+    title: Define authentication service behavior implementation gate
+    status: next_ready
+    change: changes/2026-05-15-define-authentication-service-behavior-implementation-gate
+    depends_on:
+      - W-0105
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0042
+      - ADR-0043
+      - ADR-0044
+      - ADR-0049
+    completion:
+      - Define the implementation gate for future authentication service behavior without adding service code.
+      - Name future ownership, file boundaries, repository handoff, helper composition flow, public error collapse, redaction rules, and focused tests.
+      - Preserve deferral for login execution, token validation, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior unless a later work item explicitly authorizes each slice.
+    ask_first:
+      - Implementing authentication service behavior instead of only defining the gate.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.

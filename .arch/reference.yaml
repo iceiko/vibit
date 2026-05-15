@@ -793,10 +793,12 @@ phase_plan:
       - session_binding_lifecycle
     rule: The completed phase defines the verifier digest comparison helper gate before adding comparison code. It preserves deferrals for authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
   phase_2v_verifier_digest_comparison_helper_implementation:
-    status: active
-    active_milestone: M-033
+    status: completed
+    completed_milestone: M-033
+    completed_work_item: W-0105
     previous_milestone: M-032
-    next_work_item: W-0105
+    next_milestone: M-034
+    next_work_item: W-0106
     focus:
       - verifier_digest_comparison_helpers
       - crypto_hmac_equal
@@ -809,7 +811,28 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_binding_lifecycle
-    rule: The active phase should implement verifier digest comparison helpers only. It must compare computed verifier digest bytes to stored verifier digest bytes with a constant-time primitive and preserve deferrals for authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    rule: The completed phase implements verifier digest comparison helpers only. It compares computed verifier digest bytes to stored verifier digest bytes with crypto/hmac.Equal and preserves deferrals for authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+  phase_2w_authentication_service_behavior_implementation_gate:
+    status: active
+    active_milestone: M-034
+    previous_milestone: M-033
+    next_work_item: W-0106
+    focus:
+      - authentication_service_behavior_gate
+      - helper_composition_plan
+      - repository_handoff_boundary
+      - invalid_proof_failure_collapse
+      - no_protocol_carriers
+      - no_startup_wiring
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_validation_capability
+      - server_authoritative_account_authentication
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+      - frontend_backend_handler_separation
+    rule: The active phase should define the authentication service behavior implementation gate before adding login execution or token validation. It must compose the existing helper slices into a future service plan while preserving deferrals for protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

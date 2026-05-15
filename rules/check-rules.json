@@ -552,8 +552,8 @@
       "category": "runtime",
       "default_severity": "error",
       "title": "Verifier digest comparison helper gate",
-      "description": "The verifier digest comparison helper gate must define future helper ownership, file boundaries, constant-time primitive posture, input redaction, failure posture, tests, dependency posture, and deferrals before verifier comparison code exists.",
-      "agent_guidance": "Read `docs/verifier-digest-comparison-helper-gate.md` and `ADR-0049`; do not implement verifier digest comparison outside the authorized future helper files, and do not implement authentication service behavior, expose protocol carriers, change repositories, change migrations, wire startup, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
+      "description": "The verifier digest comparison helper gate and implementation check must preserve helper ownership, file boundaries, constant-time primitive posture, input redaction, failure posture, tests, dependency posture, and service/protocol/repository deferrals.",
+      "agent_guidance": "Read `docs/verifier-digest-comparison-helper-gate.md` and `ADR-0049`; keep verifier digest comparison inside the authorized helper files, compare only computed verifier digest bytes with stored verifier digest bytes, use `crypto/hmac.Equal`, and do not implement authentication service behavior, expose protocol carriers, change repositories, change migrations, wire startup, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
       "rule_id": "runtime.layer_boundary",

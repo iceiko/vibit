@@ -1600,6 +1600,59 @@ verifier_digest_comparison_helper_gate:
     protocol carriers, repositories, migrations, startup wiring, dependencies,
     and production authentication behavior.
 
+verifier_digest_comparison_helper_implementation:
+  status: completed
+  milestone: M-033
+  completed_work_item: W-0105
+  change: changes/2026-05-15-implement-verifier-digest-comparison-helpers
+  previous_milestone: M-032
+  previous_completed_work_item: W-0104
+  next_milestone: M-034
+  next_work_item: W-0106
+  verifier_digest_comparison_helper_implementation_completed: true
+  verifier_digest_comparison_completed_work_item: W-0105
+  verifier_comparison_source: runtime/internal/app/authentication/verifier_comparison.go
+  verifier_comparison_tests: runtime/internal/app/authentication/verifier_comparison_test.go
+  verifier_comparison_helpers_implemented: true
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  digest_size_bytes: 32
+  computed_digest_handoff: ComputedDigest
+  comparison_result_type: VerifierComparisonResult
+  comparison_error_type: VerifierComparisonError
+  credential_verifier_comparison_helper: CompareCredentialVerifierDigest
+  token_verifier_comparison_helper: CompareTokenVerifierDigest
+  preferred_constant_time_primitive: crypto/hmac.Equal
+  acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare
+  comparison_input_shape: computed_verifier_digest_and_stored_verifier_digest_bytes
+  mismatch_public_mapping_status: deferred_to_authentication_service
+  lookup_digest_comparison_for_authentication: forbidden
+  raw_material_comparison: forbidden
+  database_only_verifier_comparison: forbidden
+  redacted_errors_required: true
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  credential_generation_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The verifier digest comparison helpers are implemented as a narrow
+    application-owned helper slice under runtime/internal/app/authentication.
+    They compare computed verifier digest bytes to stored verifier digest bytes
+    with crypto/hmac.Equal, return redacted match or mismatch results, reject
+    malformed and wrong-class input, and do not implement authentication service
+    behavior, protocol carriers, repositories, migrations, startup wiring,
+    dependencies, or production authentication behavior.
+
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules
