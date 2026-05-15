@@ -641,7 +641,7 @@ milestones:
 
   - id: M-030
     title: Verifier Digest Helper Implementation Gate
-    status: active
+    status: completed
     goal: Define the next bounded implementation gate for verifier digest computation helpers before adding digest code.
     completion_criteria:
       - The gate names exact helper ownership, file boundaries, canonical input posture, logical key handoff, redaction requirements, tests, and deferrals.
@@ -656,6 +656,27 @@ milestones:
       - adding protocol carriers
       - changing repositories or migrations
       - adding authentication dependencies
+    completion_summary: Defined the verifier digest helper implementation gate in docs/verifier-digest-helper-implementation-gate.md, docs/verifier-digest-helper-implementation-gate.zh-CN.md, and ADR-0048. The gate names future helper files runtime/internal/app/authentication/verifier_digest.go and verifier_digest_test.go, defines the canonical input construction with versioned ASCII header, null separator, length-prefixed purpose label and raw material, requires HMAC-SHA-256 with the matching logical key from an already-validated VerifierKeySet, defines four digest classes with registered purpose labels and key mappings, requires copied 32-byte digest output, redacted errors, and focused tests. It preserves deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior. No digest computation code was added.
+
+  - id: M-031
+    title: Verifier Digest Computation Helper Implementation
+    status: active
+    goal: Implement the verifier digest computation helpers as a narrow application-owned code slice.
+    completion_criteria:
+      - The lookup and verifier digest computation helpers are implemented under runtime/internal/app/authentication/verifier_digest.go.
+      - Focused unit tests are implemented under runtime/internal/app/authentication/verifier_digest_test.go.
+      - The helpers build deterministic canonical input and compute HMAC-SHA-256 with the matching logical key.
+      - The helpers return copied 32-byte digest bytes and expose redacted errors.
+      - The helpers preserve deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    non_goals:
+      - comparing verifier digests
+      - implementing authentication service behavior
+      - executing login or token validation
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
+      - adding authentication dependencies
+
 
 work_items:
   - id: W-0001
@@ -2885,7 +2906,7 @@ work_items:
   - id: W-0102
     milestone: M-030
     title: Define verifier digest helper implementation gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-verifier-digest-helper-implementation-gate
     depends_on:
       - W-0101
@@ -2894,13 +2915,40 @@ work_items:
       - ADR-0041
       - ADR-0043
       - ADR-0047
+      - ADR-0048
     completion:
       - Define the implementation gate for lookup and verifier digest helpers without adding digest code.
       - Name future helper files, canonical input construction boundaries, verifier key handoff, redaction rules, and focused tests.
       - Preserve deferral for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Defined the verifier digest helper implementation gate in docs/verifier-digest-helper-implementation-gate.md, docs/verifier-digest-helper-implementation-gate.zh-CN.md, and ADR-0048. The gate names future helper files runtime/internal/app/authentication/verifier_digest.go and verifier_digest_test.go, defines the canonical input construction with versioned ASCII header, null separator, length-prefixed purpose label and raw material, requires HMAC-SHA-256 with the matching logical key from an already-validated VerifierKeySet, defines four digest classes with registered purpose labels and key mappings, requires copied 32-byte digest output, redacted errors, and focused tests. It preserves deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior. No digest computation code was added.
     ask_first:
       - Implementing verifier digest computation code instead of only defining the gate.
       - Comparing verifier material.
       - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+
+  - id: W-0103
+    milestone: M-031
+    title: Implement verifier digest computation helpers
+    status: next_ready
+    change: changes/2026-05-15-implement-verifier-digest-computation-helpers
+    depends_on:
+      - W-0102
+    related_decisions:
+      - ADR-0040
+      - ADR-0043
+      - ADR-0048
+    completion:
+      - Implement helper-only lookup and verifier digest computation under runtime/internal/app/authentication/verifier_digest.go.
+      - Add focused tests under runtime/internal/app/authentication/verifier_digest_test.go.
+      - Use deterministic canonical input with versioned header, null separator, length-prefixed purpose label and raw material.
+      - Compute HMAC-SHA-256 with the matching logical key from an already-validated VerifierKeySet.
+      - Return copied 32-byte digest output with redacted errors.
+      - Preserve deferral for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Comparing verifier digests.
+      - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+

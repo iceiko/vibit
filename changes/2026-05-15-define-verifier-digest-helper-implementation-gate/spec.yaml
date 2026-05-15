@@ -1,0 +1,126 @@
+schema_version: 0.1
+change_id: define-verifier-digest-helper-implementation-gate
+date: 2026-05-15
+type: standard
+status: verified
+
+summary: Define the verifier digest helper implementation gate without adding digest computation code.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0048
+  referenced:
+    - ADR-0040
+    - ADR-0041
+    - ADR-0043
+    - ADR-0044
+    - ADR-0047
+
+standards:
+  added:
+    - docs/verifier-digest-helper-implementation-gate.md
+    - docs/verifier-digest-helper-implementation-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - rules/check-rules.json
+    - tools/vibit
+
+implementation:
+  added: []
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  verifier_digest_helper_implementation_gate_defined: true
+  verifier_digest_helper_implementation_gate_standard: docs/verifier-digest-helper-implementation-gate.md
+  verifier_digest_helper_implementation_gate_decision: ADR-0048
+  verifier_digest_helper_implementation_gate_check_rule: runtime.verifier_digest_helper_implementation_gate
+  future_source: runtime/internal/app/authentication/verifier_digest.go
+  future_tests: runtime/internal/app/authentication/verifier_digest_test.go
+  implementation_authorized_by_this_standard: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+readiness_posture:
+  package: runtime/internal/app/authentication
+  future_source: runtime/internal/app/authentication/verifier_digest.go
+  future_tests: runtime/internal/app/authentication/verifier_digest_test.go
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  digest_size_bytes: 32
+  canonical_input_version: vibit.auth.verifier.input.v1
+  hmac_hash: crypto/sha256
+  next_gate: verifier_digest_computation_helper_implementation
+
+workflow:
+  completed_work_item: W-0102
+  completed_milestone: M-030
+  next_milestone: M-031
+  next_ready_work_item: W-0103
+  next_direction: implement_verifier_digest_computation_helpers
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-verifier-digest-helper-implementation-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

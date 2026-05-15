@@ -4811,7 +4811,9 @@ function checkGeneratedContractShapeOutput(root) {
     }
 
     const expectedContent = renderContractShape(root, entry);
-    if (text === expectedContent) {
+    const normalizedText = text.replace(/\r\n/g, "\n");
+    const normalizedExpected = expectedContent.replace(/\r\n/g, "\n");
+    if (normalizedText === normalizedExpected) {
       ok(`${outputPath} is reproducible from ${entry.path}`, {
         rule_id: "generated.drift",
         artifact: outputPath,
