@@ -74,6 +74,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.local_verifier_key_configuration_loading_gate",
   "runtime.environment_verifier_key_loader_gate",
   "runtime.token_credential_material_generation_implementation_gate",
+  "runtime.verifier_digest_comparison_helper_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -8842,6 +8843,256 @@ function checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles) {
   }
 }
 
+function checkRuntimeVerifierDigestComparisonHelperGate(root, goFiles) {
+  const ruleId = "runtime.verifier_digest_comparison_helper_gate";
+  const standardPath = "docs/verifier-digest-comparison-helper-gate.md";
+  const standardTranslationPath = "docs/verifier-digest-comparison-helper-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0049-verifier-digest-comparison-helper-gate.md";
+  const conversationPath = "conversations/2026-05-15-verifier-digest-comparison-helper-gate.md";
+  const futureSource = "runtime/internal/app/authentication/verifier_comparison.go";
+  const futureTests = "runtime/internal/app/authentication/verifier_comparison_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for verifier digest comparison helper gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for verifier digest comparison helper gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "verifier_digest_comparison_helper_gate: ADR-0049"],
+    [".arch/runtime.yaml", "verifier_digest_comparison_helper_gate_defined: true"],
+    [".arch/runtime.yaml", "verifier_digest_comparison_helper_gate_check_rule: runtime.verifier_digest_comparison_helper_gate"],
+    [".arch/runtime.yaml", "future_implementation_work_item: W-0105"],
+    [".arch/runtime.yaml", "future_source: runtime/internal/app/authentication/verifier_comparison.go"],
+    [".arch/runtime.yaml", "future_tests: runtime/internal/app/authentication/verifier_comparison_test.go"],
+    [".arch/runtime.yaml", "implementation_authorized_by_this_standard: false"],
+    [".arch/work-items.yaml", "id: M-033"],
+    [".arch/work-items.yaml", "title: Verifier Digest Comparison Helper Implementation"],
+    [".arch/work-items.yaml", "title: Implement verifier digest comparison helpers"],
+    [".arch/reference.yaml", "phase_2u_verifier_digest_comparison_helper_gate"],
+    [".arch/reference.yaml", "phase_2v_verifier_digest_comparison_helper_implementation"],
+    ["AGENTS.md", "docs/verifier-digest-comparison-helper-gate.md"],
+    ["AGENTS.md", "ADR-0049"],
+    ["AGENTS.md", "runtime.verifier_digest_comparison_helper_gate"],
+    ["AGENTS.zh-CN.md", "docs/verifier-digest-comparison-helper-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0049"],
+    ["AGENTS.zh-CN.md", "runtime.verifier_digest_comparison_helper_gate"],
+    ["runtime/AGENTS.md", "../docs/verifier-digest-comparison-helper-gate.md"],
+    ["runtime/AGENTS.md", "ADR-0049"],
+    ["runtime/AGENTS.md", "runtime.verifier_digest_comparison_helper_gate"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/verifier-digest-comparison-helper-gate.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0049"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.verifier_digest_comparison_helper_gate"],
+    ["modules/authentication/module.yaml", "verifier_digest_comparison_helper_gate_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/verifier-digest-comparison-helper-gate.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/verifier-digest-comparison-helper-gate.md"],
+    ["rules/check-rules.json", "runtime.verifier_digest_comparison_helper_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "verifier_digest_comparison_helper_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "future_implementation_work_item: W-0105"],
+    [standardPath, "future_source: runtime/internal/app/authentication/verifier_comparison.go"],
+    [standardPath, "future_tests: runtime/internal/app/authentication/verifier_comparison_test.go"],
+    [standardPath, "preferred_constant_time_primitive: crypto/hmac.Equal"],
+    [standardPath, "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare"],
+    [standardPath, "computed_digest_handoff: ComputedDigest"],
+    [standardPath, "raw_material_comparison: forbidden"],
+    [standardPath, "lookup_digest_comparison_for_authentication: forbidden"],
+    [standardPath, "database_only_verifier_comparison: forbidden"],
+    [standardPath, "runtime.verifier_digest_comparison_helper_gate"],
+    [standardTranslationPath, "verifier_digest_comparison_helper_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "future_implementation_work_item: W-0105"],
+    [standardTranslationPath, "future_source: runtime/internal/app/authentication/verifier_comparison.go"],
+    [standardTranslationPath, "future_tests: runtime/internal/app/authentication/verifier_comparison_test.go"],
+    [standardTranslationPath, "preferred_constant_time_primitive: crypto/hmac.Equal"],
+    [standardTranslationPath, "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare"],
+    [standardTranslationPath, "computed_digest_handoff: ComputedDigest"],
+    [standardTranslationPath, "raw_material_comparison: forbidden"],
+    [standardTranslationPath, "lookup_digest_comparison_for_authentication: forbidden"],
+    [standardTranslationPath, "database_only_verifier_comparison: forbidden"],
+    [standardTranslationPath, "runtime.verifier_digest_comparison_helper_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "verifier_digest_comparison_helper_gate_defined: true",
+      "verifier_digest_comparison_helper_gate_standard: docs/verifier-digest-comparison-helper-gate.md",
+      "verifier_digest_comparison_helper_gate_translation: docs/verifier-digest-comparison-helper-gate.zh-CN.md",
+      "verifier_digest_comparison_helper_gate_check_rule: runtime.verifier_digest_comparison_helper_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0105",
+      "future_source: runtime/internal/app/authentication/verifier_comparison.go",
+      "future_tests: runtime/internal/app/authentication/verifier_comparison_test.go",
+      "preferred_constant_time_primitive: crypto/hmac.Equal",
+      "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare",
+      "computed_digest_handoff: ComputedDigest",
+      "raw_material_comparison: forbidden",
+      "lookup_digest_comparison_for_authentication: forbidden",
+      "database_only_verifier_comparison: forbidden",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "startup_wiring_added: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "verifier_digest_comparison_helper_gate_defined: true",
+      "verifier_digest_comparison_helper_gate_standard: docs/verifier-digest-comparison-helper-gate.md",
+      "verifier_digest_comparison_helper_gate_translation: docs/verifier-digest-comparison-helper-gate.zh-CN.md",
+      "verifier_digest_comparison_helper_gate_check_rule: runtime.verifier_digest_comparison_helper_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0105",
+      "future_source: runtime/internal/app/authentication/verifier_comparison.go",
+      "future_tests: runtime/internal/app/authentication/verifier_comparison_test.go",
+      "preferred_constant_time_primitive: crypto/hmac.Equal",
+      "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare",
+      "computed_digest_handoff: ComputedDigest",
+      "raw_material_comparison: forbidden",
+      "lookup_digest_comparison_for_authentication: forbidden",
+      "database_only_verifier_comparison: forbidden",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "startup_wiring_added: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "verifier_digest_comparison_helper_gate_defined: true",
+      "verifier_digest_comparison_helper_gate_standard: docs/verifier-digest-comparison-helper-gate.md",
+      "verifier_digest_comparison_helper_gate_decision: ADR-0049",
+      "verifier_comparison_future_source: runtime/internal/app/authentication/verifier_comparison.go",
+      "verifier_comparison_future_tests: runtime/internal/app/authentication/verifier_comparison_test.go",
+      "verifier_comparison_future_implementation_work_item: W-0105",
+      "preferred_constant_time_primitive: crypto/hmac.Equal",
+      "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare",
+      "raw_material_comparison: forbidden",
+      "lookup_digest_comparison_for_authentication: forbidden",
+      "database_only_verifier_comparison: forbidden",
+    ],
+    "modules/authentication/module.yaml": [
+      "verifier_digest_comparison_helper_gate_defined: true",
+      "verifier_digest_comparison_helper_gate_standard: docs/verifier-digest-comparison-helper-gate.md",
+      "verifier_digest_comparison_helper_gate_decision: ADR-0049",
+      "verifier_comparison_future_source: runtime/internal/app/authentication/verifier_comparison.go",
+      "verifier_comparison_future_tests: runtime/internal/app/authentication/verifier_comparison_test.go",
+      "verifier_comparison_future_implementation_work_item: W-0105",
+      "preferred_constant_time_primitive: crypto/hmac.Equal",
+      "acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare",
+      "raw_material_comparison: forbidden",
+      "lookup_digest_comparison_for_authentication: forbidden",
+      "database_only_verifier_comparison: forbidden",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing verifier digest comparison helper gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves verifier digest comparison helper gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing verifier digest comparison helper gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureSource)) {
+    fail(`${futureSource} exists before W-0105 authorizes verifier digest comparison code`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  } else {
+    ok(`${futureSource} is not present before W-0105 authorizes verifier digest comparison code`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  }
+
+  if (isFile(root, futureTests)) {
+    fail(`${futureTests} exists before W-0105 authorizes verifier digest comparison tests`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  } else {
+    ok(`${futureTests} is not present before W-0105 authorizes verifier digest comparison tests`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  }
+
+  for (const file of goFiles) {
+    if (!file.startsWith("runtime/internal/app/authentication/")) {
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const sourceText = sourceWithoutGoComments(text);
+    const forbiddenComparisonPatterns = [
+      { pattern: /\bhmac\.Equal\b/, label: "verifier digest comparison primitive outside comparison helper" },
+      { pattern: /\bsubtle\.ConstantTimeCompare\b/, label: "verifier digest comparison primitive outside comparison helper" },
+      { pattern: /\bbytes\.Equal\b/, label: "non-constant-time verifier digest comparison outside comparison helper" },
+      { pattern: /\breflect\.DeepEqual\b/, label: "non-constant-time verifier digest comparison outside comparison helper" },
+      { pattern: /\bCompare(Credential|Token|Lookup|Verifier)?Digest\b/, label: "verifier digest comparison helper outside comparison helper file" },
+      { pattern: /\bVerifierComparison(Result|Error)\b/, label: "verifier comparison type outside comparison helper file" },
+    ];
+    const matches = textMatchesAny(sourceText, forbiddenComparisonPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement verifier comparison before W-0105`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} crosses verifier digest comparison helper gate: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+}
+
 function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles) {
   const ruleId = "runtime.authentication_service_implementation_readiness_gate";
   const standardPath = "docs/authentication-service-implementation-readiness-gate.md";
@@ -10217,6 +10468,10 @@ function isVerifierDigestHelperFile(file) {
   return file === "runtime/internal/app/authentication/verifier_digest.go";
 }
 
+function isVerifierDigestComparisonHelperFile(file) {
+  return file === "runtime/internal/app/authentication/verifier_comparison.go";
+}
+
 function checkWork(root) {
   resetResults("check work");
   if (!jsonOutput) {
@@ -10572,6 +10827,7 @@ function checkRuntime(root) {
   checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles);
   checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles);
   checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles);
+  checkRuntimeVerifierDigestComparisonHelperGate(root, goFiles);
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);

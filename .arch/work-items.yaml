@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-032
+current_milestone: M-033
 
 continuation_semantics:
   default_step_unit: work_item
@@ -680,7 +680,7 @@ milestones:
 
   - id: M-032
     title: Verifier Digest Comparison Helper Gate
-    status: active
+    status: completed
     goal: Define the next bounded gate for verifier digest comparison helpers before adding comparison code.
     completion_criteria:
       - The gate names exact comparison helper ownership, file boundaries, constant-time primitive, input redaction, failure posture, tests, and deferrals.
@@ -688,6 +688,25 @@ milestones:
       - No verifier comparison code is added by the gate itself.
     non_goals:
       - comparing verifier digests in this gate-only work item
+      - implementing authentication service behavior
+      - executing login or token validation
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
+      - adding authentication dependencies
+    completion_summary: Defined the verifier digest comparison helper gate in docs/verifier-digest-comparison-helper-gate.md, docs/verifier-digest-comparison-helper-gate.zh-CN.md, and ADR-0049. The gate names future helper files runtime/internal/app/authentication/verifier_comparison.go and verifier_comparison_test.go, keeps verifier_digest.go computation-only, requires constant-time comparison with crypto/hmac.Equal as the preferred primitive and crypto/subtle.ConstantTimeCompare as the acceptable alternative, allows comparison only between ComputedDigest verifier bytes and stored verifier digest bytes, forbids raw material, lookup digest, key id, database-only, and protocol metadata comparison, defines redacted failure posture, and requires focused tests. It preserves deferrals for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior. No verifier comparison code was added.
+
+  - id: M-033
+    title: Verifier Digest Comparison Helper Implementation
+    status: active
+    goal: Implement the verifier digest comparison helpers as a narrow application-owned code slice.
+    completion_criteria:
+      - The verifier digest comparison helpers are implemented only under runtime/internal/app/authentication/verifier_comparison.go.
+      - Focused unit tests are implemented under runtime/internal/app/authentication/verifier_comparison_test.go.
+      - The helpers compare only computed verifier digest bytes to stored verifier digest bytes with a constant-time primitive.
+      - The helpers reject lookup digest classes, wrong verifier classes, missing input, and malformed stored digest bytes with redacted errors.
+      - The helpers preserve deferrals for authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    non_goals:
       - implementing authentication service behavior
       - executing login or token validation
       - wiring process startup
@@ -2974,7 +2993,7 @@ work_items:
   - id: W-0104
     milestone: M-032
     title: Define verifier digest comparison helper gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-verifier-digest-comparison-helper-gate
     depends_on:
       - W-0103
@@ -2982,12 +3001,37 @@ work_items:
       - ADR-0040
       - ADR-0043
       - ADR-0048
+      - ADR-0049
     completion:
       - Define the implementation gate for constant-time verifier digest comparison helpers without adding comparison code.
       - Name future helper ownership, file boundaries, allowed constant-time primitive, redaction rules, failure posture, and focused tests.
       - Preserve deferral for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Defined the verifier digest comparison helper gate in docs/verifier-digest-comparison-helper-gate.md, docs/verifier-digest-comparison-helper-gate.zh-CN.md, and ADR-0049. The gate names future helper files runtime/internal/app/authentication/verifier_comparison.go and verifier_comparison_test.go, keeps verifier_digest.go computation-only, requires crypto/hmac.Equal as the preferred constant-time primitive, allows crypto/subtle.ConstantTimeCompare as an equivalent alternative, forbids raw material, lookup digest, key id, database-only, and protocol metadata comparison, defines redacted failure posture, and preserves all service, protocol, repository, migration, startup, dependency, and production behavior deferrals. No verifier comparison code was added.
     ask_first:
       - Implementing verifier comparison code instead of only defining the gate.
+      - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+
+  - id: W-0105
+    milestone: M-033
+    title: Implement verifier digest comparison helpers
+    status: next_ready
+    change: changes/2026-05-15-implement-verifier-digest-comparison-helpers
+    depends_on:
+      - W-0104
+    related_decisions:
+      - ADR-0040
+      - ADR-0043
+      - ADR-0048
+      - ADR-0049
+    completion:
+      - Implement helper-only verifier digest comparison under runtime/internal/app/authentication/verifier_comparison.go.
+      - Add focused tests under runtime/internal/app/authentication/verifier_comparison_test.go.
+      - Compare only computed credential/token verifier digests against stored verifier digest bytes with crypto/hmac.Equal or an equivalent constant-time primitive.
+      - Reject lookup digest classes, wrong verifier classes, missing input, malformed stored digest bytes, and invalid comparison input with redacted errors.
+      - Preserve deferral for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
       - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.

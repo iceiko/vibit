@@ -73,6 +73,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-031 Verifier Digest Computation Helper Implementation` is completed. `W-0103` implemented lookup and verifier digest computation helpers under `runtime/internal/app/authentication`, not in this module. This module remains storage-neutral and may store already-computed digest material only. It must not compute HMACs, choose verifier key sets, compare verifier digests, generate raw token or credential material, hold raw material, wire startup, or decide authentication outcomes.
 
+`M-032 Verifier Digest Comparison Helper Gate` is completed. `W-0104` defined the verifier digest comparison helper gate in `docs/verifier-digest-comparison-helper-gate.md` and `ADR-0049` without adding service code or runtime authentication behavior. Future comparison helpers belong under `runtime/internal/app/authentication`, not this module, and should use `verifier_comparison.go` and `verifier_comparison_test.go`. This module remains storage-neutral and may store already-computed digest material only. It must not compare verifier digests, compare raw material, compare lookup digests as authentication proof, use database-only equality as final proof, expose lookup misses, call comparison helpers from repository code, or decide authentication outcomes. `runtime.verifier_digest_comparison_helper_gate` is the repository check rule for this gate.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

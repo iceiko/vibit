@@ -74,6 +74,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-031 Verifier Digest Computation Helper Implementation` 已完成。`W-0103` 已在 `runtime/internal/app/authentication` 下实现 lookup and verifier digest computation helpers，而不是在本模块中实现。本模块仍是 storage-neutral，只能存储 already-computed digest material。它不得 compute HMACs、choose verifier key sets、compare verifier digests、generate raw token 或 credential material、hold raw material、wire startup 或决定 authentication outcomes。
 
+`M-032 Verifier Digest Comparison Helper Gate` 已完成。`W-0104` 已在 `docs/verifier-digest-comparison-helper-gate.md` 和 `ADR-0049` 中定义 verifier digest comparison helper gate，且没有添加 service code 或 runtime authentication behavior。Future comparison helpers 属于 `runtime/internal/app/authentication`，不属于本模块，并应使用 `verifier_comparison.go` 和 `verifier_comparison_test.go`。本模块仍是 storage-neutral，只能存储 already-computed digest material。它不得 compare verifier digests、compare raw material、把 lookup digests comparison 当作 authentication proof、把 database-only equality 当作最终 proof、暴露 lookup misses、从 repository code 调用 comparison helpers，或决定 authentication outcomes。`runtime.verifier_digest_comparison_helper_gate` 是该 gate 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

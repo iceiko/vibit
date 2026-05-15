@@ -1541,6 +1541,65 @@ verifier_digest_computation_helper_implementation:
     change repositories, change migrations, wire startup, add dependencies,
     or add production authentication behavior.
 
+verifier_digest_comparison_helper_gate:
+  status: completed
+  milestone: M-032
+  first_work_item: W-0104
+  completed_work_item: W-0104
+  change: changes/2026-05-15-define-verifier-digest-comparison-helper-gate
+  previous_milestone: M-031
+  previous_completed_work_item: W-0103
+  next_milestone: M-033
+  next_work_item: W-0105
+  decision: ADR-0049
+  verifier_digest_comparison_helper_gate_decision: ADR-0049
+  standard: docs/verifier-digest-comparison-helper-gate.md
+  translation: docs/verifier-digest-comparison-helper-gate.zh-CN.md
+  verifier_digest_comparison_helper_gate_standard: docs/verifier-digest-comparison-helper-gate.md
+  verifier_digest_comparison_helper_gate_translation: docs/verifier-digest-comparison-helper-gate.zh-CN.md
+  verifier_digest_comparison_helper_gate_defined: true
+  verifier_digest_comparison_helper_gate_check_rule: runtime.verifier_digest_comparison_helper_gate
+  implementation_authorized_by_this_standard: false
+  future_implementation_work_item: W-0105
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  future_slice: constant_time_verifier_digest_comparison_helpers
+  future_source: runtime/internal/app/authentication/verifier_comparison.go
+  future_tests: runtime/internal/app/authentication/verifier_comparison_test.go
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  verifier_version: 1
+  digest_size_bytes: 32
+  input_shape: computed_verifier_digest_and_stored_verifier_digest_bytes
+  computed_digest_handoff: ComputedDigest
+  stored_digest_handoff: copied_repository_digest_bytes
+  preferred_constant_time_primitive: crypto/hmac.Equal
+  acceptable_constant_time_primitive: crypto/subtle.ConstantTimeCompare
+  comparison_result_shape: redacted_match_or_mismatch_result
+  raw_material_comparison: forbidden
+  lookup_digest_comparison_for_authentication: forbidden
+  database_only_verifier_comparison: forbidden
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The verifier digest comparison helper gate is defined. Future comparison
+    helpers remain a narrow application-owned helper slice under
+    runtime/internal/app/authentication, must compare only computed verifier
+    digest bytes to stored verifier digest bytes with a constant-time primitive,
+    and must keep comparison separate from digest computation, service behavior,
+    protocol carriers, repositories, migrations, startup wiring, dependencies,
+    and production authentication behavior.
+
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules
