@@ -8546,6 +8546,158 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
   }
 }
 
+function checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles) {
+  const ruleId = "runtime.verifier_digest_helper_implementation_gate";
+  const standardPath = "docs/verifier-digest-helper-implementation-gate.md";
+  const standardTranslationPath = "docs/verifier-digest-helper-implementation-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0048-verifier-digest-helper-implementation-gate.md";
+  const conversationPath = "conversations/2026-05-15-verifier-digest-helper-implementation-gate.md";
+  const futureSource = "runtime/internal/app/authentication/verifier_digest.go";
+  const futureTests = "runtime/internal/app/authentication/verifier_digest_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for verifier digest helper implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for verifier digest helper implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "verifier_digest_helper_implementation_gate: ADR-0048"],
+    [".arch/runtime.yaml", "verifier_digest_helper_implementation_gate_defined: true"],
+    [".arch/runtime.yaml", "verifier_digest_helper_implementation_gate_check_rule: runtime.verifier_digest_helper_implementation_gate"],
+    [".arch/runtime.yaml", "future_implementation_work_item: W-0103"],
+    [".arch/runtime.yaml", "future_source: runtime/internal/app/authentication/verifier_digest.go"],
+    [".arch/runtime.yaml", "future_tests: runtime/internal/app/authentication/verifier_digest_test.go"],
+    [".arch/runtime.yaml", "implementation_authorized_by_this_standard: false"],
+    [".arch/work-items.yaml", "current_milestone: M-031"],
+    [".arch/work-items.yaml", "title: Verifier Digest Computation Helper Implementation"],
+    [".arch/work-items.yaml", "title: Implement verifier digest computation helpers"],
+    [".arch/reference.yaml", "phase_2s_verifier_digest_helper_implementation_gate"],
+    ["AGENTS.md", "docs/verifier-digest-helper-implementation-gate.md"],
+    ["AGENTS.md", "ADR-0048"],
+    ["AGENTS.md", "runtime.verifier_digest_helper_implementation_gate"],
+    ["AGENTS.zh-CN.md", "docs/verifier-digest-helper-implementation-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0048"],
+    ["AGENTS.zh-CN.md", "runtime.verifier_digest_helper_implementation_gate"],
+    ["rules/check-rules.json", "runtime.verifier_digest_helper_implementation_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "verifier_digest_helper_implementation_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "future_implementation_work_item: W-0103"],
+    [standardPath, "future_source: runtime/internal/app/authentication/verifier_digest.go"],
+    [standardPath, "future_tests: runtime/internal/app/authentication/verifier_digest_test.go"],
+    [standardPath, "canonical_input_version: vibit.auth.verifier.input.v1"],
+    [standardPath, "canonical_input_encoding: ascii_header_length_prefixed_purpose_label_length_prefixed_raw_material"],
+    [standardPath, "hmac_hash: crypto/sha256"],
+    [standardPath, "verifier_key_handoff: VerifierKeySet"],
+    [standardPath, "digest_output_shape: raw_32_byte_digest"],
+    [standardPath, "runtime.verifier_digest_helper_implementation_gate"],
+    [standardTranslationPath, "verifier_digest_helper_implementation_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "future_implementation_work_item: W-0103"],
+    [standardTranslationPath, "future_source: runtime/internal/app/authentication/verifier_digest.go"],
+    [standardTranslationPath, "future_tests: runtime/internal/app/authentication/verifier_digest_test.go"],
+    [standardTranslationPath, "canonical_input_version: vibit.auth.verifier.input.v1"],
+    [standardTranslationPath, "canonical_input_encoding: ascii_header_length_prefixed_purpose_label_length_prefixed_raw_material"],
+    [standardTranslationPath, "hmac_hash: crypto/sha256"],
+    [standardTranslationPath, "verifier_key_handoff: VerifierKeySet"],
+    [standardTranslationPath, "digest_output_shape: raw_32_byte_digest"],
+    [standardTranslationPath, "runtime.verifier_digest_helper_implementation_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "verifier_digest_helper_implementation_gate_defined: true",
+      "verifier_digest_helper_implementation_gate_standard: docs/verifier-digest-helper-implementation-gate.md",
+      "verifier_digest_helper_implementation_gate_translation: docs/verifier-digest-helper-implementation-gate.zh-CN.md",
+      "verifier_digest_helper_implementation_gate_check_rule: runtime.verifier_digest_helper_implementation_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0103",
+      "future_source: runtime/internal/app/authentication/verifier_digest.go",
+      "future_tests: runtime/internal/app/authentication/verifier_digest_test.go",
+      "canonical_input_version: vibit.auth.verifier.input.v1",
+      "verifier_key_handoff: VerifierKeySet",
+      "digest_output_shape: raw_32_byte_digest",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "startup_wiring_added: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing verifier digest helper implementation gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves verifier digest helper implementation gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing verifier digest helper implementation gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureSource)) {
+    fail(`${futureSource} exists before W-0103 implements verifier digest computation helpers`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  } else {
+    ok(`${futureSource} is not implemented by the W-0102 gate-only change`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  }
+
+  if (isFile(root, futureTests)) {
+    fail(`${futureTests} exists before W-0103 implements verifier digest computation helper tests`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  } else {
+    ok(`${futureTests} is not implemented by the W-0102 gate-only change`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  }
+}
+
 function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles) {
   const ruleId = "runtime.authentication_service_implementation_readiness_gate";
   const standardPath = "docs/authentication-service-implementation-readiness-gate.md";
@@ -10271,6 +10423,7 @@ function checkRuntime(root) {
   checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles);
   checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles);
+  checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles);
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);

@@ -1,0 +1,94 @@
+schema_version: 0.1
+change_id: fix-verifier-digest-helper-gate-review-findings
+date: 2026-05-15
+type: tooling
+status: verified
+
+summary: Fix W-0102 review findings by wiring the verifier digest helper gate check, restoring traceability artifacts, and correcting work-state documentation.
+
+affected_modules:
+  - runtime
+  - authentication
+  - agent-tooling
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0048
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - AGENTS.zh-CN.md
+    - tools/vibit
+    - changes/2026-05-15-define-verifier-digest-helper-implementation-gate/verification.md
+    - conversations/2026-05-15-verifier-digest-helper-implementation-gate.md
+
+implementation:
+  added: []
+  changed:
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  corrected_current_milestone: M-031
+  next_ready_work_item: W-0103
+  next_direction: implement_verifier_digest_computation_helpers
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change fix-verifier-digest-helper-gate-review-findings --json
+    - node tools/vibit check all --json
+    - git diff --check
+    - secret scan for GitHub tokens excluding .git and .vibit.local.env
+  status: Verified

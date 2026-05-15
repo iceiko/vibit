@@ -10,7 +10,7 @@ node tools/vibit check all --json
 
 ```
 status: passed
-passed: 155 (including this change's subchecks)
+passed: 154 (including this change's subchecks)
 warnings: 1
 failures: 0
 ```
@@ -18,7 +18,7 @@ failures: 0
 ### Warning
 
 ```
-runtime.identity_boundary: runtime/internal/modules/authentication/authentication_repository.go
+runtime.identity_boundary: runtime/internal/platform/persistence/postgres/authentication_repository.go
 ```
 
 This warning is the expected `authentication_repository.go` identity boundary warning that exists before this change.
