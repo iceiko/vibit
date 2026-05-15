@@ -70,6 +70,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.secret_configuration_verifier_key_loading_boundary",
   "runtime.token_credential_material_generation_boundary",
   "runtime.verifier_digest_computation_comparison_boundary",
+  "runtime.authentication_service_implementation_readiness_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -8432,6 +8433,239 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
   }
 }
 
+function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles) {
+  const ruleId = "runtime.authentication_service_implementation_readiness_gate";
+  const standardPath = "docs/authentication-service-implementation-readiness-gate.md";
+  const standardTranslationPath = "docs/authentication-service-implementation-readiness-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0044-authentication-service-implementation-readiness-gate.md";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for authentication service implementation readiness gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for authentication service implementation readiness gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "authentication_service_implementation_readiness_gate_standard: docs/authentication-service-implementation-readiness-gate.md"],
+    [".arch/conventions.yaml", "authentication_service_implementation_readiness_gate_decision: ADR-0044"],
+    [".arch/conventions.yaml", "authentication_service_implementation_readiness_gate_check_rule: runtime.authentication_service_implementation_readiness_gate"],
+    [".arch/runtime.yaml", "authentication_service_implementation_readiness_gate: ADR-0044"],
+    [".arch/runtime.yaml", "authentication_service_implementation_readiness_gate_decision: ADR-0044"],
+    [".arch/runtime.yaml", "authentication_service_implementation_readiness_gate_standard: docs/authentication-service-implementation-readiness-gate.md"],
+    [".arch/runtime.yaml", "authentication_service_implementation_readiness_gate_defined: true"],
+    [".arch/runtime.yaml", "authentication_service_implementation_readiness_gate_check_rule: runtime.authentication_service_implementation_readiness_gate"],
+    [".arch/contracts.yaml", "authentication_service_implementation_readiness_gate_defined: true"],
+    [".arch/contracts.yaml", "authentication_service_implementation_readiness_gate_standard: docs/authentication-service-implementation-readiness-gate.md"],
+    [".arch/reference.yaml", "phase_2l_authentication_service_implementation_readiness_gate"],
+    [".arch/reference.yaml", "authentication_service_implementation_readiness_gate_decision: ADR-0044"],
+    ["AGENTS.md", "docs/authentication-service-implementation-readiness-gate.md"],
+    ["AGENTS.md", "ADR-0044"],
+    ["AGENTS.md", "runtime.authentication_service_implementation_readiness_gate"],
+    ["AGENTS.zh-CN.md", "docs/authentication-service-implementation-readiness-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0044"],
+    ["AGENTS.zh-CN.md", "runtime.authentication_service_implementation_readiness_gate"],
+    ["runtime/AGENTS.md", "../docs/authentication-service-implementation-readiness-gate.md"],
+    ["runtime/AGENTS.md", "ADR-0044"],
+    ["runtime/AGENTS.md", "runtime.authentication_service_implementation_readiness_gate"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/authentication-service-implementation-readiness-gate.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0044"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authentication_service_implementation_readiness_gate"],
+    ["modules/authentication/module.yaml", "authentication_service_implementation_readiness_gate_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/authentication-service-implementation-readiness-gate.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/authentication-service-implementation-readiness-gate.md"],
+    ["rules/check-rules.json", "runtime.authentication_service_implementation_readiness_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "authentication_service_implementation_readiness_gate: defined"],
+    [standardPath, "planned_package_candidate: runtime/internal/app/authentication"],
+    [standardPath, "first_code_slice_must_be_separately_authorized: true"],
+    [standardPath, "recommended_queue:"],
+    [standardPath, "local_verifier_key_configuration_loader"],
+    [standardPath, "runtime/internal/platform/transport/ws/"],
+    [standardPath, "required_test_classes:"],
+    [standardPath, "runtime.authentication_service_implementation_readiness_gate"],
+    [standardPath, "This is a readiness-only standard. It does not add Go code"],
+    [standardTranslationPath, "authentication_service_implementation_readiness_gate: defined"],
+    [standardTranslationPath, "planned_package_candidate: runtime/internal/app/authentication"],
+    [standardTranslationPath, "first_code_slice_must_be_separately_authorized: true"],
+    [standardTranslationPath, "recommended_queue:"],
+    [standardTranslationPath, "local_verifier_key_configuration_loader"],
+    [standardTranslationPath, "runtime/internal/platform/transport/ws/"],
+    [standardTranslationPath, "required_test_classes:"],
+    [standardTranslationPath, "runtime.authentication_service_implementation_readiness_gate"],
+    [standardTranslationPath, "这只是 readiness-only standard。它不添加 Go code"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "authentication_service_implementation_readiness_gate_defined: true",
+      "planned_package_candidate: runtime/internal/app/authentication",
+      "first_code_slice_must_be_separately_authorized: true",
+      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "service_code_status: deferred",
+      "secret_loading_code_status: deferred",
+      "material_generation_code_status: deferred",
+      "digest_helper_code_status: deferred",
+      "verifier_comparison_code_status: deferred",
+      "protobuf_authentication_messages_status: deferred",
+      "websocket_proof_carrier_status: deferred",
+      "repository_interface_change_status: deferred",
+      "migration_schema_change_status: deferred",
+      "major_dependency_status: deferred",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "secret_configuration_loading_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "authentication_service_implementation_readiness_gate_defined: true",
+      "planned_package_candidate: runtime/internal/app/authentication",
+      "first_code_slice_must_be_separately_authorized: true",
+      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "service_code_status: deferred",
+      "secret_loading_code_status: deferred",
+      "material_generation_code_status: deferred",
+      "digest_helper_code_status: deferred",
+      "verifier_comparison_code_status: deferred",
+      "protobuf_authentication_messages_status: deferred",
+      "websocket_proof_carrier_status: deferred",
+      "repository_interface_change_status: deferred",
+      "migration_schema_change_status: deferred",
+      "major_dependency_status: deferred",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "credential_generation_added: false",
+      "secret_configuration_loading_added: false",
+      "verifier_digest_computation_added: false",
+      "verifier_comparison_added: false",
+      "application_authentication_service_code_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "authentication_service_implementation_readiness_gate_defined: true",
+      "planned_package_candidate: runtime/internal/app/authentication",
+      "first_code_slice_must_be_separately_authorized: true",
+      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "runtime_authentication_implemented: false",
+      "token_behavior_implemented: false",
+      "runtime_lookup_added: false",
+      "generated_contract_shapes_added: true",
+      "authentication_generated_contract_shapes_added: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "authentication_service_implementation_readiness_gate_defined: true",
+      "planned_package_candidate: runtime/internal/app/authentication",
+      "first_code_slice_must_be_separately_authorized: true",
+      "recommended_next_gate: local_verifier_key_configuration_loading_gate",
+      "runtime_authentication_implemented: false",
+      "token_generation_added: false",
+      "token_validation_added: false",
+      "verifier_comparison_added: false",
+      "login_handlers_added: false",
+      "logout_execution_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "authentication_dependencies_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing authentication service implementation readiness gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves authentication service implementation readiness gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing authentication service implementation readiness gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\b(AuthService|Authenticator|TokenValidator|TokenIssuer|CredentialIssuer)\b/, label: "authentication service implementation before implementation gate" },
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "device credential authentication behavior before implementation gate" },
+    { pattern: /\bValidateAccessToken\b/, label: "access-token validation behavior before implementation gate" },
+    { pattern: /\bLogoutAccessToken\b/, label: "logout behavior before implementation gate" },
+    { pattern: /\bRefreshAccessToken\b/, label: "refresh behavior before implementation gate" },
+    { pattern: /\bauthentication_service_code_added\b/, label: "authentication service implementation marker in Go source" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement authentication service behavior before its implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses authentication service implementation readiness gate: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLayerBoundaries(root, goFiles) {
   const layerRules = [
     {
@@ -8864,6 +9098,7 @@ function checkRuntime(root) {
   checkRuntimeSecretConfigurationVerifierKeyLoadingBoundary(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles);
   checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles);
+  checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeLayerBoundaries(root, goFiles);
 
   const goTool = childProcess.spawnSync("go", ["version"], {

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-023
+current_milestone: M-024
 
 continuation_semantics:
   default_step_unit: work_item
@@ -477,7 +477,7 @@ milestones:
 
   - id: M-023
     title: Authentication Service Implementation Readiness Gate
-    status: active
+    status: completed
     goal: Consolidate the implementation entry criteria, test expectations, and bounded first authentication service code queue before adding authentication service behavior.
     completion_criteria:
       - The first authentication service implementation slice has explicit entry criteria, owned packages, allowed files, required tests, and deferrals.
@@ -491,6 +491,30 @@ milestones:
       - implementing credential generation
       - implementing verifier digest computation
       - implementing verifier comparison
+      - executing login, token validation, logout, refresh, or cleanup behavior
+      - adding authentication Protobuf messages
+      - changing the Protobuf envelope or WebSocket handshake
+      - adding WebSocket proof carriers or routes
+      - adding authentication dependencies
+      - changing authentication.Repository or migration schemas
+    completion_summary: M-023 defined the authentication service implementation readiness gate. The repository now has an English and Simplified Chinese readiness standard, ADR-0044, a runtime check rule, manifest and guide references, required prior-boundary list, recommended package candidate runtime/internal/app/authentication, forbidden first-slice write areas, recommended implementation queue, local verifier key configuration loader as the next recommended gate, service behavior entry criteria, required test classes, redaction and observability constraints, and Nakama/Pitaya capability mapping. No authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, or production authentication behavior were added.
+
+  - id: M-024
+    title: Local Verifier Key Configuration Loading Gate
+    status: active
+    goal: Define the first bounded local verifier key configuration loading implementation gate before adding secret-loading code.
+    completion_criteria:
+      - The local verifier key configuration loading code gate declares exact owner package, input posture, validation rules, redaction rules, test cases, and file boundaries before implementation.
+      - Environment parsing, explicit in-memory input, or both are sequenced without committing production-like secrets.
+      - External KMS, cloud secret-manager, operations dependencies, token generation, credential generation, digest helpers, login execution, token validation, protocol carriers, repository changes, migration changes, and production authentication behavior remain deferred unless separately gated.
+      - The next work item is either a narrow implementation slice or another explicit preparation gate.
+    non_goals:
+      - implementing secret loading
+      - implementing token generation
+      - implementing credential generation
+      - implementing verifier digest computation
+      - implementing verifier comparison
+      - implementing authentication service code
       - executing login, token validation, logout, refresh, or cleanup behavior
       - adding authentication Protobuf messages
       - changing the Protobuf envelope or WebSocket handshake
@@ -2569,7 +2593,7 @@ work_items:
   - id: W-0095
     milestone: M-023
     title: Define authentication service implementation readiness gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-authentication-service-implementation-readiness-gate
     depends_on:
       - W-0094
@@ -2585,7 +2609,29 @@ work_items:
       - Define the smallest safe first implementation queue without adding code.
       - Map Nakama and Pitaya authentication/session references into the readiness checklist.
       - Preserve deferral for authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, and production authentication behavior.
+    completion_summary: Defined the authentication service implementation readiness gate in ADR-0044 and the paired readiness standard. The gate consolidates required prior boundaries, application-owned package candidates, first-slice write boundaries, forbidden write areas, recommended implementation queue, local verifier key configuration loading as the next recommended gate, service behavior entry criteria, required test classes, redaction and observability constraints, and Nakama/Pitaya capability mapping. No authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior were added.
     ask_first:
       - Starting implementation code while defining readiness.
       - Selecting a major external dependency.
+      - Changing repository interfaces, migration schemas, Protobuf messages, WebSocket proof carriers, or runtime authentication behavior.
+
+  - id: W-0096
+    milestone: M-024
+    title: Define local verifier key configuration loading gate
+    status: next_ready
+    change: changes/2026-05-15-define-local-verifier-key-configuration-loading-gate
+    depends_on:
+      - W-0095
+    related_decisions:
+      - ADR-0041
+      - ADR-0043
+      - ADR-0044
+    completion:
+      - Define the first local verifier key configuration loading code gate without implementing secret loading.
+      - Choose whether the first implementation gate accepts explicit in-memory configuration, process environment configuration, or a sequenced combination.
+      - Define validation, redaction, tests, package ownership, file boundaries, and failure behavior for the future code slice.
+      - Preserve deferral for token generation, credential generation, verifier digest computation, verifier comparison, authentication service code, login execution, token validation, logout execution, cleanup jobs, Protobuf messages, WebSocket proof carriers, authentication dependencies, repository interface changes, migration schema changes, external secret-manager integrations, and production authentication behavior.
+    ask_first:
+      - Implementing secret loading while defining the gate.
+      - Selecting a major external KMS, cloud secret-manager, operations, cryptography, password-hashing, JWT, OAuth, OIDC, or provider dependency.
       - Changing repository interfaces, migration schemas, Protobuf messages, WebSocket proof carriers, or runtime authentication behavior.

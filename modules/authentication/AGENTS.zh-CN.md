@@ -60,6 +60,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-022 Verifier Digest Computation And Comparison Boundary` 已完成。`W-0094` 已在 `docs/verifier-digest-computation-comparison-boundary.md` 和 `ADR-0043` 中定义 future verifier digest computation 与 constant-time comparison posture，且没有添加 service code 或 runtime authentication behavior。Future digest computation and comparison 由 `runtime/internal/app` 下的 application 拥有；lookup digest equality 只能选择 candidate record；verifier digest comparison 必须 constant-time；invalid lookup、mismatch、unknown key id、unsupported algorithm、malformed proof 以及 expired 或 revoked proof 必须收敛到同一个 public invalid-proof class。本模块的 `authentication.Repository` 只能存取 already-computed digest material；不得 compute HMACs、choose verifier key sets、compare verifier digests、disclose lookup misses，或决定 authentication outcomes。`runtime.verifier_digest_computation_comparison_boundary` 是该 boundary 的 repository check rule。
 
+`M-023 Authentication Service Implementation Readiness Gate` 已完成。`W-0095` 已在 `docs/authentication-service-implementation-readiness-gate.md` 和 `ADR-0044` 中定义 readiness gate，且没有添加 service code 或 runtime authentication behavior。Future service implementation 仍由 `runtime/internal/app` 下的 application 拥有，package candidate 是 `runtime/internal/app/authentication`。本模块仍是 storage-neutral repository boundary。它不得吸收 service orchestration、secret loading、material generation、digest computation、verifier comparison、login execution、token validation、protocol behavior、WebSocket behavior 或 production authentication decisions。`runtime.authentication_service_implementation_readiness_gate` 是该 gate 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

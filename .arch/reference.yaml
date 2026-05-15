@@ -567,10 +567,16 @@ phase_plan:
       - session_context_boundary
     rule: The verifier digest computation and constant-time comparison posture is defined before digest helpers or authentication service behavior. Future digest helpers are application-owned, use versioned length-prefixed canonical input, keep lookup digest equality as record selection only, and require constant-time verifier digest comparison with invalid-proof public failure collapse. It does not implement verifier digest computation, verifier comparison, token generation, credential generation, secret loading, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
   phase_2l_authentication_service_implementation_readiness_gate:
-    status: active
-    active_milestone: M-023
+    status: completed
+    milestone: M-023
     previous_milestone: M-022
-    next_work_item: W-0095
+    completed_work_item: W-0095
+    change: changes/2026-05-15-define-authentication-service-implementation-readiness-gate
+    decision: ADR-0044
+    authentication_service_implementation_readiness_gate_decision: ADR-0044
+    standard: docs/authentication-service-implementation-readiness-gate.md
+    next_milestone: M-024
+    next_work_item: W-0096
     focus:
       - authentication_service_implementation_entry_criteria
       - first_code_slice_queue
@@ -585,7 +591,26 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - session_binding_lifecycle
-    rule: The active phase may define implementation readiness and the first bounded code queue before service code. It must not implement authentication service code, secret loading, token generation, credential generation, verifier digest computation, verifier comparison, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, or production authentication behavior.
+    rule: The authentication service implementation readiness gate is defined before service code. Future service implementation remains application-owned, begins with a separately authorized local verifier key configuration loading gate, and must preserve package boundaries, redaction, tests, protocol deferrals, dependency deferrals, repository boundaries, migration boundaries, and production behavior deferrals.
+  phase_2m_local_verifier_key_configuration_loading_gate:
+    status: active
+    active_milestone: M-024
+    previous_milestone: M-023
+    next_work_item: W-0096
+    focus:
+      - local_verifier_key_loading_code_gate
+      - explicit_in_memory_config_vs_environment_config_sequence
+      - key_set_validation
+      - fail_closed_secret_configuration_behavior
+      - redaction_tests_for_secret_loading
+      - no_external_secret_manager_dependency
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_validation_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+    rule: The active phase may define the local verifier key configuration loading gate before code. It must not implement secret loading, token generation, credential generation, verifier digest computation, verifier comparison, authentication service behavior, login, token validation, logout, cleanup, Protobuf messages, WebSocket carriers, authentication dependencies, repository changes, migration changes, external secret-manager integration, or production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

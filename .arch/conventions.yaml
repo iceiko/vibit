@@ -135,6 +135,9 @@ documentation_pairs:
   verifier_digest_computation_comparison_boundary_standard:
     canonical: docs/verifier-digest-computation-comparison-boundary.md
     zh-CN: docs/verifier-digest-computation-comparison-boundary.zh-CN.md
+  authentication_service_implementation_readiness_gate_standard:
+    canonical: docs/authentication-service-implementation-readiness-gate.md
+    zh-CN: docs/authentication-service-implementation-readiness-gate.zh-CN.md
 
 standard_directories:
   architecture: .arch
@@ -1168,6 +1171,68 @@ verifier_digest_computation_and_comparison_boundary:
     generation, secret loading, login execution, token validation, logout,
     cleanup, protocol, transport, dependency, repository, migration, and
     production authentication behavior remain separate gates.
+
+authentication_service_implementation_readiness_gate:
+  status: completed
+  milestone: M-023
+  first_work_item: W-0095
+  completed_work_item: W-0095
+  change: changes/2026-05-15-define-authentication-service-implementation-readiness-gate
+  next_milestone: M-024
+  next_work_item: W-0096
+  previous_milestone: M-022
+  previous_completed_work_item: W-0094
+  decision: ADR-0044
+  authentication_service_implementation_readiness_gate_decision: ADR-0044
+  standard: docs/authentication-service-implementation-readiness-gate.md
+  translation: docs/authentication-service-implementation-readiness-gate.zh-CN.md
+  authentication_service_implementation_readiness_gate_standard: docs/authentication-service-implementation-readiness-gate.md
+  authentication_service_implementation_readiness_gate_translation: docs/authentication-service-implementation-readiness-gate.zh-CN.md
+  authentication_service_implementation_readiness_gate_defined: true
+  authentication_service_implementation_readiness_gate_check_rule: runtime.authentication_service_implementation_readiness_gate
+  planned_owner: runtime/internal/app
+  planned_package_candidate: runtime/internal/app/authentication
+  planned_boundary_type: implementation_readiness_standard_only
+  allowed_scope: readiness_standard_and_manifests_only
+  first_code_slice_must_be_separately_authorized: true
+  recommended_next_gate: local_verifier_key_configuration_loading_gate
+  service_code_status: deferred
+  secret_loading_code_status: deferred
+  material_generation_code_status: deferred
+  digest_helper_code_status: deferred
+  verifier_comparison_code_status: deferred
+  login_execution_status: deferred
+  token_validation_status: deferred
+  logout_execution_status: deferred
+  cleanup_execution_status: deferred
+  protobuf_authentication_messages_status: deferred
+  websocket_proof_carrier_status: deferred
+  repository_interface_change_status: deferred
+  migration_schema_change_status: deferred
+  major_dependency_status: deferred
+  runtime_authentication_implemented: false
+  secret_configuration_loading_added: false
+  token_generation_added: false
+  credential_generation_added: false
+  token_validation_added: false
+  verifier_digest_computation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The authentication service implementation readiness gate is defined. Future
+    service implementation remains application-owned, begins with a separately
+    authorized local verifier key configuration loading gate, and must preserve
+    package boundaries, redaction, tests, protocol deferrals, dependency
+    deferrals, repository boundaries, migration boundaries, and production
+    behavior deferrals.
 
 server_runtime:
   first_reference_language: Go
