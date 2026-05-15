@@ -1,0 +1,199 @@
+schema_version: 0.1
+change_id: implement-verifier-digest-computation-helpers
+date: 2026-05-15
+type: feature
+status: verified
+
+summary: Implement narrow verifier digest computation helpers without adding verifier comparison, service, protocol, repository, migration, startup, dependency, or production authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0040
+    - ADR-0043
+    - ADR-0048
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - tools/vibit
+    - conversations/2026-05-15-verifier-digest-computation-helper-implementation.md
+
+implementation:
+  added:
+    - runtime/internal/app/authentication/verifier_digest.go
+    - runtime/internal/app/authentication/verifier_digest_test.go
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  verifier_digest_helper_implementation_completed: true
+  verifier_digest_completed_work_item: W-0103
+  verifier_digest_source: runtime/internal/app/authentication/verifier_digest.go
+  verifier_digest_tests: runtime/internal/app/authentication/verifier_digest_test.go
+  verifier_digest_helpers_implemented: true
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  digest_class_type: DigestClass
+  computed_digest_value_object: ComputedDigest
+  verifier_digest_error_type: VerifierDigestError
+  credential_lookup_digest_helper: ComputeCredentialLookupDigest
+  credential_verifier_digest_helper: ComputeCredentialVerifierDigest
+  token_lookup_digest_helper: ComputeTokenLookupDigest
+  token_verifier_digest_helper: ComputeTokenVerifierDigest
+  canonical_input_version: vibit.auth.verifier.input.v1
+  canonical_input_encoding: ascii_header_null_separator_uint16be_purpose_label_uint16be_raw_material
+  hmac_hash: crypto/sha256
+  digest_size_bytes: 32
+  verifier_key_handoff: VerifierKeySet
+  digest_copying_required: true
+  redacted_errors_required: true
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_comparison_added: false
+  authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  completed_work_item: W-0103
+  completed_milestone: M-031
+  next_milestone: M-032
+  next_ready_work_item: W-0104
+  next_direction: define_verifier_digest_comparison_helper_gate
+
+verification:
+  required:
+    - gofmt -w runtime/internal/app/authentication/verifier_digest.go runtime/internal/app/authentication/verifier_digest_test.go
+    - cd runtime && go test ./internal/app/authentication
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-verifier-digest-computation-helpers --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  results:
+    - command: gofmt -w runtime/internal/app/authentication/verifier_digest.go runtime/internal/app/authentication/verifier_digest_test.go
+      status: passed
+    - command: cd runtime && go test ./internal/app/authentication
+      status: passed
+    - command: cd runtime && go test ./...
+      status: passed
+    - command: node -c tools/vibit
+      status: passed
+    - command: node tools/vibit check schemas --json
+      status: passed
+      passed: 1976
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check memory --json
+      status: passed
+      passed: 1426
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check contracts --json
+      status: passed
+      passed: 291
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check generated --json
+      status: passed
+      passed: 205
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check runtime --json
+      status: passed
+      passed: 2261
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: node tools/vibit check module authentication --json
+      status: passed
+      passed: 23
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check work --json
+      status: passed
+      passed: 635
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check change implement-verifier-digest-computation-helpers --json
+      status: passed
+      passed: 13
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check all --json
+      status: passed
+      subchecks: 156
+      passed: 156
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: git diff --check
+      status: passed
+    - command: "secret scan for GitHub tokens excluding .git and .vibit.local.env"
+      status: passed

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-031
+current_milestone: M-032
 
 continuation_semantics:
   default_step_unit: work_item
@@ -660,7 +660,7 @@ milestones:
 
   - id: M-031
     title: Verifier Digest Computation Helper Implementation
-    status: active
+    status: completed
     goal: Implement the verifier digest computation helpers as a narrow application-owned code slice.
     completion_criteria:
       - The lookup and verifier digest computation helpers are implemented under runtime/internal/app/authentication/verifier_digest.go.
@@ -670,6 +670,24 @@ milestones:
       - The helpers preserve deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
     non_goals:
       - comparing verifier digests
+      - implementing authentication service behavior
+      - executing login or token validation
+      - wiring process startup
+      - adding protocol carriers
+      - changing repositories or migrations
+      - adding authentication dependencies
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_digest.go and verifier_digest_test.go. The helper-only slice adds DigestClass, ComputedDigest, VerifierDigestError, four registered purpose labels, deterministic canonical HMAC input with versioned ASCII header, null separator, uint16 big-endian purpose and raw material length prefixes, and four compute functions mapped to the matching logical key from VerifierKeySet. It returns copied 32-byte HMAC-SHA-256 digest bytes and redacted typed errors. Tests cover canonical input shape, purpose separation, key mapping, digest length, key/raw sensitivity, copy safety, fail-closed missing input, redaction, and the absence of verifier comparison. Verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, dependencies, and production authentication behavior remain deferred.
+
+  - id: M-032
+    title: Verifier Digest Comparison Helper Gate
+    status: active
+    goal: Define the next bounded gate for verifier digest comparison helpers before adding comparison code.
+    completion_criteria:
+      - The gate names exact comparison helper ownership, file boundaries, constant-time primitive, input redaction, failure posture, tests, and deferrals.
+      - The gate preserves deferrals for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+      - No verifier comparison code is added by the gate itself.
+    non_goals:
+      - comparing verifier digests in this gate-only work item
       - implementing authentication service behavior
       - executing login or token validation
       - wiring process startup
@@ -2931,7 +2949,7 @@ work_items:
   - id: W-0103
     milestone: M-031
     title: Implement verifier digest computation helpers
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-implement-verifier-digest-computation-helpers
     depends_on:
       - W-0102
@@ -2946,8 +2964,30 @@ work_items:
       - Compute HMAC-SHA-256 with the matching logical key from an already-validated VerifierKeySet.
       - Return copied 32-byte digest output with redacted errors.
       - Preserve deferral for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/verifier_digest.go and runtime/internal/app/authentication/verifier_digest_test.go. The helpers expose ComputedDigest, DigestClass, VerifierDigestError, ComputeCredentialLookupDigest, ComputeCredentialVerifierDigest, ComputeTokenLookupDigest, and ComputeTokenVerifierDigest. Canonical input uses the literal vibit.auth.verifier.input.v1 header, null separator, uint16 big-endian purpose-label length, purpose-label bytes, uint16 big-endian raw-material length, and raw material bytes before HMAC-SHA-256. Each helper uses the matching VerifierKeySet accessor, returns copied 32-byte digest bytes, rejects missing key sets and empty raw material with redacted typed errors, and does not compare verifier digests or implement authentication service behavior. Tests cover canonical input, purpose separation, key mapping, output length, sensitivity to key/raw changes, copy safety, fail-closed behavior, redaction, and no comparison behavior.
     ask_first:
       - Comparing verifier digests.
+      - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
+      - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.
+
+  - id: W-0104
+    milestone: M-032
+    title: Define verifier digest comparison helper gate
+    status: next_ready
+    change: changes/2026-05-15-define-verifier-digest-comparison-helper-gate
+    depends_on:
+      - W-0103
+    related_decisions:
+      - ADR-0040
+      - ADR-0043
+      - ADR-0048
+    completion:
+      - Define the implementation gate for constant-time verifier digest comparison helpers without adding comparison code.
+      - Name future helper ownership, file boundaries, allowed constant-time primitive, redaction rules, failure posture, and focused tests.
+      - Preserve deferral for authentication service behavior, login execution, token validation, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing verifier comparison code instead of only defining the gate.
       - Implementing authentication service behavior, login execution, token validation, logout, refresh, cleanup, or production authentication behavior.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, or password-hashing dependency.

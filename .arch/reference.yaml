@@ -732,8 +732,9 @@ phase_plan:
       - session_binding_lifecycle
     rule: The token and credential material generation helpers are implemented as a narrow application-owned code slice. They must not be expanded to implement digest computation, verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, or production authentication behavior.
   phase_2s_verifier_digest_helper_implementation_gate:
-    status: active
-    active_milestone: M-030
+    status: completed
+    completed_milestone: M-030
+    completed_work_item: W-0102
     previous_milestone: M-029
     next_work_item: W-0102
     focus:
@@ -750,6 +751,45 @@ phase_plan:
       - route_handler_identity_context
       - session_binding_lifecycle
     rule: The active phase should define the verifier digest helper implementation gate before adding digest code. It must preserve deferrals for verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
+  phase_2t_verifier_digest_computation_helper_implementation:
+    status: completed
+    completed_milestone: M-031
+    completed_work_item: W-0103
+    previous_milestone: M-030
+    next_milestone: M-032
+    next_work_item: W-0104
+    focus:
+      - verifier_digest_computation_helpers
+      - canonical_hmac_input
+      - logical_verifier_key_handoff
+      - digest_redaction
+      - no_verifier_comparison
+      - no_authentication_service_behavior
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_issuance_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+    rule: The completed phase implements lookup and verifier digest computation helpers only. Verifier comparison, authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior remain separate gates.
+  phase_2u_verifier_digest_comparison_helper_gate:
+    status: active
+    active_milestone: M-032
+    previous_milestone: M-031
+    next_work_item: W-0104
+    focus:
+      - verifier_digest_comparison_helper_gate
+      - constant_time_comparison
+      - digest_redaction
+      - invalid_proof_failure_posture
+      - no_authentication_service_behavior
+    nakama_reference:
+      - account_authentication_secret_handling
+      - session_token_validation_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+    rule: The active phase should define the verifier digest comparison helper gate before adding comparison code. It must preserve deferrals for authentication service behavior, protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

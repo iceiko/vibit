@@ -6977,7 +6977,8 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     .filter((file) => file !== "runtime/internal/platform/persistence/postgres/authentication_repository.go")
     .filter((file) => !isExplicitVerifierKeySetValidatorFile(file))
     .filter((file) => !isEnvironmentVerifierKeyLoaderFile(file))
-    .filter((file) => !isMaterialGenerationHelperFile(file));
+    .filter((file) => !isMaterialGenerationHelperFile(file))
+    .filter((file) => !isVerifierDigestHelperFile(file));
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -7784,6 +7785,13 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
       });
       continue;
     }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not compare verifier digests or implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8527,6 +8535,13 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
       });
       continue;
     }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest computation helper and does not compare verifier digests`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -8582,7 +8597,7 @@ function checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles) {
     [".arch/runtime.yaml", "future_source: runtime/internal/app/authentication/verifier_digest.go"],
     [".arch/runtime.yaml", "future_tests: runtime/internal/app/authentication/verifier_digest_test.go"],
     [".arch/runtime.yaml", "implementation_authorized_by_this_standard: false"],
-    [".arch/work-items.yaml", "current_milestone: M-031"],
+    [".arch/work-items.yaml", "id: M-031"],
     [".arch/work-items.yaml", "title: Verifier Digest Computation Helper Implementation"],
     [".arch/work-items.yaml", "title: Implement verifier digest computation helpers"],
     [".arch/reference.yaml", "phase_2s_verifier_digest_helper_implementation_gate"],
@@ -8674,27 +8689,156 @@ function checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles) {
   }
 
   if (isFile(root, futureSource)) {
-    fail(`${futureSource} exists before W-0103 implements verifier digest computation helpers`, {
+    ok(`${futureSource} exists for the W-0103-authorized verifier digest computation helpers`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   } else {
-    ok(`${futureSource} is not implemented by the W-0102 gate-only change`, {
+    fail(`${futureSource} is missing after W-0103 authorized verifier digest computation helpers`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   }
 
   if (isFile(root, futureTests)) {
-    fail(`${futureTests} exists before W-0103 implements verifier digest computation helper tests`, {
+    ok(`${futureTests} exists for the W-0103-authorized verifier digest computation helper tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
   } else {
-    ok(`${futureTests} is not implemented by the W-0102 gate-only change`, {
+    fail(`${futureTests} is missing after W-0103 authorized verifier digest computation helper tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
+  }
+
+  if (isFile(root, futureSource)) {
+    const sourceText = readText(path.join(root, futureSource));
+    const requiredSourceMarkers = [
+      "CanonicalInputVersion = \"vibit.auth.verifier.input.v1\"",
+      "VerifierDigestBytes",
+      "sha256.Size",
+      "type DigestClass string",
+      "DigestClassCredentialLookup",
+      "\"credential_lookup\"",
+      "DigestClassCredentialVerifier",
+      "\"credential_verifier\"",
+      "DigestClassTokenLookup",
+      "\"token_lookup\"",
+      "DigestClassTokenVerifier",
+      "\"token_verifier\"",
+      "PurposeLabelCredentialLookup",
+      "\"vibit.credential.lookup.v1\"",
+      "PurposeLabelCredentialVerifier",
+      "\"vibit.credential.verifier.v1\"",
+      "PurposeLabelTokenLookup",
+      "\"vibit.access_token.lookup.v1\"",
+      "PurposeLabelTokenVerifier",
+      "\"vibit.access_token.verifier.v1\"",
+      "ErrMissingVerifierKeySet",
+      "ErrMissingRawMaterial",
+      "ErrInvalidDigestInput",
+      "type VerifierDigestError struct",
+      "type ComputedDigest struct",
+      "func (d ComputedDigest) Class() DigestClass",
+      "func (d ComputedDigest) Bytes() []byte",
+      "func ComputeCredentialLookupDigest",
+      "CredentialLookupKey()",
+      "func ComputeCredentialVerifierDigest",
+      "CredentialVerifierKey()",
+      "func ComputeTokenLookupDigest",
+      "TokenLookupKey()",
+      "func ComputeTokenVerifierDigest",
+      "TokenVerifierKey()",
+      "func computeVerifierDigest",
+      "hmac.New(sha256.New, key)",
+      "cloneBytes(mac.Sum(nil))",
+      "func canonicalDigestInput",
+      "append(input, CanonicalInputVersion...)",
+      "append(input, 0x00)",
+      "binary.BigEndian.PutUint16",
+      "cloneBytes(d.bytes)",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${futureSource} includes W-0103 verifier digest helper marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      } else {
+        fail(`${futureSource} is missing W-0103 verifier digest helper marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      }
+    }
+
+    const sourceWithoutComments = sourceWithoutGoComments(sourceText);
+    const forbiddenSourcePatterns = [
+      { pattern: /\bhmac\.Equal\b/, label: "verifier digest comparison" },
+      { pattern: /\bsubtle\.ConstantTimeCompare\b/, label: "verifier digest comparison" },
+      { pattern: /\bbytes\.Equal\b/, label: "non-constant-time verifier digest comparison" },
+      { pattern: /\breflect\.DeepEqual\b/, label: "non-constant-time verifier digest comparison" },
+      { pattern: /\bCompare(Credential|Token|Lookup|Verifier)?Digest\b/, label: "verifier digest comparison helper" },
+      { pattern: /\bVerify(Credential|Token)?Verifier\b/, label: "verifier proof validation helper" },
+      { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "device credential authentication behavior" },
+      { pattern: /\bValidateAccessToken\b/, label: "access-token validation behavior" },
+      { pattern: /\bLogoutAccessToken\b/, label: "logout behavior" },
+      { pattern: /\bRefreshAccessToken\b/, label: "refresh behavior" },
+    ];
+    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenSourcePatterns);
+    if (forbiddenMatches.length === 0) {
+      ok(`${futureSource} stays helper-only and does not compare verifiers or implement service behavior`, {
+        rule_id: ruleId,
+        artifact: futureSource,
+      });
+    } else {
+      for (const match of forbiddenMatches) {
+        fail(`${futureSource} crosses W-0103 helper-only boundary: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureTests)) {
+    const testText = readText(path.join(root, futureTests));
+    const requiredTestMarkers = [
+      "TestCanonicalDigestInputIsDeterministic",
+      "TestCanonicalDigestInputUsesVersionHeader",
+      "TestCanonicalDigestInputNullSeparatorPresent",
+      "TestCanonicalDigestInputLengthPrefixesPurposeLabel",
+      "TestCanonicalDigestInputLengthPrefixesRawMaterial",
+      "TestLookupAndVerifierPurposeLabelsDiffer",
+      "TestCredentialAndTokenPurposeLabelsDiffer",
+      "TestDigestOutputIs32Bytes",
+      "TestCredentialLookupDigestUsesCredentialLookupKey",
+      "TestCredentialVerifierDigestUsesCredentialVerifierKey",
+      "TestTokenLookupDigestUsesTokenLookupKey",
+      "TestTokenVerifierDigestUsesTokenVerifierKey",
+      "TestDifferentKeysProduceDifferentDigests",
+      "TestDifferentRawMaterialProducesDifferentDigests",
+      "TestDigestBytesAreCopiedOnReturn",
+      "TestEmptyRawMaterialFailsClosed",
+      "TestMissingVerifierKeySetFailsClosed",
+      "TestVerifierDigestErrorsDoNotIncludeDigestOrKeyMaterial",
+      "TestVerifierDigestHelperDoesNotCompareVerifiers",
+      "assertDigestError",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${futureTests} includes W-0103 verifier digest helper test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      } else {
+        fail(`${futureTests} is missing W-0103 verifier digest helper test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      }
+    }
   }
 }
 
@@ -10067,6 +10211,10 @@ function isEnvironmentVerifierKeyLoaderFile(file) {
 
 function isMaterialGenerationHelperFile(file) {
   return file === "runtime/internal/app/authentication/material_generation.go";
+}
+
+function isVerifierDigestHelperFile(file) {
+  return file === "runtime/internal/app/authentication/verifier_digest.go";
 }
 
 function checkWork(root) {

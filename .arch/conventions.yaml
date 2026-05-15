@@ -1488,6 +1488,59 @@ token_credential_material_generation_helper_implementation:
     carriers, change repositories, change migrations, wire startup, add
     dependencies, or add production authentication behavior.
 
+verifier_digest_computation_helper_implementation:
+  status: completed
+  milestone: M-031
+  completed_work_item: W-0103
+  change: changes/2026-05-15-implement-verifier-digest-computation-helpers
+  previous_milestone: M-030
+  previous_completed_work_item: W-0102
+  next_milestone: M-032
+  next_work_item: W-0104
+  verifier_digest_helper_implementation_completed: true
+  verifier_digest_completed_work_item: W-0103
+  verifier_digest_source: runtime/internal/app/authentication/verifier_digest.go
+  verifier_digest_tests: runtime/internal/app/authentication/verifier_digest_test.go
+  verifier_digest_helpers_implemented: true
+  verifier_algorithm_family: vibit_hmac_sha256_v1
+  digest_size_bytes: 32
+  canonical_input_version: vibit.auth.verifier.input.v1
+  canonical_input_encoding: ascii_header_null_separator_uint16be_purpose_label_uint16be_raw_material
+  hmac_hash: crypto/sha256
+  verifier_key_handoff: VerifierKeySet
+  digest_class_type: DigestClass
+  computed_digest_value_object: ComputedDigest
+  credential_lookup_digest_helper: ComputeCredentialLookupDigest
+  credential_verifier_digest_helper: ComputeCredentialVerifierDigest
+  token_lookup_digest_helper: ComputeTokenLookupDigest
+  token_verifier_digest_helper: ComputeTokenVerifierDigest
+  digest_output_shape: raw_32_byte_digest
+  digest_copying_required: true
+  redacted_errors_required: true
+  next_gate_after_verifier_digest_helpers: verifier_digest_comparison_helper_gate
+  runtime_authentication_implemented: false
+  token_generation_added: false
+  credential_generation_added: false
+  verifier_comparison_added: false
+  application_authentication_service_code_added: false
+  login_handlers_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  rule: >
+    The verifier digest computation helpers are implemented as a narrow
+    application-owned helper slice under runtime/internal/app/authentication.
+    They compute lookup and verifier digests only, and do not compare
+    verifier digests, implement service behavior, touch protocol carriers,
+    change repositories, change migrations, wire startup, add dependencies,
+    or add production authentication behavior.
+
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules

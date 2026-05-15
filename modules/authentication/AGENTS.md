@@ -71,6 +71,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-029 Token And Credential Material Generation Helper Implementation` is completed. `W-0101` implemented token and credential material helpers under `runtime/internal/app/authentication`, not in this module. This module remains storage-neutral and may store already-computed digest material only. It must not generate raw token or credential material, encode raw material, hold raw material, accept raw material for storage, compute digests, compare verifiers, wire startup, or decide authentication outcomes.
 
+`M-031 Verifier Digest Computation Helper Implementation` is completed. `W-0103` implemented lookup and verifier digest computation helpers under `runtime/internal/app/authentication`, not in this module. This module remains storage-neutral and may store already-computed digest material only. It must not compute HMACs, choose verifier key sets, compare verifier digests, generate raw token or credential material, hold raw material, wire startup, or decide authentication outcomes.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.
