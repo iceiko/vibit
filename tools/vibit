@@ -77,6 +77,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.verifier_digest_comparison_helper_gate",
   "runtime.authentication_service_behavior_implementation_gate",
   "runtime.device_credential_login_service_behavior_gate",
+  "runtime.device_credential_login_service_behavior_implementation",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -6163,6 +6164,13 @@ function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
     if (pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
       continue;
     }
+    if (file === "runtime/internal/app/authentication/service_test.go") {
+      ok(`${file} uses fake player repositories only for W-0109 service behavior tests`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+      continue;
+    }
     const text = readText(path.join(root, file));
     const importsPlayer = importsWithPrefix(text, "github.com/iceiko/vibit/runtime/internal/modules/player").length > 0;
     const mentionsPlayerAccountPersistence = /\b(player_accounts|player_account_events|CreatePlayerAccountMutation|PlayerAccountCreated)\b/.test(text);
@@ -7811,6 +7819,13 @@ function checkRuntimeTokenCredentialVerifierAlgorithmRedactionBoundary(root, goF
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0109-authorized device credential login service and may use already-authorized helper APIs without owning verifier algorithms`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (isExplicitVerifierKeySetValidatorFile(file)) {
       ok(`${file} is the ADR-0045-authorized explicit verifier key set validator and does not implement token or credential verifier algorithm behavior`, {
         rule_id: ruleId,
@@ -8319,6 +8334,13 @@ function checkRuntimeTokenCredentialMaterialGenerationBoundary(root, goFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0109-authorized device credential login service and may decode proof text and request token material from the helper without owning material generation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not generate token or credential material`, {
         rule_id: ruleId,
@@ -8573,6 +8595,13 @@ function checkRuntimeVerifierDigestComputationComparisonBoundary(root, goFiles) 
   ];
   for (const file of behaviorFiles) {
     if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0109-authorized device credential login service and may compose already-authorized digest and comparison helpers without owning their implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
@@ -9475,6 +9504,13 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0109-authorized authentication service and is checked by the service behavior implementation rule`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not cross local verifier key configuration loading gate deferrals`, {
         rule_id: ruleId,
@@ -9802,21 +9838,10 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
     }
 
     const sourceWithoutComments = sourceWithoutGoComments(sourceText);
-    const forbiddenSkeletonPatterns = [
-      { pattern: /\bComputeCredentialLookupDigest\b/, label: "credential lookup digest computation inside skeleton service" },
-      { pattern: /\bComputeCredentialVerifierDigest\b/, label: "credential verifier digest computation inside skeleton service" },
-      { pattern: /\bComputeTokenLookupDigest\b/, label: "token lookup digest computation inside skeleton service" },
-      { pattern: /\bComputeTokenVerifierDigest\b/, label: "token verifier digest computation inside skeleton service" },
-      { pattern: /\bCompareCredentialVerifierDigest\b/, label: "credential verifier comparison inside skeleton service" },
-      { pattern: /\bCompareTokenVerifierDigest\b/, label: "token verifier comparison inside skeleton service" },
-      { pattern: /\bGenerateAccessTokenMaterial\b/, label: "token issuance inside skeleton service" },
-      { pattern: /\bGenerateDeviceCredentialMaterial\b/, label: "credential issuance inside skeleton service" },
-      { pattern: /\bFind(Token|Credential)ByLookupDigest\b/, label: "repository lookup inside skeleton service" },
-      { pattern: /\bStoreToken\b/, label: "token repository mutation inside skeleton service" },
-      { pattern: /\bStoreCredential\b/, label: "credential repository mutation inside skeleton service" },
-      { pattern: /\bRevokeToken\b/, label: "token revocation inside skeleton service" },
-      { pattern: /\bRevokeCredential\b/, label: "credential revocation inside skeleton service" },
-      { pattern: /\.\s*WithinUnitOfWork\s*\(/, label: "unit-of-work execution inside skeleton service methods" },
+    const forbiddenServicePatterns = [
+      { pattern: /\bGenerateDeviceCredentialMaterial\b/, label: "credential issuance inside authentication service" },
+      { pattern: /\bRevokeToken\b/, label: "token revocation inside W-0109 service slice" },
+      { pattern: /\bRevokeCredential\b/, label: "credential revocation inside W-0109 service slice" },
       { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/persistence\/postgres\b/, label: "PostgreSQL adapter import inside skeleton service" },
       { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/protocol\/protobuf\b/, label: "Protobuf adapter import inside skeleton service" },
       { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/transport\/ws\b/, label: "WebSocket adapter import inside skeleton service" },
@@ -9824,15 +9849,15 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
       { pattern: /\bcrypto\/rand\b/, label: "random material generation import inside skeleton service" },
       { pattern: /\bBearer\b/, label: "bearer proof parsing inside skeleton service" },
     ];
-    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenSkeletonPatterns);
+    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenServicePatterns);
     if (forbiddenMatches.length === 0) {
-      ok(`${futureSource} remains skeleton-only without helper composition, repository calls, protocol carriers, startup wiring, dependencies, or production behavior`, {
+      ok(`${futureSource} preserves service boundary without credential issuance, revocation, protocol carriers, startup wiring, adapter imports, or production shortcuts`, {
         rule_id: ruleId,
         artifact: futureSource,
       });
     } else {
       for (const match of forbiddenMatches) {
-        fail(`${futureSource} crosses W-0107 skeleton-only boundary: ${match.label}`, {
+        fail(`${futureSource} crosses authentication service behavior boundary: ${match.label}`, {
           rule_id: ruleId,
           artifact: futureSource,
         });
@@ -9845,7 +9870,7 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
     const requiredTestMarkers = [
       "TestNewServiceRequiresUnitOfWorkRunner",
       "TestNewServiceRejectsTypedNilUnitOfWorkRunner",
-      "TestAuthenticateWithDeviceCredentialFailsClosedWithoutRepositoryCall",
+      "TestAuthenticateWithDeviceCredentialRejectsMissingProofWithoutUnitOfWork",
       "TestValidateAccessTokenFailsClosedWithoutRepositoryCallOrIdentity",
       "TestLogoutAccessTokenFailsClosedWithoutRepositoryCall",
       "TestRefreshAccessTokenFailsClosedAsUnsupportedWithoutRepositoryCall",
@@ -9902,8 +9927,8 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
       });
       continue;
     }
-    if (isAuthenticationServiceSkeletonFile(file)) {
-      ok(`${file} is the W-0107-authorized authentication service skeleton and is checked separately for skeleton-only behavior`, {
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0107/W-0109-authorized authentication service file and is checked separately for service behavior boundaries`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -10188,33 +10213,10 @@ function checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles) {
       }
     }
 
-    const sourceWithoutComments = sourceWithoutGoComments(sourceText);
-    const forbiddenUntilW0109Patterns = [
-      { pattern: /\bbase64\./, label: "device credential proof decoding before W-0109" },
-      { pattern: /\bComputeCredentialLookupDigest\b/, label: "credential lookup digest orchestration before W-0109" },
-      { pattern: /\bFindCredentialByLookupDigest\b/, label: "credential repository lookup before W-0109" },
-      { pattern: /\bGetPlayerAccount\b/, label: "player account lookup before W-0109" },
-      { pattern: /\bCompareCredentialVerifierDigest\b/, label: "credential verifier comparison before W-0109" },
-      { pattern: /\bGenerateAccessTokenMaterial\b/, label: "access-token material generation before W-0109" },
-      { pattern: /\bStoreToken\b/, label: "token storage before W-0109" },
-      { pattern: /\bStoreTokenMutation\b/, label: "token storage mutation before W-0109" },
-      { pattern: /\bcrypto\/rand\b/, label: "production entropy import before W-0109" },
-      { pattern: /\bBearer\b/, label: "protocol proof carrier parsing before carrier gate" },
-    ];
-    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenUntilW0109Patterns);
-    if (forbiddenMatches.length === 0) {
-      ok(`${serviceSource} has not implemented device credential login execution before W-0109`, {
-        rule_id: ruleId,
-        artifact: serviceSource,
-      });
-    } else {
-      for (const match of forbiddenMatches) {
-        fail(`${serviceSource} crosses device credential login service behavior gate: ${match.label}`, {
-          rule_id: ruleId,
-          artifact: serviceSource,
-        });
-      }
-    }
+    ok(`${serviceSource} remains the device credential login implementation target after W-0109 authorization`, {
+      rule_id: ruleId,
+      artifact: serviceSource,
+    });
   } else {
     fail(`${serviceSource} is missing before device credential login implementation`, {
       rule_id: ruleId,
@@ -10225,7 +10227,7 @@ function checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles) {
   if (isFile(root, serviceTests)) {
     const testText = readText(path.join(root, serviceTests));
     const requiredTestMarkers = [
-      "TestAuthenticateWithDeviceCredentialFailsClosedWithoutRepositoryCall",
+      "TestAuthenticateWithDeviceCredentialRejectsMissingProofWithoutUnitOfWork",
       "assertNoSecretLeak",
       "recordingUnitOfWorkRunner",
     ];
@@ -10247,6 +10249,179 @@ function checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles) {
       rule_id: ruleId,
       artifact: serviceTests,
     });
+  }
+}
+
+function checkRuntimeDeviceCredentialLoginServiceBehaviorImplementation(root, goFiles) {
+  const ruleId = "runtime.device_credential_login_service_behavior_implementation";
+  const serviceSource = "runtime/internal/app/authentication/service.go";
+  const serviceTests = "runtime/internal/app/authentication/service_test.go";
+  const changePath = "changes/2026-05-16-implement-device-credential-login-service-behavior";
+  const conversationPath = "conversations/2026-05-16-device-credential-login-service-behavior.md";
+
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for device credential login service behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for device credential login service behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "device_credential_login_service_behavior_implementation:"],
+    [".arch/conventions.yaml", "status: completed"],
+    [".arch/conventions.yaml", "completed_work_item: W-0109"],
+    [".arch/conventions.yaml", "change: changes/2026-05-16-implement-device-credential-login-service-behavior"],
+    [".arch/conventions.yaml", "device_credential_login_service_behavior_implementation_check_rule: runtime.device_credential_login_service_behavior_implementation"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_implementation:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0109"],
+    [".arch/runtime.yaml", "change: changes/2026-05-16-implement-device-credential-login-service-behavior"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_implementation_check_rule: runtime.device_credential_login_service_behavior_implementation"],
+    [".arch/contracts.yaml", "device_credential_login_service_behavior_implementation_completed: true"],
+    [".arch/contracts.yaml", "device_credential_login_service_behavior_implementation_check_rule: runtime.device_credential_login_service_behavior_implementation"],
+    [".arch/work-items.yaml", "id: M-037"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0109"],
+    [".arch/work-items.yaml", "Implement device credential login service behavior"],
+    [".arch/reference.yaml", "phase_2z_device_credential_login_service_behavior_implementation"],
+    ["modules/authentication/module.yaml", "device_credential_login_service_behavior_implementation_completed: true"],
+    ["modules/authentication/module.yaml", "device_credential_login_service_behavior_implementation_check_rule: runtime.device_credential_login_service_behavior_implementation"],
+    ["AGENTS.md", "W-0109"],
+    ["AGENTS.zh-CN.md", "W-0109"],
+    ["runtime/AGENTS.md", "W-0109"],
+    ["runtime/AGENTS.zh-CN.md", "W-0109"],
+    ["modules/authentication/AGENTS.md", "W-0109"],
+    ["modules/authentication/AGENTS.zh-CN.md", "W-0109"],
+    ["rules/check-rules.json", "runtime.device_credential_login_service_behavior_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  if (isFile(root, serviceSource)) {
+    const sourceText = readText(path.join(root, serviceSource));
+    const requiredSourceMarkers = [
+      "VerifierKeySet",
+      "AccessTokenRandom",
+      "TokenRecordIDGenerator",
+      "AccessTokenLifetime",
+      "TokenAudience",
+      "base64.RawURLEncoding.DecodeString",
+      "ComputeCredentialLookupDigest",
+      "WithinUnitOfWork",
+      "NewAuthenticationRepository",
+      "NewPlayerAccountRepository",
+      "FindCredentialByLookupDigest",
+      "CompareCredentialVerifierDigest",
+      "GetPlayerAccount",
+      "GenerateAccessTokenMaterial",
+      "ComputeTokenLookupDigest",
+      "ComputeTokenVerifierDigest",
+      "StoreTokenMutation",
+      "StoreToken",
+      "AuthenticationStatusAuthenticated",
+      "TokenTypeOpaqueAccess",
+      "PublicErrorAuthenticationCredentialInvalid",
+      "PublicErrorAuthenticationCredentialUnavailable",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      checkRequiredText(root, serviceSource, marker, ruleId, marker);
+    }
+
+    const sourceWithoutComments = sourceWithoutGoComments(sourceText);
+    const forbiddenSourcePatterns = [
+      { pattern: /\bcrypto\/rand\b/, label: "production entropy import instead of injected reader" },
+      { pattern: /\bBearer\b/, label: "protocol proof carrier parsing inside service" },
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/platform\/persistence\/postgres/, label: "direct PostgreSQL adapter import" },
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/platform\/transport\/ws/, label: "direct WebSocket transport import" },
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/generated\/proto/, label: "generated Protobuf import" },
+    ];
+    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenSourcePatterns);
+    if (forbiddenMatches.length === 0) {
+      ok(`${serviceSource} keeps device credential login service-local without protocol, startup, or adapter shortcuts`, {
+        rule_id: ruleId,
+        artifact: serviceSource,
+      });
+    } else {
+      for (const match of forbiddenMatches) {
+        fail(`${serviceSource} violates device credential login service implementation boundary: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      }
+    }
+  } else {
+    fail(`${serviceSource} is missing for device credential login service behavior implementation`, {
+      rule_id: ruleId,
+      artifact: serviceSource,
+    });
+  }
+
+  if (isFile(root, serviceTests)) {
+    const requiredTestMarkers = [
+      "TestAuthenticateWithDeviceCredentialRejectsMissingProofWithoutUnitOfWork",
+      "TestAuthenticateWithDeviceCredentialRejectsMalformedProofWithoutUnitOfWork",
+      "TestAuthenticateWithDeviceCredentialStoresTokenDigestsAndReturnsTokenAfterCommit",
+      "TestAuthenticateWithDeviceCredentialCollapsesLookupMissToInvalidCredential",
+      "TestAuthenticateWithDeviceCredentialRejectsInactiveWrongKindOrWrongVerifierPosture",
+      "TestAuthenticateWithDeviceCredentialComparesVerifierBeforeTokenGeneration",
+      "TestAuthenticateWithDeviceCredentialRequiresActivePlayerAccount",
+      "TestAuthenticateWithDeviceCredentialDoesNotReturnTokenWhenStoreFails",
+      "TestAuthenticateWithDeviceCredentialDoesNotReturnTokenWhenCommitFails",
+      "fakeLoginUnitOfWork",
+      "fakeAuthenticationRepository",
+      "fakePlayerRepository",
+    ];
+    for (const marker of requiredTestMarkers) {
+      checkRequiredText(root, serviceTests, marker, ruleId, marker);
+    }
+  } else {
+    fail(`${serviceTests} is missing for device credential login service behavior implementation`, {
+      rule_id: ruleId,
+      artifact: serviceTests,
+    });
+  }
+
+  const changedRuntimeFiles = goFiles.filter((file) => {
+    if (!file.startsWith("runtime/internal/app/authentication/")) {
+      return false;
+    }
+    if (file.endsWith("_test.go")) {
+      return false;
+    }
+    return !isAuthenticationServiceFile(file) &&
+      !isExplicitVerifierKeySetValidatorFile(file) &&
+      !isEnvironmentVerifierKeyLoaderFile(file) &&
+      !isMaterialGenerationHelperFile(file) &&
+      !isVerifierDigestHelperFile(file) &&
+      !isVerifierDigestComparisonHelperFile(file);
+  });
+  if (changedRuntimeFiles.length === 0) {
+    ok("device credential login implementation remains inside the service slice and existing helper files", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/app/authentication",
+    });
+  } else {
+    for (const file of changedRuntimeFiles) {
+      warn(`${file} is an additional authentication app file; confirm it is intentional for W-0109`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
   }
 }
 
@@ -11293,6 +11468,13 @@ function checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, g
     if (file === "runtime/internal/modules/authentication/repository.go") {
       continue;
     }
+    if (isAuthenticationServiceFile(file)) {
+      ok(`${file} is the W-0109-authorized device credential login service and may call material generation helpers without owning their implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (isEnvironmentVerifierKeyLoaderFile(file)) {
       ok(`${file} is the W-0099-authorized environment verifier key loader and does not generate token or credential material`, {
         rule_id: ruleId,
@@ -11425,6 +11607,10 @@ function isVerifierDigestComparisonHelperFile(file) {
 }
 
 function isAuthenticationServiceSkeletonFile(file) {
+  return file === "runtime/internal/app/authentication/service.go";
+}
+
+function isAuthenticationServiceFile(file) {
   return file === "runtime/internal/app/authentication/service.go";
 }
 
@@ -11787,6 +11973,7 @@ function checkRuntime(root) {
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFiles);
   checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles);
+  checkRuntimeDeviceCredentialLoginServiceBehaviorImplementation(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

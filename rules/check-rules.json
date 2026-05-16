@@ -572,6 +572,14 @@
       "agent_guidance": "Read `docs/device-credential-login-service-behavior-gate.md` and `ADR-0051`; do not implement device credential login, access-token validation, protocol carriers, startup wiring, repository changes, migrations, generated files, dependencies, or broader production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.device_credential_login_service_behavior_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Device credential login service behavior implementation",
+      "description": "The device credential login service behavior implementation must execute the ADR-0051 service-local sequence while preserving protocol, startup, repository-interface, migration, dependency, generated-file, validation, logout, refresh, cleanup, and production behavior deferrals.",
+      "agent_guidance": "Keep `AuthenticateWithDeviceCredential` inside `runtime/internal/app/authentication/service.go`; require Base64URL unpadded 32-byte proof pre-validation before unit-of-work, use unit-of-work repository capabilities, compare credential verifiers before token generation, require active player accounts, store token digests only, return raw access-token text only after unit-of-work success, and do not add protocol carriers, startup wiring, repository interface changes, migrations, generated files, external dependencies, access-token validation, logout, refresh, cleanup, or broader production authentication behavior."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

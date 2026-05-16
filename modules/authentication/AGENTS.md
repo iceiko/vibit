@@ -83,6 +83,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-036 Device Credential Login Service Behavior Gate` is completed. `W-0108` defined the future login behavior gate in `docs/device-credential-login-service-behavior-gate.md` and `ADR-0051` without changing this module. Future login behavior may call this module's existing `FindCredentialByLookupDigest` and `StoreToken` methods only through the application unit-of-work boundary. This module must not decode proof, compute digests, compare verifiers, generate access-token material, decide player account state, collapse public failures, return raw tokens, wire startup, or own authentication outcomes. `runtime.device_credential_login_service_behavior_gate` is the repository check rule for this gate.
 
+`M-037 Device Credential Login Service Behavior Implementation` is completed. `W-0109` implemented device credential login in the application service, not in this module. The service may call this module's existing `FindCredentialByLookupDigest` and `StoreToken` methods through unit-of-work capabilities. This module still owns storage-neutral credential and token records only; it must not decode proof, compute digests, compare verifiers, generate access-token material, decide player account state, collapse public failures, return raw tokens, wire startup, or own authentication outcomes. `runtime.device_credential_login_service_behavior_implementation` is the repository check rule for this slice.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

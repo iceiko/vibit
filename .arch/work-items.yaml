@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-035
+current_milestone: M-038
 
 continuation_semantics:
   default_step_unit: work_item
@@ -770,7 +770,7 @@ milestones:
 
   - id: M-037
     title: Device Credential Login Service Behavior Implementation
-    status: active
+    status: completed
     goal: Implement the first bounded device credential login service behavior inside the existing application authentication service without adding access-token validation, protocol carriers, startup wiring, repository interface changes, migrations, dependencies, or production authentication behavior beyond the service method slice.
     completion_criteria:
       - `AuthenticateWithDeviceCredential` executes the gate-defined sequence using injected dependencies, verifier helpers, fake-testable unit-of-work repository capabilities, and existing repository interfaces.
@@ -783,6 +783,21 @@ milestones:
       - changing repository interfaces or migrations
       - wiring process startup
       - adding external authentication dependencies
+    completion_summary: Implemented device credential login inside runtime/internal/app/authentication/service.go as a service-only slice. The implementation validates Base64URL unpadded 32-byte proof before unit-of-work, computes credential lookup and verifier digests through application helpers, obtains authentication and player repositories through local unit-of-work capabilities, requires active credential and active player account state, generates opaque access-token material from an injected reader, stores token digests only, and returns raw access-token text only after unit-of-work success. Focused tests cover proof rejection, helper ordering, repository handoff, public error collapse, player account checks, digest-only token storage, redaction, and no token return on store or commit failure. Access-token validation, logout, refresh, cleanup, protocol carriers, startup wiring, repository interface changes, migrations, generated files, dependencies, and broader production behavior remain deferred.
+
+  - id: M-038
+    title: Access Token Validation Service Behavior Gate
+    status: active
+    goal: Define the bounded gate for future access-token validation service behavior before validating tokens, producing RequestIdentity, touching protocol carriers, wiring startup, changing repositories, changing migrations, or adding production session behavior.
+    completion_criteria:
+      - The gate names the access-token validation proof shape, service ownership, repository handoff, helper composition order, token status checks, public error collapse posture, RequestIdentity handoff posture, redaction rules, and focused tests before token validation code is added.
+      - The gate keeps WebSocket proof carriers, handshake authentication, route protection, session persistence, logout, refresh, cleanup jobs, repository interface changes, migrations, dependencies, and production authentication behavior deferred.
+    non_goals:
+      - implementing access-token validation
+      - exposing Protobuf or WebSocket token carriers
+      - changing repository interfaces or migrations
+      - wiring process startup
+      - adding session persistence
 
 
 work_items:
@@ -3193,7 +3208,7 @@ work_items:
   - id: W-0109
     milestone: M-037
     title: Implement device credential login service behavior
-    status: next_ready
+    status: completed
     change: changes/2026-05-16-implement-device-credential-login-service-behavior
     depends_on:
       - W-0108
@@ -3211,7 +3226,32 @@ work_items:
       - Implement device credential login inside runtime/internal/app/authentication/service.go using the ADR-0051 sequence.
       - Add focused tests under runtime/internal/app/authentication/service_test.go for proof rejection, helper ordering, unit-of-work repository handoff, public error collapse, active player account requirement, digest-only token storage, redaction, and token return only after successful storage and commit.
       - Preserve deferral for access-token validation, logout, refresh, cleanup, protocol carriers, repository interface changes, migrations, startup wiring, dependencies, generated files, and broader production authentication behavior.
+    completion_summary: Implemented the ADR-0051 device credential login sequence inside runtime/internal/app/authentication/service.go and added focused tests in runtime/internal/app/authentication/service_test.go. The service now rejects missing or malformed proof before unit-of-work, computes credential lookup digest before repository lookup, uses authentication and player repositories from a local unit-of-work capability, collapses lookup miss and invalid credential states to public invalid-credential errors, compares credential verifier digest before token generation, requires active player account state, generates opaque access-token material only after proof and player acceptance, stores token lookup and verifier digests only, and returns raw token text only after successful token storage and unit-of-work commit. Access-token validation, logout, refresh, cleanup, protocol carriers, startup wiring, repository interface changes, migrations, generated files, dependencies, and broader production behavior remain deferred.
     ask_first:
       - Changing service method signatures, public contracts, repository interfaces, PostgreSQL adapters, migrations, Protobuf messages, WebSocket carriers, startup wiring, or generated files.
       - Choosing a production token lifetime, public token failure disclosure policy, token rotation policy, refresh-token model, session persistence model, or protocol proof carrier beyond the service-local behavior slice.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, session-store, UUID, ULID, or KSUID dependency.
+
+  - id: W-0110
+    milestone: M-038
+    title: Define access-token validation service behavior gate
+    status: next_ready
+    change: changes/2026-05-16-define-access-token-validation-service-behavior-gate
+    depends_on:
+      - W-0109
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0043
+      - ADR-0049
+      - ADR-0050
+      - ADR-0051
+    completion:
+      - Define the future access-token validation service behavior gate without adding token validation execution code.
+      - Name the proof parsing boundary, helper composition sequence, repository handoff sequence, token status and expiration checks, RequestIdentity handoff, public error collapse posture, redaction requirements, and focused tests required before validation execution may be implemented.
+      - Preserve deferral for WebSocket proof carriers, handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository interface changes, migrations, startup wiring, dependencies, generated files, and broader production authentication behavior.
+    ask_first:
+      - Implementing real access-token validation instead of only defining the gate.
+      - Choosing or changing WebSocket proof carrier, handshake authentication, route protection, session persistence, token rotation, refresh-token behavior, repository interfaces, migrations, startup wiring, or generated files.

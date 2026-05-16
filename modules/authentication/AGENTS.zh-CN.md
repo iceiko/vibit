@@ -84,6 +84,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-036 Device Credential Login Service Behavior Gate` 已完成。`W-0108` 已在 `docs/device-credential-login-service-behavior-gate.md` 和 `ADR-0051` 中定义 future login behavior gate，且没有改变本模块。Future login behavior 只能通过 application unit-of-work boundary 调用本模块现有的 `FindCredentialByLookupDigest` 和 `StoreToken` methods。本模块不得 decode proof、compute digests、compare verifiers、generate access-token material、decide player account state、collapse public failures、return raw tokens、wire startup 或拥有 authentication outcomes。`runtime.device_credential_login_service_behavior_gate` 是该 gate 的 repository check rule。
 
+`M-037 Device Credential Login Service Behavior Implementation` 已完成。`W-0109` 已在 application service 中实现 device credential login，而不是在本模块中实现。Service 可以通过 unit-of-work capabilities 调用本模块现有的 `FindCredentialByLookupDigest` 和 `StoreToken` methods。本模块仍然只拥有 storage-neutral credential 和 token records；它不得 decode proof、compute digests、compare verifiers、generate access-token material、decide player account state、collapse public failures、return raw tokens、wire startup 或拥有 authentication outcomes。`runtime.device_credential_login_service_behavior_implementation` 是该 slice 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。
