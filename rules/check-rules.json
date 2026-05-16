@@ -580,6 +580,14 @@
       "agent_guidance": "Keep `AuthenticateWithDeviceCredential` inside `runtime/internal/app/authentication/service.go`; require Base64URL unpadded 32-byte proof pre-validation before unit-of-work, use unit-of-work repository capabilities, compare credential verifiers before token generation, require active player accounts, store token digests only, return raw access-token text only after unit-of-work success, and do not add protocol carriers, startup wiring, repository interface changes, migrations, generated files, external dependencies, access-token validation, logout, refresh, cleanup, or broader production authentication behavior."
     },
     {
+      "rule_id": "runtime.access_token_validation_service_behavior_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Access token validation service behavior gate",
+      "description": "The access token validation service behavior gate must define proof shape, service ownership, dependency reuse, helper ordering, repository handoff, token lifecycle checks, request identity handoff, public error collapse, redaction, tests, and deferrals before validation execution code exists.",
+      "agent_guidance": "Read `docs/access-token-validation-service-behavior-gate.md` and `ADR-0052`; do not implement access-token validation, WebSocket proof carriers, handshake authentication, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, or broader production authentication behavior until a later bounded work item authorizes that exact slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

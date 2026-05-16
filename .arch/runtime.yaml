@@ -53,11 +53,12 @@ purpose: >
   verifier_digest_comparison_helper_gate: ADR-0049
   authentication_service_behavior_implementation_gate: ADR-0050
   device_credential_login_service_behavior_gate: ADR-0051
+  access_token_validation_service_behavior_gate: ADR-0052
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: access_token_validation_service_behavior_gate
+  current_phase: access_token_validation_service_behavior_implementation
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -2207,13 +2208,74 @@ identity_session_boundary:
     broader_production_authentication_behavior_added: false
     rule: The completed phase implements device credential login inside the existing application authentication service only. It preserves the ADR-0051 sequence, stores token digests only, returns raw token text only after unit-of-work success, and does not add access-token validation, protocol carriers, startup wiring, repository changes, migrations, generated files, dependencies, or broader production authentication behavior.
   access_token_validation_service_behavior_gate:
-    status: active
+    status: completed
     milestone: M-038
-    next_work_item: W-0110
+    completed_work_item: W-0110
+    change: changes/2026-05-16-define-access-token-validation-service-behavior-gate
     previous_milestone: M-037
     previous_completed_work_item: W-0109
-    planned_change: changes/2026-05-16-define-access-token-validation-service-behavior-gate
+    next_milestone: M-039
+    next_work_item: W-0111
+    decision: ADR-0052
+    access_token_validation_service_behavior_gate_decision: ADR-0052
+    standard: docs/access-token-validation-service-behavior-gate.md
+    translation: docs/access-token-validation-service-behavior-gate.zh-CN.md
+    access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md
+    access_token_validation_service_behavior_gate_translation: docs/access-token-validation-service-behavior-gate.zh-CN.md
+    access_token_validation_service_behavior_gate_defined: true
+    access_token_validation_service_behavior_gate_check_rule: runtime.access_token_validation_service_behavior_gate
     planned_scope: gate_only_no_token_validation_execution
+    implementation_authorized_by_this_standard: false
+    future_implementation_work_item: W-0111
+    planned_owner: runtime/internal/app
+    planned_package: runtime/internal/app/authentication
+    planned_source: runtime/internal/app/authentication/service.go
+    planned_tests: runtime/internal/app/authentication/service_test.go
+    service_method: ValidateAccessToken
+    validation_execution_target: ValidateAccessToken
+    token_kind: access_token
+    token_type: opaque_access_token
+    proof_carrier_status: already_decoded_service_request_only
+    proof_text_encoding: base64url_unpadded
+    proof_raw_length_bytes: 32
+    proof_prevalidation_before_unit_of_work: required
+    repository_handoff: application_unit_of_work_capability
+    authentication_repository_lookup_method: FindTokenByLookupDigest
+    player_repository_lookup_method: GetPlayerAccount
+    verifier_comparison_before_request_identity: required
+    token_lifecycle_checks_required: true
+    token_audience_check_required: true
+    active_player_account_required: true
+    request_identity_handoff_defined: true
+    session_validated_without_session_persistence: false
+    public_error_collapse_defined: true
+    redaction_requirements_defined: true
+    required_tests_defined: true
+    access_token_validation_added: false
+    validation_execution_added: false
+    protocol_carrier_added: false
+    websocket_handshake_authentication_added: false
+    route_protection_added: false
+    session_persistence_added: false
+    logout_execution_added: false
+    refresh_behavior_added: false
+    cleanup_jobs_added: false
+    startup_wiring_added: false
+    repository_interface_change_planned: false
+    migration_schema_change_planned: false
+    authentication_dependencies_planned: false
+    route_protection_planned: false
+    generated_files_changed: false
+    production_authentication_behavior_added: false
+    rule: The access-token validation service behavior gate is defined. Future validation execution must remain application-owned under runtime/internal/app/authentication, reject missing or malformed token proof before unit-of-work, use existing repositories through unit-of-work capabilities, compare verifier digest before request identity, require active token and active player account state, keep SessionValidated false until session persistence is ratified, and preserve deferrals for protocol carriers, startup wiring, repository changes, migrations, dependencies, generated files, session persistence, route protection, and broader production behavior.
+  access_token_validation_service_behavior_implementation:
+    status: active
+    milestone: M-039
+    next_work_item: W-0111
+    previous_milestone: M-038
+    previous_completed_work_item: W-0110
+    planned_change: changes/2026-05-16-implement-access-token-validation-service-behavior
+    planned_scope: service_method_only_no_protocol_route_session_or_startup_wiring
     validation_execution_target: ValidateAccessToken
     access_token_validation_added: false
     protocol_carrier_added: false
@@ -2226,8 +2288,9 @@ identity_session_boundary:
     startup_wiring_added: false
     repository_interface_change_planned: false
     migration_schema_change_planned: false
+    generated_files_changed: false
     authentication_dependencies_planned: false
-    rule: The active phase may define the future access-token validation service behavior gate only; it must not implement validation execution or protocol carriers before a later bounded work item.
+    rule: The active phase may implement future access-token validation inside the existing service method only; it must not add protocol carriers, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, or broader production behavior.
 
 persistence_model:
   decision: ADR-0011

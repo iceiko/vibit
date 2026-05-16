@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-038
+current_milestone: M-039
 
 continuation_semantics:
   default_step_unit: work_item
@@ -787,7 +787,7 @@ milestones:
 
   - id: M-038
     title: Access Token Validation Service Behavior Gate
-    status: active
+    status: completed
     goal: Define the bounded gate for future access-token validation service behavior before validating tokens, producing RequestIdentity, touching protocol carriers, wiring startup, changing repositories, changing migrations, or adding production session behavior.
     completion_criteria:
       - The gate names the access-token validation proof shape, service ownership, repository handoff, helper composition order, token status checks, public error collapse posture, RequestIdentity handoff posture, redaction rules, and focused tests before token validation code is added.
@@ -798,6 +798,23 @@ milestones:
       - changing repository interfaces or migrations
       - wiring process startup
       - adding session persistence
+    completion_summary: Defined the access-token validation service behavior gate in docs/access-token-validation-service-behavior-gate.md, docs/access-token-validation-service-behavior-gate.zh-CN.md, and ADR-0052. The gate fixes the future service-owned validation sequence, proof input shape, dependency reuse, unit-of-work repository handoff, token lifecycle and audience checks, token verifier comparison, active player account requirement, request identity handoff with SessionValidated kept false until session persistence is ratified, public error collapse, redaction requirements, and required tests before validation execution code is added. It preserves deferrals for protocol carriers, WebSocket handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository changes, migrations, generated files, dependencies, and production authentication behavior.
+
+  - id: M-039
+    title: Access Token Validation Service Behavior Implementation
+    status: active
+    goal: Implement the first bounded access-token validation service behavior inside the existing application authentication service without adding protocol carriers, route protection, session persistence, startup wiring, repository interface changes, migrations, dependencies, or broader production authentication behavior.
+    completion_criteria:
+      - `ValidateAccessToken` executes the ADR-0052 sequence using injected dependencies, verifier helpers, fake-testable unit-of-work repository capabilities, and existing repository interfaces.
+      - Focused tests prove proof pre-validation, helper ordering, repository handoff, public error collapse, token lifecycle checks, audience checks, player account active checks, request identity handoff, no raw token leakage, and no identity return on failed storage or commit boundary behavior.
+      - Protocol carriers, WebSocket handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository changes, migrations, generated files, dependencies, and broader production authentication behavior remain deferred.
+    non_goals:
+      - exposing Protobuf or WebSocket authentication carriers
+      - changing service method signatures
+      - changing repository interfaces or migrations
+      - wiring process startup
+      - adding session persistence
+      - adding external authentication dependencies
 
 
 work_items:
@@ -3235,7 +3252,7 @@ work_items:
   - id: W-0110
     milestone: M-038
     title: Define access-token validation service behavior gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-16-define-access-token-validation-service-behavior-gate
     depends_on:
       - W-0109
@@ -3248,10 +3265,38 @@ work_items:
       - ADR-0049
       - ADR-0050
       - ADR-0051
+      - ADR-0052
     completion:
       - Define the future access-token validation service behavior gate without adding token validation execution code.
       - Name the proof parsing boundary, helper composition sequence, repository handoff sequence, token status and expiration checks, RequestIdentity handoff, public error collapse posture, redaction requirements, and focused tests required before validation execution may be implemented.
       - Preserve deferral for WebSocket proof carriers, handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository interface changes, migrations, startup wiring, dependencies, generated files, and broader production authentication behavior.
+    completion_summary: Defined the future access-token validation service behavior gate without adding validation execution code. The gate establishes Base64URL unpadded 32-byte opaque access-token proof input, proof pre-validation before unit-of-work, token lookup digest computation, authentication and player repository handoff through unit-of-work capabilities, token lifecycle and audience checks, verifier digest comparison before request identity, active player account requirement, request identity handoff with SessionValidated kept false until session persistence is ratified, public error collapse, redaction rules, and required tests. Protocol carriers, WebSocket handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository interface changes, migrations, startup wiring, dependencies, generated files, and production behavior remain deferred.
     ask_first:
       - Implementing real access-token validation instead of only defining the gate.
       - Choosing or changing WebSocket proof carrier, handshake authentication, route protection, session persistence, token rotation, refresh-token behavior, repository interfaces, migrations, startup wiring, or generated files.
+
+  - id: W-0111
+    milestone: M-039
+    title: Implement access-token validation service behavior
+    status: next_ready
+    change: changes/2026-05-16-implement-access-token-validation-service-behavior
+    depends_on:
+      - W-0110
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0043
+      - ADR-0049
+      - ADR-0050
+      - ADR-0051
+      - ADR-0052
+    completion:
+      - Implement access-token validation inside runtime/internal/app/authentication/service.go using the ADR-0052 sequence.
+      - Add focused tests under runtime/internal/app/authentication/service_test.go for proof rejection, helper ordering, unit-of-work repository handoff, public error collapse, token lifecycle and audience checks, active player account requirement, request identity handoff, redaction, and no validated identity return on failure.
+      - Preserve deferral for protocol carriers, WebSocket handshake authentication, route protection, session persistence, logout, refresh, cleanup, repository interface changes, migrations, startup wiring, dependencies, generated files, and broader production authentication behavior.
+    ask_first:
+      - Changing service method signatures, public contracts, repository interfaces, PostgreSQL adapters, migrations, Protobuf messages, WebSocket carriers, route protection, startup wiring, session persistence, or generated files.
+      - Choosing a public expired/revoked/account-disabled disclosure policy different from ADR-0052, token rotation policy, refresh-token model, session persistence model, or protocol proof carrier beyond the service-local behavior slice.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, session-store, UUID, ULID, or KSUID dependency.

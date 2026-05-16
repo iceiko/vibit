@@ -903,10 +903,12 @@ phase_plan:
       - frontend_backend_handler_separation
     rule: The completed phase implements device credential login inside the existing application authentication service only. It adapts Nakama's account authentication and token issuance capability through vibit's agent-native service boundary and preserves Pitaya-style route identity separation by deferring token validation and protocol carriers.
   phase_2aa_access_token_validation_service_behavior_gate:
-    status: active
-    active_milestone: M-038
+    status: completed
+    completed_milestone: M-038
+    completed_work_item: W-0110
     previous_milestone: M-037
-    next_work_item: W-0110
+    next_milestone: M-039
+    next_work_item: W-0111
     focus:
       - access_token_validation_behavior_gate
       - request_identity_handoff
@@ -920,7 +922,28 @@ phase_plan:
       - route_handler_identity_context
       - session_binding_lifecycle
       - frontend_backend_handler_separation
-    rule: The active phase may define the future access-token validation service behavior gate only. Nakama guides token/session capability coverage and Pitaya guides route identity context, but vibit must keep validation service behavior, protocol carriers, startup wiring, and session persistence separately bounded.
+    rule: The completed phase defines the future access-token validation service behavior gate only. Nakama guides token/session capability coverage and Pitaya guides route identity context, but vibit keeps validation service behavior, protocol carriers, startup wiring, route protection, and session persistence separately bounded.
+  phase_2ab_access_token_validation_service_behavior_implementation:
+    status: active
+    active_milestone: M-039
+    previous_milestone: M-038
+    next_work_item: W-0111
+    focus:
+      - access_token_validation_execution
+      - service_method_only
+      - request_identity_handoff
+      - no_protocol_carriers
+      - no_route_protection
+      - no_session_persistence
+      - no_startup_wiring
+    nakama_reference:
+      - session_token_validation_capability
+      - server_authoritative_session_context
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+      - frontend_backend_handler_separation
+    rule: The active phase may implement access-token validation inside the existing application authentication service only. Protocol carriers, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, and broader production behavior remain deferred.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

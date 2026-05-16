@@ -10425,6 +10425,300 @@ function checkRuntimeDeviceCredentialLoginServiceBehaviorImplementation(root, go
   }
 }
 
+function checkRuntimeAccessTokenValidationServiceBehaviorGate(root, goFiles) {
+  const ruleId = "runtime.access_token_validation_service_behavior_gate";
+  const standardPath = "docs/access-token-validation-service-behavior-gate.md";
+  const standardTranslationPath = "docs/access-token-validation-service-behavior-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0052-access-token-validation-service-behavior-gate.md";
+  const conversationPath = "conversations/2026-05-16-access-token-validation-service-behavior-gate.md";
+  const serviceSource = "runtime/internal/app/authentication/service.go";
+  const serviceTests = "runtime/internal/app/authentication/service_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for access token validation service behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for access token validation service behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md"],
+    [".arch/conventions.yaml", "access_token_validation_service_behavior_gate_decision: ADR-0052"],
+    [".arch/conventions.yaml", "access_token_validation_service_behavior_gate_check_rule: runtime.access_token_validation_service_behavior_gate"],
+    [".arch/runtime.yaml", "access_token_validation_service_behavior_gate: ADR-0052"],
+    [".arch/runtime.yaml", "access_token_validation_service_behavior_gate_decision: ADR-0052"],
+    [".arch/runtime.yaml", "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md"],
+    [".arch/runtime.yaml", "access_token_validation_service_behavior_gate_defined: true"],
+    [".arch/runtime.yaml", "access_token_validation_service_behavior_gate_check_rule: runtime.access_token_validation_service_behavior_gate"],
+    [".arch/contracts.yaml", "access_token_validation_service_behavior_gate_defined: true"],
+    [".arch/contracts.yaml", "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md"],
+    [".arch/reference.yaml", "phase_2aa_access_token_validation_service_behavior_gate"],
+    [".arch/reference.yaml", "phase_2ab_access_token_validation_service_behavior_implementation"],
+    [".arch/work-items.yaml", "id: M-038"],
+    [".arch/work-items.yaml", "title: Access Token Validation Service Behavior Gate"],
+    [".arch/work-items.yaml", "id: W-0110"],
+    [".arch/work-items.yaml", "title: Define access-token validation service behavior gate"],
+    [".arch/work-items.yaml", "id: W-0111"],
+    [".arch/work-items.yaml", "title: Implement access-token validation service behavior"],
+    ["AGENTS.md", "W-0110"],
+    ["AGENTS.zh-CN.md", "W-0110"],
+    ["runtime/AGENTS.md", "W-0110"],
+    ["runtime/AGENTS.zh-CN.md", "W-0110"],
+    ["modules/authentication/AGENTS.md", "W-0110"],
+    ["modules/authentication/AGENTS.zh-CN.md", "W-0110"],
+    ["rules/check-rules.json", "runtime.access_token_validation_service_behavior_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "access_token_validation_service_behavior_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "future_implementation_work_item: W-0111"],
+    [standardPath, "completed_gate_work_item: W-0110"],
+    [standardPath, "planned_source: runtime/internal/app/authentication/service.go"],
+    [standardPath, "planned_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardPath, "service_method: ValidateAccessToken"],
+    [standardPath, "text_encoding: base64url_unpadded"],
+    [standardPath, "raw_length_bytes: 32"],
+    [standardPath, "reject_missing_or_malformed_access_token_before_unit_of_work"],
+    [standardPath, "find_token_by_lookup_digest"],
+    [standardPath, "compare_token_verifier_digest_with_CompareTokenVerifierDigest"],
+    [standardPath, "construct_validated_player_RequestIdentity"],
+    [standardPath, "keep SessionValidated false until session persistence is ratified"],
+    [standardPath, "runtime.access_token_validation_service_behavior_gate"],
+    [standardPath, "This is a gate-only standard. It does not implement access-token validation"],
+    [standardTranslationPath, "access_token_validation_service_behavior_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "future_implementation_work_item: W-0111"],
+    [standardTranslationPath, "completed_gate_work_item: W-0110"],
+    [standardTranslationPath, "planned_source: runtime/internal/app/authentication/service.go"],
+    [standardTranslationPath, "planned_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardTranslationPath, "service_method: ValidateAccessToken"],
+    [standardTranslationPath, "text_encoding: base64url_unpadded"],
+    [standardTranslationPath, "raw_length_bytes: 32"],
+    [standardTranslationPath, "reject_missing_or_malformed_access_token_before_unit_of_work"],
+    [standardTranslationPath, "find_token_by_lookup_digest"],
+    [standardTranslationPath, "compare_token_verifier_digest_with_CompareTokenVerifierDigest"],
+    [standardTranslationPath, "construct_validated_player_RequestIdentity"],
+    [standardTranslationPath, "keep SessionValidated false until session persistence is ratified"],
+    [standardTranslationPath, "runtime.access_token_validation_service_behavior_gate"],
+    [standardTranslationPath, "这只是 gate-only standard。它不实现 access-token validation"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "access_token_validation_service_behavior_gate_defined: true",
+      "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md",
+      "access_token_validation_service_behavior_gate_translation: docs/access-token-validation-service-behavior-gate.zh-CN.md",
+      "access_token_validation_service_behavior_gate_check_rule: runtime.access_token_validation_service_behavior_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0111",
+      "planned_source: runtime/internal/app/authentication/service.go",
+      "planned_tests: runtime/internal/app/authentication/service_test.go",
+      "service_method: ValidateAccessToken",
+      "proof_text_encoding: base64url_unpadded",
+      "proof_raw_length_bytes: 32",
+      "proof_prevalidation_before_unit_of_work: required",
+      "repository_handoff: application_unit_of_work_capability",
+      "authentication_repository_lookup_method: FindTokenByLookupDigest",
+      "player_repository_lookup_method: GetPlayerAccount",
+      "verifier_comparison_before_request_identity: required",
+      "token_lifecycle_checks_required: true",
+      "token_audience_check_required: true",
+      "active_player_account_required: true",
+      "request_identity_handoff_defined: true",
+      "session_validated_without_session_persistence: false",
+      "public_error_collapse_defined: true",
+      "redaction_requirements_defined: true",
+      "required_tests_defined: true",
+      "validation_execution_added: false",
+      "route_protection_added: false",
+      "session_persistence_added: false",
+      "protocol_carrier_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "generated_files_changed: false",
+      "production_authentication_behavior_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "access_token_validation_service_behavior_gate_defined: true",
+      "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md",
+      "access_token_validation_service_behavior_gate_translation: docs/access-token-validation-service-behavior-gate.zh-CN.md",
+      "access_token_validation_service_behavior_gate_check_rule: runtime.access_token_validation_service_behavior_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0111",
+      "planned_source: runtime/internal/app/authentication/service.go",
+      "planned_tests: runtime/internal/app/authentication/service_test.go",
+      "service_method: ValidateAccessToken",
+      "proof_text_encoding: base64url_unpadded",
+      "proof_raw_length_bytes: 32",
+      "proof_prevalidation_before_unit_of_work: required",
+      "repository_handoff: application_unit_of_work_capability",
+      "authentication_repository_lookup_method: FindTokenByLookupDigest",
+      "player_repository_lookup_method: GetPlayerAccount",
+      "verifier_comparison_before_request_identity: required",
+      "token_lifecycle_checks_required: true",
+      "token_audience_check_required: true",
+      "active_player_account_required: true",
+      "request_identity_handoff_defined: true",
+      "session_validated_without_session_persistence: false",
+      "public_error_collapse_defined: true",
+      "redaction_requirements_defined: true",
+      "required_tests_defined: true",
+      "validation_execution_added: false",
+      "route_protection_added: false",
+      "session_persistence_added: false",
+      "protocol_carrier_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "generated_files_changed: false",
+      "production_authentication_behavior_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "access_token_validation_service_behavior_gate_defined: true",
+      "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md",
+      "access_token_validation_service_behavior_gate_decision: ADR-0052",
+      "access_token_validation_future_implementation_work_item: W-0111",
+      "access_token_validation_future_source: runtime/internal/app/authentication/service.go",
+      "access_token_validation_future_tests: runtime/internal/app/authentication/service_test.go",
+      "access_token_validation_service_method: ValidateAccessToken",
+      "access_token_validation_proof_text_encoding: base64url_unpadded",
+      "access_token_validation_proof_raw_length_bytes: 32",
+      "access_token_validation_repository_handoff: application_unit_of_work_capability",
+      "access_token_validation_authentication_lookup_method: FindTokenByLookupDigest",
+      "access_token_validation_player_lookup_method: GetPlayerAccount",
+      "access_token_validation_token_type: opaque_access_token",
+      "access_token_validation_request_identity_handoff_defined: true",
+      "access_token_validation_session_validated_without_session_persistence: false",
+      "access_token_validation_public_error_collapse_defined: true",
+      "access_token_validation_redaction_requirements_defined: true",
+      "access_token_validation_required_tests_defined: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "access_token_validation_service_behavior_gate_defined: true",
+      "access_token_validation_service_behavior_gate_standard: docs/access-token-validation-service-behavior-gate.md",
+      "access_token_validation_service_behavior_gate_decision: ADR-0052",
+      "access_token_validation_future_implementation_work_item: W-0111",
+      "access_token_validation_future_source: runtime/internal/app/authentication/service.go",
+      "access_token_validation_future_tests: runtime/internal/app/authentication/service_test.go",
+      "access_token_validation_service_method: ValidateAccessToken",
+      "access_token_validation_proof_text_encoding: base64url_unpadded",
+      "access_token_validation_proof_raw_length_bytes: 32",
+      "access_token_validation_repository_handoff: application_unit_of_work_capability",
+      "access_token_validation_authentication_lookup_method: FindTokenByLookupDigest",
+      "access_token_validation_player_lookup_method: GetPlayerAccount",
+      "access_token_validation_token_type: opaque_access_token",
+      "access_token_validation_request_identity_handoff_defined: true",
+      "access_token_validation_session_validated_without_session_persistence: false",
+      "access_token_validation_public_error_collapse_defined: true",
+      "access_token_validation_redaction_requirements_defined: true",
+      "access_token_validation_required_tests_defined: true",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing access token validation service behavior gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves access token validation service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing access token validation service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, serviceSource)) {
+    const sourceText = readText(path.join(root, serviceSource));
+    const requiredSkeletonMarkers = [
+      "type AccessTokenValidationRequest struct",
+      "AccessToken",
+      "type AccessTokenValidationResult struct",
+      "RequestIdentity",
+      "func (s Service) ValidateAccessToken",
+      "PublicErrorAuthenticationNotImplemented",
+    ];
+    for (const marker of requiredSkeletonMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${serviceSource} preserves validation implementation target marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      } else {
+        fail(`${serviceSource} is missing validation implementation target marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      }
+    }
+
+    ok(`${serviceSource} remains the access token validation implementation target after W-0110 authorization`, {
+      rule_id: ruleId,
+      artifact: serviceSource,
+    });
+  } else {
+    fail(`${serviceSource} is missing before access token validation implementation`, {
+      rule_id: ruleId,
+      artifact: serviceSource,
+    });
+  }
+
+  if (isFile(root, serviceTests)) {
+    const testText = readText(path.join(root, serviceTests));
+    const requiredTestMarkers = [
+      "TestValidateAccessTokenFailsClosedWithoutRepositoryCallOrIdentity",
+      "assertNoSecretLeak",
+      "recordingUnitOfWorkRunner",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${serviceTests} preserves validation skeleton test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceTests,
+        });
+      } else {
+        fail(`${serviceTests} is missing validation skeleton test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceTests,
+        });
+      }
+    }
+  } else {
+    fail(`${serviceTests} is missing before access token validation implementation`, {
+      rule_id: ruleId,
+      artifact: serviceTests,
+    });
+  }
+}
+
 function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
   const ruleId = "runtime.local_verifier_key_configuration_loading_gate";
   const standardPath = "docs/local-verifier-key-configuration-loading-gate.md";
@@ -11974,6 +12268,7 @@ function checkRuntime(root) {
   checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFiles);
   checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles);
   checkRuntimeDeviceCredentialLoginServiceBehaviorImplementation(root, goFiles);
+  checkRuntimeAccessTokenValidationServiceBehaviorGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
