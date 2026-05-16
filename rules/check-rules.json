@@ -560,8 +560,8 @@
       "category": "runtime",
       "default_severity": "error",
       "title": "Authentication service behavior implementation gate",
-      "description": "The authentication service behavior implementation gate must preserve service ownership, file boundaries, repository handoff, helper composition flow, public error collapse, redaction rules, tests, and login/protocol/repository/startup deferrals before service behavior code exists.",
-      "agent_guidance": "Read `docs/authentication-service-behavior-implementation-gate.md` and `ADR-0050`; keep future service behavior under `runtime/internal/app/authentication`, use `authentication.Repository` only through the application unit-of-work boundary, collapse public proof failures, and do not implement login execution, access-token validation execution, protocol carriers, repository changes, migrations, startup wiring, dependencies, or production authentication behavior until a later bounded work item authorizes that exact slice."
+      "description": "The authentication service behavior implementation gate and skeleton check must preserve service ownership, file boundaries, repository handoff, helper composition flow, public error collapse, redaction rules, tests, and login/protocol/repository/startup deferrals.",
+      "agent_guidance": "Read `docs/authentication-service-behavior-implementation-gate.md` and `ADR-0050`; keep the skeleton service under `runtime/internal/app/authentication`, use `authentication.Repository` only through the application unit-of-work boundary after a later behavior work item authorizes it, collapse public proof failures, and do not implement login execution, access-token validation execution, protocol carriers, repository changes, migrations, startup wiring, dependencies, or production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
       "rule_id": "runtime.layer_boundary",

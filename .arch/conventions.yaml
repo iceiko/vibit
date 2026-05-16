@@ -1711,6 +1711,76 @@ authentication_service_behavior_implementation_gate:
     validation execution, protocol carriers, repository changes, migrations,
     startup wiring, dependencies, and production authentication behavior.
 
+authentication_service_behavior_skeleton:
+  status: completed
+  milestone: M-035
+  completed_work_item: W-0107
+  change: changes/2026-05-16-implement-authentication-service-behavior-skeleton
+  previous_milestone: M-034
+  previous_completed_work_item: W-0106
+  next_milestone: M-036
+  next_work_item: W-0108
+  source: runtime/internal/app/authentication/service.go
+  tests: runtime/internal/app/authentication/service_test.go
+  authentication_service_behavior_skeleton_added: true
+  authentication_service_behavior_skeleton_completed_work_item: W-0107
+  authentication_service_source: runtime/internal/app/authentication/service.go
+  authentication_service_tests: runtime/internal/app/authentication/service_test.go
+  authentication_service_type: Service
+  authentication_service_dependencies_type: ServiceDependencies
+  authentication_service_error_type: ServiceError
+  unit_of_work_runner_dependency_type: UnitOfWorkRunner
+  request_result_vocabulary_added: true
+  internal_failure_classes_redacted: true
+  unit_of_work_required_at_construction: true
+  unit_of_work_called_by_skeleton_methods: false
+  fail_closed_default: AUTHENTICATION_NOT_IMPLEMENTED
+  refresh_first_posture: AUTHENTICATION_REFRESH_NOT_SUPPORTED
+  login_execution_added: false
+  token_validation_added: false
+  token_issuance_added: false
+  repository_lookup_added: false
+  repository_mutation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protocol_carrier_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_implemented: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  migration_schemas_changed: false
+  production_authentication_behavior_added: false
+  rule: >
+    The authentication service behavior skeleton is present under
+    runtime/internal/app/authentication. It defines typed dependencies,
+    request/result vocabulary, redacted internal failure classes, and fail-closed
+    not-implemented or refresh-not-supported behavior only; real login, token
+    validation, token issuance, repository orchestration, protocol carriers,
+    startup wiring, dependencies, migrations, and production authentication
+    behavior remain deferred.
+
+device_credential_login_service_behavior_gate:
+  status: active
+  milestone: M-036
+  next_work_item: W-0108
+  previous_milestone: M-035
+  previous_completed_work_item: W-0107
+  planned_change: changes/2026-05-16-define-device-credential-login-service-behavior-gate
+  planned_scope: gate_only_no_login_execution
+  login_execution_added: false
+  token_validation_added: false
+  token_issuance_added: false
+  repository_lookup_added: false
+  repository_mutation_added: false
+  protocol_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  rule: >
+    The next active phase should define the device credential login service
+    behavior gate before implementing real login execution.
+
 server_runtime:
   first_reference_language: Go
   package_manager: go_modules

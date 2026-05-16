@@ -78,7 +78,9 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-033 Verifier Digest Comparison Helper Implementation` 已完成。`W-0105` 已在 `runtime/internal/app/authentication` 下实现 verifier comparison helpers，而不是在本模块中实现。本模块仍是 storage-neutral，只能存储 already-computed digest material。它不得 compare verifier digests、从 repository code 调用 comparison helpers、决定 mismatch/public failure mapping、执行 login、validate tokens、wire startup 或决定 authentication outcomes。
 
-`M-034 Authentication Service Behavior Implementation Gate` 已完成。`W-0106` 已在 `docs/authentication-service-behavior-implementation-gate.md` 和 `ADR-0050` 中定义 authentication service behavior implementation gate，且没有添加 service code 或 runtime authentication behavior。Future service behavior 属于 `runtime/internal/app/authentication`，不属于本模块，并且只有后续 work item 授权代码后才应使用 `service.go` 和 `service_test.go`。本模块仍是 storage-neutral，只能存储和读取 already-computed digest material。它不得拥有 service orchestration、调用 helper functions 决定 proof validity、构造 `RequestIdentity`、折叠 public proof failures、执行 login、validate tokens、wire startup 或决定 authentication outcomes。`runtime.authentication_service_behavior_implementation_gate` 是该 gate 的 repository check rule。
+`M-034 Authentication Service Behavior Implementation Gate` 已完成。`W-0106` 已在 `docs/authentication-service-behavior-implementation-gate.md` 和 `ADR-0050` 中定义 authentication service behavior implementation gate，且没有添加 service code 或 runtime authentication behavior。Future service behavior 属于 `runtime/internal/app/authentication`，不属于本模块，并且必须只通过 application unit-of-work boundary 使用本模块的 repository。
+
+`M-035 Authentication Service Behavior Skeleton` 已完成。`W-0107` 在 `runtime/internal/app/authentication` 下添加了 skeleton service files，不在本模块内。该 skeleton 预留 service vocabulary 和 fail-closed public errors，但不调用 repositories、不决定 proof validity、不构造 validated `RequestIdentity`、不执行 login、不 validate tokens、不 wire startup，也不决定 authentication outcomes。本模块仍是 storage-neutral，只能存储和读取 already-computed digest material。`runtime.authentication_service_behavior_implementation_gate` 是该 skeleton boundary 的 repository check rule。
 
 ## Forbidden Shortcuts
 

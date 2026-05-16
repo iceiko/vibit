@@ -6980,7 +6980,9 @@ function checkRuntimeSelectedLoginTokenBoundaries(root, goFiles) {
     .filter((file) => !isExplicitVerifierKeySetValidatorFile(file))
     .filter((file) => !isEnvironmentVerifierKeyLoaderFile(file))
     .filter((file) => !isMaterialGenerationHelperFile(file))
-    .filter((file) => !isVerifierDigestHelperFile(file));
+    .filter((file) => !isVerifierDigestHelperFile(file))
+    .filter((file) => !isVerifierDigestComparisonHelperFile(file))
+    .filter((file) => !isAuthenticationServiceSkeletonFile(file));
   const selectedRuntimeForbiddenPatterns = [
     { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "selected login implementation" },
     { pattern: /\bValidateAccessToken\b/, label: "selected token validation implementation" },
@@ -7318,6 +7320,27 @@ function checkRuntimeAuthenticationImplementationBoundary(root, goFiles) {
       });
       continue;
     }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not implement runtime authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is the W-0105-authorized verifier digest comparison helper and does not implement runtime authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and does not execute runtime authentication behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -7533,6 +7556,27 @@ function checkRuntimeApplicationAuthenticationServiceInterfaceBoundary(root, goF
     }
     if (isMaterialGenerationHelperFile(file)) {
       ok(`${file} is the W-0101-authorized material generation helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is the W-0105-authorized verifier digest comparison helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and does not execute login or token validation behavior`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -9444,6 +9488,27 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
       });
       continue;
     }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is the W-0105-authorized verifier digest comparison helper and does not implement authentication service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and does not execute login, token validation, logout, refresh, or repository behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const rawText = readText(path.join(root, file));
     const text = sourceWithoutGoComments(rawText);
     const matches = textMatchesAny(text, forbiddenPatterns);
@@ -9667,27 +9732,140 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
   }
 
   if (isFile(root, futureSource)) {
-    fail(`${futureSource} exists before W-0107 authorizes authentication service behavior skeleton code`, {
+    ok(`${futureSource} exists for the W-0107-authorized authentication service behavior skeleton`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   } else {
-    ok(`${futureSource} is not present before W-0107 authorizes service skeleton code`, {
+    fail(`${futureSource} is missing after W-0107 authorized service skeleton code`, {
       rule_id: ruleId,
       artifact: futureSource,
     });
   }
 
   if (isFile(root, futureTests)) {
-    fail(`${futureTests} exists before W-0107 authorizes authentication service behavior skeleton tests`, {
+    ok(`${futureTests} exists for the W-0107-authorized authentication service behavior skeleton tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
   } else {
-    ok(`${futureTests} is not present before W-0107 authorizes service skeleton tests`, {
+    fail(`${futureTests} is missing after W-0107 authorized service skeleton tests`, {
       rule_id: ruleId,
       artifact: futureTests,
     });
+  }
+
+  if (isFile(root, futureSource)) {
+    const sourceText = readText(path.join(root, futureSource));
+    const requiredSourceMarkers = [
+      "type Service struct",
+      "type ServiceDependencies struct",
+      "type UnitOfWorkRunner interface",
+      "type ServiceError struct",
+      "type DeviceCredentialAuthenticationRequest struct",
+      "type AuthenticationResult struct",
+      "type AccessTokenValidationRequest struct",
+      "type AccessTokenValidationResult struct",
+      "type LogoutAccessTokenRequest struct",
+      "type LogoutAccessTokenResult struct",
+      "type RefreshAccessTokenRequest struct",
+      "type RefreshAccessTokenResult struct",
+      "OperationAuthenticateWithDeviceCredential",
+      "OperationValidateAccessToken",
+      "OperationLogoutAccessToken",
+      "OperationRefreshAccessToken",
+      "FailureClassNotImplemented",
+      "FailureClassRefreshNotSupported",
+      "PublicErrorAuthenticationNotImplemented",
+      "PublicErrorAuthenticationRefreshNotSupported",
+      "func NewService(dependencies ServiceDependencies) (Service, error)",
+      "func (s Service) AuthenticateWithDeviceCredential",
+      "func (s Service) ValidateAccessToken",
+      "func (s Service) LogoutAccessToken",
+      "func (s Service) RefreshAccessToken",
+      "serviceNotImplemented",
+      "Status: app.IdentityValidationUnknown",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${futureSource} includes W-0107 skeleton marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      } else {
+        fail(`${futureSource} is missing W-0107 skeleton marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      }
+    }
+
+    const sourceWithoutComments = sourceWithoutGoComments(sourceText);
+    const forbiddenSkeletonPatterns = [
+      { pattern: /\bComputeCredentialLookupDigest\b/, label: "credential lookup digest computation inside skeleton service" },
+      { pattern: /\bComputeCredentialVerifierDigest\b/, label: "credential verifier digest computation inside skeleton service" },
+      { pattern: /\bComputeTokenLookupDigest\b/, label: "token lookup digest computation inside skeleton service" },
+      { pattern: /\bComputeTokenVerifierDigest\b/, label: "token verifier digest computation inside skeleton service" },
+      { pattern: /\bCompareCredentialVerifierDigest\b/, label: "credential verifier comparison inside skeleton service" },
+      { pattern: /\bCompareTokenVerifierDigest\b/, label: "token verifier comparison inside skeleton service" },
+      { pattern: /\bGenerateAccessTokenMaterial\b/, label: "token issuance inside skeleton service" },
+      { pattern: /\bGenerateDeviceCredentialMaterial\b/, label: "credential issuance inside skeleton service" },
+      { pattern: /\bFind(Token|Credential)ByLookupDigest\b/, label: "repository lookup inside skeleton service" },
+      { pattern: /\bStoreToken\b/, label: "token repository mutation inside skeleton service" },
+      { pattern: /\bStoreCredential\b/, label: "credential repository mutation inside skeleton service" },
+      { pattern: /\bRevokeToken\b/, label: "token revocation inside skeleton service" },
+      { pattern: /\bRevokeCredential\b/, label: "credential revocation inside skeleton service" },
+      { pattern: /\.\s*WithinUnitOfWork\s*\(/, label: "unit-of-work execution inside skeleton service methods" },
+      { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/persistence\/postgres\b/, label: "PostgreSQL adapter import inside skeleton service" },
+      { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/protocol\/protobuf\b/, label: "Protobuf adapter import inside skeleton service" },
+      { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/transport\/ws\b/, label: "WebSocket adapter import inside skeleton service" },
+      { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/generated\b/, label: "generated package import inside skeleton service" },
+      { pattern: /\bcrypto\/rand\b/, label: "random material generation import inside skeleton service" },
+      { pattern: /\bBearer\b/, label: "bearer proof parsing inside skeleton service" },
+    ];
+    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenSkeletonPatterns);
+    if (forbiddenMatches.length === 0) {
+      ok(`${futureSource} remains skeleton-only without helper composition, repository calls, protocol carriers, startup wiring, dependencies, or production behavior`, {
+        rule_id: ruleId,
+        artifact: futureSource,
+      });
+    } else {
+      for (const match of forbiddenMatches) {
+        fail(`${futureSource} crosses W-0107 skeleton-only boundary: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: futureSource,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureTests)) {
+    const testText = readText(path.join(root, futureTests));
+    const requiredTestMarkers = [
+      "TestNewServiceRequiresUnitOfWorkRunner",
+      "TestNewServiceRejectsTypedNilUnitOfWorkRunner",
+      "TestAuthenticateWithDeviceCredentialFailsClosedWithoutRepositoryCall",
+      "TestValidateAccessTokenFailsClosedWithoutRepositoryCallOrIdentity",
+      "TestLogoutAccessTokenFailsClosedWithoutRepositoryCall",
+      "TestRefreshAccessTokenFailsClosedAsUnsupportedWithoutRepositoryCall",
+      "TestServiceErrorRedactsInternalDetails",
+      "TestServiceSkeletonExposesReservedVocabulary",
+      "assertNoSecretLeak",
+      "recordingUnitOfWorkRunner",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${futureTests} includes W-0107 skeleton test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      } else {
+        fail(`${futureTests} is missing W-0107 skeleton test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: futureTests,
+        });
+      }
+    }
   }
 
   const behaviorFiles = goFiles
@@ -9718,6 +9896,13 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
       isVerifierDigestHelperFile(file) ||
       isVerifierDigestComparisonHelperFile(file)) {
       ok(`${file} is an already-authorized authentication helper and not service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and is checked separately for skeleton-only behavior`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -10005,6 +10190,27 @@ function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
     }
     if (isMaterialGenerationHelperFile(file)) {
       ok(`${file} is the W-0101-authorized material generation helper and does not implement environment verifier key loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is the W-0105-authorized verifier digest comparison helper and does not cross local verifier key configuration loading gate deferrals`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and does not load verifier keys or secrets`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -10421,6 +10627,27 @@ function checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles) {
     }
     if (isMaterialGenerationHelperFile(file)) {
       ok(`${file} is the W-0101-authorized material generation helper and does not implement environment verifier key loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestHelperFile(file)) {
+      ok(`${file} is the W-0103-authorized verifier digest helper and does not implement environment verifier key loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is the W-0105-authorized verifier digest comparison helper and does not implement environment verifier key loading`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isAuthenticationServiceSkeletonFile(file)) {
+      ok(`${file} is the W-0107-authorized authentication service skeleton and does not parse environment or load verifier keys`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -10872,6 +11099,10 @@ function isVerifierDigestHelperFile(file) {
 
 function isVerifierDigestComparisonHelperFile(file) {
   return file === "runtime/internal/app/authentication/verifier_comparison.go";
+}
+
+function isAuthenticationServiceSkeletonFile(file) {
+  return file === "runtime/internal/app/authentication/service.go";
 }
 
 function checkWork(root) {

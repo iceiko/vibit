@@ -733,7 +733,7 @@ milestones:
 
   - id: M-035
     title: Authentication Service Behavior Skeleton
-    status: active
+    status: completed
     goal: Add a skeleton-only application authentication service shape that fails closed before login execution, token validation execution, protocol carriers, repository behavior, startup wiring, dependencies, or production authentication behavior are implemented.
     completion_criteria:
       - The skeleton defines typed service dependencies, request/result vocabulary, redacted internal failure classes, and fail-closed not-implemented behavior under runtime/internal/app/authentication.
@@ -746,6 +746,24 @@ milestones:
       - calling PostgreSQL adapters directly
       - changing repository interfaces or migrations
       - exposing Protobuf or WebSocket authentication carriers
+      - wiring process startup
+      - adding authentication dependencies
+    completion_summary: Implemented runtime/internal/app/authentication/service.go and service_test.go as a skeleton-only application authentication service shape. The skeleton defines Service, ServiceDependencies, UnitOfWorkRunner, ServiceError, reserved request/result vocabulary for AuthenticateWithDeviceCredential, ValidateAccessToken, LogoutAccessToken, and RefreshAccessToken, public authentication error codes, redacted internal failure classes, and fail-closed not-implemented or refresh-not-supported behavior. Focused tests prove nil dependency rejection, no unit-of-work calls from skeleton methods, no raw proof leakage, no token issuance, no identity proof population, and no revocation/refresh behavior. Real login execution, access-token validation execution, token issuance, repository lookup/mutation behavior, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior remain deferred.
+
+  - id: M-036
+    title: Device Credential Login Service Behavior Gate
+    status: active
+    goal: Define the bounded gate for future device credential login service behavior before adding real login execution, token issuance, repository orchestration, protocol carriers, startup wiring, dependencies, migrations, or production authentication behavior.
+    completion_criteria:
+      - The gate names exact login service behavior ownership, repository handoff sequence, helper composition order, public error collapse posture, redaction rules, and tests before login code is added.
+      - The gate preserves the existing service skeleton while deferring real credential lookup, verifier comparison orchestration, token issuance, repository mutation, protocol carriers, startup wiring, dependencies, and production behavior.
+      - Nakama account-authentication capability and Pitaya route identity context remain active references without copying their public APIs.
+    non_goals:
+      - executing device credential login
+      - issuing access tokens
+      - validating access tokens
+      - changing Protobuf or WebSocket carriers
+      - changing repository interfaces or migrations
       - wiring process startup
       - adding authentication dependencies
 
@@ -3102,7 +3120,7 @@ work_items:
   - id: W-0107
     milestone: M-035
     title: Implement authentication service behavior skeleton
-    status: next_ready
+    status: completed
     change: changes/2026-05-16-implement-authentication-service-behavior-skeleton
     depends_on:
       - W-0106
@@ -3120,9 +3138,35 @@ work_items:
       - Add focused tests under runtime/internal/app/authentication/service_test.go.
       - Define typed dependencies, request/result vocabulary, internal redacted failure classes, and fail-closed not-implemented behavior.
       - Preserve deferral for real login execution, access-token validation execution, token issuance, repository mutation/query behavior, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior.
+    completion_summary: Implemented runtime/internal/app/authentication/service.go and service_test.go. The skeleton exposes Service, ServiceDependencies, UnitOfWorkRunner, ServiceError, reserved operation names, request/result vocabulary, redacted internal failure classes, and public error codes. AuthenticateWithDeviceCredential, ValidateAccessToken, and LogoutAccessToken fail closed with AUTHENTICATION_NOT_IMPLEMENTED; RefreshAccessToken fails closed with AUTHENTICATION_REFRESH_NOT_SUPPORTED. Tests prove nil dependency rejection, no unit-of-work calls, no proof leakage, no token issuance, no validated identity output, no revocation, no refresh output, and reserved vocabulary presence. Repository orchestration, login execution, access-token validation, token issuance, logout execution, cleanup, protocol carriers, startup wiring, dependencies, migrations, and production authentication behavior remain deferred.
     ask_first:
       - Implementing real device credential login instead of skeleton-only not-implemented behavior.
       - Implementing real access-token validation instead of skeleton-only not-implemented behavior.
       - Calling repositories for real behavior, changing repository interfaces, changing PostgreSQL adapters, or changing migrations.
       - Exposing Protobuf authentication messages, WebSocket proof carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.
+
+  - id: W-0108
+    milestone: M-036
+    title: Define device credential login service behavior gate
+    status: next_ready
+    change: changes/2026-05-16-define-device-credential-login-service-behavior-gate
+    depends_on:
+      - W-0107
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0042
+      - ADR-0043
+      - ADR-0044
+      - ADR-0050
+    completion:
+      - Define the future device credential login service behavior gate without adding login execution code.
+      - Name the helper composition sequence, repository handoff sequence, token issuance posture, public error collapse posture, redaction requirements, and focused tests required before login execution may be implemented.
+      - Preserve deferral for access-token validation execution, logout, refresh, cleanup, protocol carriers, repository interface changes, migrations, startup wiring, dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing real device credential login instead of only defining the gate.
+      - Changing service method signatures, public contracts, repository interfaces, PostgreSQL adapters, migrations, Protobuf messages, WebSocket carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.

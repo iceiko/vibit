@@ -836,10 +836,12 @@ phase_plan:
       - frontend_backend_handler_separation
     rule: The completed phase defines the authentication service behavior implementation gate before adding login execution or token validation. It composes the existing helper slices into a future service plan while preserving deferrals for protocol carriers, repositories, migrations, startup wiring, authentication dependencies, and production authentication behavior.
   phase_2x_authentication_service_behavior_skeleton:
-    status: active
-    active_milestone: M-035
+    status: completed
+    completed_milestone: M-035
+    completed_work_item: W-0107
     previous_milestone: M-034
-    next_work_item: W-0107
+    next_milestone: M-036
+    next_work_item: W-0108
     focus:
       - authentication_service_behavior_skeleton
       - fail_closed_service_shape
@@ -854,7 +856,28 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - frontend_backend_handler_separation
-    rule: The active phase may add a skeleton-only authentication service shape if the work item authorizes it. It must fail closed and must not execute login, validate tokens, call repositories for real behavior, expose protocol carriers, wire startup, add dependencies, or add production authentication behavior.
+    rule: The completed phase added a skeleton-only authentication service shape under runtime/internal/app/authentication. It fails closed and does not execute login, validate tokens, call repositories for real behavior, expose protocol carriers, wire startup, add dependencies, or add production authentication behavior.
+  phase_2y_device_credential_login_service_behavior_gate:
+    status: active
+    active_milestone: M-036
+    previous_milestone: M-035
+    next_work_item: W-0108
+    focus:
+      - device_credential_login_service_behavior_gate
+      - helper_composition_sequence
+      - repository_handoff_sequence
+      - token_issuance_posture
+      - public_error_collapse
+      - no_login_execution
+      - no_protocol_carriers
+      - no_startup_wiring
+    nakama_reference:
+      - server_authoritative_account_authentication
+      - session_token_issuance_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - frontend_backend_handler_separation
+    rule: The active phase should define the future device credential login service behavior gate before adding real login execution, token issuance, repository orchestration, protocol carriers, startup wiring, dependencies, migrations, or production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
