@@ -556,6 +556,14 @@
       "agent_guidance": "Read `docs/verifier-digest-comparison-helper-gate.md` and `ADR-0049`; keep verifier digest comparison inside the authorized helper files, compare only computed verifier digest bytes with stored verifier digest bytes, use `crypto/hmac.Equal`, and do not implement authentication service behavior, expose protocol carriers, change repositories, change migrations, wire startup, add authentication dependencies, or add production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.authentication_service_behavior_implementation_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Authentication service behavior implementation gate",
+      "description": "The authentication service behavior implementation gate must preserve service ownership, file boundaries, repository handoff, helper composition flow, public error collapse, redaction rules, tests, and login/protocol/repository/startup deferrals before service behavior code exists.",
+      "agent_guidance": "Read `docs/authentication-service-behavior-implementation-gate.md` and `ADR-0050`; keep future service behavior under `runtime/internal/app/authentication`, use `authentication.Repository` only through the application unit-of-work boundary, collapse public proof failures, and do not implement login execution, access-token validation execution, protocol carriers, repository changes, migrations, startup wiring, dependencies, or production authentication behavior until a later bounded work item authorizes that exact slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

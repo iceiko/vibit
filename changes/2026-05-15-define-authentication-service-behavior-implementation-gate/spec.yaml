@@ -1,0 +1,193 @@
+schema_version: 0.1
+change_id: define-authentication-service-behavior-implementation-gate
+date: 2026-05-16
+type: standard
+status: active
+
+summary: Define the authentication service behavior implementation gate without adding service code.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0050
+  referenced:
+    - ADR-0036
+    - ADR-0039
+    - ADR-0040
+    - ADR-0041
+    - ADR-0042
+    - ADR-0043
+    - ADR-0044
+    - ADR-0049
+
+standards:
+  added:
+    - docs/authentication-service-behavior-implementation-gate.md
+    - docs/authentication-service-behavior-implementation-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+implementation:
+  added: []
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  authentication_service_behavior_implementation_gate_defined: true
+  authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md
+  authentication_service_behavior_implementation_gate_translation: docs/authentication-service-behavior-implementation-gate.zh-CN.md
+  authentication_service_behavior_implementation_gate_decision: ADR-0050
+  authentication_service_behavior_implementation_gate_check_rule: runtime.authentication_service_behavior_implementation_gate
+  future_implementation_work_item: W-0107
+  future_slice: authentication_service_behavior_skeleton
+  future_source: runtime/internal/app/authentication/service.go
+  future_tests: runtime/internal/app/authentication/service_test.go
+  implementation_authorized_by_this_standard: false
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  repository_handoff: application_unit_of_work
+  helper_composition_flow_defined: true
+  public_error_collapse_defined: true
+  request_identity_handoff_defined: true
+  service_code_added: false
+  login_execution_added: false
+  token_validation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protobuf_authentication_messages_added: false
+  websocket_proof_carrier_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  authentication_repository_changed: false
+  authentication_migrations_changed: false
+
+workflow:
+  completed_work_item: W-0106
+  completed_milestone: M-034
+  next_milestone: M-035
+  next_ready_work_item: W-0107
+  next_direction: implement_authentication_service_behavior_skeleton
+
+verification:
+  required:
+    - node -c tools/vibit
+    - cd runtime && go test ./...
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-authentication-service-behavior-implementation-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  results:
+    - command: node -c tools/vibit
+      status: passed
+    - command: cd runtime && go test ./...
+      status: passed
+    - command: node tools/vibit check schemas --json
+      status: passed
+      passed: 2026
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check memory --json
+      status: passed
+      passed: 1482
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check contracts --json
+      status: passed
+      passed: 291
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check generated --json
+      status: passed
+      passed: 205
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check runtime --json
+      status: passed
+      passed: 2602
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: node tools/vibit check module authentication --json
+      status: passed
+      passed: 23
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check work --json
+      status: passed
+      passed: 653
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check change define-authentication-service-behavior-implementation-gate --json
+      status: passed
+      passed: 13
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check all --json
+      status: passed
+      subchecks: 159
+      passed: 159
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: git diff --check
+      status: passed
+    - command: "secret scan for GitHub tokens excluding .git and .vibit.local.env"
+      status: passed

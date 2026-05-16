@@ -75,6 +75,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.environment_verifier_key_loader_gate",
   "runtime.token_credential_material_generation_implementation_gate",
   "runtime.verifier_digest_comparison_helper_gate",
+  "runtime.authentication_service_behavior_implementation_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -9462,6 +9463,285 @@ function checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFi
   }
 }
 
+function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFiles) {
+  const ruleId = "runtime.authentication_service_behavior_implementation_gate";
+  const standardPath = "docs/authentication-service-behavior-implementation-gate.md";
+  const standardTranslationPath = "docs/authentication-service-behavior-implementation-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0050-authentication-service-behavior-implementation-gate.md";
+  const conversationPath = "conversations/2026-05-16-authentication-service-behavior-implementation-gate.md";
+  const futureSource = "runtime/internal/app/authentication/service.go";
+  const futureTests = "runtime/internal/app/authentication/service_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for authentication service behavior implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for authentication service behavior implementation gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md"],
+    [".arch/conventions.yaml", "authentication_service_behavior_implementation_gate_decision: ADR-0050"],
+    [".arch/conventions.yaml", "authentication_service_behavior_implementation_gate_check_rule: runtime.authentication_service_behavior_implementation_gate"],
+    [".arch/runtime.yaml", "authentication_service_behavior_implementation_gate: ADR-0050"],
+    [".arch/runtime.yaml", "authentication_service_behavior_implementation_gate_decision: ADR-0050"],
+    [".arch/runtime.yaml", "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md"],
+    [".arch/runtime.yaml", "authentication_service_behavior_implementation_gate_defined: true"],
+    [".arch/runtime.yaml", "authentication_service_behavior_implementation_gate_check_rule: runtime.authentication_service_behavior_implementation_gate"],
+    [".arch/contracts.yaml", "authentication_service_behavior_implementation_gate_defined: true"],
+    [".arch/contracts.yaml", "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md"],
+    [".arch/reference.yaml", "phase_2w_authentication_service_behavior_implementation_gate"],
+    [".arch/reference.yaml", "authentication_service_behavior_skeleton"],
+    [".arch/work-items.yaml", "id: M-035"],
+    [".arch/work-items.yaml", "title: Authentication Service Behavior Skeleton"],
+    [".arch/work-items.yaml", "title: Implement authentication service behavior skeleton"],
+    ["AGENTS.md", "docs/authentication-service-behavior-implementation-gate.md"],
+    ["AGENTS.md", "ADR-0050"],
+    ["AGENTS.md", "runtime.authentication_service_behavior_implementation_gate"],
+    ["AGENTS.zh-CN.md", "docs/authentication-service-behavior-implementation-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0050"],
+    ["AGENTS.zh-CN.md", "runtime.authentication_service_behavior_implementation_gate"],
+    ["runtime/AGENTS.md", "../docs/authentication-service-behavior-implementation-gate.md"],
+    ["runtime/AGENTS.md", "ADR-0050"],
+    ["runtime/AGENTS.md", "runtime.authentication_service_behavior_implementation_gate"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/authentication-service-behavior-implementation-gate.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0050"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authentication_service_behavior_implementation_gate"],
+    ["modules/authentication/module.yaml", "authentication_service_behavior_implementation_gate_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/authentication-service-behavior-implementation-gate.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/authentication-service-behavior-implementation-gate.md"],
+    ["rules/check-rules.json", "runtime.authentication_service_behavior_implementation_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "authentication_service_behavior_implementation_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "future_implementation_work_item: W-0107"],
+    [standardPath, "future_source: runtime/internal/app/authentication/service.go"],
+    [standardPath, "future_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardPath, "repository_handoff: application_unit_of_work"],
+    [standardPath, "helper_composition_flow_defined"],
+    [standardPath, "public_error_collapse:"],
+    [standardPath, "request_identity_handoff:"],
+    [standardPath, "runtime.authentication_service_behavior_implementation_gate"],
+    [standardPath, "This is an implementation-gate standard. It does not add Go service code"],
+    [standardTranslationPath, "authentication_service_behavior_implementation_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "future_implementation_work_item: W-0107"],
+    [standardTranslationPath, "future_source: runtime/internal/app/authentication/service.go"],
+    [standardTranslationPath, "future_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardTranslationPath, "repository_handoff: application_unit_of_work"],
+    [standardTranslationPath, "helper_composition_flow_defined"],
+    [standardTranslationPath, "public_error_collapse:"],
+    [standardTranslationPath, "request_identity_handoff:"],
+    [standardTranslationPath, "runtime.authentication_service_behavior_implementation_gate"],
+    [standardTranslationPath, "这只是 implementation-gate standard。它不添加 Go service code"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "authentication_service_behavior_implementation_gate_defined: true",
+      "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md",
+      "authentication_service_behavior_implementation_gate_translation: docs/authentication-service-behavior-implementation-gate.zh-CN.md",
+      "authentication_service_behavior_implementation_gate_check_rule: runtime.authentication_service_behavior_implementation_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0107",
+      "future_source: runtime/internal/app/authentication/service.go",
+      "future_tests: runtime/internal/app/authentication/service_test.go",
+      "repository_handoff: application_unit_of_work",
+      "helper_composition_flow_defined: true",
+      "public_error_collapse_defined: true",
+      "request_identity_handoff_defined: true",
+      "service_code_added: false",
+      "login_execution_added: false",
+      "token_validation_added: false",
+      "logout_execution_added: false",
+      "refresh_behavior_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "startup_wiring_added: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/conventions.yaml": [
+      "authentication_service_behavior_implementation_gate_defined: true",
+      "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md",
+      "authentication_service_behavior_implementation_gate_translation: docs/authentication-service-behavior-implementation-gate.zh-CN.md",
+      "authentication_service_behavior_implementation_gate_check_rule: runtime.authentication_service_behavior_implementation_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0107",
+      "future_source: runtime/internal/app/authentication/service.go",
+      "future_tests: runtime/internal/app/authentication/service_test.go",
+      "repository_handoff: application_unit_of_work",
+      "helper_composition_flow_defined: true",
+      "public_error_collapse_defined: true",
+      "request_identity_handoff_defined: true",
+      "service_code_added: false",
+      "login_execution_added: false",
+      "token_validation_added: false",
+      "logout_execution_added: false",
+      "refresh_behavior_added: false",
+      "cleanup_jobs_added: false",
+      "protobuf_authentication_messages_added: false",
+      "websocket_proof_carrier_implemented: false",
+      "startup_wiring_added: false",
+      "authentication_dependencies_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+    ],
+    ".arch/contracts.yaml": [
+      "authentication_service_behavior_implementation_gate_defined: true",
+      "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md",
+      "authentication_service_behavior_implementation_gate_decision: ADR-0050",
+      "authentication_service_future_source: runtime/internal/app/authentication/service.go",
+      "authentication_service_future_tests: runtime/internal/app/authentication/service_test.go",
+      "authentication_service_future_implementation_work_item: W-0107",
+      "authentication_service_future_slice: authentication_service_behavior_skeleton",
+      "repository_handoff: application_unit_of_work",
+      "helper_composition_flow_defined: true",
+      "public_error_collapse_defined: true",
+      "request_identity_handoff_defined: true",
+      "service_code_added: false",
+      "login_execution_added: false",
+      "token_validation_added: false",
+    ],
+    "modules/authentication/module.yaml": [
+      "authentication_service_behavior_implementation_gate_defined: true",
+      "authentication_service_behavior_implementation_gate_standard: docs/authentication-service-behavior-implementation-gate.md",
+      "authentication_service_behavior_implementation_gate_decision: ADR-0050",
+      "authentication_service_future_source: runtime/internal/app/authentication/service.go",
+      "authentication_service_future_tests: runtime/internal/app/authentication/service_test.go",
+      "authentication_service_future_implementation_work_item: W-0107",
+      "authentication_service_future_slice: authentication_service_behavior_skeleton",
+      "repository_handoff: application_unit_of_work",
+      "helper_composition_flow_defined: true",
+      "public_error_collapse_defined: true",
+      "request_identity_handoff_defined: true",
+      "service_code_added: false",
+      "login_execution_added: false",
+      "token_validation_added: false",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing authentication service behavior gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves authentication service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing authentication service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, futureSource)) {
+    fail(`${futureSource} exists before W-0107 authorizes authentication service behavior skeleton code`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  } else {
+    ok(`${futureSource} is not present before W-0107 authorizes service skeleton code`, {
+      rule_id: ruleId,
+      artifact: futureSource,
+    });
+  }
+
+  if (isFile(root, futureTests)) {
+    fail(`${futureTests} exists before W-0107 authorizes authentication service behavior skeleton tests`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  } else {
+    ok(`${futureTests} is not present before W-0107 authorizes service skeleton tests`, {
+      rule_id: ruleId,
+      artifact: futureTests,
+    });
+  }
+
+  const behaviorFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/") ||
+      pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") ||
+      pathStartsWith(file, "runtime/internal/platform/transport/ws/") ||
+      pathStartsWith(file, "runtime/internal/modules/"));
+  const forbiddenPatterns = [
+    { pattern: /\b(AuthService|AuthenticationService|Authenticator|TokenValidator|TokenIssuer|TokenVerifier)\b/, label: "authentication service implementation before behavior gate" },
+    { pattern: /\bAuthenticateWithDeviceCredential\b/, label: "device credential login execution before service behavior authorization" },
+    { pattern: /\bValidateAccessToken\b/, label: "access-token validation execution before service behavior authorization" },
+    { pattern: /\bLogoutAccessToken\b/, label: "logout execution before service behavior authorization" },
+    { pattern: /\bRefreshAccessToken\b/, label: "refresh execution before service behavior authorization" },
+    { pattern: /\bGenerateAccessTokenMaterial\b/, label: "token issuance behavior outside authorized helper" },
+    { pattern: /\bStoreToken\b/, label: "token storage orchestration before service behavior authorization" },
+    { pattern: /\bFind(Token|Credential)ByLookupDigest\b/, label: "repository proof lookup orchestration before service behavior authorization" },
+    { pattern: /\bCompare(Credential|Token)VerifierDigest\b/, label: "verifier comparison orchestration before service behavior authorization" },
+    { pattern: /\bBearer\b/, label: "bearer proof parsing before service behavior authorization" },
+  ];
+  for (const file of behaviorFiles) {
+    if (file === "runtime/internal/modules/authentication/repository.go") {
+      continue;
+    }
+    if (isExplicitVerifierKeySetValidatorFile(file) ||
+      isEnvironmentVerifierKeyLoaderFile(file) ||
+      isMaterialGenerationHelperFile(file) ||
+      isVerifierDigestHelperFile(file) ||
+      isVerifierDigestComparisonHelperFile(file)) {
+      ok(`${file} is an already-authorized authentication helper and not service behavior`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const rawText = readText(path.join(root, file));
+    const text = sourceWithoutGoComments(rawText);
+    const matches = textMatchesAny(text, forbiddenPatterns);
+    if (matches.length === 0) {
+      ok(`${file} does not implement authentication service behavior before W-0107`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    for (const match of matches) {
+      fail(`${file} crosses authentication service behavior implementation gate: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+}
+
 function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
   const ruleId = "runtime.local_verifier_key_configuration_loading_gate";
   const standardPath = "docs/local-verifier-key-configuration-loading-gate.md";
@@ -10951,6 +11231,7 @@ function checkRuntime(root) {
   checkRuntimeVerifierDigestHelperImplementationGate(root, goFiles);
   checkRuntimeVerifierDigestComparisonHelperGate(root, goFiles);
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
+  checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

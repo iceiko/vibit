@@ -77,6 +77,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-033 Verifier Digest Comparison Helper Implementation` is completed. `W-0105` implemented verifier comparison helpers under `runtime/internal/app/authentication`, not in this module. This module remains storage-neutral and may store already-computed digest material only. It must not compare verifier digests, call comparison helpers from repository code, decide mismatch/public failure mapping, execute login, validate tokens, wire startup, or decide authentication outcomes.
 
+`M-034 Authentication Service Behavior Implementation Gate` is completed. `W-0106` defined the authentication service behavior implementation gate in `docs/authentication-service-behavior-implementation-gate.md` and `ADR-0050` without adding service code or runtime authentication behavior. Future service behavior belongs under `runtime/internal/app/authentication`, not this module, and should use `service.go` and `service_test.go` only after a later work item authorizes code. This module remains storage-neutral and may store and retrieve already-computed digest material only. It must not own service orchestration, call helper functions to decide proof validity, construct `RequestIdentity`, collapse public proof failures, execute login, validate tokens, wire startup, or decide authentication outcomes. `runtime.authentication_service_behavior_implementation_gate` is the repository check rule for this gate.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

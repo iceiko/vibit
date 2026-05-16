@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-034
+current_milestone: M-035
 
 continuation_semantics:
   default_step_unit: work_item
@@ -717,7 +717,7 @@ milestones:
 
   - id: M-034
     title: Authentication Service Behavior Implementation Gate
-    status: active
+    status: completed
     goal: Define the bounded gate for future authentication service behavior before adding login execution, token validation, protocol carriers, repository orchestration, startup wiring, or production authentication behavior.
     completion_criteria:
       - The gate names exact service behavior ownership, input/output boundaries, repository handoff, proof validation flow, error collapse posture, tests, and deferrals.
@@ -727,6 +727,25 @@ milestones:
       - implementing authentication service behavior in the gate-only work item
       - executing login or token validation
       - changing public contracts, repositories, migrations, or protocol carriers
+      - wiring process startup
+      - adding authentication dependencies
+    completion_summary: Defined the authentication service behavior implementation gate in docs/authentication-service-behavior-implementation-gate.md, docs/authentication-service-behavior-implementation-gate.zh-CN.md, and ADR-0050. The gate names future service files runtime/internal/app/authentication/service.go and service_test.go, keeps service behavior application-owned, requires repository usage through the application unit-of-work boundary, maps existing verifier key, material generation, digest computation, and verifier comparison helpers into future login and access-token validation flows, defines public proof failure collapse, redaction requirements, request identity handoff, and focused tests, and preserves deferrals for login execution, token validation execution, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior. No service code was added.
+
+  - id: M-035
+    title: Authentication Service Behavior Skeleton
+    status: active
+    goal: Add a skeleton-only application authentication service shape that fails closed before login execution, token validation execution, protocol carriers, repository behavior, startup wiring, dependencies, or production authentication behavior are implemented.
+    completion_criteria:
+      - The skeleton defines typed service dependencies, request/result vocabulary, redacted internal failure classes, and fail-closed not-implemented behavior under runtime/internal/app/authentication.
+      - Focused tests prove the skeleton does not execute login, validate tokens, call repositories for real behavior, expose protocol carriers, or leak raw proof material.
+      - The skeleton preserves deferrals for real login execution, access-token validation execution, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior.
+    non_goals:
+      - executing device credential login
+      - validating access tokens
+      - issuing tokens
+      - calling PostgreSQL adapters directly
+      - changing repository interfaces or migrations
+      - exposing Protobuf or WebSocket authentication carriers
       - wiring process startup
       - adding authentication dependencies
 
@@ -3056,7 +3075,7 @@ work_items:
   - id: W-0106
     milestone: M-034
     title: Define authentication service behavior implementation gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-15-define-authentication-service-behavior-implementation-gate
     depends_on:
       - W-0105
@@ -3069,11 +3088,41 @@ work_items:
       - ADR-0043
       - ADR-0044
       - ADR-0049
+      - ADR-0050
     completion:
       - Define the implementation gate for future authentication service behavior without adding service code.
       - Name future ownership, file boundaries, repository handoff, helper composition flow, public error collapse, redaction rules, and focused tests.
       - Preserve deferral for login execution, token validation, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior unless a later work item explicitly authorizes each slice.
+    completion_summary: Defined the authentication service behavior implementation gate in docs/authentication-service-behavior-implementation-gate.md, docs/authentication-service-behavior-implementation-gate.zh-CN.md, and ADR-0050. The gate names future service files runtime/internal/app/authentication/service.go and service_test.go, keeps service behavior application-owned, requires repository usage through the application unit-of-work boundary, maps existing verifier key, material generation, digest computation, and verifier comparison helpers into future login and access-token validation flows, defines public proof failure collapse, redaction requirements, request identity handoff, and focused tests, and preserves deferrals for login execution, token validation execution, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior. No service code was added.
     ask_first:
       - Implementing authentication service behavior instead of only defining the gate.
       - Changing public contracts, repositories, migrations, protocol carriers, or startup wiring.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.
+
+  - id: W-0107
+    milestone: M-035
+    title: Implement authentication service behavior skeleton
+    status: next_ready
+    change: changes/2026-05-16-implement-authentication-service-behavior-skeleton
+    depends_on:
+      - W-0106
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0042
+      - ADR-0043
+      - ADR-0044
+      - ADR-0050
+    completion:
+      - Add skeleton-only service shape under runtime/internal/app/authentication/service.go.
+      - Add focused tests under runtime/internal/app/authentication/service_test.go.
+      - Define typed dependencies, request/result vocabulary, internal redacted failure classes, and fail-closed not-implemented behavior.
+      - Preserve deferral for real login execution, access-token validation execution, token issuance, repository mutation/query behavior, logout, refresh, cleanup, protocol carriers, repository changes, migrations, startup wiring, dependencies, and production authentication behavior.
+    ask_first:
+      - Implementing real device credential login instead of skeleton-only not-implemented behavior.
+      - Implementing real access-token validation instead of skeleton-only not-implemented behavior.
+      - Calling repositories for real behavior, changing repository interfaces, changing PostgreSQL adapters, or changing migrations.
+      - Exposing Protobuf authentication messages, WebSocket proof carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.
