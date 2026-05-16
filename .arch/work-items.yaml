@@ -752,7 +752,7 @@ milestones:
 
   - id: M-036
     title: Device Credential Login Service Behavior Gate
-    status: active
+    status: completed
     goal: Define the bounded gate for future device credential login service behavior before adding real login execution, token issuance, repository orchestration, protocol carriers, startup wiring, dependencies, migrations, or production authentication behavior.
     completion_criteria:
       - The gate names exact login service behavior ownership, repository handoff sequence, helper composition order, public error collapse posture, redaction rules, and tests before login code is added.
@@ -766,6 +766,23 @@ milestones:
       - changing repository interfaces or migrations
       - wiring process startup
       - adding authentication dependencies
+    completion_summary: Defined the device credential login service behavior gate in docs/device-credential-login-service-behavior-gate.md, docs/device-credential-login-service-behavior-gate.zh-CN.md, and ADR-0051. The gate fixes the future service-owned login sequence, proof input shape, unit-of-work repository handoff, helper order, player account active check, opaque access-token issuance posture, public error collapse, redaction requirements, and required tests before login execution code is added. It preserves deferrals for access-token validation, logout, refresh, cleanup, protocol carriers, WebSocket handshake authentication, startup wiring, repository changes, migrations, generated files, dependencies, and production authentication behavior.
+
+  - id: M-037
+    title: Device Credential Login Service Behavior Implementation
+    status: active
+    goal: Implement the first bounded device credential login service behavior inside the existing application authentication service without adding access-token validation, protocol carriers, startup wiring, repository interface changes, migrations, dependencies, or production authentication behavior beyond the service method slice.
+    completion_criteria:
+      - `AuthenticateWithDeviceCredential` executes the gate-defined sequence using injected dependencies, verifier helpers, fake-testable unit-of-work repository capabilities, and existing repository interfaces.
+      - Focused tests prove proof pre-validation, helper ordering, repository handoff, public error collapse, player account active checks, token digest-only storage, no raw proof leakage, and no token return on storage or commit failure.
+      - Access-token validation, logout, refresh, cleanup, protocol carriers, startup wiring, repository changes, migrations, generated files, dependencies, and broader production authentication behavior remain deferred.
+    non_goals:
+      - validating access tokens
+      - exposing Protobuf or WebSocket authentication carriers
+      - changing service method signatures
+      - changing repository interfaces or migrations
+      - wiring process startup
+      - adding external authentication dependencies
 
 
 work_items:
@@ -3149,7 +3166,7 @@ work_items:
   - id: W-0108
     milestone: M-036
     title: Define device credential login service behavior gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-16-define-device-credential-login-service-behavior-gate
     depends_on:
       - W-0107
@@ -3162,11 +3179,39 @@ work_items:
       - ADR-0043
       - ADR-0044
       - ADR-0050
+      - ADR-0051
     completion:
       - Define the future device credential login service behavior gate without adding login execution code.
       - Name the helper composition sequence, repository handoff sequence, token issuance posture, public error collapse posture, redaction requirements, and focused tests required before login execution may be implemented.
       - Preserve deferral for access-token validation execution, logout, refresh, cleanup, protocol carriers, repository interface changes, migrations, startup wiring, dependencies, and production authentication behavior.
+    completion_summary: Defined the future device credential login service behavior gate without adding login execution code. The gate establishes server-issued Base64URL unpadded 32-byte proof input, proof pre-validation before unit-of-work, credential lookup digest computation, authentication and player repository handoff through unit-of-work capabilities, verifier digest comparison before token generation, active credential and active player account requirements, opaque access-token generation and digest-only storage, one-time token return after unit-of-work success, public error collapse, redaction rules, and required tests. Access-token validation, logout, refresh, cleanup, protocol carriers, repository interface changes, migrations, startup wiring, dependencies, and production behavior remain deferred.
     ask_first:
       - Implementing real device credential login instead of only defining the gate.
       - Changing service method signatures, public contracts, repository interfaces, PostgreSQL adapters, migrations, Protobuf messages, WebSocket carriers, or startup wiring.
       - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, or session-store dependency.
+
+  - id: W-0109
+    milestone: M-037
+    title: Implement device credential login service behavior
+    status: next_ready
+    change: changes/2026-05-16-implement-device-credential-login-service-behavior
+    depends_on:
+      - W-0108
+    related_decisions:
+      - ADR-0036
+      - ADR-0039
+      - ADR-0040
+      - ADR-0041
+      - ADR-0042
+      - ADR-0043
+      - ADR-0044
+      - ADR-0050
+      - ADR-0051
+    completion:
+      - Implement device credential login inside runtime/internal/app/authentication/service.go using the ADR-0051 sequence.
+      - Add focused tests under runtime/internal/app/authentication/service_test.go for proof rejection, helper ordering, unit-of-work repository handoff, public error collapse, active player account requirement, digest-only token storage, redaction, and token return only after successful storage and commit.
+      - Preserve deferral for access-token validation, logout, refresh, cleanup, protocol carriers, repository interface changes, migrations, startup wiring, dependencies, generated files, and broader production authentication behavior.
+    ask_first:
+      - Changing service method signatures, public contracts, repository interfaces, PostgreSQL adapters, migrations, Protobuf messages, WebSocket carriers, startup wiring, or generated files.
+      - Choosing a production token lifetime, public token failure disclosure policy, token rotation policy, refresh-token model, session persistence model, or protocol proof carrier beyond the service-local behavior slice.
+      - Adding a major external cryptography, JWT, OAuth, OIDC, provider, KMS, cloud secret-manager, operations, password-hashing, Redis-like, queue, session-store, UUID, ULID, or KSUID dependency.

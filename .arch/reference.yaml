@@ -858,10 +858,12 @@ phase_plan:
       - frontend_backend_handler_separation
     rule: The completed phase added a skeleton-only authentication service shape under runtime/internal/app/authentication. It fails closed and does not execute login, validate tokens, call repositories for real behavior, expose protocol carriers, wire startup, add dependencies, or add production authentication behavior.
   phase_2y_device_credential_login_service_behavior_gate:
-    status: active
-    active_milestone: M-036
+    status: completed
+    completed_milestone: M-036
+    completed_work_item: W-0108
     previous_milestone: M-035
-    next_work_item: W-0108
+    next_milestone: M-037
+    next_work_item: W-0109
     focus:
       - device_credential_login_service_behavior_gate
       - helper_composition_sequence
@@ -877,7 +879,25 @@ phase_plan:
     pitaya_reference:
       - route_handler_identity_context
       - frontend_backend_handler_separation
-    rule: The active phase should define the future device credential login service behavior gate before adding real login execution, token issuance, repository orchestration, protocol carriers, startup wiring, dependencies, migrations, or production authentication behavior.
+    rule: The completed phase defined the future device credential login service behavior gate before adding real login execution. It preserves application-owned proof validation, unit-of-work repository handoff, token digest-only storage, public error collapse, and protocol/startup/dependency deferrals.
+  phase_2z_device_credential_login_service_behavior_implementation:
+    status: active
+    active_milestone: M-037
+    previous_milestone: M-036
+    next_work_item: W-0109
+    focus:
+      - device_credential_login_execution
+      - service_method_only
+      - no_access_token_validation
+      - no_protocol_carriers
+      - no_startup_wiring
+    nakama_reference:
+      - server_authoritative_account_authentication
+      - session_token_issuance_capability
+    pitaya_reference:
+      - route_handler_identity_context
+      - frontend_backend_handler_separation
+    rule: The active phase may implement device credential login inside the existing application authentication service only if it preserves the ADR-0051 sequence and does not add access-token validation, protocol carriers, startup wiring, repository changes, migrations, dependencies, or broader production authentication behavior.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

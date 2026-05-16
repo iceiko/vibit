@@ -564,6 +564,14 @@
       "agent_guidance": "Read `docs/authentication-service-behavior-implementation-gate.md` and `ADR-0050`; keep the skeleton service under `runtime/internal/app/authentication`, use `authentication.Repository` only through the application unit-of-work boundary after a later behavior work item authorizes it, collapse public proof failures, and do not implement login execution, access-token validation execution, protocol carriers, repository changes, migrations, startup wiring, dependencies, or production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.device_credential_login_service_behavior_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Device credential login service behavior gate",
+      "description": "The device credential login service behavior gate must define proof shape, service ownership, dependency shape, helper ordering, repository handoff, token issuance posture, public error collapse, redaction, tests, and deferrals before login execution code exists.",
+      "agent_guidance": "Read `docs/device-credential-login-service-behavior-gate.md` and `ADR-0051`; do not implement device credential login, access-token validation, protocol carriers, startup wiring, repository changes, migrations, generated files, dependencies, or broader production authentication behavior until a later bounded work item authorizes that exact slice."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",

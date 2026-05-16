@@ -76,6 +76,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.token_credential_material_generation_implementation_gate",
   "runtime.verifier_digest_comparison_helper_gate",
   "runtime.authentication_service_behavior_implementation_gate",
+  "runtime.device_credential_login_service_behavior_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -9927,6 +9928,328 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
   }
 }
 
+function checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles) {
+  const ruleId = "runtime.device_credential_login_service_behavior_gate";
+  const standardPath = "docs/device-credential-login-service-behavior-gate.md";
+  const standardTranslationPath = "docs/device-credential-login-service-behavior-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0051-device-credential-login-service-behavior-gate.md";
+  const conversationPath = "conversations/2026-05-16-device-credential-login-service-behavior-gate.md";
+  const serviceSource = "runtime/internal/app/authentication/service.go";
+  const serviceTests = "runtime/internal/app/authentication/service_test.go";
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for device credential login service behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for device credential login service behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/conventions.yaml", "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md"],
+    [".arch/conventions.yaml", "device_credential_login_service_behavior_gate_decision: ADR-0051"],
+    [".arch/conventions.yaml", "device_credential_login_service_behavior_gate_check_rule: runtime.device_credential_login_service_behavior_gate"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_gate: ADR-0051"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_gate_decision: ADR-0051"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_gate_defined: true"],
+    [".arch/runtime.yaml", "device_credential_login_service_behavior_gate_check_rule: runtime.device_credential_login_service_behavior_gate"],
+    [".arch/contracts.yaml", "device_credential_login_service_behavior_gate_defined: true"],
+    [".arch/contracts.yaml", "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md"],
+    [".arch/reference.yaml", "phase_2y_device_credential_login_service_behavior_gate"],
+    [".arch/reference.yaml", "phase_2z_device_credential_login_service_behavior_implementation"],
+    [".arch/work-items.yaml", "id: M-036"],
+    [".arch/work-items.yaml", "title: Device Credential Login Service Behavior Gate"],
+    [".arch/work-items.yaml", "id: W-0108"],
+    [".arch/work-items.yaml", "title: Define device credential login service behavior gate"],
+    [".arch/work-items.yaml", "id: W-0109"],
+    [".arch/work-items.yaml", "title: Implement device credential login service behavior"],
+    ["AGENTS.md", "docs/device-credential-login-service-behavior-gate.md"],
+    ["AGENTS.md", "ADR-0051"],
+    ["AGENTS.md", "runtime.device_credential_login_service_behavior_gate"],
+    ["AGENTS.zh-CN.md", "docs/device-credential-login-service-behavior-gate.md"],
+    ["AGENTS.zh-CN.md", "ADR-0051"],
+    ["AGENTS.zh-CN.md", "runtime.device_credential_login_service_behavior_gate"],
+    ["runtime/AGENTS.md", "../docs/device-credential-login-service-behavior-gate.md"],
+    ["runtime/AGENTS.md", "ADR-0051"],
+    ["runtime/AGENTS.md", "runtime.device_credential_login_service_behavior_gate"],
+    ["runtime/AGENTS.zh-CN.md", "../docs/device-credential-login-service-behavior-gate.md"],
+    ["runtime/AGENTS.zh-CN.md", "ADR-0051"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.device_credential_login_service_behavior_gate"],
+    ["modules/authentication/module.yaml", "device_credential_login_service_behavior_gate_defined: true"],
+    ["modules/authentication/AGENTS.md", "docs/device-credential-login-service-behavior-gate.md"],
+    ["modules/authentication/AGENTS.zh-CN.md", "docs/device-credential-login-service-behavior-gate.md"],
+    ["rules/check-rules.json", "runtime.device_credential_login_service_behavior_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "device_credential_login_service_behavior_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "future_implementation_work_item: W-0109"],
+    [standardPath, "completed_gate_work_item: W-0108"],
+    [standardPath, "planned_source: runtime/internal/app/authentication/service.go"],
+    [standardPath, "planned_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardPath, "service_method: AuthenticateWithDeviceCredential"],
+    [standardPath, "text_encoding: base64url_unpadded"],
+    [standardPath, "raw_length_bytes: 32"],
+    [standardPath, "reject_missing_or_malformed_device_credential_proof_before_unit_of_work"],
+    [standardPath, "find_credential_by_lookup_digest"],
+    [standardPath, "compare_credential_verifier_digest_with_CompareCredentialVerifierDigest"],
+    [standardPath, "get_player_account_by_credential_player_id"],
+    [standardPath, "store_access_token_record_through_authentication_repository"],
+    [standardPath, "return_raw_access_token_text_once_after_unit_of_work_success"],
+    [standardPath, "runtime.device_credential_login_service_behavior_gate"],
+    [standardPath, "This is a gate-only standard. It does not implement device credential login"],
+    [standardTranslationPath, "device_credential_login_service_behavior_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "future_implementation_work_item: W-0109"],
+    [standardTranslationPath, "completed_gate_work_item: W-0108"],
+    [standardTranslationPath, "planned_source: runtime/internal/app/authentication/service.go"],
+    [standardTranslationPath, "planned_tests: runtime/internal/app/authentication/service_test.go"],
+    [standardTranslationPath, "service_method: AuthenticateWithDeviceCredential"],
+    [standardTranslationPath, "text_encoding: base64url_unpadded"],
+    [standardTranslationPath, "raw_length_bytes: 32"],
+    [standardTranslationPath, "reject_missing_or_malformed_device_credential_proof_before_unit_of_work"],
+    [standardTranslationPath, "find_credential_by_lookup_digest"],
+    [standardTranslationPath, "compare_credential_verifier_digest_with_CompareCredentialVerifierDigest"],
+    [standardTranslationPath, "get_player_account_by_credential_player_id"],
+    [standardTranslationPath, "store_access_token_record_through_authentication_repository"],
+    [standardTranslationPath, "return_raw_access_token_text_once_after_unit_of_work_success"],
+    [standardTranslationPath, "runtime.device_credential_login_service_behavior_gate"],
+    [standardTranslationPath, "这只是 gate-only standard。它不实现 device credential login"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "device_credential_login_service_behavior_gate_defined: true",
+      "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md",
+      "device_credential_login_service_behavior_gate_translation: docs/device-credential-login-service-behavior-gate.zh-CN.md",
+      "device_credential_login_service_behavior_gate_check_rule: runtime.device_credential_login_service_behavior_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0109",
+      "planned_source: runtime/internal/app/authentication/service.go",
+      "planned_tests: runtime/internal/app/authentication/service_test.go",
+      "service_method: AuthenticateWithDeviceCredential",
+      "proof_text_encoding: base64url_unpadded",
+      "proof_raw_length_bytes: 32",
+      "proof_prevalidation_before_unit_of_work: required",
+      "repository_handoff: application_unit_of_work_capability",
+      "authentication_repository_lookup_method: FindCredentialByLookupDigest",
+      "authentication_repository_token_store_method: StoreToken",
+      "player_repository_lookup_method: GetPlayerAccount",
+      "verifier_comparison_before_token_generation: required",
+      "active_player_account_required: true",
+      "token_return_after_unit_of_work_success: required",
+      "public_error_collapse_defined: true",
+      "redaction_requirements_defined: true",
+      "required_tests_defined: true",
+      "login_execution_added: false",
+      "token_validation_added: false",
+      "protocol_carrier_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+      "production_authentication_behavior_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "device_credential_login_service_behavior_gate_defined: true",
+      "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md",
+      "device_credential_login_service_behavior_gate_translation: docs/device-credential-login-service-behavior-gate.zh-CN.md",
+      "device_credential_login_service_behavior_gate_check_rule: runtime.device_credential_login_service_behavior_gate",
+      "implementation_authorized_by_this_standard: false",
+      "future_implementation_work_item: W-0109",
+      "planned_source: runtime/internal/app/authentication/service.go",
+      "planned_tests: runtime/internal/app/authentication/service_test.go",
+      "service_method: AuthenticateWithDeviceCredential",
+      "proof_text_encoding: base64url_unpadded",
+      "proof_raw_length_bytes: 32",
+      "proof_prevalidation_before_unit_of_work: required",
+      "repository_handoff: application_unit_of_work_capability",
+      "authentication_repository_lookup_method: FindCredentialByLookupDigest",
+      "authentication_repository_token_store_method: StoreToken",
+      "player_repository_lookup_method: GetPlayerAccount",
+      "verifier_comparison_before_token_generation: required",
+      "active_player_account_required: true",
+      "token_return_after_unit_of_work_success: required",
+      "public_error_collapse_defined: true",
+      "redaction_requirements_defined: true",
+      "required_tests_defined: true",
+      "login_execution_added: false",
+      "token_validation_added: false",
+      "protocol_carrier_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "migration_schemas_changed: false",
+      "production_authentication_behavior_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "device_credential_login_service_behavior_gate_defined: true",
+      "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md",
+      "device_credential_login_service_behavior_gate_decision: ADR-0051",
+      "device_credential_login_future_implementation_work_item: W-0109",
+      "device_credential_login_future_source: runtime/internal/app/authentication/service.go",
+      "device_credential_login_future_tests: runtime/internal/app/authentication/service_test.go",
+      "device_credential_login_service_method: AuthenticateWithDeviceCredential",
+      "device_credential_login_proof_text_encoding: base64url_unpadded",
+      "device_credential_login_proof_raw_length_bytes: 32",
+      "device_credential_login_repository_handoff: application_unit_of_work_capability",
+      "device_credential_login_authentication_lookup_method: FindCredentialByLookupDigest",
+      "device_credential_login_token_store_method: StoreToken",
+      "device_credential_login_player_lookup_method: GetPlayerAccount",
+      "device_credential_login_token_type: opaque_access_token",
+      "device_credential_login_public_error_collapse_defined: true",
+      "device_credential_login_redaction_requirements_defined: true",
+      "device_credential_login_required_tests_defined: true",
+    ],
+    "modules/authentication/module.yaml": [
+      "device_credential_login_service_behavior_gate_defined: true",
+      "device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md",
+      "device_credential_login_service_behavior_gate_decision: ADR-0051",
+      "device_credential_login_future_implementation_work_item: W-0109",
+      "device_credential_login_future_source: runtime/internal/app/authentication/service.go",
+      "device_credential_login_future_tests: runtime/internal/app/authentication/service_test.go",
+      "device_credential_login_service_method: AuthenticateWithDeviceCredential",
+      "device_credential_login_proof_text_encoding: base64url_unpadded",
+      "device_credential_login_proof_raw_length_bytes: 32",
+      "device_credential_login_repository_handoff: application_unit_of_work_capability",
+      "device_credential_login_authentication_lookup_method: FindCredentialByLookupDigest",
+      "device_credential_login_token_store_method: StoreToken",
+      "device_credential_login_player_lookup_method: GetPlayerAccount",
+      "device_credential_login_token_type: opaque_access_token",
+      "device_credential_login_public_error_collapse_defined: true",
+      "device_credential_login_redaction_requirements_defined: true",
+      "device_credential_login_required_tests_defined: true",
+    ],
+  };
+  for (const [file, statusMarkers] of Object.entries(statusMarkersByFile)) {
+    if (!isFile(root, file)) {
+      fail(`${file} is missing device credential login service behavior gate markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of statusMarkers) {
+      if (text.includes(marker)) {
+        ok(`${file} preserves device credential login service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        fail(`${file} is missing device credential login service behavior gate marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, serviceSource)) {
+    const sourceText = readText(path.join(root, serviceSource));
+    const requiredSkeletonMarkers = [
+      "type DeviceCredentialAuthenticationRequest struct",
+      "CredentialProof",
+      "type AuthenticationResult struct",
+      "AccessToken",
+      "TokenRecordID",
+      "CredentialRecordID",
+      "func (s Service) AuthenticateWithDeviceCredential",
+      "PublicErrorAuthenticationNotImplemented",
+    ];
+    for (const marker of requiredSkeletonMarkers) {
+      if (sourceText.includes(marker)) {
+        ok(`${serviceSource} preserves login implementation target marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      } else {
+        fail(`${serviceSource} is missing login implementation target marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      }
+    }
+
+    const sourceWithoutComments = sourceWithoutGoComments(sourceText);
+    const forbiddenUntilW0109Patterns = [
+      { pattern: /\bbase64\./, label: "device credential proof decoding before W-0109" },
+      { pattern: /\bComputeCredentialLookupDigest\b/, label: "credential lookup digest orchestration before W-0109" },
+      { pattern: /\bFindCredentialByLookupDigest\b/, label: "credential repository lookup before W-0109" },
+      { pattern: /\bGetPlayerAccount\b/, label: "player account lookup before W-0109" },
+      { pattern: /\bCompareCredentialVerifierDigest\b/, label: "credential verifier comparison before W-0109" },
+      { pattern: /\bGenerateAccessTokenMaterial\b/, label: "access-token material generation before W-0109" },
+      { pattern: /\bStoreToken\b/, label: "token storage before W-0109" },
+      { pattern: /\bStoreTokenMutation\b/, label: "token storage mutation before W-0109" },
+      { pattern: /\bcrypto\/rand\b/, label: "production entropy import before W-0109" },
+      { pattern: /\bBearer\b/, label: "protocol proof carrier parsing before carrier gate" },
+    ];
+    const forbiddenMatches = textMatchesAny(sourceWithoutComments, forbiddenUntilW0109Patterns);
+    if (forbiddenMatches.length === 0) {
+      ok(`${serviceSource} has not implemented device credential login execution before W-0109`, {
+        rule_id: ruleId,
+        artifact: serviceSource,
+      });
+    } else {
+      for (const match of forbiddenMatches) {
+        fail(`${serviceSource} crosses device credential login service behavior gate: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: serviceSource,
+        });
+      }
+    }
+  } else {
+    fail(`${serviceSource} is missing before device credential login implementation`, {
+      rule_id: ruleId,
+      artifact: serviceSource,
+    });
+  }
+
+  if (isFile(root, serviceTests)) {
+    const testText = readText(path.join(root, serviceTests));
+    const requiredTestMarkers = [
+      "TestAuthenticateWithDeviceCredentialFailsClosedWithoutRepositoryCall",
+      "assertNoSecretLeak",
+      "recordingUnitOfWorkRunner",
+    ];
+    for (const marker of requiredTestMarkers) {
+      if (testText.includes(marker)) {
+        ok(`${serviceTests} preserves skeleton login test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceTests,
+        });
+      } else {
+        fail(`${serviceTests} is missing skeleton login test marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: serviceTests,
+        });
+      }
+    }
+  } else {
+    fail(`${serviceTests} is missing before device credential login implementation`, {
+      rule_id: ruleId,
+      artifact: serviceTests,
+    });
+  }
+}
+
 function checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles) {
   const ruleId = "runtime.local_verifier_key_configuration_loading_gate";
   const standardPath = "docs/local-verifier-key-configuration-loading-gate.md";
@@ -11463,6 +11786,7 @@ function checkRuntime(root) {
   checkRuntimeVerifierDigestComparisonHelperGate(root, goFiles);
   checkRuntimeAuthenticationServiceImplementationReadinessGate(root, goFiles);
   checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFiles);
+  checkRuntimeDeviceCredentialLoginServiceBehaviorGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

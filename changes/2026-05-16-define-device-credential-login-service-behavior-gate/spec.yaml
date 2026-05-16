@@ -1,0 +1,212 @@
+schema_version: 0.1
+change_id: define-device-credential-login-service-behavior-gate
+date: 2026-05-16
+type: standard
+status: verified
+
+summary: Define the device credential login service behavior gate without adding login execution code.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0051
+  referenced:
+    - ADR-0036
+    - ADR-0039
+    - ADR-0040
+    - ADR-0041
+    - ADR-0042
+    - ADR-0043
+    - ADR-0044
+    - ADR-0050
+
+standards:
+  added:
+    - docs/device-credential-login-service-behavior-gate.md
+    - docs/device-credential-login-service-behavior-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+implementation:
+  added: []
+  changed: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  device_credential_login_service_behavior_gate_defined: true
+  device_credential_login_service_behavior_gate_standard: docs/device-credential-login-service-behavior-gate.md
+  device_credential_login_service_behavior_gate_translation: docs/device-credential-login-service-behavior-gate.zh-CN.md
+  device_credential_login_service_behavior_gate_decision: ADR-0051
+  device_credential_login_service_behavior_gate_check_rule: runtime.device_credential_login_service_behavior_gate
+  completed_gate_work_item: W-0108
+  future_implementation_work_item: W-0109
+  implementation_authorized_by_this_standard: false
+  planned_owner: runtime/internal/app
+  planned_package: runtime/internal/app/authentication
+  planned_source: runtime/internal/app/authentication/service.go
+  planned_tests: runtime/internal/app/authentication/service_test.go
+  service_method: AuthenticateWithDeviceCredential
+  login_method: device_credential_login
+  credential_kind: device_credential_login
+  token_kind: access_token
+  token_type: opaque_access_token
+  proof_carrier_status: already_decoded_service_request_only
+  proof_text_encoding: base64url_unpadded
+  proof_raw_length_bytes: 32
+  proof_prevalidation_before_unit_of_work: required
+  repository_handoff: application_unit_of_work_capability
+  authentication_repository_lookup_method: FindCredentialByLookupDigest
+  authentication_repository_token_store_method: StoreToken
+  player_repository_lookup_method: GetPlayerAccount
+  verifier_comparison_before_token_generation: required
+  active_player_account_required: true
+  token_return_after_unit_of_work_success: required
+  public_error_collapse_defined: true
+  redaction_requirements_defined: true
+  required_tests_defined: true
+  login_execution_added: false
+  token_validation_added: false
+  token_issuance_added: false
+  repository_lookup_added: false
+  repository_mutation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protocol_carrier_added: false
+  websocket_handshake_authentication_added: false
+  startup_wiring_added: false
+  authentication_dependencies_added: false
+  repository_interface_changed: false
+  authentication_migrations_changed: false
+  generated_files_changed: false
+  production_authentication_behavior_added: false
+
+workflow:
+  completed_work_item: W-0108
+  completed_milestone: M-036
+  next_milestone: M-037
+  next_ready_work_item: W-0109
+  next_direction: implement_device_credential_login_service_behavior
+
+verification:
+  required:
+    - node -c tools/vibit
+    - cd runtime && go test ./...
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-device-credential-login-service-behavior-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  results:
+    - command: node -c tools/vibit
+      status: passed
+    - command: cd runtime && go test ./...
+      status: passed
+    - command: node tools/vibit check schemas --json
+      status: passed
+      passed: 2054
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check memory --json
+      status: passed
+      passed: 1515
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check contracts --json
+      status: passed
+      passed: 291
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check generated --json
+      status: passed
+      passed: 205
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check runtime --json
+      status: passed
+      passed: 2833
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: node tools/vibit check module authentication --json
+      status: passed
+      passed: 23
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check work --json
+      status: passed
+      passed: 665
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check change define-device-credential-login-service-behavior-gate --json
+      status: passed
+      passed: 13
+      warnings: 0
+      failures: 0
+    - command: node tools/vibit check all --json
+      status: passed
+      subchecks: 161
+      passed: 161
+      warnings: 1
+      failures: 0
+      note: "Known warning: runtime.identity_boundary for runtime/internal/platform/persistence/postgres/authentication_repository.go."
+    - command: git diff --check
+      status: passed
+    - command: "secret scan for GitHub tokens excluding .git and .vibit.local.env"
+      status: passed

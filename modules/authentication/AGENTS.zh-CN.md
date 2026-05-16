@@ -82,6 +82,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-035 Authentication Service Behavior Skeleton` 已完成。`W-0107` 在 `runtime/internal/app/authentication` 下添加了 skeleton service files，不在本模块内。该 skeleton 预留 service vocabulary 和 fail-closed public errors，但不调用 repositories、不决定 proof validity、不构造 validated `RequestIdentity`、不执行 login、不 validate tokens、不 wire startup，也不决定 authentication outcomes。本模块仍是 storage-neutral，只能存储和读取 already-computed digest material。`runtime.authentication_service_behavior_implementation_gate` 是该 skeleton boundary 的 repository check rule。
 
+`M-036 Device Credential Login Service Behavior Gate` 已完成。`W-0108` 已在 `docs/device-credential-login-service-behavior-gate.md` 和 `ADR-0051` 中定义 future login behavior gate，且没有改变本模块。Future login behavior 只能通过 application unit-of-work boundary 调用本模块现有的 `FindCredentialByLookupDigest` 和 `StoreToken` methods。本模块不得 decode proof、compute digests、compare verifiers、generate access-token material、decide player account state、collapse public failures、return raw tokens、wire startup 或拥有 authentication outcomes。`runtime.device_credential_login_service_behavior_gate` 是该 gate 的 repository check rule。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

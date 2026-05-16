@@ -81,6 +81,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-035 Authentication Service Behavior Skeleton` is completed. `W-0107` added the skeleton service files under `runtime/internal/app/authentication`, not this module. The skeleton reserves service vocabulary and fail-closed public errors but does not call repositories, decide proof validity, construct validated `RequestIdentity`, execute login, validate tokens, wire startup, or decide authentication outcomes. This module remains storage-neutral and may store and retrieve already-computed digest material only. `runtime.authentication_service_behavior_implementation_gate` is the repository check rule for the skeleton boundary.
 
+`M-036 Device Credential Login Service Behavior Gate` is completed. `W-0108` defined the future login behavior gate in `docs/device-credential-login-service-behavior-gate.md` and `ADR-0051` without changing this module. Future login behavior may call this module's existing `FindCredentialByLookupDigest` and `StoreToken` methods only through the application unit-of-work boundary. This module must not decode proof, compute digests, compare verifiers, generate access-token material, decide player account state, collapse public failures, return raw tokens, wire startup, or own authentication outcomes. `runtime.device_credential_login_service_behavior_gate` is the repository check rule for this gate.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.
