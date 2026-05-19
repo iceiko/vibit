@@ -83,11 +83,12 @@ purpose: >
   protocol_logout_route_gate: ADR-0079
   transport_close_handoff_gate: ADR-0080
   transport_close_handoff_single_process_implementation: ADR-0081
+  gate_density_optimization: ADR-0082
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: next_direction_confirmation_after_transport_close_handoff_single_process_implementation
+  current_phase: reconnect_connection_epoch_functional_slice
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -4938,32 +4939,28 @@ identity_session_boundary:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0174 implemented only the first single-process transport-owned concrete close handoff for server-observed connection id and epoch.
 
-  next_direction_confirmation_after_transport_close_handoff_single_process_implementation:
+  reconnect_connection_epoch_functional_slice:
     status: active
     milestone: M-103
     next_ready_work_item: W-0175
     previous_milestone: M-102
     previous_completed_work_item: W-0174
-    candidate_directions:
-      - define_reconnect_connection_epoch_gate
-      - define_protocol_session_carrier_gate
-      - define_logout_triggered_socket_close_gate
-      - define_presence_lifecycle_gate
-      - strengthen_operations_observability_and_admin_tooling
-    recommended_direction: define_reconnect_connection_epoch_gate
+    tier: tier_2_functional
+    gate_density_strategy: ADR-0082
+    selected_direction: define_reconnect_connection_epoch_functional_slice
+    boundary_location: changes/2026-05-20-define-reconnect-connection-epoch-functional-slice
     deferred:
       - close_code_mapping
       - close_reason_text
       - logout_triggered_socket_close
       - runtime_session_revocation
-      - reconnect_epoch_behavior
       - protocol_session_carrier
       - presence_lifecycle
       - operations_admin_disconnect
       - dependencies
       - direct_nakama_pitaya_api_compatibility
       - broad_product_modules
-    rule: After W-0174, the queue must select the next lifecycle-closure direction explicitly before adding reconnect, protocol session carriers, logout-triggered close, operations/admin behavior, direct compatibility, or broad product modules.
+    rule: After W-0174 and ADR-0082, reconnect/connection epoch behavior proceeds as a Tier 2 functional slice with the boundary embedded in the change spec instead of a pure direction-confirmation milestone.
 
 persistence_model:
   decision: ADR-0011

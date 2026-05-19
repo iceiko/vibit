@@ -22,6 +22,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "markdown.section",
   "markdown.heading",
   "markdown.metadata",
+  "markdown.unique_id",
   "module.registry_match",
   "contract.registry_declared",
   "contract.registry_entry",
@@ -3583,6 +3584,7 @@ function checkMemory(root) {
     });
   }
 
+  const decisionIds = new Map();
   for (const conversation of conversations) {
     requireMarkdownHeading(root, conversation, "Conversation:");
     requireMarkdownField(root, conversation, "Date");
@@ -3601,6 +3603,13 @@ function checkMemory(root) {
   for (const decision of decisions) {
     const heading = requireMarkdownHeading(root, decision, "ADR-");
     const idFromFile = path.basename(decision).match(/^(ADR-\d{4})-/);
+    if (idFromFile) {
+      const decisionId = idFromFile[1];
+      if (!decisionIds.has(decisionId)) {
+        decisionIds.set(decisionId, []);
+      }
+      decisionIds.get(decisionId).push(decision);
+    }
     if (heading && idFromFile && heading.startsWith(idFromFile[1])) {
       ok(`${decision} heading matches file id`);
     } else if (idFromFile) {
@@ -3619,6 +3628,20 @@ function checkMemory(root) {
       "Reversal Conditions",
       "Follow-Up",
     ]);
+  }
+
+  for (const [decisionId, files] of decisionIds.entries()) {
+    if (files.length === 1) {
+      ok(`${decisionId} is unique`, {
+        rule_id: "markdown.unique_id",
+        artifact: files[0],
+      });
+    } else {
+      fail(`${decisionId} is used by multiple ADR files: ${files.join(", ")}`, {
+        rule_id: "markdown.unique_id",
+        artifact: files[0],
+      });
+    }
   }
 
   finish({
@@ -19497,8 +19520,14 @@ function checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFi
     [".arch/work-items.yaml", "title: Implement transport close handoff single process"],
     [".arch/work-items.yaml", "status: completed"],
     [".arch/work-items.yaml", "id: M-103"],
+    [".arch/work-items.yaml", "title: Reconnect Connection Epoch Functional Slice"],
     [".arch/work-items.yaml", "id: W-0175"],
+    [".arch/work-items.yaml", "title: Define reconnect connection epoch functional slice"],
+    [".arch/work-items.yaml", "tier: tier_2_functional"],
+    [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "reconnect_connection_epoch_functional_slice:"],
+    [".arch/runtime.yaml", "gate_density_strategy: ADR-0082"],
     [".arch/runtime.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
     [".arch/runtime.yaml", "check_rule: runtime.transport_close_handoff_single_process_implementation"],
     [".arch/runtime.yaml", "transport_handoff_owner: runtime/internal/platform/transport/ws"],
@@ -19509,7 +19538,7 @@ function checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFi
     [".arch/contracts.yaml", "transport_close_handoff_single_process_implementation:"],
     [".arch/contracts.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
     [".arch/reference.yaml", "phase_2cl_transport_close_handoff_single_process_implementation"],
-    [".arch/reference.yaml", "phase_2cm_next_direction_confirmation_after_transport_close_handoff_single_process_implementation"],
+    [".arch/reference.yaml", "phase_2cm_reconnect_connection_epoch_functional_slice"],
     ["modules/authentication/module.yaml", "transport_close_handoff_single_process_implementation:"],
     ["modules/authentication/module.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
     ["AGENTS.md", "M-102 Transport Close Handoff Single Process Implementation"],
@@ -21319,7 +21348,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
-    ["W-0174", "current_phase: next_direction_confirmation_after_transport_close_handoff_single_process_implementation"],
+    ["W-0174", "current_phase: reconnect_connection_epoch_functional_slice"],
     ["W-0173", "current_phase: transport_close_handoff_single_process_implementation"],
     ["W-0172", "current_phase: next_direction_confirmation_after_transport_close_handoff_gate"],
     ["W-0171", "current_phase: transport_close_handoff_gate"],

@@ -1893,17 +1893,19 @@ milestones:
     completion_summary: Implemented a WebSocket transport-owned single-process close handoff. The implementation registers accepted sockets by server-observed connection id and epoch, exposes `RequestClose` with redacted outcomes, uses concrete socket mechanics without selecting close codes or reason text, protects stale epochs, and keeps application close policy, active connection registry policy, authentication logout behavior, runtime sessions, reconnect behavior, protocol carriers, dependencies, and direct Nakama/Pitaya API compatibility deferred.
 
   - id: M-103
-    title: Next Direction Confirmation After Transport Close Handoff Single Process Implementation
+    title: Reconnect Connection Epoch Functional Slice
     status: active
-    goal: Select the next lifecycle-closure direction after implementing the first concrete WebSocket transport close handoff.
+    goal: Define and implement the first bounded reconnect/connection epoch behavior as a Tier 2 functional slice after the concrete transport close handoff.
     completion_criteria:
-      - The next direction is selected from the Nakama/Pitaya product parity roadmap lifecycle phase.
-      - The selected direction preserves close code mapping, close reason text, logout-triggered close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, and broad product modules behind explicit gates unless selected.
-      - The resulting next ready work item is bounded and checkable.
+      - The slice records the reconnect/connection epoch boundary in its change spec before implementation.
+      - The implementation, if added in the slice, remains bounded to server-observed connection epoch semantics and focused tests.
+      - Close code mapping, close reason text, logout-triggered close, runtime session revocation, protocol session carriers, presence, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, and broad product modules remain behind explicit ask-first boundaries.
+      - The resulting state is checkable through focused tests and repository checks.
     non_goals:
-      - selecting close code mapping or player-visible close reason text in the confirmation step
-      - making logout automatically close sockets in the confirmation step
-      - adding reconnect, duplicate replacement, protocol session carriers, presence, chat, friends, groups, matchmaking, match runtime, cluster, SDK, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility without selection
+      - selecting close code mapping or player-visible close reason text
+      - making logout automatically close sockets
+      - revoking runtime sessions
+      - adding protocol session carriers, presence, chat, friends, groups, matchmaking, match runtime, cluster, SDK, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -6066,21 +6068,18 @@ work_items:
 
   - id: W-0175
     milestone: M-103
-    title: Confirm next direction after transport close handoff single-process implementation
+    title: Define reconnect connection epoch functional slice
     status: next_ready
-    change: changes/2026-05-19-confirm-next-direction-after-transport-close-handoff-single-process-implementation
+    change: changes/2026-05-20-define-reconnect-connection-epoch-functional-slice
     depends_on:
       - W-0174
-    expected_change_id: confirm-next-direction-after-transport-close-handoff-single-process-implementation
-    candidate_directions:
-      - define_reconnect_connection_epoch_gate
-      - define_protocol_session_carrier_gate
-      - define_logout_triggered_socket_close_gate
-      - define_presence_lifecycle_gate
-      - strengthen_operations_observability_and_admin_tooling
-    recommended_direction: define_reconnect_connection_epoch_gate
+    expected_change_id: define-reconnect-connection-epoch-functional-slice
+    tier: tier_2_functional
+    selected_direction: define_reconnect_connection_epoch_functional_slice
+    gate_density_strategy: ADR-0082
     ask_first:
-      - Selecting reconnect/epoch behavior, protocol session carriers, logout-triggered socket close, close code mapping, close reason text, runtime session revocation, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, durable/distributed close handoff, or broad product module expansion.
+      - Selecting close code mapping, close reason text, logout-triggered socket close, runtime session revocation, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, durable/distributed close handoff, or broad product module expansion.
     completion:
-      - Select the next lifecycle-closure direction after the concrete transport close handoff implementation.
-      - Preserve close code mapping, close reason text, logout-triggered socket close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, and broad product behavior behind later gates unless explicitly selected.
+      - Create a change spec that embeds the reconnect/connection epoch boundary instead of creating a separate confirmation gate.
+      - Define the smallest checkable reconnect/epoch behavior for the next functional slice.
+      - Preserve close code mapping, close reason text, logout-triggered socket close, runtime session revocation, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, and broad product behavior behind ask-first boundaries.

@@ -568,7 +568,44 @@ Not applicable: <reason>
 - 修改 server runtime language、primary protocol direction、persistence direction 或 core project thesis
 - 添加重大的外部框架依赖
 
-## 11. 禁止事项
+## 11. 分层 Gate 策略
+
+不是所有 work item 都需要同样重的 gate 成本。使用以下分层，在安全性和推进效率之间取得平衡：
+
+### Tier 1 — Security-Critical（两步：Gate + Implementation）
+
+适用于 cryptography、verifier algorithms、Protobuf wire format、credential schema、token lifecycle、secret configuration。
+
+- 需要先用独立 gate milestone 定义边界，再进入实现。
+- Gate 必须包含 threat model、redaction rules、fail-closed behavior 和 dependency posture。
+- Implementation 作为后续独立 bounded work item 推进。
+
+### Tier 2 — Functional Implementation（单步）
+
+适用于 transport features、application policy、registry behavior、route registration、protocol bridge、session lifecycle、connection lifecycle。
+
+- 使用单个 implementation work item，并把边界定义嵌入 change spec。
+- 不要求单独 gate milestone。
+- 仍必须包含 focused tests、`vibit check all` 和 verification record。
+
+### Tier 3 — Lightweight（直接实现）
+
+适用于 documentation、translation、简单 check rules、小型 tooling edits，以及已经 ratify 的机械性 migration-source updates。
+
+- 非平凡时才需要 change spec；简单变更可以直接实现。
+- 不要把新的 data ownership、新 schema semantics、新 dependencies 或新的 runtime behavior 归为 Tier 3。
+- 通过 `vibit check all` 或相关静态检查完成验证即可。
+
+### Direction Confirmation
+
+- Direction confirmation milestones 不再要求作为独立 work item。
+- 方向通过 work item 的 `ask_first` 字段和 continuation semantics 的 `recommended_direction` 管理。
+- 如果方向选择足够重大，用 ADR 记录。
+- 当推荐方向已经明确，且工作属于 Tier 2 时，应直接进入有边界的功能切片，而不是创建纯 confirmation milestone。
+
+## 12. 通用禁止事项
+
+以下禁止事项适用于所有 milestones 和 work items。不要在单个 milestone 的 `non_goals` 或 work item 的 `ask_first` 中反复重复：
 
 禁止：
 
@@ -580,10 +617,12 @@ Not applicable: <reason>
 - 添加无类型 cross-module payloads
 - 在没有声明边界的情况下做大范围仓库编辑
 - 无记录地手工编辑 generated files
-- 英文公共文档发生实质变更后，让中文译本静默落后
+- 英文核心文档发生实质变更后，让中文译本静默落后
 - 没有运行验证却声称已验证
+- 没有明确 ADR 就添加 direct Nakama/Pitaya API compatibility
+- 没有 dependency adoption record 就添加 dependencies
 
-## 12. 新增标准时
+## 13. 新增标准时
 
 新增标准应说明：
 
@@ -597,7 +636,7 @@ Not applicable: <reason>
 
 优先选择可以被执行和检查的小标准，而不是无法检查的宏大表述。
 
-## 13. 新增实现代码时
+## 14. 新增实现代码时
 
 不要一开始就把框架代码分散到整个仓库。
 
@@ -609,7 +648,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 
 一个好的第一版实现目标，应包含一个小而完整的后端领域，例如 player accounts、inventory、currency、rewards、quests 或 match sessions。
 
-## 14. 自举控制
+## 15. 自举控制
 
 Self-bootstrapping 只有在它能改善通向可工作服务器框架的路径时才有价值。
 
@@ -639,7 +678,7 @@ Runtime readiness 只应回答让第一个 slice 成立所必需的决策：
 
 例外情况应记录在 change spec 或 Agent Decision Record 中。
 
-## 15. 交接要求
+## 16. 交接要求
 
 每次变更结束时，都要给下一个 agent 或 human 留下足够上下文。
 
@@ -669,6 +708,8 @@ Runtime readiness 只应回答让第一个 slice 成立所必需的决策：
 
 `M-101 Next Direction Confirmation After Transport Close Handoff Gate` 已完成。`W-0173` 选择了 `implement_transport_close_handoff_single_process` 作为下一步 lifecycle-closure direction。当前 work queue active 在 `M-102/W-0174`，next ready work item 是 `implement_transport_close_handoff_single_process`。该 implementation 只能通过 WebSocket transport-owned handoff target server-observed `connection_id + epoch`，同时保持 application-owned close policy 和 transport credential neutrality。不要在此 slice 中选择 close codes、close reason text、logout-triggered socket close、runtime session revocation、reconnect/epoch behavior、protocol session carriers、operations/admin disconnect、dependencies、direct Nakama/Pitaya API compatibility 或 broad product modules。
 
-`M-102 Transport Close Handoff Single Process Implementation` 已完成。`W-0174` 添加了 `runtime/internal/platform/transport/ws/close_handoff.go`、`runtime/internal/platform/transport/ws/close_handoff_test.go` 和 `ADR-0081`。WebSocket transport 现在拥有 single-process in-memory accepted socket table，并通过 server-observed `connection_id + epoch` 暴露 `RequestClose`，返回 close requested、socket not found、epoch mismatch、already closed 和 close failed 等 redacted outcomes。该实现不解析 credentials，不改变 Protobuf envelope/logout/session behavior，不选择 close codes 或 reason text，也不添加 logout-triggered socket close、runtime session revocation、reconnect behavior、protocol session carriers、operations/admin disconnect、dependencies、direct Nakama/Pitaya API compatibility 或 broad product modules。当前 work queue active 在 `M-103/W-0175`，next ready work item 是 `confirm_next_direction_after_transport_close_handoff_single_process_implementation`。
+`M-102 Transport Close Handoff Single Process Implementation` 已完成。`W-0174` 添加了 `runtime/internal/platform/transport/ws/close_handoff.go`、`runtime/internal/platform/transport/ws/close_handoff_test.go` 和 `ADR-0081`。WebSocket transport 现在拥有 single-process in-memory accepted socket table，并通过 server-observed `connection_id + epoch` 暴露 `RequestClose`，返回 close requested、socket not found、epoch mismatch、already closed 和 close failed 等 redacted outcomes。该实现不解析 credentials，不改变 Protobuf envelope/logout/session behavior，不选择 close codes 或 reason text，也不添加 logout-triggered socket close、runtime session revocation、reconnect behavior、protocol session carriers、operations/admin disconnect、dependencies、direct Nakama/Pitaya API compatibility 或 broad product modules。当前 work queue active 在 `M-103/W-0175`，next ready work item 是 `define_reconnect_connection_epoch_functional_slice`。
+
+`ADR-0082` 采纳了分层 gate density strategy。Security-critical work 仍保持 gate plus implementation 两步；transport features、application policy、registry behavior、route registration、protocol bridges、session lifecycle、connection lifecycle 等 functional work 通常应作为单个 bounded work item 推进，并把边界嵌入 change spec；轻量 docs/tooling/translation/check-rule work 在简单时可以直接实现。未来 Tier 2 work 不再强制使用独立 direction confirmation milestone；用 `ask_first`、`recommended_direction` 和重大方向变化的 ADR 管理方向。`M-103/W-0175` 是该策略的第一个前向应用，应作为 bounded reconnect/connection epoch functional slice 推进，而不是纯 confirmation step。
 
 后续 major work 必须映射到一个 roadmap family：identity/auth/session、connection lifecycle、storage、presence/status/notifications、chat/realtime messaging、friends/groups/parties、leaderboards/tournaments、economy/progression、matchmaking、match runtime、server runtime hooks/RPC、operations、SDK/developer experience 或 distributed runtime。近期优先级是 lifecycle closure：protocol logout route、transport close handoff、reconnect/epoch、protocol session carrier，然后才是 presence。在 logout/close/reconnect/session-carrier 语义未解决前，不要直接跳到 chat、social modules、matchmaking、match runtime、SDKs 或 distributed runtime。

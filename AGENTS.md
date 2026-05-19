@@ -1,7 +1,7 @@
 # Agent Operating Guide
 
-Status: Draft v0.2  
-Last updated: 2026-05-19
+Status: Draft v0.2
+Last updated: 2026-05-20
 Scope: Repository-level operating instructions for coding agents  
 Canonical source: `CONSTITUTION.md`
 
@@ -590,9 +590,10 @@ Applies to: transport features, application policy, registry behavior, route reg
 
 ### Tier 3 — Lightweight (Direct Implementation)
 
-Applies to: documentation, tooling, migration source, translation, check rules.
+Applies to: documentation, translation, simple check rules, small tooling edits, and already-ratified mechanical migration-source updates.
 
 - Direct implementation without change spec unless non-trivial.
+- Do not classify new data ownership, new schema semantics, new dependencies, or new runtime behavior as Tier 3.
 - Verification through `vibit check all` is sufficient.
 
 ### Direction Confirmation
@@ -600,6 +601,7 @@ Applies to: documentation, tooling, migration source, translation, check rules.
 - Direction confirmation milestones are **not required** as separate work items.
 - Direction is managed through `ask_first` fields on work items and `recommended_direction` on continuation semantics.
 - If a direction choice is significant enough, record it as an ADR.
+- When the recommended direction is already explicit and the work is Tier 2, continue directly into a bounded functional slice instead of creating a pure confirmation milestone.
 
 ## 12. Universal Prohibitions
 
@@ -706,6 +708,8 @@ If the work is incomplete, state the next concrete action.
 
 `M-101 Next Direction Confirmation After Transport Close Handoff Gate` is completed. `W-0173` selected `implement_transport_close_handoff_single_process` as the next lifecycle-closure direction. The current work queue is active at `M-102/W-0174`, and the next ready work item is `implement_transport_close_handoff_single_process`. This implementation may target only server-observed `connection_id + epoch` through a WebSocket transport-owned handoff while preserving application-owned close policy and transport credential neutrality. Do not select close codes, close reason text, logout-triggered socket close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, or broad product modules in this slice.
 
-`M-102 Transport Close Handoff Single Process Implementation` is completed. `W-0174` added `runtime/internal/platform/transport/ws/close_handoff.go`, `runtime/internal/platform/transport/ws/close_handoff_test.go`, and `ADR-0081`. WebSocket transport now owns a single-process in-memory accepted socket table and exposes `RequestClose` by server-observed `connection_id + epoch`, returning redacted outcomes for close requested, socket not found, epoch mismatch, already closed, and close failed. The implementation does not parse credentials, does not change Protobuf envelope/logout/session behavior, does not select close codes or reason text, and does not add logout-triggered socket close, runtime session revocation, reconnect behavior, protocol session carriers, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, or broad product modules. The current work queue is active at `M-103/W-0175`, and the next ready work item is `confirm_next_direction_after_transport_close_handoff_single_process_implementation`.
+`M-102 Transport Close Handoff Single Process Implementation` is completed. `W-0174` added `runtime/internal/platform/transport/ws/close_handoff.go`, `runtime/internal/platform/transport/ws/close_handoff_test.go`, and `ADR-0081`. WebSocket transport now owns a single-process in-memory accepted socket table and exposes `RequestClose` by server-observed `connection_id + epoch`, returning redacted outcomes for close requested, socket not found, epoch mismatch, already closed, and close failed. The implementation does not parse credentials, does not change Protobuf envelope/logout/session behavior, does not select close codes or reason text, and does not add logout-triggered socket close, runtime session revocation, reconnect behavior, protocol session carriers, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, or broad product modules. The current work queue is active at `M-103/W-0175`, and the next ready work item is `define_reconnect_connection_epoch_functional_slice`.
+
+`ADR-0082` adopts the tiered gate density strategy. Security-critical work remains two-step gate plus implementation. Functional work such as transport features, application policy, registry behavior, route registration, protocol bridges, session lifecycle, and connection lifecycle should usually be a single bounded work item with the boundary embedded in its change spec. Lightweight docs/tooling/translation/check-rule work may be direct when trivial. Direction confirmation milestones are no longer mandatory for future Tier 2 work; use `ask_first`, `recommended_direction`, and ADRs for significant direction changes. `M-103/W-0175` is the first prospective application of this strategy and should proceed as the bounded reconnect/connection epoch functional slice rather than as a pure confirmation step.
 
 Future major work must map to a roadmap family: identity/auth/session, connection lifecycle, storage, presence/status/notifications, chat/realtime messaging, friends/groups/parties, leaderboards/tournaments, economy/progression, matchmaking, match runtime, server runtime hooks/RPC, operations, SDK/developer experience, or distributed runtime. The near-term priority is lifecycle closure: protocol logout route, transport close handoff, reconnect/epoch, protocol session carrier, then presence. Do not jump directly to chat, social modules, matchmaking, match runtime, SDKs, or distributed runtime while logout/close/reconnect/session-carrier semantics remain unresolved.

@@ -1,7 +1,7 @@
-# ADR-0081: Gate Density Optimization
+# ADR-0082: Gate Density Optimization
 
 Status: Accepted
-Date: 2026-05-19
+Date: 2026-05-20
 Scope: Workflow governance, milestone gating, development velocity
 
 ## Context
@@ -16,9 +16,11 @@ Adopt a three-tier gate strategy:
 
 - **Tier 1 — Security-Critical** (Two-Step: Gate + Implementation): Applies to cryptography, verifier algorithms, Protobuf wire format, credential schema, token lifecycle, secret configuration. Retains the existing two-step process.
 - **Tier 2 — Functional Implementation** (Single Step): Applies to transport features, application policy, registry behavior, route registration, protocol bridge, session lifecycle, connection lifecycle. Single implementation work item with boundary in change spec.
-- **Tier 3 — Lightweight** (Direct Implementation): Applies to documentation, tooling, migration source, translation, check rules. Direct implementation without change spec unless non-trivial.
+- **Tier 3 — Lightweight** (Direct Implementation): Applies to documentation, translation, simple check rules, small tooling edits, and already-ratified mechanical migration-source updates. Direct implementation without change spec is allowed only when the change is trivial and does not introduce new data ownership, new schema semantics, new dependencies, or new runtime behavior.
 
 Direction confirmation milestones are no longer mandatory. Direction is managed through `ask_first` fields and `recommended_direction` on continuation semantics.
+
+Apply this strategy prospectively. `M-103/W-0175` is the first queue transition that should stop using a dedicated direction-confirmation step and instead move directly into the recommended Tier 2 functional slice.
 
 ## Alternatives Considered
 
@@ -27,6 +29,8 @@ Direction confirmation milestones are no longer mandatory. Direction is managed 
 2. **Remove all gates entirely**: Direct implementation for everything. Rejected because security-critical boundaries (cryptography, credential schema, token lifecycle) genuinely benefit from separate threat-model and boundary documentation before implementation.
 
 3. **Two-tier system (security vs everything else)**: Simpler but loses the distinction between functional features (which still benefit from embedded boundary definitions) and lightweight changes (which need almost no ceremony).
+
+4. **Classify all migration sources as lightweight**: Rejected because new schema semantics and data ownership need explicit boundaries. Only already-ratified mechanical migration-source updates belong in Tier 3.
 
 ## Rationale
 
@@ -53,6 +57,7 @@ Analysis of M-001 through M-102 showed that gate-only milestones consistently pr
 - Existing completed milestones are not retroactively changed.
 - Chinese translation for feature-level documents is relaxed to asynchronous/deferred.
 - Universal prohibitions (Nakama/Pitaya compatibility, dependency adoption) are consolidated in `AGENTS.md` Section 12 rather than repeated per-milestone.
+- ADR identifiers remain unique; this decision uses `ADR-0082` because `ADR-0081` already records the transport close handoff single-process implementation.
 
 ## Reversal Conditions
 
@@ -62,6 +67,6 @@ Analysis of M-001 through M-102 showed that gate-only milestones consistently pr
 
 ## Follow-Up
 
-- Apply Tier 2 strategy to the next functional milestone (M-103 and beyond).
+- Apply Tier 2 strategy to the next functional milestone (`M-103/W-0175`) by making the next ready item a bounded reconnect/connection epoch slice instead of a pure direction-confirmation step.
 - Monitor whether embedded boundaries in change specs provide sufficient agent context.
 - Do not retroactively reclassify completed milestones.

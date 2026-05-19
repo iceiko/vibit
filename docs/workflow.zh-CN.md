@@ -1,7 +1,7 @@
 # Work Continuation Workflow 中文版
 
-状态：Draft v0.1
-最后更新：2026-05-13
+状态：Draft v0.2
+最后更新：2026-05-20
 范围：maintainer-agent continuation、work item sequencing 和 roadmap state
 说明：本文件是 `docs/workflow.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
@@ -172,3 +172,35 @@ node tools/vibit check all
 `check work` 验证 `.arch/work-items.yaml` 和本 workflow standard 是否存在并基本一致。
 
 未来 checks 可以验证 dependency ordering、单步 state transitions，以及 completed work items 是否链接到存在的 commits。
+
+## 11. Gate Density Strategy
+
+本节记录 `ADR-0082` 采纳的分层 gate 策略，用来在架构安全和开发效率之间取得更好的平衡。
+
+### 问题
+
+早期 workflow 对很多功能性实现也使用独立 gate milestone 和 direction confirmation milestone。这个做法对 cryptography、credential schema、token lifecycle 等安全敏感边界有价值，但对 transport feature、route registration、connection lifecycle 这类功能性工作会带来过高流程成本。
+
+### 分层
+
+权威 tier 定义见 `AGENTS.md` 第 11 节：
+
+- **Tier 1**（Security-Critical）：保留 gate + implementation 两步。
+- **Tier 2**（Functional）：单个 implementation work item，边界写入 change spec。
+- **Tier 3**（Lightweight）：trivial docs、translations、简单 checks、小型 tooling edits，以及已经 ratify 的机械性 migration-source updates 可以直接实现。
+
+该策略只面向未来工作。已经完成的 milestones 不做追溯改写。
+
+### Direction Confirmation
+
+Direction confirmation milestones 不再是强制要求。方向选择通过以下机制管理：
+
+- work item 上的 `ask_first` 字段
+- continuation semantics 上的 `recommended_direction`
+- 对重大方向变化使用 ADR 记录
+
+当推荐的 Tier 2 方向已经明确，且没有触发 ask-first boundary 时，下一个 ready work item 应直接是有边界的功能切片，而不是纯 direction-confirmation item。
+
+### Existing Gates
+
+不要追溯修改已完成 milestone 的 gate 结构。新策略适用于未来 work items。

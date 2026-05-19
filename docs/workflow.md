@@ -1,7 +1,7 @@
 # Work Continuation Workflow
 
 Status: Draft v0.2
-Last updated: 2026-05-19
+Last updated: 2026-05-20
 Scope: Maintainer-agent continuation, work item sequencing, and roadmap state
 
 This standard defines how vibit agents decide what "continue" means.
@@ -176,7 +176,7 @@ Future checks may validate dependency ordering, one-step state transitions, and 
 
 ## 11. Gate Density Strategy
 
-This section codifies the tiered gate strategy adopted in ADR-0081 to optimize the balance between architectural safety and development velocity.
+This section codifies the tiered gate strategy adopted in ADR-0082 to optimize the balance between architectural safety and development velocity.
 
 ### Problem
 
@@ -188,7 +188,9 @@ See `AGENTS.md` Section 11 for the authoritative tier definitions:
 
 - **Tier 1** (Security-Critical): Two-step gate + implementation.
 - **Tier 2** (Functional): Single implementation step with boundary in change spec.
-- **Tier 3** (Lightweight): Direct implementation.
+- **Tier 3** (Lightweight): Direct implementation for trivial docs, translations, simple checks, small tooling edits, and already-ratified mechanical migration-source updates.
+
+Tiering is prospective. Completed milestones keep their recorded structure.
 
 ### Direction Confirmation
 
@@ -197,6 +199,8 @@ Direction confirmation milestones are no longer mandatory. Direction choices are
 - `ask_first` fields on work items
 - `recommended_direction` on continuation semantics
 - ADRs for significant direction changes
+
+When a recommended Tier 2 direction is already explicit and no ask-first boundary is crossed, the next ready work item should be the bounded functional slice itself, not a pure direction-confirmation item.
 
 ### Existing Gates
 
