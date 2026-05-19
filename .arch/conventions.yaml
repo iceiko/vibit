@@ -3928,13 +3928,36 @@ transport_close_handoff_single_process_implementation:
   direct_nakama_pitaya_api_compatibility_added: false
 
 reconnect_connection_epoch_functional_slice:
-  status: active
+  status: completed
   milestone: M-103
-  next_ready_work_item: W-0175
+  completed_work_item: W-0175
+  decision: ADR-0083
   previous_completed_work_item: W-0174
   tier: tier_2_functional
   gate_density_strategy: ADR-0082
   selected_direction: define_reconnect_connection_epoch_functional_slice
+  reconnect_connection_epoch_functional_slice_completed: true
+  check_rule: runtime.reconnect_connection_epoch_functional_slice
+  application_registry_owner: runtime/internal/app/connection
+  first_epoch_behavior: server_observed_newer_epoch_supersedes_earlier_active_epoch
+  stale_epoch_rejection_added: true
+  stale_epoch_error_code: connection_epoch_stale
+  superseded_state_added: true
+  durable_reconnect_resume_added: false
+  duplicate_replacement_close_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  next_ready_work_item: W-0176
+
+protocol_session_carrier_functional_slice:
+  status: active
+  milestone: M-104
+  next_ready_work_item: W-0176
+  previous_completed_work_item: W-0175
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  selected_direction: define_protocol_session_carrier_functional_slice
 
 server_runtime:
   first_reference_language: Go

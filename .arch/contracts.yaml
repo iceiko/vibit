@@ -198,6 +198,26 @@ implemented_wire_and_runtime_slices:
     dependencies_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0174 added only the narrow single-process transport close handoff authorized by ADR-0080.
+  reconnect_connection_epoch_functional_slice:
+    status: completed
+    completed_work_item: W-0175
+    decision: ADR-0083
+    reconnect_connection_epoch_functional_slice_completed: true
+    check_rule: runtime.reconnect_connection_epoch_functional_slice
+    application_registry_owner: runtime/internal/app/connection
+    first_epoch_behavior: server_observed_newer_epoch_supersedes_earlier_active_epoch
+    stale_epoch_error_code: connection_epoch_stale
+    superseded_state_added: true
+    protocol_source_added: false
+    generated_output_added: false
+    protobuf_envelope_changed: false
+    reconnect_token_added: false
+    resume_route_added: false
+    logout_triggered_socket_close_added: false
+    runtime_session_revocation_added: false
+    protocol_session_carrier_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0175 added only application-owned connection epoch progression semantics and did not add protocol contracts or generated output.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

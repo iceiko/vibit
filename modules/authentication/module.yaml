@@ -373,6 +373,22 @@ external_runtime_slices:
     protocol_session_carrier_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     module_ownership_rule: W-0174 added only a WebSocket transport-owned in-process close handoff by server-observed connection id and epoch. Authentication remains token lifecycle service logic only and must not own concrete socket mechanics.
+  reconnect_connection_epoch_functional_slice:
+    status: completed
+    completed_work_item: W-0175
+    decision: ADR-0083
+    check_rule: runtime.reconnect_connection_epoch_functional_slice
+    application_registry_owner: runtime/internal/app/connection
+    authentication_module_owns_reconnect_epoch_behavior: false
+    stale_epoch_error_code: connection_epoch_stale
+    superseded_state_added: true
+    protocol_session_carrier_added: false
+    reconnect_token_added: false
+    resume_route_added: false
+    logout_triggered_socket_close_added: false
+    runtime_session_revocation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    module_ownership_rule: W-0175 added only application registry-owned connection epoch progression. Authentication remains token lifecycle service logic and must not own reconnect, epoch, resume, socket close, or runtime session revocation behavior.
 
 decisions:
   - ADR-0029

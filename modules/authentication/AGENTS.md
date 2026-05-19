@@ -153,6 +153,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-102 Transport Close Handoff Single Process Implementation` is completed outside this module's ownership. `W-0174` added a WebSocket transport-owned single-process close handoff by server-observed `connection_id + epoch`; `ADR-0081` records the implementation. Authentication remains token lifecycle service logic only. Authentication must not call WebSocket transport, own concrete socket close handoff, close sockets after logout, choose close codes or close reason text, revoke runtime sessions, add protocol session carriers, or add direct Nakama/Pitaya API compatibility. `ADR-0082` moves the next lifecycle work into a Tier 2 reconnect/connection epoch functional slice. The current next ready work item is `M-103/W-0175 define_reconnect_connection_epoch_functional_slice`.
 
+`M-103 Reconnect Connection Epoch Functional Slice` is completed outside this module's ownership. `W-0175` added application registry-owned connection epoch progression in `runtime/internal/app/connection` and `ADR-0083`. Authentication remains token lifecycle service logic only. Authentication must not own reconnect, epoch progression, resume behavior, protocol session carriers, socket close behavior, logout-triggered close, runtime session revocation, or direct Nakama/Pitaya API compatibility. The current next ready work item is `M-104/W-0176 define_protocol_session_carrier_functional_slice`.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

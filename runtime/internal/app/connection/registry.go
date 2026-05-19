@@ -23,6 +23,7 @@ const (
 	StateBound       State = "bound"
 	StateClosed      State = "closed"
 	StateInvalidated State = "invalidated"
+	StateSuperseded  State = "superseded"
 )
 
 func (s State) IsActive() bool {
@@ -44,6 +45,7 @@ type ErrorCode string
 const (
 	ErrorCodeConnectionInvalid      ErrorCode = "connection_invalid"
 	ErrorCodeConnectionAlreadyOpen  ErrorCode = "connection_already_open"
+	ErrorCodeConnectionEpochStale   ErrorCode = "connection_epoch_stale"
 	ErrorCodeConnectionNotFound     ErrorCode = "connection_not_found"
 	ErrorCodeConnectionNotActive    ErrorCode = "connection_not_active"
 	ErrorCodeIdentityInvalid        ErrorCode = "identity_invalid"
@@ -94,6 +96,8 @@ type Record struct {
 	CloseReasonClass    string
 	InvalidatedAt       *time.Time
 	InvalidationClass   string
+	SupersededAt        *time.Time
+	SupersededByEpoch   ConnectionEpoch
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
 }
@@ -162,6 +166,10 @@ func (r *InMemoryRegistry) RegisterOpenConnection(ctx context.Context, command O
 	if existing, ok := r.records[key]; ok && existing.State.IsActive() {
 		return Record{}, registryError(ErrorCodeConnectionAlreadyOpen, nil)
 	}
+	if latestEpoch := r.latestObservedEpochLocked(command.ConnectionID); latestEpoch >= command.ConnectionEpoch {
+		return Record{}, registryError(ErrorCodeConnectionEpochStale, nil)
+	}
+	r.supersedeActiveEarlierEpochsLocked(command.ConnectionID, command.ConnectionEpoch, command.OpenedAt)
 
 	record := Record{
 		ConnectionID:    command.ConnectionID,
@@ -315,6 +323,29 @@ func (r *InMemoryRegistry) ListConnectionsByAccessTokenRecordID(ctx context.Cont
 	})
 }
 
+func (r *InMemoryRegistry) latestObservedEpochLocked(connectionID ConnectionID) ConnectionEpoch {
+	var latest ConnectionEpoch
+	for key := range r.records {
+		if key.connectionID == connectionID && key.connectionEpoch > latest {
+			latest = key.connectionEpoch
+		}
+	}
+	return latest
+}
+
+func (r *InMemoryRegistry) supersedeActiveEarlierEpochsLocked(connectionID ConnectionID, newEpoch ConnectionEpoch, observedAt time.Time) {
+	for key, record := range r.records {
+		if key.connectionID != connectionID || key.connectionEpoch >= newEpoch || !record.State.IsActive() {
+			continue
+		}
+		record.State = StateSuperseded
+		record.SupersededAt = copyTime(observedAt)
+		record.SupersededByEpoch = newEpoch
+		record.UpdatedAt = observedAt
+		r.records[key] = record
+	}
+}
+
 func (r *InMemoryRegistry) listActive(match func(Record) bool) []Record {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
@@ -454,6 +485,7 @@ func copyRecord(record Record) Record {
 	record.LastSeenAt = copyTimeValue(record.LastSeenAt)
 	record.ClosedAt = copyTimeValue(record.ClosedAt)
 	record.InvalidatedAt = copyTimeValue(record.InvalidatedAt)
+	record.SupersededAt = copyTimeValue(record.SupersededAt)
 	return record
 }
 

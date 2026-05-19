@@ -112,6 +112,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.protocol_logout_route_implementation",
   "runtime.transport_close_handoff_gate",
   "runtime.transport_close_handoff_single_process_implementation",
+  "runtime.reconnect_connection_epoch_functional_slice",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -19673,6 +19674,193 @@ function checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFi
   });
 }
 
+function checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles) {
+  const ruleId = "runtime.reconnect_connection_epoch_functional_slice";
+  const changePath = "changes/2026-05-20-define-reconnect-connection-epoch-functional-slice";
+  const decisionPath = "decisions/ADR-0083-reconnect-connection-epoch-functional-slice.md";
+  const conversationPath = "conversations/2026-05-20-reconnect-connection-epoch-functional-slice.md";
+
+  if (!workItemHasStatus(root, "W-0175", "completed")) {
+    ok("reconnect connection epoch functional slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    decisionPath,
+    conversationPath,
+    "runtime/internal/app/connection/registry.go",
+    "runtime/internal/app/connection/registry_test.go",
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for reconnect connection epoch functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for reconnect connection epoch functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-103"],
+    [".arch/work-items.yaml", "title: Reconnect Connection Epoch Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0175"],
+    [".arch/work-items.yaml", "title: Define reconnect connection epoch functional slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "related_decisions:"],
+    [".arch/work-items.yaml", "ADR-0083"],
+    [".arch/work-items.yaml", "id: M-104"],
+    [".arch/work-items.yaml", "title: Protocol Session Carrier Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0176"],
+    [".arch/work-items.yaml", "title: Define protocol session carrier functional slice"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "tier: tier_2_functional"],
+    [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "reconnect_connection_epoch_functional_slice:"],
+    [".arch/runtime.yaml", "reconnect_connection_epoch_functional_slice_completed: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.reconnect_connection_epoch_functional_slice"],
+    [".arch/runtime.yaml", "first_epoch_behavior: server_observed_newer_epoch_supersedes_earlier_active_epoch"],
+    [".arch/runtime.yaml", "stale_epoch_error_code: connection_epoch_stale"],
+    [".arch/runtime.yaml", "superseded_state_added: true"],
+    [".arch/runtime.yaml", "protocol_session_carrier_functional_slice:"],
+    [".arch/conventions.yaml", "reconnect_connection_epoch_functional_slice:"],
+    [".arch/conventions.yaml", "reconnect_connection_epoch_functional_slice_completed: true"],
+    [".arch/conventions.yaml", "protocol_session_carrier_functional_slice:"],
+    [".arch/contracts.yaml", "reconnect_connection_epoch_functional_slice:"],
+    [".arch/contracts.yaml", "reconnect_connection_epoch_functional_slice_completed: true"],
+    [".arch/reference.yaml", "phase_2cm_reconnect_connection_epoch_functional_slice"],
+    [".arch/reference.yaml", "phase_2cn_protocol_session_carrier_functional_slice"],
+    ["modules/authentication/module.yaml", "reconnect_connection_epoch_functional_slice:"],
+    ["modules/authentication/module.yaml", "authentication_module_owns_reconnect_epoch_behavior: false"],
+    ["AGENTS.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["AGENTS.zh-CN.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["runtime/AGENTS.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["runtime/AGENTS.zh-CN.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["modules/authentication/AGENTS.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["modules/authentication/AGENTS.zh-CN.md", "M-103 Reconnect Connection Epoch Functional Slice"],
+    ["rules/check-rules.json", "runtime.reconnect_connection_epoch_functional_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "define_reconnect_connection_epoch_functional_slice",
+      "runtime.reconnect_connection_epoch_functional_slice",
+      "StateSuperseded",
+      "ErrorCodeConnectionEpochStale",
+      "connection_epoch_stale",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0175",
+      "completed_milestone: M-103",
+      "next_milestone: M-104",
+      "next_work_item: W-0176",
+      "reconnect_connection_epoch_functional_slice_check_rule: runtime.reconnect_connection_epoch_functional_slice",
+      "first_epoch_behavior: server_observed_newer_epoch_supersedes_earlier_active_epoch",
+      "stale_epoch_error_code: connection_epoch_stale",
+      "superseded_state_added: true",
+      "server_observed_target_required: true",
+      "client_metadata_authority_allowed: false",
+      "durable_reconnect_resume_added: false",
+      "duplicate_replacement_close_added: false",
+      "protocol_session_carrier_added: false",
+      "dependencies_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    "runtime/internal/app/connection/registry.go": [
+      "StateSuperseded",
+      "ErrorCodeConnectionEpochStale",
+      "SupersededAt",
+      "SupersededByEpoch",
+      "latestObservedEpochLocked",
+      "supersedeActiveEarlierEpochsLocked",
+    ],
+    "runtime/internal/app/connection/registry_test.go": [
+      "TestRegisterOpenConnectionSupersedesEarlierActiveEpoch",
+      "TestRegisterOpenConnectionRejectsStaleEpochAfterNewerObservedEpoch",
+      "TestFindConnectionByIDReturnsSupersededRecordForLifecycleInspection",
+      "ErrorCodeConnectionEpochStale",
+      "StateSuperseded",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "runtime/internal/app/connection/registry.go",
+      patterns: [
+        { pattern: /\bAuthorization\b|\bSec-WebSocket-Protocol\b|\bBearer\b|\bCookie\b|\bQueryString\b|\bSubprotocol\b|\bRemoteAddr\b/, label: "transport credential carrier or remote address reconnect authority" },
+        { pattern: /\bRawAccessToken\b|\bRawToken\b|\bRawCredential\b|\bLookupDigest\b|\bVerifierDigest\b|\bVerifierKeyID\b/, label: "raw proof, credential, or digest reconnect authority" },
+        { pattern: /\bCloseCode\b|\bCloseReason\b|\bReasonText\b|\bStatusPolicyViolation\b|\bKick\b|\bDisconnect\b/, label: "close code, close reason, kick, or disconnect policy" },
+        { pattern: /\bLogoutAccessToken\b|\bRevokeRuntimeSession\b|\bReconnectToken\b|\bResumeToken\b/, label: "logout, session revocation, reconnect token, or resume token behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/transport/ws/server.go",
+      patterns: [
+        { pattern: /\bReconnect\b|\bResume\b|\bSessionCarrier\b|\bAccessToken\b|\bAuthorization\b|\bCookie\b|\bSec-WebSocket-Protocol\b/, label: "transport-owned reconnect, session carrier, or credential parsing behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/authentication/service.go",
+      patterns: [
+        { pattern: /\bStateSuperseded\b|\bConnectionEpochStale\b|\bReconnect\b|\bResume\b|\bCloseHandoff\b|\btransport\/ws\b|\bwebsocket\b/, label: "authentication-owned connection epoch or transport behavior" },
+      ],
+    },
+    {
+      file: "proto/vibit/protocol/v1/envelope.proto",
+      patterns: [
+        { pattern: /\breconnect\b|\bresume\b|\bsession_token\b|\bclose_reason\b|\bclose_code\b|\bdisconnect\b|\bkick\b/i, label: "protocol reconnect, session carrier, or close carrier" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, rule.file)));
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} stays inside reconnect connection epoch functional slice boundary`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses reconnect connection epoch functional slice boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("reconnect connection epoch functional slice is completed with application-owned epoch progression and no protocol/auth/transport credential side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -21348,6 +21536,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0175", "current_phase: protocol_session_carrier_functional_slice"],
     ["W-0174", "current_phase: reconnect_connection_epoch_functional_slice"],
     ["W-0173", "current_phase: transport_close_handoff_single_process_implementation"],
     ["W-0172", "current_phase: next_direction_confirmation_after_transport_close_handoff_gate"],
@@ -21860,6 +22049,7 @@ function checkRuntime(root) {
   checkRuntimeProtocolLogoutRouteImplementation(root, goFiles);
   checkRuntimeTransportCloseHandoffGate(root, goFiles);
   checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFiles);
+  checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

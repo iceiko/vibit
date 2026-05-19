@@ -43,13 +43,43 @@ func TestRegisterOpenConnectionRejectsDuplicateActiveSameIDAndEpoch(t *testing.T
 	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); !hasRegistryCode(err, ErrorCodeConnectionAlreadyOpen) {
 		t.Fatalf("RegisterOpenConnection() duplicate error = %v, want %s", err, ErrorCodeConnectionAlreadyOpen)
 	}
+}
 
+func TestRegisterOpenConnectionSupersedesEarlierActiveEpoch(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
+	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); err != nil {
+		t.Fatalf("RegisterOpenConnection() initial error = %v, want nil", err)
+	}
 	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 2)); err != nil {
 		t.Fatalf("RegisterOpenConnection() new epoch error = %v, want nil", err)
 	}
+	oldRecord, ok := registry.FindConnectionByID(context.Background(), "connection-1", 1)
+	if !ok {
+		t.Fatal("FindConnectionByID(old epoch) ok = false, want true")
+	}
+	if oldRecord.State != StateSuperseded ||
+		oldRecord.SupersededAt == nil ||
+		!oldRecord.SupersededAt.Equal(fixedTime()) ||
+		oldRecord.SupersededByEpoch != 2 {
+		t.Fatalf("old epoch record = %#v, want superseded by new epoch", oldRecord)
+	}
+	newRecord, ok := registry.FindConnectionByID(context.Background(), "connection-1", 2)
+	if !ok || newRecord.State != StateOpenUnbound {
+		t.Fatalf("new epoch record = %#v, ok = %v, want open unbound", newRecord, ok)
+	}
 }
 
-func TestRegisterOpenConnectionAllowsReopenAfterTerminalStateWithoutReplacementPolicy(t *testing.T) {
+func TestRegisterOpenConnectionRejectsStaleEpochAfterNewerObservedEpoch(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
+	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 2)); err != nil {
+		t.Fatalf("RegisterOpenConnection() initial error = %v, want nil", err)
+	}
+	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); !hasRegistryCode(err, ErrorCodeConnectionEpochStale) {
+		t.Fatalf("RegisterOpenConnection() stale epoch error = %v, want %s", err, ErrorCodeConnectionEpochStale)
+	}
+}
+
+func TestRegisterOpenConnectionRequiresNewerEpochAfterTerminalState(t *testing.T) {
 	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
 	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); err != nil {
 		t.Fatalf("RegisterOpenConnection() initial error = %v, want nil", err)
@@ -62,12 +92,16 @@ func TestRegisterOpenConnectionAllowsReopenAfterTerminalStateWithoutReplacementP
 		t.Fatalf("MarkConnectionClosed() error = %v, want nil", err)
 	}
 
-	reopened, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1))
-	if err != nil {
-		t.Fatalf("RegisterOpenConnection() after closed error = %v, want nil", err)
+	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); !hasRegistryCode(err, ErrorCodeConnectionEpochStale) {
+		t.Fatalf("RegisterOpenConnection() same epoch after closed error = %v, want %s", err, ErrorCodeConnectionEpochStale)
 	}
-	if reopened.State != StateOpenUnbound || reopened.CloseReasonClass != "" || reopened.ClosedAt != nil {
-		t.Fatalf("reopened record = %#v, want fresh active record", reopened)
+
+	reopened, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 2))
+	if err != nil {
+		t.Fatalf("RegisterOpenConnection() newer epoch after closed error = %v, want nil", err)
+	}
+	if reopened.State != StateOpenUnbound || reopened.CloseReasonClass != "" || reopened.ClosedAt != nil || reopened.ConnectionEpoch != 2 {
+		t.Fatalf("reopened record = %#v, want fresh active record at newer epoch", reopened)
 	}
 }
 
@@ -310,6 +344,25 @@ func TestFindConnectionByIDReturnsTerminalRecordForLifecycleInspection(t *testin
 	}
 	if record.State != StateClosed || record.CloseReasonClass != "transport_closed" {
 		t.Fatalf("FindConnectionByID() = %#v, want closed lifecycle record", record)
+	}
+}
+
+func TestFindConnectionByIDReturnsSupersededRecordForLifecycleInspection(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
+	registerAndBind(t, registry, "connection-1", 1, "player-1", "session-1", "token-1")
+	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 2)); err != nil {
+		t.Fatalf("RegisterOpenConnection() new epoch error = %v, want nil", err)
+	}
+
+	record, ok := registry.FindConnectionByID(context.Background(), "connection-1", 1)
+	if !ok {
+		t.Fatal("FindConnectionByID() ok = false, want true")
+	}
+	if record.State != StateSuperseded || record.SupersededAt == nil || record.SupersededByEpoch != 2 {
+		t.Fatalf("FindConnectionByID() = %#v, want superseded lifecycle record", record)
+	}
+	if got := registry.ListConnectionsByPlayerID(context.Background(), "player-1"); len(got) != 0 {
+		t.Fatalf("ListConnectionsByPlayerID(player-1) = %#v, want superseded record excluded", got)
 	}
 }
 

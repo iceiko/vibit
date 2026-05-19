@@ -988,6 +988,14 @@
       "agent_guidance": "Read docs/transport-close-handoff-gate.md and ADR-0080 before implementing W-0174. Add only a narrow in-process handoff for server-observed connection_id + epoch; keep application close decisions in runtime/internal/app/connection and do not add close codes, close reason text, logout-triggered close, session revocation, reconnect/epoch behavior, protocol session carriers, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.reconnect_connection_epoch_functional_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Reconnect connection epoch functional slice",
+      "description": "The first reconnect/connection epoch functional slice must remain application registry-owned, server-observed, monotonic by connection_id and epoch, and separated from reconnect tokens, resume routes, protocol session carriers, logout side effects, session revocation, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0082, ADR-0083, and the W-0175 change spec before changing connection epoch behavior. Keep epoch progression in runtime/internal/app/connection, reject stale epochs, keep superseded records out of active lists, and do not add protocol carriers, reconnect/resume tokens, socket close coupling, session revocation, presence, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

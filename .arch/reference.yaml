@@ -2919,14 +2919,36 @@ phase_plan:
         - direct_nakama_pitaya_api_compatibility
     rule: W-0174 implemented only the in-process transport close handoff that follows ADR-0080 target and ownership boundaries.
   phase_2cm_reconnect_connection_epoch_functional_slice:
-    status: active
+    status: completed
     milestone: M-103
-    next_ready_work_item: W-0175
+    completed_work_item: W-0175
+    decision: ADR-0083
     previous_completed_work_item: W-0174
     tier: tier_2_functional
     gate_density_strategy: ADR-0082
     selected_direction: define_reconnect_connection_epoch_functional_slice
+    check_rule: runtime.reconnect_connection_epoch_functional_slice
+    implementation:
+      owner: runtime/internal/app/connection
+      first_epoch_behavior: server_observed_newer_epoch_supersedes_earlier_active_epoch
+      stale_epoch_error_code: connection_epoch_stale
+      superseded_state_added: true
+    vibit_position:
+      adopted:
+        - server_observed_connection_epoch_progression
+        - superseded_terminal_connection_record_state
+        - stale_epoch_fail_closed_registry_behavior
+      deferred:
+        - reconnect_tokens
+        - resume_tokens
+        - protocol_session_carrier
+        - presence_lifecycle
+        - operations_admin_disconnect
+        - direct_nakama_pitaya_api_compatibility
+    next_ready_work_item: W-0176
     deferred:
+      - reconnect_tokens
+      - resume_tokens
       - close_code_mapping
       - close_reason_text
       - logout_triggered_socket_close
@@ -2935,7 +2957,26 @@ phase_plan:
       - presence_lifecycle
       - operations_admin_disconnect
       - direct_nakama_pitaya_api_compatibility
-    rule: After concrete close handoff exists, reconnect/epoch semantics are the next lifecycle closure slice before protocol session carriers and presence expansion. ADR-0082 keeps this as a Tier 2 functional slice rather than a pure confirmation gate.
+    rule: W-0175 implemented only the first server-observed connection epoch progression primitive before protocol session carriers and presence expansion.
+  phase_2cn_protocol_session_carrier_functional_slice:
+    status: active
+    milestone: M-104
+    next_ready_work_item: W-0176
+    previous_completed_work_item: W-0175
+    tier: tier_2_functional
+    gate_density_strategy: ADR-0082
+    selected_direction: define_protocol_session_carrier_functional_slice
+    deferred:
+      - reconnect_tokens
+      - resume_tokens
+      - close_code_mapping
+      - close_reason_text
+      - logout_triggered_socket_close
+      - runtime_session_revocation
+      - presence_lifecycle
+      - operations_admin_disconnect
+      - direct_nakama_pitaya_api_compatibility
+    rule: After epoch progression exists, protocol session carrier behavior is the next lifecycle closure slice before presence expansion.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
