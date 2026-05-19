@@ -1,0 +1,132 @@
+schema_version: 0.1
+change_id: define-protocol-session-carrier-functional-slice
+date: 2026-05-20
+type: feature
+status: verified
+
+summary: Implement the first bounded protocol-visible runtime session carrier by reusing existing Envelope.Session metadata on successful login responses.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0084
+  referenced:
+    - ADR-0083
+    - ADR-0082
+    - ADR-0078
+    - ADR-0068
+    - ADR-0015
+    - ADR-0016
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - runtime.authentication.AuthenticateWithDeviceCredential response envelope session metadata carries the created runtime session id and validated player id on success.
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  protobuf_sources_changed: []
+  generated_outputs_changed: []
+  existing_envelope_changed: false
+  existing_envelope_session_reused: true
+  login_runtime_session_carrier_added: true
+  session_id_is_proof: false
+  reconnect_token_added: false
+  resume_route_added: false
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Protobuf adapter owns response-envelope session metadata mapping.
+    - Authentication service remains owner of login execution and runtime session creation composition.
+    - WebSocket transport remains credential-neutral and does not own durable session proof.
+
+runtime:
+  completed_work_item: W-0176
+  completed_milestone: M-104
+  next_milestone: M-105
+  next_work_item: W-0177
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  protocol_session_carrier_functional_slice_completed: true
+  protocol_session_carrier_functional_slice_decision: ADR-0084
+  protocol_session_carrier_functional_slice_check_rule: runtime.protocol_session_carrier_functional_slice
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  changed_source:
+    - runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+    - runtime/internal/platform/protocol/protobuf/authentication_bridge.go
+  changed_tests:
+    - runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go
+    - runtime/internal/platform/protocol/protobuf/authentication_bridge_test.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_request_test.go
+  first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+  existing_envelope_session_reused: true
+  protobuf_source_added: false
+  generated_output_added: false
+  login_response_proto_field_added: false
+  metadata_only_identity_upgraded: false
+  session_id_is_proof: false
+  reconnect_token_added: false
+  resume_token_added: false
+  handshake_authentication_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  presence_lifecycle_added: false
+  operations_admin_disconnect_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  boundary:
+    allowed:
+      - Reuse existing Envelope.Session to carry server-created runtime session id after successful login.
+      - Derive response session metadata from already validated application identity.
+      - Preserve metadata-only identity as metadata-only.
+    forbidden:
+      - Add new Protobuf fields or generated output.
+      - Treat session id as proof.
+      - Add reconnect tokens, resume tokens, handshake authentication, durable/distributed session routing, logout-triggered close, runtime session revocation, presence, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - cd runtime && go test ./internal/platform/protocol/protobuf
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check change define-protocol-session-carrier-functional-slice --json
+    - node tools/vibit inspect next
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

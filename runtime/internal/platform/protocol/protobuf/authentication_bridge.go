@@ -1,6 +1,7 @@
 package protobuf
 
 import (
+	"strings"
 	"time"
 
 	"github.com/iceiko/vibit/runtime/internal/app"
@@ -90,6 +91,31 @@ func protoPayloadFromAuthenticationRoute(route app.RouteKey, payload any) (proto
 	default:
 		return nil, false, nil
 	}
+}
+
+func sessionCarrierFromAuthenticationPayload(route app.RouteKey, session app.Session, payload any) app.Session {
+	if route != app.AuthenticateWithDeviceCredentialRoute() {
+		return session
+	}
+
+	result, ok := payload.(appauth.AuthenticationResult)
+	if !ok {
+		if pointerResult, pointerOK := payload.(*appauth.AuthenticationResult); pointerOK && pointerResult != nil {
+			result = *pointerResult
+			ok = true
+		}
+	}
+	if !ok || result.Status != appauth.AuthenticationStatusAuthenticated {
+		return session
+	}
+
+	if sessionID := strings.TrimSpace(result.SessionID); sessionID != "" {
+		session.SessionID = sessionID
+	}
+	if playerID := strings.TrimSpace(result.PlayerID); playerID != "" {
+		session.PlayerID = playerID
+	}
+	return session
 }
 
 func accountCreationIntentFromProto(value authenticationv1.AccountCreationIntent) appauth.AccountCreationIntent {

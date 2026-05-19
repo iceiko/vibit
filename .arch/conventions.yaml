@@ -3951,13 +3951,31 @@ reconnect_connection_epoch_functional_slice:
   next_ready_work_item: W-0176
 
 protocol_session_carrier_functional_slice:
-  status: active
+  status: completed
   milestone: M-104
-  next_ready_work_item: W-0176
+  completed_work_item: W-0176
+  decision: ADR-0084
   previous_completed_work_item: W-0175
   tier: tier_2_functional
   gate_density_strategy: ADR-0082
   selected_direction: define_protocol_session_carrier_functional_slice
+  protocol_session_carrier_functional_slice_completed: true
+  check_rule: runtime.protocol_session_carrier_functional_slice
+  existing_envelope_session_reused: true
+  first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+  protobuf_source_added: false
+  generated_output_added: false
+  session_id_is_proof: false
+  next_ready_work_item: W-0177
+
+presence_lifecycle_functional_slice:
+  status: active
+  milestone: M-105
+  next_ready_work_item: W-0177
+  previous_completed_work_item: W-0176
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  selected_direction: define_presence_lifecycle_functional_slice
 
 server_runtime:
   first_reference_language: Go

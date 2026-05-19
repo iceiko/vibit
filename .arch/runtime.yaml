@@ -85,11 +85,12 @@ purpose: >
   transport_close_handoff_single_process_implementation: ADR-0081
   gate_density_optimization: ADR-0082
   reconnect_connection_epoch_functional_slice: ADR-0083
+  protocol_session_carrier_functional_slice: ADR-0084
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: protocol_session_carrier_functional_slice
+  current_phase: presence_lifecycle_functional_slice
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -4993,15 +4994,38 @@ identity_session_boundary:
     rule: W-0175 implemented only the first server-observed connection epoch progression primitive in the application connection registry.
 
   protocol_session_carrier_functional_slice:
-    status: active
+    status: completed
     milestone: M-104
-    next_ready_work_item: W-0176
+    completed_work_item: W-0176
+    decision: ADR-0084
     previous_milestone: M-103
     previous_completed_work_item: W-0175
     tier: tier_2_functional
     gate_density_strategy: ADR-0082
     selected_direction: define_protocol_session_carrier_functional_slice
     boundary_location: changes/2026-05-20-define-protocol-session-carrier-functional-slice
+    protocol_session_carrier_functional_slice_completed: true
+    protocol_session_carrier_functional_slice_work_item: W-0176
+    check_rule: runtime.protocol_session_carrier_functional_slice
+    protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+    first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+    existing_envelope_session_reused: true
+    protobuf_source_added: false
+    generated_output_added: false
+    login_response_proto_field_added: false
+    metadata_only_identity_upgraded: false
+    session_id_is_proof: false
+    reconnect_token_added: false
+    resume_token_added: false
+    handshake_authentication_added: false
+    logout_triggered_socket_close_added: false
+    runtime_session_revocation_added: false
+    presence_lifecycle_added: false
+    operations_admin_disconnect_added: false
+    dependencies_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_milestone: M-105
+    next_ready_work_item: W-0177
     deferred:
       - reconnect_tokens
       - resume_tokens
@@ -5014,7 +5038,36 @@ identity_session_boundary:
       - dependencies
       - direct_nakama_pitaya_api_compatibility
       - broad_product_modules
-    rule: After W-0175, protocol session carrier behavior is the next lifecycle closure slice before presence expansion. ADR-0082 keeps this as a Tier 2 functional slice rather than a pure confirmation gate.
+    rule: W-0176 reused existing Envelope.Session metadata for the first login-created runtime session carrier without changing Protobuf sources, generated output, transport authentication, reconnect/resume, logout close behavior, or route proof policy.
+
+  presence_lifecycle_functional_slice:
+    status: active
+    milestone: M-105
+    next_ready_work_item: W-0177
+    previous_milestone: M-104
+    previous_completed_work_item: W-0176
+    tier: tier_2_functional
+    gate_density_strategy: ADR-0082
+    selected_direction: define_presence_lifecycle_functional_slice
+    boundary_location: changes/2026-05-20-define-presence-lifecycle-functional-slice
+    deferred:
+      - chat
+      - friends
+      - groups
+      - parties
+      - matchmaking
+      - match_runtime
+      - cluster
+      - sdk
+      - operations_admin_behavior
+      - reconnect_tokens
+      - resume_tokens
+      - logout_triggered_socket_close
+      - runtime_session_revocation
+      - dependencies
+      - direct_nakama_pitaya_api_compatibility
+      - broad_product_modules
+    rule: After W-0176 exposes protocol session metadata, presence lifecycle is the next bounded product-parity slice before chat, social, matchmaking, and match runtime expansion.
 
 persistence_model:
   decision: ADR-0011

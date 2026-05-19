@@ -218,6 +218,27 @@ implemented_wire_and_runtime_slices:
     protocol_session_carrier_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0175 added only application-owned connection epoch progression semantics and did not add protocol contracts or generated output.
+  protocol_session_carrier_functional_slice:
+    status: completed
+    completed_work_item: W-0176
+    decision: ADR-0084
+    protocol_session_carrier_functional_slice_completed: true
+    check_rule: runtime.protocol_session_carrier_functional_slice
+    protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+    existing_envelope_session_reused: true
+    first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+    protocol_source_added: false
+    generated_output_added: false
+    protobuf_envelope_changed: false
+    login_response_proto_field_added: false
+    session_id_is_proof: false
+    reconnect_token_added: false
+    resume_route_added: false
+    handshake_authentication_added: false
+    logout_triggered_socket_close_added: false
+    runtime_session_revocation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0176 reused existing Envelope.Session metadata for the first runtime session carrier and did not change contract source or generated Protobuf output.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

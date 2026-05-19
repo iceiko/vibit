@@ -2959,13 +2959,34 @@ phase_plan:
       - direct_nakama_pitaya_api_compatibility
     rule: W-0175 implemented only the first server-observed connection epoch progression primitive before protocol session carriers and presence expansion.
   phase_2cn_protocol_session_carrier_functional_slice:
-    status: active
+    status: completed
     milestone: M-104
-    next_ready_work_item: W-0176
+    completed_work_item: W-0176
+    decision: ADR-0084
     previous_completed_work_item: W-0175
     tier: tier_2_functional
     gate_density_strategy: ADR-0082
     selected_direction: define_protocol_session_carrier_functional_slice
+    check_rule: runtime.protocol_session_carrier_functional_slice
+    implementation:
+      owner: runtime/internal/platform/protocol/protobuf
+      first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+      existing_envelope_session_reused: true
+      session_id_is_proof: false
+    vibit_position:
+      adopted:
+        - client_visible_runtime_session_metadata_after_login
+        - existing_envelope_session_carrier
+        - metadata_only_identity_not_upgraded
+      deferred:
+        - reconnect_tokens
+        - resume_tokens
+        - handshake_authentication
+        - runtime_session_revocation
+        - presence_lifecycle
+        - operations_admin_disconnect
+        - direct_nakama_pitaya_api_compatibility
+    next_ready_work_item: W-0177
     deferred:
       - reconnect_tokens
       - resume_tokens
@@ -2976,7 +2997,30 @@ phase_plan:
       - presence_lifecycle
       - operations_admin_disconnect
       - direct_nakama_pitaya_api_compatibility
-    rule: After epoch progression exists, protocol session carrier behavior is the next lifecycle closure slice before presence expansion.
+    rule: W-0176 reused existing Envelope.Session metadata for the first login-created runtime session carrier before presence expansion.
+  phase_2co_presence_lifecycle_functional_slice:
+    status: active
+    milestone: M-105
+    next_ready_work_item: W-0177
+    previous_completed_work_item: W-0176
+    tier: tier_2_functional
+    gate_density_strategy: ADR-0082
+    selected_direction: define_presence_lifecycle_functional_slice
+    deferred:
+      - chat
+      - friends
+      - groups
+      - parties
+      - matchmaking
+      - match_runtime
+      - cluster
+      - sdk
+      - operations_admin_behavior
+      - reconnect_tokens
+      - resume_tokens
+      - runtime_session_revocation
+      - direct_nakama_pitaya_api_compatibility
+    rule: After protocol session carrier behavior exists, presence lifecycle is the next bounded product-parity slice before chat, social, matchmaking, and match runtime expansion.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

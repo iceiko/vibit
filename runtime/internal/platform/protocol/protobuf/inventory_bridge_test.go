@@ -79,6 +79,60 @@ func TestRouteRequestFromEnvelopeForDispatchMapsGetInventoryPayload(t *testing.T
 	}
 }
 
+func TestSessionCarrierFromApplicationResultUsesValidatedIdentity(t *testing.T) {
+	result := app.ApplicationResult{
+		Session: app.Session{
+			ConnectionID:    " request-connection ",
+			SessionID:       " metadata-session ",
+			PlayerID:        " metadata-player ",
+			ConnectionEpoch: 3,
+		},
+		Identity: app.RequestIdentity{
+			Status:            app.IdentityValidationValidated,
+			ActorKind:         app.ActorKindPlayer,
+			ActorID:           "player-1",
+			PlayerID:          " player-1 ",
+			SessionID:         " runtime-session-1 ",
+			ConnectionID:      " server-connection-1 ",
+			ConnectionEpoch:   9,
+			PlayerIDValidated: true,
+			SessionValidated:  true,
+		},
+	}
+
+	session := SessionCarrierFromApplicationResult(result)
+
+	if session.ConnectionID != "server-connection-1" ||
+		session.ConnectionEpoch != 9 ||
+		session.SessionID != "runtime-session-1" ||
+		session.PlayerID != "player-1" {
+		t.Fatalf("SessionCarrierFromApplicationResult() = %#v, want validated identity metadata", session)
+	}
+}
+
+func TestSessionCarrierFromApplicationResultKeepsMetadataOnlySession(t *testing.T) {
+	result := app.ApplicationResult{
+		Session: app.Session{
+			ConnectionID:    "connection-1",
+			SessionID:       "metadata-session",
+			PlayerID:        "metadata-player",
+			ConnectionEpoch: 3,
+		},
+		Identity: app.MetadataOnlyIdentityFromSession(app.Session{
+			ConnectionID:    "connection-1",
+			SessionID:       "metadata-session",
+			PlayerID:        "metadata-player",
+			ConnectionEpoch: 3,
+		}),
+	}
+
+	session := SessionCarrierFromApplicationResult(result)
+
+	if session != result.Session {
+		t.Fatalf("SessionCarrierFromApplicationResult() = %#v, want unchanged metadata-only session", session)
+	}
+}
+
 func TestRouteRequestWithDomainPayloadRejectsWrongInventoryPayload(t *testing.T) {
 	_, err := RouteRequestWithDomainPayload(app.RouteRequest{
 		Route:   inventory.GrantItemRoute(),

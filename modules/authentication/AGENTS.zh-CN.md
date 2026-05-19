@@ -156,6 +156,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-103 Reconnect Connection Epoch Functional Slice` 已在本模块所有权之外完成。`W-0175` 在 `runtime/internal/app/connection` 添加了 application registry-owned connection epoch progression，并添加 `ADR-0083`。Authentication 仍只是 token lifecycle service logic。Authentication 不得拥有 reconnect、epoch progression、resume behavior、protocol session carriers、socket close behavior、logout-triggered close、runtime session revocation 或 direct Nakama/Pitaya API compatibility。当前 next ready work item 是 `M-104/W-0176 define_protocol_session_carrier_functional_slice`。
 
+`M-104 Protocol Session Carrier Functional Slice` 已在本模块所有权之外完成。`W-0176` 在 `runtime/internal/platform/protocol/protobuf` 添加了 Protobuf adapter-owned response session metadata mapping，并添加 `ADR-0084`。Authentication 可以继续在成功登录后返回 `AuthenticationResult.SessionID`，但不拥有 protocol carrier mapping、session-id proof semantics、reconnect/resume behavior、WebSocket handshake authentication、logout-triggered close、runtime session revocation 或 direct Nakama/Pitaya API compatibility。当前 next ready work item 是 `M-105/W-0177 define_presence_lifecycle_functional_slice`。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

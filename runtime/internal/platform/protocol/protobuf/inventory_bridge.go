@@ -2,6 +2,7 @@ package protobuf
 
 import (
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/iceiko/vibit/runtime/internal/app"
@@ -71,7 +72,7 @@ func BuildEnvelopeFromApplicationResult(result app.ApplicationResult) (*protocol
 	if err != nil {
 		return nil, err
 	}
-	return BuildEnvelope(result.Route, result.RequestID, result.Target, result.Session, payload)
+	return BuildEnvelope(result.Route, result.RequestID, result.Target, SessionCarrierFromApplicationResult(result), payload)
 }
 
 func BuildEnvelopeFromApplicationEvent(event app.ApplicationEvent, requestID string, target app.Target, session app.Session) (*protocolv1.Envelope, error) {
@@ -80,6 +81,31 @@ func BuildEnvelopeFromApplicationEvent(event app.ApplicationEvent, requestID str
 		return nil, err
 	}
 	return BuildEnvelope(event.Route, requestID, target, session, payload)
+}
+
+func SessionCarrierFromApplicationResult(result app.ApplicationResult) app.Session {
+	session := result.Session
+	session = sessionCarrierFromAuthenticationPayload(result.Route, session, result.Payload)
+
+	identity := result.Identity
+	if identity.Status != app.IdentityValidationValidated {
+		return session
+	}
+
+	if playerID := strings.TrimSpace(identity.PlayerID); playerID != "" && identity.PlayerIDValidated {
+		session.PlayerID = playerID
+	}
+	if sessionID := strings.TrimSpace(identity.SessionID); sessionID != "" && identity.SessionValidated {
+		session.SessionID = sessionID
+	}
+	if connectionID := strings.TrimSpace(identity.ConnectionID); connectionID != "" {
+		session.ConnectionID = connectionID
+	}
+	if identity.ConnectionEpoch != 0 {
+		session.ConnectionEpoch = identity.ConnectionEpoch
+	}
+
+	return session
 }
 
 func ProtoPayloadFromApplicationResult(result app.ApplicationResult) (proto.Message, error) {

@@ -219,14 +219,17 @@ func (s *recordingDeviceCredentialAuthenticationService) AuthenticateWithDeviceC
 		return s.result, nil
 	}
 	return appauth.AuthenticationResult{
-		Status:        appauth.AuthenticationStatusAuthenticated,
-		ActorKind:     app.ActorKindPlayer,
-		PlayerID:      "player-1",
-		AccessToken:   "redacted-access-token",
-		TokenType:     appauth.TokenTypeOpaqueAccess,
-		IssuedAt:      time.Date(2026, 5, 17, 1, 2, 3, 0, time.UTC),
-		ExpiresAt:     time.Date(2026, 5, 17, 2, 2, 3, 0, time.UTC),
-		TokenRecordID: "token-record-1",
+		Status:           appauth.AuthenticationStatusAuthenticated,
+		ActorKind:        app.ActorKindPlayer,
+		PlayerID:         "player-1",
+		AccessToken:      "redacted-access-token",
+		TokenType:        appauth.TokenTypeOpaqueAccess,
+		IssuedAt:         time.Date(2026, 5, 17, 1, 2, 3, 0, time.UTC),
+		ExpiresAt:        time.Date(2026, 5, 17, 2, 2, 3, 0, time.UTC),
+		SessionID:        "runtime-session-1",
+		SessionCreated:   true,
+		SessionExpiresAt: time.Date(2026, 5, 17, 2, 2, 3, 0, time.UTC),
+		TokenRecordID:    "token-record-1",
 	}, nil
 }
 

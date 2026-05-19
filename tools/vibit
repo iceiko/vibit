@@ -113,6 +113,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.transport_close_handoff_gate",
   "runtime.transport_close_handoff_single_process_implementation",
   "runtime.reconnect_connection_epoch_functional_slice",
+  "runtime.protocol_session_carrier_functional_slice",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -19861,6 +19862,197 @@ function checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles) {
   });
 }
 
+function checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles) {
+  const ruleId = "runtime.protocol_session_carrier_functional_slice";
+  const changePath = "changes/2026-05-20-define-protocol-session-carrier-functional-slice";
+  const decisionPath = "decisions/ADR-0084-protocol-session-carrier-functional-slice.md";
+  const conversationPath = "conversations/2026-05-20-protocol-session-carrier-functional-slice.md";
+
+  if (!workItemHasStatus(root, "W-0176", "completed")) {
+    ok("protocol session carrier functional slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    decisionPath,
+    conversationPath,
+    "runtime/internal/platform/protocol/protobuf/inventory_bridge.go",
+    "runtime/internal/platform/protocol/protobuf/authentication_bridge.go",
+    "runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go",
+    "runtime/internal/platform/protocol/protobuf/authenticated_request_test.go",
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for protocol session carrier functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for protocol session carrier functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-104"],
+    [".arch/work-items.yaml", "title: Protocol Session Carrier Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0176"],
+    [".arch/work-items.yaml", "title: Define protocol session carrier functional slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0084"],
+    [".arch/work-items.yaml", "id: M-105"],
+    [".arch/work-items.yaml", "title: Presence Lifecycle Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0177"],
+    [".arch/work-items.yaml", "title: Define presence lifecycle functional slice"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "tier: tier_2_functional"],
+    [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "protocol_session_carrier_functional_slice:"],
+    [".arch/runtime.yaml", "protocol_session_carrier_functional_slice_completed: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.protocol_session_carrier_functional_slice"],
+    [".arch/runtime.yaml", "first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id"],
+    [".arch/runtime.yaml", "existing_envelope_session_reused: true"],
+    [".arch/runtime.yaml", "session_id_is_proof: false"],
+    [".arch/runtime.yaml", "presence_lifecycle_functional_slice:"],
+    [".arch/conventions.yaml", "protocol_session_carrier_functional_slice:"],
+    [".arch/conventions.yaml", "protocol_session_carrier_functional_slice_completed: true"],
+    [".arch/conventions.yaml", "presence_lifecycle_functional_slice:"],
+    [".arch/contracts.yaml", "protocol_session_carrier_functional_slice:"],
+    [".arch/contracts.yaml", "protocol_session_carrier_functional_slice_completed: true"],
+    [".arch/reference.yaml", "phase_2cn_protocol_session_carrier_functional_slice"],
+    [".arch/reference.yaml", "phase_2co_presence_lifecycle_functional_slice"],
+    ["modules/authentication/module.yaml", "protocol_session_carrier_functional_slice:"],
+    ["modules/authentication/module.yaml", "authentication_module_owns_protocol_session_carrier: false"],
+    ["AGENTS.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["AGENTS.zh-CN.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["runtime/AGENTS.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["runtime/AGENTS.zh-CN.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["modules/authentication/AGENTS.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["modules/authentication/AGENTS.zh-CN.md", "M-104 Protocol Session Carrier Functional Slice"],
+    ["rules/check-rules.json", "runtime.protocol_session_carrier_functional_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "define_protocol_session_carrier_functional_slice",
+      "runtime.protocol_session_carrier_functional_slice",
+      "Envelope.Session",
+      "session_id is not proof",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0176",
+      "completed_milestone: M-104",
+      "next_milestone: M-105",
+      "next_work_item: W-0177",
+      "protocol_session_carrier_functional_slice_check_rule: runtime.protocol_session_carrier_functional_slice",
+      "first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id",
+      "existing_envelope_session_reused: true",
+      "metadata_only_identity_upgraded: false",
+      "session_id_is_proof: false",
+      "reconnect_token_added: false",
+      "resume_token_added: false",
+      "handshake_authentication_added: false",
+      "runtime_session_revocation_added: false",
+      "dependencies_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    "runtime/internal/platform/protocol/protobuf/inventory_bridge.go": [
+      "SessionCarrierFromApplicationResult",
+      "sessionCarrierFromAuthenticationPayload",
+      "IdentityValidationValidated",
+      "PlayerIDValidated",
+      "SessionValidated",
+    ],
+    "runtime/internal/platform/protocol/protobuf/authentication_bridge.go": [
+      "sessionCarrierFromAuthenticationPayload",
+      "AuthenticateWithDeviceCredentialRoute",
+      "AuthenticationStatusAuthenticated",
+      "SessionID",
+      "PlayerID",
+    ],
+    "runtime/internal/platform/protocol/protobuf/inventory_bridge_test.go": [
+      "TestSessionCarrierFromApplicationResultUsesValidatedIdentity",
+      "TestSessionCarrierFromApplicationResultKeepsMetadataOnlySession",
+    ],
+    "runtime/internal/platform/protocol/protobuf/authenticated_request_test.go": [
+      "runtime-session-1",
+      "want login-created runtime session carrier",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "proto/vibit/protocol/v1/envelope.proto",
+      patterns: [
+        { pattern: /\bsession_token\b|\breconnect\b|\bresume\b|\bclose_reason\b|\bclose_code\b|\bdisconnect\b|\bkick\b/i, label: "new protocol carrier beyond existing session metadata" },
+      ],
+    },
+    {
+      file: "proto/vibit/authentication/v1/authentication.proto",
+      patterns: [
+        { pattern: /\bsession_id\b|\bsession_expires_at\b|\breconnect\b|\bresume\b/i, label: "new authentication response/session fields instead of existing envelope session metadata" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/transport/ws/server.go",
+      patterns: [
+        { pattern: /\bSessionCarrier\b|\bSessionID\b|\bRuntimeSession\b|\bAuthorization\b|\bCookie\b|\bSec-WebSocket-Protocol\b|\bBearer\b|\bReconnect\b|\bResume\b/, label: "transport-owned session carrier, handshake auth, or reconnect behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/protocol/protobuf/frame_handler.go",
+      patterns: [
+        { pattern: /\bHandshake\b|\bReconnectToken\b|\bResumeToken\b|\bRevokeRuntimeSession\b|\bCloseCode\b|\bCloseReason\b|\bKick\b|\bDisconnect\b/, label: "protocol-owned handshake, reconnect, session revocation, or close policy" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, rule.file)));
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} stays inside protocol session carrier functional slice boundary`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses protocol session carrier functional slice boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("protocol session carrier functional slice is completed with existing envelope session metadata and no handshake/reconnect/session-revocation side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -21536,6 +21728,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0176", "current_phase: presence_lifecycle_functional_slice"],
     ["W-0175", "current_phase: protocol_session_carrier_functional_slice"],
     ["W-0174", "current_phase: reconnect_connection_epoch_functional_slice"],
     ["W-0173", "current_phase: transport_close_handoff_single_process_implementation"],
@@ -22050,6 +22243,7 @@ function checkRuntime(root) {
   checkRuntimeTransportCloseHandoffGate(root, goFiles);
   checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFiles);
   checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles);
+  checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

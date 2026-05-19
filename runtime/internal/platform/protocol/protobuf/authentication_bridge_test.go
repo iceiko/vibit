@@ -64,14 +64,17 @@ func TestProtoPayloadFromAuthenticationResultMapsLoginResponse(t *testing.T) {
 	payload, err := ProtoPayloadFromApplicationResult(app.ApplicationResult{
 		Route: app.AuthenticateWithDeviceCredentialRoute(),
 		Payload: appauth.AuthenticationResult{
-			Status:        appauth.AuthenticationStatusAuthenticated,
-			ActorKind:     app.ActorKindPlayer,
-			PlayerID:      "player-1",
-			AccessToken:   "redacted-access-token",
-			TokenType:     appauth.TokenTypeOpaqueAccess,
-			IssuedAt:      issuedAt,
-			ExpiresAt:     expiresAt,
-			TokenRecordID: "token-record-1",
+			Status:           appauth.AuthenticationStatusAuthenticated,
+			ActorKind:        app.ActorKindPlayer,
+			PlayerID:         "player-1",
+			AccessToken:      "redacted-access-token",
+			TokenType:        appauth.TokenTypeOpaqueAccess,
+			IssuedAt:         issuedAt,
+			ExpiresAt:        expiresAt,
+			SessionID:        "runtime-session-1",
+			SessionCreated:   true,
+			SessionExpiresAt: expiresAt,
+			TokenRecordID:    "token-record-1",
 		},
 	})
 	if err != nil {

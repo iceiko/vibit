@@ -389,6 +389,25 @@ external_runtime_slices:
     runtime_session_revocation_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     module_ownership_rule: W-0175 added only application registry-owned connection epoch progression. Authentication remains token lifecycle service logic and must not own reconnect, epoch, resume, socket close, or runtime session revocation behavior.
+  protocol_session_carrier_functional_slice:
+    status: completed
+    completed_work_item: W-0176
+    decision: ADR-0084
+    check_rule: runtime.protocol_session_carrier_functional_slice
+    protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+    authentication_module_owns_protocol_session_carrier: false
+    existing_envelope_session_reused: true
+    first_carrier_behavior: successful_login_response_envelope_session_carries_runtime_session_id
+    protobuf_source_added: false
+    generated_output_added: false
+    session_id_is_proof: false
+    reconnect_token_added: false
+    resume_route_added: false
+    handshake_authentication_added: false
+    logout_triggered_socket_close_added: false
+    runtime_session_revocation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    module_ownership_rule: W-0176 reused existing Envelope.Session metadata in the Protobuf adapter for the login-created runtime session carrier. Authentication remains token lifecycle service logic and does not own protocol carrier mapping, reconnect/resume, transport authentication, or runtime session revocation behavior.
 
 decisions:
   - ADR-0029

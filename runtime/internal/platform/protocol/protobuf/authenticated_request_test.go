@@ -283,12 +283,14 @@ func TestFrameHandlerLeavesPublicAuthenticationRouteExplicit(t *testing.T) {
 				Session:   request.Session,
 				Identity:  request.Identity,
 				Payload: appauth.AuthenticationResult{
-					Status:        appauth.AuthenticationStatusAuthenticated,
-					ActorKind:     app.ActorKindPlayer,
-					PlayerID:      "player-1",
-					AccessToken:   "redacted-access-token",
-					TokenType:     appauth.TokenTypeOpaqueAccess,
-					TokenRecordID: "token-record-1",
+					Status:         appauth.AuthenticationStatusAuthenticated,
+					ActorKind:      app.ActorKindPlayer,
+					PlayerID:       "player-1",
+					AccessToken:    "redacted-access-token",
+					TokenType:      appauth.TokenTypeOpaqueAccess,
+					SessionID:      "runtime-session-1",
+					SessionCreated: true,
+					TokenRecordID:  "token-record-1",
 				},
 			}, nil
 		}),
@@ -333,6 +335,11 @@ func TestFrameHandlerLeavesPublicAuthenticationRouteExplicit(t *testing.T) {
 		loginResponse.GetTokenType() != string(appauth.TokenTypeOpaqueAccess) ||
 		loginResponse.GetTokenRecordId() != "token-record-1" {
 		t.Fatalf("login response = %#v, want mapped authentication result", loginResponse)
+	}
+	if response.GetSession().GetConnectionId() != "ws-1" ||
+		response.GetSession().GetSessionId() != "runtime-session-1" ||
+		response.GetSession().GetPlayerId() != "player-1" {
+		t.Fatalf("response session = %#v, want login-created runtime session carrier", response.GetSession())
 	}
 }
 

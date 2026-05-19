@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-104
+current_milestone: M-105
 
 continuation_semantics:
   default_step_unit: work_item
@@ -1910,7 +1910,7 @@ milestones:
 
   - id: M-104
     title: Protocol Session Carrier Functional Slice
-    status: active
+    status: completed
     goal: Define and implement the first bounded protocol-visible runtime session carrier behavior after logout, close handoff, and connection epoch lifecycle primitives are in place.
     completion_criteria:
       - The slice records the protocol session carrier boundary in its change spec before implementation.
@@ -1923,6 +1923,22 @@ milestones:
       - making logout automatically close sockets
       - revoking runtime sessions
       - adding presence, chat, friends, groups, matchmaking, match runtime, cluster, SDK, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the first bounded protocol session carrier by reusing existing `Envelope.Session` metadata. Successful login responses now carry the server-created runtime session id and authenticated player id without changing Protobuf sources or generated output. The Protobuf response builder can also derive response session metadata from already validated application identity, while metadata-only identity remains metadata-only and session id remains non-proof.
+
+  - id: M-105
+    title: Presence Lifecycle Functional Slice
+    status: active
+    goal: Define and implement the first bounded presence lifecycle behavior after protocol-visible session metadata exists.
+    completion_criteria:
+      - The slice records the presence lifecycle boundary in its change spec before implementation.
+      - Any implementation remains bounded to the smallest presence/status primitive needed for Nakama/Pitaya-class lifecycle closure and focused tests.
+      - Chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, reconnect/resume tokens, logout-triggered close, runtime session revocation, dependencies, direct Nakama/Pitaya API compatibility, and broad product modules remain behind explicit ask-first boundaries.
+      - The resulting state is checkable through focused tests and repository checks.
+    non_goals:
+      - adding chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, or direct Nakama/Pitaya API compatibility
+      - adding reconnect or resume tokens
+      - making logout automatically close sockets
+      - revoking runtime sessions
 
 work_items:
   - id: W-0001
@@ -6108,7 +6124,7 @@ work_items:
   - id: W-0176
     milestone: M-104
     title: Define protocol session carrier functional slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-20-define-protocol-session-carrier-functional-slice
     depends_on:
       - W-0175
@@ -6116,9 +6132,31 @@ work_items:
     tier: tier_2_functional
     selected_direction: define_protocol_session_carrier_functional_slice
     gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0082
+      - ADR-0084
     ask_first:
       - Selecting reconnect tokens, resume tokens, close code mapping, close reason text, logout-triggered socket close, runtime session revocation, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, durable/distributed session routing, or broad product module expansion.
     completion:
       - Create a change spec that embeds the protocol session carrier boundary instead of creating a separate confirmation gate.
       - Define the smallest checkable protocol session carrier behavior for lifecycle closure.
       - Preserve reconnect tokens, resume behavior, close code mapping, close reason text, logout-triggered socket close, runtime session revocation, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, and broad product behavior behind ask-first boundaries.
+    completion_summary: Added the first bounded protocol-visible runtime session carrier. Successful login responses now reuse existing `Envelope.Session` metadata to carry the server-created runtime session id and authenticated player id, and response envelopes can derive session metadata from already validated application identity. No Protobuf source, generated output, reconnect/resume token, handshake authentication, session id proof behavior, logout-triggered close, runtime session revocation, dependency, direct compatibility, or broad product behavior was added.
+
+  - id: W-0177
+    milestone: M-105
+    title: Define presence lifecycle functional slice
+    status: next_ready
+    change: changes/2026-05-20-define-presence-lifecycle-functional-slice
+    depends_on:
+      - W-0176
+    expected_change_id: define-presence-lifecycle-functional-slice
+    tier: tier_2_functional
+    selected_direction: define_presence_lifecycle_functional_slice
+    gate_density_strategy: ADR-0082
+    ask_first:
+      - Selecting chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect tokens, resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, or broad product module expansion.
+    completion:
+      - Create a change spec that embeds the presence lifecycle boundary instead of creating a separate confirmation gate.
+      - Define the smallest checkable presence/status behavior after protocol session carrier support.
+      - Preserve chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, and broad product behavior behind ask-first boundaries.

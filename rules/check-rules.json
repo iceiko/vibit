@@ -996,6 +996,14 @@
       "agent_guidance": "Read ADR-0082, ADR-0083, and the W-0175 change spec before changing connection epoch behavior. Keep epoch progression in runtime/internal/app/connection, reject stale epochs, keep superseded records out of active lists, and do not add protocol carriers, reconnect/resume tokens, socket close coupling, session revocation, presence, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.protocol_session_carrier_functional_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Protocol session carrier functional slice",
+      "description": "The first protocol session carrier functional slice must reuse existing envelope session metadata, expose only login-created runtime session metadata, keep session_id as non-proof, and stay separated from new Protobuf fields, generated output, handshake auth, reconnect/resume, logout side effects, session revocation, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0082, ADR-0084, and the W-0176 change spec before changing protocol session carrier behavior. Keep the carrier in runtime/internal/platform/protocol/protobuf, reuse Envelope.Session, preserve metadata-only identity as non-proof, and do not add new Protobuf fields, generated output, reconnect/resume tokens, WebSocket handshake authentication, logout-triggered close, runtime session revocation, presence, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",
