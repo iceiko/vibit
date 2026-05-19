@@ -3,10 +3,12 @@ package ws
 import (
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"strings"
+	"sync"
 	"sync/atomic"
 	"testing"
 	"time"
@@ -296,6 +298,136 @@ func TestServerCloseHandoffClosesAcceptedSocket(t *testing.T) {
 	}
 }
 
+func TestServerNotifiesLifecycleObserverForOpenAndClosedConnection(t *testing.T) {
+	observer := &recordingLifecycleObserver{}
+	wsServer := httptest.NewServer(&Server{
+		AcceptOptions: &websocket.AcceptOptions{
+			InsecureSkipVerify: true,
+		},
+		Lifecycle: observer,
+		Handler: FrameHandlerFunc(func(ctx context.Context, frame Frame) ([][]byte, error) {
+			return [][]byte{frame.Payload}, nil
+		}),
+	})
+	defer wsServer.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, _, err := websocket.Dial(ctx, websocketURL(wsServer.URL), nil)
+	if err != nil {
+		t.Fatalf("dial websocket: %v", err)
+	}
+	if err := conn.Close(websocket.StatusNormalClosure, "done"); err != nil {
+		t.Fatalf("close websocket: %v", err)
+	}
+
+	if !eventually(time.Second, func() bool {
+		return observer.openedCount() == 1 && observer.closedCount() == 1
+	}) {
+		t.Fatalf("lifecycle counts = opened %d closed %d, want 1/1", observer.openedCount(), observer.closedCount())
+	}
+	opened := observer.openedEvent(0)
+	closed := observer.closedEvent(0)
+	if opened.ConnectionID == "" ||
+		opened.ConnectionEpoch != 1 ||
+		closed.ConnectionID != opened.ConnectionID ||
+		closed.ConnectionEpoch != opened.ConnectionEpoch {
+		t.Fatalf("lifecycle events opened=%#v closed=%#v, want matching server-observed connection target", opened, closed)
+	}
+	if opened.ObservedAt.IsZero() || closed.ObservedAt.IsZero() {
+		t.Fatalf("lifecycle events opened=%#v closed=%#v, want observed times", opened, closed)
+	}
+}
+
+func TestServerRejectsConnectionWhenLifecycleOpenFails(t *testing.T) {
+	observer := &recordingLifecycleObserver{openErr: errors.New("raw observer detail")}
+	wsServer := httptest.NewServer(&Server{
+		AcceptOptions: &websocket.AcceptOptions{
+			InsecureSkipVerify: true,
+		},
+		Lifecycle: observer,
+		Handler: FrameHandlerFunc(func(ctx context.Context, frame Frame) ([][]byte, error) {
+			t.Fatal("handler should not be called when lifecycle open fails")
+			return nil, nil
+		}),
+	})
+	defer wsServer.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, _, err := websocket.Dial(ctx, websocketURL(wsServer.URL), nil)
+	if err != nil {
+		t.Fatalf("dial websocket: %v", err)
+	}
+	defer conn.CloseNow()
+
+	_, _, err = conn.Read(ctx)
+	if websocket.CloseStatus(err) != websocket.StatusInternalError {
+		t.Fatalf("read error = %v, want internal close after lifecycle open failure", err)
+	}
+	if observer.openedCount() != 1 || observer.closedCount() != 0 {
+		t.Fatalf("lifecycle counts = opened %d closed %d, want failed open only", observer.openedCount(), observer.closedCount())
+	}
+}
+
 func websocketURL(httpURL string) string {
 	return "ws" + strings.TrimPrefix(httpURL, "http")
+}
+
+func eventually(timeout time.Duration, condition func() bool) bool {
+	deadline := time.Now().Add(timeout)
+	for time.Now().Before(deadline) {
+		if condition() {
+			return true
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	return condition()
+}
+
+type recordingLifecycleObserver struct {
+	mu      sync.Mutex
+	opened  []ConnectionLifecycleEvent
+	closed  []ConnectionLifecycleEvent
+	openErr error
+}
+
+func (o *recordingLifecycleObserver) ConnectionOpened(_ context.Context, event ConnectionLifecycleEvent) error {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	o.opened = append(o.opened, event)
+	return o.openErr
+}
+
+func (o *recordingLifecycleObserver) ConnectionClosed(_ context.Context, event ConnectionLifecycleEvent) error {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	o.closed = append(o.closed, event)
+	return nil
+}
+
+func (o *recordingLifecycleObserver) openedCount() int {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return len(o.opened)
+}
+
+func (o *recordingLifecycleObserver) closedCount() int {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return len(o.closed)
+}
+
+func (o *recordingLifecycleObserver) openedEvent(index int) ConnectionLifecycleEvent {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return o.opened[index]
+}
+
+func (o *recordingLifecycleObserver) closedEvent(index int) ConnectionLifecycleEvent {
+	o.mu.Lock()
+	defer o.mu.Unlock()
+	return o.closed[index]
 }

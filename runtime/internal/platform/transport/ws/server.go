@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"net/http"
 	"sync/atomic"
+	"time"
 
 	"github.com/coder/websocket"
 )
@@ -33,11 +34,23 @@ func (f FrameHandlerFunc) HandleFrame(ctx context.Context, frame Frame) ([][]byt
 
 type Server struct {
 	Handler        FrameHandler
+	Lifecycle      ConnectionLifecycleObserver
 	AcceptOptions  *websocket.AcceptOptions
 	ReadLimitBytes int64
 
 	nextConnectionID uint64
 	closeHandoff     closeHandoffSocketTable
+}
+
+type ConnectionLifecycleObserver interface {
+	ConnectionOpened(context.Context, ConnectionLifecycleEvent) error
+	ConnectionClosed(context.Context, ConnectionLifecycleEvent) error
+}
+
+type ConnectionLifecycleEvent struct {
+	ConnectionID    string
+	ConnectionEpoch uint64
+	ObservedAt      time.Time
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -63,6 +76,17 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		epoch:      1,
 		remoteAddr: r.RemoteAddr,
 	}
+	if s.Lifecycle != nil {
+		if err := s.Lifecycle.ConnectionOpened(r.Context(), lifecycleEvent(meta)); err != nil {
+			_ = conn.Close(websocket.StatusInternalError, "connection lifecycle failed")
+			return
+		}
+	}
+	defer func() {
+		if s.Lifecycle != nil {
+			_ = s.Lifecycle.ConnectionClosed(context.Background(), lifecycleEvent(meta))
+		}
+	}()
 	s.registerCloseHandoffSocket(meta, conn)
 	defer s.unregisterCloseHandoffSocket(meta)
 	_ = s.handleConnection(r.Context(), conn, meta)
@@ -109,5 +133,13 @@ func newFrame(meta connectionMetadata, payload []byte) Frame {
 		ConnectionEpoch: meta.epoch,
 		RemoteAddr:      meta.remoteAddr,
 		Payload:         append([]byte(nil), payload...),
+	}
+}
+
+func lifecycleEvent(meta connectionMetadata) ConnectionLifecycleEvent {
+	return ConnectionLifecycleEvent{
+		ConnectionID:    meta.id,
+		ConnectionEpoch: meta.epoch,
+		ObservedAt:      time.Now().UTC(),
 	}
 }

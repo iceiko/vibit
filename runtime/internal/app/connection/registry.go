@@ -36,6 +36,13 @@ const (
 	ActorKindPlayer ActorKind = "player"
 )
 
+type PresenceStatus string
+
+const (
+	PresenceStatusOffline PresenceStatus = "offline"
+	PresenceStatusOnline  PresenceStatus = "online"
+)
+
 type Clock interface {
 	Now() time.Time
 }
@@ -100,6 +107,26 @@ type Record struct {
 	SupersededByEpoch   ConnectionEpoch
 	CreatedAt           time.Time
 	UpdatedAt           time.Time
+}
+
+type PlayerPresence struct {
+	PlayerID           PlayerID
+	Status             PresenceStatus
+	ActiveConnections  []PresenceConnection
+	ConnectionCount    int
+	LastSeenAt         *time.Time
+	RuntimeSessionIDs  []RuntimeSessionID
+	AccessTokenRecords []AccessTokenRecordID
+	ObservedAt         time.Time
+}
+
+type PresenceConnection struct {
+	ConnectionID     ConnectionID
+	ConnectionEpoch  ConnectionEpoch
+	RuntimeSessionID RuntimeSessionID
+	LastSeenAt       *time.Time
+	OpenedAt         time.Time
+	BoundAt          *time.Time
 }
 
 type OpenConnection struct {
@@ -323,6 +350,61 @@ func (r *InMemoryRegistry) ListConnectionsByAccessTokenRecordID(ctx context.Cont
 	})
 }
 
+func (r *InMemoryRegistry) PresenceForPlayer(ctx context.Context, playerID PlayerID) PlayerPresence {
+	playerID = PlayerID(strings.TrimSpace(string(playerID)))
+	if ctxErr(ctx) != nil || playerID == "" {
+		return PlayerPresence{
+			PlayerID: playerID,
+			Status:   PresenceStatusOffline,
+		}
+	}
+
+	records := r.ListConnectionsByPlayerID(ctx, playerID)
+	observedAt, err := r.now()
+	if err != nil {
+		observedAt = time.Time{}
+	}
+
+	presence := PlayerPresence{
+		PlayerID:           playerID,
+		Status:             PresenceStatusOffline,
+		ActiveConnections:  make([]PresenceConnection, 0, len(records)),
+		RuntimeSessionIDs:  make([]RuntimeSessionID, 0, len(records)),
+		AccessTokenRecords: make([]AccessTokenRecordID, 0, len(records)),
+		ObservedAt:         observedAt,
+	}
+	if len(records) == 0 {
+		return copyPlayerPresence(presence)
+	}
+
+	presence.Status = PresenceStatusOnline
+	sessionIDs := make(map[RuntimeSessionID]struct{})
+	tokenRecordIDs := make(map[AccessTokenRecordID]struct{})
+	for _, record := range records {
+		presence.ActiveConnections = append(presence.ActiveConnections, PresenceConnection{
+			ConnectionID:     record.ConnectionID,
+			ConnectionEpoch:  record.ConnectionEpoch,
+			RuntimeSessionID: record.RuntimeSessionID,
+			LastSeenAt:       copyTimeValue(record.LastSeenAt),
+			OpenedAt:         record.OpenedAt,
+			BoundAt:          copyTimeValue(record.BoundAt),
+		})
+		if record.LastSeenAt != nil && (presence.LastSeenAt == nil || record.LastSeenAt.After(*presence.LastSeenAt)) {
+			presence.LastSeenAt = copyTimeValue(record.LastSeenAt)
+		}
+		if record.RuntimeSessionID != "" {
+			sessionIDs[record.RuntimeSessionID] = struct{}{}
+		}
+		if record.AccessTokenRecordID != "" {
+			tokenRecordIDs[record.AccessTokenRecordID] = struct{}{}
+		}
+	}
+	presence.ConnectionCount = len(presence.ActiveConnections)
+	presence.RuntimeSessionIDs = sortedRuntimeSessionIDs(sessionIDs)
+	presence.AccessTokenRecords = sortedAccessTokenRecordIDs(tokenRecordIDs)
+	return copyPlayerPresence(presence)
+}
+
 func (r *InMemoryRegistry) latestObservedEpochLocked(connectionID ConnectionID) ConnectionEpoch {
 	var latest ConnectionEpoch
 	for key := range r.records {
@@ -487,6 +569,40 @@ func copyRecord(record Record) Record {
 	record.InvalidatedAt = copyTimeValue(record.InvalidatedAt)
 	record.SupersededAt = copyTimeValue(record.SupersededAt)
 	return record
+}
+
+func copyPlayerPresence(presence PlayerPresence) PlayerPresence {
+	presence.LastSeenAt = copyTimeValue(presence.LastSeenAt)
+	presence.ActiveConnections = append([]PresenceConnection(nil), presence.ActiveConnections...)
+	for index := range presence.ActiveConnections {
+		presence.ActiveConnections[index].LastSeenAt = copyTimeValue(presence.ActiveConnections[index].LastSeenAt)
+		presence.ActiveConnections[index].BoundAt = copyTimeValue(presence.ActiveConnections[index].BoundAt)
+	}
+	presence.RuntimeSessionIDs = append([]RuntimeSessionID(nil), presence.RuntimeSessionIDs...)
+	presence.AccessTokenRecords = append([]AccessTokenRecordID(nil), presence.AccessTokenRecords...)
+	return presence
+}
+
+func sortedRuntimeSessionIDs(values map[RuntimeSessionID]struct{}) []RuntimeSessionID {
+	result := make([]RuntimeSessionID, 0, len(values))
+	for value := range values {
+		result = append(result, value)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] < result[j]
+	})
+	return result
+}
+
+func sortedAccessTokenRecordIDs(values map[AccessTokenRecordID]struct{}) []AccessTokenRecordID {
+	result := make([]AccessTokenRecordID, 0, len(values))
+	for value := range values {
+		result = append(result, value)
+	}
+	sort.Slice(result, func(i, j int) bool {
+		return result[i] < result[j]
+	})
+	return result
 }
 
 func copyTimeValue(value *time.Time) *time.Time {

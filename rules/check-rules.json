@@ -1004,6 +1004,14 @@
       "agent_guidance": "Read ADR-0082, ADR-0084, and the W-0176 change spec before changing protocol session carrier behavior. Keep the carrier in runtime/internal/platform/protocol/protobuf, reuse Envelope.Session, preserve metadata-only identity as non-proof, and do not add new Protobuf fields, generated output, reconnect/resume tokens, WebSocket handshake authentication, logout-triggered close, runtime session revocation, presence, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.presence_lifecycle_functional_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Presence lifecycle functional slice",
+      "description": "The first presence lifecycle functional slice must derive player online/offline state from active bound connection registry records, wire only credential-neutral WebSocket lifecycle and validated binding into the registry, and stay separated from protocol presence routes, subscriptions, broadcasts, durable/distributed presence, social modules, matchmaking, match runtime, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0082, ADR-0085, and the W-0177 change spec before changing presence lifecycle behavior. Keep presence state in runtime/internal/app/connection, keep WebSocket transport credential-neutral, keep startup composition as the adapter layer, and do not add Protobuf presence messages, generated output, protocol presence queries, subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, durable/distributed presence, reconnect/resume tokens, logout-triggered close, runtime session revocation, dependencies, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

@@ -2999,13 +2999,21 @@ phase_plan:
       - direct_nakama_pitaya_api_compatibility
     rule: W-0176 reused existing Envelope.Session metadata for the first login-created runtime session carrier before presence expansion.
   phase_2co_presence_lifecycle_functional_slice:
-    status: active
+    status: completed
     milestone: M-105
-    next_ready_work_item: W-0177
+    completed_work_item: W-0177
+    decision: ADR-0085
     previous_completed_work_item: W-0176
     tier: tier_2_functional
     gate_density_strategy: ADR-0082
     selected_direction: define_presence_lifecycle_functional_slice
+    check_rule: runtime.presence_lifecycle_functional_slice
+    first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections
+    websocket_lifecycle_observer_added: true
+    startup_registry_lifecycle_wiring_added: true
+    connection_binding_registry_wiring_added: true
+    protocol_presence_query_added: false
+    durable_distributed_presence_added: false
     deferred:
       - chat
       - friends
@@ -3020,7 +3028,32 @@ phase_plan:
       - resume_tokens
       - runtime_session_revocation
       - direct_nakama_pitaya_api_compatibility
-    rule: After protocol session carrier behavior exists, presence lifecycle is the next bounded product-parity slice before chat, social, matchmaking, and match runtime expansion.
+    rule: W-0177 added server-owned player presence lifecycle state from active bound connection records before protocol query, subscriptions, chat, social, matchmaking, and match runtime expansion.
+  phase_2cp_presence_protocol_query_functional_slice:
+    status: active
+    milestone: M-106
+    next_ready_work_item: W-0178
+    previous_completed_work_item: W-0177
+    tier: tier_2_functional
+    gate_density_strategy: ADR-0082
+    selected_direction: define_presence_protocol_query_functional_slice
+    deferred:
+      - presence_subscription
+      - presence_broadcast
+      - chat
+      - friends
+      - groups
+      - parties
+      - matchmaking
+      - match_runtime
+      - cluster
+      - sdk
+      - operations_admin_behavior
+      - reconnect_tokens
+      - resume_tokens
+      - runtime_session_revocation
+      - direct_nakama_pitaya_api_compatibility
+    rule: After server-owned presence lifecycle exists, a protected protocol presence query is the next bounded product-parity slice before subscriptions, chat, social, matchmaking, and match runtime expansion.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

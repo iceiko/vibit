@@ -3969,13 +3969,33 @@ protocol_session_carrier_functional_slice:
   next_ready_work_item: W-0177
 
 presence_lifecycle_functional_slice:
-  status: active
+  status: completed
   milestone: M-105
-  next_ready_work_item: W-0177
+  completed_work_item: W-0177
+  decision: ADR-0085
   previous_completed_work_item: W-0176
   tier: tier_2_functional
   gate_density_strategy: ADR-0082
   selected_direction: define_presence_lifecycle_functional_slice
+  presence_lifecycle_functional_slice_completed: true
+  check_rule: runtime.presence_lifecycle_functional_slice
+  presence_owner: runtime/internal/app/connection
+  first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections
+  websocket_lifecycle_observer_added: true
+  startup_registry_lifecycle_wiring_added: true
+  connection_binding_registry_wiring_added: true
+  protocol_presence_query_added: false
+  durable_distributed_presence_added: false
+  next_ready_work_item: W-0178
+
+presence_protocol_query_functional_slice:
+  status: active
+  milestone: M-106
+  next_ready_work_item: W-0178
+  previous_completed_work_item: W-0177
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  selected_direction: define_presence_protocol_query_functional_slice
 
 server_runtime:
   first_reference_language: Go

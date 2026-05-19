@@ -114,6 +114,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.transport_close_handoff_single_process_implementation",
   "runtime.reconnect_connection_epoch_functional_slice",
   "runtime.protocol_session_carrier_functional_slice",
+  "runtime.presence_lifecycle_functional_slice",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -20053,6 +20054,237 @@ function checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles) {
   });
 }
 
+function checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles) {
+  const ruleId = "runtime.presence_lifecycle_functional_slice";
+  const changePath = "changes/2026-05-20-define-presence-lifecycle-functional-slice";
+  const decisionPath = "decisions/ADR-0085-presence-lifecycle-functional-slice.md";
+  const conversationPath = "conversations/2026-05-20-presence-lifecycle-functional-slice.md";
+
+  if (!workItemHasStatus(root, "W-0177", "completed")) {
+    ok("presence lifecycle functional slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    decisionPath,
+    conversationPath,
+    "runtime/internal/app/connection/registry.go",
+    "runtime/internal/app/connection/registry_test.go",
+    "runtime/internal/platform/transport/ws/server.go",
+    "runtime/internal/platform/transport/ws/server_test.go",
+    "runtime/cmd/vibit-server/connection_lifecycle.go",
+    "runtime/cmd/vibit-server/connection_binding_registry.go",
+    "runtime/cmd/vibit-server/connection_lifecycle_test.go",
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for presence lifecycle functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for presence lifecycle functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-105"],
+    [".arch/work-items.yaml", "title: Presence Lifecycle Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0177"],
+    [".arch/work-items.yaml", "title: Define presence lifecycle functional slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0085"],
+    [".arch/work-items.yaml", "id: M-106"],
+    [".arch/work-items.yaml", "title: Presence Protocol Query Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0178"],
+    [".arch/work-items.yaml", "title: Define presence protocol query functional slice"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "tier: tier_2_functional"],
+    [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "presence_lifecycle_functional_slice:"],
+    [".arch/runtime.yaml", "presence_lifecycle_functional_slice_completed: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.presence_lifecycle_functional_slice"],
+    [".arch/runtime.yaml", "first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections"],
+    [".arch/runtime.yaml", "websocket_lifecycle_observer_added: true"],
+    [".arch/runtime.yaml", "startup_registry_lifecycle_wiring_added: true"],
+    [".arch/runtime.yaml", "connection_binding_registry_wiring_added: true"],
+    [".arch/runtime.yaml", "protocol_presence_query_added: false"],
+    [".arch/runtime.yaml", "presence_protocol_query_functional_slice:"],
+    [".arch/conventions.yaml", "presence_lifecycle_functional_slice:"],
+    [".arch/conventions.yaml", "presence_lifecycle_functional_slice_completed: true"],
+    [".arch/conventions.yaml", "presence_protocol_query_functional_slice:"],
+    [".arch/contracts.yaml", "presence_lifecycle_functional_slice:"],
+    [".arch/contracts.yaml", "presence_lifecycle_functional_slice_completed: true"],
+    [".arch/contracts.yaml", "internal_presence_query_primitive_added: true"],
+    [".arch/contracts.yaml", "presence_protocol_query_functional_slice:"],
+    [".arch/reference.yaml", "phase_2co_presence_lifecycle_functional_slice"],
+    [".arch/reference.yaml", "phase_2cp_presence_protocol_query_functional_slice"],
+    ["modules/authentication/module.yaml", "presence_lifecycle_functional_slice:"],
+    ["modules/authentication/module.yaml", "authentication_module_owns_presence_lifecycle: false"],
+    ["AGENTS.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["AGENTS.zh-CN.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["runtime/AGENTS.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["runtime/AGENTS.zh-CN.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["modules/authentication/AGENTS.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["modules/authentication/AGENTS.zh-CN.md", "M-105 Presence Lifecycle Functional Slice"],
+    ["rules/check-rules.json", "runtime.presence_lifecycle_functional_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "define_presence_lifecycle_functional_slice",
+      "runtime.presence_lifecycle_functional_slice",
+      "PresenceForPlayer",
+      "ConnectionLifecycleObserver",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0177",
+      "completed_milestone: M-105",
+      "next_milestone: M-106",
+      "next_work_item: W-0178",
+      "presence_lifecycle_functional_slice_check_rule: runtime.presence_lifecycle_functional_slice",
+      "first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections",
+      "player_presence_snapshot_added: true",
+      "websocket_lifecycle_observer_added: true",
+      "startup_registry_lifecycle_wiring_added: true",
+      "connection_binding_registry_wiring_added: true",
+      "protocol_presence_query_added: false",
+      "presence_subscription_added: false",
+      "presence_broadcast_added: false",
+      "durable_distributed_presence_added: false",
+      "dependencies_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    "runtime/internal/app/connection/registry.go": [
+      "PresenceForPlayer",
+      "PresenceStatusOnline",
+      "PresenceStatusOffline",
+      "PlayerPresence",
+      "PresenceConnection",
+    ],
+    "runtime/internal/app/connection/registry_test.go": [
+      "TestPresenceForPlayerReportsOnlineFromActiveBoundConnections",
+      "TestPresenceForPlayerReportsOfflineForNoActiveBoundConnections",
+      "TestPresenceForPlayerReturnsCopies",
+    ],
+    "runtime/internal/platform/transport/ws/server.go": [
+      "ConnectionLifecycleObserver",
+      "ConnectionLifecycleEvent",
+      "ConnectionOpened",
+      "ConnectionClosed",
+    ],
+    "runtime/internal/platform/transport/ws/server_test.go": [
+      "TestServerNotifiesLifecycleObserverForOpenAndClosedConnection",
+      "TestServerRejectsConnectionWhenLifecycleOpenFails",
+      "recordingLifecycleObserver",
+    ],
+    "runtime/cmd/vibit-server/connection_lifecycle.go": [
+      "connectionLifecycleRegistryObserver",
+      "RegisterOpenConnection",
+      "MarkConnectionClosed",
+      "transport_closed",
+    ],
+    "runtime/cmd/vibit-server/connection_binding_registry.go": [
+      "registryConnectionBinder",
+      "BindConnectionIdentity",
+      "ErrorCodeConnectionBindingUnavailable",
+    ],
+    "runtime/cmd/vibit-server/connection_lifecycle_test.go": [
+      "TestConnectionLifecycleRegistryObserverRegistersOpenAndClosedConnection",
+      "TestRegistryConnectionBinderBindsValidatedConnectionIntoRegistry",
+      "TestRegistryConnectionBinderFailsClosedWhenRegistryBindFails",
+      "PresenceForPlayer",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "proto/vibit/protocol/v1/envelope.proto",
+      patterns: [
+        { pattern: /\bPresenceRequest\b|\bPresenceResponse\b|\bGetPresence\b|\bpresence_status\b|\bpresence_subscription\b|\bpresence_broadcast\b/i, label: "protocol presence fields or messages" },
+      ],
+    },
+    {
+      file: "proto/vibit/authentication/v1/authentication.proto",
+      patterns: [
+        { pattern: /\bPresenceRequest\b|\bPresenceResponse\b|\bGetPresence\b|\bpresence_status\b|\bpresence_subscription\b|\bpresence_broadcast\b/i, label: "authentication-owned presence protocol fields or messages" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/transport/ws/server.go",
+      patterns: [
+        { pattern: /\bAuthorization\b|\bCookie\b|\bSec-WebSocket-Protocol\b|\bBearer\b|\bAccessToken\b|\bSessionID\b|\bPlayerID\b|\bRuntimeSessionID\b/, label: "transport credential, token, session, or player identity parsing" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/protocol/protobuf/frame_handler.go",
+      patterns: [
+        { pattern: /\bPresence\b|\bGetPresence\b|\bSubscribePresence\b|\bBroadcastPresence\b/, label: "protocol presence route or subscription behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/authentication/service.go",
+      patterns: [
+        { pattern: /\bPresenceForPlayer\b|\bConnectionLifecycleObserver\b|\bBindConnectionIdentity\b|\bRegisterOpenConnection\b|\bMarkConnectionClosed\b/, label: "authentication service owning presence lifecycle or registry wiring" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/connection/registry.go",
+      patterns: [
+        { pattern: /\bwebsocket\b|\bprotocol\/protobuf\b|\bpostgres\b|\bpgx\b/, label: "connection registry importing transport, protocol, or persistence concerns" },
+        { pattern: /\bRawAccessToken\b|\bRawToken\b|\bRawCredential\b|\bLookupDigest\b|\bVerifierDigest\b|\bVerifierKeyID\b/, label: "presence registry owning proof material or verifier details" },
+        { pattern: /\bSubscribe\b|\bBroadcast\b|\bChat\b|\bMatchmaking\b|\bMatchRuntime\b/, label: "presence registry expanding into subscriptions, chat, matchmaking, or match runtime" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, rule.file)));
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} stays inside presence lifecycle functional slice boundary`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses presence lifecycle functional slice boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("presence lifecycle functional slice is completed with registry-backed player online/offline snapshots and no protocol/subscription/durable presence side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -21728,6 +21960,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0177", "current_phase: presence_protocol_query_functional_slice"],
     ["W-0176", "current_phase: presence_lifecycle_functional_slice"],
     ["W-0175", "current_phase: protocol_session_carrier_functional_slice"],
     ["W-0174", "current_phase: reconnect_connection_epoch_functional_slice"],
@@ -22244,6 +22477,7 @@ function checkRuntime(root) {
   checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFiles);
   checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles);
   checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles);
+  checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

@@ -366,6 +366,94 @@ func TestFindConnectionByIDReturnsSupersededRecordForLifecycleInspection(t *test
 	}
 }
 
+func TestPresenceForPlayerReportsOnlineFromActiveBoundConnections(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime().Add(5 * time.Minute)})
+	registerAndBind(t, registry, "connection-1", 1, "player-1", "session-2", "token-2")
+	registerAndBind(t, registry, "connection-2", 1, "player-1", "session-1", "token-1")
+	registerAndBind(t, registry, "connection-3", 1, "player-2", "session-3", "token-3")
+	if _, err := registry.MarkConnectionClosed(context.Background(), MarkClosed{
+		ConnectionID:     "connection-2",
+		ConnectionEpoch:  1,
+		ClosedAt:         fixedTime().Add(10 * time.Minute),
+		CloseReasonClass: "transport_closed",
+	}); err != nil {
+		t.Fatalf("MarkConnectionClosed() error = %v, want nil", err)
+	}
+
+	presence := registry.PresenceForPlayer(context.Background(), " player-1 ")
+
+	if presence.PlayerID != "player-1" ||
+		presence.Status != PresenceStatusOnline ||
+		presence.ConnectionCount != 1 ||
+		len(presence.ActiveConnections) != 1 {
+		t.Fatalf("PresenceForPlayer() = %#v, want one online active connection", presence)
+	}
+	connection := presence.ActiveConnections[0]
+	if connection.ConnectionID != "connection-1" ||
+		connection.ConnectionEpoch != 1 ||
+		connection.RuntimeSessionID != "session-2" ||
+		connection.LastSeenAt == nil ||
+		!connection.LastSeenAt.Equal(fixedTime().Add(5*time.Minute)) {
+		t.Fatalf("presence connection = %#v, want active bound connection metadata", connection)
+	}
+	if presence.LastSeenAt == nil || !presence.LastSeenAt.Equal(fixedTime().Add(5*time.Minute)) {
+		t.Fatalf("LastSeenAt = %v, want registry binding time", presence.LastSeenAt)
+	}
+	if !reflect.DeepEqual(presence.RuntimeSessionIDs, []RuntimeSessionID{"session-2"}) ||
+		!reflect.DeepEqual(presence.AccessTokenRecords, []AccessTokenRecordID{"token-2"}) {
+		t.Fatalf("presence ids = %#v/%#v, want sorted active ids", presence.RuntimeSessionIDs, presence.AccessTokenRecords)
+	}
+	if !presence.ObservedAt.Equal(fixedTime().Add(5 * time.Minute)) {
+		t.Fatalf("ObservedAt = %v, want registry clock", presence.ObservedAt)
+	}
+}
+
+func TestPresenceForPlayerReportsOfflineForNoActiveBoundConnections(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
+	registerAndBind(t, registry, "connection-1", 1, "player-1", "session-1", "token-1")
+	if _, err := registry.MarkConnectionInvalidated(context.Background(), Invalidation{
+		ConnectionID:      "connection-1",
+		ConnectionEpoch:   1,
+		InvalidationClass: "token_revoked",
+	}); err != nil {
+		t.Fatalf("MarkConnectionInvalidated() error = %v, want nil", err)
+	}
+
+	presence := registry.PresenceForPlayer(context.Background(), "player-1")
+
+	if presence.Status != PresenceStatusOffline ||
+		presence.ConnectionCount != 0 ||
+		len(presence.ActiveConnections) != 0 ||
+		presence.LastSeenAt != nil {
+		t.Fatalf("PresenceForPlayer() = %#v, want offline without active connections", presence)
+	}
+}
+
+func TestPresenceForPlayerReturnsCopies(t *testing.T) {
+	registry := NewInMemoryRegistry(staticClock{now: fixedTime()})
+	registerAndBind(t, registry, "connection-1", 1, "player-1", "session-1", "token-1")
+
+	presence := registry.PresenceForPlayer(context.Background(), "player-1")
+	if presence.LastSeenAt == nil || len(presence.ActiveConnections) != 1 || presence.ActiveConnections[0].LastSeenAt == nil {
+		t.Fatalf("PresenceForPlayer() = %#v, want time pointers", presence)
+	}
+	mutatedTime := fixedTime().Add(time.Hour)
+	*presence.LastSeenAt = mutatedTime
+	*presence.ActiveConnections[0].LastSeenAt = mutatedTime
+	presence.ActiveConnections[0].ConnectionID = "mutated"
+	presence.RuntimeSessionIDs[0] = "mutated"
+	presence.AccessTokenRecords[0] = "mutated"
+
+	presenceAgain := registry.PresenceForPlayer(context.Background(), "player-1")
+	if presenceAgain.ActiveConnections[0].ConnectionID != "connection-1" ||
+		presenceAgain.LastSeenAt.Equal(mutatedTime) ||
+		presenceAgain.ActiveConnections[0].LastSeenAt.Equal(mutatedTime) ||
+		presenceAgain.RuntimeSessionIDs[0] != "session-1" ||
+		presenceAgain.AccessTokenRecords[0] != "token-1" {
+		t.Fatalf("PresenceForPlayer() returned aliased presence = %#v", presenceAgain)
+	}
+}
+
 func TestRegistryRejectsInvalidConnectionShapeAndClock(t *testing.T) {
 	registry := NewInMemoryRegistry(staticClock{now: time.Time{}})
 	if _, err := registry.RegisterOpenConnection(context.Background(), openCommand("connection-1", 1)); !hasRegistryCode(err, ErrorCodeClockUnavailable) {

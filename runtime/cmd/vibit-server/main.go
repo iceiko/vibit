@@ -15,6 +15,7 @@ import (
 	"github.com/iceiko/vibit/runtime/internal/app"
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
+	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/platform/persistence/postgres"
 	vibitprotobuf "github.com/iceiko/vibit/runtime/internal/platform/protocol/protobuf"
@@ -71,7 +72,7 @@ func newHTTPHandler() (http.Handler, error) {
 	if err != nil {
 		return nil, err
 	}
-	return newHTTPHandlerWithDispatcher(dispatcher, nil, nil), nil
+	return newHTTPHandlerWithDispatcher(dispatcher, nil, nil, nil), nil
 }
 
 func newHTTPHandlerFromEnv(ctx context.Context, lookup func(string) (string, bool)) (http.Handler, func(), error) {
@@ -132,14 +133,30 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 			app.LogoutAccessTokenRoute(),
 		},
 	}
-	return newHTTPHandlerWithDispatcher(transactionalDispatcher, authComposition.RouteProtector, authComposition.ConnectionBinder), pool.Close, nil
+	connectionRegistry := appconnection.NewInMemoryRegistry(nil)
+	connectionBinder := registryConnectionBinder{
+		binder:   authComposition.ConnectionBinder,
+		registry: connectionRegistry,
+	}
+	return newHTTPHandlerWithDispatcher(
+		transactionalDispatcher,
+		authComposition.RouteProtector,
+		connectionBinder,
+		connectionLifecycleRegistryObserver{registry: connectionRegistry},
+	), pool.Close, nil
 }
 
-func newHTTPHandlerWithDispatcher(dispatcher vibitprotobuf.ApplicationDispatcher, routeProtector vibitprotobuf.RouteProtector, connectionBinder vibitprotobuf.ConnectionBinder) http.Handler {
+func newHTTPHandlerWithDispatcher(
+	dispatcher vibitprotobuf.ApplicationDispatcher,
+	routeProtector vibitprotobuf.RouteProtector,
+	connectionBinder vibitprotobuf.ConnectionBinder,
+	lifecycle ws.ConnectionLifecycleObserver,
+) http.Handler {
 	protocolHandler := newProtocolFrameHandlerWithDispatcher(dispatcher, routeProtector, connectionBinder)
 	mux := http.NewServeMux()
 	mux.Handle(websocketPath, &ws.Server{
-		Handler: websocketProtocolHandler{handler: protocolHandler},
+		Handler:   websocketProtocolHandler{handler: protocolHandler},
+		Lifecycle: lifecycle,
 	})
 	return mux
 }

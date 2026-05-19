@@ -406,6 +406,25 @@ external_runtime_slices:
     handshake_authentication_added: false
     logout_triggered_socket_close_added: false
     runtime_session_revocation_added: false
+  presence_lifecycle_functional_slice:
+    status: completed
+    completed_work_item: W-0177
+    decision: ADR-0085
+    check_rule: runtime.presence_lifecycle_functional_slice
+    authentication_module_owns_presence_lifecycle: false
+    authentication_module_owns_websocket_lifecycle_observer: false
+    authentication_module_owns_connection_registry_wiring: false
+    authentication_service_behavior_changed: false
+    connection_binding_may_feed_registry_after_validation: true
+    presence_owner: runtime/internal/app/connection
+    transport_lifecycle_owner: runtime/internal/platform/transport/ws
+    startup_composition_owner: runtime/cmd/vibit-server
+    protocol_presence_query_added: false
+    presence_subscription_added: false
+    presence_broadcast_added: false
+    durable_distributed_presence_added: false
+    runtime_session_revocation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     module_ownership_rule: W-0176 reused existing Envelope.Session metadata in the Protobuf adapter for the login-created runtime session carrier. Authentication remains token lifecycle service logic and does not own protocol carrier mapping, reconnect/resume, transport authentication, or runtime session revocation behavior.
 

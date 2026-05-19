@@ -239,6 +239,30 @@ implemented_wire_and_runtime_slices:
     runtime_session_revocation_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0176 reused existing Envelope.Session metadata for the first runtime session carrier and did not change contract source or generated Protobuf output.
+  presence_lifecycle_functional_slice:
+    status: completed
+    completed_work_item: W-0177
+    decision: ADR-0085
+    presence_lifecycle_functional_slice_completed: true
+    check_rule: runtime.presence_lifecycle_functional_slice
+    presence_owner: runtime/internal/app/connection
+    internal_presence_query_primitive_added: true
+    first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections
+    protocol_contract_source_added: false
+    protocol_presence_query_added: false
+    generated_output_added: false
+    presence_subscription_added: false
+    presence_broadcast_added: false
+    durable_distributed_presence_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0177 added an application-owned internal player presence snapshot primitive and startup lifecycle wiring without adding public contract source or generated Protobuf output.
+  presence_protocol_query_functional_slice:
+    status: active
+    next_ready_work_item: W-0178
+    selected_direction: define_presence_protocol_query_functional_slice
+    protocol_contract_source_added: false
+    generated_output_added: false
+    rule: W-0178 may add a protected protocol presence query only after the W-0177 server-owned presence lifecycle primitive exists.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

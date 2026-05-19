@@ -1,0 +1,148 @@
+schema_version: 0.1
+change_id: define-presence-lifecycle-functional-slice
+date: 2026-05-20
+type: feature
+status: verified
+
+summary: Implement the first bounded server-owned presence lifecycle primitive from active bound connection registry state.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0085
+  referenced:
+    - ADR-0084
+    - ADR-0083
+    - ADR-0082
+    - ADR-0081
+    - ADR-0078
+    - ADR-0075
+    - ADR-0058
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added:
+      - runtime.connection.PresenceForPlayer internal application query primitive
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  protobuf_sources_changed: []
+  generated_outputs_changed: []
+  existing_envelope_changed: false
+  presence_protocol_query_added: false
+  presence_subscription_added: false
+  presence_broadcast_added: false
+  room_presence_added: false
+  party_presence_added: false
+  match_presence_added: false
+
+data:
+  migrations_required: false
+  migration_sources: []
+  durable_presence_store_added: false
+  ownership_changes:
+    - Active connection registry owns server-observed single-process presence snapshot state.
+    - WebSocket transport owns credential-neutral connection lifecycle observation.
+    - Process startup composes transport lifecycle and connection binding into the registry.
+    - Authentication service remains token lifecycle service logic and does not own presence.
+
+runtime:
+  completed_work_item: W-0177
+  completed_milestone: M-105
+  next_milestone: M-106
+  next_work_item: W-0178
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  presence_lifecycle_functional_slice_completed: true
+  presence_lifecycle_functional_slice_decision: ADR-0085
+  presence_lifecycle_functional_slice_check_rule: runtime.presence_lifecycle_functional_slice
+  presence_owner: runtime/internal/app/connection
+  transport_lifecycle_owner: runtime/internal/platform/transport/ws
+  startup_composition_owner: runtime/cmd/vibit-server
+  changed_source:
+    - runtime/internal/app/connection/registry.go
+    - runtime/internal/platform/transport/ws/server.go
+    - runtime/cmd/vibit-server/main.go
+    - runtime/cmd/vibit-server/connection_lifecycle.go
+    - runtime/cmd/vibit-server/connection_binding_registry.go
+  changed_tests:
+    - runtime/internal/app/connection/registry_test.go
+    - runtime/internal/platform/transport/ws/server_test.go
+    - runtime/cmd/vibit-server/connection_lifecycle_test.go
+  first_presence_behavior: registry_backed_player_online_offline_snapshot_from_active_bound_connections
+  player_presence_snapshot_added: true
+  websocket_lifecycle_observer_added: true
+  startup_registry_lifecycle_wiring_added: true
+  connection_binding_registry_wiring_added: true
+  session_presence_linkage_from_validation_added: false
+  access_token_record_presence_linkage_from_validation_added: false
+  protocol_presence_query_added: false
+  presence_subscription_added: false
+  presence_broadcast_added: false
+  durable_distributed_presence_added: false
+  chat_added: false
+  friends_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  reconnect_token_added: false
+  resume_token_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  boundary:
+    allowed:
+      - Derive online/offline player presence from active bound registry records.
+      - Notify a credential-neutral transport lifecycle observer when WebSocket connections open and close.
+      - Wire PostgreSQL startup composition so transport lifecycle and successful first-message binding update the registry.
+      - Keep presence single-process and non-durable in this first slice.
+    forbidden:
+      - Add Protobuf presence messages, generated output, protocol routes, subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, operations/admin behavior, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, dependencies, or direct Nakama/Pitaya API compatibility.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - cd runtime && go test ./cmd/vibit-server ./internal/app/connection ./internal/platform/transport/ws
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check change define-presence-lifecycle-functional-slice --json
+    - node tools/vibit inspect next
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

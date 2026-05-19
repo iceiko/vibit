@@ -157,6 +157,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-104 Protocol Session Carrier Functional Slice` is completed outside this module's ownership. `W-0176` added Protobuf adapter-owned response session metadata mapping in `runtime/internal/platform/protocol/protobuf` and `ADR-0084`. Authentication may continue returning `AuthenticationResult.SessionID` after successful login, but it does not own protocol carrier mapping, session-id proof semantics, reconnect/resume behavior, WebSocket handshake authentication, logout-triggered close, runtime session revocation, or direct Nakama/Pitaya API compatibility. The current next ready work item is `M-105/W-0177 define_presence_lifecycle_functional_slice`.
 
+`M-105 Presence Lifecycle Functional Slice` is completed outside this module's ownership. `W-0177` added application registry-owned player presence snapshots, a WebSocket transport lifecycle observer, and startup composition adapters that can feed validated first-message binding into the active connection registry. Authentication service behavior did not change and authentication does not own presence lifecycle, WebSocket lifecycle observation, protocol presence queries, subscriptions, broadcasts, runtime session revocation, or direct Nakama/Pitaya API compatibility. The current next ready work item is `M-106/W-0178 define_presence_protocol_query_functional_slice`.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.

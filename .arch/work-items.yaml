@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-105
+current_milestone: M-106
 
 continuation_semantics:
   default_step_unit: work_item
@@ -1927,7 +1927,7 @@ milestones:
 
   - id: M-105
     title: Presence Lifecycle Functional Slice
-    status: active
+    status: completed
     goal: Define and implement the first bounded presence lifecycle behavior after protocol-visible session metadata exists.
     completion_criteria:
       - The slice records the presence lifecycle boundary in its change spec before implementation.
@@ -1939,6 +1939,24 @@ milestones:
       - adding reconnect or resume tokens
       - making logout automatically close sockets
       - revoking runtime sessions
+    completion_summary: Implemented the first server-owned presence lifecycle primitive as a Tier 2 functional slice. WebSocket transport now exposes a credential-neutral connection lifecycle observer, PostgreSQL startup composition wires open/close lifecycle and successful first-message binding into the application-owned active connection registry, and the registry can derive player online/offline presence snapshots from active bound records. No Protobuf presence route, generated output, subscription, broadcast, chat, social module, matchmaking, match runtime, durable/distributed presence, dependency, direct compatibility, logout-triggered close, or runtime session revocation was added.
+
+  - id: M-106
+    title: Presence Protocol Query Functional Slice
+    status: active
+    goal: Expose the server-owned presence lifecycle snapshot through the first bounded protected protocol query.
+    completion_criteria:
+      - The slice records the presence protocol query boundary in its change spec before implementation.
+      - Any implementation remains bounded to a protected query over the existing server-owned presence snapshot with focused tests.
+      - Presence subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, reconnect/resume tokens, logout-triggered close, runtime session revocation, durable/distributed presence, dependencies, direct Nakama/Pitaya API compatibility, and broad product modules remain behind explicit ask-first boundaries.
+      - The resulting state is checkable through focused tests and repository checks.
+    non_goals:
+      - adding presence subscriptions or broadcasts
+      - adding chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, or direct Nakama/Pitaya API compatibility
+      - adding reconnect or resume tokens
+      - making logout automatically close sockets
+      - revoking runtime sessions
+      - adding durable or distributed presence
 
 work_items:
   - id: W-0001
@@ -6146,7 +6164,7 @@ work_items:
   - id: W-0177
     milestone: M-105
     title: Define presence lifecycle functional slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-20-define-presence-lifecycle-functional-slice
     depends_on:
       - W-0176
@@ -6154,9 +6172,31 @@ work_items:
     tier: tier_2_functional
     selected_direction: define_presence_lifecycle_functional_slice
     gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0082
+      - ADR-0085
     ask_first:
       - Selecting chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect tokens, resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, or broad product module expansion.
     completion:
       - Create a change spec that embeds the presence lifecycle boundary instead of creating a separate confirmation gate.
       - Define the smallest checkable presence/status behavior after protocol session carrier support.
       - Preserve chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, and broad product behavior behind ask-first boundaries.
+    completion_summary: Added the first server-owned player presence lifecycle primitive. WebSocket transport reports credential-neutral open/closed lifecycle events to startup composition, successful first-message binding records validated player identity in the registry, and `PresenceForPlayer` derives online/offline snapshots from active bound registry records. No protocol presence query, subscription, broadcast, durable/distributed presence, social, matchmaking, match runtime, dependency, direct compatibility, logout-triggered close, or runtime session revocation was added.
+
+  - id: W-0178
+    milestone: M-106
+    title: Define presence protocol query functional slice
+    status: next_ready
+    change: changes/2026-05-20-define-presence-protocol-query-functional-slice
+    depends_on:
+      - W-0177
+    expected_change_id: define-presence-protocol-query-functional-slice
+    tier: tier_2_functional
+    selected_direction: define_presence_protocol_query_functional_slice
+    gate_density_strategy: ADR-0082
+    ask_first:
+      - Selecting presence subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect tokens, resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, or broad product module expansion.
+    completion:
+      - Create a change spec that embeds the presence protocol query boundary instead of creating a separate confirmation gate.
+      - Define and implement the smallest protected presence query over the existing server-owned registry-backed player presence snapshot.
+      - Preserve subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, and broad product behavior behind ask-first boundaries.
