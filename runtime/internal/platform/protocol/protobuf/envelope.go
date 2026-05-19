@@ -19,6 +19,19 @@ func (e *DecodeEnvelopeError) Error() string {
 }
 
 func RouteRequestFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, error) {
+	request, err := RouteRequestMetadataFromEnvelope(envelope)
+	if err != nil {
+		return app.RouteRequest{}, err
+	}
+	payload, err := DecodePayload(request.PayloadType, request.PayloadBytes)
+	if err != nil {
+		return app.RouteRequest{}, err
+	}
+	request.Payload = payload
+	return request, nil
+}
+
+func RouteRequestMetadataFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, error) {
 	if envelope == nil {
 		return app.RouteRequest{}, &DecodeEnvelopeError{Message: "envelope is nil"}
 	}
@@ -51,10 +64,6 @@ func RouteRequestFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, 
 		return app.RouteRequest{}, &DecodeEnvelopeError{Message: "envelope payload_type is empty"}
 	}
 	payloadBytes := append([]byte(nil), envelope.GetPayload()...)
-	payload, err := DecodePayload(payloadType, payloadBytes)
-	if err != nil {
-		return app.RouteRequest{}, err
-	}
 
 	appSession := app.Session{
 		ConnectionID:    strings.TrimSpace(session.GetConnectionId()),
@@ -77,7 +86,6 @@ func RouteRequestFromEnvelope(envelope *protocolv1.Envelope) (app.RouteRequest, 
 		Session:      appSession,
 		Identity:     app.MetadataOnlyIdentityFromSession(appSession),
 		PayloadType:  payloadType,
-		Payload:      payload,
 		PayloadBytes: payloadBytes,
 	}, nil
 }

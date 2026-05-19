@@ -1,0 +1,110 @@
+schema_version: 0.1
+change_id: implement-session-repository-interface
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Add the storage-neutral runtime session repository interface and lifecycle value types without PostgreSQL adapter or runtime validation behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0062
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0059
+    - ADR-0060
+    - ADR-0061
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_table_referenced:
+    - runtime_sessions
+  ownership_changes:
+    - runtime/internal/app/session owns storage-neutral session repository interface vocabulary
+    - authentication remains token linkage only
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0136
+  completed_milestone: M-064
+  session_repository_interface_added: true
+  session_repository_interface_decision: ADR-0062
+  session_repository_interface_check_rule: runtime.session_repository_interface_implementation
+  source: runtime/internal/app/session/repository.go
+  tests: runtime/internal/app/session/repository_test.go
+  repository_owner: runtime/internal/app/session
+  repository_interface: runtime/internal/app/session.Repository
+  postgresql_adapter_added: false
+  unit_of_work_factory_added: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_revocation_added: false
+  runtime_session_cleanup_added: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - go test ./...
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-session-repository-boundary --json
+    - node tools/vibit check change implement-session-repository-interface --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

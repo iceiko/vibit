@@ -1,0 +1,143 @@
+schema_version: 0.1
+change_id: define-first-message-connection-binding-implementation-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the first-message connection binding implementation gate before adding BindConnection protocol messages or runtime binding behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0058
+  referenced:
+    - ADR-0015
+    - ADR-0016
+    - ADR-0017
+    - ADR-0018
+    - ADR-0019
+    - ADR-0021
+    - ADR-0023
+    - ADR-0024
+    - ADR-0026
+    - ADR-0027
+    - ADR-0036
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+    - ADR-0055
+    - ADR-0056
+    - ADR-0057
+
+standards:
+  added:
+    - docs/first-message-connection-binding-implementation-gate.md
+    - docs/first-message-connection-binding-implementation-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  first_message_connection_binding_implementation_gate_defined: true
+  first_message_connection_binding_implementation_gate_check_rule: runtime.first_message_connection_binding_implementation_gate
+  implementation_authorized_by_this_standard: false
+  future_implementation_work_item: W-0128
+  future_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  future_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  future_protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  future_application_binding_owner: runtime/internal/app
+  future_startup_owner: runtime/cmd/vibit-server
+  future_route: runtime.authentication.BindConnection
+  future_route_kind: system
+  future_request: vibit.authentication.v1.BindConnectionRequest
+  future_response: vibit.authentication.v1.BindConnectionResponse
+  future_status_enum: vibit.authentication.v1.ConnectionBindingStatus
+  future_first_composed_runtime_store: postgres
+  memory_store_binding_status: unavailable_bootstrap
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_change_added: false
+  protocol_source_added_by_this_change: false
+  generated_output_added_by_this_change: false
+  connection_binding_registry_added_by_this_change: false
+  route_policy_bound_identity_added_by_this_change: false
+  session_persistence_added: false
+  session_table_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  reconnect_epoch_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0126
+  completed_milestone: M-054
+  next_milestone: M-055
+  blocked_work_item: W-0127
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change confirm-next-direction-after-first-message-connection-binding-gate --json
+    - node tools/vibit check change define-first-message-connection-binding-implementation-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

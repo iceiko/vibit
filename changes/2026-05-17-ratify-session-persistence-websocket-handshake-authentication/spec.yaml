@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: ratify-session-persistence-websocket-handshake-authentication
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Ratify the first session persistence and WebSocket handshake authentication posture after public login and request-level route protection.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0056
+  referenced:
+    - ADR-0015
+    - ADR-0018
+    - ADR-0019
+    - ADR-0021
+    - ADR-0023
+    - ADR-0024
+    - ADR-0026
+    - ADR-0027
+    - ADR-0036
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+    - ADR-0055
+
+standards:
+  added:
+    - docs/session-persistence-websocket-handshake-ratification.md
+    - docs/session-persistence-websocket-handshake-ratification.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  session_persistence_websocket_handshake_ratification_defined: true
+  session_persistence_websocket_handshake_ratification_check_rule: runtime.session_persistence_websocket_handshake_ratification
+  current_validation_model: request_level_access_token_validation
+  current_proof_carrier: protobuf_authenticated_request_payload_wrapper
+  current_websocket_handshake_authentication: not_selected
+  current_websocket_transport_credential_neutral: true
+  current_protobuf_envelope_change: unchanged
+  future_connection_binding_preferred_gate: first_message_protocol_binding
+  future_session_store_preferred_first_durable_target: postgres
+  session_table_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  token_rotation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0122
+  completed_milestone: M-050
+  next_milestone: M-051
+  blocked_work_item: W-0123
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check memory --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change confirm-next-direction-after-authentication-login-route --json
+    - node tools/vibit check change ratify-session-persistence-websocket-handshake-authentication --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

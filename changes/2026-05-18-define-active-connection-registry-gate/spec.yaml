@@ -1,0 +1,107 @@
+schema_version: 0.1
+change_id: define-active-connection-registry-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Define the gate-only boundary for future active WebSocket connection registry behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0074
+  referenced:
+    - ADR-0019
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+    - ADR-0069
+    - ADR-0070
+    - ADR-0071
+    - ADR-0072
+    - ADR-0073
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Future active connection registry behavior is application-owned under runtime/internal/app/connection.
+    - WebSocket transport remains a lifecycle handoff owner only and does not own authentication state.
+    - Authentication remains token lifecycle behavior and does not own active connection invalidation.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0160
+  completed_milestone: M-088
+  active_connection_registry_gate_defined: true
+  active_connection_registry_gate_decision: ADR-0074
+  active_connection_registry_gate_standard: docs/active-connection-registry-gate.md
+  active_connection_registry_gate_check_rule: runtime.active_connection_registry_gate
+  future_registry_owner: runtime/internal/app/connection
+  first_registry_posture: single_process_in_memory
+  registry_persistence_posture: non_durable_runtime_state
+  cluster_registry_posture: deferred
+  metadata_only_targeting_allowed: false
+  active_connection_registry_added: false
+  active_connection_invalidation_added: false
+  websocket_close_policy_added: false
+  kick_disconnect_behavior_added: false
+  duplicate_connection_replacement_added: false
+  reconnect_epoch_behavior_added: false
+  runtime_session_revocation_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-logout-access-token-behavior-implementation --json
+    - node tools/vibit check change define-active-connection-registry-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

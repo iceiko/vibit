@@ -12,9 +12,10 @@ import (
 const defaultReadLimitBytes int64 = 1 << 20
 
 type Frame struct {
-	ConnectionID string
-	RemoteAddr   string
-	Payload      []byte
+	ConnectionID    string
+	ConnectionEpoch uint64
+	RemoteAddr      string
+	Payload         []byte
 }
 
 type FrameHandler interface {
@@ -58,6 +59,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	meta := connectionMetadata{
 		id:         fmt.Sprintf("ws-%d", atomic.AddUint64(&s.nextConnectionID, 1)),
+		epoch:      1,
 		remoteAddr: r.RemoteAddr,
 	}
 	_ = s.handleConnection(r.Context(), conn, meta)
@@ -65,6 +67,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 type connectionMetadata struct {
 	id         string
+	epoch      uint64
 	remoteAddr string
 }
 
@@ -99,8 +102,9 @@ func (s *Server) handleConnection(ctx context.Context, conn *websocket.Conn, met
 
 func newFrame(meta connectionMetadata, payload []byte) Frame {
 	return Frame{
-		ConnectionID: meta.id,
-		RemoteAddr:   meta.remoteAddr,
-		Payload:      append([]byte(nil), payload...),
+		ConnectionID:    meta.id,
+		ConnectionEpoch: meta.epoch,
+		RemoteAddr:      meta.remoteAddr,
+		Payload:         append([]byte(nil), payload...),
 	}
 }

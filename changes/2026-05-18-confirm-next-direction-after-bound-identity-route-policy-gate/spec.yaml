@@ -1,0 +1,63 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-bound-identity-route-policy-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Select the next milestone direction after the bound identity route policy gate.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0070
+  referenced:
+    - ADR-0019
+    - ADR-0053
+    - ADR-0057
+    - ADR-0058
+    - ADR-0065
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+
+selected_direction: implement_bound_identity_route_policy
+
+candidate_directions:
+  - implement_bound_identity_route_policy
+  - define_logout_revocation_active_connection_gate
+  - define_reconnect_connection_epoch_gate
+  - define_protocol_session_carrier_gate
+  - strengthen_operations_observability_and_admin_tooling
+  - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime:
+  completed_work_item: W-0151
+  completed_milestone: M-079
+  next_milestone: M-080
+  next_work_item: W-0152
+  bound_identity_route_policy_implementation_selected: true
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  protocol_session_carrier_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+  direct_nakama_pitaya_api_compatibility_selected: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit check change confirm-next-direction-after-bound-identity-route-policy-gate --json
+    - node tools/vibit check all --json
+  status: Verified

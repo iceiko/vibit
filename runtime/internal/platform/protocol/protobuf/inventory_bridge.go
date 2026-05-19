@@ -28,6 +28,10 @@ func RouteRequestFromEnvelopeForDispatch(envelope *protocolv1.Envelope) (app.Rou
 }
 
 func RouteRequestWithDomainPayload(request app.RouteRequest) (app.RouteRequest, error) {
+	if authenticationRequest, handled, err := routeRequestWithAuthenticationPayload(request); handled || err != nil {
+		return authenticationRequest, err
+	}
+
 	switch request.Route {
 	case inventory.GrantItemRoute():
 		payload, ok := request.Payload.(*inventoryv1.GrantItemRequest)
@@ -90,6 +94,13 @@ func ProtoPayloadFromApplicationEvent(event app.ApplicationEvent) (proto.Message
 }
 
 func protoPayloadFromRouteAndPayload(route app.RouteKey, payload any) (proto.Message, error) {
+	if authenticationPayload, handled, err := protoPayloadFromAuthenticationRoute(route, payload); handled || err != nil {
+		return authenticationPayload, err
+	}
+	if connectionBindingPayload, handled, err := protoPayloadFromConnectionBindingRoute(route, payload); handled || err != nil {
+		return connectionBindingPayload, err
+	}
+
 	switch route {
 	case inventory.GrantItemRoute():
 		response, ok := payload.(inventory.GrantItemResponse)

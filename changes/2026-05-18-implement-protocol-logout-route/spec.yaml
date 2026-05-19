@@ -1,0 +1,112 @@
+schema_version: 0.1
+change_id: implement-protocol-logout-route
+date: 2026-05-18
+type: protocol
+status: verified
+
+summary: Expose the existing access-token logout behavior through the WebSocket Protobuf route surface.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0079
+    - ADR-0078
+    - ADR-0073
+    - ADR-0055
+    - ADR-0018
+
+contracts:
+  commands:
+    added: []
+    changed:
+      - LogoutAccessToken
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  routes_added:
+    - runtime.authentication.LogoutAccessToken
+  protobuf_sources_changed:
+    - proto/vibit/authentication/v1/authentication.proto
+  generated_outputs_changed:
+    - runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  existing_envelope_changed: false
+  proof_carrier_posture: access_token_in_logout_request_payload
+  route_protection_posture: explicit_service_validated_token_lifecycle_route
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+runtime:
+  completed_work_item: W-0170
+  completed_milestone: M-098
+  protocol_logout_route_implemented: true
+  protocol_logout_route_gate_decision: ADR-0079
+  protocol_logout_route_implementation_check_rule: runtime.protocol_logout_route_implementation
+  public_logout_route: runtime.authentication.LogoutAccessToken
+  route_kind: command
+  proof_carrier_posture: access_token_in_logout_request_payload
+  route_protection_posture: explicit_service_validated_token_lifecycle_route
+  first_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  first_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  request_message: vibit.authentication.v1.LogoutAccessTokenRequest
+  response_message: vibit.authentication.v1.LogoutAccessTokenResponse
+  application_handler_owner: runtime/internal/app/bootstrap
+  authentication_service_owner: runtime/internal/app/authentication
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_logout_route_status: unavailable_bootstrap
+  transaction_bypass_added: true
+  logout_closes_socket: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  concrete_socket_close_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - buf generate
+    - cd runtime && go test ./...
+    - node tools/vibit check schemas --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-protocol-logout-route --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

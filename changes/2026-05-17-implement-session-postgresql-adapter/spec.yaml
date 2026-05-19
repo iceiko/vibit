@@ -1,0 +1,115 @@
+schema_version: 0.1
+change_id: implement-session-postgresql-adapter
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Add the PostgreSQL runtime session repository adapter and unit-of-work factory without runtime session validation behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0064
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0059
+    - ADR-0060
+    - ADR-0061
+    - ADR-0062
+    - ADR-0063
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  existing_logical_table_referenced:
+    - runtime_sessions
+  ownership_changes:
+    - runtime/internal/platform/persistence/postgres owns the PostgreSQL session adapter
+    - runtime/internal/app/session remains the storage-neutral repository interface owner
+    - authentication remains token linkage only
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0140
+  completed_milestone: M-068
+  session_postgresql_adapter_implementation_completed: true
+  session_postgresql_adapter_implementation_decision: ADR-0064
+  session_postgresql_adapter_implementation_check_rule: runtime.session_postgresql_adapter_implementation
+  repository_interface: runtime/internal/app/session.Repository
+  repository_owner: runtime/internal/app/session
+  postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  adapter_source: runtime/internal/platform/persistence/postgres/session_repository.go
+  adapter_tests: runtime/internal/platform/persistence/postgres/session_repository_test.go
+  unit_of_work_factory: NewSessionRepository
+  postgresql_adapter_added: true
+  unit_of_work_factory_added: true
+  runtime_session_behavior_added: false
+  runtime_session_creation_added: false
+  runtime_session_validation_added: false
+  request_identity_session_validated_true_added: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - go test ./internal/platform/persistence/postgres
+    - go test ./...
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-session-postgresql-adapter-gate --json
+    - node tools/vibit check change implement-session-postgresql-adapter --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -1,0 +1,21 @@
+# Checklist
+
+- [x] Requirement clarified.
+- [x] Access-token validation boundary preserved.
+- [x] Proof pre-validation implemented.
+- [x] Token lookup digest computation implemented.
+- [x] Repository handoff through unit-of-work capability implemented.
+- [x] Token lifecycle and audience checks implemented.
+- [x] Token verifier comparison before request identity implemented.
+- [x] Active player account requirement implemented.
+- [x] Validated request identity handoff implemented.
+- [x] `SessionValidated` kept false.
+- [x] Public invalid-token failure collapse implemented.
+- [x] Focused tests added.
+- [x] Architecture manifests updated.
+- [x] Authentication module metadata updated.
+- [x] Agent guides updated in English and Simplified Chinese.
+- [x] Repository check rule added.
+- [x] Work item `W-0111` marked completed.
+- [x] Next direction held behind a blocked confirmation gate.
+- [x] Verification recorded.

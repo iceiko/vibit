@@ -8,6 +8,8 @@ This document records how vibit should use mature game server projects as refere
 
 The paired Simplified Chinese translation is `docs/reference-game-server-alignment.zh-CN.md`. The English file is authoritative.
 
+`ADR-0078` and `docs/nakama-pitaya-product-parity-roadmap.md` refine this reference baseline into an explicit product target: vibit should become a Nakama/Pitaya-class game backend framework by covering common capability families while preserving vibit's agent-native constraints. This document still defines reference roles; the product parity roadmap defines phased execution.
+
 ## 1. Purpose
 
 vibit is not only an inventory proof slice.
@@ -34,6 +36,17 @@ The difference is not the existence of those game server capabilities. The diffe
 - Verification commands that agents can run before and after changes.
 
 Nakama documents a broad game server product surface that includes user accounts, authentication, storage, friends, groups, chat, leaderboards, tournaments, matchmaking, realtime multiplayer, and authoritative match runtime concepts. Pitaya documents a Go game server framework shape around client acceptors, sessions, route handlers, remote calls, groups, serializers, and cluster vocabulary. vibit should learn from both surfaces while making every adopted capability explicit, generated where appropriate, and machine-checkable.
+
+Current product target markers:
+
+```text
+nakama_pitaya_product_parity_roadmap: ratified
+decision: ADR-0078
+check_rule: runtime.reference_product_parity_roadmap
+parity_goal: nakama_pitaya_same_class_common_capability_coverage
+api_compatibility_goal: false
+recommended_next_direction: define_protocol_logout_route_gate
+```
 
 ## 2. Reference Roles
 

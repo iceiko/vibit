@@ -1,0 +1,54 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-websocket-close-policy-implementation
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Hold the work queue at an explicit confirmation point after the WebSocket close policy implementation.
+
+affected_modules:
+  - runtime
+  - authentication
+  - reference
+
+decisions:
+  added:
+    - ADR-0078
+  referenced:
+    - ADR-0077
+
+candidate_directions:
+  - define_protocol_logout_route_gate
+  - define_reconnect_connection_epoch_gate
+  - define_protocol_session_carrier_gate
+  - define_transport_close_handoff_gate
+  - strengthen_operations_observability_and_admin_tooling
+  - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
+next_milestone: M-096
+next_ready_work_item: W-0168
+
+runtime:
+  blocked_work_item: W-0167
+  active_milestone: M-095
+  previous_milestone: M-094
+  previous_completed_work_item: W-0166
+  completion_status: completed
+  next_direction_scope: ratify_nakama_pitaya_product_parity_roadmap
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  runtime_behavior_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+  status: Verified

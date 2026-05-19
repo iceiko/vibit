@@ -1,0 +1,115 @@
+schema_version: 0.1
+change_id: define-bound-identity-route-policy-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Define the gate-only boundary for future route-policy use of request-token, bound connection, and session-validated identity.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0069
+  referenced:
+    - ADR-0019
+    - ADR-0053
+    - ADR-0057
+    - ADR-0058
+    - ADR-0065
+    - ADR-0066
+    - ADR-0067
+    - ADR-0068
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Future route policy remains application-owned under runtime/internal/app.
+    - Authentication service remains proof/token/session-creation composition and does not own route policy.
+    - WebSocket transport remains credential-neutral.
+    - Protobuf adapter remains carrier/adapter only and does not decide policy.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_authentication_response_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0150
+  completed_milestone: M-078
+  bound_identity_route_policy_gate_defined: true
+  bound_identity_route_policy_gate_decision: ADR-0069
+  bound_identity_route_policy_gate_check_rule: runtime.bound_identity_route_policy_gate
+  future_policy_owner: runtime/internal/app
+  future_policy_source_candidate: runtime/internal/app/route_authentication.go
+  future_policy_test_candidate: runtime/internal/app/route_authentication_test.go
+  candidate_policy_families:
+    - public
+    - request_token_required
+    - bound_connection_required
+    - session_validated_required
+    - bound_session_required
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  ordinary_protected_routes_use_bound_identity: false
+  ordinary_protected_routes_use_session_validated_identity: false
+  request_token_route_policy_changed: false
+  connection_binding_changed: false
+  runtime_session_validation_changed: false
+  session_creation_changed: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  protobuf_authentication_response_changed: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-session-creation-composition-implementation --json
+    - node tools/vibit check change define-bound-identity-route-policy-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

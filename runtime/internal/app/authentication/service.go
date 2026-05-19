@@ -11,6 +11,7 @@ import (
 	"time"
 
 	"github.com/iceiko/vibit/runtime/internal/app"
+	"github.com/iceiko/vibit/runtime/internal/app/session"
 	authenticationmodule "github.com/iceiko/vibit/runtime/internal/modules/authentication"
 	playermodule "github.com/iceiko/vibit/runtime/internal/modules/player"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
@@ -67,6 +68,7 @@ const (
 	verifierAlgorithmHMACSHA256V1       = "vibit_hmac_sha256_v1"
 	verifierVersionV1                   = 1
 	defaultRequestedBy                  = "authentication_service"
+	logoutReasonPresentedAccessToken    = "logout_presented_access_token"
 )
 
 var (
@@ -75,6 +77,7 @@ var (
 	errMissingAuthenticationUOW       = errors.New("authentication service: authentication unit-of-work capability is required")
 	errMissingDependency              = errors.New("authentication service: dependency is required")
 	errInvalidDependency              = errors.New("authentication service: dependency is invalid")
+	errMalformedRuntimeSessionID      = errors.New("authentication service: generated runtime session id is malformed")
 )
 
 type ServiceError struct {
@@ -120,12 +123,17 @@ type TokenRecordIDGenerator interface {
 	GenerateTokenRecordID(context.Context) (string, error)
 }
 
+type SessionIDGenerator interface {
+	GenerateSessionID(context.Context) (string, error)
+}
+
 type ServiceDependencies struct {
 	UnitOfWorkRunner       UnitOfWorkRunner
 	VerifierKeySet         VerifierKeySet
 	AccessTokenRandom      io.Reader
 	Clock                  Clock
 	TokenRecordIDGenerator TokenRecordIDGenerator
+	SessionIDGenerator     SessionIDGenerator
 	AccessTokenLifetime    time.Duration
 	TokenAudience          string
 }
@@ -136,6 +144,7 @@ type Service struct {
 	accessTokenRandom      io.Reader
 	clock                  Clock
 	tokenRecordIDGenerator TokenRecordIDGenerator
+	sessionIDGenerator     SessionIDGenerator
 	accessTokenLifetime    time.Duration
 	tokenAudience          string
 }
@@ -180,6 +189,14 @@ func NewService(dependencies ServiceDependencies) (Service, error) {
 			Err:        errMissingDependency,
 		}
 	}
+	if isNilInterface(dependencies.SessionIDGenerator) {
+		return Service{}, &ServiceError{
+			Operation:  "NewService",
+			Class:      FailureClassDependencyUnavailable,
+			PublicCode: PublicErrorAuthenticationCredentialUnavailable,
+			Err:        errMissingDependency,
+		}
+	}
 	if dependencies.AccessTokenLifetime <= 0 {
 		return Service{}, &ServiceError{
 			Operation:  "NewService",
@@ -203,6 +220,7 @@ func NewService(dependencies ServiceDependencies) (Service, error) {
 		accessTokenRandom:      dependencies.AccessTokenRandom,
 		clock:                  dependencies.Clock,
 		tokenRecordIDGenerator: dependencies.TokenRecordIDGenerator,
+		sessionIDGenerator:     dependencies.SessionIDGenerator,
 		accessTokenLifetime:    dependencies.AccessTokenLifetime,
 		tokenAudience:          tokenAudience,
 	}, nil
@@ -247,6 +265,9 @@ type AuthenticationResult struct {
 	TokenType          TokenType
 	IssuedAt           time.Time
 	ExpiresAt          time.Time
+	SessionID          string
+	SessionCreated     bool
+	SessionExpiresAt   time.Time
 	TokenRecordID      string
 	CredentialRecordID string
 }
@@ -370,6 +391,35 @@ func (s Service) AuthenticateWithDeviceCredential(ctx context.Context, request D
 			return serviceFailure(OperationAuthenticateWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationCredentialUnavailable, err)
 		}
 
+		sessionRepository, err := repositories.NewSessionRepository()
+		if err != nil {
+			failedResult = rejectedAuthenticationResult(PublicErrorAuthenticationCredentialUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationAuthenticateWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationCredentialUnavailable, err)
+		}
+
+		sessionID, err := s.generatedRuntimeSessionID(runCtx)
+		if err != nil {
+			failedResult = rejectedAuthenticationResult(PublicErrorAuthenticationCredentialUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationAuthenticateWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationCredentialUnavailable, err)
+		}
+
+		runtimeSession, err := sessionRepository.CreateRuntimeSession(runCtx, session.CreateRuntimeSessionMutation{
+			SessionID:           sessionID,
+			ActorKind:           session.ActorKindPlayer,
+			ActorID:             credential.PlayerID,
+			PlayerID:            credential.PlayerID,
+			SessionStatus:       session.SessionStatusActive,
+			IssuedAt:            issuedAt,
+			ExpiresAt:           expiresAt,
+			LastSeenAt:          issuedAt,
+			AccessTokenRecordID: tokenRecord.TokenRecordID,
+			RequestedBy:         defaultRequestedBy,
+		})
+		if err != nil {
+			failedResult = rejectedAuthenticationResult(PublicErrorAuthenticationCredentialUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationAuthenticateWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationCredentialUnavailable, err)
+		}
+
 		committedResult = AuthenticationResult{
 			Status:             AuthenticationStatusAuthenticated,
 			ActorKind:          app.ActorKindPlayer,
@@ -378,6 +428,9 @@ func (s Service) AuthenticateWithDeviceCredential(ctx context.Context, request D
 			TokenType:          TokenTypeOpaqueAccess,
 			IssuedAt:           issuedAt,
 			ExpiresAt:          expiresAt,
+			SessionID:          runtimeSession.SessionID,
+			SessionCreated:     true,
+			SessionExpiresAt:   runtimeSession.ExpiresAt,
 			TokenRecordID:      tokenRecord.TokenRecordID,
 			CredentialRecordID: credential.CredentialRecordID,
 		}
@@ -415,6 +468,9 @@ const (
 	ProofStatusMissing      ProofStatus = "missing"
 	ProofStatusMalformed    ProofStatus = "malformed"
 	ProofStatusInvalid      ProofStatus = "invalid"
+	ProofStatusExpired      ProofStatus = "expired"
+	ProofStatusRevoked      ProofStatus = "revoked"
+	ProofStatusUnavailable  ProofStatus = "unavailable"
 	ProofStatusValid        ProofStatus = "valid"
 )
 
@@ -433,18 +489,108 @@ type AccessTokenValidationResult struct {
 	CredentialRecordID string
 }
 
-func (s Service) ValidateAccessToken(_ context.Context, _ AccessTokenValidationRequest) (AccessTokenValidationResult, error) {
-	_ = s.unitOfWorkRunner
-	result := AccessTokenValidationResult{
-		Status:          ValidationStatusNotImplemented,
-		ProofStatus:     ProofStatusNotEvaluated,
-		PublicErrorCode: PublicErrorAuthenticationNotImplemented,
-		FailureClass:    FailureClassNotImplemented,
-		Identity: app.RequestIdentity{
-			Status: app.IdentityValidationUnknown,
-		},
+const tokenIssuedAtClockTolerance time.Duration = 0
+
+func (s Service) ValidateAccessToken(ctx context.Context, request AccessTokenValidationRequest) (AccessTokenValidationResult, error) {
+	rawToken, err := decodeAccessTokenProof(request.AccessToken)
+	if err != nil {
+		if errors.Is(err, errMissingAccessTokenProof) {
+			return rejectedAccessTokenValidationResult(ProofStatusMissing, PublicErrorAuthenticationTokenMissing, FailureClassMissingProof),
+				serviceFailure(OperationValidateAccessToken, FailureClassMissingProof, PublicErrorAuthenticationTokenMissing, err)
+		}
+		return rejectedAccessTokenValidationResult(ProofStatusMalformed, PublicErrorAuthenticationTokenMalformed, FailureClassMalformedProof),
+			serviceFailure(OperationValidateAccessToken, FailureClassMalformedProof, PublicErrorAuthenticationTokenMalformed, err)
 	}
-	return result, serviceNotImplemented(OperationValidateAccessToken)
+	defer zeroBytes(rawToken)
+
+	tokenLookupDigest, err := ComputeTokenLookupDigest(s.verifierKeySet, rawToken)
+	if err != nil {
+		return rejectedAccessTokenValidationResult(ProofStatusUnavailable, PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationValidateAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+	}
+
+	var committedResult AccessTokenValidationResult
+	var failedResult AccessTokenValidationResult
+	err = s.unitOfWorkRunner.WithinUnitOfWork(ctx, func(runCtx context.Context, unit tx.UnitOfWork) error {
+		repositories, ok := unit.(authenticationValidationUnitOfWork)
+		if !ok {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusUnavailable, PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationValidateAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, errMissingAuthenticationUOW)
+		}
+
+		authenticationRepository, err := repositories.NewAuthenticationRepository()
+		if err != nil {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusUnavailable, PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationValidateAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+		}
+		playerRepository, err := repositories.NewPlayerAccountRepository()
+		if err != nil {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusUnavailable, PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationValidateAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+		}
+
+		token, err := authenticationRepository.FindTokenByLookupDigest(runCtx, tokenLookupDigest.Bytes())
+		if err != nil {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusInvalid, PublicErrorAuthenticationTokenInvalid, FailureClassLookupMiss)
+			return serviceFailure(OperationValidateAccessToken, FailureClassLookupMiss, PublicErrorAuthenticationTokenInvalid, err)
+		}
+		if failureClass, ok := s.rejectTokenRecord(token); ok {
+			failedResult = rejectedAccessTokenValidationResult(validationProofStatusForTokenFailure(failureClass), PublicErrorAuthenticationTokenInvalid, failureClass)
+			return serviceFailure(OperationValidateAccessToken, failureClass, PublicErrorAuthenticationTokenInvalid, nil)
+		}
+
+		tokenVerifierDigest, err := ComputeTokenVerifierDigest(s.verifierKeySet, rawToken)
+		if err != nil {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusInvalid, PublicErrorAuthenticationTokenInvalid, FailureClassVerifierMismatch)
+			return serviceFailure(OperationValidateAccessToken, FailureClassVerifierMismatch, PublicErrorAuthenticationTokenInvalid, err)
+		}
+		comparison, err := CompareTokenVerifierDigest(tokenVerifierDigest, token.TokenVerifierDigest)
+		if err != nil || !comparison.Matched() {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusInvalid, PublicErrorAuthenticationTokenInvalid, FailureClassVerifierMismatch)
+			return serviceFailure(OperationValidateAccessToken, FailureClassVerifierMismatch, PublicErrorAuthenticationTokenInvalid, err)
+		}
+
+		account, err := playerRepository.GetPlayerAccount(runCtx, token.PlayerID)
+		if err != nil || account.AccountState != playermodule.AccountStateActive {
+			failedResult = rejectedAccessTokenValidationResult(ProofStatusInvalid, PublicErrorAuthenticationTokenInvalid, FailureClassPlayerAccountNotActive)
+			return serviceFailure(OperationValidateAccessToken, FailureClassPlayerAccountNotActive, PublicErrorAuthenticationTokenInvalid, err)
+		}
+
+		identity := app.ValidatedPlayerIdentity(token.PlayerID, app.Session{
+			ConnectionID:    request.ConnectionID,
+			ConnectionEpoch: request.ConnectionEpoch,
+			PlayerID:        token.PlayerID,
+		})
+		identity.SessionValidated = false
+		identity.PlayerIDValidated = true
+		identity.ActorKind = app.ActorKindPlayer
+		identity.ActorID = token.PlayerID
+		identity.PlayerID = token.PlayerID
+
+		committedResult = AccessTokenValidationResult{
+			Status:             ValidationStatusValidated,
+			ProofStatus:        ProofStatusValid,
+			PublicErrorCode:    "",
+			FailureClass:       "",
+			Identity:           identity,
+			ActorKind:          app.ActorKindPlayer,
+			ActorID:            token.PlayerID,
+			PlayerID:           token.PlayerID,
+			PlayerIDValidated:  true,
+			SessionValidated:   false,
+			TokenRecordID:      token.TokenRecordID,
+			CredentialRecordID: token.CredentialRecordID,
+		}
+		return nil
+	})
+	if err != nil {
+		if failedResult.Status != "" {
+			return failedResult, err
+		}
+		return rejectedAccessTokenValidationResult(ProofStatusUnavailable, PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationValidateAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+	}
+	return committedResult, nil
 }
 
 type LogoutAccessTokenRequest struct {
@@ -477,14 +623,94 @@ type LogoutAccessTokenResult struct {
 	RevokedAt       time.Time
 }
 
-func (s Service) LogoutAccessToken(_ context.Context, _ LogoutAccessTokenRequest) (LogoutAccessTokenResult, error) {
-	_ = s.unitOfWorkRunner
-	result := LogoutAccessTokenResult{
-		Status:          LogoutStatusNotImplemented,
-		PublicErrorCode: PublicErrorAuthenticationNotImplemented,
-		FailureClass:    FailureClassNotImplemented,
+func (s Service) LogoutAccessToken(ctx context.Context, request LogoutAccessTokenRequest) (LogoutAccessTokenResult, error) {
+	rawToken, err := decodeAccessTokenProof(request.AccessToken)
+	if err != nil {
+		if errors.Is(err, errMissingAccessTokenProof) {
+			return rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenMissing, FailureClassMissingProof),
+				serviceFailure(OperationLogoutAccessToken, FailureClassMissingProof, PublicErrorAuthenticationTokenMissing, err)
+		}
+		return rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenMalformed, FailureClassMalformedProof),
+			serviceFailure(OperationLogoutAccessToken, FailureClassMalformedProof, PublicErrorAuthenticationTokenMalformed, err)
 	}
-	return result, serviceNotImplemented(OperationLogoutAccessToken)
+	defer zeroBytes(rawToken)
+
+	tokenLookupDigest, err := ComputeTokenLookupDigest(s.verifierKeySet, rawToken)
+	if err != nil {
+		return rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+	}
+
+	var committedResult LogoutAccessTokenResult
+	var failedResult LogoutAccessTokenResult
+	err = s.unitOfWorkRunner.WithinUnitOfWork(ctx, func(runCtx context.Context, unit tx.UnitOfWork) error {
+		repositories, ok := unit.(authenticationLogoutUnitOfWork)
+		if !ok {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, errMissingAuthenticationUOW)
+		}
+
+		authenticationRepository, err := repositories.NewAuthenticationRepository()
+		if err != nil {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+		}
+
+		token, err := authenticationRepository.FindTokenByLookupDigest(runCtx, tokenLookupDigest.Bytes())
+		if err != nil {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenInvalid, FailureClassLookupMiss)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassLookupMiss, PublicErrorAuthenticationTokenInvalid, err)
+		}
+		if failureClass, ok := s.rejectTokenRecord(token); ok {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenInvalid, failureClass)
+			return serviceFailure(OperationLogoutAccessToken, failureClass, PublicErrorAuthenticationTokenInvalid, nil)
+		}
+
+		tokenVerifierDigest, err := ComputeTokenVerifierDigest(s.verifierKeySet, rawToken)
+		if err != nil {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenInvalid, FailureClassVerifierMismatch)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassVerifierMismatch, PublicErrorAuthenticationTokenInvalid, err)
+		}
+		comparison, err := CompareTokenVerifierDigest(tokenVerifierDigest, token.TokenVerifierDigest)
+		if err != nil || !comparison.Matched() {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenInvalid, FailureClassVerifierMismatch)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassVerifierMismatch, PublicErrorAuthenticationTokenInvalid, err)
+		}
+
+		revokedAt := s.clock.Now().UTC()
+		if revokedAt.IsZero() {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, errInvalidDependency)
+		}
+
+		err = authenticationRepository.RevokeToken(runCtx, authenticationmodule.RevokeTokenMutation{
+			TokenRecordID: token.TokenRecordID,
+			RevokedAt:     revokedAt,
+			RevokedReason: logoutReasonPresentedAccessToken,
+			RequestedBy:   defaultRequestedBy,
+		})
+		if err != nil {
+			failedResult = rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+		}
+
+		committedResult = LogoutAccessTokenResult{
+			Status:        LogoutStatusRevoked,
+			Revoked:       true,
+			LogoutScope:   LogoutScopeToken,
+			TokenRecordID: token.TokenRecordID,
+			RevokedAt:     revokedAt,
+		}
+		return nil
+	})
+	if err != nil {
+		if failedResult.Status != "" {
+			return failedResult, err
+		}
+		return rejectedLogoutAccessTokenResult(PublicErrorAuthenticationTokenUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationLogoutAccessToken, FailureClassDependencyUnavailable, PublicErrorAuthenticationTokenUnavailable, err)
+	}
+	return committedResult, nil
 }
 
 type RefreshAccessTokenRequest struct {
@@ -534,6 +760,16 @@ func serviceNotImplemented(operation Operation) error {
 type authenticationLoginUnitOfWork interface {
 	NewAuthenticationRepository() (authenticationmodule.Repository, error)
 	NewPlayerAccountRepository() (playermodule.Repository, error)
+	NewSessionRepository() (session.Repository, error)
+}
+
+type authenticationValidationUnitOfWork interface {
+	NewAuthenticationRepository() (authenticationmodule.Repository, error)
+	NewPlayerAccountRepository() (playermodule.Repository, error)
+}
+
+type authenticationLogoutUnitOfWork interface {
+	NewAuthenticationRepository() (authenticationmodule.Repository, error)
 }
 
 func decodeDeviceCredentialProof(proof string) ([]byte, error) {
@@ -556,12 +792,79 @@ func decodeDeviceCredentialProof(proof string) ([]byte, error) {
 	return raw, nil
 }
 
+var errMissingAccessTokenProof = errors.New("authentication service: missing access token proof")
+var errMalformedAccessTokenProof = errors.New("authentication service: malformed access token proof")
+
+func decodeAccessTokenProof(proof string) ([]byte, error) {
+	if strings.TrimSpace(proof) == "" {
+		return nil, errMissingAccessTokenProof
+	}
+	if strings.TrimSpace(proof) != proof {
+		return nil, errMalformedAccessTokenProof
+	}
+	if len(proof) != EncodedSecretMaterialChars {
+		return nil, errMalformedAccessTokenProof
+	}
+	raw, err := base64.RawURLEncoding.DecodeString(proof)
+	if err != nil {
+		return nil, errMalformedAccessTokenProof
+	}
+	if len(raw) != RawSecretMaterialBytes {
+		return nil, errMalformedAccessTokenProof
+	}
+	return raw, nil
+}
+
+func rejectedAccessTokenValidationResult(proofStatus ProofStatus, publicCode PublicErrorCode, failureClass FailureClass) AccessTokenValidationResult {
+	return AccessTokenValidationResult{
+		Status:          ValidationStatusRejected,
+		ProofStatus:     proofStatus,
+		PublicErrorCode: publicCode,
+		FailureClass:    failureClass,
+		Identity: app.RequestIdentity{
+			Status: app.IdentityValidationUnknown,
+		},
+	}
+}
+
+func validationProofStatusForTokenFailure(failureClass FailureClass) ProofStatus {
+	switch failureClass {
+	case FailureClassTokenExpired:
+		return ProofStatusExpired
+	case FailureClassTokenRevoked:
+		return ProofStatusRevoked
+	default:
+		return ProofStatusInvalid
+	}
+}
+
 func rejectedAuthenticationResult(publicCode PublicErrorCode, failureClass FailureClass) AuthenticationResult {
 	return AuthenticationResult{
 		Status:          AuthenticationStatusRejected,
 		PublicErrorCode: publicCode,
 		FailureClass:    failureClass,
 	}
+}
+
+func rejectedLogoutAccessTokenResult(publicCode PublicErrorCode, failureClass FailureClass) LogoutAccessTokenResult {
+	return LogoutAccessTokenResult{
+		Status:          LogoutStatusRejected,
+		PublicErrorCode: publicCode,
+		FailureClass:    failureClass,
+		LogoutScope:     LogoutScopeUnspecified,
+	}
+}
+
+func (s Service) generatedRuntimeSessionID(ctx context.Context) (string, error) {
+	sessionID, err := s.sessionIDGenerator.GenerateSessionID(ctx)
+	if err != nil {
+		return "", err
+	}
+	trimmed := strings.TrimSpace(sessionID)
+	if trimmed == "" || trimmed != sessionID {
+		return "", errMalformedRuntimeSessionID
+	}
+	return trimmed, nil
 }
 
 func serviceFailure(operation Operation, class FailureClass, publicCode PublicErrorCode, err error) error {
@@ -588,6 +891,45 @@ func (s Service) rejectCredentialRecord(record authenticationmodule.CredentialRe
 	}
 	if record.VerifierKeyID != s.verifierKeySet.KeySetID() {
 		return FailureClassUnknownVerifierKeyID, true
+	}
+	return "", false
+}
+
+func (s Service) rejectTokenRecord(record authenticationmodule.TokenRecord) (FailureClass, bool) {
+	if record.TokenKind != tokenKindAccessToken {
+		return FailureClassTokenNotActive, true
+	}
+	if record.TokenStatus != authenticationmodule.TokenStatusActive {
+		switch record.TokenStatus {
+		case authenticationmodule.TokenStatusExpired:
+			return FailureClassTokenExpired, true
+		case authenticationmodule.TokenStatusRevoked:
+			return FailureClassTokenRevoked, true
+		default:
+			return FailureClassTokenNotActive, true
+		}
+	}
+	if record.VerifierAlgorithm != verifierAlgorithmHMACSHA256V1 {
+		return FailureClassWrongVerifierAlgorithm, true
+	}
+	if record.VerifierVersion != verifierVersionV1 {
+		return FailureClassUnsupportedVersion, true
+	}
+	if record.VerifierKeyID != s.verifierKeySet.KeySetID() {
+		return FailureClassUnknownVerifierKeyID, true
+	}
+	if strings.TrimSpace(record.Audience) != s.tokenAudience {
+		return FailureClassTokenNotActive, true
+	}
+	now := s.clock.Now().UTC()
+	if record.IssuedAt.IsZero() {
+		return FailureClassTokenNotActive, true
+	}
+	if record.IssuedAt.After(now.Add(tokenIssuedAtClockTolerance)) {
+		return FailureClassTokenNotActive, true
+	}
+	if !record.ExpiresAt.IsZero() && now.After(record.ExpiresAt) {
+		return FailureClassTokenExpired, true
 	}
 	return "", false
 }

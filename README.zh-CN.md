@@ -73,6 +73,8 @@ vibit 从另一个前提出发：
 - `docs/runtime-runbook.zh-CN.md`：简体中文译本
 - `docs/reference-game-server-alignment.md`：Nakama 和 Pitaya 的 active game server reference alignment 标准
 - `docs/reference-game-server-alignment.zh-CN.md`：简体中文译本
+- `docs/nakama-pitaya-product-parity-roadmap.md`：面向 Nakama/Pitaya 同级常用能力覆盖的产品路线图
+- `docs/nakama-pitaya-product-parity-roadmap.zh-CN.md`：简体中文译本
 - `schema/`：用于机器可检查 standards 的 JSON Schema files
 - `rules/`：面向机器可读 check metadata 的 rule catalogs
 
@@ -203,7 +205,7 @@ Check output 的 rule metadata 位于 `rules/check-rules.json`。
 
 Runtime protocol adapter boundary 定义在 `docs/runtime-protocol-adapter.md` 和 `decisions/ADR-0018-runtime-protocol-adapter-boundary.md` 中。WebSocket transport 拥有 frames，Protobuf adapter 拥有 envelope conversion，application dispatch 拥有 command/query routing，domain modules 拥有 invariants 和 behavior，generated packages 只提供 shapes。
 
-Nakama 和 Pitaya 是 capability planning 的主动参考基线。Nakama 应指导 broad game backend product surface：accounts、sessions、storage、social systems、chat、groups、parties、leaderboards、tournaments、matchmaking、realtime multiplayer、authoritative matches 和 operations。Pitaya 应指导 Go game server architecture vocabulary：acceptors、sessions、routes、handlers、remotes/RPC、frontend/backend roles、groups、broadcast、serializers 和 cluster service discovery。它们是 references，不是 governing standards；vibit 的 Agent-Native constraints 仍然权威。见 `.arch/reference.yaml`、`docs/reference-game-server-alignment.md` 和 `decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md`。
+Nakama 和 Pitaya 是 capability planning 的主动参考基线。Nakama 应指导 broad game backend product surface：accounts、sessions、storage、social systems、chat、groups、parties、leaderboards、tournaments、matchmaking、realtime multiplayer、authoritative matches 和 operations。Pitaya 应指导 Go game server architecture vocabulary：acceptors、sessions、routes、handlers、remotes/RPC、frontend/backend roles、groups、broadcast、serializers 和 cluster service discovery。`ADR-0078` 已 ratify Nakama/Pitaya-class product parity roadmap：vibit 应覆盖同级常用 capability families，同时保留 vibit 的 agent-native constraints，并避免意外 direct API compatibility。近期优先级是 runtime lifecycle closure，然后再扩展 presence、chat、social modules、matchmaking 或 match runtime。见 `.arch/reference.yaml`、`docs/reference-game-server-alignment.md`、`docs/nakama-pitaya-product-parity-roadmap.md`、`decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md` 和 `decisions/ADR-0078-nakama-pitaya-product-parity-roadmap.md`。
 
 PostgreSQL 是 runtime state 的第一版 authoritative durable relational store。S3-compatible object storage 计划用于 replays、snapshots、exports、binary assets 和 diagnostic archives 等大对象 artifacts。MinIO 是这个 S3-compatible 角色的本地/自托管优先候选，但在具体 use case 和 dependency adoption record 证明它必要之前，它不是 mandatory runtime dependency。Domain modules 必须使用 vibit-owned storage interfaces，而不是直接依赖 database drivers 或 object-storage clients。见 `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`。
 

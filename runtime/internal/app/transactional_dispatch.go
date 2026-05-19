@@ -13,8 +13,9 @@ type RouteDispatcher interface {
 }
 
 type TransactionalDispatcher struct {
-	Dispatcher RouteDispatcher
-	Runner     tx.Runner
+	Dispatcher   RouteDispatcher
+	Runner       tx.Runner
+	BypassRoutes []RouteKey
 }
 
 func (d TransactionalDispatcher) Dispatch(ctx context.Context, request RouteRequest) (ApplicationResult, error) {
@@ -24,6 +25,9 @@ func (d TransactionalDispatcher) Dispatch(ctx context.Context, request RouteRequ
 	}
 
 	if MessageKind(strings.TrimSpace(string(request.Route.Kind))) != MessageKindCommand {
+		return dispatcher.Dispatch(ctx, request)
+	}
+	if d.bypassesTransaction(request.Route) {
 		return dispatcher.Dispatch(ctx, request)
 	}
 
@@ -43,4 +47,17 @@ func (d TransactionalDispatcher) Dispatch(ctx context.Context, request RouteRequ
 		result = resultForRequest(request)
 	}
 	return result, err
+}
+
+func (d TransactionalDispatcher) bypassesTransaction(route RouteKey) bool {
+	normalizedRoute := normalizeRouteForAuthentication(route)
+	if normalizedRoute == (RouteKey{}) {
+		return false
+	}
+	for _, bypassRoute := range d.BypassRoutes {
+		if normalizeRouteForAuthentication(bypassRoute) == normalizedRoute {
+			return true
+		}
+	}
+	return false
 }

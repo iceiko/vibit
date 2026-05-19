@@ -1,0 +1,49 @@
+schema_version: 0.1
+change_id: define-runtime-session-validation-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the gate-only runtime session validation boundary after the PostgreSQL session adapter.
+
+affected_modules:
+  - runtime
+  - authentication
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+
+verification:
+  required:
+    - node tools/vibit check change define-runtime-session-validation-gate --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+  status: Verified

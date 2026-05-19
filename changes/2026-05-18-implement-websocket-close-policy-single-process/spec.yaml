@@ -1,0 +1,132 @@
+schema_version: 0.1
+change_id: implement-websocket-close-policy-single-process
+date: 2026-05-18
+type: feature
+status: verified
+
+summary: Implement the first application-owned single-process WebSocket close policy primitive.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0077
+  referenced:
+    - ADR-0019
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+    - ADR-0070
+    - ADR-0071
+    - ADR-0072
+    - ADR-0073
+    - ADR-0074
+    - ADR-0075
+    - ADR-0076
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - connection close policy redacted internal error codes
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - WebSocket close policy implementation is application-owned under runtime/internal/app/connection.
+    - Active connection registry remains the target model used by the policy.
+    - Authentication remains token lifecycle owner and does not own close policy.
+    - WebSocket transport remains deferred as a future narrow concrete close handoff owner.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0166
+  completed_milestone: M-094
+  websocket_close_policy_single_process_implemented: true
+  websocket_close_policy_single_process_decision: ADR-0077
+  websocket_close_policy_single_process_check_rule: runtime.websocket_close_policy_single_process_implementation
+  close_policy_source: runtime/internal/app/connection/close_policy.go
+  close_policy_tests: runtime/internal/app/connection/close_policy_test.go
+  close_policy_owner: runtime/internal/app/connection
+  close_policy_posture: single_process_in_memory_registry_backed
+  close_policy_target_kinds:
+    - connection_id_and_epoch
+    - player_id
+    - runtime_session_id
+    - access_token_record_id
+  close_policy_transport_action: mark_invalidated_only
+  registry_invalidation_added: policy_marker_only
+  close_intents_added: redacted_application_intents
+  websocket_close_implementation_added: false
+  concrete_socket_close_added: false
+  transport_close_handoff_added: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  protocol_close_message_added: false
+  kick_disconnect_behavior_added: false
+  logout_access_token_behavior_changed: false
+  runtime_session_revocation_added: false
+  duplicate_connection_replacement_added: false
+  reconnect_epoch_behavior_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  durable_distributed_registry_storage_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  broader_game_backend_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - go test ./internal/app/connection
+    - go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-websocket-close-policy-gate --json
+    - node tools/vibit check change implement-websocket-close-policy-single-process --json
+    - node tools/vibit check change confirm-next-direction-after-websocket-close-policy-implementation --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

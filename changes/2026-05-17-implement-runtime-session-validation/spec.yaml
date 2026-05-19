@@ -1,0 +1,114 @@
+schema_version: 0.1
+change_id: implement-runtime-session-validation
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Add an application-owned persistent runtime session validator without route-policy, transport, protocol, logout, or reconnect behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0066
+  referenced:
+    - ADR-0019
+    - ADR-0021
+    - ADR-0052
+    - ADR-0053
+    - ADR-0056
+    - ADR-0057
+    - ADR-0060
+    - ADR-0061
+    - ADR-0062
+    - ADR-0063
+    - ADR-0064
+    - ADR-0065
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  existing_logical_table_referenced:
+    - runtime_sessions
+  ownership_changes:
+    - runtime/internal/app owns the persistent runtime session validator
+    - runtime/internal/app/session remains the storage-neutral session repository owner
+    - authentication remains token proof validation owner
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0144
+  completed_milestone: M-072
+  runtime_session_validation_implementation_completed: true
+  runtime_session_validation_implementation_decision: ADR-0066
+  runtime_session_validation_implementation_check_rule: runtime.runtime_session_validation_implementation
+  validator_owner: runtime/internal/app
+  session_repository_interface: runtime/internal/app/session.Repository
+  session_repository_owner: runtime/internal/app/session
+  validator_source: runtime/internal/app/runtime_session_validator.go
+  validator_tests: runtime/internal/app/runtime_session_validator_test.go
+  persistent_session_validator_added: true
+  request_identity_session_validated_true_added: true
+  session_repository_lookup_method: FindActiveSessionByID
+  session_creation_composition_added: false
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - go test ./internal/app
+    - go test ./...
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-runtime-session-validation-gate --json
+    - node tools/vibit check change implement-runtime-session-validation --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

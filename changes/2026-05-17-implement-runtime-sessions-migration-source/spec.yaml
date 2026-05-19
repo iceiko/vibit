@@ -1,0 +1,112 @@
+schema_version: 0.1
+change_id: implement-runtime-sessions-migration-source
+date: 2026-05-17
+type: migration
+status: verified
+
+summary: Add the PostgreSQL runtime_sessions migration source without repository, adapter, or runtime session behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0060
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+    - ADR-0059
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: true
+  migration_sources:
+    - runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  logical_tables_added:
+    - runtime_sessions
+  forbidden_tables:
+    - runtime_session_connections
+  forbidden_columns:
+    - raw_access_token
+    - raw_credential
+    - token_verifier_digest
+    - token_lookup_digest
+    - credential_verifier_digest
+    - credential_lookup_digest
+  ownership_changes:
+    - runtime.session owns runtime_sessions
+    - authentication does not own runtime_sessions
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0132
+  completed_milestone: M-060
+  runtime_sessions_migration_source_added: true
+  runtime_sessions_migration_source_decision: ADR-0060
+  runtime_sessions_migration_source_check_rule: runtime.runtime_sessions_migration_source
+  migration_source: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  session_table_added: true
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  websocket_handshake_authentication_added: false
+  route_policy_bound_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+
+workflow:
+  completed_work_item: W-0132
+  completed_milestone: M-060
+  next_milestone: M-061
+  blocked_work_item: W-0133
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change implement-runtime-sessions-migration-source --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -1,0 +1,48 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-websocket-close-policy-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Confirm the next direction after the WebSocket close policy gate and select the single-process close policy implementation.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0077
+  referenced:
+    - ADR-0076
+
+candidate_directions:
+  - implement_websocket_close_policy_single_process
+  - define_protocol_logout_route_gate
+  - define_reconnect_connection_epoch_gate
+  - define_protocol_session_carrier_gate
+  - strengthen_operations_observability_and_admin_tooling
+  - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime:
+  completed_work_item: W-0165
+  completed_milestone: M-093
+  previous_milestone: M-092
+  previous_completed_work_item: W-0164
+  selected_direction: implement_websocket_close_policy_single_process
+  next_milestone: M-094
+  next_ready_work_item: W-0166
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node tools/vibit inspect next --json
+  status: Verified

@@ -1,0 +1,112 @@
+schema_version: 0.1
+change_id: define-logout-access-token-behavior-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Define the gate-only boundary for future presented opaque access-token logout behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0072
+  referenced:
+    - ADR-0019
+    - ADR-0052
+    - ADR-0056
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+    - ADR-0070
+    - ADR-0071
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Future logout behavior remains application-owned under runtime/internal/app/authentication.
+    - Authentication repository remains storage-neutral and does not parse raw access tokens or decide logout proof validity.
+    - Runtime sessions and active WebSocket connections remain separate future lifecycle decisions.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0156
+  completed_milestone: M-084
+  logout_access_token_behavior_gate_defined: true
+  logout_access_token_behavior_gate_decision: ADR-0072
+  logout_access_token_behavior_gate_standard: docs/logout-access-token-behavior-gate.md
+  logout_access_token_behavior_gate_check_rule: runtime.logout_access_token_behavior_gate
+  first_logout_scope: presented_access_token_only
+  proof_carrier_status: already_decoded_service_request_only
+  token_lookup_before_revocation_required: true
+  token_verifier_comparison_before_revocation_required: true
+  token_status_must_be_active_before_revocation: true
+  already_revoked_token_public_behavior: invalid_token
+  expired_token_public_behavior: invalid_token
+  logout_execution_added: false
+  token_revocation_execution_added: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  connection_registry_added: false
+  websocket_close_policy_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  refresh_behavior_added: false
+  logout_all_sessions_added: false
+  admin_revocation_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-logout-revocation-active-connection-gate --json
+    - node tools/vibit check change define-logout-access-token-behavior-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

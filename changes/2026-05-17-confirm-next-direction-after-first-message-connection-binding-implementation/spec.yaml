@@ -1,0 +1,96 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-first-message-connection-binding-implementation
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Select the PostgreSQL session persistence schema gate as the next direction after first-message connection binding implementation.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+
+selected_direction:
+  previous_milestone: M-056
+  previous_work_item: W-0128
+  blocked_work_item: W-0129
+  selected_direction: define_postgres_session_persistence_schema_gate
+  next_milestone: M-058
+  next_ready_work_item: W-0130
+  recommendation_basis:
+    - bind_connection_completed_without_durable_sessions
+    - session_persistence_websocket_handshake_ratification_prefers_postgres_first_session_store
+    - nakama_sessions_are_first_class_lifecycle_records
+    - pitaya_session_context_is_separate_from_acceptor
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  postgres_session_persistence_schema_gate_selected: true
+  implementation_added_by_this_change: false
+  migration_source_added_by_this_change: false
+  repository_interface_added_by_this_change: false
+  postgresql_adapter_added_by_this_change: false
+  websocket_transport_credential_carriers_selected: false
+  route_policy_bound_identity_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_behavior_selected: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0129
+  completed_milestone: M-057
+  next_milestone: M-058
+  next_ready_work_item: W-0130
+
+verification:
+  required:
+    - node tools/vibit check change confirm-next-direction-after-first-message-connection-binding-implementation --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+  status: Verified

@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: define-access-token-protocol-carrier-route-protection-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the gate for future request-level access-token protocol carrier and route-protection work without implementation.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0053
+  referenced:
+    - ADR-0015
+    - ADR-0018
+    - ADR-0019
+    - ADR-0021
+    - ADR-0023
+    - ADR-0024
+    - ADR-0026
+    - ADR-0027
+    - ADR-0036
+    - ADR-0039
+    - ADR-0051
+    - ADR-0052
+
+standards:
+  added:
+    - docs/access-token-protocol-carrier-route-protection-gate.md
+    - docs/access-token-protocol-carrier-route-protection-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  access_token_protocol_carrier_route_protection_gate_defined: true
+  access_token_protocol_carrier_route_protection_gate_check_rule: runtime.access_token_protocol_carrier_route_protection_gate
+  selected_validation_model: request_level_validation
+  selected_first_proof_carrier_posture: protobuf_payload_wrapper
+  wrapper_message_candidate: vibit.authentication.v1.AuthenticatedRequest
+  protobuf_envelope_change_added: false
+  websocket_handshake_authentication_added: false
+  session_persistence_added: false
+  protocol_adapter_behavior_added: false
+  route_protection_behavior_added: false
+  startup_wiring_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+
+workflow:
+  completed_work_item: W-0113
+  completed_milestone: M-041
+  next_milestone: M-042
+  next_ready_work_item: W-0114
+  next_direction: implement_access_token_protocol_carrier_route_protection_slice
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-access-token-protocol-carrier-route-protection-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

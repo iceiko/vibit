@@ -81,6 +81,12 @@ documentation_pairs:
   reference_alignment_standard:
     canonical: docs/reference-game-server-alignment.md
     zh-CN: docs/reference-game-server-alignment.zh-CN.md
+  nakama_pitaya_product_parity_roadmap_standard:
+    canonical: docs/nakama-pitaya-product-parity-roadmap.md
+    zh-CN: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  protocol_logout_route_gate_standard:
+    canonical: docs/protocol-logout-route-gate.md
+    zh-CN: docs/protocol-logout-route-gate.zh-CN.md
   player_identity_session_boundary_standard:
     canonical: docs/player-identity-session-boundary.md
     zh-CN: docs/player-identity-session-boundary.zh-CN.md
@@ -156,6 +162,107 @@ documentation_pairs:
   device_credential_login_service_behavior_gate_standard:
     canonical: docs/device-credential-login-service-behavior-gate.md
     zh-CN: docs/device-credential-login-service-behavior-gate.zh-CN.md
+  access_token_protocol_carrier_route_protection_gate_standard:
+    canonical: docs/access-token-protocol-carrier-route-protection-gate.md
+    zh-CN: docs/access-token-protocol-carrier-route-protection-gate.zh-CN.md
+  runtime_authentication_startup_composition_gate_standard:
+    canonical: docs/runtime-authentication-startup-composition-gate.md
+    zh-CN: docs/runtime-authentication-startup-composition-gate.zh-CN.md
+  authentication_command_protocol_login_route_gate_standard:
+    canonical: docs/authentication-command-protocol-login-route-gate.md
+    zh-CN: docs/authentication-command-protocol-login-route-gate.zh-CN.md
+  session_persistence_websocket_handshake_ratification_standard:
+    canonical: docs/session-persistence-websocket-handshake-ratification.md
+    zh-CN: docs/session-persistence-websocket-handshake-ratification.zh-CN.md
+  first_message_connection_binding_gate_standard:
+    canonical: docs/first-message-connection-binding-gate.md
+    zh-CN: docs/first-message-connection-binding-gate.zh-CN.md
+  first_message_connection_binding_implementation_gate_standard:
+    canonical: docs/first-message-connection-binding-implementation-gate.md
+    zh-CN: docs/first-message-connection-binding-implementation-gate.zh-CN.md
+  postgres_session_persistence_schema_gate_standard:
+    canonical: docs/postgres-session-persistence-schema-gate.md
+    zh-CN: docs/postgres-session-persistence-schema-gate.zh-CN.md
+  runtime_sessions_migration_source:
+    source: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+    decision: ADR-0060
+    check_rule: runtime.runtime_sessions_migration_source
+  session_repository_boundary_standard:
+    canonical: docs/session-repository-boundary.md
+    zh-CN: docs/session-repository-boundary.zh-CN.md
+  session_postgresql_adapter_gate_standard:
+    canonical: docs/session-postgresql-adapter-gate.md
+    zh-CN: docs/session-postgresql-adapter-gate.zh-CN.md
+  session_postgresql_adapter_implementation:
+    decision: ADR-0064
+    check_rule: runtime.session_postgresql_adapter_implementation
+    source: runtime/internal/platform/persistence/postgres/session_repository.go
+    tests: runtime/internal/platform/persistence/postgres/session_repository_test.go
+  runtime_session_validation_gate_standard:
+    canonical: docs/runtime-session-validation-gate.md
+    zh-CN: docs/runtime-session-validation-gate.zh-CN.md
+  runtime_session_validation_gate:
+    decision: ADR-0065
+    check_rule: runtime.runtime_session_validation_gate
+  session_creation_composition_gate_standard:
+    canonical: docs/session-creation-composition-gate.md
+    zh-CN: docs/session-creation-composition-gate.zh-CN.md
+  session_creation_composition_gate:
+    decision: ADR-0067
+    check_rule: runtime.session_creation_composition_gate
+  session_creation_composition_implementation:
+    decision: ADR-0068
+    check_rule: runtime.session_creation_composition_implementation
+  bound_identity_route_policy_gate_standard:
+    canonical: docs/bound-identity-route-policy-gate.md
+    zh-CN: docs/bound-identity-route-policy-gate.zh-CN.md
+  bound_identity_route_policy_gate:
+    decision: ADR-0069
+    check_rule: runtime.bound_identity_route_policy_gate
+  bound_identity_route_policy_implementation:
+    decision: ADR-0070
+    check_rule: runtime.bound_identity_route_policy_implementation
+  logout_revocation_active_connection_gate_standard:
+    canonical: docs/logout-revocation-active-connection-gate.md
+    zh-CN: docs/logout-revocation-active-connection-gate.zh-CN.md
+  logout_revocation_active_connection_gate:
+    decision: ADR-0071
+    check_rule: runtime.logout_revocation_active_connection_gate
+  logout_access_token_behavior_gate_standard:
+    canonical: docs/logout-access-token-behavior-gate.md
+    zh-CN: docs/logout-access-token-behavior-gate.zh-CN.md
+  logout_access_token_behavior_gate:
+    decision: ADR-0072
+    check_rule: runtime.logout_access_token_behavior_gate
+  logout_access_token_behavior_implementation:
+    decision: ADR-0073
+    check_rule: runtime.logout_access_token_behavior_implementation
+  active_connection_registry_gate_standard:
+    canonical: docs/active-connection-registry-gate.md
+    zh-CN: docs/active-connection-registry-gate.zh-CN.md
+  active_connection_registry_gate:
+    decision: ADR-0074
+    check_rule: runtime.active_connection_registry_gate
+  active_connection_registry_single_process_implementation:
+    decision: ADR-0075
+    check_rule: runtime.active_connection_registry_single_process_implementation
+  websocket_close_policy_gate_standard:
+    canonical: docs/websocket-close-policy-gate.md
+    zh-CN: docs/websocket-close-policy-gate.zh-CN.md
+  websocket_close_policy_gate:
+    decision: ADR-0076
+    check_rule: runtime.websocket_close_policy_gate
+  websocket_close_policy_single_process_implementation:
+    decision: ADR-0077
+    check_rule: runtime.websocket_close_policy_single_process_implementation
+  nakama_pitaya_product_parity_roadmap:
+    decision: ADR-0078
+    standard: docs/nakama-pitaya-product-parity-roadmap.md
+    translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+    check_rule: runtime.reference_product_parity_roadmap
+    parity_goal: nakama_pitaya_same_class_common_capability_coverage
+    api_compatibility_goal: false
+    recommended_next_direction: define_protocol_logout_route_gate
 
 standard_directories:
   architecture: .arch
@@ -1956,15 +2063,35 @@ access_token_validation_service_behavior_gate:
     production behavior.
 
 access_token_validation_service_behavior_implementation:
-  status: active
+  status: completed
   milestone: M-039
-  next_work_item: W-0111
+  completed_work_item: W-0111
+  change: changes/2026-05-16-implement-access-token-validation-service-behavior
   previous_milestone: M-038
   previous_completed_work_item: W-0110
-  planned_change: changes/2026-05-16-implement-access-token-validation-service-behavior
+  next_milestone: M-040
+  blocked_work_item: W-0112
   planned_scope: service_method_only_no_protocol_route_session_or_startup_wiring
   validation_execution_target: ValidateAccessToken
-  access_token_validation_added: false
+  access_token_validation_service_behavior_implementation_completed: true
+  access_token_validation_service_behavior_implementation_work_item: W-0111
+  access_token_validation_service_behavior_implementation_change: changes/2026-05-16-implement-access-token-validation-service-behavior
+  access_token_validation_service_behavior_implementation_check_rule: runtime.access_token_validation_service_behavior_implementation
+  access_token_validation_added: true
+  validation_execution_added: true
+  proof_prevalidation_before_unit_of_work: implemented
+  token_lookup_digest_before_repository_lookup: implemented
+  repository_handoff: application_unit_of_work_capability
+  authentication_repository_lookup_method: FindTokenByLookupDigest
+  player_repository_lookup_method: GetPlayerAccount
+  token_lifecycle_checks_implemented: true
+  token_audience_check_implemented: true
+  verifier_comparison_before_request_identity: implemented
+  active_player_account_required: true
+  request_identity_handoff_implemented: true
+  session_validated_without_session_persistence: false
+  public_error_collapse_implemented: true
+  redaction_tests_added: true
   protocol_carrier_added: false
   websocket_handshake_authentication_added: false
   route_protection_added: false
@@ -1978,10 +2105,1816 @@ access_token_validation_service_behavior_implementation:
   generated_files_changed: false
   authentication_dependencies_planned: false
   rule: >
-    The active phase may implement future access-token validation inside the
-    existing service method only; it must not add protocol carriers, route
-    protection, session persistence, startup wiring, repository changes, migrations,
-    generated files, dependencies, or broader production behavior.
+    The completed phase implements access-token validation inside the existing
+    application authentication service only. It preserves the ADR-0052 sequence,
+    keeps SessionValidated false until session persistence is ratified, and does
+    not add protocol carriers, route protection, session persistence, startup
+    wiring, repository changes, migrations, generated files, dependencies, logout,
+    refresh, cleanup, or broader production behavior.
+
+next_direction_confirmation_after_service_local_authentication:
+  status: completed
+  milestone: M-040
+  completed_work_item: W-0112
+  change: changes/2026-05-17-confirm-next-direction-after-service-local-authentication
+  previous_milestone: M-039
+  previous_completed_work_item: W-0111
+  selected_direction: expose_access_token_protocol_carrier_and_route_protection_gate
+  next_milestone: M-041
+  next_ready_work_item_created: W-0113
+  candidate_directions:
+    - expose_access_token_protocol_carrier_and_route_protection_gate
+    - ratify_session_persistence_and_websocket_handshake_authentication
+    - implement_logout_refresh_cleanup_behavior_gates
+    - wire_runtime_authentication_startup_composition
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+    - strengthen_operations_observability_and_admin_tooling
+    - review_self_bootstrapping_agent_native_process_before_more_runtime_scope
+  protocol_carrier_selected: true
+  route_protection_selected: true
+  session_persistence_selected: false
+  websocket_handshake_authentication_selected: false
+  logout_refresh_cleanup_selected: false
+  startup_wiring_selected: false
+  core_game_backend_modules_selected: false
+  rule: >
+    The maintainer authorized continued progress and selected the access-token
+    protocol carrier and route-protection gate as the next direction. The
+    selection creates a gate-only milestone before implementation and preserves
+    ask-first boundaries for session persistence, WebSocket handshake
+    authentication, startup wiring, logout, refresh, cleanup, repository changes,
+    migrations, dependencies, and core game backend expansion.
+
+access_token_protocol_carrier_route_protection_gate:
+  status: completed
+  milestone: M-041
+  completed_work_item: W-0113
+  change: changes/2026-05-17-define-access-token-protocol-carrier-route-protection-gate
+  decision: ADR-0053
+  standard: docs/access-token-protocol-carrier-route-protection-gate.md
+  translation: docs/access-token-protocol-carrier-route-protection-gate.zh-CN.md
+  previous_milestone: M-040
+  previous_completed_work_item: W-0112
+  next_milestone: M-042
+  next_ready_work_item: W-0114
+  access_token_protocol_carrier_route_protection_gate_defined: true
+  access_token_protocol_carrier_route_protection_gate_check_rule: runtime.access_token_protocol_carrier_route_protection_gate
+  validation_model: request_level_validation
+  first_proof_carrier_posture: protobuf_payload_wrapper
+  wrapper_message_candidate: vibit.authentication.v1.AuthenticatedRequest
+  planned_protocol_source: proto/vibit/authentication/v1/authenticated_request.proto
+  planned_generated_go_proto_output: runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+  existing_protobuf_envelope_change_added: false
+  protobuf_envelope_change_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  session_persistence_added: false
+  protocol_adapter_behavior_added: false
+  route_protection_behavior_added: false
+  startup_wiring_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  production_authentication_behavior_added: false
+  rule: >
+    The completed gate selects request-level validation with a future Protobuf
+    payload wrapper candidate, keeps the existing envelope unchanged, keeps
+    WebSocket transport credential-neutral, requires application-owned route
+    policy before protected domain dispatch, and does not add protocol sources,
+    generated output, adapter behavior, route protection, startup wiring, session
+    persistence, WebSocket handshake authentication, repository changes,
+    migrations, dependencies, logout, refresh, cleanup, or broader production
+    behavior.
+
+access_token_protocol_carrier_route_protection_implementation:
+  status: completed
+  milestone: M-042
+  completed_work_item: W-0114
+  access_token_protocol_carrier_route_protection_implementation_completed: true
+  access_token_protocol_carrier_route_protection_implementation_work_item: W-0114
+  access_token_protocol_carrier_route_protection_implementation_change: changes/2026-05-17-implement-access-token-payload-wrapper-route-protection
+  previous_milestone: M-041
+  previous_completed_work_item: W-0113
+  implemented_scope: request_level_protobuf_payload_wrapper_and_application_route_policy_only
+  validation_model: request_level_validation
+  first_proof_carrier_posture: protobuf_payload_wrapper
+  wrapper_message_candidate: vibit.authentication.v1.AuthenticatedRequest
+  protocol_source: proto/vibit/authentication/v1/authenticated_request.proto
+  generated_go_proto_output: runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+  route_policy_source: runtime/internal/app/route_authentication.go
+  route_validator_source: runtime/internal/app/authentication/route_validator.go
+  protocol_source_added: true
+  generated_output_added: true
+  protocol_adapter_behavior_added: true
+  route_protection_behavior_added: true
+  existing_protobuf_envelope_change_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  session_persistence_added: false
+  startup_wiring_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  token_rotation_added: false
+  production_authentication_behavior_added: false
+  next_milestone: M-043
+  blocked_work_item: W-0115
+  rule: >
+    The completed implementation adds only the gate-authorized payload wrapper,
+    generated output, protocol adapter behavior, application route policy,
+    authentication validation handoff, and focused tests. It preserves deferrals
+    for existing envelope changes, WebSocket handshake authentication, session
+    persistence, startup wiring, repository changes, migrations, dependencies,
+    logout, refresh, cleanup, token rotation, and broader production behavior.
+
+next_direction_confirmation_after_request_level_route_protection:
+  status: completed
+  milestone: M-043
+  completed_work_item: W-0115
+  change: changes/2026-05-17-confirm-next-direction-after-request-level-route-protection
+  previous_milestone: M-042
+  previous_completed_work_item: W-0114
+  selected_direction: wire_runtime_authentication_startup_composition
+  next_milestone: M-044
+  next_ready_work_item_created: W-0116
+  candidate_directions:
+    - ratify_session_persistence_and_websocket_handshake_authentication
+    - wire_runtime_authentication_startup_composition
+    - implement_logout_refresh_cleanup_behavior_gates
+    - ratify_token_rotation_and_reauthentication_lifecycle
+    - add_protocol_authentication_command_messages_after_wrapper_slice
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+    - strengthen_operations_observability_and_admin_tooling
+  startup_wiring_selected: true
+  session_persistence_selected: false
+  websocket_handshake_authentication_selected: false
+  logout_refresh_cleanup_selected: false
+  token_rotation_selected: false
+  rule: >
+    The maintainer selected runtime authentication startup composition and
+    emphasized Nakama and Pitaya as references. The selection creates a
+    startup-composition gate before implementation and preserves ask-first
+    boundaries for session persistence, WebSocket handshake authentication,
+    logout, refresh, cleanup, token rotation, repository changes, migrations,
+    dependencies, generated authentication messages beyond the wrapper,
+    operations posture, and core game backend expansion.
+
+runtime_authentication_startup_composition_gate:
+  status: completed
+  milestone: M-044
+  completed_work_item: W-0116
+  change: changes/2026-05-17-define-runtime-authentication-startup-composition-gate
+  decision: ADR-0054
+  runtime_authentication_startup_composition_gate_decision: ADR-0054
+  standard: docs/runtime-authentication-startup-composition-gate.md
+  runtime_authentication_startup_composition_gate_standard: docs/runtime-authentication-startup-composition-gate.md
+  translation: docs/runtime-authentication-startup-composition-gate.zh-CN.md
+  runtime_authentication_startup_composition_gate_defined: true
+  runtime_authentication_startup_composition_gate_check_rule: runtime.authentication_startup_composition_gate
+  implementation_authorized_by_this_standard: true
+  future_implementation_work_item: W-0117
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_authentication_status: bootstrap_metadata_only
+  access_token_lifetime_environment: VIBIT_AUTH_ACCESS_TOKEN_TTL
+  default_access_token_lifetime: 1h
+  token_audience_environment: VIBIT_AUTH_TOKEN_AUDIENCE
+  default_token_audience: vibit_gameplay_runtime_requests
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_change_status: unchanged
+  session_persistence_status: deferred
+  websocket_handshake_authentication_status: deferred
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  authentication_command_routes_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+
+runtime_authentication_startup_composition_implementation:
+  status: completed
+  milestone: M-045
+  completed_work_item: W-0117
+  runtime_authentication_startup_composition_implementation_completed: true
+  runtime_authentication_startup_composition_implementation_work_item: W-0117
+  runtime_authentication_startup_composition_implementation_change: changes/2026-05-17-implement-runtime-authentication-startup-composition
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_authentication_status: bootstrap_metadata_only
+  environment_verifier_key_loader_wired: true
+  authentication_service_composed: true
+  route_access_token_validator_composed: true
+  route_protector_injected: true
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_changed: false
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  authentication_command_routes_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+
+next_direction_confirmation_after_runtime_authentication_startup_composition:
+  status: completed
+  milestone: M-046
+  completed_work_item: W-0118
+  change: changes/2026-05-17-confirm-next-direction-after-runtime-authentication-startup-composition
+  previous_milestone: M-045
+  previous_completed_work_item: W-0117
+  selected_direction: add_authentication_command_protocol_messages_and_login_route_registration
+  next_milestone: M-047
+  next_ready_work_item_created: W-0119
+  candidate_directions:
+    - ratify_session_persistence_and_websocket_handshake_authentication
+    - add_authentication_command_protocol_messages_and_login_route_registration
+    - implement_logout_refresh_cleanup_behavior_gates
+    - ratify_token_rotation_and_reauthentication_lifecycle
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+    - strengthen_operations_observability_and_admin_tooling
+  authentication_command_protocol_login_route_selected: true
+  session_persistence_selected: false
+  websocket_handshake_authentication_selected: false
+  logout_refresh_cleanup_selected: false
+  token_rotation_selected: false
+  repository_changes_selected: false
+  migrations_selected: false
+  dependencies_selected: false
+  core_game_backend_modules_selected: false
+  rule: >
+    The maintainer selected authentication command protocol messages and login
+    route registration after startup composition. The selection creates a gate
+    before implementation and preserves ask-first boundaries for session
+    persistence, WebSocket handshake authentication, logout, refresh, cleanup,
+    token rotation, repository changes, migrations, major dependencies,
+    operations posture, and core game backend expansion.
+
+authentication_command_protocol_login_route_gate:
+  status: completed
+  milestone: M-047
+  completed_work_item: W-0119
+  change: changes/2026-05-17-define-authentication-command-protocol-login-route-gate
+  decision: ADR-0055
+  authentication_command_protocol_login_route_gate_decision: ADR-0055
+  standard: docs/authentication-command-protocol-login-route-gate.md
+  authentication_command_protocol_login_route_gate_standard: docs/authentication-command-protocol-login-route-gate.md
+  translation: docs/authentication-command-protocol-login-route-gate.zh-CN.md
+  authentication_command_protocol_login_route_gate_defined: true
+  authentication_command_protocol_login_route_gate_check_rule: runtime.authentication_command_protocol_login_route_gate
+  implementation_authorized_by_this_standard: true
+  future_implementation_work_item: W-0120
+  public_login_route: runtime.authentication.AuthenticateWithDeviceCredential
+  route_kind: command
+  route_public_policy_status: already_public_in_route_protection_policy
+  first_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  first_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  application_handler_owner: runtime/internal/app/bootstrap
+  authentication_service_owner: runtime/internal/app/authentication
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_login_route_status: unavailable_bootstrap
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_change_status: unchanged
+  session_persistence_status: deferred
+  websocket_handshake_authentication_status: deferred
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  token_rotation_added: false
+
+authentication_command_protocol_login_route_implementation:
+  status: completed
+  milestone: M-048
+  completed_work_item: W-0120
+  authentication_command_protocol_login_route_implementation_completed: true
+  authentication_command_protocol_login_route_implementation_work_item: W-0120
+  authentication_command_protocol_login_route_implementation_change: changes/2026-05-17-implement-authentication-command-protocol-login-route
+  previous_milestone: M-047
+  previous_completed_work_item: W-0119
+  next_milestone: M-049
+  blocked_work_item: W-0121
+  implemented_scope: public_device_credential_login_route_only
+  protocol_source_added: proto/vibit/authentication/v1/authentication.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  application_handler_owner: runtime/internal/app/bootstrap
+  application_handler_added: true
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  protocol_adapter_behavior_added: true
+  startup_owner: runtime/cmd/vibit-server
+  postgres_startup_route_registration_added: true
+  transaction_wrapper_bypass_route: runtime.authentication.AuthenticateWithDeviceCredential
+  transaction_wrapper_bypass_added: true
+  memory_store_login_route_status: unavailable_bootstrap
+  existing_protobuf_envelope_change_added: false
+  websocket_transport_credential_neutral: true
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  token_validation_audit_mutation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_authentication_login_route:
+  status: completed
+  milestone: M-049
+  completed_work_item: W-0121
+  change: changes/2026-05-17-confirm-next-direction-after-authentication-login-route
+  previous_milestone: M-048
+  previous_completed_work_item: W-0120
+  selected_direction: ratify_session_persistence_and_websocket_handshake_authentication
+  next_milestone: M-050
+  next_ready_work_item_created: W-0122
+  candidate_directions:
+    - ratify_session_persistence_and_websocket_handshake_authentication
+    - implement_logout_refresh_cleanup_behavior_gates
+    - ratify_token_rotation_and_reauthentication_lifecycle
+    - add_memory_durable_authentication_support
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+    - strengthen_operations_observability_and_admin_tooling
+  session_persistence_selected_for_ratification: true
+  websocket_handshake_authentication_selected_for_ratification: true
+  logout_refresh_cleanup_selected: false
+  token_rotation_selected: false
+  repository_changes_selected: false
+  migrations_selected: false
+  dependencies_selected: false
+  memory_durable_authentication_selected: false
+  core_game_backend_modules_selected: false
+
+session_persistence_websocket_handshake_ratification:
+  status: completed
+  milestone: M-050
+  completed_work_item: W-0122
+  change: changes/2026-05-17-ratify-session-persistence-websocket-handshake-authentication
+  decision: ADR-0056
+  session_persistence_websocket_handshake_ratification_decision: ADR-0056
+  standard: docs/session-persistence-websocket-handshake-ratification.md
+  session_persistence_websocket_handshake_ratification_standard: docs/session-persistence-websocket-handshake-ratification.md
+  translation: docs/session-persistence-websocket-handshake-ratification.zh-CN.md
+  session_persistence_websocket_handshake_ratification_defined: true
+  session_persistence_websocket_handshake_ratification_check_rule: runtime.session_persistence_websocket_handshake_ratification
+  implementation_authorized_by_this_standard: false
+  current_validation_model: request_level_access_token_validation
+  current_proof_carrier: protobuf_authenticated_request_payload_wrapper
+  current_login_route: runtime.authentication.AuthenticateWithDeviceCredential
+  current_authenticated_request_message: vibit.authentication.v1.AuthenticatedRequest
+  current_websocket_handshake_authentication: not_selected
+  current_websocket_transport_credential_neutral: true
+  current_protobuf_envelope_change: unchanged
+  future_connection_binding_preferred_gate: first_message_protocol_binding
+  future_session_store_preferred_first_durable_target: postgres
+  first_message_connection_binding_implemented: false
+  session_persistence_added: false
+  session_table_added: false
+  websocket_handshake_authentication_added: false
+  transport_authorization_header_carrier_added: false
+  transport_bearer_carrier_added: false
+  transport_cookie_carrier_added: false
+  transport_query_token_carrier_added: false
+  transport_subprotocol_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_proto_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  reconnect_epoch_behavior_added: false
+  active_connection_invalidation_added: false
+  memory_durable_authentication_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_handshake_ratification:
+  status: completed
+  milestone: M-051
+  completed_work_item: W-0123
+  change: changes/2026-05-17-confirm-next-direction-after-session-handshake-ratification
+  previous_milestone: M-050
+  previous_completed_work_item: W-0122
+  selected_direction: define_first_message_connection_binding_gate
+  next_milestone: M-052
+  next_ready_work_item_created: W-0124
+  candidate_directions:
+    - define_first_message_connection_binding_gate
+    - define_postgres_session_persistence_schema_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - implement_logout_refresh_cleanup_behavior_gates
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  first_message_connection_binding_selected: true
+  session_persistence_schema_selected: false
+  websocket_handshake_authentication_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  operations_posture_selected: false
+  memory_durable_authentication_selected: false
+  core_game_backend_modules_selected: false
+
+first_message_connection_binding_gate:
+  status: completed
+  milestone: M-052
+  completed_work_item: W-0124
+  change: changes/2026-05-17-define-first-message-connection-binding-gate
+  decision: ADR-0057
+  first_message_connection_binding_gate_decision: ADR-0057
+  standard: docs/first-message-connection-binding-gate.md
+  first_message_connection_binding_gate_standard: docs/first-message-connection-binding-gate.md
+  translation: docs/first-message-connection-binding-gate.zh-CN.md
+  first_message_connection_binding_gate_defined: true
+  first_message_connection_binding_gate_check_rule: runtime.first_message_connection_binding_gate
+  implementation_authorized_by_this_standard: false
+  selected_binding_message_kind: system
+  selected_binding_route: runtime.authentication.BindConnection
+  selected_binding_payload_candidate: vibit.authentication.v1.BindConnectionRequest
+  selected_binding_response_candidate: vibit.authentication.v1.BindConnectionResponse
+  selected_proof_carrier: protobuf_system_payload_access_token
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_change_added: false
+  protocol_source_added: false
+  generated_output_added: false
+  connection_binding_registry_added: false
+  route_policy_bound_identity_added: false
+  session_persistence_added: false
+  session_table_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  reconnect_epoch_behavior_added: false
+  active_connection_invalidation_added: false
+  memory_durable_authentication_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_first_message_connection_binding_gate:
+  status: completed
+  milestone: M-053
+  completed_work_item: W-0125
+  change: changes/2026-05-17-confirm-next-direction-after-first-message-connection-binding-gate
+  previous_milestone: M-052
+  previous_completed_work_item: W-0124
+  selected_direction: define_first_message_connection_binding_implementation_gate
+  next_milestone: M-054
+  next_ready_work_item_created: W-0126
+  candidate_directions:
+    - define_first_message_connection_binding_implementation_gate
+    - define_postgres_session_persistence_schema_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - implement_logout_refresh_cleanup_behavior_gates
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  first_message_connection_binding_implementation_selected: true
+  session_persistence_schema_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  operations_posture_selected: false
+  memory_durable_authentication_selected: false
+  core_game_backend_modules_selected: false
+
+first_message_connection_binding_implementation_gate:
+  status: completed
+  milestone: M-054
+  completed_work_item: W-0126
+  change: changes/2026-05-17-define-first-message-connection-binding-implementation-gate
+  decision: ADR-0058
+  first_message_connection_binding_implementation_gate_decision: ADR-0058
+  standard: docs/first-message-connection-binding-implementation-gate.md
+  first_message_connection_binding_implementation_gate_standard: docs/first-message-connection-binding-implementation-gate.md
+  translation: docs/first-message-connection-binding-implementation-gate.zh-CN.md
+  first_message_connection_binding_implementation_gate_defined: true
+  first_message_connection_binding_implementation_gate_check_rule: runtime.first_message_connection_binding_implementation_gate
+  implementation_authorized_by_this_standard: false
+  future_implementation_work_item: W-0128
+  future_route: runtime.authentication.BindConnection
+  future_route_kind: system
+  future_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  future_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  future_protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  future_application_binding_owner: runtime/internal/app
+  future_startup_owner: runtime/cmd/vibit-server
+  future_request: vibit.authentication.v1.BindConnectionRequest
+  future_response: vibit.authentication.v1.BindConnectionResponse
+  future_status_enum: vibit.authentication.v1.ConnectionBindingStatus
+  first_composed_runtime_store: postgres
+  memory_store_binding_status: unavailable_bootstrap
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_change_added: false
+  protocol_source_added: false
+  generated_output_added: false
+  connection_binding_registry_added: false
+  route_policy_bound_identity_added: false
+  session_persistence_added: false
+  session_table_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  reconnect_epoch_behavior_added: false
+  active_connection_invalidation_added: false
+  memory_durable_authentication_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_first_message_connection_binding_implementation_gate:
+  status: completed
+  milestone: M-055
+  completed_work_item: W-0127
+  change: changes/2026-05-17-confirm-next-direction-after-first-message-connection-binding-implementation-gate
+  previous_milestone: M-054
+  previous_completed_work_item: W-0126
+  selected_direction: implement_first_message_connection_binding
+  next_milestone: M-056
+  next_ready_work_item_created: W-0128
+  candidate_directions:
+    - implement_first_message_connection_binding
+    - define_postgres_session_persistence_schema_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  first_message_connection_binding_implementation_selected: true
+  session_persistence_schema_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  operations_posture_selected: false
+  memory_durable_authentication_selected: false
+  core_game_backend_modules_selected: false
+
+first_message_connection_binding_implementation:
+  status: completed
+  milestone: M-056
+  completed_work_item: W-0128
+  first_message_connection_binding_implementation_completed: true
+  first_message_connection_binding_implementation_work_item: W-0128
+  first_message_connection_binding_implementation_change: changes/2026-05-17-implement-first-message-connection-binding
+  previous_milestone: M-055
+  previous_completed_work_item: W-0127
+  next_milestone: M-057
+  blocked_work_item: W-0129
+  bind_connection_route: runtime.authentication.BindConnection
+  bind_connection_route_kind: system
+  bind_connection_request: vibit.authentication.v1.BindConnectionRequest
+  bind_connection_response: vibit.authentication.v1.BindConnectionResponse
+  bind_connection_status_enum: vibit.authentication.v1.ConnectionBindingStatus
+  application_binding_added: runtime/internal/app/connection_binding.go
+  protocol_adapter_added: runtime/internal/platform/protocol/protobuf/connection_binding.go
+  startup_composition_added: runtime/cmd/vibit-server/main.go
+  websocket_connection_epoch_handoff_added: true
+  first_composed_runtime_store: postgres
+  memory_store_binding_status: unavailable_bootstrap
+  route_policy_bound_identity_added: false
+  existing_request_level_authenticated_wrapper_preserved: true
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_changed: false
+  session_persistence_added: false
+  session_table_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  reconnect_epoch_behavior_added: false
+  active_connection_invalidation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_first_message_connection_binding_implementation:
+  status: completed
+  milestone: M-057
+  completed_work_item: W-0129
+  change: changes/2026-05-17-confirm-next-direction-after-first-message-connection-binding-implementation
+  previous_milestone: M-056
+  previous_completed_work_item: W-0128
+  selected_direction: define_postgres_session_persistence_schema_gate
+  next_milestone: M-058
+  next_ready_work_item_created: W-0130
+  candidate_directions:
+    - define_postgres_session_persistence_schema_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_persistence_schema_selected: true
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_authentication_selected: false
+  core_game_backend_modules_selected: false
+
+postgres_session_persistence_schema_gate:
+  status: completed
+  milestone: M-058
+  completed_work_item: W-0130
+  change: changes/2026-05-17-define-postgres-session-persistence-schema-gate
+  decision: ADR-0059
+  postgres_session_persistence_schema_gate_decision: ADR-0059
+  standard: docs/postgres-session-persistence-schema-gate.md
+  postgres_session_persistence_schema_gate_standard: docs/postgres-session-persistence-schema-gate.md
+  translation: docs/postgres-session-persistence-schema-gate.zh-CN.md
+  postgres_session_persistence_schema_gate_defined: true
+  postgres_session_persistence_schema_gate_check_rule: runtime.postgres_session_persistence_schema_gate
+  implementation_authorized_by_this_standard: false
+  previous_milestone: M-057
+  previous_completed_work_item: W-0129
+  next_milestone: M-059
+  completed_direction_work_item: W-0131
+  selected_first_session_store: postgres
+  future_session_logical_table: runtime_sessions
+  future_migration_source_candidate: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  future_repository_owner_candidate: runtime/internal/app/session
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  runtime_session_owner: runtime/internal/app
+  player_module_owns_session_table: false
+  authentication_module_owns_session_table: false
+  websocket_transport_owns_session_table: false
+  session_persistence_implementation_added: false
+  session_table_added: true
+  migration_source_added: true
+  runtime_session_connections_table_selected_now: false
+  connection_binding_registry_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  route_policy_bound_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_postgres_session_persistence_schema_gate:
+  status: completed
+  milestone: M-059
+  completed_work_item: W-0131
+  previous_milestone: M-058
+  previous_completed_work_item: W-0130
+  selected_direction: implement_runtime_sessions_migration_source
+  next_milestone: M-060
+  next_completed_work_item: W-0132
+  candidate_directions:
+    - implement_runtime_sessions_migration_source
+    - define_session_repository_boundary
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_migration_source_selected: true
+  session_repository_boundary_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+
+runtime_sessions_migration_source:
+  status: completed
+  milestone: M-060
+  completed_work_item: W-0132
+  change: changes/2026-05-17-implement-runtime-sessions-migration-source
+  decision: ADR-0060
+  runtime_sessions_migration_source_decision: ADR-0060
+  runtime_sessions_migration_source_check_rule: runtime.runtime_sessions_migration_source
+  migration_source: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  selected_first_session_store: postgres
+  session_logical_table: runtime_sessions
+  session_table_added: true
+  migration_source_added: true
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  websocket_handshake_authentication_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  route_policy_bound_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_runtime_sessions_migration_source:
+  status: completed
+  milestone: M-061
+  completed_work_item: W-0133
+  previous_milestone: M-060
+  previous_completed_work_item: W-0132
+  selected_direction: define_session_repository_boundary
+  next_milestone: M-062
+  next_completed_work_item: W-0134
+  candidate_directions:
+    - define_session_repository_boundary
+    - define_session_postgresql_adapter_gate
+    - define_runtime_session_validation_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_repository_boundary_selected: true
+  session_postgresql_adapter_selected: false
+  runtime_session_validation_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+
+session_repository_boundary:
+  status: completed
+  milestone: M-062
+  completed_work_item: W-0134
+  change: changes/2026-05-17-define-session-repository-boundary
+  decision: ADR-0061
+  session_repository_boundary_decision: ADR-0061
+  session_repository_boundary_standard: docs/session-repository-boundary.md
+  session_repository_boundary_translation: docs/session-repository-boundary.zh-CN.md
+  session_repository_boundary_check_rule: runtime.session_repository_boundary
+  session_logical_table: runtime_sessions
+  future_repository_owner_candidate: runtime/internal/app/session
+  future_repository_interface_candidate: runtime/internal/app/session.Repository
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  repository_interface_added: false
+  postgresql_adapter_added: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_revocation_added: false
+  runtime_session_cleanup_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_repository_boundary:
+  status: completed
+  milestone: M-063
+  completed_work_item: W-0135
+  previous_milestone: M-062
+  previous_completed_work_item: W-0134
+  selected_direction: implement_session_repository_interface
+  next_milestone: M-064
+  next_completed_work_item: W-0136
+  candidate_directions:
+    - define_session_postgresql_adapter_gate
+    - implement_session_repository_interface
+    - define_runtime_session_validation_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_postgresql_adapter_selected: false
+  session_repository_implementation_selected: true
+  runtime_session_validation_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+
+session_repository_interface_implementation:
+  status: completed
+  milestone: M-064
+  completed_work_item: W-0136
+  change: changes/2026-05-17-implement-session-repository-interface
+  decision: ADR-0062
+  session_repository_interface_decision: ADR-0062
+  session_repository_interface_check_rule: runtime.session_repository_interface_implementation
+  repository_owner: runtime/internal/app/session
+  repository_interface: runtime/internal/app/session.Repository
+  repository_source: runtime/internal/app/session/repository.go
+  repository_tests: runtime/internal/app/session/repository_test.go
+  session_logical_table: runtime_sessions
+  interface_added: true
+  value_types_added: true
+  normalizers_added: true
+  postgresql_adapter_added: false
+  unit_of_work_factory_added: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_revocation_added: false
+  runtime_session_cleanup_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_repository_interface:
+  status: completed
+  milestone: M-065
+  completed_work_item: W-0137
+  previous_milestone: M-064
+  previous_completed_work_item: W-0136
+  selected_direction: define_session_postgresql_adapter_gate
+  next_milestone: M-066
+  next_completed_work_item: W-0138
+  candidate_directions:
+    - define_session_postgresql_adapter_gate
+    - implement_session_postgresql_adapter
+    - define_runtime_session_validation_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_postgresql_adapter_selected: true
+  runtime_session_validation_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+
+session_postgresql_adapter_gate:
+  status: completed
+  milestone: M-066
+  completed_work_item: W-0138
+  change: changes/2026-05-17-define-session-postgresql-adapter-gate
+  decision: ADR-0063
+  session_postgresql_adapter_gate_decision: ADR-0063
+  session_postgresql_adapter_gate_standard: docs/session-postgresql-adapter-gate.md
+  session_postgresql_adapter_gate_translation: docs/session-postgresql-adapter-gate.zh-CN.md
+  session_postgresql_adapter_gate_check_rule: runtime.session_postgresql_adapter_gate
+  repository_owner: runtime/internal/app/session
+  repository_interface: runtime/internal/app/session.Repository
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/session_repository.go
+  future_adapter_test_candidate: runtime/internal/platform/persistence/postgres/session_repository_test.go
+  session_logical_table: runtime_sessions
+  unit_of_work_factory_candidate: NewSessionRepository
+  postgresql_adapter_added: false
+  unit_of_work_factory_added: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_revocation_added: false
+  runtime_session_cleanup_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_postgresql_adapter_gate:
+  status: completed
+  milestone: M-067
+  completed_work_item: W-0139
+  previous_milestone: M-066
+  previous_completed_work_item: W-0138
+  selected_direction: implement_session_postgresql_adapter
+  next_milestone: M-068
+  next_completed_work_item: W-0140
+  candidate_directions:
+    - implement_session_postgresql_adapter
+    - define_runtime_session_validation_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+  session_postgresql_adapter_implementation_selected: true
+  runtime_session_validation_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_selected: false
+  bound_identity_route_policy_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+
+session_postgresql_adapter_implementation:
+  status: completed
+  milestone: M-068
+  completed_work_item: W-0140
+  change: changes/2026-05-17-implement-session-postgresql-adapter
+  decision: ADR-0064
+  session_postgresql_adapter_implementation_decision: ADR-0064
+  session_postgresql_adapter_implementation_check_rule: runtime.session_postgresql_adapter_implementation
+  repository_owner: runtime/internal/app/session
+  repository_interface: runtime/internal/app/session.Repository
+  postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  adapter_source: runtime/internal/platform/persistence/postgres/session_repository.go
+  adapter_tests: runtime/internal/platform/persistence/postgres/session_repository_test.go
+  unit_of_work_factory: NewSessionRepository
+  session_logical_table: runtime_sessions
+  postgresql_adapter_added: true
+  unit_of_work_factory_added: true
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_cleanup_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_postgresql_adapter_implementation:
+  status: completed
+  milestone: M-069
+  completed_work_item: W-0141
+  previous_milestone: M-068
+  previous_completed_work_item: W-0140
+  selected_direction: define_runtime_session_validation_gate
+  next_milestone: M-070
+  next_completed_work_item: W-0142
+  candidate_directions:
+    - define_runtime_session_validation_gate
+    - define_session_creation_composition_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_bound_identity_route_policy_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime_session_validation_gate:
+  status: completed
+  milestone: M-070
+  completed_work_item: W-0142
+  change: changes/2026-05-17-define-runtime-session-validation-gate
+  decision: ADR-0065
+  runtime_session_validation_gate_decision: ADR-0065
+  runtime_session_validation_gate_standard: docs/runtime-session-validation-gate.md
+  runtime_session_validation_gate_check_rule: runtime.runtime_session_validation_gate
+  future_validation_owner: runtime/internal/app
+  session_repository_owner: runtime/internal/app/session
+  postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_validator_source_candidate: runtime/internal/app/runtime_session_validator.go
+  future_validator_test_candidate: runtime/internal/app/runtime_session_validator_test.go
+  runtime_session_validation_gate_defined: true
+  runtime_session_validation_added: false
+  request_identity_session_validated_true_added: false
+  session_creation_composition_added: false
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_runtime_session_validation_gate:
+  status: completed
+  milestone: M-071
+  completed_work_item: W-0143
+  previous_milestone: M-070
+  previous_completed_work_item: W-0142
+  selected_direction: implement_runtime_session_validation
+  next_milestone: M-072
+  next_completed_work_item: W-0144
+  candidate_directions:
+    - implement_runtime_session_validation
+    - define_session_creation_composition_gate
+    - define_bound_identity_route_policy_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime_session_validation_implementation:
+  status: completed
+  milestone: M-072
+  completed_work_item: W-0144
+  change: changes/2026-05-17-implement-runtime-session-validation
+  decision: ADR-0066
+  runtime_session_validation_implementation_completed: true
+  runtime_session_validation_implementation_decision: ADR-0066
+  runtime_session_validation_implementation_check_rule: runtime.runtime_session_validation_implementation
+  validator_owner: runtime/internal/app
+  session_repository_interface: runtime/internal/app/session.Repository
+  session_repository_owner: runtime/internal/app/session
+  validator_source: runtime/internal/app/runtime_session_validator.go
+  validator_tests: runtime/internal/app/runtime_session_validator_test.go
+  persistent_session_validator_added: true
+  runtime_session_validation_added: true
+  request_identity_session_validated_true_added: true
+  session_repository_lookup_method: FindActiveSessionByID
+  session_creation_composition_added: false
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_runtime_session_validation_implementation:
+  status: completed
+  milestone: M-073
+  completed_work_item: W-0145
+  previous_milestone: M-072
+  previous_completed_work_item: W-0144
+  selected_direction: define_session_creation_composition_gate
+  next_milestone: M-074
+  next_completed_work_item: W-0146
+  candidate_directions:
+    - define_session_creation_composition_gate
+    - define_bound_identity_route_policy_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+session_creation_composition_gate:
+  status: completed
+  milestone: M-074
+  completed_work_item: W-0146
+  change: changes/2026-05-17-define-session-creation-composition-gate
+  decision: ADR-0067
+  session_creation_composition_gate_defined: true
+  session_creation_composition_gate_decision: ADR-0067
+  session_creation_composition_gate_standard: docs/session-creation-composition-gate.md
+  session_creation_composition_gate_check_rule: runtime.session_creation_composition_gate
+  future_composition_owner: runtime/internal/app
+  future_authentication_service_owner: runtime/internal/app/authentication
+  session_repository_interface: runtime/internal/app/session.Repository
+  session_repository_owner: runtime/internal/app/session
+  session_repository_create_method: CreateRuntimeSession
+  future_login_composition_candidate: AuthenticateWithDeviceCredential
+  future_session_id_generation_owner: runtime/internal/app
+  session_creation_behavior_added: false
+  authentication_service_code_changed: false
+  runtime_session_validation_changed: false
+  request_identity_session_validated_policy_changed: false
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_creation_composition_gate:
+  status: completed
+  milestone: M-075
+  completed_work_item: W-0147
+  selected_direction: implement_session_creation_composition
+  next_milestone: M-076
+  next_completed_work_item: W-0148
+  previous_milestone: M-074
+  previous_completed_work_item: W-0146
+  candidate_directions:
+    - implement_session_creation_composition
+    - define_bound_identity_route_policy_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+session_creation_composition_implementation:
+  status: completed
+  milestone: M-076
+  completed_work_item: W-0148
+  change: changes/2026-05-18-implement-session-creation-composition
+  decision: ADR-0068
+  session_creation_composition_implementation_completed: true
+  session_creation_composition_implementation_decision: ADR-0068
+  session_creation_composition_implementation_check_rule: runtime.session_creation_composition_implementation
+  composition_owner: runtime/internal/app/authentication
+  session_repository_interface: runtime/internal/app/session.Repository
+  session_repository_create_method: CreateRuntimeSession
+  login_composition_method: AuthenticateWithDeviceCredential
+  service_source: runtime/internal/app/authentication/service.go
+  service_tests: runtime/internal/app/authentication/service_test.go
+  session_id_generator_dependency_added: true
+  unit_of_work_session_repository_capability_added: true
+  login_creates_runtime_session: true
+  token_session_same_unit_of_work: true
+  runtime_session_access_token_record_linkage_added: true
+  raw_token_material_stored_in_session: false
+  raw_credential_material_stored_in_session: false
+  lookup_or_verifier_digest_stored_in_session: false
+  runtime_session_validation_changed: false
+  route_policy_session_identity_added: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  protobuf_authentication_response_changed: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_session_creation_composition_implementation:
+  status: completed
+  milestone: M-077
+  completed_work_item: W-0149
+  previous_milestone: M-076
+  previous_completed_work_item: W-0148
+  selected_direction: define_bound_identity_route_policy_gate
+  next_milestone: M-078
+  next_completed_work_item: W-0150
+  candidate_directions:
+    - define_bound_identity_route_policy_gate
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+bound_identity_route_policy_gate:
+  status: completed
+  milestone: M-078
+  completed_work_item: W-0150
+  change: changes/2026-05-18-define-bound-identity-route-policy-gate
+  decision: ADR-0069
+  bound_identity_route_policy_gate_defined: true
+  bound_identity_route_policy_gate_decision: ADR-0069
+  bound_identity_route_policy_gate_standard: docs/bound-identity-route-policy-gate.md
+  bound_identity_route_policy_gate_check_rule: runtime.bound_identity_route_policy_gate
+  future_route_policy_owner: runtime/internal/app
+  future_policy_source_candidate: runtime/internal/app/route_authentication.go
+  future_policy_test_candidate: runtime/internal/app/route_authentication_test.go
+  candidate_policy_families:
+    - public
+    - request_token_required
+    - bound_connection_required
+    - session_validated_required
+    - bound_session_required
+  recommended_first_default_domain_policy: request_token_required
+  public_routes_remain_explicit: true
+  metadata_only_identity_satisfies_protected_policy: false
+  persisted_session_id_alone_is_proof: false
+  route_policy_session_identity_added: false
+  route_policy_bound_identity_added: false
+  ordinary_protected_routes_use_bound_identity: false
+  ordinary_protected_routes_use_session_validated_identity: false
+  request_token_route_policy_changed: false
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  protobuf_authentication_response_changed: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_bound_identity_route_policy_gate:
+  status: completed
+  milestone: M-079
+  completed_work_item: W-0151
+  previous_milestone: M-078
+  previous_completed_work_item: W-0150
+  selected_direction: implement_bound_identity_route_policy
+  next_milestone: M-080
+  next_completed_work_item: W-0152
+  candidate_directions:
+    - implement_bound_identity_route_policy
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+bound_identity_route_policy_implementation:
+  status: completed
+  milestone: M-080
+  completed_work_item: W-0152
+  change: changes/2026-05-18-implement-bound-identity-route-policy
+  decision: ADR-0070
+  bound_identity_route_policy_implementation_completed: true
+  bound_identity_route_policy_implementation_decision: ADR-0070
+  bound_identity_route_policy_implementation_check_rule: runtime.bound_identity_route_policy_implementation
+  policy_owner: runtime/internal/app
+  policy_source: runtime/internal/app/route_authentication.go
+  policy_tests: runtime/internal/app/route_authentication_test.go
+  default_domain_route_policy: request_token_required
+  public_authentication_route_remains_public: true
+  ordinary_protected_routes_still_require_request_token: true
+  explicit_bound_connection_policy_available: true
+  explicit_session_validated_policy_available: true
+  explicit_bound_session_policy_available: true
+  route_scoped_policy_requirements_added: true
+  metadata_only_identity_satisfies_protected_policy: false
+  persisted_session_id_alone_is_proof: false
+  route_policy_asserts_session_validated_true: false
+  request_token_route_policy_changed: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  protobuf_session_messages_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_bound_identity_route_policy_implementation:
+  status: completed
+  milestone: M-081
+  completed_work_item: W-0153
+  previous_milestone: M-080
+  previous_completed_work_item: W-0152
+  selected_direction: define_logout_revocation_active_connection_gate
+  next_milestone: M-082
+  next_completed_work_item: W-0154
+  candidate_directions:
+    - define_logout_revocation_active_connection_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+logout_revocation_active_connection_gate:
+  status: completed
+  milestone: M-082
+  completed_work_item: W-0154
+  change: changes/2026-05-18-define-logout-revocation-active-connection-gate
+  decision: ADR-0071
+  logout_revocation_active_connection_gate_defined: true
+  logout_revocation_active_connection_gate_decision: ADR-0071
+  logout_revocation_active_connection_gate_standard: docs/logout-revocation-active-connection-gate.md
+  logout_revocation_active_connection_gate_check_rule: runtime.logout_revocation_active_connection_gate
+  future_policy_owner: runtime/internal/app
+  future_authentication_service_owner: runtime/internal/app/authentication
+  future_session_repository_owner: runtime/internal/app/session
+  future_connection_registry_owner_candidate: runtime/internal/app
+  first_recommended_logout_scope: presented_access_token_only
+  token_revocation_and_session_revocation_separate: true
+  connection_registry_required_before_active_socket_targeting: true
+  websocket_transport_auth_state_owner: false
+  logout_execution_added: false
+  token_revocation_execution_added: false
+  runtime_session_revocation_execution_added: false
+  active_connection_invalidation_added: false
+  connection_registry_added: false
+  websocket_close_policy_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_logout_revocation_active_connection_gate:
+  status: completed
+  milestone: M-083
+  completed_work_item: W-0155
+  previous_milestone: M-082
+  previous_completed_work_item: W-0154
+  selected_direction: define_logout_access_token_behavior_gate
+  next_milestone: M-084
+  next_completed_work_item: W-0156
+  candidate_directions:
+    - define_logout_access_token_behavior_gate
+    - define_active_connection_registry_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_logout_route_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+logout_access_token_behavior_gate:
+  status: completed
+  milestone: M-084
+  completed_work_item: W-0156
+  change: changes/2026-05-18-define-logout-access-token-behavior-gate
+  decision: ADR-0072
+  logout_access_token_behavior_gate_defined: true
+  logout_access_token_behavior_gate_decision: ADR-0072
+  logout_access_token_behavior_gate_standard: docs/logout-access-token-behavior-gate.md
+  logout_access_token_behavior_gate_check_rule: runtime.logout_access_token_behavior_gate
+  future_service_owner: runtime/internal/app/authentication
+  future_repository_capability_owner: runtime/internal/modules/authentication
+  future_transaction_owner: runtime/internal/app
+  first_logout_scope: presented_access_token_only
+  proof_carrier_status: already_decoded_service_request_only
+  token_lookup_before_revocation_required: true
+  token_verifier_comparison_before_revocation_required: true
+  already_revoked_token_public_behavior: invalid_token
+  expired_token_public_behavior: invalid_token
+  logout_execution_added: false
+  token_revocation_execution_added: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  connection_registry_added: false
+  websocket_close_policy_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  refresh_behavior_added: false
+  logout_all_sessions_added: false
+  admin_revocation_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_logout_access_token_behavior_gate:
+  status: completed
+  milestone: M-085
+  completed_work_item: W-0157
+  previous_milestone: M-084
+  previous_completed_work_item: W-0156
+  selected_direction: implement_logout_access_token_behavior
+  next_milestone: M-086
+  next_completed_work_item: W-0158
+  candidate_directions:
+    - implement_logout_access_token_behavior
+    - define_active_connection_registry_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_logout_route_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+logout_access_token_behavior_implementation:
+  status: completed
+  milestone: M-086
+  completed_work_item: W-0158
+  change: changes/2026-05-18-implement-logout-access-token-behavior
+  decision: ADR-0073
+  logout_access_token_behavior_implemented: true
+  logout_access_token_behavior_implementation_decision: ADR-0073
+  logout_access_token_behavior_implementation_check_rule: runtime.logout_access_token_behavior_implementation
+  service_owner: runtime/internal/app/authentication
+  repository_capability_owner: runtime/internal/modules/authentication
+  transaction_owner: runtime/internal/app
+  first_logout_scope: presented_access_token_only
+  proof_carrier_status: already_decoded_service_request_only
+  token_lookup_before_revocation_required: true
+  token_verifier_comparison_before_revocation_required: true
+  success_after_commit_only: true
+  logout_execution_added: true
+  token_revocation_execution_added: true
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  connection_registry_added: false
+  websocket_close_policy_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  refresh_behavior_added: false
+  logout_all_sessions_added: false
+  admin_revocation_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_logout_access_token_behavior_implementation:
+  status: completed
+  milestone: M-087
+  completed_work_item: W-0159
+  previous_milestone: M-086
+  previous_completed_work_item: W-0158
+  selected_direction: define_active_connection_registry_gate
+  next_milestone: M-088
+  next_completed_work_item: W-0160
+  candidate_directions:
+    - define_active_connection_registry_gate
+    - define_protocol_logout_route_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+active_connection_registry_gate:
+  status: completed
+  milestone: M-088
+  completed_work_item: W-0160
+  change: changes/2026-05-18-define-active-connection-registry-gate
+  decision: ADR-0074
+  active_connection_registry_gate_defined: true
+  active_connection_registry_gate_decision: ADR-0074
+  active_connection_registry_gate_standard: docs/active-connection-registry-gate.md
+  active_connection_registry_gate_check_rule: runtime.active_connection_registry_gate
+  future_registry_owner: runtime/internal/app/connection
+  future_policy_owner: runtime/internal/app
+  first_registry_posture: single_process_in_memory
+  registry_persistence_posture: non_durable_runtime_state
+  cluster_registry_posture: deferred
+  server_observed_connection_id_required: true
+  connection_epoch_required: true
+  metadata_only_targeting_allowed: false
+  active_connection_registry_added: false
+  active_connection_invalidation_added: false
+  websocket_close_policy_added: false
+  kick_disconnect_behavior_added: false
+  duplicate_connection_replacement_added: false
+  reconnect_epoch_behavior_added: false
+  runtime_session_revocation_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_active_connection_registry_gate:
+  status: completed
+  milestone: M-089
+  completed_work_item: W-0161
+  previous_milestone: M-088
+  previous_completed_work_item: W-0160
+  selected_direction: implement_active_connection_registry_single_process
+  next_milestone: M-090
+  next_completed_work_item: W-0162
+  candidate_directions:
+    - implement_active_connection_registry_single_process
+    - define_websocket_close_policy_gate
+    - define_protocol_logout_route_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+active_connection_registry_single_process_implementation:
+  status: completed
+  milestone: M-090
+  completed_work_item: W-0162
+  change: changes/2026-05-18-implement-active-connection-registry-single-process
+  decision: ADR-0075
+  active_connection_registry_single_process_implemented: true
+  active_connection_registry_single_process_decision: ADR-0075
+  active_connection_registry_single_process_check_rule: runtime.active_connection_registry_single_process_implementation
+  registry_source: runtime/internal/app/connection/registry.go
+  registry_tests: runtime/internal/app/connection/registry_test.go
+  registry_owner: runtime/internal/app/connection
+  registry_posture: single_process_in_memory
+  registry_persistence_posture: non_durable_runtime_state
+  server_observed_connection_id_required: true
+  connection_epoch_required: true
+  validated_player_identity_required_for_binding: true
+  metadata_only_targeting_allowed: false
+  active_connection_registry_added: true
+  websocket_close_policy_added: false
+  kick_disconnect_behavior_added: false
+  reconnect_epoch_behavior_added: false
+  runtime_session_revocation_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  generated_output_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_active_connection_registry_implementation:
+  status: completed
+  milestone: M-091
+  completed_work_item: W-0163
+  previous_milestone: M-090
+  previous_completed_work_item: W-0162
+  selected_direction: define_websocket_close_policy_gate
+  next_milestone: M-092
+  next_completed_work_item: W-0164
+  candidate_directions:
+    - define_websocket_close_policy_gate
+    - define_protocol_logout_route_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+websocket_close_policy_gate:
+  status: completed
+  milestone: M-092
+  completed_work_item: W-0164
+  change: changes/2026-05-18-define-websocket-close-policy-gate
+  decision: ADR-0076
+  websocket_close_policy_gate_defined: true
+  websocket_close_policy_gate_decision: ADR-0076
+  websocket_close_policy_gate_standard: docs/websocket-close-policy-gate.md
+  websocket_close_policy_gate_check_rule: runtime.websocket_close_policy_gate
+  future_policy_owner: runtime/internal/app
+  future_registry_owner: runtime/internal/app/connection
+  future_transport_handoff_owner: runtime/internal/platform/transport/ws
+  first_close_policy_posture: application_owned_policy_before_transport_handoff
+  transport_close_handoff_posture: deferred
+  registry_invalidation_to_close_default: not_selected_by_this_gate
+  logout_close_socket_default: not_selected_by_this_gate
+  websocket_close_implementation_added: false
+  transport_close_handoff_added: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  protocol_close_message_added: false
+  kick_disconnect_behavior_added: false
+  runtime_session_revocation_added: false
+  reconnect_epoch_behavior_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  generated_output_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_websocket_close_policy_gate:
+  status: completed
+  milestone: M-093
+  completed_work_item: W-0165
+  previous_milestone: M-092
+  previous_completed_work_item: W-0164
+  selected_direction: implement_websocket_close_policy_single_process
+  next_milestone: M-094
+  next_completed_work_item: W-0166
+  candidate_directions:
+    - implement_websocket_close_policy_single_process
+    - define_protocol_logout_route_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+websocket_close_policy_single_process_implementation:
+  status: completed
+  milestone: M-094
+  completed_work_item: W-0166
+  change: changes/2026-05-18-implement-websocket-close-policy-single-process
+  decision: ADR-0077
+  websocket_close_policy_single_process_implemented: true
+  websocket_close_policy_single_process_decision: ADR-0077
+  websocket_close_policy_single_process_check_rule: runtime.websocket_close_policy_single_process_implementation
+  close_policy_source: runtime/internal/app/connection/close_policy.go
+  close_policy_tests: runtime/internal/app/connection/close_policy_test.go
+  close_policy_owner: runtime/internal/app/connection
+  close_policy_posture: single_process_in_memory_registry_backed
+  close_policy_transport_action: mark_invalidated_only
+  close_intents_added: redacted_application_intents
+  concrete_socket_close_added: false
+  transport_close_handoff_added: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  protocol_close_message_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  generated_output_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_websocket_close_policy_implementation:
+  status: completed
+  milestone: M-095
+  completed_work_item: W-0167
+  previous_milestone: M-094
+  previous_completed_work_item: W-0166
+  selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
+  next_milestone: M-096
+  next_completed_work_item: W-0168
+  candidate_directions:
+    - define_protocol_logout_route_gate
+    - define_reconnect_connection_epoch_gate
+    - define_protocol_session_carrier_gate
+    - define_transport_close_handoff_gate
+    - strengthen_operations_observability_and_admin_tooling
+    - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+nakama_pitaya_product_parity_roadmap:
+  status: ratified
+  milestone: M-096
+  completed_work_item: W-0168
+  decision: ADR-0078
+  standard: docs/nakama-pitaya-product-parity-roadmap.md
+  translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  check_rule: runtime.reference_product_parity_roadmap
+  parity_goal: nakama_pitaya_same_class_common_capability_coverage
+  api_compatibility_goal: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  implementation_authorized_by_this_standard: roadmap_only
+  current_near_term_priority: protocol_logout_and_connection_lifecycle
+  recommended_next_direction: define_protocol_logout_route_gate
+
+protocol_logout_route_gate:
+  status: completed
+  milestone: M-097
+  completed_work_item: W-0169
+  change: changes/2026-05-18-define-protocol-logout-route-gate
+  decision: ADR-0079
+  protocol_logout_route_gate_decision: ADR-0079
+  standard: docs/protocol-logout-route-gate.md
+  protocol_logout_route_gate_standard: docs/protocol-logout-route-gate.md
+  translation: docs/protocol-logout-route-gate.zh-CN.md
+  protocol_logout_route_gate_defined: true
+  check_rule: runtime.protocol_logout_route_gate
+  protocol_logout_route_gate_check_rule: runtime.protocol_logout_route_gate
+  implementation_authorized_by_this_standard: true
+  future_implementation_work_item: W-0170
+  public_logout_route: runtime.authentication.LogoutAccessToken
+  route_kind: command
+  route_protection_posture: explicit_service_validated_token_lifecycle_route
+  proof_carrier_posture: access_token_in_logout_request_payload
+  first_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  first_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  request_message_candidate: vibit.authentication.v1.LogoutAccessTokenRequest
+  response_message_candidate: vibit.authentication.v1.LogoutAccessTokenResponse
+  application_handler_owner: runtime/internal/app/bootstrap
+  authentication_service_owner: runtime/internal/app/authentication
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_logout_route_status: unavailable_bootstrap
+  transaction_bypass_required: true
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_change_status: unchanged
+  first_logout_scope: presented_access_token_only
+  already_revoked_token_public_behavior: invalid_token
+  expired_token_public_behavior: invalid_token
+  protocol_route_added: false
+  protocol_source_added: false
+  generated_output_added: false
+  existing_protobuf_envelope_change_added: false
+  logout_closes_socket: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  concrete_socket_close_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+protocol_logout_route_implementation:
+  status: completed
+  milestone: M-098
+  completed_work_item: W-0170
+  change: changes/2026-05-18-implement-protocol-logout-route
+  protocol_logout_route_implementation_completed: true
+  protocol_logout_route_implementation_work_item: W-0170
+  protocol_logout_route_implementation_change: changes/2026-05-18-implement-protocol-logout-route
+  public_logout_route: runtime.authentication.LogoutAccessToken
+  route_kind: command
+  route_protection_posture: explicit_service_validated_token_lifecycle_route
+  proof_carrier_posture: access_token_in_logout_request_payload
+  request_message: vibit.authentication.v1.LogoutAccessTokenRequest
+  response_message: vibit.authentication.v1.LogoutAccessTokenResponse
+  protocol_source_added: proto/vibit/authentication/v1/authentication.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  protocol_bridge_added: true
+  application_handler_added: true
+  postgres_startup_route_registration_added: true
+  transaction_wrapper_bypass_added: true
+  authenticated_request_wrapper_for_logout_rejected: true
+  first_composed_runtime_store: postgres
+  memory_store_logout_route_status: unavailable_bootstrap
+  existing_protobuf_envelope_change_added: false
+  websocket_transport_credential_neutral: true
+  logout_closes_socket: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  concrete_socket_close_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  next_direction_confirmation_work_item: W-0171
+  recommended_next_direction: define_transport_close_handoff_gate
+
+transport_close_handoff_gate:
+  status: completed
+  milestone: M-100
+  completed_work_item: W-0172
+  change: changes/2026-05-18-define-transport-close-handoff-gate
+  transport_close_handoff_gate_defined: true
+  transport_close_handoff_gate_decision: ADR-0080
+  transport_close_handoff_gate_standard: docs/transport-close-handoff-gate.md
+  transport_close_handoff_gate_translation: docs/transport-close-handoff-gate.zh-CN.md
+  check_rule: runtime.transport_close_handoff_gate
+  application_policy_owner: runtime/internal/app/connection
+  active_connection_registry_owner: runtime/internal/app/connection
+  future_transport_handoff_owner: runtime/internal/platform/transport/ws
+  first_handoff_target: connection_id_and_epoch
+  server_observed_target_required: true
+  client_metadata_authority_allowed: false
+  transport_policy_ownership_allowed: false
+  transport_credential_parsing_allowed: false
+  implementation_authorized_by_this_standard: false
+  concrete_socket_close_added: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  protocol_close_message_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  next_direction_confirmation_work_item: W-0173
+  recommended_next_direction: implement_transport_close_handoff_single_process
+  next_direction_confirmation_completed_work_item: W-0173
+  selected_next_direction: implement_transport_close_handoff_single_process
+  next_implementation_milestone: M-102
+  next_implementation_work_item: W-0174
+
+transport_close_handoff_single_process_implementation:
+  status: active
+  milestone: M-102
+  next_ready_work_item: W-0174
+  selected_direction: implement_transport_close_handoff_single_process
+  implementation_gate_decision: ADR-0080
+  transport_close_handoff_gate_standard: docs/transport-close-handoff-gate.md
+  application_policy_owner: runtime/internal/app/connection
+  active_connection_registry_owner: runtime/internal/app/connection
+  transport_handoff_owner: runtime/internal/platform/transport/ws
+  first_handoff_target: connection_id_and_epoch
+  server_observed_target_required: true
+  client_metadata_authority_allowed: false
+  transport_policy_ownership_allowed: false
+  transport_credential_parsing_allowed: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:
   first_reference_language: Go

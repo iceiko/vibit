@@ -1,0 +1,128 @@
+schema_version: 0.1
+change_id: implement-runtime-authentication-startup-composition
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Implement the bounded PostgreSQL runtime authentication startup composition slice by wiring existing authentication service validation into request-level route protection.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0018
+    - ADR-0019
+    - ADR-0023
+    - ADR-0026
+    - ADR-0027
+    - ADR-0036
+    - ADR-0039
+    - ADR-0046
+    - ADR-0051
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - tools/vibit
+
+implementation:
+  added: []
+  changed:
+    - runtime/cmd/vibit-server/main.go
+    - runtime/cmd/vibit-server/main_test.go
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  startup_composition_implemented: true
+  startup_composition_work_item: W-0117
+  startup_composition_check_rule: runtime.authentication_startup_composition_gate
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_authentication_status: bootstrap_metadata_only
+  environment_verifier_key_loader_wired: true
+  route_protector_injected: true
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_changed: false
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  authentication_command_routes_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+
+workflow:
+  completed_work_item: W-0117
+  completed_milestone: M-045
+  next_milestone: M-046
+  blocked_work_item: W-0118
+
+verification:
+  required:
+    - gofmt -w runtime/cmd/vibit-server/main.go runtime/cmd/vibit-server/main_test.go
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-runtime-authentication-startup-composition --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

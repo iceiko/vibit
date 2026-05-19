@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: define-websocket-close-policy-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Define the gate-only boundary for future WebSocket close policy behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0076
+  referenced:
+    - ADR-0019
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+    - ADR-0070
+    - ADR-0071
+    - ADR-0072
+    - ADR-0073
+    - ADR-0074
+    - ADR-0075
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Future WebSocket close policy is application-owned under runtime/internal/app.
+    - Future concrete transport close handoff may live under runtime/internal/platform/transport/ws after a later implementation gate.
+    - Active connection registry remains target state under runtime/internal/app/connection and does not own close policy.
+    - Authentication remains token lifecycle owner but does not own socket close policy.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0164
+  completed_milestone: M-092
+  websocket_close_policy_gate_defined: true
+  websocket_close_policy_gate_decision: ADR-0076
+  websocket_close_policy_gate_standard: docs/websocket-close-policy-gate.md
+  websocket_close_policy_gate_check_rule: runtime.websocket_close_policy_gate
+  future_policy_owner: runtime/internal/app
+  future_registry_owner: runtime/internal/app/connection
+  future_transport_handoff_owner: runtime/internal/platform/transport/ws
+  first_close_policy_posture: application_owned_policy_before_transport_handoff
+  transport_close_handoff_posture: deferred
+  registry_invalidation_to_close_default: not_selected_by_this_gate
+  logout_close_socket_default: not_selected_by_this_gate
+  websocket_close_implementation_added: false
+  transport_close_handoff_added: false
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  protocol_close_message_added: false
+  kick_disconnect_behavior_added: false
+  runtime_session_revocation_added: false
+  duplicate_connection_replacement_added: false
+  reconnect_epoch_behavior_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  durable_distributed_registry_storage_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  broader_game_backend_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-active-connection-registry-implementation --json
+    - node tools/vibit check change define-websocket-close-policy-gate --json
+    - node tools/vibit check change confirm-next-direction-after-websocket-close-policy-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

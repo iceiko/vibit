@@ -1,0 +1,100 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-runtime-sessions-migration-source
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Select the session repository boundary as the next direction after the runtime_sessions migration source.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+    - ADR-0059
+    - ADR-0060
+
+selected_direction:
+  previous_milestone: M-060
+  previous_work_item: W-0132
+  blocked_work_item: W-0133
+  selected_direction: define_session_repository_boundary
+  next_milestone: M-062
+  next_ready_work_item: W-0134
+  recommendation_basis:
+    - runtime_sessions_migration_source_exists
+    - nakama_sessions_are_first_class_lifecycle_records
+    - pitaya_session_context_is_separate_from_acceptor
+    - repository_boundary_should_precede_adapter_or_runtime_behavior
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  session_repository_boundary_selected: true
+  implementation_added_by_this_change: false
+  repository_interface_added_by_this_change: false
+  postgresql_adapter_added_by_this_change: false
+  runtime_session_validation_added_by_this_change: false
+  websocket_transport_credential_carriers_selected: false
+  route_policy_bound_identity_selected: false
+  logout_revocation_active_connection_selected: false
+  reconnect_epoch_behavior_selected: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0133
+  completed_milestone: M-061
+  next_milestone: M-062
+  next_ready_work_item: W-0134
+
+verification:
+  required:
+    - node tools/vibit check change confirm-next-direction-after-runtime-sessions-migration-source --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+  status: Verified

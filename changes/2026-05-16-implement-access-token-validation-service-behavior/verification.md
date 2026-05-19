@@ -1,0 +1,36 @@
+# Verification
+
+Verified:
+
+- `gofmt -w runtime/internal/app/authentication/service.go runtime/internal/app/authentication/service_test.go`
+- `cd runtime && go test ./internal/app/authentication`
+- `cd runtime && go test ./...`
+- `node -c tools/vibit`
+- `node tools/vibit check schemas --json`
+- `node tools/vibit check memory --json`
+- `node tools/vibit check contracts --json`
+- `node tools/vibit check generated --json`
+- `node tools/vibit check runtime --json`
+- `node tools/vibit check module authentication --json`
+- `node tools/vibit check work --json`
+- `node tools/vibit check change implement-access-token-validation-service-behavior --json`
+- `node tools/vibit check all --json`
+- `git diff --check`
+- `rg -n "ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+" -g '!.git' -g '!.vibit.local.env' .`
+
+Results:
+
+- Final verification passed.
+- `node tools/vibit check runtime --json` passed with 3199 passed checks, 1 existing warning, and 0 failures.
+- `node tools/vibit check all --json` passed with 164 subchecks passed, 1 existing warning, and 0 failures.
+- Secret scan returned no matches.
+
+Known warning:
+
+- `runtime.identity_boundary` may warn that `runtime/internal/platform/persistence/postgres/authentication_repository.go` mentions credential dependency and must stay behind the ratified boundary. This is a known existing warning, not introduced by this change.
+
+Not applicable:
+
+- Live PostgreSQL verification is not required because this change does not change PostgreSQL adapters or migrations.
+- WebSocket/protocol integration verification is not required because this change does not expose authentication protocol carriers or wire route protection.
+- Session persistence, logout, refresh, cleanup, token rotation, and startup wiring are not verified because this change intentionally does not implement them.

@@ -1,0 +1,189 @@
+schema_version: 0.1
+change_id: implement-access-token-validation-service-behavior
+date: 2026-05-16
+type: feature
+status: verified
+
+summary: Implement access-token validation inside the application authentication service without adding protocol carriers, route protection, session persistence, startup wiring, repository changes, migrations, dependencies, or broader authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+  - player
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0036
+    - ADR-0039
+    - ADR-0040
+    - ADR-0041
+    - ADR-0043
+    - ADR-0049
+    - ADR-0050
+    - ADR-0051
+    - ADR-0052
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+implementation:
+  added: []
+  changed:
+    - runtime/internal/app/authentication/service.go
+    - runtime/internal/app/authentication/service_test.go
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  access_token_validation_service_behavior_implementation_completed: true
+  access_token_validation_service_behavior_implementation_check_rule: runtime.access_token_validation_service_behavior_implementation
+  completed_work_item: W-0111
+  completed_milestone: M-039
+  next_milestone: M-040
+  next_ready_work_item: null
+  blocked_work_item: W-0112
+  service_source: runtime/internal/app/authentication/service.go
+  service_tests: runtime/internal/app/authentication/service_test.go
+  service_method: ValidateAccessToken
+  proof_text_encoding: base64url_unpadded
+  proof_raw_length_bytes: 32
+  proof_prevalidation_before_unit_of_work: implemented
+  token_lookup_digest_before_repository_lookup: implemented
+  repository_handoff: application_unit_of_work_capability
+  authentication_repository_lookup_method: FindTokenByLookupDigest
+  player_repository_lookup_method: GetPlayerAccount
+  token_lifecycle_checks_implemented: true
+  token_audience_check_implemented: true
+  verifier_comparison_before_request_identity: implemented
+  active_player_account_required: true
+  request_identity_handoff_implemented: true
+  session_validated_without_session_persistence: false
+  public_error_collapse_implemented: true
+  redaction_tests_added: true
+  access_token_validation_added: true
+  validation_execution_added: true
+  token_issuance_added: false
+  repository_lookup_added: true
+  repository_mutation_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  protocol_carrier_added: false
+  websocket_handshake_authentication_added: false
+  route_protection_added: false
+  session_persistence_added: false
+  startup_wiring_added: false
+  repository_interface_changed: false
+  authentication_migrations_changed: false
+  generated_files_changed: false
+  authentication_dependencies_added: false
+  broader_production_authentication_behavior_added: false
+
+workflow:
+  completed_work_item: W-0111
+  completed_milestone: M-039
+  next_milestone: M-040
+  blocked_work_item: W-0112
+  next_direction: confirm_next_major_direction_after_service_local_authentication
+
+verification:
+  required:
+    - gofmt -w runtime/internal/app/authentication/service.go runtime/internal/app/authentication/service_test.go
+    - cd runtime && go test ./internal/app/authentication
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-access-token-validation-service-behavior --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+  results:
+    - command: gofmt -w runtime/internal/app/authentication/service.go runtime/internal/app/authentication/service_test.go
+      status: passed
+    - command: cd runtime && go test ./internal/app/authentication
+      status: passed
+    - command: cd runtime && go test ./...
+      status: passed
+    - command: node -c tools/vibit
+      status: passed
+    - command: node tools/vibit check schemas --json
+      status: passed
+    - command: node tools/vibit check memory --json
+      status: passed
+    - command: node tools/vibit check contracts --json
+      status: passed
+    - command: node tools/vibit check generated --json
+      status: passed
+    - command: node tools/vibit check runtime --json
+      status: passed_with_existing_warning
+      warnings:
+        - runtime.identity_boundary warning for the existing authentication PostgreSQL adapter boundary.
+    - command: node tools/vibit check module authentication --json
+      status: passed
+    - command: node tools/vibit check work --json
+      status: passed
+    - command: node tools/vibit check change implement-access-token-validation-service-behavior --json
+      status: passed
+    - command: node tools/vibit check all --json
+      status: passed_with_existing_warning
+      warnings:
+        - One existing repository warning remained; no failures.
+    - command: git diff --check
+      status: passed
+    - command: rg -n "ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+" -g '!.git' -g '!.vibit.local.env' .
+      status: passed_no_matches

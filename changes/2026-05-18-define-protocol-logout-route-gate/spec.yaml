@@ -1,0 +1,113 @@
+schema_version: 0.1
+change_id: define-protocol-logout-route-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Define the gate-only boundary for future client-facing protocol logout route behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0079
+  referenced:
+    - ADR-0018
+    - ADR-0053
+    - ADR-0055
+    - ADR-0072
+    - ADR-0073
+    - ADR-0076
+    - ADR-0077
+    - ADR-0078
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+runtime:
+  completed_work_item: W-0169
+  completed_milestone: M-097
+  protocol_logout_route_gate_defined: true
+  protocol_logout_route_gate_decision: ADR-0079
+  protocol_logout_route_gate_standard: docs/protocol-logout-route-gate.md
+  protocol_logout_route_gate_translation: docs/protocol-logout-route-gate.zh-CN.md
+  protocol_logout_route_gate_check_rule: runtime.protocol_logout_route_gate
+  future_implementation_work_item: W-0170
+  public_logout_route: runtime.authentication.LogoutAccessToken
+  route_kind: command
+  route_protection_posture: explicit_service_validated_token_lifecycle_route
+  proof_carrier_posture: access_token_in_logout_request_payload
+  first_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  first_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  request_message_candidate: vibit.authentication.v1.LogoutAccessTokenRequest
+  response_message_candidate: vibit.authentication.v1.LogoutAccessTokenResponse
+  application_handler_owner: runtime/internal/app/bootstrap
+  authentication_service_owner: runtime/internal/app/authentication
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  startup_owner: runtime/cmd/vibit-server
+  first_composed_runtime_store: postgres
+  memory_store_logout_route_status: unavailable_bootstrap
+  transaction_bypass_required: true
+  first_logout_scope: presented_access_token_only
+  already_revoked_token_public_behavior: invalid_token
+  expired_token_public_behavior: invalid_token
+  protocol_route_added: false
+  protocol_source_added: false
+  generated_output_added: false
+  existing_protobuf_envelope_change_added: false
+  websocket_transport_credential_neutral: true
+  logout_closes_socket: false
+  runtime_session_revocation_added: false
+  active_connection_invalidation_added: false
+  concrete_socket_close_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  runtime_behavior_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-protocol-logout-route-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+    - node tools/vibit inspect next --json
+  status: Verified

@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+package vibit.authentication.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1;authenticationv1";
+
+// @source docs/access-token-protocol-carrier-route-protection-gate.md
+// @source decisions/ADR-0053-access-token-protocol-carrier-route-protection-gate.md
+
+message AuthenticatedRequest {
+  string access_token = 1;
+  string inner_payload_type = 2;
+  bytes inner_payload = 3;
+}

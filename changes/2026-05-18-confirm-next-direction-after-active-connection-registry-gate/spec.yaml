@@ -1,0 +1,61 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-active-connection-registry-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Select the next milestone direction after the active connection registry gate.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0075
+  referenced:
+    - ADR-0074
+
+selected_direction: implement_active_connection_registry_single_process
+
+candidate_directions:
+  - implement_active_connection_registry_single_process
+  - define_websocket_close_policy_gate
+  - define_protocol_logout_route_gate
+  - define_reconnect_connection_epoch_gate
+  - define_protocol_session_carrier_gate
+  - strengthen_operations_observability_and_admin_tooling
+  - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime:
+  completed_work_item: W-0161
+  completed_milestone: M-089
+  previous_milestone: M-088
+  previous_completed_work_item: W-0160
+  next_milestone: M-090
+  next_work_item: W-0162
+  active_connection_registry_single_process_selected: true
+  websocket_close_policy_selected: false
+  protocol_logout_route_selected: false
+  reconnect_epoch_selected: false
+  protocol_session_carrier_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+  direct_nakama_pitaya_api_compatibility_selected: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit check change confirm-next-direction-after-active-connection-registry-gate --json
+    - node tools/vibit check all --json
+  status: Verified

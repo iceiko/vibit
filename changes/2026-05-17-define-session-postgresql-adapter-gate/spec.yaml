@@ -1,0 +1,118 @@
+schema_version: 0.1
+change_id: define-session-postgresql-adapter-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the gate-only PostgreSQL session adapter boundary without adding adapter code or runtime validation behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0063
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0059
+    - ADR-0060
+    - ADR-0061
+    - ADR-0062
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_table_referenced:
+    - runtime_sessions
+  ownership_changes:
+    - future PostgreSQL session adapter is platform persistence-owned
+    - runtime/internal/app/session remains the storage-neutral repository interface owner
+    - authentication remains token linkage only
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0138
+  completed_milestone: M-066
+  session_postgresql_adapter_gate_defined: true
+  session_postgresql_adapter_gate_decision: ADR-0063
+  session_postgresql_adapter_gate_check_rule: runtime.session_postgresql_adapter_gate
+  repository_interface: runtime/internal/app/session.Repository
+  repository_owner: runtime/internal/app/session
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/session_repository.go
+  future_adapter_test_candidate: runtime/internal/platform/persistence/postgres/session_repository_test.go
+  postgresql_adapter_added: false
+  unit_of_work_factory_added: false
+  runtime_session_behavior_added: false
+  runtime_session_validation_added: false
+  runtime_session_creation_added: false
+  runtime_session_revocation_added: false
+  runtime_session_cleanup_added: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  route_policy_session_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0138
+  completed_milestone: M-066
+  next_milestone: M-067
+  blocked_work_item: W-0139
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check migrations --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-session-repository-interface --json
+    - node tools/vibit check change define-session-postgresql-adapter-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

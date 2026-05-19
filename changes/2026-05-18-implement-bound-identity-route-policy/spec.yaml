@@ -1,0 +1,111 @@
+schema_version: 0.1
+change_id: implement-bound-identity-route-policy
+date: 2026-05-18
+type: feature
+status: verified
+
+summary: Implement explicit application-owned route policy families for request-token, bound-connection, session-validated, and bound-session routes.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0070
+  referenced:
+    - ADR-0019
+    - ADR-0053
+    - ADR-0057
+    - ADR-0058
+    - ADR-0065
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Route policy remains application-owned under runtime/internal/app.
+    - Authentication service remains proof validation owner and does not own route classification.
+    - WebSocket transport remains credential-neutral.
+    - Protobuf adapter behavior remains unchanged.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_authentication_response_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0152
+  completed_milestone: M-080
+  bound_identity_route_policy_implementation_completed: true
+  bound_identity_route_policy_implementation_decision: ADR-0070
+  bound_identity_route_policy_implementation_check_rule: runtime.bound_identity_route_policy_implementation
+  policy_source: runtime/internal/app/route_authentication.go
+  policy_tests: runtime/internal/app/route_authentication_test.go
+  default_domain_route_policy: request_token_required
+  public_authentication_route_remains_public: true
+  ordinary_protected_routes_still_require_request_token: true
+  explicit_bound_connection_policy_available: true
+  explicit_session_validated_policy_available: true
+  explicit_bound_session_policy_available: true
+  metadata_only_identity_satisfies_protected_policy: false
+  persisted_session_id_alone_is_proof: false
+  route_policy_asserts_session_validated_true: false
+  websocket_handshake_authentication_added: false
+  transport_credential_carrier_added: false
+  protobuf_session_messages_added: false
+  protobuf_authentication_response_changed: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - go test ./internal/app
+    - go test ./...
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-bound-identity-route-policy-gate --json
+    - node tools/vibit check change implement-bound-identity-route-policy --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

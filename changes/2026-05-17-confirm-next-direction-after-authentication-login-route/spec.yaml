@@ -1,0 +1,104 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-authentication-login-route
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Select session persistence and WebSocket handshake authentication ratification as the next milestone after the public authentication login route.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0015
+    - ADR-0018
+    - ADR-0019
+    - ADR-0021
+    - ADR-0023
+    - ADR-0024
+    - ADR-0026
+    - ADR-0027
+    - ADR-0036
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+    - ADR-0055
+
+selected_direction:
+  previous_milestone: M-048
+  previous_work_item: W-0120
+  blocked_work_item: W-0121
+  selected_direction: ratify_session_persistence_and_websocket_handshake_authentication
+  next_milestone: M-050
+  next_ready_work_item: W-0122
+  recommendation_basis:
+    - public_login_route_now_exists
+    - protected_gameplay_routes_already_use_request_level_access_token_validation
+    - nakama_session_socket_lifecycle_is_the_next_capability_reference
+    - pitaya_session_binding_and_handler_layering_is_the_next_architecture_reference
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  session_persistence_selected_for_ratification: true
+  websocket_handshake_authentication_selected_for_ratification: true
+  request_level_validation_current_path_preserved: true
+  first_message_connection_binding_selected_for_future_gate: true
+  transport_header_query_cookie_subprotocol_carriers_selected: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_refresh_cleanup_added: false
+  token_rotation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+workflow:
+  completed_work_item: W-0121
+  completed_milestone: M-049
+  next_milestone: M-050
+  next_ready_work_item: W-0122
+
+verification:
+  required:
+    - node tools/vibit check change confirm-next-direction-after-authentication-login-route --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+  status: Verified

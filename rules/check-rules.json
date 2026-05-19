@@ -588,6 +588,190 @@
       "agent_guidance": "Read `docs/access-token-validation-service-behavior-gate.md` and `ADR-0052`; do not implement access-token validation, WebSocket proof carriers, handshake authentication, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, or broader production authentication behavior until a later bounded work item authorizes that exact slice."
     },
     {
+      "rule_id": "runtime.access_token_validation_service_behavior_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Access token validation service behavior implementation",
+      "description": "The access token validation service behavior implementation must execute the ADR-0052 service-local sequence while preserving protocol, route-protection, session-persistence, startup, repository-interface, migration, dependency, generated-file, logout, refresh, cleanup, and production behavior deferrals.",
+      "agent_guidance": "Keep `ValidateAccessToken` inside `runtime/internal/app/authentication/service.go`; require Base64URL unpadded 32-byte proof pre-validation before unit-of-work, use unit-of-work repository capabilities, check token lifecycle and audience posture, compare token verifiers before request identity, require active player accounts, keep SessionValidated false, collapse public invalid-token failures, and do not add protocol carriers, route protection, session persistence, startup wiring, repository interface changes, migrations, generated files, external dependencies, logout, refresh, cleanup, or broader production authentication behavior."
+    },
+    {
+      "rule_id": "runtime.access_token_protocol_carrier_route_protection_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Access token protocol carrier and route protection gate",
+      "description": "The access token protocol carrier and route protection gate must define the selected request-level proof carrier posture, route policy boundary, validation handoff, error mapping, redaction, tests, reference mapping, and implementation deferrals before protocol carrier or route protection code exists.",
+      "agent_guidance": "Read `docs/access-token-protocol-carrier-route-protection-gate.md` and `ADR-0053`; keep WebSocket transport credential-neutral, keep the existing Protobuf envelope unchanged, use the future `vibit.authentication.v1.AuthenticatedRequest` payload-wrapper posture only after a bounded implementation work item authorizes `.proto` sources and generated output, and do not add WebSocket handshake authentication, session persistence, startup wiring, repository changes, migrations, dependencies, logout, refresh, cleanup, or broader production authentication behavior from the gate."
+    },
+    {
+      "rule_id": "runtime.authentication_startup_composition_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime authentication startup composition gate",
+      "description": "The runtime authentication startup composition gate must keep startup wiring in the process composition boundary, wire only existing authentication service and route-protection behavior, preserve WebSocket transport neutrality, and keep session persistence, WebSocket handshake authentication, repository changes, migrations, dependencies, logout, refresh, cleanup, token rotation, and broader behavior deferred.",
+      "agent_guidance": "Read `docs/runtime-authentication-startup-composition-gate.md` and `ADR-0054`; wire authentication startup composition only in `runtime/cmd/vibit-server`, use the existing environment verifier key loader and service dependencies, limit the first composed path to `VIBIT_RUNTIME_STORE=postgres`, preserve memory bootstrap behavior, and do not add handshake authentication, session persistence, repository/migration changes, dependencies, logout, refresh, cleanup, token rotation, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.authentication_command_protocol_login_route_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Authentication command protocol login route gate",
+      "description": "The authentication command protocol login route gate must expose only the explicit public device credential login command route through Protobuf payloads, generated output, protocol bridge behavior, application bootstrap registration, PostgreSQL startup composition, and transaction-wrapper bypass while preserving WebSocket transport neutrality and deferrals.",
+      "agent_guidance": "Read `docs/authentication-command-protocol-login-route-gate.md` and `ADR-0055`; expose only `runtime.authentication.AuthenticateWithDeviceCredential` through the existing WebSocket Protobuf request loop, keep the existing envelope unchanged, keep WebSocket transport credential-neutral, register the route only when the authentication service is composed, bypass the outer transaction wrapper for the login route, and do not add session persistence, WebSocket handshake authentication, repository/migration changes, dependencies, logout, refresh, cleanup, token rotation, memory durable authentication behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.session_persistence_websocket_handshake_ratification",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session persistence and WebSocket handshake ratification",
+      "description": "The session persistence and WebSocket handshake ratification must keep request-level access-token validation as the current path, keep WebSocket transport credential-neutral, keep the existing Protobuf envelope unchanged, and defer session storage, first-message binding, handshake authentication, migrations, dependencies, logout, refresh, cleanup, token rotation, reconnect, and direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Read `docs/session-persistence-websocket-handshake-ratification.md` and `ADR-0056`; preserve request-level validation through `vibit.authentication.v1.AuthenticatedRequest`, keep `RequestIdentity.SessionValidated` false until a later session implementation, do not parse Authorization/Bearer/cookie/query/subprotocol carriers in WebSocket transport, do not change the existing envelope, and do not add session tables, repositories, migrations, dependencies, logout, refresh, cleanup, token rotation, reconnect/epoch behavior, active-connection invalidation, memory durable authentication behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.first_message_connection_binding_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "First-message connection binding gate",
+      "description": "The first-message connection binding gate must select a future protocol/application binding route while keeping WebSocket transport credential-neutral, keeping the existing Protobuf envelope unchanged, preserving request-level validation as the current protected-route path, and deferring implementation, generated output, session persistence, logout/revocation, reconnect, and direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Read `docs/first-message-connection-binding-gate.md` and `ADR-0057`; future binding is through the `runtime.authentication.BindConnection` system route with `vibit.authentication.v1.BindConnectionRequest` / `BindConnectionResponse` payload candidates, but this gate does not authorize Protobuf source changes, generated output, connection binding registries, route-policy use of bound identity, session tables, repositories, migrations, dependencies, logout/revocation, reconnect/epoch behavior, transport credential carriers, memory durable authentication behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.first_message_connection_binding_implementation_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "First-message connection binding implementation gate",
+      "description": "The first-message connection binding implementation gate must define the future bounded BindConnection implementation slice while keeping the current runtime behavior unchanged, WebSocket transport credential-neutral, the existing Protobuf envelope unchanged, request-level validation as the current protected-route path, and session persistence, logout/revocation, reconnect, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/first-message-connection-binding-implementation-gate.md` and `ADR-0058`; the future implementation may later add `BindConnectionRequest`, `BindConnectionResponse`, `ConnectionBindingStatus`, Buf-generated output, Protobuf adapter behavior, application binding behavior, PostgreSQL startup composition, and focused tests, but this gate does not authorize Go runtime behavior, Protobuf source changes, generated output, connection registries, route-policy use of bound identity, session tables, repositories, migrations, dependencies, logout/revocation, reconnect/epoch behavior, transport credential carriers, memory durable authentication behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.first_message_connection_binding_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "First-message connection binding implementation",
+      "description": "The first-message connection binding implementation must add only the bounded BindConnection system route slice authorized by ADR-0058, preserving WebSocket transport credential neutrality, the existing envelope, request-level route protection, and all session persistence, logout/revocation, reconnect, migration, dependency, and direct Nakama/Pitaya compatibility deferrals.",
+      "agent_guidance": "Read `docs/first-message-connection-binding-implementation-gate.md`, `ADR-0058`, and the W-0128 change spec; BindConnection must remain a Protobuf system route handled by the protocol/application boundary, validate opaque access-token proof through the existing application authentication validator, use server-observed connection metadata, return no secret material, keep SessionValidated false, wire only the PostgreSQL startup composition, and avoid WebSocket handshake credential carriers, envelope proof fields, durable session tables, repository changes, migrations, logout/revocation, reconnect/epoch policy, new dependencies, memory durable authentication behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.postgres_session_persistence_schema_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "PostgreSQL session persistence schema gate",
+      "description": "The PostgreSQL session persistence schema gate must define only the future runtime_sessions schema boundary while deferring migration source, session repositories, PostgreSQL adapters, runtime session behavior, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, and direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Read `docs/postgres-session-persistence-schema-gate.md` and `ADR-0059`; keep `runtime_sessions` as a future PostgreSQL logical table candidate only, do not add `runtime/migrations/postgres/000005_create_runtime_sessions.sql`, do not create `runtime/internal/app/session`, do not add session repository or adapter behavior, keep `RequestIdentity.SessionValidated` false, keep WebSocket transport credential-neutral, keep the existing Protobuf envelope unchanged, and do not copy raw token, raw credential, or digest material into session records."
+    },
+    {
+      "rule_id": "runtime.runtime_sessions_migration_source",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime sessions migration source",
+      "description": "The runtime sessions migration source must add only the bounded PostgreSQL runtime_sessions table while keeping repositories, adapters, runtime session behavior, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `ADR-0060` and `changes/2026-05-17-implement-runtime-sessions-migration-source/`; `runtime/migrations/postgres/000005_create_runtime_sessions.sql` may create `runtime_sessions` with lifecycle metadata and optional access-token record linkage, but must not store raw token, raw credential, lookup digest, verifier digest, WebSocket connection state, or runtime_session_connections rows, and must not add Go repository/adapter/runtime behavior."
+    },
+    {
+      "rule_id": "runtime.session_repository_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session repository boundary",
+      "description": "The session repository boundary must define only the future storage-neutral runtime session repository ownership and capability vocabulary while keeping Go repository implementation, PostgreSQL adapters, runtime session behavior, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/session-repository-boundary.md` and `ADR-0061`; the future owner candidate may be `runtime/internal/app/session` and the future PostgreSQL adapter owner may be `runtime/internal/platform/persistence/postgres`, but this gate must not create `runtime/internal/app/session`, add SessionRepository Go code, add PostgreSQL runtime_sessions adapter code, set `RequestIdentity.SessionValidated` true, add WebSocket credential carriers, add Protobuf session messages, change the envelope, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.session_repository_interface_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session repository interface implementation",
+      "description": "The session repository interface implementation must add only storage-neutral runtime session lifecycle value types, query/mutation normalizers, and a repository interface under runtime/internal/app/session while keeping PostgreSQL adapters, SQL behavior, runtime validation, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, generated output, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `ADR-0062` and `changes/2026-05-17-implement-session-repository-interface/`; `runtime/internal/app/session` may define RuntimeSession, SessionStatus, Repository, lifecycle mutation/query types, and focused unit tests, but must not import PostgreSQL, WebSocket, or generated Protobuf packages, must not add unit-of-work factory wiring, must not execute SQL against runtime_sessions, must not set `RequestIdentity.SessionValidated` true, and must not add protocol, transport, route-policy, logout disconnect, reconnect, dependency, memory durable session, or direct Nakama/Pitaya API behavior."
+    },
+    {
+      "rule_id": "runtime.session_postgresql_adapter_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session PostgreSQL adapter gate",
+      "description": "The session PostgreSQL adapter gate must define only the future platform persistence adapter boundary for runtime sessions while keeping adapter implementation, SQL execution, unit-of-work factory wiring, runtime validation, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, generated output, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/session-postgresql-adapter-gate.md` and `ADR-0063`; the future adapter owner may be `runtime/internal/platform/persistence/postgres`, but this gate must not add session adapter Go files, execute SQL against runtime_sessions, add NewSessionRepository unit-of-work wiring, set `RequestIdentity.SessionValidated` true, add WebSocket credential carriers, add Protobuf session messages, change the envelope, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.session_postgresql_adapter_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session PostgreSQL adapter implementation",
+      "description": "The session PostgreSQL adapter implementation must add only the platform persistence adapter and unit-of-work factory for the existing runtime session repository interface while keeping runtime session validation, session creation composition, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, generated output, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `ADR-0064` and `changes/2026-05-17-implement-session-postgresql-adapter/`; `runtime/internal/platform/persistence/postgres/session_repository.go` may map `session.Repository` calls to `runtime_sessions`, and `UnitOfWork.NewSessionRepository` may expose the adapter, but the slice must not validate access-token proof, set `RequestIdentity.SessionValidated` true, add WebSocket credential carriers, add Protobuf session messages, change the envelope, add logout socket invalidation, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.runtime_session_validation_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime session validation gate",
+      "description": "The runtime session validation gate must define only the future application-owned persisted session validation boundary while keeping validation implementation, SessionValidated=true behavior, session creation composition, WebSocket handshake authentication, route-policy use of session or bound identity, logout/revocation active-connection behavior, reconnect/epoch behavior, dependencies, generated output, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/runtime-session-validation-gate.md` and `ADR-0065`; future validation belongs under `runtime/internal/app` and must require already-validated actor identity before trusting persisted runtime session rows, but this gate must not add validator Go code, set `RequestIdentity.SessionValidated` true in production behavior, change route policy, add session creation, add WebSocket credential carriers, add Protobuf session messages, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.runtime_session_validation_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime session validation implementation",
+      "description": "The runtime session validation implementation must keep persisted session validation application-owned, repository-interface based, redacted, and separate from session creation, route policy, transport, protocol, logout, reconnect, and external API compatibility.",
+      "agent_guidance": "Keep the implementation in `runtime/internal/app/runtime_session_validator.go`; use only `runtime/internal/app/session.Repository.FindActiveSessionByID`, require an already validated player identity before trusting a persisted session row, set `RequestIdentity.SessionValidated` true only after active durable validation succeeds, collapse public invalid-session failures, and do not add session creation, last-seen mutation, route-policy use, WebSocket authentication, Protobuf messages, logout/revocation active-connection behavior, reconnect behavior, dependencies, memory durable session behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.session_creation_composition_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session creation composition gate",
+      "description": "The session creation composition gate must define only the future application-owned durable runtime session creation composition boundary while keeping session creation code, authentication service changes, route policy, transport, protocol, logout, reconnect, dependencies, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/session-creation-composition-gate.md` and `ADR-0067`; future session creation may be composed under `runtime/internal/app` and may later call `session.Repository.CreateRuntimeSession` through unit-of-work capabilities, but this gate must not modify `AuthenticateWithDeviceCredential`, generate session ids, create sessions at login or BindConnection, set `RequestIdentity.SessionValidated` true, add WebSocket credential carriers, add Protobuf session messages, change the envelope, add logout socket invalidation, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.session_creation_composition_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Session creation composition implementation",
+      "description": "The session creation composition implementation must keep login-time durable runtime session creation application-owned, transactional with access-token storage, repository-interface based, redacted, and separate from route policy, transport, protocol, logout, reconnect, dependencies, generated output, and direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Keep session creation composition in `runtime/internal/app/authentication/service.go`; use `session.Repository.CreateRuntimeSession` through `NewSessionRepository` on the application unit of work, generate server-owned session ids through an injected dependency, link only to `access_token_record_id`, return success only after commit, and do not expose session ids through Protobuf, change the envelope, set `SessionValidated` true during token validation, add WebSocket credential carriers, add logout socket invalidation, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.bound_identity_route_policy_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Bound identity route policy gate",
+      "description": "The bound identity route policy gate must define only the future application-owned route-policy boundary for request-token, bound-connection, session-validated, and bound-session identity while keeping production route-policy changes, WebSocket authentication, protocol carriers, logout, reconnect, dependencies, generated output, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/bound-identity-route-policy-gate.md` and `ADR-0069`; future route policy belongs under `runtime/internal/app`, ordinary protected routes should keep request-level access-token proof in the first implementation posture, and bound/session identity must be route-scoped, fail-closed, and redacted. This gate must not implement route-policy use of bound or session identity, remove per-request proof, add WebSocket credential carriers, expose session ids through Protobuf, change the envelope, add logout socket invalidation, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.bound_identity_route_policy_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Bound identity route policy implementation",
+      "description": "The bound identity route policy implementation must keep route policy application-owned, route-scoped, fail-closed, and conservative: ordinary protected routes continue to require request-level access-token proof, while bound/session identity can satisfy only explicitly classified routes.",
+      "agent_guidance": "Keep the implementation in `runtime/internal/app/route_authentication.go`; use explicit `RouteProtectionRequirement` vocabulary, preserve the default `request_token_required` behavior for ordinary protected routes, reject metadata-only identity, accept `SessionValidated=true` only from provided validated identity, and do not wire WebSocket handshake authentication, protocol session carriers, connection registries, runtime session validation into frame handling, logout active-connection invalidation, reconnect behavior, dependencies, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.logout_revocation_active_connection_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Logout revocation active connection gate",
+      "description": "The logout revocation active connection gate must define only the future application-owned boundary for logout, token/session revocation, and active WebSocket connection invalidation while keeping logout execution, socket close behavior, connection registries, protocol carriers, reconnect behavior, dependencies, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/logout-revocation-active-connection-gate.md` and `ADR-0071`; future policy belongs under `runtime/internal/app`, token revocation, runtime session revocation, and active socket invalidation remain separate decisions, and a connection registry is required before targeting open sockets. This gate must not implement `LogoutAccessToken`, revoke tokens or sessions, close WebSocket connections, add connection registries, add WebSocket close policy, add Protobuf logout routes, add session carriers, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.logout_access_token_behavior_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Logout access token behavior gate",
+      "description": "The logout access token behavior gate must define only the future application-owned boundary for presented opaque access-token logout behavior while keeping logout implementation, session revocation, socket invalidation, protocol routes, reconnect behavior, refresh/logout-all/admin behavior, dependencies, and direct Nakama/Pitaya API compatibility deferred.",
+      "agent_guidance": "Read `docs/logout-access-token-behavior-gate.md` and `ADR-0072`; future behavior belongs under `runtime/internal/app/authentication`, the first logout scope is `presented_access_token_only`, verifier comparison must happen before revocation, and success must be returned only after unit-of-work commit. This gate must not implement `LogoutAccessToken`, revoke tokens, revoke runtime sessions, close WebSocket connections, add connection registries, add Protobuf logout routes, add session carriers, add refresh/logout-all/admin revocation behavior, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
+      "rule_id": "runtime.logout_access_token_behavior_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Logout access token behavior implementation",
+      "description": "The logout access token behavior implementation must stay application-owned and presented-token scoped: it verifies the opaque access token, compares verifier digest before revocation, revokes only the presented token record, and returns success only after commit while preserving session, socket, protocol, reconnect, refresh/logout-all/admin, dependency, and direct Nakama/Pitaya compatibility deferrals.",
+      "agent_guidance": "Read `ADR-0073` and `docs/logout-access-token-behavior-gate.md`; the implementation belongs in `runtime/internal/app/authentication`, must use lookup digest plus verifier comparison before `RevokeToken`, and must not revoke runtime sessions, close WebSocket connections, add connection registries, add Protobuf logout routes, add protocol session carriers, add refresh/logout-all/admin revocation behavior, add reconnect behavior, or copy Nakama/Pitaya public APIs."
+    },
+    {
       "rule_id": "runtime.layer_boundary",
       "category": "runtime",
       "default_severity": "error",
@@ -722,6 +906,78 @@
       "title": "Operator guidance",
       "description": "A check emitted an actionable command or hint.",
       "agent_guidance": "Treat this as follow-up guidance, not as a failed rule by itself."
+    },
+    {
+      "rule_id": "runtime.active_connection_registry_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Active connection registry gate",
+      "description": "The future active WebSocket connection registry boundary must stay application-owned and gate-only until a later implementation slice authorizes registry, socket close, reconnect, or protocol behavior.",
+      "agent_guidance": "Read docs/active-connection-registry-gate.md and ADR-0074 before adding active connection registry code, WebSocket close policy, kick/disconnect behavior, reconnect/epoch behavior, protocol carriers, durable/distributed registry storage, or direct Nakama/Pitaya compatibility."
+    },
+    {
+      "rule_id": "runtime.active_connection_registry_single_process_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Active connection registry single-process implementation",
+      "description": "The first active connection registry implementation must stay application-owned, single-process, in-memory, non-durable, policy-neutral, and separated from WebSocket close behavior, reconnect behavior, protocol carriers, durable storage, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0075 and docs/active-connection-registry-gate.md before changing runtime/internal/app/connection. Do not wire socket close, kick/disconnect, reconnect, protocol logout/session carriers, distributed registry storage, or direct external API compatibility into this slice."
+    },
+    {
+      "rule_id": "runtime.websocket_close_policy_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "WebSocket close policy gate",
+      "description": "The future WebSocket close policy boundary must stay application-owned and gate-only until a later implementation slice authorizes close behavior, transport handoff, close codes, close reasons, or kick/disconnect behavior.",
+      "agent_guidance": "Read docs/websocket-close-policy-gate.md and ADR-0076 before adding WebSocket close policy, transport close handoff code, close codes, close reason text, kick/disconnect behavior, logout-triggered socket close, reconnect/epoch behavior, protocol logout/session carriers, durable/distributed registry storage, or direct Nakama/Pitaya compatibility."
+    },
+    {
+      "rule_id": "runtime.websocket_close_policy_single_process_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "WebSocket close policy single-process implementation",
+      "description": "The first WebSocket close policy implementation must stay application-owned, single-process, registry-backed, redacted, and separated from concrete socket close handoff, close codes, close reasons, protocol routes, reconnect behavior, durable storage, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0077 and docs/websocket-close-policy-gate.md before changing runtime/internal/app/connection/close_policy.go. Do not wire concrete WebSocket close, close codes, close reason text, protocol logout/session carriers, reconnect/epoch behavior, transport credential carriers, distributed registry storage, or direct external API compatibility into this slice."
+    },
+    {
+      "rule_id": "runtime.reference_product_parity_roadmap",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Nakama/Pitaya product parity roadmap",
+      "description": "The Nakama/Pitaya-class product parity target must remain explicit, checkable, lifecycle-first, and separated from direct API compatibility or un-gated runtime feature implementation.",
+      "agent_guidance": "Read docs/nakama-pitaya-product-parity-roadmap.md and ADR-0078 before proposing major product modules. Map new work to a parity capability family, keep direct API compatibility behind a future ADR, and finish protocol logout, transport close handoff, reconnect/epoch, and session-carrier gates before presence, chat, social, matchmaking, or match runtime expansion."
+    },
+    {
+      "rule_id": "runtime.protocol_logout_route_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Protocol logout route gate",
+      "description": "The future client-facing protocol logout route must stay explicit, service-validated, redacted, and separated from socket close, runtime session revocation, reconnect behavior, session carriers, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read docs/protocol-logout-route-gate.md and ADR-0079 before adding logout Protobuf messages or route registration. The next implementation may expose runtime.authentication.LogoutAccessToken through the protocol pipeline, but must keep the existing envelope unchanged, keep WebSocket transport credential-neutral, avoid socket close/session revocation side effects, and preserve direct API compatibility deferrals."
+    },
+    {
+      "rule_id": "runtime.protocol_logout_route_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Protocol logout route implementation",
+      "description": "The client-facing protocol logout route implementation must stay bounded to Protobuf messages, generated output, protocol bridge mapping, application route registration, startup composition, transaction bypass, and focused tests.",
+      "agent_guidance": "Read docs/protocol-logout-route-gate.md and ADR-0079 before changing runtime.authentication.LogoutAccessToken route behavior. Keep WebSocket transport credential-neutral, keep the existing envelope unchanged, reject AuthenticatedRequest wrapping for logout, and do not add socket close, runtime session revocation, active connection invalidation, reconnect/epoch behavior, protocol session carriers, dependencies, broad game backend behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.transport_close_handoff_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Transport close handoff gate",
+      "description": "The future application-to-WebSocket transport close handoff must stay narrow, server-observed, credential-neutral, policy-neutral, and separated from close implementation, close codes, close reasons, logout side effects, session revocation, reconnect, protocol carriers, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read docs/transport-close-handoff-gate.md and ADR-0080 before adding concrete WebSocket close handoff behavior. The first future target is connection_id + epoch from server-observed connection metadata; do not close by client metadata, player id, session id, token record id, headers, cookies, query strings, subprotocol values, or remote address."
+    },
+    {
+      "rule_id": "runtime.transport_close_handoff_single_process_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Transport close handoff single-process implementation",
+      "description": "The first concrete transport close handoff must remain single-process, WebSocket transport-owned, server-observed by connection_id and epoch, credential-neutral, and separated from close code mapping, logout side effects, session revocation, reconnect, protocol carriers, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read docs/transport-close-handoff-gate.md and ADR-0080 before implementing W-0174. Add only a narrow in-process handoff for server-observed connection_id + epoch; keep application close decisions in runtime/internal/app/connection and do not add close codes, close reason text, logout-triggered close, session revocation, reconnect/epoch behavior, protocol session carriers, operations/admin disconnect, dependencies, or direct Nakama/Pitaya API compatibility."
     },
     {
       "rule_id": "generator.created_artifact",

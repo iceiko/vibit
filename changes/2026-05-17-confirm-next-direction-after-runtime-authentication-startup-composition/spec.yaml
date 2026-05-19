@@ -1,0 +1,89 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-runtime-authentication-startup-composition
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Select authentication command protocol messages and login route registration as the next milestone after runtime authentication startup composition.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0018
+    - ADR-0019
+    - ADR-0023
+    - ADR-0024
+    - ADR-0028
+    - ADR-0036
+    - ADR-0039
+    - ADR-0051
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+
+selected_direction:
+  previous_milestone: M-045
+  previous_work_item: W-0117
+  blocked_work_item: W-0118
+  selected_direction: add_authentication_command_protocol_messages_and_login_route_registration
+  next_milestone: M-047
+  next_ready_work_item: W-0119
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_command_routes_added: false
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  logout_refresh_cleanup_added: false
+  token_rotation_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change confirm-next-direction-after-runtime-authentication-startup-composition --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

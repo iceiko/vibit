@@ -1,0 +1,145 @@
+schema_version: 0.1
+change_id: implement-authentication-command-protocol-login-route
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Implement the bounded public device credential login command route by adding the gate-authorized authentication Protobuf messages, generated output, protocol bridge, application route handler, PostgreSQL startup registration, and transaction-wrapper bypass.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0018
+    - ADR-0019
+    - ADR-0023
+    - ADR-0036
+    - ADR-0039
+    - ADR-0051
+    - ADR-0053
+    - ADR-0054
+    - ADR-0055
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+implementation:
+  added:
+    - proto/vibit/authentication/v1/authentication.proto
+    - runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+    - runtime/internal/app/bootstrap/authentication.go
+    - runtime/internal/app/bootstrap/authentication_test.go
+    - runtime/internal/platform/protocol/protobuf/authentication_bridge.go
+    - runtime/internal/platform/protocol/protobuf/authentication_bridge_test.go
+  changed:
+    - runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+    - runtime/internal/platform/protocol/protobuf/payload_registry.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_request_test.go
+    - runtime/internal/app/transactional_dispatch.go
+    - runtime/internal/app/transactional_dispatch_test.go
+    - runtime/cmd/vibit-server/main.go
+    - runtime/cmd/vibit-server/main_test.go
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: true
+  authentication_command_protocol_login_route_implemented: true
+  authentication_command_protocol_login_route_work_item: W-0120
+  authentication_command_protocol_login_route_check_rule: runtime.authentication_command_protocol_login_route_gate
+  public_login_route: runtime.authentication.AuthenticateWithDeviceCredential
+  protocol_source_added: proto/vibit/authentication/v1/authentication.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  protocol_bridge_added: true
+  application_handler_added: true
+  postgres_startup_route_registration_added: true
+  transaction_wrapper_bypass_added: true
+  first_composed_runtime_store: postgres
+  memory_store_login_route_status: unavailable_bootstrap
+  websocket_transport_credential_neutral: true
+  protobuf_envelope_changed: false
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  token_validation_audit_mutation_added: false
+
+workflow:
+  completed_work_item: W-0120
+  completed_milestone: M-048
+  next_milestone: M-049
+  blocked_work_item: W-0121
+
+verification:
+  required:
+    - buf generate
+    - gofmt -w runtime/internal/app/bootstrap/authentication.go runtime/internal/app/bootstrap/authentication_test.go runtime/internal/platform/protocol/protobuf/authentication_bridge.go runtime/internal/platform/protocol/protobuf/authentication_bridge_test.go runtime/internal/platform/protocol/protobuf/inventory_bridge.go runtime/internal/platform/protocol/protobuf/payload_registry.go runtime/internal/platform/protocol/protobuf/authenticated_request_test.go runtime/internal/app/transactional_dispatch.go runtime/internal/app/transactional_dispatch_test.go runtime/cmd/vibit-server/main.go runtime/cmd/vibit-server/main_test.go
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check generated --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-authentication-command-protocol-login-route --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

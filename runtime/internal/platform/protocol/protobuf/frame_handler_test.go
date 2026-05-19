@@ -107,7 +107,7 @@ func TestRequestWithFrameMetadataRefreshesMetadataOnlyIdentity(t *testing.T) {
 		}),
 	}
 
-	request = requestWithFrameMetadata(request, FrameRequest{ConnectionID: " ws-1 "})
+	request = requestWithFrameMetadata(request, FrameRequest{ConnectionID: " ws-1 ", ConnectionEpoch: 11})
 
 	if request.Session.ConnectionID != "ws-1" {
 		t.Fatalf("Session.ConnectionID = %q, want ws-1", request.Session.ConnectionID)
@@ -120,6 +120,9 @@ func TestRequestWithFrameMetadataRefreshesMetadataOnlyIdentity(t *testing.T) {
 	}
 	if request.Identity.PlayerIDValidated || request.Identity.SessionValidated {
 		t.Fatalf("Identity validation flags = %#v, want metadata-only identity", request.Identity)
+	}
+	if request.Session.ConnectionEpoch != 11 || request.Identity.ConnectionEpoch != 11 {
+		t.Fatalf("connection epoch session=%d identity=%d, want 11", request.Session.ConnectionEpoch, request.Identity.ConnectionEpoch)
 	}
 }
 

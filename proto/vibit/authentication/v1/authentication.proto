@@ -1,0 +1,70 @@
+syntax = "proto3";
+
+package vibit.authentication.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1;authenticationv1";
+
+// @source docs/authentication-command-protocol-login-route-gate.md
+// @source decisions/ADR-0055-authentication-command-protocol-login-route-gate.md
+// @source docs/first-message-connection-binding-implementation-gate.md
+// @source decisions/ADR-0058-first-message-connection-binding-implementation-gate.md
+// @source docs/protocol-logout-route-gate.md
+// @source decisions/ADR-0079-protocol-logout-route-gate.md
+
+message AuthenticateWithDeviceCredentialRequest {
+  string credential_proof = 1;
+  string requested_player_id = 2;
+  string client_instance_id = 3;
+  AccountCreationIntent account_creation_intent = 4;
+}
+
+message AuthenticateWithDeviceCredentialResponse {
+  string authentication_status = 1;
+  string actor_kind = 2;
+  string player_id = 3;
+  string access_token = 4;
+  string token_type = 5;
+  string issued_at = 6;
+  string expires_at = 7;
+  string token_record_id = 8;
+}
+
+enum AccountCreationIntent {
+  ACCOUNT_CREATION_INTENT_UNSPECIFIED = 0;
+  ACCOUNT_CREATION_INTENT_ALLOW_CREATE = 1;
+  ACCOUNT_CREATION_INTENT_AUTHENTICATE_EXISTING_ONLY = 2;
+}
+
+message BindConnectionRequest {
+  string access_token = 1;
+  string client_instance_id = 2;
+}
+
+message BindConnectionResponse {
+  ConnectionBindingStatus binding_status = 1;
+  string actor_kind = 2;
+  string player_id = 3;
+  string connection_id = 4;
+  uint64 connection_epoch = 5;
+  bool session_validated = 6;
+  string bound_at = 7;
+}
+
+enum ConnectionBindingStatus {
+  CONNECTION_BINDING_STATUS_UNSPECIFIED = 0;
+  CONNECTION_BINDING_STATUS_BOUND = 1;
+  CONNECTION_BINDING_STATUS_REJECTED = 2;
+}
+
+message LogoutAccessTokenRequest {
+  string access_token = 1;
+  string logout_reason = 2;
+}
+
+message LogoutAccessTokenResponse {
+  string logout_status = 1;
+  bool revoked = 2;
+  string logout_scope = 3;
+  string revoked_at = 4;
+  string token_record_id = 5;
+}

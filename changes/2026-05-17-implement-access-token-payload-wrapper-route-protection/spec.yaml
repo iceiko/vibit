@@ -1,0 +1,150 @@
+schema_version: 0.1
+change_id: implement-access-token-payload-wrapper-route-protection
+date: 2026-05-17
+type: feature
+status: verified
+
+summary: Implement the bounded request-level access-token Protobuf payload wrapper and application route-protection slice without changing the existing envelope, WebSocket handshake, session persistence, startup wiring, repositories, migrations, dependencies, logout, refresh, cleanup, token rotation, or broader production authentication behavior.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added: []
+  referenced:
+    - ADR-0015
+    - ADR-0018
+    - ADR-0021
+    - ADR-0023
+    - ADR-0036
+    - ADR-0039
+    - ADR-0052
+    - ADR-0053
+
+standards:
+  added: []
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - tools/vibit
+
+implementation:
+  added:
+    - proto/vibit/authentication/v1/authenticated_request.proto
+    - runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+    - runtime/internal/app/route_authentication.go
+    - runtime/internal/app/route_authentication_test.go
+    - runtime/internal/app/authentication/route_validator.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_request_test.go
+  changed:
+    - runtime/internal/platform/protocol/protobuf/envelope.go
+    - runtime/internal/platform/protocol/protobuf/frame_handler.go
+    - runtime/internal/platform/transport/ws/server_test.go
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: true
+  protobuf_source_added: true
+  generated_go_proto_output_added: true
+  completed_work_item: W-0114
+  completed_milestone: M-042
+  next_milestone: M-043
+  blocked_work_item: W-0115
+  access_token_protocol_carrier_route_protection_implementation_completed: true
+  access_token_protocol_carrier_route_protection_implementation_check_rule: runtime.access_token_protocol_carrier_route_protection_gate
+  validation_model: request_level_validation
+  proof_carrier_posture: protobuf_payload_wrapper
+  wrapper_message: vibit.authentication.v1.AuthenticatedRequest
+  protocol_source: proto/vibit/authentication/v1/authenticated_request.proto
+  generated_go_proto_output: runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+  route_policy_source: runtime/internal/app/route_authentication.go
+  route_validator_source: runtime/internal/app/authentication/route_validator.go
+  protocol_adapter_sources:
+    - runtime/internal/platform/protocol/protobuf/envelope.go
+    - runtime/internal/platform/protocol/protobuf/frame_handler.go
+  protected_route_requires_validated_player_identity: true
+  metadata_only_identity_rejected_for_protected_routes: true
+  public_device_credential_login_route_explicit: true
+  session_validated_without_session_persistence: false
+  existing_envelope_changed: false
+  envelope_route_fields_remain_domain_route: true
+  websocket_transport_credential_neutral: true
+  websocket_handshake_authentication_added: false
+  session_persistence_added: false
+  startup_wiring_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  logout_execution_added: false
+  refresh_behavior_added: false
+  cleanup_jobs_added: false
+  token_rotation_added: false
+  broader_production_authentication_behavior_added: false
+
+workflow:
+  completed_work_item: W-0114
+  completed_milestone: M-042
+  next_milestone: M-043
+  blocked_work_item: W-0115
+  next_direction: confirm_next_major_direction_after_request_level_route_protection
+
+verification:
+  required:
+    - buf lint
+    - buf generate
+    - gofmt -w runtime/internal/app/route_authentication.go runtime/internal/app/route_authentication_test.go runtime/internal/app/authentication/route_validator.go runtime/internal/platform/protocol/protobuf/envelope.go runtime/internal/platform/protocol/protobuf/frame_handler.go runtime/internal/platform/protocol/protobuf/authenticated_request_test.go runtime/internal/platform/transport/ws/server_test.go
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check generated --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-access-token-payload-wrapper-route-protection --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

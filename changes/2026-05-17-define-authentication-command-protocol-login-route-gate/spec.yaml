@@ -1,0 +1,115 @@
+schema_version: 0.1
+change_id: define-authentication-command-protocol-login-route-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the authentication command protocol and public device credential login route gate before adding Protobuf login messages, generated output, protocol bridge behavior, route registration, or startup composition.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0055
+  referenced:
+    - ADR-0018
+    - ADR-0019
+    - ADR-0023
+    - ADR-0024
+    - ADR-0028
+    - ADR-0036
+    - ADR-0039
+    - ADR-0051
+    - ADR-0052
+    - ADR-0053
+    - ADR-0054
+
+standards:
+  added:
+    - docs/authentication-command-protocol-login-route-gate.md
+    - docs/authentication-command-protocol-login-route-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  authentication_command_protocol_login_route_gate_defined: true
+  authentication_command_protocol_login_route_gate_check_rule: runtime.authentication_command_protocol_login_route_gate
+  public_login_route: runtime.authentication.AuthenticateWithDeviceCredential
+  first_protocol_source: proto/vibit/authentication/v1/authentication.proto
+  first_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+  implementation_authorized_by_this_standard: true
+  route_registration_implemented_by_gate: false
+  session_persistence_added: false
+  websocket_handshake_authentication_added: false
+  repository_interface_changed: false
+  migrations_changed: false
+  dependencies_added: false
+
+workflow:
+  completed_work_item: W-0119
+  completed_milestone: M-047
+  next_milestone: M-048
+  next_ready_work_item: W-0120
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check memory --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change define-authentication-command-protocol-login-route-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

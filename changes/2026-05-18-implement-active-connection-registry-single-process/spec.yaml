@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: implement-active-connection-registry-single-process
+date: 2026-05-18
+type: feature
+status: verified
+
+summary: Implement the first application-owned single-process in-memory active connection registry.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0075
+  referenced:
+    - ADR-0019
+    - ADR-0057
+    - ADR-0058
+    - ADR-0066
+    - ADR-0068
+    - ADR-0070
+    - ADR-0071
+    - ADR-0072
+    - ADR-0073
+    - ADR-0074
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - Active connection registry behavior is application-owned under runtime/internal/app/connection.
+    - WebSocket transport remains credential-neutral and does not own authenticated identity state.
+    - Authentication remains token lifecycle owner but does not own active connection registry policy.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_logout_route_added: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0162
+  completed_milestone: M-090
+  active_connection_registry_single_process_implemented: true
+  active_connection_registry_single_process_decision: ADR-0075
+  active_connection_registry_single_process_check_rule: runtime.active_connection_registry_single_process_implementation
+  registry_source: runtime/internal/app/connection/registry.go
+  registry_tests: runtime/internal/app/connection/registry_test.go
+  registry_owner: runtime/internal/app/connection
+  registry_posture: single_process_in_memory
+  registry_persistence_posture: non_durable_runtime_state
+  server_observed_connection_id_required: true
+  connection_epoch_required: true
+  validated_player_identity_required_for_binding: true
+  metadata_only_targeting_allowed: false
+  list_by_player_id_added: true
+  list_by_runtime_session_id_added: true
+  list_by_access_token_record_id_added: true
+  find_by_connection_id_and_epoch_added: true
+  mark_connection_invalidated_added: true
+  websocket_close_policy_added: false
+  concrete_socket_close_added: false
+  kick_disconnect_behavior_added: false
+  runtime_session_revocation_added: false
+  duplicate_connection_replacement_added: false
+  reconnect_epoch_behavior_added: false
+  protobuf_logout_route_added: false
+  protobuf_session_carrier_added: false
+  existing_protobuf_envelope_change_added: false
+  generated_output_added: false
+  transport_credential_carrier_added: false
+  websocket_handshake_authentication_added: false
+  durable_distributed_registry_storage_added: false
+  cleanup_jobs_added: false
+  dependencies_added: false
+  memory_durable_session_behavior_added: false
+  broader_game_backend_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - go test ./internal/app/connection
+    - go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check schemas --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change confirm-next-direction-after-active-connection-registry-gate --json
+    - node tools/vibit check change implement-active-connection-registry-single-process --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

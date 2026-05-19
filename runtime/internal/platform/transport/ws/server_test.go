@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"fmt"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"sync/atomic"
@@ -55,6 +56,9 @@ func TestServerBinaryFrameRoundTrip(t *testing.T) {
 		if frame.ConnectionID == "" {
 			t.Fatal("frame ConnectionID is empty")
 		}
+		if frame.ConnectionEpoch != 1 {
+			t.Fatalf("frame ConnectionEpoch = %d, want 1", frame.ConnectionEpoch)
+		}
 		if frame.RemoteAddr == "" {
 			t.Fatal("frame RemoteAddr is empty")
 		}
@@ -70,6 +74,7 @@ func TestFrameCopiesPayload(t *testing.T) {
 	payload := []byte("ping")
 	frame := newFrame(connectionMetadata{
 		id:         "ws-1",
+		epoch:      7,
 		remoteAddr: "127.0.0.1:1",
 	}, payload)
 
@@ -80,6 +85,9 @@ func TestFrameCopiesPayload(t *testing.T) {
 	}
 	if frame.ConnectionID != "ws-1" {
 		t.Fatalf("frame ConnectionID = %q, want %q", frame.ConnectionID, "ws-1")
+	}
+	if frame.ConnectionEpoch != 7 {
+		t.Fatalf("frame ConnectionEpoch = %d, want 7", frame.ConnectionEpoch)
 	}
 	if frame.RemoteAddr != "127.0.0.1:1" {
 		t.Fatalf("frame RemoteAddr = %q, want %q", frame.RemoteAddr, "127.0.0.1:1")
@@ -147,6 +155,58 @@ func TestServerRequiresFrameHandler(t *testing.T) {
 	}
 	if resp.StatusCode != 500 {
 		t.Fatalf("status code = %d, want 500", resp.StatusCode)
+	}
+}
+
+func TestServerDoesNotParseCredentialCarriersFromHandshake(t *testing.T) {
+	received := make(chan Frame, 1)
+	server := httptest.NewServer(&Server{
+		AcceptOptions: &websocket.AcceptOptions{
+			InsecureSkipVerify: true,
+		},
+		Handler: FrameHandlerFunc(func(ctx context.Context, frame Frame) ([][]byte, error) {
+			received <- frame
+			return [][]byte{[]byte("ok")}, nil
+		}),
+	})
+	defer server.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	header := http.Header{}
+	header.Set("Authorization", "Bearer secret-from-header")
+	header.Set("Cookie", "access_token=secret-from-cookie")
+	header.Set("Sec-WebSocket-Protocol", "secret-subprotocol")
+	conn, _, err := websocket.Dial(ctx, websocketURL(server.URL)+"?access_token=secret-from-query", &websocket.DialOptions{
+		HTTPHeader: header,
+	})
+	if err != nil {
+		t.Fatalf("dial websocket: %v", err)
+	}
+	defer conn.CloseNow()
+
+	if err := conn.Write(ctx, websocket.MessageBinary, []byte("payload-only")); err != nil {
+		t.Fatalf("write binary frame: %v", err)
+	}
+	_, _, err = conn.Read(ctx)
+	if err != nil {
+		t.Fatalf("read response frame: %v", err)
+	}
+
+	select {
+	case frame := <-received:
+		if string(frame.Payload) != "payload-only" {
+			t.Fatalf("frame payload = %q, want payload-only", string(frame.Payload))
+		}
+		frameText := frame.ConnectionID + " " + frame.RemoteAddr + " " + string(frame.Payload)
+		for _, secret := range []string{"secret-from-header", "secret-from-cookie", "secret-from-query", "secret-subprotocol"} {
+			if strings.Contains(frameText, secret) {
+				t.Fatalf("frame metadata leaks credential carrier %q: %#v", secret, frame)
+			}
+		}
+	case <-ctx.Done():
+		t.Fatal("handler did not receive frame")
 	}
 }
 

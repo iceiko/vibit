@@ -1,0 +1,123 @@
+schema_version: 0.1
+change_id: define-postgres-session-persistence-schema-gate
+date: 2026-05-17
+type: standard
+status: verified
+
+summary: Define the gate-only PostgreSQL session persistence schema boundary for future runtime session storage.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0059
+  referenced:
+    - ADR-0019
+    - ADR-0020
+    - ADR-0021
+    - ADR-0023
+    - ADR-0056
+    - ADR-0057
+    - ADR-0058
+
+standards:
+  added:
+    - docs/postgres-session-persistence-schema-gate.md
+    - docs/postgres-session-persistence-schema-gate.zh-CN.md
+  changed:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - .arch/conventions.yaml
+    - .arch/contracts.yaml
+    - .arch/reference.yaml
+    - modules/authentication/module.yaml
+    - AGENTS.md
+    - AGENTS.zh-CN.md
+    - runtime/AGENTS.md
+    - runtime/AGENTS.zh-CN.md
+    - modules/authentication/AGENTS.md
+    - modules/authentication/AGENTS.zh-CN.md
+    - rules/check-rules.json
+    - tools/vibit
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  future_session_logical_table: runtime_sessions
+  future_migration_source_candidate: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0130
+  completed_milestone: M-058
+  postgres_session_persistence_schema_gate_defined: true
+  postgres_session_persistence_schema_gate_decision: ADR-0059
+  postgres_session_persistence_schema_gate_standard: docs/postgres-session-persistence-schema-gate.md
+  postgres_session_persistence_schema_gate_check_rule: runtime.postgres_session_persistence_schema_gate
+  selected_first_session_store: postgres
+  future_session_logical_table: runtime_sessions
+  future_migration_source_candidate: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+  future_repository_owner_candidate: runtime/internal/app/session
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  session_persistence_implementation_added: false
+  session_table_added: false
+  migration_source_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  websocket_handshake_authentication_added: false
+  route_policy_bound_identity_added: false
+  logout_revocation_active_connection_added: false
+  reconnect_epoch_behavior_added: false
+  dependencies_added: false
+
+workflow:
+  completed_work_item: W-0130
+  completed_milestone: M-058
+  next_milestone: M-059
+  blocked_work_item: W-0131
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check module authentication --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check change define-postgres-session-persistence-schema-gate --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

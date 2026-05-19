@@ -9,6 +9,36 @@ purpose: >
 standard: docs/reference-game-server-alignment.md
 translation: docs/reference-game-server-alignment.zh-CN.md
 decision: ADR-0019
+product_parity_roadmap:
+  status: ratified
+  standard: docs/nakama-pitaya-product-parity-roadmap.md
+  translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  decision: ADR-0078
+  check_rule: runtime.reference_product_parity_roadmap
+  completed_work_item: W-0168
+  selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
+  parity_goal: nakama_pitaya_same_class_common_capability_coverage
+  api_compatibility_goal: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  implementation_authorized_by_this_standard: roadmap_only
+  current_near_term_priority: protocol_logout_and_connection_lifecycle
+  recommended_next_direction: define_protocol_logout_route_gate
+
+parity_capability_families:
+  - identity_authentication_sessions
+  - connection_lifecycle_reconnect_logout
+  - storage_objects_and_durable_game_state
+  - presence_status_and_notifications
+  - chat_streams_and_realtime_messaging
+  - friends_groups_and_parties
+  - leaderboards_tournaments_and_competitive_systems
+  - economy_inventory_rewards_currencies_and_progression
+  - matchmaking_match_listing_and_room_lifecycle
+  - realtime_multiplayer_and_authoritative_match_runtime
+  - server_runtime_hooks_rpc_and_custom_logic
+  - admin_console_metrics_observability_and_operations
+  - client_sdks_examples_and_developer_experience
+  - distributed_runtime_frontend_backend_rpc_and_service_discovery
 
 reference_projects:
   - name: Nakama
@@ -924,10 +954,12 @@ phase_plan:
       - frontend_backend_handler_separation
     rule: The completed phase defines the future access-token validation service behavior gate only. Nakama guides token/session capability coverage and Pitaya guides route identity context, but vibit keeps validation service behavior, protocol carriers, startup wiring, route protection, and session persistence separately bounded.
   phase_2ab_access_token_validation_service_behavior_implementation:
-    status: active
-    active_milestone: M-039
+    status: completed
+    completed_milestone: M-039
+    completed_work_item: W-0111
     previous_milestone: M-038
-    next_work_item: W-0111
+    next_milestone: M-040
+    blocked_work_item: W-0112
     focus:
       - access_token_validation_execution
       - service_method_only
@@ -943,7 +975,1937 @@ phase_plan:
       - route_handler_identity_context
       - session_binding_lifecycle
       - frontend_backend_handler_separation
-    rule: The active phase may implement access-token validation inside the existing application authentication service only. Protocol carriers, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, and broader production behavior remain deferred.
+    rule: The completed phase implements access-token validation inside the existing application authentication service only. Nakama guides session token validation capability and Pitaya guides route identity context, but vibit still defers protocol carriers, route protection, session persistence, startup wiring, repository changes, migrations, generated files, dependencies, logout, refresh, cleanup, and broader production behavior.
+  phase_2ac_next_direction_confirmation_after_service_local_authentication:
+    status: completed
+    completed_milestone: M-040
+    completed_work_item: W-0112
+    change: changes/2026-05-17-confirm-next-direction-after-service-local-authentication
+    previous_milestone: M-039
+    previous_completed_work_item: W-0111
+    selected_direction: expose_access_token_protocol_carrier_and_route_protection_gate
+    next_milestone: M-041
+    next_ready_work_item_created: W-0113
+    focus:
+      - next_direction_confirmation
+      - service_local_authentication_completed
+      - no_implicit_protocol_carriers
+      - no_implicit_route_protection
+      - no_implicit_session_persistence
+      - no_implicit_startup_wiring
+    candidate_directions:
+      - expose_access_token_protocol_carrier_and_route_protection_gate
+      - ratify_session_persistence_and_websocket_handshake_authentication
+      - implement_logout_refresh_cleanup_behavior_gates
+      - wire_runtime_authentication_startup_composition
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+      - strengthen_operations_observability_and_admin_tooling
+      - review_self_bootstrapping_agent_native_process_before_more_runtime_scope
+    nakama_reference:
+      - session_token_validation_capability
+      - server_authoritative_session_context
+      - account_session_logout_refresh_capabilities
+    pitaya_reference:
+      - route_handler_identity_context
+      - session_binding_lifecycle
+      - frontend_backend_handler_separation
+    rule: The maintainer selected the access-token protocol carrier and route-protection gate as the next direction after service-local login and access-token validation. The choice opens a gate-only step before implementation and preserves deferrals for session persistence, WebSocket handshake authentication, startup wiring, logout, refresh, cleanup, repository changes, migrations, generated files, dependencies, core game backend module expansion, and broader process changes.
+  phase_2ad_access_token_protocol_carrier_route_protection_gate:
+    status: completed
+    completed_milestone: M-041
+    completed_work_item: W-0113
+    change: changes/2026-05-17-define-access-token-protocol-carrier-route-protection-gate
+    decision: ADR-0053
+    standard: docs/access-token-protocol-carrier-route-protection-gate.md
+    previous_milestone: M-040
+    previous_completed_work_item: W-0112
+    next_milestone: M-042
+    next_ready_work_item: W-0114
+    focus:
+      - request_level_validation
+      - protobuf_payload_wrapper
+      - route_policy_before_domain_dispatch
+      - credential_neutral_websocket_transport
+      - unchanged_existing_envelope
+      - metadata_only_identity_rejected_for_protected_routes
+    selected_wrapper_message_candidate: vibit.authentication.v1.AuthenticatedRequest
+    planned_protocol_source: proto/vibit/authentication/v1/authenticated_request.proto
+    planned_generated_go_proto_output: runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+    deferrals:
+      - websocket_handshake_authentication
+      - session_persistence
+      - startup_wiring
+      - repository_changes
+      - migrations
+      - dependencies
+  phase_2ae_access_token_protocol_carrier_route_protection_implementation:
+    status: completed
+    completed_milestone: M-042
+    completed_work_item: W-0114
+    change: changes/2026-05-17-implement-access-token-payload-wrapper-route-protection
+    previous_milestone: M-041
+    previous_completed_work_item: W-0113
+    next_milestone: M-043
+    blocked_work_item: W-0115
+    focus:
+      - request_level_validation
+      - authenticated_request_payload_wrapper
+      - route_policy_before_domain_dispatch
+      - validated_player_identity_required_for_protected_routes
+      - credential_neutral_websocket_transport
+      - unchanged_existing_envelope
+    implemented_wrapper_message: vibit.authentication.v1.AuthenticatedRequest
+    protocol_source: proto/vibit/authentication/v1/authenticated_request.proto
+    generated_go_proto_output: runtime/internal/generated/proto/vibit/authentication/v1/authenticated_request.pb.go
+    route_policy_source: runtime/internal/app/route_authentication.go
+    route_validator_source: runtime/internal/app/authentication/route_validator.go
+    deferrals:
+      - websocket_handshake_authentication
+      - session_persistence
+      - startup_wiring
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_refresh_cleanup
+      - token_rotation
+  phase_2af_next_direction_confirmation_after_request_level_route_protection:
+    status: completed
+    milestone: M-043
+    completed_work_item: W-0115
+    change: changes/2026-05-17-confirm-next-direction-after-request-level-route-protection
+    previous_milestone: M-042
+    previous_completed_work_item: W-0114
+    selected_direction: wire_runtime_authentication_startup_composition
+    next_milestone: M-044
+    next_ready_work_item_created: W-0116
+    candidate_directions:
+      - ratify_session_persistence_and_websocket_handshake_authentication
+      - wire_runtime_authentication_startup_composition
+      - implement_logout_refresh_cleanup_behavior_gates
+      - ratify_token_rotation_and_reauthentication_lifecycle
+      - add_protocol_authentication_command_messages_after_wrapper_slice
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+      - strengthen_operations_observability_and_admin_tooling
+      - logout_refresh_cleanup
+      - direct_nakama_or_pitaya_api_compatibility
+    nakama_reference:
+      - session_token_validation_capability
+      - gameplay_request_authentication_before_handler_dispatch
+      - account_session_logout_refresh_capabilities_deferred
+    pitaya_reference:
+      - route_handler_identity_context
+      - frontend_backend_handler_separation
+      - connection_layer_not_domain_auth_logic
+    rule: The maintainer selected runtime authentication startup composition as the next direction and emphasized Nakama and Pitaya as references. Nakama guides the authenticate-then-session/token capability expectation, and Pitaya guides keeping connection/session/route/handler concerns separated. The selection starts with a gate-only milestone and preserves deferrals for session persistence, WebSocket handshake authentication, logout, refresh, cleanup, token rotation, repository changes, migrations, dependencies, operations posture, generated authentication messages beyond the wrapper, and core game backend expansion.
+  phase_2ag_runtime_authentication_startup_composition_gate:
+    status: completed
+    completed_milestone: M-044
+    completed_work_item: W-0116
+    change: changes/2026-05-17-define-runtime-authentication-startup-composition-gate
+    decision: ADR-0054
+    standard: docs/runtime-authentication-startup-composition-gate.md
+    previous_milestone: M-043
+    previous_completed_work_item: W-0115
+    next_milestone: M-045
+    next_ready_work_item: W-0117
+    focus:
+      - postgres_startup_composition
+      - existing_authentication_service
+      - environment_verifier_key_loader
+      - route_protector_injection
+      - credential_neutral_websocket_transport
+      - unchanged_existing_envelope
+    first_composed_runtime_store: postgres
+    memory_store_authentication_status: bootstrap_metadata_only
+    nakama_reference:
+      - authenticate_before_server_feature_access
+      - session_token_context_before_realtime_socket_features
+    pitaya_reference:
+      - acceptor_connection_boundary
+      - handler_service_handoff
+      - user_session_context
+    deferrals:
+      - websocket_handshake_authentication
+      - session_persistence
+      - authentication_command_routes
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_refresh_cleanup
+      - token_rotation
+  phase_2ah_runtime_authentication_startup_composition_implementation:
+    status: completed
+    completed_milestone: M-045
+    completed_work_item: W-0117
+    change: changes/2026-05-17-implement-runtime-authentication-startup-composition
+    previous_milestone: M-044
+    previous_completed_work_item: W-0116
+    next_milestone: M-046
+    blocked_work_item: W-0118
+    focus:
+      - postgres_startup_composition
+      - verifier_key_environment_loading
+      - authentication_service_composition
+      - route_access_token_validator
+      - route_protector_injection
+      - memory_bootstrap_preserved
+    startup_source: runtime/cmd/vibit-server/main.go
+    startup_tests: runtime/cmd/vibit-server/main_test.go
+    environment_verifier_key_loader_wired: true
+    route_protector_injected: true
+    websocket_transport_credential_neutral: true
+    protobuf_envelope_changed: false
+    deferrals:
+      - websocket_handshake_authentication
+      - session_persistence
+      - authentication_command_routes
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_refresh_cleanup
+      - token_rotation
+  phase_2ai_next_direction_confirmation_after_runtime_authentication_startup_composition:
+    status: completed
+    milestone: M-046
+    completed_work_item: W-0118
+    previous_milestone: M-045
+    previous_completed_work_item: W-0117
+    selected_direction: add_authentication_command_protocol_messages_and_login_route_registration
+    next_milestone: M-047
+    next_ready_work_item_created: W-0119
+    candidate_directions:
+      - ratify_session_persistence_and_websocket_handshake_authentication
+      - add_authentication_command_protocol_messages_and_login_route_registration
+      - implement_logout_refresh_cleanup_behavior_gates
+      - ratify_token_rotation_and_reauthentication_lifecycle
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+      - strengthen_operations_observability_and_admin_tooling
+    rule: The maintainer selected authentication command protocol messages and login route registration after startup composition, preserving ask-first boundaries for session persistence, WebSocket handshake authentication, logout, refresh, cleanup, token rotation, repository changes, migrations, operations posture, dependencies, and broader game backend expansion.
+  phase_2aj_authentication_command_protocol_login_route_gate:
+    status: completed
+    completed_milestone: M-047
+    completed_work_item: W-0119
+    change: changes/2026-05-17-define-authentication-command-protocol-login-route-gate
+    decision: ADR-0055
+    standard: docs/authentication-command-protocol-login-route-gate.md
+    previous_milestone: M-046
+    previous_completed_work_item: W-0118
+    next_milestone: M-048
+    next_ready_work_item: W-0120
+    focus:
+      - public_device_credential_login_command_route
+      - protobuf_login_request_response_messages
+      - application_route_registration
+      - protocol_bridge_handoff
+      - postgres_startup_composition_route_registration
+      - transaction_wrapper_bypass
+    nakama_reference:
+      - authenticate_before_gameplay_feature_access
+      - login_response_returns_token_material
+    pitaya_reference:
+      - connection_transport_separated_from_route_handler
+      - route_handler_service_handoff
+    deferrals:
+      - websocket_handshake_authentication
+      - session_persistence
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_refresh_cleanup
+      - token_rotation
+      - direct_nakama_pitaya_api_compatibility
+  phase_2ak_authentication_command_protocol_login_route_implementation:
+    status: completed
+    completed_milestone: M-048
+    completed_work_item: W-0120
+    change: changes/2026-05-17-implement-authentication-command-protocol-login-route
+    previous_milestone: M-047
+    previous_completed_work_item: W-0119
+    next_milestone: M-049
+    blocked_work_item: W-0121
+    focus:
+      - authentication_command_proto_source
+      - generated_go_protobuf_output
+      - protobuf_authentication_bridge
+      - application_bootstrap_login_handler
+      - postgres_startup_login_route_registration
+      - transactional_dispatcher_bypass
+    protocol_source: proto/vibit/authentication/v1/authentication.proto
+    generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+    application_handler_source: runtime/internal/app/bootstrap/authentication.go
+    protocol_bridge_source: runtime/internal/platform/protocol/protobuf/authentication_bridge.go
+    startup_source: runtime/cmd/vibit-server/main.go
+    transaction_wrapper_bypass_source: runtime/internal/app/transactional_dispatch.go
+    websocket_transport_credential_neutral: true
+    protobuf_envelope_changed: false
+    session_persistence_added: false
+    websocket_handshake_authentication_added: false
+    repository_interface_changed: false
+    migrations_changed: false
+    dependencies_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2al_next_direction_confirmation_after_authentication_login_route:
+    status: completed
+    milestone: M-049
+    completed_work_item: W-0121
+    change: changes/2026-05-17-confirm-next-direction-after-authentication-login-route
+    previous_milestone: M-048
+    previous_completed_work_item: W-0120
+    selected_direction: ratify_session_persistence_and_websocket_handshake_authentication
+    next_milestone: M-050
+    next_ready_work_item_created: W-0122
+    candidate_directions:
+      - ratify_session_persistence_and_websocket_handshake_authentication
+      - implement_logout_refresh_cleanup_behavior_gates
+      - ratify_token_rotation_and_reauthentication_lifecycle
+      - add_memory_durable_authentication_support
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+      - strengthen_operations_observability_and_admin_tooling
+    nakama_reference:
+      - authenticate_then_session_then_realtime_socket_lifecycle
+      - session_lifetime_and_revocation_dimensions
+    pitaya_reference:
+      - acceptor_session_route_handler_separation
+      - session_binding_before_group_room_match_membership
+    rule: The maintainer asked for the agent's recommendation and authorized continuing according to it. The selected direction is session persistence and WebSocket handshake authentication ratification, preserving implementation deferrals for first-message connection binding, session persistence, WebSocket handshake authentication, logout, refresh, cleanup, token rotation, repository changes, migrations, operations posture, dependencies, memory durable authentication behavior, direct Nakama/Pitaya API compatibility, and broader game backend expansion.
+  phase_2am_session_persistence_websocket_handshake_ratification:
+    status: completed
+    completed_milestone: M-050
+    completed_work_item: W-0122
+    change: changes/2026-05-17-ratify-session-persistence-websocket-handshake-authentication
+    decision: ADR-0056
+    standard: docs/session-persistence-websocket-handshake-ratification.md
+    previous_milestone: M-049
+    previous_completed_work_item: W-0121
+    next_milestone: M-051
+    blocked_work_item: W-0123
+    focus:
+      - request_level_access_token_validation_current_path
+      - protobuf_authenticated_request_payload_wrapper
+      - credential_neutral_websocket_transport
+      - unchanged_existing_envelope
+      - future_first_message_connection_binding_gate
+      - future_postgres_session_persistence_schema_gate
+    current_validation_model: request_level_access_token_validation
+    current_proof_carrier: vibit.authentication.v1.AuthenticatedRequest
+    future_connection_binding_preferred_gate: first_message_protocol_binding
+    future_session_store_preferred_first_durable_target: postgres
+    nakama_reference:
+      - authenticate_before_protected_gameplay
+      - session_lifetime_dimensions
+      - realtime_socket_associated_with_authenticated_state
+      - refresh_and_reconnect_deferred
+    pitaya_reference:
+      - transport_acceptor_separated_from_session_binding
+      - route_handler_separated_from_connection_plumbing
+      - groups_rooms_broadcast_require_later_binding_context
+      - cluster_frontend_backend_deferred
+    deferrals:
+      - first_message_connection_binding_implementation
+      - websocket_handshake_authentication
+      - session_persistence_schema
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_refresh_cleanup
+      - token_rotation
+      - reconnect_epoch_behavior
+      - active_connection_invalidation
+      - direct_nakama_pitaya_api_compatibility
+    rule: Nakama guides the login-session-realtime socket lifecycle, and Pitaya guides the acceptor-session-route-handler separation. vibit adapts these references by keeping request-level validation as the current path, planning future first-message protocol/application binding, and deferring durable session persistence to a later PostgreSQL-first schema/repository/migration gate.
+  phase_2an_next_direction_confirmation_after_session_handshake_ratification:
+    status: completed
+    milestone: M-051
+    completed_work_item: W-0123
+    change: changes/2026-05-17-confirm-next-direction-after-session-handshake-ratification
+    previous_milestone: M-050
+    previous_completed_work_item: W-0122
+    selected_direction: define_first_message_connection_binding_gate
+    next_milestone: M-052
+    next_ready_work_item_created: W-0124
+    candidate_directions:
+      - define_first_message_connection_binding_gate
+      - define_postgres_session_persistence_schema_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - implement_logout_refresh_cleanup_behavior_gates
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: The maintainer asked for the agent's recommendation and authorized continuing according to it. The selected direction is first-message connection binding gate definition, preserving implementation deferrals for connection binding behavior, Protobuf messages, generated output, connection registries, route-policy bound identity, session persistence, WebSocket handshake authentication, logout/revocation, reconnect/epoch behavior, operations posture, memory durable authentication behavior, direct Nakama/Pitaya API compatibility, and broader game backend expansion.
+  phase_2ao_first_message_connection_binding_gate:
+    status: completed
+    completed_milestone: M-052
+    completed_work_item: W-0124
+    change: changes/2026-05-17-define-first-message-connection-binding-gate
+    decision: ADR-0057
+    standard: docs/first-message-connection-binding-gate.md
+    previous_milestone: M-051
+    previous_completed_work_item: W-0123
+    next_milestone: M-053
+    blocked_work_item: W-0125
+    focus:
+      - future_runtime_authentication_bind_connection_system_route
+      - protocol_application_owned_connection_binding
+      - credential_neutral_websocket_transport
+      - unchanged_existing_envelope
+      - request_level_validation_current_path
+      - session_persistence_deferred
+    selected_binding_route: runtime.authentication.BindConnection
+    selected_binding_message_kind: system
+    selected_binding_payload_candidate: vibit.authentication.v1.BindConnectionRequest
+    selected_binding_response_candidate: vibit.authentication.v1.BindConnectionResponse
+    selected_proof_carrier: protobuf_system_payload_access_token
+    nakama_reference:
+      - authenticate_before_realtime_socket_features
+      - socket_connection_associated_with_authenticated_state
+      - session_and_socket_lifecycle_are_related_but_not_identical
+      - single_socket_and_reconnect_deferred
+    pitaya_reference:
+      - acceptor_session_route_handler_separation
+      - bind_user_identity_to_session_like_connection_context
+      - groups_rooms_and_broadcast_need_bound_identity_later
+      - cluster_frontend_backend_deferred
+    deferrals:
+      - first_message_connection_binding_implementation
+      - bind_connection_protobuf_messages
+      - generated_output
+      - connection_binding_registry
+      - route_policy_bound_identity
+      - websocket_handshake_authentication
+      - session_persistence_schema
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: Nakama guides the authenticate-to-realtime-socket lifecycle, and Pitaya guides acceptor/session/handler separation. vibit adapts these references by selecting a future protocol/application `runtime.authentication.BindConnection` system route while keeping WebSocket transport credential-neutral, the existing envelope unchanged, and durable session or active-connection behavior behind later gates.
+  phase_2ap_next_direction_confirmation_after_first_message_connection_binding_gate:
+    status: completed
+    milestone: M-053
+    completed_work_item: W-0125
+    change: changes/2026-05-17-confirm-next-direction-after-first-message-connection-binding-gate
+    previous_milestone: M-052
+    previous_completed_work_item: W-0124
+    selected_direction: define_first_message_connection_binding_implementation_gate
+    next_milestone: M-054
+    next_ready_work_item_created: W-0126
+    candidate_directions:
+      - define_first_message_connection_binding_implementation_gate
+      - define_postgres_session_persistence_schema_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - implement_logout_refresh_cleanup_behavior_gates
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: The maintainer asked for the agent's recommendation and authorized continuing according to it. The selected direction is first-message connection binding implementation gate definition, preserving implementation deferrals for actual BindConnection behavior, Protobuf messages, generated output, connection registries, route-policy bound identity, session persistence, WebSocket handshake authentication, logout/revocation, reconnect/epoch behavior, operations posture, memory durable authentication behavior, direct Nakama/Pitaya API compatibility, and broader game backend expansion.
+  phase_2aq_first_message_connection_binding_implementation_gate:
+    status: completed
+    completed_milestone: M-054
+    completed_work_item: W-0126
+    change: changes/2026-05-17-define-first-message-connection-binding-implementation-gate
+    decision: ADR-0058
+    standard: docs/first-message-connection-binding-implementation-gate.md
+    previous_milestone: M-053
+    previous_completed_work_item: W-0125
+    next_milestone: M-055
+    blocked_work_item: W-0127
+    focus:
+      - future_runtime_authentication_bind_connection_implementation_boundary
+      - bind_connection_protocol_messages_and_generated_output
+      - application_owned_connection_binding
+      - protocol_adapter_handoff
+      - postgres_startup_composition_candidate
+      - request_level_validation_current_path
+    future_route: runtime.authentication.BindConnection
+    future_route_kind: system
+    future_protocol_source: proto/vibit/authentication/v1/authentication.proto
+    future_generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+    future_request: vibit.authentication.v1.BindConnectionRequest
+    future_response: vibit.authentication.v1.BindConnectionResponse
+    future_status_enum: vibit.authentication.v1.ConnectionBindingStatus
+    nakama_reference:
+      - authenticated_session_material_precedes_authenticated_realtime_socket_use
+      - realtime_socket_lifecycle_can_have_authenticated_player_context
+      - session_token_lifetime_and_socket_connection_lifetime_are_related_but_distinct
+      - refresh_disconnect_and_reconnect_deferred
+    pitaya_reference:
+      - transport_acceptor_separated_from_session_binding
+      - user_identity_can_bind_to_session_like_connection_context
+      - route_handlers_should_receive_context_not_parse_transport_credentials
+      - cluster_session_broadcast_deferred
+    deferrals:
+      - first_message_connection_binding_implementation
+      - session_persistence_schema
+      - route_policy_bound_identity_without_future_slice
+      - websocket_handshake_authentication
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: Nakama guides the authenticated realtime socket lifecycle and Pitaya guides acceptor/session/handler separation. vibit adapts these references by defining a bounded future `runtime.authentication.BindConnection` implementation slice while keeping WebSocket transport credential-neutral, the existing envelope unchanged, request-level access-token validation as the current protected-route path, and durable session or active-connection behavior behind later gates.
+  phase_2ar_next_direction_confirmation_after_first_message_connection_binding_implementation_gate:
+    status: completed
+    milestone: M-055
+    completed_work_item: W-0127
+    change: changes/2026-05-17-confirm-next-direction-after-first-message-connection-binding-implementation-gate
+    previous_milestone: M-054
+    previous_completed_work_item: W-0126
+    selected_direction: implement_first_message_connection_binding
+    next_milestone: M-056
+    next_ready_work_item_created: W-0128
+    candidate_directions:
+      - implement_first_message_connection_binding
+      - define_postgres_session_persistence_schema_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: The maintainer asked for the agent's recommendation and authorized continuing according to it. The selected direction is the bounded first-message connection binding implementation slice, using Nakama as a reference for authenticated session material before realtime socket use and Pitaya as a reference for acceptor/session/handler separation. Session persistence schema, logout/revocation active-connection behavior, reconnect/epoch behavior, operations posture, memory durable authentication behavior, direct Nakama/Pitaya API compatibility, and broader game backend expansion remain deferred.
+  phase_2as_first_message_connection_binding_implementation:
+    status: completed
+    completed_milestone: M-056
+    completed_work_item: W-0128
+    change: changes/2026-05-17-implement-first-message-connection-binding
+    decision_basis: ADR-0058
+    previous_milestone: M-055
+    previous_completed_work_item: W-0127
+    next_milestone: M-057
+    blocked_work_item: W-0129
+    focus:
+      - runtime_authentication_bind_connection_system_route
+      - bind_connection_protobuf_messages_and_generated_output
+      - application_owned_connection_binding
+      - protocol_adapter_handoff_before_normal_dispatch
+      - postgres_startup_composition
+      - server_observed_connection_metadata_handoff
+      - request_level_validation_current_path_preserved
+    implemented_route: runtime.authentication.BindConnection
+    implemented_route_kind: system
+    protocol_source: proto/vibit/authentication/v1/authentication.proto
+    generated_go_output: runtime/internal/generated/proto/vibit/authentication/v1/authentication.pb.go
+    request: vibit.authentication.v1.BindConnectionRequest
+    response: vibit.authentication.v1.BindConnectionResponse
+    status_enum: vibit.authentication.v1.ConnectionBindingStatus
+    nakama_reference:
+      - authenticated_session_material_precedes_authenticated_realtime_socket_use
+      - realtime_socket_lifecycle_can_have_authenticated_player_context
+      - session_token_lifetime_and_socket_connection_lifetime_are_related_but_distinct
+      - logout_revocation_current_socket_disconnect_behavior_deferred
+    pitaya_reference:
+      - transport_acceptor_separated_from_session_binding
+      - user_identity_can_bind_to_session_like_connection_context
+      - route_handlers_should_receive_context_not_parse_transport_credentials
+      - groups_rooms_broadcast_and_cluster_session_routing_deferred
+    adapted_positions:
+      nakama:
+        socket_after_authenticated_material: adapted_as_first_message_bind_connection
+        session_token_direct_compatibility: rejected
+        current_socket_disconnect_on_logout: deferred
+        durable_session_store: deferred
+      pitaya:
+        session_bind_vocabulary: adapted_without_api_compatibility
+        acceptor_owns_transport_only: adopted
+        handler_context_identity_handoff: adapted
+        frontend_backend_cluster_model: deferred
+    deferrals:
+      - session_persistence_schema
+      - route_policy_bound_identity
+      - websocket_handshake_authentication
+      - connection_binding_registry
+      - repository_changes
+      - migrations
+      - dependencies
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - direct_nakama_pitaya_api_compatibility
+      - presence_rooms_parties_match_runtime
+    rule: The implementation adapts Nakama's authenticated realtime socket lifecycle and Pitaya's session binding vocabulary into a vibit-native Protobuf system route. It does not move credentials into the WebSocket handshake, change the existing envelope, make bound identity satisfy ordinary route policy, create durable session state, or copy Nakama/Pitaya APIs.
+  phase_2at_next_direction_confirmation_after_first_message_connection_binding_implementation:
+    status: completed
+    milestone: M-057
+    completed_work_item: W-0129
+    previous_milestone: M-056
+    previous_completed_work_item: W-0128
+    selected_direction: define_postgres_session_persistence_schema_gate
+    next_milestone: M-058
+    next_ready_work_item_created: W-0130
+    candidate_directions:
+      - define_postgres_session_persistence_schema_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After BindConnection implementation, the maintainer selected the PostgreSQL session persistence schema gate. Nakama and Pitaya suggest important next capability families, especially durable sessions, connection lifecycle, reconnect, route context, and realtime groups, but each remains behind a vibit-native bounded gate.
+  phase_2au_postgres_session_persistence_schema_gate:
+    status: completed
+    milestone: M-058
+    completed_work_item: W-0130
+    decision: ADR-0059
+    standard: docs/postgres-session-persistence-schema-gate.md
+    standard_translation: docs/postgres-session-persistence-schema-gate.zh-CN.md
+    check_rule: runtime.postgres_session_persistence_schema_gate
+    future_session_logical_table: runtime_sessions
+    future_migration_source_candidate: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_are_first_class_lifecycle_records
+          - session_expiration_and_revocation_are_distinct_from_login
+          - realtime_socket_identity_depends_on_authenticated_session_material
+        adapted:
+          - first_session_store_is_vibit_postgresql_runtime_sessions
+          - opaque_access_token_remains_separate_from_session_id
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - reconnect_restore_socket_state
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_like_context_is_separate_from_acceptor
+          - user_identity_can_be_bound_to_session_context
+        adapted:
+          - durable_runtime_session_schema_is_vibit_owned
+          - handler_context_handoff_remains_application_owned
+        deferred:
+          - durable_connection_registry
+          - group_broadcast_session_membership
+          - frontend_backend_cluster_session_routing
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - sql_migration_source
+      - runtime_sessions_table_creation
+      - runtime_session_connections_table
+      - session_repository_interfaces
+      - postgresql_adapters
+      - runtime_session_creation_validation_revocation_cleanup
+      - websocket_handshake_authentication
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The gate adapts Nakama's first-class session lifecycle and Pitaya's session-context separation into a vibit-owned PostgreSQL session schema boundary. It does not add migration source, runtime behavior, connection registries, route-policy changes, or direct external API compatibility.
+  phase_2av_next_direction_confirmation_after_postgres_session_persistence_schema_gate:
+    status: completed
+    milestone: M-059
+    completed_work_item: W-0131
+    previous_milestone: M-058
+    previous_completed_work_item: W-0130
+    selected_direction: implement_runtime_sessions_migration_source
+    next_milestone: M-060
+    next_completed_work_item: W-0132
+    candidate_directions:
+      - implement_runtime_sessions_migration_source
+      - define_session_repository_boundary
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the PostgreSQL session persistence schema gate, the maintainer selected the runtime_sessions migration-source-only slice. Repository boundary, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, and broader game backend modules remain separate vibit-native gates.
+  phase_2aw_runtime_sessions_migration_source:
+    status: completed
+    milestone: M-060
+    completed_work_item: W-0132
+    decision: ADR-0060
+    change: changes/2026-05-17-implement-runtime-sessions-migration-source
+    check_rule: runtime.runtime_sessions_migration_source
+    migration_source: runtime/migrations/postgres/000005_create_runtime_sessions.sql
+    session_logical_table: runtime_sessions
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_are_first_class_lifecycle_records
+          - session_expiration_and_revocation_are_distinct_from_login
+          - authenticated_session_lifecycle_is_queryable
+        adapted:
+          - session_record_is_vibit_postgresql_runtime_sessions
+          - opaque_access_token_record_linkage_is_optional
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - reconnect_restore_socket_state
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_like_context_is_separate_from_acceptor
+          - user_identity_can_be_bound_to_session_context
+        adapted:
+          - durable_session_lifecycle_is_not_transport_owned
+          - handler_context_handoff_remains_application_owned
+        deferred:
+          - durable_connection_registry
+          - group_broadcast_session_membership
+          - frontend_backend_cluster_session_routing
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - session_repository_interfaces
+      - postgresql_adapters
+      - runtime_session_creation_validation_revocation_cleanup
+      - runtime_session_connections_table
+      - websocket_handshake_authentication
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The runtime_sessions migration source adapts Nakama's first-class session lifecycle and Pitaya's session-context separation into a vibit-owned PostgreSQL table. It does not add runtime behavior, repositories, adapters, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2ax_next_direction_confirmation_after_runtime_sessions_migration_source:
+    status: completed
+    milestone: M-061
+    completed_work_item: W-0133
+    previous_milestone: M-060
+    previous_completed_work_item: W-0132
+    selected_direction: define_session_repository_boundary
+    next_milestone: M-062
+    next_completed_work_item: W-0134
+    candidate_directions:
+      - define_session_repository_boundary
+      - define_session_postgresql_adapter_gate
+      - define_runtime_session_validation_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the runtime_sessions migration source, the maintainer selected the session repository boundary. Repository implementation, PostgreSQL adapters, runtime validation, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2ay_session_repository_boundary:
+    status: completed
+    milestone: M-062
+    completed_work_item: W-0134
+    decision: ADR-0061
+    change: changes/2026-05-17-define-session-repository-boundary
+    check_rule: runtime.session_repository_boundary
+    standard: docs/session-repository-boundary.md
+    session_logical_table: runtime_sessions
+    future_repository_owner_candidate: runtime/internal/app/session
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_are_first_class_lifecycle_records
+          - session_expiration_revocation_and_logout_need_repository_ready_boundaries
+          - active_session_lookup_is_needed_before_richer_realtime_features
+        adapted:
+          - repository_is_vibit_storage_neutral_application_boundary
+          - access_token_record_linkage_is_optional_and_not_public_session_api
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - single_socket_or_single_session_policy
+          - admin_session_management_api
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_context_is_separate_from_acceptor
+          - handlers_should_receive_application_context_not_transport_storage
+          - routing_and_session_context_need_clean_boundaries
+        adapted:
+          - durable_session_repository_is_not_transport_owned
+          - handler_context_handoff_remains_request_identity_owned
+        deferred:
+          - frontend_backend_cluster_session_routing
+          - durable_connection_registry
+          - group_or_room_session_membership
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - go_session_repository_interfaces
+      - postgresql_adapters
+      - runtime_session_creation_validation_revocation_cleanup
+      - runtime_session_connections_table
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The session repository boundary adapts Nakama's first-class session lifecycle pressure and Pitaya's session-context separation into a future vibit-owned storage-neutral application repository boundary. It does not add repository code, adapter behavior, runtime behavior, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2az_next_direction_confirmation_after_session_repository_boundary:
+    status: completed
+    milestone: M-063
+    completed_work_item: W-0135
+    previous_milestone: M-062
+    previous_completed_work_item: W-0134
+    selected_direction: implement_session_repository_interface
+    next_milestone: M-064
+    next_completed_work_item: W-0136
+    candidate_directions:
+      - define_session_postgresql_adapter_gate
+      - implement_session_repository_interface
+      - define_runtime_session_validation_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the session repository boundary, the maintainer selected storage-neutral session repository interface implementation. PostgreSQL adapters, runtime validation, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2ba_session_repository_interface_implementation:
+    status: completed
+    milestone: M-064
+    completed_work_item: W-0136
+    decision: ADR-0062
+    change: changes/2026-05-17-implement-session-repository-interface
+    check_rule: runtime.session_repository_interface_implementation
+    repository_owner: runtime/internal/app/session
+    repository_interface: runtime/internal/app/session.Repository
+    repository_source: runtime/internal/app/session/repository.go
+    repository_tests: runtime/internal/app/session/repository_test.go
+    session_logical_table: runtime_sessions
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_are_first_class_lifecycle_records
+          - session_lookup_expiration_revocation_logout_and_management_need_repository_shapes
+          - active_session_listing_is_needed_before_richer_social_realtime_features
+        adapted:
+          - repository_interface_is_vibit_storage_neutral_application_boundary
+          - access_token_record_linkage_is_optional_and_not_public_session_api
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - single_socket_or_single_session_policy
+          - admin_session_management_api
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_context_is_separate_from_acceptor
+          - handlers_should_receive_application_context_not_transport_storage
+          - routing_and_session_context_need_clean_boundaries
+        adapted:
+          - durable_session_repository_is_not_transport_owned
+          - handler_context_handoff_remains_request_identity_owned
+        deferred:
+          - frontend_backend_cluster_session_routing
+          - durable_connection_registry
+          - group_or_room_session_membership
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - postgresql_adapters
+      - unit_of_work_factory_wiring
+      - runtime_session_creation_validation_revocation_cleanup
+      - runtime_session_connections_table
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - existing_envelope_changes
+      - generated_output
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The session repository interface implementation adapts Nakama's first-class lifecycle pressure and Pitaya's session-context separation into a storage-neutral vibit application interface. It does not add adapter behavior, SQL execution, runtime behavior, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bb_next_direction_confirmation_after_session_repository_interface:
+    status: completed
+    milestone: M-065
+    completed_work_item: W-0137
+    previous_milestone: M-064
+    previous_completed_work_item: W-0136
+    selected_direction: define_session_postgresql_adapter_gate
+    next_milestone: M-066
+    next_completed_work_item: W-0138
+    candidate_directions:
+      - define_session_postgresql_adapter_gate
+      - implement_session_postgresql_adapter
+      - define_runtime_session_validation_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the storage-neutral session repository interface, the maintainer selected the session PostgreSQL adapter gate. Adapter implementation, runtime validation, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bc_session_postgresql_adapter_gate:
+    status: completed
+    milestone: M-066
+    completed_work_item: W-0138
+    decision: ADR-0063
+    change: changes/2026-05-17-define-session-postgresql-adapter-gate
+    check_rule: runtime.session_postgresql_adapter_gate
+    standard: docs/session-postgresql-adapter-gate.md
+    translation: docs/session-postgresql-adapter-gate.zh-CN.md
+    repository_owner: runtime/internal/app/session
+    repository_interface: runtime/internal/app/session.Repository
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    session_logical_table: runtime_sessions
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_are_first_class_durable_lifecycle_records
+          - session_lookup_expiration_revocation_logout_and_listing_need_adapter_ready_storage
+          - operational_session_management_pressure_should_shape_repository_queries
+        adapted:
+          - adapter_is_vibit_postgresql_persistence_boundary
+          - opaque_access_token_and_session_id_remain_separate
+          - token_record_linkage_is_private_metadata
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - admin_session_management_api
+          - single_socket_or_single_session_policy
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_context_is_separate_from_acceptor
+          - handlers_should_receive_application_context_not_transport_storage
+          - transport_and_routing_must_not_own_durable_session_persistence
+        adapted:
+          - postgresql_session_adapter_is_platform_persistence_only
+          - request_identity_handoff_remains_application_owned
+        deferred:
+          - frontend_backend_cluster_session_routing
+          - durable_connection_registry
+          - group_or_room_session_membership
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - postgresql_adapter_implementation
+      - unit_of_work_factory_wiring
+      - runtime_session_creation_validation_revocation_cleanup
+      - runtime_session_connections_table
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - existing_envelope_changes
+      - generated_output
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The session PostgreSQL adapter gate adapts Nakama's durable session lifecycle pressure and Pitaya's session-context separation into a future persistence-only adapter boundary. It does not add adapter implementation, SQL execution, runtime behavior, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bd_next_direction_confirmation_after_session_postgresql_adapter_gate:
+    status: completed
+    milestone: M-067
+    completed_work_item: W-0139
+    previous_milestone: M-066
+    previous_completed_work_item: W-0138
+    selected_direction: implement_session_postgresql_adapter
+    next_milestone: M-068
+    next_completed_work_item: W-0140
+    candidate_directions:
+      - implement_session_postgresql_adapter
+      - define_runtime_session_validation_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the session PostgreSQL adapter gate, the maintainer selected the bounded PostgreSQL adapter implementation. Runtime validation, session creation composition, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2be_session_postgresql_adapter_implementation:
+    status: completed
+    milestone: M-068
+    completed_work_item: W-0140
+    decision: ADR-0064
+    change: changes/2026-05-17-implement-session-postgresql-adapter
+    check_rule: runtime.session_postgresql_adapter_implementation
+    repository_owner: runtime/internal/app/session
+    repository_interface: runtime/internal/app/session.Repository
+    postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    adapter_source: runtime/internal/platform/persistence/postgres/session_repository.go
+    adapter_tests: runtime/internal/platform/persistence/postgres/session_repository_test.go
+    unit_of_work_factory: NewSessionRepository
+    session_logical_table: runtime_sessions
+    reference_alignment:
+      nakama:
+        adopted:
+          - durable_session_lifecycle_records_need_repository_adapter
+          - lookup_expiration_revocation_logout_support_and_listing_are_core_session_pressure
+          - operational_listing_pressure_should_be_bounded_and_explicit
+        adapted:
+          - runtime_sessions_is_vibit_postgresql_table
+          - access_token_record_id_is_private_linkage_not_public_session_api
+          - adapter_errors_are_redacted_vibit_error_classes
+        deferred:
+          - login_session_creation
+          - runtime_session_validation
+          - logout_disconnect_active_socket
+          - admin_session_management_api
+          - single_socket_or_single_session_policy
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - acceptor_does_not_own_durable_session_persistence
+          - handler_context_handoff_stays_application_owned
+          - session_persistence_is_separate_from_routing
+        adapted:
+          - postgresql_adapter_is_platform_persistence_and_transaction_bound
+          - future_session_context_validation_stays_outside_adapter
+        deferred:
+          - frontend_backend_cluster_session_routing
+          - durable_connection_registry
+          - group_or_room_session_membership
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - runtime_session_creation_at_login_or_bind_connection
+      - runtime_session_validation
+      - request_identity_session_validated_true
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - existing_envelope_changes
+      - generated_output
+      - route_policy_session_or_bound_identity
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - cleanup_jobs
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The session PostgreSQL adapter implementation adapts Nakama's durable session lifecycle pressure and Pitaya's separation between acceptors, session context, and routing into a persistence-only vibit adapter. It does not add runtime validation, session creation composition, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bf_next_direction_confirmation_after_session_postgresql_adapter_implementation:
+    status: completed
+    milestone: M-069
+    completed_work_item: W-0141
+    previous_milestone: M-068
+    previous_completed_work_item: W-0140
+    selected_direction: define_runtime_session_validation_gate
+    next_milestone: M-070
+    next_completed_work_item: W-0142
+    candidate_directions:
+      - define_runtime_session_validation_gate
+      - define_session_creation_composition_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_bound_identity_route_policy_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the session PostgreSQL adapter implementation, the maintainer selected the bounded runtime session validation gate. Runtime validation implementation, session creation composition, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bg_runtime_session_validation_gate:
+    status: completed
+    milestone: M-070
+    completed_work_item: W-0142
+    decision: ADR-0065
+    change: changes/2026-05-17-define-runtime-session-validation-gate
+    check_rule: runtime.runtime_session_validation_gate
+    future_validation_owner: runtime/internal/app
+    session_repository_owner: runtime/internal/app/session
+    postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    reference_alignment:
+      nakama:
+        adopted:
+          - sessions_have_lifetime_and_invalid_state
+          - logout_and_revocation_affect_session_validity
+          - realtime_socket_lifecycle_is_related_but_not_identical_to_session_validity
+        adapted:
+          - vibit_uses_opaque_access_token_proof_plus_durable_runtime_session_records
+          - public_invalid_session_failures_are_collapsed
+          - session_validation_is_application_owned
+        deferred:
+          - refresh_token_session_extension
+          - logout_disconnect_active_socket
+          - admin_session_management_api
+          - single_socket_or_single_session_policy
+        rejected_for_now:
+          - direct_nakama_session_api_compatibility
+      pitaya:
+        adopted:
+          - session_context_is_available_to_handlers_through_context
+          - acceptor_transport_and_handler_logic_are_separate
+          - session_lifecycle_callbacks_are_distinct_from_request_handler_logic
+        adapted:
+          - durable_session_validation_builds_application_request_identity
+          - transport_acceptor_remains_credential_neutral
+          - route_handlers_receive_normalized_identity_not_storage_rows
+        deferred:
+          - unique_session_enforcement
+          - frontend_backend_cluster_session_routing
+          - durable_connection_registry
+          - group_or_room_session_membership
+        rejected_for_now:
+          - direct_pitaya_session_api_compatibility
+    deferrals:
+      - runtime_session_validation_implementation
+      - request_identity_session_validated_true
+      - session_creation_composition
+      - route_policy_session_or_bound_identity
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - existing_envelope_changes
+      - generated_output
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - cleanup_jobs
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The runtime session validation gate adapts Nakama's session lifecycle pressure and Pitaya's acceptor/session/handler separation into a future application-owned validation boundary. It does not add validation implementation, session creation, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bh_next_direction_confirmation_after_runtime_session_validation_gate:
+    status: completed
+    milestone: M-071
+    completed_work_item: W-0143
+    previous_milestone: M-070
+    previous_completed_work_item: W-0142
+    selected_direction: implement_runtime_session_validation
+    next_completed_work_item: W-0144
+    candidate_directions:
+      - implement_runtime_session_validation
+      - define_session_creation_composition_gate
+      - define_bound_identity_route_policy_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the runtime session validation gate, the maintainer selected the bounded runtime session validation implementation. Session creation composition, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bi_runtime_session_validation_implementation:
+    status: completed
+    milestone: M-072
+    completed_work_item: W-0144
+    decision: ADR-0066
+    check_rule: runtime.runtime_session_validation_implementation
+    change: changes/2026-05-17-implement-runtime-session-validation
+    artifacts:
+      - runtime/internal/app/runtime_session_validator.go
+      - runtime/internal/app/runtime_session_validator_test.go
+    nakama_alignment:
+      adapted:
+        - active_session_validation_before_authenticated_identity_handoff
+        - session_expiration_and_invalid_state_are_first_class
+        - logout_refresh_and_socket_disconnect_remain_separate_future_boundaries
+      deferred:
+        - refresh_token_behavior
+        - logout_endpoint_behavior
+        - session_disconnect_behavior
+      rejected_for_now:
+        - direct_nakama_session_api_compatibility
+    pitaya_alignment:
+      adapted:
+        - durable_session_validation_is_outside_transport_acceptor
+        - handler_facing_identity_is_application_context_not_storage_row
+        - backend_session_state_mutation_needs_explicit_composition
+      deferred:
+        - frontend_backend_cluster_session_routing
+        - explicit_session_push_or_sync
+        - distributed_routing_function_integration
+      rejected_for_now:
+        - direct_pitaya_session_api_compatibility
+    deferrals:
+      - session_creation_composition
+      - route_policy_session_or_bound_identity
+      - websocket_handshake_authentication
+      - transport_credential_carriers
+      - protobuf_session_messages
+      - existing_envelope_changes
+      - generated_output
+      - logout_revocation_active_connection
+      - reconnect_epoch_behavior
+      - cleanup_jobs
+      - dependencies
+      - memory_durable_session_behavior
+      - direct_nakama_pitaya_api_compatibility
+    rule: The runtime session validation implementation adapts Nakama's session lifecycle pressure and Pitaya's acceptor/session/handler separation into a narrow application-owned validator. It does not add session creation, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bj_next_direction_confirmation_after_runtime_session_validation_implementation:
+    status: completed
+    milestone: M-073
+    completed_work_item: W-0145
+    previous_milestone: M-072
+    previous_completed_work_item: W-0144
+    selected_direction: define_session_creation_composition_gate
+    next_milestone: M-074
+    next_completed_work_item: W-0146
+    candidate_directions:
+      - define_session_creation_composition_gate
+      - define_bound_identity_route_policy_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After runtime session validation implementation, the maintainer selected a gate-only session creation composition slice. Session creation implementation, logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bk_session_creation_composition_gate:
+    status: completed
+    milestone: M-074
+    completed_work_item: W-0146
+    decision: ADR-0067
+    standard: docs/session-creation-composition-gate.md
+    check_rule: runtime.session_creation_composition_gate
+    nakama_alignment:
+      adopted:
+        - login_creates_session_lifecycle_pressure
+        - sessions_have_expiration_logout_refresh_and_management_implications
+        - token_or_session_response_material_is_client_visible_only_after_success
+      adapted:
+        - vibit_keeps_opaque_access_token_proof_and_runtime_session_records_separate
+        - runtime_session_creation_is_application_unit_of_work_composition
+        - access_token_record_linkage_is_private_server_metadata
+      deferred:
+        - refresh_token_session_extension
+        - logout_disconnect_active_socket
+        - session_management_api
+        - single_session_or_single_socket_policy
+    pitaya_alignment:
+      adopted:
+        - acceptor_transport_and_handler_logic_are_separate
+        - session_context_can_be_handler_facing_without_transport_owning_persistence
+        - backend_session_state_changes_need_explicit_composition
+      adapted:
+        - durable_session_creation_belongs_to_application_composition
+        - websocket_transport_remains_credential_neutral
+        - route_handlers_receive_normalized_identity_not_storage_rows
+      deferred:
+        - unique_session_enforcement
+        - frontend_backend_cluster_session_routing
+        - durable_connection_registry
+    rule: The session creation composition gate adapts Nakama's login/session lifecycle pressure and Pitaya's acceptor/session/handler separation into a future application-owned unit-of-work composition boundary. It does not add session creation implementation, protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bl_next_direction_confirmation_after_session_creation_composition_gate:
+    status: completed
+    milestone: M-075
+    completed_work_item: W-0147
+    selected_direction: implement_session_creation_composition
+    next_milestone: M-076
+    next_completed_work_item: W-0148
+    previous_milestone: M-074
+    previous_completed_work_item: W-0146
+    candidate_directions:
+      - implement_session_creation_composition
+      - define_bound_identity_route_policy_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the session creation composition gate, the maintainer selected session creation composition implementation. Logout/revocation connection behavior, reconnect/epoch behavior, route-policy use of session or bound identity, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bm_session_creation_composition_implementation:
+    status: completed
+    milestone: M-076
+    completed_work_item: W-0148
+    decision: ADR-0068
+    change: changes/2026-05-18-implement-session-creation-composition
+    check_rule: runtime.session_creation_composition_implementation
+    nakama_alignment:
+      adopted:
+        - login_creates_session_lifecycle_pressure
+        - token_or_session_response_material_is_client_visible_only_after_success
+      adapted:
+        - runtime_session_creation_is_application_unit_of_work_composition
+        - access_token_record_linkage_is_private_server_metadata
+        - first_runtime_session_lifetime_aligns_to_access_token_lifetime
+      deferred:
+        - refresh_token_session_extension
+        - logout_disconnect_active_socket
+        - session_management_api
+        - single_session_or_single_socket_policy
+    pitaya_alignment:
+      adopted:
+        - acceptor_transport_and_handler_logic_are_separate
+        - backend_session_state_changes_need_explicit_composition
+      adapted:
+        - durable_session_creation_belongs_to_application_composition
+        - websocket_transport_remains_credential_neutral
+        - protocol_adapter_does_not_own_session_creation
+      deferred:
+        - unique_session_enforcement
+        - frontend_backend_cluster_session_routing
+        - durable_connection_registry
+    rule: The session creation composition implementation adapts Nakama's login/session lifecycle pressure and Pitaya's acceptor/session/handler separation into application-owned login-time session creation. It does not add protocol changes, transport credential carriers, connection registries, route-policy changes, logout disconnect behavior, reconnect behavior, or direct external API compatibility.
+  phase_2bn_next_direction_confirmation_after_session_creation_composition_implementation:
+    status: completed
+    milestone: M-077
+    completed_work_item: W-0149
+    previous_milestone: M-076
+    previous_completed_work_item: W-0148
+    selected_direction: define_bound_identity_route_policy_gate
+    next_milestone: M-078
+    next_completed_work_item: W-0150
+    candidate_directions:
+      - define_bound_identity_route_policy_gate
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After session creation composition implementation, the maintainer selected the bound identity route policy gate. Route-policy implementation, logout/revocation connection behavior, reconnect/epoch behavior, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bo_bound_identity_route_policy_gate:
+    status: completed
+    milestone: M-078
+    completed_work_item: W-0150
+    decision: ADR-0069
+    change: changes/2026-05-18-define-bound-identity-route-policy-gate
+    check_rule: runtime.bound_identity_route_policy_gate
+    nakama_alignment:
+      adopted:
+        - authenticated_session_material_controls_gameplay_access
+        - session_lifetime_and_route_authorization_are_related
+        - logout_refresh_and_session_management_have_future_policy_pressure
+      adapted:
+        - request_token_bound_connection_and_durable_session_identity_are_explicit_policy_families
+        - route_scoped_policy_required_before_trusting_bound_or_session_identity
+        - no_direct_nakama_session_api_or_jwt_shape
+      deferred:
+        - refresh_token_flow
+        - session_management_api
+        - logout_disconnect_active_socket
+        - single_session_or_single_socket_policy
+    pitaya_alignment:
+      adopted:
+        - acceptor_transport_and_handler_logic_are_separate
+        - sessions_can_bind_user_identity_to_connection_context
+        - handlers_should_receive_context_not_parse_credentials
+      adapted:
+        - route_policy_is_application_owned_and_contract_first
+        - bound_identity_is_not_implicitly_all_routes_authenticated
+        - cluster_session_routing_remains_deferred
+      deferred:
+        - frontend_backend_cluster_session_routing
+        - remote_session_binding_broadcast
+        - groups_rooms_and_presence_attachment
+        - server_to_server_rpc
+    rule: The bound identity route policy gate adapts Nakama's session-backed gameplay access pressure and Pitaya's acceptor/session/handler separation into explicit application-owned route policy families. It does not change production route behavior, protocol, transport, logout, reconnect, operations, memory durable session behavior, or direct external API compatibility.
+  phase_2bp_next_direction_confirmation_after_bound_identity_route_policy_gate:
+    status: completed
+    milestone: M-079
+    completed_work_item: W-0151
+    previous_milestone: M-078
+    previous_completed_work_item: W-0150
+    selected_direction: implement_bound_identity_route_policy
+    next_milestone: M-080
+    next_completed_work_item: W-0152
+    candidate_directions:
+      - implement_bound_identity_route_policy
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After the bound identity route policy gate, the maintainer selected a conservative route policy implementation slice. Logout/revocation connection behavior, reconnect/epoch behavior, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bq_bound_identity_route_policy_implementation:
+    status: completed
+    milestone: M-080
+    completed_work_item: W-0152
+    decision: ADR-0070
+    change: changes/2026-05-18-implement-bound-identity-route-policy
+    check_rule: runtime.bound_identity_route_policy_implementation
+    nakama_alignment:
+      adopted:
+        - authenticated_session_material_can_gate_gameplay_access_when_policy_explicit
+        - session_lifetime_logout_refresh_and_management_remain_separate_lifecycle_concerns
+        - protected_gameplay_routes_must_not_accept_metadata_only_identity
+      adapted:
+        - ordinary_domain_routes_keep_per_request_opaque_access_token_proof_by_default
+        - bound_or_session_identity_requires_explicit_route_classification
+        - no_direct_nakama_session_api_or_token_shape
+      deferred:
+        - refresh_token_flow
+        - logout_disconnect_active_socket
+        - session_management_api
+        - protocol_session_carriers
+    pitaya_alignment:
+      adopted:
+        - acceptor_transport_session_context_and_handler_layers_remain_separate
+        - bound_connection_identity_can_be_context_for_named_routes
+        - handlers_receive_normalized_identity_context
+      adapted:
+        - route_policy_is_application_owned_not_transport_owned
+        - bound_identity_is_route_scoped_not_global_frontend_default
+        - cluster_session_routing_remains_deferred
+      deferred:
+        - frontend_backend_cluster_session_routing
+        - remote_session_binding_broadcast
+        - groups_rooms_and_presence_attachment
+        - server_to_server_rpc
+    rule: The bound identity route policy implementation adapts Nakama's session-backed access model and Pitaya's session/handler separation into explicit vibit route policy families. It keeps ordinary protected routes on request-token proof and does not add protocol carriers, transport credential parsing, logout/revocation behavior, reconnect behavior, or direct external API compatibility.
+  phase_2br_next_direction_confirmation_after_bound_identity_route_policy_implementation:
+    status: completed
+    milestone: M-081
+    completed_work_item: W-0153
+    previous_milestone: M-080
+    previous_completed_work_item: W-0152
+    selected_direction: define_logout_revocation_active_connection_gate
+    next_milestone: M-082
+    next_completed_work_item: W-0154
+    candidate_directions:
+      - define_logout_revocation_active_connection_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After implementing bound identity route policy, the maintainer selected a gate-only logout/revocation active-connection boundary. Logout execution, active connection registries, reconnect/epoch behavior, protocol logout routes, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bs_logout_revocation_active_connection_gate:
+    status: completed
+    milestone: M-082
+    completed_work_item: W-0154
+    decision: ADR-0071
+    change: changes/2026-05-18-define-logout-revocation-active-connection-gate
+    check_rule: runtime.logout_revocation_active_connection_gate
+    nakama_alignment:
+      adopted:
+        - authenticated_session_material_has_logout_revocation_and_expiration_lifecycle_pressure
+        - revoked_or_expired_credentials_must_not_authorize_gameplay_requests
+        - realtime_socket_behavior_must_be_considered_when_session_lifecycle_changes
+      adapted:
+        - presented_token_logout_runtime_session_revocation_and_active_socket_invalidation_are_separate_policy_decisions
+        - connection_registry_policy_required_before_targeting_open_sockets
+        - no_direct_nakama_session_api_jwt_shape_or_realtime_socket_contract
+      deferred:
+        - refresh_token_flow
+        - logout_all_sessions
+        - session_management_api
+        - admin_session_revocation_surface
+        - dashboard_session_operations
+    pitaya_alignment:
+      adopted:
+        - acceptors_sessions_and_handlers_are_separate_lifecycle_surfaces
+        - session_binding_can_support_targeted_connection_management
+        - handler_logic_should_receive_context_not_parse_transport_credentials
+      adapted:
+        - future_connection_registry_is_application_runtime_owned_with_narrow_transport_close_handoff
+        - socket_close_policy_stays_out_of_authentication_repositories
+        - cluster_session_routing_remains_deferred
+      deferred:
+        - frontend_backend_cluster_session_invalidation
+        - distributed_kick_or_disconnect_routing
+        - groups_broadcast_integration
+        - server_to_server_rpc_invalidation
+    rule: The logout/revocation active-connection gate adapts Nakama's session lifecycle pressure and Pitaya's acceptor/session/handler separation into explicit vibit policy questions. It does not add logout execution, token/session revocation execution, active socket invalidation, connection registries, WebSocket close policy, protocol carriers, reconnect behavior, or direct external API compatibility.
+  phase_2bt_next_direction_confirmation_after_logout_revocation_active_connection_gate:
+    status: completed
+    milestone: M-083
+    completed_work_item: W-0155
+    previous_milestone: M-082
+    previous_completed_work_item: W-0154
+    selected_direction: define_logout_access_token_behavior_gate
+    next_milestone: M-084
+    next_completed_work_item: W-0156
+    candidate_directions:
+      - define_logout_access_token_behavior_gate
+      - define_active_connection_registry_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_logout_route_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After defining the logout/revocation active-connection gate, the maintainer selected a gate-only logout access-token behavior boundary. Logout implementation, active connection registry behavior, reconnect/epoch behavior, protocol logout routes, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bu_logout_access_token_behavior_gate:
+    status: completed
+    milestone: M-084
+    completed_work_item: W-0156
+    decision: ADR-0072
+    change: changes/2026-05-18-define-logout-access-token-behavior-gate
+    check_rule: runtime.logout_access_token_behavior_gate
+    nakama_alignment:
+      adopted:
+        - session_material_has_lifecycle_state
+        - revoked_material_must_not_authorize_future_gameplay_requests
+        - logout_must_have_clear_public_failure_semantics
+      adapted:
+        - presented_token_logout_uses_vibit_opaque_access_token_record_model
+        - verifier_comparison_required_before_revocation
+        - success_requires_unit_of_work_commit
+      deferred:
+        - refresh_token_flow
+        - logout_all_sessions
+        - session_management_api
+        - admin_session_revocation_surface
+        - realtime_socket_invalidation
+    pitaya_alignment:
+      adopted:
+        - session_connection_infrastructure_stays_separate_from_handler_logic
+        - handlers_should_not_parse_credentials
+        - connection_lifecycle_side_effects_require_explicit_infrastructure
+      adapted:
+        - logout_behavior_is_application_service_owned
+        - future_connection_coordination_requires_narrow_interfaces
+        - protocol_and_transport_do_not_own_token_revocation_policy
+      deferred:
+        - frontend_backend_cluster_session_invalidation
+        - distributed_kick_or_disconnect_routing
+        - server_to_server_rpc_invalidation
+    rule: The logout access-token behavior gate adapts Nakama's session lifecycle pressure and Pitaya's connection/session/handler separation into a presented-token-only logout behavior boundary. It does not add logout implementation, token revocation execution, runtime session revocation, active socket invalidation, connection registries, WebSocket close policy, protocol routes, reconnect behavior, refresh, logout-all, admin revocation, or direct external API compatibility.
+  phase_2bv_next_direction_confirmation_after_logout_access_token_behavior_gate:
+    status: completed
+    milestone: M-085
+    completed_work_item: W-0157
+    previous_milestone: M-084
+    previous_completed_work_item: W-0156
+    selected_direction: implement_logout_access_token_behavior
+    next_milestone: M-086
+    next_completed_work_item: W-0158
+    candidate_directions:
+      - implement_logout_access_token_behavior
+      - define_active_connection_registry_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_logout_route_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After defining the logout access-token behavior gate, the maintainer selected the bounded `implement_logout_access_token_behavior` direction. Runtime session revocation, active connection registry behavior, reconnect/epoch behavior, protocol logout routes, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2bw_logout_access_token_behavior_implementation:
+    status: completed
+    milestone: M-086
+    completed_work_item: W-0158
+    decision: ADR-0073
+    change: changes/2026-05-18-implement-logout-access-token-behavior
+    check_rule: runtime.logout_access_token_behavior_implementation
+    nakama_alignment:
+      adopted:
+        - revoked_material_must_not_authorize_future_gameplay_requests_when_validation_runs
+        - logout_is_part_of_authenticated_material_lifecycle
+      adapted:
+        - presented_token_logout_uses_vibit_opaque_access_token_record_model
+        - verifier_comparison_required_before_revocation
+        - success_requires_unit_of_work_commit
+      deferred:
+        - refresh_token_flow
+        - logout_all_sessions
+        - session_management_api
+        - admin_session_revocation_surface
+        - realtime_socket_invalidation
+    pitaya_alignment:
+      adopted:
+        - session_connection_infrastructure_stays_separate_from_handler_logic
+        - handlers_should_not_parse_credentials
+      adapted:
+        - logout_behavior_is_application_service_owned
+        - protocol_and_transport_do_not_own_token_revocation_policy
+      deferred:
+        - frontend_backend_cluster_session_invalidation
+        - distributed_kick_or_disconnect_routing
+        - server_to_server_rpc_invalidation
+    rule: The logout access-token behavior implementation adapts Nakama's authentication material lifecycle pressure and Pitaya's connection/session/handler separation into a narrow application service behavior. It revokes only the verified presented opaque access-token record and does not add runtime session revocation, active socket invalidation, connection registries, WebSocket close policy, protocol routes, reconnect behavior, refresh, logout-all, admin revocation, or direct external API compatibility.
+  phase_2bx_next_direction_confirmation_after_logout_access_token_behavior_implementation:
+    status: completed
+    milestone: M-087
+    completed_work_item: W-0159
+    previous_milestone: M-086
+    previous_completed_work_item: W-0158
+    selected_direction: define_active_connection_registry_gate
+    next_milestone: M-088
+    next_completed_work_item: W-0160
+    candidate_directions:
+      - define_active_connection_registry_gate
+      - define_protocol_logout_route_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After implementing presented access-token logout behavior, the maintainer selected a gate-only active connection registry boundary. Active connection registry implementation, WebSocket close policy, reconnect/epoch behavior, protocol logout routes, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2by_active_connection_registry_gate:
+    status: completed
+    milestone: M-088
+    completed_work_item: W-0160
+    decision: ADR-0074
+    change: changes/2026-05-18-define-active-connection-registry-gate
+    check_rule: runtime.active_connection_registry_gate
+    nakama_alignment:
+      adopted:
+        - realtime_sockets_and_authenticated_session_material_need_coordinated_lifecycle_semantics
+        - active_socket_targeting_needs_server_owned_state
+      adapted:
+        - active_connection_registry_tracks_server_observed_connections_and_validated_identity_linkage
+        - first_registry_posture_is_single_process_in_memory_non_durable
+        - no_direct_nakama_session_api_or_realtime_socket_contract
+      deferred:
+        - realtime_socket_invalidation
+        - dashboard_session_operations
+        - session_management_api
+        - cluster_session_routing
+    pitaya_alignment:
+      adopted:
+        - acceptors_sessions_handlers_and_connection_management_are_separate
+        - session_context_can_support_targeted_connection_management
+      adapted:
+        - registry_state_is_application_owned
+        - transport_lifecycle_handoff_remains_narrow_and_future
+        - frontend_backend_cluster_routing_remains_deferred
+      deferred:
+        - distributed_kick_or_disconnect_routing
+        - groups_rooms_integration
+        - server_to_server_rpc_invalidation
+    rule: The active connection registry gate adapts Nakama's realtime lifecycle pressure and Pitaya's acceptor/session/handler separation into a vibit-native application-owned registry boundary. It does not add registry implementation, socket close behavior, kick/disconnect behavior, runtime session revocation, reconnect behavior, protocol carriers, durable/distributed storage, dependencies, or direct external API compatibility.
+  phase_2bz_next_direction_confirmation_after_active_connection_registry_gate:
+    status: completed
+    milestone: M-089
+    completed_work_item: W-0161
+    previous_milestone: M-088
+    previous_completed_work_item: W-0160
+    selected_direction: implement_active_connection_registry_single_process
+    next_milestone: M-090
+    next_completed_work_item: W-0162
+    candidate_directions:
+      - implement_active_connection_registry_single_process
+      - define_websocket_close_policy_gate
+      - define_protocol_logout_route_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After defining the active connection registry gate, the maintainer selected the bounded `implement_active_connection_registry_single_process` direction. WebSocket close policy, reconnect/epoch behavior, protocol logout routes, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2ca_active_connection_registry_single_process_implementation:
+    status: completed
+    milestone: M-090
+    completed_work_item: W-0162
+    decision: ADR-0075
+    change: changes/2026-05-18-implement-active-connection-registry-single-process
+    check_rule: runtime.active_connection_registry_single_process_implementation
+    registry_source: runtime/internal/app/connection/registry.go
+    registry_posture: single_process_in_memory_non_durable
+    nakama_alignment:
+      adopted:
+        - realtime_sockets_and_authenticated_session_material_need_coordinated_lifecycle_state
+        - active_socket_targeting_needs_server_owned_runtime_records
+      adapted:
+        - registry_records_track_connection_id_epoch_and_validated_identity_linkage
+        - invalidation_marker_is_separate_from_socket_close_policy
+        - no_direct_nakama_session_api_or_realtime_socket_contract
+      deferred:
+        - realtime_socket_close_or_kick_behavior
+        - dashboard_session_operations
+        - session_management_api
+        - cluster_session_routing
+    pitaya_alignment:
+      adopted:
+        - acceptors_sessions_handlers_and_connection_management_are_separate
+        - session_context_can_support_targeted_connection_management
+      adapted:
+        - registry_state_is_application_owned_and_policy_neutral
+        - transport_lifecycle_handoff_remains_future
+        - frontend_backend_cluster_routing_remains_deferred
+      deferred:
+        - distributed_kick_or_disconnect_routing
+        - groups_rooms_integration
+        - server_to_server_rpc_invalidation
+    rule: The active connection registry implementation adapts Nakama's realtime lifecycle state pressure and Pitaya's acceptor/session/handler separation into a vibit-native local application primitive. It does not close sockets, kick/disconnect users, revoke sessions, add reconnect behavior, add protocol carriers, add durable/distributed storage, add dependencies, or add direct external API compatibility.
+  phase_2cb_next_direction_confirmation_after_active_connection_registry_implementation:
+    status: completed
+    milestone: M-091
+    completed_work_item: W-0163
+    previous_milestone: M-090
+    previous_completed_work_item: W-0162
+    selected_direction: define_websocket_close_policy_gate
+    next_milestone: M-092
+    next_completed_work_item: W-0164
+    candidate_directions:
+      - define_websocket_close_policy_gate
+      - define_protocol_logout_route_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After implementing the active connection registry, the maintainer selected the bounded `define_websocket_close_policy_gate` direction. WebSocket close implementation, protocol logout routes, reconnect/epoch behavior, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2cc_websocket_close_policy_gate:
+    status: completed
+    milestone: M-092
+    completed_work_item: W-0164
+    decision: ADR-0076
+    standard: docs/websocket-close-policy-gate.md
+    check_rule: runtime.websocket_close_policy_gate
+    vibit_position:
+      adopted:
+        - application_owned_websocket_close_policy_before_transport_handoff
+        - registry_invalidation_and_concrete_socket_close_are_separate_actions
+        - internal_close_reason_classes_are_not_player_visible_reason_text
+      adapted:
+        - nakama_session_logout_and_socket_disconnect_distinction
+        - nakama_single_socket_lifecycle_pressure_without_api_compatibility
+        - pitaya_acceptor_session_handler_connection_management_separation
+        - pitaya_session_kick_capability_without_public_api_compatibility
+      deferred:
+        - concrete_socket_close_handoff
+        - close_codes_and_reason_text
+        - logout_triggered_socket_close
+        - runtime_session_revocation_close
+        - reconnect_epoch_behavior
+        - protocol_logout_route
+        - protocol_session_carrier
+        - distributed_kick_disconnect
+        - operations_admin_disconnect
+    nakama_alignment:
+      adopted:
+        - realtime_socket_lifecycle_must_be_explicit
+        - session_logout_and_socket_disconnect_are_distinct_actions
+        - single_socket_style_policy_requires_clear_close_semantics
+      adapted:
+        - close_policy_is_vibit_application_owned
+        - no_direct_nakama_session_api_or_realtime_socket_contract
+      deferred:
+        - direct_session_disconnect_api
+        - dashboard_session_operations
+        - cluster_session_routing
+    pitaya_alignment:
+      adopted:
+        - acceptors_sessions_handlers_and_connection_management_are_separate
+        - sessions_can_support_kick_disconnect_style_capabilities
+      adapted:
+        - close_policy_is_application_owned_before_transport_handoff
+        - frontend_backend_cluster_routing_remains_deferred
+      deferred:
+        - distributed_kick_or_disconnect_routing
+        - groups_rooms_integration
+        - server_to_server_rpc_invalidation
+    rule: The WebSocket close policy gate adapts Nakama's realtime lifecycle pressure and Pitaya's acceptor/session/handler separation into a vibit-native application policy boundary. It does not close sockets, add close codes or reason text, kick/disconnect users, revoke sessions, add reconnect behavior, add protocol carriers, add durable/distributed storage, add dependencies, or add direct external API compatibility.
+  phase_2cd_next_direction_confirmation_after_websocket_close_policy_gate:
+    status: completed
+    milestone: M-093
+    completed_work_item: W-0165
+    previous_milestone: M-092
+    previous_completed_work_item: W-0164
+    selected_direction: implement_websocket_close_policy_single_process
+    next_milestone: M-094
+    next_completed_work_item: W-0166
+    candidate_directions:
+      - implement_websocket_close_policy_single_process
+      - define_protocol_logout_route_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After defining the WebSocket close policy gate, the maintainer selected the bounded `implement_websocket_close_policy_single_process` direction. Concrete transport close handoff, close codes, close reason text, protocol logout routes, reconnect/epoch behavior, protocol session carriers, operations, memory durable session behavior, direct Nakama/Pitaya API compatibility, and broader game backend modules remain separate vibit-native gates.
+  phase_2ce_websocket_close_policy_single_process_implementation:
+    status: completed
+    milestone: M-094
+    completed_work_item: W-0166
+    decision: ADR-0077
+    standard: decisions/ADR-0077-websocket-close-policy-single-process-implementation.md
+    check_rule: runtime.websocket_close_policy_single_process_implementation
+    vibit_position:
+      adopted:
+        - application_owned_close_policy_primitive
+        - registry_backed_target_resolution
+        - redacted_close_intents
+        - mark_invalidated_only_first_transport_action
+      adapted:
+        - nakama_realtime_lifecycle_explicitness_without_api_compatibility
+        - pitaya_connection_management_layering_without_api_compatibility
+      deferred:
+        - concrete_socket_close_handoff
+        - close_codes_and_reason_text
+        - protocol_close_messages
+        - logout_protocol_route
+        - reconnect_epoch_behavior
+        - protocol_session_carrier
+        - distributed_kick_disconnect
+        - operations_admin_disconnect
+    nakama_alignment:
+      adopted:
+        - realtime_socket_lifecycle_and_token_session_lifecycle_need_explicit_server_semantics
+        - server_directed_close_intent_is_distinct_from_token_revocation
+      adapted:
+        - close_policy_invalidates_registry_records_without_copying_nakama_api
+        - logout_does_not_implicitly_close_sockets_in_this_slice
+      deferred:
+        - direct_session_disconnect_api
+        - dashboard_session_operations
+        - cluster_session_routing
+    pitaya_alignment:
+      adopted:
+        - acceptors_sessions_handlers_and_connection_management_are_separate
+        - connection_management_should_not_be_hidden_domain_handler_logic
+      adapted:
+        - close_policy_is_application_owned_before_transport_handoff
+        - frontend_backend_cluster_routing_remains_deferred
+      deferred:
+        - distributed_kick_or_disconnect_routing
+        - groups_rooms_integration
+        - server_to_server_rpc_invalidation
+    rule: The single-process close policy implementation adapts Nakama's lifecycle explicitness and Pitaya's connection-management layering into a vibit-native application primitive. It invalidates local active bound registry records and emits redacted close intents; it does not close sockets, add transport handoff, expose close codes or reason text, add protocol routes, add reconnect behavior, add durable/distributed storage, add dependencies, or add direct external API compatibility.
+  phase_2cf_next_direction_confirmation_after_websocket_close_policy_implementation:
+    status: completed
+    milestone: M-095
+    completed_work_item: W-0167
+    previous_milestone: M-094
+    previous_completed_work_item: W-0166
+    selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
+    next_milestone: M-096
+    next_completed_work_item: W-0168
+    candidate_directions:
+      - define_protocol_logout_route_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_transport_close_handoff_gate
+      - strengthen_operations_observability_and_admin_tooling
+      - expand_core_game_backend_modules_after_nakama_pitaya_review
+    rule: After implementing the single-process WebSocket close policy primitive, the maintainer clarified the Nakama/Pitaya-class product target and selected `expand_core_game_backend_modules_after_nakama_pitaya_review`, scoped first to a checkable product parity roadmap. Protocol logout routes, reconnect/epoch behavior, protocol session carriers, concrete transport close handoff, operations, direct API compatibility, and broader runtime behavior remain separate vibit-native gates.
+  phase_2cg_nakama_pitaya_product_parity_roadmap:
+    status: completed
+    milestone: M-096
+    completed_work_item: W-0168
+    decision: ADR-0078
+    standard: docs/nakama-pitaya-product-parity-roadmap.md
+    translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+    check_rule: runtime.reference_product_parity_roadmap
+    parity_goal: nakama_pitaya_same_class_common_capability_coverage
+    api_compatibility_goal: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    implementation_authorized_by_this_standard: roadmap_only
+    current_near_term_priority: protocol_logout_and_connection_lifecycle
+    recommended_next_direction: define_protocol_logout_route_gate
+    next_milestone: M-097
+    next_ready_work_item: W-0169
+    near_term_lifecycle_sequence:
+      - define_protocol_logout_route_gate
+      - define_transport_close_handoff_gate
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_presence_lifecycle_gate
+      - strengthen_operations_observability_and_admin_tooling
+    rule: Product parity is now a roadmap target for common Nakama/Pitaya capability coverage. Direct API compatibility, runtime behavior, generated output, protocol routes, dependencies, and broad product modules still require separate gates.
+  phase_2ch_protocol_logout_route_gate:
+    status: completed
+    milestone: M-097
+    completed_work_item: W-0169
+    decision: ADR-0079
+    standard: docs/protocol-logout-route-gate.md
+    translation: docs/protocol-logout-route-gate.zh-CN.md
+    check_rule: runtime.protocol_logout_route_gate
+    parity_phase: phase_2r_runtime_lifecycle_closure
+    vibit_position:
+      adopted:
+        - explicit_client_visible_logout_route
+        - service_validated_presented_token_logout
+        - token_logout_separate_from_socket_disconnect
+      adapted:
+        - nakama_session_logout_lifecycle_without_api_compatibility
+        - pitaya_session_connection_layering_without_api_compatibility
+      deferred:
+        - protocol_logout_route_implementation
+        - concrete_socket_close_handoff
+        - runtime_session_revocation
+        - reconnect_epoch_behavior
+        - protocol_session_carrier
+    reference_mapping:
+      nakama:
+        - session_logout_and_realtime_socket_lifecycle_are_separate_but_related
+        - client_visible_logout_must_have_explicit_response_and_error_semantics
+      pitaya:
+        - route_handlers_must_not_own_transport_connection_close_policy
+        - session_connection_management_stays_separate_from_domain_handlers
+    rule: The protocol logout route gate defines future client-facing logout route semantics before implementation, while preserving transport close handoff, reconnect, protocol session carriers, presence, chat, social, matchmaking, match runtime, dependencies, and direct API compatibility deferrals.
+  phase_2ci_protocol_logout_route_implementation:
+    status: completed
+    milestone: M-098
+    completed_work_item: W-0170
+    change: changes/2026-05-18-implement-protocol-logout-route
+    protocol_logout_route_implementation_completed: true
+    protocol_logout_route_implementation_work_item: W-0170
+    check_rule: runtime.protocol_logout_route_implementation
+    vibit_position:
+      adopted:
+        - client_visible_logout_route
+        - service_validated_presented_access_token_logout
+        - explicit_response_for_revoked_or_rejected_logout
+      adapted:
+        - nakama_session_logout_without_nakama_api_compatibility
+        - pitaya_route_handler_layering_without_transport_close_side_effect
+      deferred:
+        - concrete_transport_close_handoff
+        - runtime_session_revocation
+        - active_connection_invalidation_from_logout
+        - reconnect_epoch_behavior
+        - protocol_session_carrier
+        - direct_nakama_pitaya_api_compatibility
+    reference_mapping:
+      nakama:
+        - logout_is_client_visible_lifecycle_behavior
+        - session_token_invalidation_and_realtime_disconnect_remain_distinct
+      pitaya:
+        - handler_routes_remain_separate_from_connection_close_mechanics
+        - session_connection_lifecycle_surfaces_are_not_hidden_in_protocol_mapping
+    next_direction_confirmation_work_item: W-0171
+    recommended_next_direction: define_transport_close_handoff_gate
+    rule: The W-0170 lifecycle-closure implementation exposes the ADR-0079 logout route through Protobuf and application dispatch only. It does not add socket close, session revocation, reconnect, session carriers, dependencies, direct API compatibility, or broad product behavior.
+  phase_2cj_transport_close_handoff_gate:
+    status: completed
+    milestone: M-100
+    completed_work_item: W-0172
+    change: changes/2026-05-18-define-transport-close-handoff-gate
+    decision: ADR-0080
+    standard: docs/transport-close-handoff-gate.md
+    check_rule: runtime.transport_close_handoff_gate
+    vibit_position:
+      adopted:
+        - explicit_server_directed_close_handoff_boundary
+        - server_observed_connection_id_and_epoch_target
+        - transport_policy_neutrality
+      adapted:
+        - nakama_realtime_disconnect_lifecycle_without_api_compatibility
+        - pitaya_connection_management_layering_without_route_api_compatibility
+      deferred:
+        - concrete_socket_close_implementation
+        - close_code_mapping
+        - close_reason_text
+        - logout_triggered_socket_close
+        - runtime_session_revocation
+        - reconnect_epoch_behavior
+        - protocol_session_carrier
+        - operations_admin_disconnect
+        - direct_nakama_pitaya_api_compatibility
+    reference_mapping:
+      nakama:
+        - logout_session_and_realtime_disconnect_are_related_but_distinct_lifecycle_surfaces
+        - server_directed_disconnect_needs_explicit_policy_and_handoff
+      pitaya:
+        - acceptors_sessions_handlers_and_kick_disconnect_mechanics_remain_separate
+        - concrete_transport_close_occurs_after_application_policy_selects_target
+    next_direction_confirmation_work_item: W-0173
+    recommended_next_direction: implement_transport_close_handoff_single_process
+    rule: The W-0172 gate defines the future handoff boundary only. It keeps transport close policy-neutral, targets server-observed connection id and epoch, and preserves implementation and broader product behavior for later gates.
+  phase_2ck_next_direction_confirmation_after_transport_close_handoff_gate:
+    status: completed
+    milestone: M-101
+    completed_work_item: W-0173
+    change: changes/2026-05-18-confirm-next-direction-after-transport-close-handoff-gate
+    selected_direction: implement_transport_close_handoff_single_process
+    next_milestone: M-102
+    next_ready_work_item: W-0174
+    candidate_directions:
+      - implement_transport_close_handoff_single_process
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_presence_lifecycle_gate
+      - strengthen_operations_observability_and_admin_tooling
+    deferred:
+      - close_code_mapping
+      - close_reason_text
+      - logout_triggered_socket_close
+      - runtime_session_revocation
+      - reconnect_epoch_behavior
+      - protocol_session_carrier
+      - presence_lifecycle
+      - operations_admin_disconnect
+      - direct_nakama_pitaya_api_compatibility
+    rule: After defining the transport close handoff gate, the maintainer selected the bounded `implement_transport_close_handoff_single_process` direction before reconnect, protocol session carrier, presence, operations/admin disconnect, direct compatibility, or broad product work.
+  phase_2cl_transport_close_handoff_single_process_implementation:
+    status: active
+    milestone: M-102
+    next_ready_work_item: W-0174
+    gate_decision: ADR-0080
+    target: server_observed_connection_id_and_epoch
+    vibit_position:
+      adopted:
+        - transport_owned_concrete_close_mechanics
+        - application_owned_close_policy
+        - server_observed_connection_epoch_stale_intent_protection
+      deferred:
+        - close_code_mapping
+        - close_reason_text
+        - logout_triggered_socket_close
+        - runtime_session_revocation
+        - reconnect_epoch_behavior
+        - protocol_session_carrier
+        - operations_admin_disconnect
+        - direct_nakama_pitaya_api_compatibility
+    rule: W-0174 may implement only the in-process transport close handoff that follows ADR-0080 target and ownership boundaries.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

@@ -1,0 +1,65 @@
+schema_version: 0.1
+change_id: confirm-next-direction-after-logout-revocation-active-connection-gate
+date: 2026-05-18
+type: standard
+status: verified
+
+summary: Select the next milestone direction after the logout/revocation active-connection gate.
+
+affected_modules:
+  - runtime
+  - authentication
+
+decisions:
+  added:
+    - ADR-0072
+  referenced:
+    - ADR-0019
+    - ADR-0052
+    - ADR-0056
+    - ADR-0066
+    - ADR-0068
+    - ADR-0069
+    - ADR-0070
+    - ADR-0071
+
+selected_direction: define_logout_access_token_behavior_gate
+
+candidate_directions:
+  - define_logout_access_token_behavior_gate
+  - define_active_connection_registry_gate
+  - define_reconnect_connection_epoch_gate
+  - define_protocol_logout_route_gate
+  - define_protocol_session_carrier_gate
+  - strengthen_operations_observability_and_admin_tooling
+  - expand_core_game_backend_modules_after_nakama_pitaya_review
+
+runtime:
+  completed_work_item: W-0155
+  completed_milestone: M-083
+  next_milestone: M-084
+  next_work_item: W-0156
+  logout_access_token_behavior_gate_selected: true
+  active_connection_registry_selected: false
+  reconnect_epoch_selected: false
+  protocol_logout_route_selected: false
+  protocol_session_carrier_selected: false
+  operations_posture_selected: false
+  memory_durable_session_selected: false
+  core_game_backend_modules_selected: false
+  direct_nakama_pitaya_api_compatibility_selected: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node tools/vibit check work --json
+    - node tools/vibit check change confirm-next-direction-after-logout-revocation-active-connection-gate --json
+    - node tools/vibit check all --json
+  status: Verified

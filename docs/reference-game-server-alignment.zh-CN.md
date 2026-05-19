@@ -7,6 +7,8 @@
 
 本文档记录 vibit 应如何使用成熟 game server projects 作为参考。
 
+`ADR-0078` 和 `docs/nakama-pitaya-product-parity-roadmap.md` 已把这个 reference baseline 细化为明确产品目标：vibit 应通过覆盖 common capability families，成为 Nakama/Pitaya-class game backend framework，同时保留 vibit 的 agent-native constraints。本文档仍定义 reference roles；product parity roadmap 定义分阶段执行。
+
 ## 1. 目的
 
 vibit 不只是一个 inventory proof slice。
@@ -33,6 +35,17 @@ vibit 最终应覆盖与 Nakama、Pitaya 等成熟 game backend 和 game server 
 - Agents 在变更前后都能运行的 verification commands。
 
 Nakama 记录了一套 broad game server product surface，包括 user accounts、authentication、storage、friends、groups、chat、leaderboards、tournaments、matchmaking、realtime multiplayer 和 authoritative match runtime concepts。Pitaya 记录了一套围绕 client acceptors、sessions、route handlers、remote calls、groups、serializers 和 cluster vocabulary 的 Go game server framework shape。vibit 应同时向这两类 surface 学习，但每个被采纳的 capability 都必须显式、必要时可生成，并且机器可检查。
+
+当前产品目标标记：
+
+```text
+nakama_pitaya_product_parity_roadmap: ratified
+decision: ADR-0078
+check_rule: runtime.reference_product_parity_roadmap
+parity_goal: nakama_pitaya_same_class_common_capability_coverage
+api_compatibility_goal: false
+recommended_next_direction: define_protocol_logout_route_gate
+```
 
 ## 2. Reference Roles
 

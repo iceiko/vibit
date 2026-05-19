@@ -67,6 +67,47 @@ func TestTransactionalDispatcherDoesNotWrapQueries(t *testing.T) {
 	}
 }
 
+func TestTransactionalDispatcherBypassesConfiguredCommandRoutes(t *testing.T) {
+	routes := []RouteKey{
+		AuthenticateWithDeviceCredentialRoute(),
+		LogoutAccessTokenRoute(),
+	}
+
+	for _, route := range routes {
+		t.Run(RenderRouteKey(route), func(t *testing.T) {
+			request := RouteRequest{RequestID: "request-1", Route: route}
+			runner := &recordingRunner{}
+			var dispatched bool
+			inner := routeDispatcherFunc(func(ctx context.Context, req RouteRequest) (ApplicationResult, error) {
+				dispatched = true
+				if _, ok := UnitOfWorkFromContext(ctx); ok {
+					t.Fatal("dispatcher context has unit of work, want bypassed transaction")
+				}
+				return resultForRequest(req), nil
+			})
+			dispatcher := TransactionalDispatcher{
+				Dispatcher:   inner,
+				Runner:       runner,
+				BypassRoutes: routes,
+			}
+
+			result, err := dispatcher.Dispatch(context.Background(), request)
+			if err != nil {
+				t.Fatalf("Dispatch() error = %v, want nil", err)
+			}
+			if !dispatched {
+				t.Fatal("inner dispatcher was not called")
+			}
+			if result.RequestID != request.RequestID || result.Route != route {
+				t.Fatalf("result = %#v, want request metadata", result)
+			}
+			if runner.calls != 0 {
+				t.Fatalf("runner calls = %d, want 0", runner.calls)
+			}
+		})
+	}
+}
+
 func TestTransactionalDispatcherRequiresRunnerForCommands(t *testing.T) {
 	dispatcher := TransactionalDispatcher{
 		Dispatcher: routeDispatcherFunc(func(_ context.Context, req RouteRequest) (ApplicationResult, error) {
