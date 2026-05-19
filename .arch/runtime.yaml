@@ -82,11 +82,12 @@ purpose: >
   nakama_pitaya_product_parity_roadmap: ADR-0078
   protocol_logout_route_gate: ADR-0079
   transport_close_handoff_gate: ADR-0080
+  transport_close_handoff_single_process_implementation: ADR-0081
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: transport_close_handoff_single_process_implementation
+  current_phase: next_direction_confirmation_after_transport_close_handoff_single_process_implementation
   implementation_code_status: durable_inventory_runtime_live_verified_with_websocket_protobuf_postgresql_composition
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -4897,20 +4898,34 @@ identity_session_boundary:
     rule: After defining the transport close handoff gate, the maintainer selected the bounded `implement_transport_close_handoff_single_process` direction. Close code mapping, close reason text, logout-triggered close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, operations/admin disconnect, direct Nakama/Pitaya API compatibility, and broader product modules remain separate gates.
 
   transport_close_handoff_single_process_implementation:
-    status: active
+    status: completed
     milestone: M-102
-    next_ready_work_item: W-0174
+    completed_work_item: W-0174
+    decision: ADR-0081
     previous_milestone: M-101
     previous_completed_work_item: W-0173
     selected_direction: implement_transport_close_handoff_single_process
     implementation_gate_decision: ADR-0080
     transport_close_handoff_gate_standard: docs/transport-close-handoff-gate.md
+    transport_close_handoff_single_process_implementation_completed: true
+    transport_close_handoff_single_process_implementation_work_item: W-0174
+    check_rule: runtime.transport_close_handoff_single_process_implementation
     application_policy_owner: runtime/internal/app/connection
     active_connection_registry_owner: runtime/internal/app/connection
     transport_handoff_owner: runtime/internal/platform/transport/ws
     first_handoff_target: connection_id_and_epoch
     server_observed_target_required: true
     client_metadata_authority_allowed: false
+    accepted_socket_table: single_process_in_memory
+    concrete_socket_close_handoff_added: true
+    close_request_type: CloseHandoffRequest
+    close_result_type: CloseHandoffResult
+    close_outcomes:
+      - close_requested
+      - socket_not_found
+      - epoch_mismatch
+      - already_closed
+      - close_failed
     transport_policy_ownership_allowed: false
     transport_credential_parsing_allowed: false
     close_code_mapping_added: false
@@ -4921,7 +4936,34 @@ identity_session_boundary:
     protocol_session_carrier_added: false
     dependencies_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0174 may implement only the first single-process transport-owned concrete close handoff for server-observed connection id and epoch.
+    rule: W-0174 implemented only the first single-process transport-owned concrete close handoff for server-observed connection id and epoch.
+
+  next_direction_confirmation_after_transport_close_handoff_single_process_implementation:
+    status: active
+    milestone: M-103
+    next_ready_work_item: W-0175
+    previous_milestone: M-102
+    previous_completed_work_item: W-0174
+    candidate_directions:
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_logout_triggered_socket_close_gate
+      - define_presence_lifecycle_gate
+      - strengthen_operations_observability_and_admin_tooling
+    recommended_direction: define_reconnect_connection_epoch_gate
+    deferred:
+      - close_code_mapping
+      - close_reason_text
+      - logout_triggered_socket_close
+      - runtime_session_revocation
+      - reconnect_epoch_behavior
+      - protocol_session_carrier
+      - presence_lifecycle
+      - operations_admin_disconnect
+      - dependencies
+      - direct_nakama_pitaya_api_compatibility
+      - broad_product_modules
+    rule: After W-0174, the queue must select the next lifecycle-closure direction explicitly before adding reconnect, protocol session carriers, logout-triggered close, operations/admin behavior, direct compatibility, or broad product modules.
 
 persistence_model:
   decision: ADR-0011

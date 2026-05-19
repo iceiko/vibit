@@ -2886,11 +2886,23 @@ phase_plan:
       - direct_nakama_pitaya_api_compatibility
     rule: After defining the transport close handoff gate, the maintainer selected the bounded `implement_transport_close_handoff_single_process` direction before reconnect, protocol session carrier, presence, operations/admin disconnect, direct compatibility, or broad product work.
   phase_2cl_transport_close_handoff_single_process_implementation:
-    status: active
+    status: completed
     milestone: M-102
-    next_ready_work_item: W-0174
+    completed_work_item: W-0174
     gate_decision: ADR-0080
+    implementation_decision: ADR-0081
+    check_rule: runtime.transport_close_handoff_single_process_implementation
     target: server_observed_connection_id_and_epoch
+    implementation:
+      owner: runtime/internal/platform/transport/ws
+      accepted_socket_table: single_process_in_memory
+      concrete_socket_close_handoff_added: true
+      close_outcomes:
+        - close_requested
+        - socket_not_found
+        - epoch_mismatch
+        - already_closed
+        - close_failed
     vibit_position:
       adopted:
         - transport_owned_concrete_close_mechanics
@@ -2905,7 +2917,29 @@ phase_plan:
         - protocol_session_carrier
         - operations_admin_disconnect
         - direct_nakama_pitaya_api_compatibility
-    rule: W-0174 may implement only the in-process transport close handoff that follows ADR-0080 target and ownership boundaries.
+    rule: W-0174 implemented only the in-process transport close handoff that follows ADR-0080 target and ownership boundaries.
+  phase_2cm_next_direction_confirmation_after_transport_close_handoff_single_process_implementation:
+    status: active
+    milestone: M-103
+    next_ready_work_item: W-0175
+    previous_completed_work_item: W-0174
+    candidate_directions:
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_logout_triggered_socket_close_gate
+      - define_presence_lifecycle_gate
+      - strengthen_operations_observability_and_admin_tooling
+    recommended_direction: define_reconnect_connection_epoch_gate
+    deferred:
+      - close_code_mapping
+      - close_reason_text
+      - logout_triggered_socket_close
+      - runtime_session_revocation
+      - protocol_session_carrier
+      - presence_lifecycle
+      - operations_admin_disconnect
+      - direct_nakama_pitaya_api_compatibility
+    rule: After concrete close handoff exists, reconnect/epoch semantics are the recommended next lifecycle closure gate before protocol session carriers and presence expansion.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

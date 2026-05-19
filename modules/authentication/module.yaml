@@ -349,9 +349,12 @@ external_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     module_ownership_rule: The W-0173 confirmation selected a transport-owned close handoff implementation outside authentication ownership. Authentication must not call WebSocket transport or make logout close sockets in this step.
   transport_close_handoff_single_process_implementation:
-    status: active
-    next_ready_work_item: W-0174
+    status: completed
+    completed_work_item: W-0174
+    decision: ADR-0081
     implementation_gate_decision: ADR-0080
+    transport_close_handoff_single_process_implementation_completed: true
+    check_rule: runtime.transport_close_handoff_single_process_implementation
     transport_handoff_owner: runtime/internal/platform/transport/ws
     application_policy_owner: runtime/internal/app/connection
     authentication_module_owns_transport_close_handoff: false
@@ -359,6 +362,8 @@ external_runtime_slices:
     first_handoff_target: connection_id_and_epoch
     server_observed_target_required: true
     client_metadata_authority_allowed: false
+    accepted_socket_table: single_process_in_memory
+    concrete_socket_close_handoff_added: true
     transport_credential_parsing_allowed: false
     close_code_mapping_added: false
     close_reason_text_added: false
@@ -367,7 +372,7 @@ external_runtime_slices:
     reconnect_epoch_behavior_added: false
     protocol_session_carrier_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    module_ownership_rule: W-0174 may add only a WebSocket transport-owned in-process close handoff by server-observed connection id and epoch. Authentication remains token lifecycle service logic only and must not own concrete socket mechanics.
+    module_ownership_rule: W-0174 added only a WebSocket transport-owned in-process close handoff by server-observed connection id and epoch. Authentication remains token lifecycle service logic only and must not own concrete socket mechanics.
 
 decisions:
   - ADR-0029

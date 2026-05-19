@@ -37,6 +37,7 @@ type Server struct {
 	ReadLimitBytes int64
 
 	nextConnectionID uint64
+	closeHandoff     closeHandoffSocketTable
 }
 
 func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
@@ -62,6 +63,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		epoch:      1,
 		remoteAddr: r.RemoteAddr,
 	}
+	s.registerCloseHandoffSocket(meta, conn)
+	defer s.unregisterCloseHandoffSocket(meta)
 	_ = s.handleConnection(r.Context(), conn, meta)
 }
 

@@ -168,14 +168,25 @@ implemented_wire_and_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0173 selects the next bounded implementation direction without adding protocol contracts, generated output, or runtime behavior.
   transport_close_handoff_single_process_implementation:
-    status: active
-    next_ready_work_item: W-0174
+    status: completed
+    completed_work_item: W-0174
+    decision: ADR-0081
     implementation_gate_decision: ADR-0080
+    transport_close_handoff_single_process_implementation_completed: true
+    check_rule: runtime.transport_close_handoff_single_process_implementation
     transport_handoff_owner: runtime/internal/platform/transport/ws
     application_policy_owner: runtime/internal/app/connection
     first_handoff_target: connection_id_and_epoch
     server_observed_target_required: true
     client_metadata_authority_allowed: false
+    accepted_socket_table: single_process_in_memory
+    concrete_socket_close_handoff_added: true
+    close_outcomes:
+      - close_requested
+      - socket_not_found
+      - epoch_mismatch
+      - already_closed
+      - close_failed
     transport_policy_ownership_allowed: false
     transport_credential_parsing_allowed: false
     close_code_mapping_added: false
@@ -186,7 +197,7 @@ implemented_wire_and_runtime_slices:
     protocol_session_carrier_added: false
     dependencies_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0174 may add only the narrow single-process transport close handoff authorized by ADR-0080.
+    rule: W-0174 added only the narrow single-process transport close handoff authorized by ADR-0080.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

@@ -243,6 +243,59 @@ func TestServerClosesWhenFrameHandlerFails(t *testing.T) {
 	}
 }
 
+func TestServerCloseHandoffClosesAcceptedSocket(t *testing.T) {
+	accepted := make(chan Frame, 1)
+	wsServer := &Server{
+		AcceptOptions: &websocket.AcceptOptions{
+			InsecureSkipVerify: true,
+		},
+		Handler: FrameHandlerFunc(func(ctx context.Context, frame Frame) ([][]byte, error) {
+			accepted <- frame
+			select {
+			case <-ctx.Done():
+				return nil, ctx.Err()
+			case <-time.After(5 * time.Second):
+				return nil, nil
+			}
+		}),
+	}
+	server := httptest.NewServer(wsServer)
+	defer server.Close()
+
+	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+	defer cancel()
+
+	conn, _, err := websocket.Dial(ctx, websocketURL(server.URL), nil)
+	if err != nil {
+		t.Fatalf("dial websocket: %v", err)
+	}
+	defer conn.CloseNow()
+
+	if err := conn.Write(ctx, websocket.MessageBinary, []byte("close-me")); err != nil {
+		t.Fatalf("write binary frame: %v", err)
+	}
+
+	var frame Frame
+	select {
+	case frame = <-accepted:
+	case <-ctx.Done():
+		t.Fatal("handler did not receive accepted frame")
+	}
+
+	result := wsServer.RequestClose(ctx, CloseHandoffRequest{
+		ConnectionID:    frame.ConnectionID,
+		ConnectionEpoch: frame.ConnectionEpoch,
+	})
+	if result.Outcome != CloseHandoffOutcomeCloseRequested {
+		t.Fatalf("RequestClose() outcome = %s, want %s", result.Outcome, CloseHandoffOutcomeCloseRequested)
+	}
+
+	_, _, err = conn.Read(ctx)
+	if err == nil {
+		t.Fatal("read after close handoff succeeded, want closed socket")
+	}
+}
+
 func websocketURL(httpURL string) string {
 	return "ws" + strings.TrimPrefix(httpURL, "http")
 }

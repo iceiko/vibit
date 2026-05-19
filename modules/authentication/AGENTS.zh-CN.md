@@ -152,6 +152,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-101 Next Direction Confirmation After Transport Close Handoff Gate` 已完成。`W-0173` 选择了 `implement_transport_close_handoff_single_process`，它仍在本模块所有权之外。当前 next ready work item 是 `M-102/W-0174 implement_transport_close_handoff_single_process`。Authentication 仍不得调用 WebSocket transport，不得拥有 concrete socket close handoff，不得在 logout 后关闭 sockets，不得选择 close codes 或 close reason text，不得 revoke runtime sessions，不得添加 reconnect/epoch behavior、protocol session carriers 或 direct Nakama/Pitaya API compatibility。
 
+`M-102 Transport Close Handoff Single Process Implementation` 已在本模块所有权之外完成。`W-0174` 添加了 WebSocket transport-owned、按 server-observed `connection_id + epoch` 定位的 single-process close handoff；`ADR-0081` 记录该实现。Authentication 仍只是 token lifecycle service logic。Authentication 不得调用 WebSocket transport，不得拥有 concrete socket close handoff，不得在 logout 后关闭 sockets，不得选择 close codes 或 close reason text，不得 revoke runtime sessions，不得添加 reconnect/epoch behavior、protocol session carriers 或 direct Nakama/Pitaya API compatibility。当前 next ready work item 是 `M-103/W-0175 confirm_next_direction_after_transport_close_handoff_single_process_implementation`。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

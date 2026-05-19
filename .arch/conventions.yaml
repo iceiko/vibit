@@ -3893,18 +3893,29 @@ transport_close_handoff_gate:
   next_implementation_work_item: W-0174
 
 transport_close_handoff_single_process_implementation:
-  status: active
+  status: completed
   milestone: M-102
-  next_ready_work_item: W-0174
+  completed_work_item: W-0174
+  decision: ADR-0081
   selected_direction: implement_transport_close_handoff_single_process
   implementation_gate_decision: ADR-0080
   transport_close_handoff_gate_standard: docs/transport-close-handoff-gate.md
+  transport_close_handoff_single_process_implementation_completed: true
+  check_rule: runtime.transport_close_handoff_single_process_implementation
   application_policy_owner: runtime/internal/app/connection
   active_connection_registry_owner: runtime/internal/app/connection
   transport_handoff_owner: runtime/internal/platform/transport/ws
   first_handoff_target: connection_id_and_epoch
   server_observed_target_required: true
   client_metadata_authority_allowed: false
+  accepted_socket_table: single_process_in_memory
+  concrete_socket_close_handoff_added: true
+  close_outcomes:
+    - close_requested
+    - socket_not_found
+    - epoch_mismatch
+    - already_closed
+    - close_failed
   transport_policy_ownership_allowed: false
   transport_credential_parsing_allowed: false
   close_code_mapping_added: false
@@ -3915,6 +3926,13 @@ transport_close_handoff_single_process_implementation:
   protocol_session_carrier_added: false
   dependencies_added: false
   direct_nakama_pitaya_api_compatibility_added: false
+
+next_direction_confirmation_after_transport_close_handoff_single_process_implementation:
+  status: active
+  milestone: M-103
+  next_ready_work_item: W-0175
+  previous_completed_work_item: W-0174
+  recommended_direction: define_reconnect_connection_epoch_gate
 
 server_runtime:
   first_reference_language: Go

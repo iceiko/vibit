@@ -1,0 +1,116 @@
+schema_version: 0.1
+change_id: implement-transport-close-handoff-single-process
+date: 2026-05-19
+type: feature
+status: verified
+
+summary: Implement the first WebSocket transport-owned single-process close handoff.
+
+affected_modules:
+  - runtime
+  - authentication
+  - reference
+
+decisions:
+  added:
+    - ADR-0081
+  referenced:
+    - ADR-0080
+    - ADR-0077
+    - ADR-0078
+    - ADR-0079
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - transport close handoff redacted outcomes
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  protobuf_sources_changed: []
+  generated_outputs_changed: []
+  existing_envelope_changed: false
+  logout_route_behavior_changed: false
+  protocol_session_carrier_added: false
+
+data:
+  migrations_required: false
+  migration_sources: []
+  ownership_changes:
+    - WebSocket transport owns concrete accepted socket close mechanics.
+    - Application close policy remains owned by runtime/internal/app/connection.
+    - Active connection registry lifecycle markers remain owned by runtime/internal/app/connection.
+    - Authentication remains token lifecycle owner and does not own concrete socket close.
+
+runtime:
+  completed_work_item: W-0174
+  completed_milestone: M-102
+  next_milestone: M-103
+  next_work_item: W-0175
+  transport_close_handoff_single_process_implemented: true
+  transport_close_handoff_single_process_decision: ADR-0081
+  transport_close_handoff_single_process_check_rule: runtime.transport_close_handoff_single_process_implementation
+  transport_handoff_owner: runtime/internal/platform/transport/ws
+  close_handoff_source: runtime/internal/platform/transport/ws/close_handoff.go
+  close_handoff_tests: runtime/internal/platform/transport/ws/close_handoff_test.go
+  server_source_changed: runtime/internal/platform/transport/ws/server.go
+  server_tests_changed: runtime/internal/platform/transport/ws/server_test.go
+  accepted_socket_table: single_process_in_memory
+  first_handoff_target: connection_id_and_epoch
+  server_observed_target_required: true
+  client_metadata_authority_allowed: false
+  concrete_socket_close_handoff_added: true
+  close_request_type: CloseHandoffRequest
+  close_result_type: CloseHandoffResult
+  close_outcomes:
+    - close_requested
+    - socket_not_found
+    - epoch_mismatch
+    - already_closed
+    - close_failed
+  close_code_mapping_added: false
+  close_reason_text_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  reconnect_epoch_behavior_added: false
+  protocol_session_carrier_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - go test ./internal/platform/transport/ws
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check change implement-transport-close-handoff-single-process --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

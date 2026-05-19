@@ -19252,7 +19252,7 @@ function checkRuntimeTransportCloseHandoffGate(root, goFiles) {
     [".arch/work-items.yaml", "id: M-102"],
     [".arch/work-items.yaml", "id: W-0174"],
     [".arch/work-items.yaml", "title: Implement transport close handoff single process"],
-    [".arch/runtime.yaml", "current_phase: transport_close_handoff_single_process_implementation"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "transport_close_handoff_gate_defined: true"],
     [".arch/runtime.yaml", "check_rule: runtime.transport_close_handoff_gate"],
     [".arch/conventions.yaml", "transport_close_handoff_gate_defined: true"],
@@ -19451,6 +19451,9 @@ function checkRuntimeTransportCloseHandoffGate(root, goFiles) {
 
 function checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFiles) {
   const ruleId = "runtime.transport_close_handoff_single_process_implementation";
+  const changePath = "changes/2026-05-19-implement-transport-close-handoff-single-process";
+  const decisionPath = "decisions/ADR-0081-transport-close-handoff-single-process-implementation.md";
+  const conversationPath = "conversations/2026-05-19-transport-close-handoff-single-process-implementation.md";
 
   if (!workItemHasStatus(root, "W-0174", "completed")) {
     ok("transport close handoff single-process implementation is not completed yet", {
@@ -19460,21 +19463,185 @@ function checkRuntimeTransportCloseHandoffSingleProcessImplementation(root, goFi
     return;
   }
 
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    decisionPath,
+    conversationPath,
+    "runtime/internal/platform/transport/ws/close_handoff.go",
+    "runtime/internal/platform/transport/ws/close_handoff_test.go",
+    "runtime/internal/platform/transport/ws/server.go",
+    "runtime/internal/platform/transport/ws/server_test.go",
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for transport close handoff single-process implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for transport close handoff single-process implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
   const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-102"],
+    [".arch/work-items.yaml", "title: Transport Close Handoff Single Process Implementation"],
     [".arch/work-items.yaml", "id: W-0174"],
     [".arch/work-items.yaml", "title: Implement transport close handoff single process"],
-    [".arch/runtime.yaml", "current_phase: transport_close_handoff_single_process_implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: M-103"],
+    [".arch/work-items.yaml", "id: W-0175"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.transport_close_handoff_single_process_implementation"],
     [".arch/runtime.yaml", "transport_handoff_owner: runtime/internal/platform/transport/ws"],
     [".arch/runtime.yaml", "first_handoff_target: connection_id_and_epoch"],
+    [".arch/runtime.yaml", "concrete_socket_close_handoff_added: true"],
     [".arch/conventions.yaml", "transport_close_handoff_single_process_implementation:"],
+    [".arch/conventions.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
     [".arch/contracts.yaml", "transport_close_handoff_single_process_implementation:"],
+    [".arch/contracts.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
     [".arch/reference.yaml", "phase_2cl_transport_close_handoff_single_process_implementation"],
+    [".arch/reference.yaml", "phase_2cm_next_direction_confirmation_after_transport_close_handoff_single_process_implementation"],
     ["modules/authentication/module.yaml", "transport_close_handoff_single_process_implementation:"],
+    ["modules/authentication/module.yaml", "transport_close_handoff_single_process_implementation_completed: true"],
+    ["AGENTS.md", "M-102 Transport Close Handoff Single Process Implementation"],
+    ["AGENTS.zh-CN.md", "M-102 Transport Close Handoff Single Process Implementation"],
+    ["runtime/AGENTS.md", "M-102 Transport Close Handoff Single Process Implementation"],
+    ["runtime/AGENTS.zh-CN.md", "M-102 Transport Close Handoff Single Process Implementation"],
+    ["modules/authentication/AGENTS.md", "M-102 Transport Close Handoff Single Process Implementation"],
+    ["modules/authentication/AGENTS.zh-CN.md", "M-102 Transport Close Handoff Single Process Implementation"],
     ["rules/check-rules.json", "runtime.transport_close_handoff_single_process_implementation"],
   ];
   for (const [relativePath, requiredText] of requiredReferences) {
     checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
   }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "implement_transport_close_handoff_single_process",
+      "runtime.transport_close_handoff_single_process_implementation",
+      "runtime/internal/platform/transport/ws/close_handoff.go",
+      "RequestClose(context.Context, CloseHandoffRequest) CloseHandoffResult",
+      "connection_id + connection_epoch",
+      "This ADR does not add close code mapping",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0174",
+      "completed_milestone: M-102",
+      "next_milestone: M-103",
+      "next_work_item: W-0175",
+      "transport_close_handoff_single_process_check_rule: runtime.transport_close_handoff_single_process_implementation",
+      "first_handoff_target: connection_id_and_epoch",
+      "server_observed_target_required: true",
+      "client_metadata_authority_allowed: false",
+      "concrete_socket_close_handoff_added: true",
+      "close_code_mapping_added: false",
+      "close_reason_text_added: false",
+      "logout_triggered_socket_close_added: false",
+      "runtime_session_revocation_added: false",
+      "reconnect_epoch_behavior_added: false",
+      "protocol_session_carrier_added: false",
+      "dependencies_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    "runtime/internal/platform/transport/ws/close_handoff.go": [
+      "type CloseHandoffRequest struct",
+      "ConnectionID    string",
+      "ConnectionEpoch uint64",
+      "type CloseHandoffResult struct",
+      "CloseHandoffOutcomeCloseRequested",
+      "CloseHandoffOutcomeSocketNotFound",
+      "CloseHandoffOutcomeEpochMismatch",
+      "CloseHandoffOutcomeAlreadyClosed",
+      "CloseHandoffOutcomeCloseFailed",
+      "func (s *Server) RequestClose",
+      "CloseNow() error",
+    ],
+    "runtime/internal/platform/transport/ws/close_handoff_test.go": [
+      "TestCloseHandoffRequestsConcreteSocketCloseByConnectionIDAndEpoch",
+      "TestCloseHandoffRejectsStaleEpochWithoutClosingCurrentSocket",
+      "TestCloseHandoffReturnsRedactedMissingAndAlreadyClosedOutcomes",
+      "TestCloseHandoffReturnsRedactedCloseFailedOutcome",
+      "TestCloseHandoffRequestAndResultRemainCredentialNeutral",
+    ],
+    "runtime/internal/platform/transport/ws/server.go": [
+      "closeHandoff     closeHandoffSocketTable",
+      "s.registerCloseHandoffSocket(meta, conn)",
+      "defer s.unregisterCloseHandoffSocket(meta)",
+    ],
+    "runtime/internal/platform/transport/ws/server_test.go": [
+      "TestServerCloseHandoffClosesAcceptedSocket",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "runtime/internal/platform/transport/ws/close_handoff.go",
+      patterns: [
+        { pattern: /\bAuthorization\b|\bSec-WebSocket-Protocol\b|\bBearer\b|\bCookie\b|\bQueryString\b|\bSubprotocol\b|\bRemoteAddr\b/, label: "transport credential carrier or remote address close authority" },
+        { pattern: /\bPlayerID\b|\bRuntimeSessionID\b|\bAccessTokenRecordID\b|\bAccessToken\b|\bCredential\b|\bLookupDigest\b|\bVerifierDigest\b|\bVerifierKeyID\b/, label: "application identity, credential, or digest close authority" },
+        { pattern: /\bCloseCode\b|\bCloseReason\b|\bReasonText\b|\bStatusPolicyViolation\b|\bStatusNormalClosure\b|\bKick\b|\bDisconnect\b/, label: "close code, close reason, kick, or disconnect policy" },
+        { pattern: /\bLogoutAccessToken\b|\bRevokeRuntimeSession\b|\bReconnect\b|\bResume\b/, label: "logout, session revocation, or reconnect behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/authentication/service.go",
+      patterns: [
+        { pattern: /\bRequestClose\b|\bCloseHandoff\b|\btransport\/ws\b|\bwebsocket\b|\bCloseSocket\b|\bKick\b|\bDisconnect\b/, label: "authentication-owned transport close behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/protocol/protobuf/frame_handler.go",
+      patterns: [
+        { pattern: /\bRequestClose\b|\bCloseHandoff\b|\bCloseSocket\b|\bCloseCode\b|\bCloseReason\b|\bKick\b|\bDisconnect\b/, label: "protocol-owned concrete close behavior" },
+      ],
+    },
+    {
+      file: "proto/vibit/protocol/v1/envelope.proto",
+      patterns: [
+        { pattern: /\bclose_reason\b|\bclose_code\b|\bdisconnect\b|\bkick\b/i, label: "protocol close carrier" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, rule.file)));
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} stays inside transport close handoff single-process implementation boundary`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses transport close handoff single-process implementation boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("transport close handoff single-process implementation is completed with server-observed target, redacted outcomes, and no protocol/auth/session side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
 }
 
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {

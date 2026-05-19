@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-102
+current_milestone: M-103
 
 continuation_semantics:
   default_step_unit: work_item
@@ -1877,7 +1877,7 @@ milestones:
 
   - id: M-102
     title: Transport Close Handoff Single Process Implementation
-    status: active
+    status: completed
     goal: Implement the first single-process application-to-WebSocket concrete close handoff while preserving application-owned close policy and transport credential neutrality.
     completion_criteria:
       - WebSocket transport exposes a narrow in-process handoff keyed only by server-observed connection id and epoch.
@@ -1890,6 +1890,20 @@ milestones:
       - making logout automatically close sockets
       - revoking runtime sessions
       - changing reconnect, duplicate replacement, protocol session carriers, presence, chat, friends, groups, matchmaking, match runtime, cluster, SDK, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented a WebSocket transport-owned single-process close handoff. The implementation registers accepted sockets by server-observed connection id and epoch, exposes `RequestClose` with redacted outcomes, uses concrete socket mechanics without selecting close codes or reason text, protects stale epochs, and keeps application close policy, active connection registry policy, authentication logout behavior, runtime sessions, reconnect behavior, protocol carriers, dependencies, and direct Nakama/Pitaya API compatibility deferred.
+
+  - id: M-103
+    title: Next Direction Confirmation After Transport Close Handoff Single Process Implementation
+    status: active
+    goal: Select the next lifecycle-closure direction after implementing the first concrete WebSocket transport close handoff.
+    completion_criteria:
+      - The next direction is selected from the Nakama/Pitaya product parity roadmap lifecycle phase.
+      - The selected direction preserves close code mapping, close reason text, logout-triggered close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, and broad product modules behind explicit gates unless selected.
+      - The resulting next ready work item is bounded and checkable.
+    non_goals:
+      - selecting close code mapping or player-visible close reason text in the confirmation step
+      - making logout automatically close sockets in the confirmation step
+      - adding reconnect, duplicate replacement, protocol session carriers, presence, chat, friends, groups, matchmaking, match runtime, cluster, SDK, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility without selection
 
 work_items:
   - id: W-0001
@@ -6030,7 +6044,7 @@ work_items:
   - id: W-0174
     milestone: M-102
     title: Implement transport close handoff single process
-    status: next_ready
+    status: completed
     change: changes/2026-05-19-implement-transport-close-handoff-single-process
     depends_on:
       - W-0173
@@ -6038,6 +6052,7 @@ work_items:
     related_decisions:
       - ADR-0080
       - ADR-0077
+      - ADR-0081
     completion:
       - Add the first in-process WebSocket transport close handoff owned by `runtime/internal/platform/transport/ws`.
       - Target sockets only by server-observed `connection_id` and `connection_epoch`.
@@ -6045,5 +6060,27 @@ work_items:
       - Return redacted outcomes for close requested, socket not found, epoch mismatch, already closed, and close failed.
       - Add focused tests for stale epoch protection, missing socket redaction, transport credential neutrality, application policy ownership, and unchanged Protobuf envelope/logout/session behavior.
       - Keep close code mapping, close reason text, logout-triggered close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, and broad product behavior deferred.
+    completion_summary: Added `runtime/internal/platform/transport/ws/close_handoff.go` and focused tests. `Server` now keeps a single-process in-memory socket table for accepted sockets and exposes `RequestClose` by server-observed connection id and epoch. Outcomes are redacted as close requested, socket not found, epoch mismatch, already closed, or close failed. The implementation keeps application close decisions in `runtime/internal/app/connection`, does not parse credential carriers, does not change Protobuf envelope or logout/session behavior, does not choose close codes or reason text, and does not add reconnect, protocol session carriers, dependencies, operations/admin disconnect, or direct Nakama/Pitaya API compatibility.
     ask_first:
       - Selecting close code mapping, close reason text, logout-triggered socket close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, durable/distributed close handoff, or broad product module expansion.
+
+  - id: W-0175
+    milestone: M-103
+    title: Confirm next direction after transport close handoff single-process implementation
+    status: next_ready
+    change: changes/2026-05-19-confirm-next-direction-after-transport-close-handoff-single-process-implementation
+    depends_on:
+      - W-0174
+    expected_change_id: confirm-next-direction-after-transport-close-handoff-single-process-implementation
+    candidate_directions:
+      - define_reconnect_connection_epoch_gate
+      - define_protocol_session_carrier_gate
+      - define_logout_triggered_socket_close_gate
+      - define_presence_lifecycle_gate
+      - strengthen_operations_observability_and_admin_tooling
+    recommended_direction: define_reconnect_connection_epoch_gate
+    ask_first:
+      - Selecting reconnect/epoch behavior, protocol session carriers, logout-triggered socket close, close code mapping, close reason text, runtime session revocation, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, durable/distributed close handoff, or broad product module expansion.
+    completion:
+      - Select the next lifecycle-closure direction after the concrete transport close handoff implementation.
+      - Preserve close code mapping, close reason text, logout-triggered socket close, runtime session revocation, reconnect/epoch behavior, protocol session carriers, presence, operations/admin disconnect, dependencies, direct Nakama/Pitaya API compatibility, and broad product behavior behind later gates unless explicitly selected.
