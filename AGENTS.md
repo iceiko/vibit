@@ -1,7 +1,7 @@
 # Agent Operating Guide
 
-Status: Draft v0.1  
-Last updated: 2026-05-13
+Status: Draft v0.2  
+Last updated: 2026-05-19
 Scope: Repository-level operating instructions for coding agents  
 Canonical source: `CONSTITUTION.md`
 
@@ -388,7 +388,8 @@ docs/<name>.zh-CN.md
 
 Rules:
 
-- Update the Chinese translation in the same change when the English source changes materially.
+- **Core documents** (`CONSTITUTION.md`, `AGENTS.md`, `.arch/README.md`): Update Chinese translation synchronously in the same change.
+- **Feature-level and milestone-specific documents** (`docs/*.md`, `decisions/ADR-*.md`, change specs): Chinese translation may be **deferred/asynchronous**. Mark the English source with `Translation: pending` if the translation is not updated in the same change.
 - If the translation cannot be updated in the same change, mark it clearly as out of date.
 - Keep machine-readable identifiers in English.
 - Use English for code identifiers, module names, commands, events, permissions, and errors unless a strong domain reason exists.
@@ -567,7 +568,42 @@ Ask the human maintainer before:
 - Changing server runtime language, primary protocol direction, persistence direction, or core project thesis
 - Adding a major external framework dependency
 
-## 11. Never
+## 11. Tiered Gate Strategy
+
+Not all work items require the same level of gating overhead. Use the following tiers to balance safety with velocity:
+
+### Tier 1 — Security-Critical (Two-Step: Gate + Implementation)
+
+Applies to: cryptography, verifier algorithms, Protobuf wire format, credential schema, token lifecycle, secret configuration.
+
+- Requires a separate gate milestone defining the boundary before implementation.
+- Gate must include: threat model, redaction rules, fail-closed behavior, dependency posture.
+- Implementation follows as a separate bounded work item.
+
+### Tier 2 — Functional Implementation (Single Step)
+
+Applies to: transport features, application policy, registry behavior, route registration, protocol bridge, session lifecycle, connection lifecycle.
+
+- Single implementation work item with boundary definition embedded in the change spec.
+- No separate gate milestone required.
+- Must still include: focused tests, `vibit check all`, verification record.
+
+### Tier 3 — Lightweight (Direct Implementation)
+
+Applies to: documentation, tooling, migration source, translation, check rules.
+
+- Direct implementation without change spec unless non-trivial.
+- Verification through `vibit check all` is sufficient.
+
+### Direction Confirmation
+
+- Direction confirmation milestones are **not required** as separate work items.
+- Direction is managed through `ask_first` fields on work items and `recommended_direction` on continuation semantics.
+- If a direction choice is significant enough, record it as an ADR.
+
+## 12. Universal Prohibitions
+
+The following prohibitions apply to **all** milestones and work items. Do not repeat them in individual milestone `non_goals` or work item `ask_first` lists:
 
 Never:
 
@@ -579,10 +615,12 @@ Never:
 - Add untyped cross-module payloads
 - Make broad repository edits without a declared boundary
 - Hand-edit generated files without documenting why
-- Leave an English public document materially changed while its Chinese translation silently falls behind
+- Leave an English core document materially changed while its Chinese translation silently falls behind
 - Claim verification was run when it was not
+- Add direct Nakama/Pitaya API compatibility without an explicit ADR
+- Add dependencies without a dependency adoption record
 
-## 12. When Adding New Standards
+## 13. When Adding New Standards
 
 New standards should explain:
 
@@ -596,7 +634,7 @@ New standards should explain:
 
 Prefer a small standard that can be enforced over a broad statement that cannot be checked.
 
-## 13. When Adding Implementation Code
+## 14. When Adding Implementation Code
 
 Do not start by scattering framework code across the repository.
 
@@ -608,7 +646,7 @@ requirement -> spec -> contract -> generated shape -> handwritten logic -> tests
 
 A good first implementation target should include a small but complete backend domain, such as player accounts, inventory, currency, rewards, quests, or match sessions.
 
-## 14. Bootstrapping Control
+## 15. Bootstrapping Control
 
 Self-bootstrapping is useful only while it improves the path to a working server framework.
 
@@ -638,7 +676,7 @@ Do not rush into implementation when these choices are still ambiguous. Also do 
 
 Record exceptions in a change spec or Agent Decision Record.
 
-## 15. Handoff Requirements
+## 16. Handoff Requirements
 
 At the end of a change, leave enough context for the next agent or human to continue.
 

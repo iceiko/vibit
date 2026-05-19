@@ -1,7 +1,7 @@
 # Work Continuation Workflow
 
-Status: Draft v0.1
-Last updated: 2026-05-13
+Status: Draft v0.2
+Last updated: 2026-05-19
 Scope: Maintainer-agent continuation, work item sequencing, and roadmap state
 
 This standard defines how vibit agents decide what "continue" means.
@@ -173,3 +173,31 @@ node tools/vibit check all
 `check work` verifies the presence and basic consistency of `.arch/work-items.yaml` and this workflow standard.
 
 Future checks may validate dependency ordering, one-step state transitions, and whether completed work items link to existing commits.
+
+## 11. Gate Density Strategy
+
+This section codifies the tiered gate strategy adopted in ADR-0081 to optimize the balance between architectural safety and development velocity.
+
+### Problem
+
+The original gate-heavy workflow required separate gate milestones for every functional implementation. This caused ~50% of milestones to be pure overhead (documentation/gate-only), significantly reducing development velocity without proportional safety gains for non-security work.
+
+### Tiers
+
+See `AGENTS.md` Section 11 for the authoritative tier definitions:
+
+- **Tier 1** (Security-Critical): Two-step gate + implementation.
+- **Tier 2** (Functional): Single implementation step with boundary in change spec.
+- **Tier 3** (Lightweight): Direct implementation.
+
+### Direction Confirmation
+
+Direction confirmation milestones are no longer mandatory. Direction choices are managed through:
+
+- `ask_first` fields on work items
+- `recommended_direction` on continuation semantics
+- ADRs for significant direction changes
+
+### Existing Gates
+
+Do not retroactively change gate structures on completed milestones. The new strategy applies to all future work items.
