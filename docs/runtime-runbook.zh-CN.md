@@ -1,7 +1,7 @@
 # Runtime Runbook 中文版
 
 状态：Draft v0.1
-最后更新：2026-05-13
+最后更新：2026-05-20
 范围：第一版 Go runtime process startup 和 manual verification
 说明：本文件是 `docs/runtime-runbook.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
@@ -17,7 +17,7 @@
 
 该 endpoint 期望接收 binary WebSocket messages，其中 payload 是 `vibit.protocol.v1.Envelope` Protobuf bytes。
 
-第一版已挂载的 request loop 是：
+Bootstrap in-memory request loop 是：
 
 ```text
 WebSocket binary frame
@@ -61,6 +61,25 @@ VIBIT_RUNTIME_STORE=memory
 VIBIT_RUNTIME_STORE=postgres VIBIT_POSTGRES_DSN='postgres://user:pass@127.0.0.1:5432/vibit?sslmode=disable' go run ./cmd/vibit-server
 ```
 
+PostgreSQL runtime path 也会 wire 当前 authentication、token、runtime session、route protection、connection binding、logout 和 presence-lifecycle composition。它需要 authentication verifier key environment variables：
+
+```text
+VIBIT_AUTH_VERIFIER_KEY_SET_ID
+VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY
+VIBIT_AUTH_CREDENTIAL_VERIFIER_KEY
+VIBIT_AUTH_TOKEN_LOOKUP_KEY
+VIBIT_AUTH_TOKEN_VERIFIER_KEY
+```
+
+Verifier key values 必须是 runtime loader 接受的 Base64 text。不要提交 local verifier keys。
+
+可选 authentication settings：
+
+```text
+VIBIT_AUTH_ACCESS_TOKEN_TTL
+VIBIT_AUTH_TOKEN_AUDIENCE
+```
+
 可选 PostgreSQL pool settings：
 
 ```text
@@ -74,7 +93,7 @@ VIBIT_POSTGRES_MIN_CONNS
 
 1. 启动 server。
 2. 连接 WebSocket client 到 `ws://127.0.0.1:8080/v1/ws`。
-3. 发送 `inventory.GrantItem` 或 `inventory.GetInventory` 的 binary Protobuf `Envelope`。
+3. 对 bootstrap in-memory path，发送 `inventory.GrantItem` 或 `inventory.GetInventory` 的 binary Protobuf `Envelope`。
 4. 确认 response 是 binary Protobuf `Envelope`，并且带有相同的 `request_id`。
 
 Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受 JSON。
@@ -82,13 +101,14 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 ## Current Runtime Assumptions
 
 - Runtime 默认使用 in-memory inventory repository。
-- `VIBIT_RUNTIME_STORE=postgres` 会启用显式 PostgreSQL inventory composition path。
+- `VIBIT_RUNTIME_STORE=postgres` 会启用显式 PostgreSQL composition path，覆盖 persistent inventory、player account、authentication token/credential、runtime session、route protection、logout、connection binding 和 presence-lifecycle wiring。
 - Inventory bootstrap permissions 允许 grant 和 read operations。
-- Authentication 和 session validation 尚未实现。
-- PostgreSQL persistence 只在显式选择时接入 inventory runtime composition。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
+- Authentication 和 runtime session behavior 已存在于 PostgreSQL path，但 public onboarding/device credential issuance flow 还不可用。
+- PostgreSQL persistence 只在显式选择时启用。Persistence boundary 已定义在 `docs/postgresql-persistence-boundary.md`。
 - 普通 server startup 不会自动 apply PostgreSQL migrations。
 - Optional live PostgreSQL verification 定义在 `docs/postgresql-verification-environment.md`；它要求 `VIBIT_POSTGRES_TEST_DSN`，且不属于默认 server startup。
-- Generated route registration 尚未实现。
+- Generated route registration 尚未实现；route registration 仍是 handwritten startup/bootstrap code。
+- v0.1 alpha path 仍需要 documented onboarding flow、presence protocol query、example client 或 request-loop script，以及 alpha acceptance checklist。
 
 这些是第一版 request loop 的 bootstrap assumptions，不是长期 production policy。
 

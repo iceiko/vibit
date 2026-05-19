@@ -1,0 +1,96 @@
+schema_version: 0.1
+change_id: define-v0-1-alpha-goal
+date: 2026-05-20
+type: docs
+status: verified
+
+summary: Define v0.1 alpha as the short-term release target and AI-era Nakama/Pitaya-class capability as the long-term product target.
+
+affected_modules:
+  - runtime
+  - reference
+  - workflow
+
+decisions:
+  added:
+    - ADR-0086
+  referenced:
+    - ADR-0085
+    - ADR-0082
+    - ADR-0078
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+release_target:
+  short_term_release_target: v0.1_alpha
+  long_term_product_target: ai_era_nakama_pitaya_class_server_framework
+  release_declared: false
+  implementation_authorized_by_this_change: roadmap_only
+  alpha_goal_standard: docs/v0.1-alpha-goal.md
+  alpha_goal_translation: docs/v0.1-alpha-goal.zh-CN.md
+  alpha_goal_decision: ADR-0086
+  current_next_work_item: W-0178
+  recommended_after_current:
+    - first_local_onboarding_device_credential_issuance
+    - authenticated_gameplay_e2e
+    - runtime_runbook_refresh
+    - minimal_example_client_or_request_loop
+    - health_readiness_version_config_surface
+    - alpha_acceptance_checklist_or_check
+
+runtime:
+  completed_work_item: W-0179
+  current_milestone: M-106
+  next_work_item: W-0178
+  docs_only: true
+  runtime_behavior_changed: false
+  protocol_messages_changed: false
+  generated_output_changed: false
+  migrations_changed: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+data:
+  migrations_required: false
+  ownership_changes:
+    - README becomes the external user and contributor entry point.
+    - docs/v0.1-alpha-goal.md records the first developer-usable release target.
+    - .arch/work-items.yaml remains the immediate continuation queue.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  release_status_changed: pre_alpha_to_v0.1_alpha_target
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-v0-1-alpha-goal --json
+    - node tools/vibit check work --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -160,6 +160,8 @@ Runtime authentication implementation boundary planning 记录在 `docs/runtime-
 
 `M-105 Presence Lifecycle Functional Slice` 已在本模块所有权之外完成。`W-0177` 添加了 application registry-owned player presence snapshots、WebSocket transport lifecycle observer，以及可以把 validated first-message binding 写入 active connection registry 的 startup composition adapters。Authentication service behavior 没有改变，authentication 不拥有 presence lifecycle、WebSocket lifecycle observation、protocol presence queries、subscriptions、broadcasts、runtime session revocation 或 direct Nakama/Pitaya API compatibility。当前 next ready work item 是 `M-106/W-0178 define_presence_protocol_query_functional_slice`。
 
+`M-107 v0.1 Alpha Goal And Long Term Product Target` 已作为 docs-only roadmap slice 完成。`W-0179` 记录 `v0.1 alpha` 为短期 developer-usable release target，并记录 AI-era Nakama/Pitaya-class server framework 为长期目标。未来 alpha 相关 authentication work 很可能包括 first local onboarding/device credential issuance 和 authenticated gameplay E2E，但这个 docs slice 不授权 module-owned credential issuance code、新 protocol messages、generated output、migrations、dependencies、release publishing 或 direct Nakama/Pitaya API compatibility。当前 next ready work item 仍是 `M-106/W-0178 define_presence_protocol_query_functional_slice`。
+
 ## Forbidden Shortcuts
 
 - 不要存储 raw credential 或 token material。

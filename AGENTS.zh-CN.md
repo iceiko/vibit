@@ -47,7 +47,11 @@ vibit is an open-source agent-native server framework for building backends that
 
 ## 3. 当前仓库状态
 
-本仓库当前处于宪法和标准设计阶段。
+本仓库当前是 pre-alpha，并正在推进 `v0.1 alpha`。
+
+短期目标是第一个 developer-usable alpha，让外部开发者可以下载、本地运行、检查，并把它作为加入开发的入口。持久目标文档是 `docs/v0.1-alpha-goal.md`，配套简体中文译本是 `docs/v0.1-alpha-goal.zh-CN.md`。`ADR-0086` 记录该决策。
+
+长期产品目标是 AI 时代的 Nakama/Pitaya-class open-source game/backend server framework。这表示按 vibit 的 agent-native maintainability 模型覆盖同级常用能力；它不表示 direct Nakama/Pitaya API compatibility。
 
 现有基础：
 
@@ -102,7 +106,7 @@ vibit is an open-source agent-native server framework for building backends that
 - `schema/`
 - `rules/`
 
-框架实现代码、generators、modules 和 verification commands 可能尚不存在。如果它们不存在，应记录 verification 当前不可用，而不是假装已经运行。
+框架实现代码现在已位于 `runtime/`，generated output 已位于 `runtime/internal/generated/`，verification commands 已通过 `tools/vibit` 和 Go tests 存在。当某个 capability 或 verification path 尚不存在时，应记录它目前不可用，而不是假装已经运行。
 
 当前 runtime readiness decisions 指向 Go 作为第一版 server runtime implementation language、WebSocket 作为第一版 gameplay/client protocol、Protobuf 作为第一版 wire message format、modular monolith single-process server model、contract-first commands/queries/events/errors/permissions，以及 `inventory` 作为优先的第一 proof slice。在创建 runtime implementation code 前，必须阅读 `.arch/runtime.yaml`、`ADR-0004` 到 `ADR-0010`，并注意 `ADR-0003` 已被 superseded。
 
@@ -362,6 +366,8 @@ node tools/vibit generate contract-shapes <module|all>
 使用 `docs/authentication-token-session-validation.md`、`docs/authentication-proof-token-session-contract-dimensions.md`、`docs/credential-storage-external-identity-linking-boundaries.md`、`docs/session-persistence-websocket-handshake-decision-gates.md`、`docs/login-method-token-format-ratification.md`、`ADR-0023`、`ADR-0024` 和 `runtime.authentication_token_session_boundary`，再修改 authentication proof、login methods、token behavior、credential storage、external identity linking、runtime session persistence、request identity trust、Protobuf envelope authentication behavior、WebSocket handshake authentication、runtime player handlers 或 WebSocket routes。该设计标准分离 authentication proof、login methods、tokens、credentials、external identity links、runtime sessions、request identity、transport metadata、envelope metadata 和 player account lifecycle。该 dimensions standard ratify actor kinds、validation statuses、proof statuses、failure classes、retryability、request identity handoff、session error dimensions、session permission dimensions 和 validation event dimensions。Credential/external identity boundary standard 保持 player lifecycle tables 不包含 credential 和 provider subject，并延后 login-method families、credential schema、provider subject semantics、account linking、recovery、merge behavior 和 dependencies。Session/handshake gates standard 会保持 request-level、first-message、handshake-level、every-request 和 hybrid validation 为未来选择，直到它们被单独选择。Login/token ratification standard 定义如何 comparison 和选择第一批 login-method set、token model、proof carrier posture、lifecycle semantics、schema gates、checks 和 implementation queue，但不授予 implementation permission。
 
 使用 `.arch/work-items.yaml` 作为 continuation 的机器可读 intake 入口。`W-0007` 这样的 Work item IDs 是执行步骤；ADR IDs 仍然是架构决策；change spec IDs 仍然是具体执行记录；Git hashes 仍然是 repository snapshots；versions 仍然是 release identifiers。
+
+使用 `docs/v0.1-alpha-goal.md` 作为短期 release target intake。当前 release state 是 pre-alpha，目标是 `v0.1 alpha`，即时 next ready work item 仍然是 `W-0178 define_presence_protocol_query_functional_slice`。不要把该目标文档理解为发布 release、添加 direct Nakama/Pitaya API compatibility 或跳过 `.arch/work-items.yaml` 的授权。
 
 修改 Go runtime 文件前，先阅读 `ADR-0014`。第一版 Go module 位于 `runtime/go.mod`，module path 为 `github.com/iceiko/vibit/runtime`。Process startup 放在 `runtime/cmd/vibit-server/`，application dispatch 和 composition 放在 `runtime/internal/app/`，platform adapters 放在 `runtime/internal/platform/`，手写 domain module logic 放在 `runtime/internal/modules/<module>/`，生成的 Go contract shapes 放在 `runtime/internal/generated/contracts/`，生成的 Go Protobuf output 放在 `runtime/internal/generated/proto/`，SQL-first PostgreSQL migrations 放在 `runtime/migrations/postgres/`，Protobuf source files 放在仓库根目录的 `proto/vibit/<module>/v1/`。
 
@@ -716,6 +722,8 @@ Runtime readiness 只应回答让第一个 slice 成立所必需的决策：
 
 `M-105 Presence Lifecycle Functional Slice` 已完成。`W-0177` 添加了 `ADR-0085`、`runtime/internal/app/connection` 中的 registry-backed player presence snapshots、`runtime/internal/platform/transport/ws` 中的 credential-neutral WebSocket lifecycle observer，以及 `runtime/cmd/vibit-server` 下的 PostgreSQL startup composition adapters。第一版 presence behavior 从 active bound server-owned connection registry records 推导 online/offline state；成功的 first-message connection binding 可以把 validated player identity 写入 registry。该 slice 不添加 Protobuf presence messages、generated output、protocol presence queries、subscriptions、broadcasts、chat、friends、groups、parties、matchmaking、match runtime、operations/admin behavior、durable/distributed presence、reconnect/resume tokens、logout-triggered close、runtime session revocation、dependencies、direct Nakama/Pitaya API compatibility 或 broad product modules。当前 work queue active 在 `M-106/W-0178`，next ready work item 是 `define_presence_protocol_query_functional_slice`。
 
+`M-107 v0.1 Alpha Goal And Long Term Product Target` 已作为 documentation and roadmap slice 完成。`W-0179` 添加了 `docs/v0.1-alpha-goal.md`、`docs/v0.1-alpha-goal.zh-CN.md`、`ADR-0086`，以及定义 `v0.1 alpha` 短期 developer-usable release target 和 AI-era Nakama/Pitaya-class server framework 长期目标的 conversation/change records。它没有发布 release、添加 runtime behavior、添加 protocol messages、改变 generated output、修改 migrations、添加 dependencies 或选择 direct Nakama/Pitaya API compatibility。当前 work queue 仍 active 在 `M-106/W-0178`，next ready work item 仍是 `define_presence_protocol_query_functional_slice`。
+
 `ADR-0082` 采纳了分层 gate density strategy。Security-critical work 仍保持 gate plus implementation 两步；transport features、application policy、registry behavior、route registration、protocol bridges、session lifecycle、connection lifecycle 等 functional work 通常应作为单个 bounded work item 推进，并把边界嵌入 change spec；轻量 docs/tooling/translation/check-rule work 在简单时可以直接实现。未来 Tier 2 work 不再强制使用独立 direction confirmation milestone；用 `ask_first`、`recommended_direction` 和重大方向变化的 ADR 管理方向。`M-103/W-0175` 是该策略的第一个前向应用，应作为 bounded reconnect/connection epoch functional slice 推进，而不是纯 confirmation step。
 
-后续 major work 必须映射到一个 roadmap family：identity/auth/session、connection lifecycle、storage、presence/status/notifications、chat/realtime messaging、friends/groups/parties、leaderboards/tournaments、economy/progression、matchmaking、match runtime、server runtime hooks/RPC、operations、SDK/developer experience 或 distributed runtime。近期优先级是 lifecycle closure：protocol logout route、transport close handoff、reconnect/epoch、protocol session carrier，然后才是 presence。在 logout/close/reconnect/session-carrier 语义未解决前，不要直接跳到 chat、social modules、matchmaking、match runtime、SDKs 或 distributed runtime。
+后续 major work 必须映射到一个 roadmap family：identity/auth/session、connection lifecycle、storage、presence/status/notifications、chat/realtime messaging、friends/groups/parties、leaderboards/tournaments、economy/progression、matchmaking、match runtime、server runtime hooks/RPC、operations、SDK/developer experience 或 distributed runtime。近期优先级现在是通向 `v0.1 alpha` 的最短路径：presence protocol query、first local onboarding/device credential issuance、authenticated gameplay E2E、runtime runbook refresh、minimal example client 或 request-loop script、health/readiness/version/config surface，以及 alpha acceptance checklist。在 alpha path 可用前，不要直接跳到 chat、social modules、matchmaking、match runtime、SDKs、distributed runtime 或 direct Nakama/Pitaya API compatibility。

@@ -2,265 +2,199 @@
 
 vibit is an open-source agent-native server framework for building backends that AI coding agents can understand, extend, verify, and maintain from first principles.
 
-Status: constitutional design phase
+Status: pre-alpha, building toward `v0.1 alpha`
 
-## What This Project Means By Agent-Native
+The short-term target is a first developer-usable `v0.1 alpha`: a single-node, PostgreSQL-backed, WebSocket + Protobuf game backend runtime that real developers can run locally, inspect, and use as a contribution starting point.
 
-Agent-native does not primarily mean that the server has AI features.
+The long-term target is an AI-era Nakama or Pitaya: the same class of serious game/backend server capability, adapted around vibit's agent-native maintainability model. This does not mean direct Nakama or Pitaya API compatibility.
 
-It means the server architecture is designed so AI coding agents can work inside it reliably:
+## What Exists Today
 
-- The architecture is explicit instead of tribal knowledge.
-- Module ownership is declared instead of guessed.
-- Public behavior is contract-first.
-- Repeatable structure is generated.
-- Business rules are tested as invariants.
-- Cross-module communication is bounded.
-- Change workflow is documented and verifiable.
-- Documentation is written for both humans and agents.
+The repository has moved beyond a pure design phase. Current implemented foundation includes:
 
-AI gameplay features such as NPC agents, memory, model routing, tool calling, and simulations may become extensions later. They are not the foundation.
+- Agent-readable governance: `CONSTITUTION.md`, `AGENTS.md`, change specs, ADRs, conversation logs, and machine-readable architecture manifests.
+- A Go runtime under `runtime/`.
+- A WebSocket gameplay endpoint at `/v1/ws`.
+- A Protobuf envelope and generated Go Protobuf output.
+- PostgreSQL migration sources and platform persistence adapters.
+- An inventory proof slice.
+- Player account persistence boundaries and adapters.
+- Device credential login service behavior and protocol route.
+- Opaque access-token validation for protected routes.
+- Logout service behavior and protocol route.
+- Runtime session persistence and response session metadata.
+- First-message WebSocket connection binding.
+- Single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot.
+- `tools/vibit` checks and inspection commands for agents and humans.
 
-## Why This Exists
+This is not yet a finished alpha. The most important missing pieces are a clean onboarding/device credential issuance flow, a public presence query, a minimal example client or request-loop script, refreshed runbook coverage for the current authentication/session flow, and an alpha acceptance checklist.
 
-Many existing server codebases were built for human maintainers with local context, long memory, and implicit team conventions. AI coding agents can help in those codebases, but they often lose force when architecture rules are hidden, module boundaries are weak, tests are incomplete, or public contracts are unclear.
+## Try It Locally
 
-vibit starts from a different premise:
+Prerequisites for the current development workflow:
 
-> The next generation of long-lived server software should be designed so agents can safely understand, modify, verify, and extend it.
+- Go, for the runtime.
+- Node.js, for `tools/vibit`.
+- PostgreSQL, when using the persistent runtime path.
+- Buf and Protobuf tooling, when regenerating Protobuf output.
 
-The goal is not to make agents magically smarter. The goal is to make the codebase more legible, bounded, generated, contract-driven, and testable.
-
-## Current Documents
-
-- `CONSTITUTION.md`: canonical project constitution
-- `CONSTITUTION.zh-CN.md`: Simplified Chinese translation
-- `AGENTS.md`: repository-level operating guide for coding agents
-- `AGENTS.zh-CN.md`: Simplified Chinese translation
-- `.arch/README.md`: machine-readable architecture manifest entry point
-- `.arch/modules.yaml`: first draft module registry manifest
-- `.arch/conventions.yaml`: first draft repository convention manifest
-- `.arch/protocol.yaml`: game protocol framework manifest for the first WebSocket Protobuf envelope
-- `.arch/runtime.yaml`: runtime readiness manifest for the first Go server runtime direction
-- `.arch/contracts.yaml`: contract registry for public command, query, event, error, and permission source files
-- `.arch/dependencies.yaml`: dependency adoption registry for foundational dependency decision slots
-- `.arch/reference.yaml`: active Nakama/Pitaya reference baseline manifest for game server capability planning
-- `buf.yaml`: Buf source, lint, and breaking-check configuration for Protobuf
-- `buf.gen.yaml`: Buf generation configuration for planned Go Protobuf output
-- `proto/`: Protobuf source root for the protocol envelope and module wire schemas
-- `docs/module-manifest.md`: module manifest standard
-- `docs/module-manifest.zh-CN.md`: Simplified Chinese translation
-- `docs/change-spec.md`: change spec standard
-- `docs/change-spec.zh-CN.md`: Simplified Chinese translation
-- `changes/_template/`: reusable change spec template
-- `docs/conversation-log.md`: conversation log standard
-- `docs/conversation-log.zh-CN.md`: Simplified Chinese translation
-- `conversations/`: maintainer-agent project memory
-- `docs/agent-decision-record.md`: Agent Decision Record standard
-- `docs/agent-decision-record.zh-CN.md`: Simplified Chinese translation
-- `decisions/`: durable decision rationale
-- `docs/schema-validation.md`: schema validation standard
-- `docs/schema-validation.zh-CN.md`: Simplified Chinese translation
-- `docs/dependency-adoption.md`: dependency adoption standard
-- `docs/dependency-adoption.zh-CN.md`: Simplified Chinese translation
-- `docs/game-protocol.md`: game protocol framework standard
-- `docs/game-protocol.zh-CN.md`: Simplified Chinese translation
-- `docs/generated-output.md`: generated output standard
-- `docs/generated-output.zh-CN.md`: Simplified Chinese translation
-- `docs/runtime-protocol-adapter.md`: runtime protocol adapter boundary standard
-- `docs/runtime-protocol-adapter.zh-CN.md`: Simplified Chinese translation
-- `docs/runtime-runbook.md`: first Go runtime process startup and manual verification runbook
-- `docs/runtime-runbook.zh-CN.md`: Simplified Chinese translation
-- `docs/reference-game-server-alignment.md`: active game server reference alignment standard for Nakama and Pitaya
-- `docs/reference-game-server-alignment.zh-CN.md`: Simplified Chinese translation
-- `docs/nakama-pitaya-product-parity-roadmap.md`: product parity roadmap for Nakama/Pitaya-class common capability coverage
-- `docs/nakama-pitaya-product-parity-roadmap.zh-CN.md`: Simplified Chinese translation
-- `schema/`: JSON Schema files for machine-checkable standards
-- `rules/`: rule catalogs for machine-readable check metadata
-
-English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
-
-## Intended Direction
-
-vibit should evolve toward:
-
-- Architecture manifests under `.arch/`
-- A first Go server runtime governed by `.arch/runtime.yaml` and Agent Decision Records
-- WebSocket as the first gameplay/client protocol
-- Protobuf as the first client/server wire message format
-- PostgreSQL as the first authoritative durable relational store
-- `github.com/coder/websocket` as the first WebSocket platform adapter dependency
-- `google.golang.org/protobuf`, `protoc-gen-go`, and Buf CLI as the first Protobuf tooling stack
-- `github.com/jackc/pgx/v5` as the first PostgreSQL driver behind platform persistence adapters
-- `github.com/pressly/goose/v3` as the first SQL-first migration tooling
-- A first Go module at `runtime/go.mod` with module path `github.com/iceiko/vibit/runtime`
-- Go runtime package boundaries under `runtime/cmd/vibit-server/`, `runtime/internal/app/`, `runtime/internal/platform/`, `runtime/internal/modules/`, and `runtime/internal/generated/`
-- Protobuf source files under `proto/vibit/<module>/v1/`, with generated Go Protobuf output under `runtime/internal/generated/proto/`
-- Generated output rules under `docs/generated-output.md`, with Go Protobuf output checked before commit
-- Runtime protocol adapter boundary rules under `docs/runtime-protocol-adapter.md`
-- A protocol envelope source at `proto/vibit/protocol/v1/envelope.proto`
-- Buf generation configuration at `buf.yaml` and `buf.gen.yaml`
-- A game-aware WebSocket Protobuf envelope governed by `.arch/protocol.yaml`, `docs/game-protocol.md`, and `ADR-0015`
-- SQL-first PostgreSQL migration source files under `runtime/migrations/postgres/`
-- S3-compatible object storage as a planned large-object storage abstraction, with MinIO as the preferred local/self-hosted candidate pending dependency adoption
-- Module manifests at `modules/<module>/module.yaml`, following `docs/module-manifest.md`
-- Module-level agent guides at `modules/<module>/AGENTS.md`
-- Contract-first commands, queries, events, errors, permissions, and migrations
-- Contract source files under `contracts/`, registered by `.arch/contracts.yaml`
-- Foundational dependency decisions registered by `.arch/dependencies.yaml`
-- Generated scaffolds for repeatable framework structure
-- Architecture checks that verify dependency, contract, event, and generated-file rules
-- Change specs under `changes/<date>-<change-id>/`, following `docs/change-spec.md`
-- Conversation logs under `conversations/`, following `docs/conversation-log.md`
-- Agent Decision Records under `decisions/`, following `docs/agent-decision-record.md`
-- Schema validation under `schema/`, following `docs/schema-validation.md`
-- Rule catalogs under `rules/`, starting with `rules/check-rules.json`
-
-The first serious prototype should prove one claim:
-
-> Given a new backend requirement, an AI coding agent can identify the affected module, update the correct contracts, generate the correct structure, implement the behavior, add tests, run verification, and update documentation without damaging unrelated architecture.
-
-## CLI Prototype
-
-The first executable standard lives at:
+Run the repository checks:
 
 ```bash
-tools/vibit
-```
-
-Initial commands:
-
-```bash
-node tools/vibit --help
 node tools/vibit check all
-node tools/vibit check all --json
-node tools/vibit check schemas
-node tools/vibit check schemas --json
-node tools/vibit check memory
-node tools/vibit check memory --json
-node tools/vibit check contracts
-node tools/vibit check contracts --json
-node tools/vibit check protocol
-node tools/vibit check protocol --json
-node tools/vibit check generated
-node tools/vibit check generated --json
-node tools/vibit check runtime
-node tools/vibit check runtime --json
-node tools/vibit inspect module inventory
-node tools/vibit inspect boundary --from inventory --to player
-node tools/vibit inspect contract --module inventory --type command --id GrantItem
-node tools/vibit inspect change bootstrap-vibit-cli
-node tools/vibit inspect memory
-node tools/vibit inspect rule check.subcheck
-node tools/vibit inspect rules --category check
-node tools/vibit check architecture
-node tools/vibit check architecture --json
-node tools/vibit check change bootstrap-vibit-cli
-node tools/vibit check change bootstrap-vibit-cli --json
-node tools/vibit check module inventory
-node tools/vibit check module inventory --json
-node tools/vibit generate module <module>
 ```
 
-The CLI currently uses Node.js standard-library APIs only. It is a prototype for architecture checks, inspection, and generators. It is not the server runtime and does not determine the server runtime language.
+Run the Go runtime tests:
 
-Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff. Human-readable text output remains the default.
-
-Each JSON check result item includes a stable `rule_id` and an `artifact` value so agents can route failures without parsing prose. `check all --json` is a compact overview; run the specific failing check with `--json` to get full result details.
-
-Use `node tools/vibit check memory` to verify required conversation log and Agent Decision Record structure.
-
-Use `node tools/vibit check contracts` to verify that `.arch/contracts.yaml` and registered contract source files are consistent.
-
-Use `node tools/vibit check protocol` to verify manifest-to-Protobuf alignment before adding or changing `.proto` files. While no `.proto` files exist, it reports planned protocol sources and messages; once `.proto` files exist, it checks package names, source traces, expected messages, and field names.
-
-The first Protobuf source files now define the protocol envelope and inventory wire messages:
-
-```text
-proto/vibit/protocol/v1/envelope.proto
-proto/vibit/inventory/v1/inventory.proto
+```bash
+cd runtime
+go test ./...
 ```
 
-`buf.yaml` and `buf.gen.yaml` define the planned generation path, but generated Go Protobuf output is not committed until generation is run with the accepted toolchain. Do not create or edit generated Go Protobuf files by hand.
-
-Use `node tools/vibit check generated` to verify that module-declared generated files exist and include generated, source, and generator trace markers. It also checks the planned Go Protobuf output root under `runtime/internal/generated/proto/`; generated Protobuf Go files must use the `*.pb.go` suffix, include the `protoc-gen-go` generated-code marker, and trace to existing `.proto` sources.
-
-Use `node tools/vibit check runtime` for server runtime verification. Before the Go runtime exists, this check reports that runtime implementation has not started. After `runtime/go.mod` exists but before Go source files exist, it verifies the ADR-0014 skeleton. Once Go source files exist, it must discover Go test files and run the Go runtime test path.
-
-Use `node tools/vibit inspect contract --module <module> --type <type> --id <id>` to inspect one registered command, query, event, error catalog, or permission catalog as JSON during agent intake.
-
-Use `node tools/vibit inspect change <change-id>` to inspect a change spec directory and its verification metadata without manually opening every file.
-
-Use `node tools/vibit inspect memory` to list change specs, conversation logs, and Agent Decision Records as a machine-readable project memory index.
-
-Rule metadata for check output lives in `rules/check-rules.json`.
-
-Use `node tools/vibit inspect rule <rule-id>` to inspect one rule without parsing the full catalog.
-
-Use `node tools/vibit inspect rules` or `node tools/vibit inspect rules --category <category>` to discover available rules.
-
-The first server runtime direction is Go, using a modular monolith single-process server model. WebSocket is the first gameplay/client protocol, and Protobuf is the first client/server wire format. Semantic business contracts remain in vibit manifests and contract source files; Protobuf owns wire schema shape. See `.arch/runtime.yaml`, `decisions/ADR-0008-go-server-runtime-language.md`, and `decisions/ADR-0009-websocket-protobuf-client-protocol.md`.
-
-The first game protocol framework is a WebSocket-framed Protobuf envelope with explicit `kind`, `module`, and `name` routing fields, request correlation, session metadata, target scopes, server-authoritative message rules, and error mapping. The first endpoint is `/v1/ws`, mounted by the Go runtime process. The first inventory slice uses player-scoped command/query/event/error/system messages, while room state sync, matchmaking, allocation, reconnect replay, presence, streams, realtime input, and state patches remain deferred until their own modules and standards exist. See `.arch/protocol.yaml`, `docs/game-protocol.md`, and `decisions/ADR-0015-game-protocol-framework.md`.
-
-The runtime protocol adapter boundary is defined in `docs/runtime-protocol-adapter.md` and `decisions/ADR-0018-runtime-protocol-adapter-boundary.md`. WebSocket transport owns frames, the Protobuf adapter owns envelope conversion, application dispatch owns command/query routing, domain modules own invariants and behavior, and generated packages provide shapes only.
-
-Nakama and Pitaya are active reference baselines for capability planning. Nakama should guide the broad game backend product surface: accounts, sessions, storage, social systems, chat, groups, parties, leaderboards, tournaments, matchmaking, realtime multiplayer, authoritative matches, and operations. Pitaya should guide Go game server architecture vocabulary: acceptors, sessions, routes, handlers, remotes/RPC, frontend/backend roles, groups, broadcast, serializers, and cluster service discovery. `ADR-0078` now ratifies a Nakama/Pitaya-class product parity roadmap: vibit should cover common capability families at the same product class while preserving vibit's agent-native constraints and avoiding accidental direct API compatibility. The near-term priority is runtime lifecycle closure before presence, chat, social modules, matchmaking, or match runtime expansion. See `.arch/reference.yaml`, `docs/reference-game-server-alignment.md`, `docs/nakama-pitaya-product-parity-roadmap.md`, `decisions/ADR-0019-nakama-and-pitaya-reference-baseline.md`, and `decisions/ADR-0078-nakama-pitaya-product-parity-roadmap.md`.
-
-PostgreSQL is the first authoritative durable relational store for runtime state. S3-compatible object storage is planned for large artifacts such as replays, snapshots, exports, binary assets, and diagnostic archives. MinIO is the preferred local/self-hosted candidate for that S3-compatible role, but it is not a mandatory runtime dependency until a concrete use case and dependency adoption record justify it. Domain modules must use vibit-owned storage interfaces rather than depending directly on database drivers or object-storage clients. See `decisions/ADR-0011-postgresql-and-object-storage-persistence.md`.
-
-The first accepted foundational runtime dependencies are recorded in `decisions/ADR-0013-first-go-runtime-dependencies.md` and `.arch/dependencies.yaml`. They are accepted only for platform adapters and generation tooling, not for direct use inside domain modules. S3 client tooling, MinIO deployment, observability, and external Go test framework adoption remain deferred until concrete runtime needs justify them.
-
-The first Go runtime layout is recorded in `decisions/ADR-0014-go-runtime-layout-and-boundaries.md`. The runtime now has generated Go Protobuf output, pure application handoff types, a Protobuf protocol adapter that converts generated envelopes into application route requests, a small application dispatch skeleton for command and query routes, inventory runtime handlers, a WebSocket transport adapter, and minimal process wiring for `/v1/ws`. PostgreSQL persistence, migrations, transaction wiring, authentication/session validation, and generated route registration have not started yet. Future Go files should follow these boundaries:
-
-- `runtime/cmd/vibit-server/`: process startup, configuration wiring, and lifecycle.
-- `runtime/internal/app/`: command/query dispatch, application composition, and transaction orchestration.
-- `runtime/internal/platform/`: WebSocket, Protobuf, PostgreSQL, migration, event, and transaction platform adapters.
-- `runtime/internal/modules/<module>/`: handwritten domain module logic.
-- `runtime/internal/generated/`: generated Go contract and Protobuf output.
-
-State-changing commands should run inside an application-owned unit of work before repository mutation and domain-event recording. Event publication outside the transaction is deferred until vibit adopts an explicit event delivery or outbox standard.
-
-`node tools/vibit check runtime` now verifies the skeleton, import boundaries, app/domain layer boundaries, runtime test discovery, and Go runtime test path once Go source files exist.
-
-Start the first runtime process with:
+Start the bootstrap in-memory runtime:
 
 ```bash
 cd runtime
 go run ./cmd/vibit-server
 ```
 
-See `docs/runtime-runbook.md` for current endpoint and manual verification notes.
+The runtime listens on `:8080` by default and mounts:
 
-## Early Reference Domain
+```text
+/v1/ws
+```
 
-A small game backend is the recommended first demonstration domain because it naturally contains state, permissions, events, consistency rules, and long-lived modules.
+The endpoint expects binary WebSocket messages containing `vibit.protocol.v1.Envelope` Protobuf bytes. JSON is not accepted on this gameplay endpoint.
 
-Suggested modules:
+The PostgreSQL runtime path is more complete, but it requires migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md` for the current operational notes. The runbook is part of the v0.1 alpha hardening path and should be treated as development documentation, not a polished release guide.
 
-- Player accounts
-- Inventory
-- Currency
-- Rewards
-- Tasks or quests
-- Match sessions
+## Next Target: v0.1 Alpha
 
-The first backend slice should emphasize maintainability and agent workflow over feature count. It should still be treated as the beginning of a long-maintained system, not as disposable demo code.
+The durable target is recorded in `docs/v0.1-alpha-goal.md`.
+
+`v0.1 alpha` should let a technically capable developer:
+
+- clone the repo,
+- prepare local config without committing secrets,
+- apply or verify required PostgreSQL migrations,
+- create or obtain a first device credential,
+- login through the protocol route,
+- receive an opaque access token and runtime session metadata,
+- bind a WebSocket connection,
+- call a protected inventory route,
+- query presence,
+- logout,
+- run checks,
+- and identify a concrete next contribution.
+
+Recommended next sequence:
+
+1. Complete `W-0178`: protected presence protocol query.
+2. Add first local onboarding/device credential issuance.
+3. Prove onboarding -> login -> bind connection -> protected inventory -> presence query -> logout end to end.
+4. Refresh the runtime runbook around the actual alpha path.
+5. Add a minimal example client or request-loop script.
+6. Add health/readiness/version/config surfaces.
+7. Add an alpha acceptance checklist or check.
+
+## Continue Development
+
+If you are an agent or contributor continuing the project, start with:
+
+```bash
+node tools/vibit inspect next
+node tools/vibit check work --json
+```
+
+At the time of this README update, the next ready item is:
+
+```text
+W-0178 Define presence protocol query functional slice
+```
+
+Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary or verification failure.
+
+## Agent-Native Means
+
+Agent-native does not primarily mean that the server has AI features.
+
+It means the codebase is designed so AI coding agents can work inside it reliably:
+
+- architecture rules are explicit,
+- module ownership is declared,
+- public behavior is contract-first,
+- generated structure is traceable,
+- business rules are tested,
+- change workflow is bounded,
+- repository state is checkable,
+- and project memory is stored in durable artifacts instead of chat history.
+
+AI gameplay features such as NPC agents, memory, model routing, tool calling, and simulations may become extensions later. They are not the foundation.
+
+## Nakama And Pitaya Target
+
+Nakama and Pitaya are active reference baselines for capability planning.
+
+- Nakama guides the broad game backend surface: accounts, sessions, storage, social systems, chat, groups, parties, leaderboards, tournaments, matchmaking, realtime multiplayer, authoritative matches, operations, SDKs, and examples.
+- Pitaya guides Go game server architecture vocabulary: acceptors, sessions, routes, handlers, remotes/RPC, frontend/backend roles, groups, broadcast, serializers, and cluster service discovery.
+
+vibit should cover the same class of common capability over time while preserving its own architecture: explicit manifests, contracts, generation, tests, ADRs, repository checks, and bounded agent workflow.
+
+See:
+
+- `docs/reference-game-server-alignment.md`
+- `docs/nakama-pitaya-product-parity-roadmap.md`
+- `docs/v0.1-alpha-goal.md`
+
+## Project Map
+
+Important entry points:
+
+- `CONSTITUTION.md`: canonical project constitution.
+- `AGENTS.md`: repository-level operating guide for coding agents.
+- `.arch/README.md`: architecture manifest entry point.
+- `.arch/work-items.yaml`: continuation queue.
+- `.arch/runtime.yaml`: runtime readiness and implementation state.
+- `.arch/reference.yaml`: Nakama/Pitaya reference and product parity planning.
+- `docs/v0.1-alpha-goal.md`: short-term alpha and long-term product target.
+- `docs/runtime-runbook.md`: current runtime startup and verification notes.
+- `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
+- `changes/`: concrete change specs and verification records.
+- `conversations/`: durable maintainer-agent project memory.
+- `decisions/`: Agent Decision Records.
+- `runtime/`: first Go reference runtime.
+- `proto/`: Protobuf protocol source files.
+- `tools/vibit`: architecture check, inspection, and generator CLI.
+
+English documents are canonical. Simplified Chinese translations are maintained for human readers and early project discussion.
+
+## CLI
+
+The current CLI is:
+
+```bash
+node tools/vibit --help
+node tools/vibit inspect next
+node tools/vibit inspect work
+node tools/vibit inspect reference
+node tools/vibit check all
+node tools/vibit check all --json
+node tools/vibit check runtime
+node tools/vibit check work
+node tools/vibit check memory
+node tools/vibit check schemas
+```
+
+Use `--json` when an agent needs machine-readable check results during intake, verification, or handoff.
 
 ## Governance
 
 Project decisions are governed by `CONSTITUTION.md`.
 
-Before changing constitutional principles, ratifying the name, introducing a major architectural pattern, or making a breaking standard change, read the constitution and record the motivation, alternatives, compatibility impact, and migration path.
+Before changing constitutional principles, introducing a major architectural pattern, changing public protocol shape, adding dependencies, or shifting release direction, record the motivation, alternatives, compatibility impact, and migration path in a change spec and ADR when appropriate.
 
-## Name
-
-`vibit` is the product name.
-
-The intended category phrase is:
+`vibit` is the product name. The intended category phrase is:
 
 ```text
 agent-native server framework
 ```
-
-Before final ratification, the name should be checked against major public registries and platforms for obvious conflicts.

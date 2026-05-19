@@ -159,6 +159,8 @@ Runtime authentication implementation boundary planning is documented in `docs/r
 
 `M-105 Presence Lifecycle Functional Slice` is completed outside this module's ownership. `W-0177` added application registry-owned player presence snapshots, a WebSocket transport lifecycle observer, and startup composition adapters that can feed validated first-message binding into the active connection registry. Authentication service behavior did not change and authentication does not own presence lifecycle, WebSocket lifecycle observation, protocol presence queries, subscriptions, broadcasts, runtime session revocation, or direct Nakama/Pitaya API compatibility. The current next ready work item is `M-106/W-0178 define_presence_protocol_query_functional_slice`.
 
+`M-107 v0.1 Alpha Goal And Long Term Product Target` is completed as a docs-only roadmap slice. `W-0179` records `v0.1 alpha` as the short-term developer-usable release target and AI-era Nakama/Pitaya-class server framework as the long-term target. Authentication-related future alpha work will likely include first local onboarding/device credential issuance and authenticated gameplay E2E, but this docs slice does not authorize module-owned credential issuance code, new protocol messages, generated output, migrations, dependencies, release publishing, or direct Nakama/Pitaya API compatibility. The current next ready work item remains `M-106/W-0178 define_presence_protocol_query_functional_slice`.
+
 ## Forbidden Shortcuts
 
 - Do not store raw credential or token material.
