@@ -1,0 +1,157 @@
+schema_version: 0.1
+change_id: define-release-publishing-decision-gate
+date: 2026-05-21
+type: docs
+status: verified
+
+summary: Define the release publishing decision gate without declaring a release, publishing a release, or creating release artifacts.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0098
+  referenced:
+    - ADR-0097
+    - ADR-0096
+    - ADR-0095
+    - ADR-0094
+    - ADR-0093
+    - ADR-0092
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0190
+  completed_milestone: M-118
+  previous_completed_work_item: W-0189
+  next_milestone: M-119
+  next_work_item: W-0191
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: release_publishing_decision_gate
+  next_direction: release_execution_preparation_gate
+  release_publishing_decision_gate_defined: true
+  release_publishing_decision_gate_decision: ADR-0098
+  release_publishing_decision_gate_check_rule: runtime.release_publishing_decision_gate
+  gate_standard: docs/release-publishing-decision-gate.md
+  gate_standard_translation: docs/release-publishing-decision-gate.zh-CN.md
+  release_declared: false
+  release_publishing_authorized_by_this_change: false
+  release_execution_authorized_by_this_change: false
+  release_packaging_authorized_by_this_change: false
+  release_artifacts_created_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  release_tag_created: false
+  release_binary_created: false
+  release_archive_created: false
+  release_container_created: false
+  release_package_created: false
+  release_checksum_created: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  release_publishing_prerequisites:
+    - packaged_alpha_developer_flow
+    - alpha_acceptance_checklist
+    - runtime_runbook
+    - redacted_request_loop
+    - local_status_endpoints
+    - required_verification
+    - redaction_review
+    - maintainer_authorized_later_preparation
+  release_artifact_boundary:
+    - no_tags_created
+    - no_binaries_created
+    - no_archives_created
+    - no_containers_created
+    - no_packages_created
+    - no_checksums_created
+    - no_hosted_deployments_created
+  known_deferrals:
+    - release_execution_preparation_gate
+    - release_publishing
+    - release_tags
+    - release_binaries
+    - release_archives
+    - release_containers
+    - release_packages
+    - hosted_deployments
+    - protocol_changes
+    - generated_output_changes
+    - migrations
+    - dependencies
+    - broad_operations_admin_behavior
+    - direct_nakama_pitaya_api_compatibility
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/release-publishing-decision-gate.md records the release publishing decision boundary.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  release_artifacts_created: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-release-publishing-decision-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+  status: Verified

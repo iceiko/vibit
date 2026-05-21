@@ -3317,16 +3317,58 @@ phase_plan:
     check_rule: runtime.package_alpha_developer_flow
     rule: W-0189 packaged the alpha developer flow without direct compatibility or release publishing.
   phase_2da_release_publishing_decision_gate:
-    status: next_ready
+    status: completed
     milestone: M-118
-    next_ready_work_item: W-0190
+    completed_work_item: W-0190
+    decision: ADR-0098
+    change: changes/2026-05-21-define-release-publishing-decision-gate
+    next_ready_work_item: W-0191
     previous_completed_work_item: W-0189
     alpha_target_alignment: developer_experience
     selected_direction: release_publishing_decision_gate
-    expected_change: changes/2026-05-21-define-release-publishing-decision-gate
+    gate_standard: docs/release-publishing-decision-gate.md
+    gate_standard_translation: docs/release-publishing-decision-gate.zh-CN.md
     reference_mapping:
       nakama: A release decision gate should separate local developer readiness from public release mechanics and support expectations.
       pitaya: A release decision gate should preserve runtime architecture boundaries while deciding publication readiness.
+    release_publishing_decision_gate_defined: true
+    release_declared: false
+    release_publishing_authorized_by_this_gate: false
+    release_execution_authorized_by_this_gate: false
+    release_packaging_authorized_by_this_gate: false
+    release_artifacts_created_by_this_gate: false
+    hosted_deployment_authorized_by_this_gate: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_packaging_added: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_direction: release_execution_preparation_gate
+    check_rule: runtime.release_publishing_decision_gate
+    rule: W-0190 defined the release publishing decision gate without direct compatibility, release publishing, or release artifacts.
+  phase_2db_release_execution_preparation_gate:
+    status: next_ready
+    milestone: M-119
+    next_ready_work_item: W-0191
+    previous_completed_work_item: W-0190
+    alpha_target_alignment: developer_experience
+    selected_direction: release_execution_preparation_gate
+    expected_change: changes/2026-05-21-define-release-execution-preparation-gate
+    reference_mapping:
+      nakama: A release execution preparation gate should make public release mechanics explicit without broadening product compatibility.
+      pitaya: A release execution preparation gate should keep runtime architecture and deployment boundaries explicit before release execution.
     release_publishing_authorized_by_current_state: false
     release_declared: false
     release_packaging_added: false
@@ -3337,8 +3379,10 @@ phase_plan:
     generated_output_added: false
     migration_added: false
     dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0190 should define the release publishing decision gate without direct compatibility, release publishing, or release artifacts.
+    rule: W-0191 should define the release execution preparation gate without direct compatibility, release publishing, or release artifacts.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

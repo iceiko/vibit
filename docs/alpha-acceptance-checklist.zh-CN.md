@@ -122,7 +122,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-下一步推荐 contribution 是定义 release publishing decision gate，但不发布 release。该 gate 应在未来任何 release-publishing work 前，决定 prerequisites、release artifact boundaries、verification requirements 和 stop conditions。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`。下一步推荐 contribution 是定义 release execution preparation gate，但不发布 release，也不创建 release artifacts。
 
 ## 11. Release Deferrals
 
@@ -144,7 +144,8 @@ Local alpha flow 已经可以检查，并已 packaged 供 local developer review
 ```text
 local_alpha_flow_checkable: true
 local_alpha_developer_flow_packaged: true
+release_publishing_decision_gate_defined: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_publishing_decision_gate
+next_direction: release_execution_preparation_gate
 ```

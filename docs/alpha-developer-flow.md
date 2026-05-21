@@ -28,7 +28,8 @@ local_alpha_developer_flow_packaged: true
 release_declared: false
 release_publishing_authorized_by_this_document: false
 release_packaging_authorized_by_this_document: false
-next_direction: release_publishing_decision_gate
+release_publishing_decision_gate_defined: true
+next_direction: release_execution_preparation_gate
 ```
 
 The repository remains pre-alpha. The packaged flow is ready for local review, but publishing `v0.1 alpha` remains behind a later explicit work item.
@@ -144,7 +145,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-After this packaging slice, the preferred next work is a release publishing decision gate. That gate may decide whether publishing should proceed, but this document does not publish a release and does not create release tags, binaries, archives, containers, packages, or hosted deployments.
+After the release publishing decision gate, the preferred next work is a release execution preparation gate. That future gate may prepare release execution mechanics, but this document does not publish a release and does not create release tags, binaries, archives, containers, packages, or hosted deployments.
 
 ## 9. Deferred Work
 

@@ -4327,24 +4327,69 @@ package_alpha_developer_flow:
   check_rule: runtime.package_alpha_developer_flow
 
 release_publishing_decision_gate:
-  status: next_ready
+  status: completed
   milestone: M-118
-  next_ready_work_item: W-0190
+  completed_work_item: W-0190
+  decision: ADR-0098
+  change: changes/2026-05-21-define-release-publishing-decision-gate
+  next_milestone: M-119
+  next_ready_work_item: W-0191
   depends_on:
     - W-0189
   selected_direction: release_publishing_decision_gate
-  expected_change: changes/2026-05-21-define-release-publishing-decision-gate
+  tier: tier_2_developer_experience
+  gate_standard: docs/release-publishing-decision-gate.md
+  gate_standard_translation: docs/release-publishing-decision-gate.zh-CN.md
+  release_publishing_decision_gate_defined: true
+  release_declared: false
+  release_publishing_authorized_by_this_gate: false
+  release_execution_authorized_by_this_gate: false
+  release_packaging_authorized_by_this_gate: false
+  release_artifacts_created_by_this_gate: false
+  hosted_deployment_authorized_by_this_gate: false
+  release_tag_created: false
+  release_binary_created: false
+  release_archive_created: false
+  release_container_created: false
+  release_package_created: false
+  release_checksum_created: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  next_direction: release_execution_preparation_gate
+  check_rule: runtime.release_publishing_decision_gate
+
+release_execution_preparation_gate:
+  status: next_ready
+  milestone: M-119
+  next_ready_work_item: W-0191
+  depends_on:
+    - W-0190
+  selected_direction: release_execution_preparation_gate
+  expected_change: changes/2026-05-21-define-release-execution-preparation-gate
   tier: tier_2_developer_experience
   release_publishing_authorized_by_current_state: false
   release_declared: false
   release_packaging_added: false
   hosted_deployment_added: false
   runtime_behavior_added: false
+  authentication_session_behavior_changed: false
   protocol_route_added: false
   protobuf_source_added: false
   generated_output_added: false
   migration_added: false
   dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
   direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:

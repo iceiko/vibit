@@ -27,7 +27,7 @@ The repository has moved beyond a pure design phase. Current implemented foundat
 - Single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot.
 - `tools/vibit` checks and inspection commands for agents and humans.
 
-This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, the runtime exposes a small health/readiness/version/config surface, the alpha acceptance checklist records the local readiness state, and `docs/alpha-developer-flow.md` packages those entry points into one coherent local developer journey. The most important remaining missing piece is a release publishing decision gate.
+This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, the runtime exposes a small health/readiness/version/config surface, the alpha acceptance checklist records the local readiness state, `docs/alpha-developer-flow.md` packages those entry points into one coherent local developer journey, and `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary. The most important remaining missing piece is a release execution preparation gate.
 
 ## Try It Locally
 
@@ -82,6 +82,8 @@ The current local acceptance checklist is recorded in `docs/alpha-acceptance-che
 
 The packaged local developer journey is recorded in `docs/alpha-developer-flow.md`.
 
+The release publishing decision gate is recorded in `docs/release-publishing-decision-gate.md`.
+
 `v0.1 alpha` should let a technically capable developer:
 
 - clone the repo,
@@ -107,7 +109,8 @@ Recommended next sequence:
 6. Add health/readiness/version/config surfaces. Completed.
 7. Add an alpha acceptance checklist or check. Completed.
 8. Package the alpha developer flow and document prerequisites. Completed.
-9. Define the release publishing decision gate.
+9. Define the release publishing decision gate. Completed.
+10. Define the release execution preparation gate.
 
 Run the minimal local alpha request loop with:
 
@@ -129,7 +132,7 @@ node tools/vibit check work --json
 At the time of this README update, the next ready item is:
 
 ```text
-W-0190 Define release publishing decision gate
+W-0191 Define release execution preparation gate
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary or verification failure.
@@ -178,6 +181,7 @@ Important entry points:
 - `.arch/reference.yaml`: Nakama/Pitaya reference and product parity planning.
 - `docs/v0.1-alpha-goal.md`: short-term alpha and long-term product target.
 - `docs/alpha-developer-flow.md`: packaged local alpha developer journey.
+- `docs/release-publishing-decision-gate.md`: release publishing decision boundary.
 - `docs/alpha-acceptance-checklist.md`: local v0.1 alpha acceptance checklist.
 - `docs/runtime-runbook.md`: current runtime startup and verification notes.
 - `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-118
+current_milestone: M-119
 
 release_targets:
   short_term:
@@ -15,9 +15,9 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0190
+    next_ready_work_item: W-0191
     preferred_after_current:
-      - release_publishing_decision_gate
+      - release_execution_preparation_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2182,7 +2182,7 @@ milestones:
 
   - id: M-118
     title: Release Publishing Decision Gate
-    status: active
+    status: completed
     goal: Decide whether and how to publish v0.1 alpha without publishing it in the gate step.
     completion_criteria:
       - The gate defines release-publishing prerequisites, release artifact boundaries, verification requirements, and stop conditions.
@@ -2197,6 +2197,26 @@ milestones:
       - adding protocol routes or generated output
       - adding migrations or dependencies
       - adding broad operations/admin behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `docs/release-publishing-decision-gate.md` and `docs/release-publishing-decision-gate.zh-CN.md` as the release publishing decision gate, recorded `ADR-0098`, and added repository check coverage through `runtime.release_publishing_decision_gate`. The gate defines publishing prerequisites, release artifact boundaries, verification requirements, stop conditions, redaction expectations, and the next release execution preparation gate while preserving pre-alpha state, release publishing, release artifacts, hosted deployment, runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: M-119
+    title: Release Execution Preparation Gate
+    status: active
+    goal: Prepare the decision framework for a future v0.1 alpha release execution step without publishing a release or creating release artifacts.
+    completion_criteria:
+      - The gate defines the future release execution plan, release-note inputs, artifact plan boundaries, maintainer approval points, and rollback or stop conditions.
+      - The gate distinguishes release execution preparation from creating release artifacts or publishing a release.
+      - The gate preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless separately authorized.
+      - The resulting preparation gate is covered by repository checks or explicit verification notes.
+    non_goals:
+      - publishing v0.1 alpha in the preparation gate
+      - creating release tags, binaries, archives, containers, packages, checksums, or hosted deployments in the preparation gate
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -6777,8 +6797,10 @@ work_items:
   - id: W-0190
     milestone: M-118
     title: Define release publishing decision gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-define-release-publishing-decision-gate
+    commits:
+      - b0fb035
     depends_on:
       - W-0189
     expected_change_id: define-release-publishing-decision-gate
@@ -6786,6 +6808,7 @@ work_items:
     selected_direction: release_publishing_decision_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0098
       - ADR-0097
       - ADR-0096
       - ADR-0095
@@ -6800,3 +6823,32 @@ work_items:
       - Define the release publishing decision gate without publishing a release.
       - Specify release-publishing prerequisites, release artifact boundaries, verification requirements, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, and direct compatibility deferrals.
+    completion_summary: Added the release publishing decision gate and Simplified Chinese translation, recorded `ADR-0098`, and added repository check coverage through `runtime.release_publishing_decision_gate`. The gate defines release-publishing prerequisites, artifact boundaries, verification requirements, stop conditions, redaction expectations, and a next `release_execution_preparation_gate` direction while preserving pre-alpha state, release publishing, release artifact, hosted deployment, runtime, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: W-0191
+    milestone: M-119
+    title: Define release execution preparation gate
+    status: next_ready
+    change: changes/2026-05-21-define-release-execution-preparation-gate
+    depends_on:
+      - W-0190
+    expected_change_id: define-release-execution-preparation-gate
+    tier: tier_2_developer_experience
+    selected_direction: release_execution_preparation_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0098
+      - ADR-0097
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Publishing v0.1 alpha, creating release tags, binaries, archives, containers, packages, checksums, or hosted deployments, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the release execution preparation gate without publishing a release or creating release artifacts.
+      - Specify release execution planning inputs, release-note boundaries, artifact plan boundaries, maintainer approval points, verification requirements, rollback notes, and stop conditions.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals.
