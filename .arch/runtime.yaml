@@ -105,18 +105,19 @@ purpose: >
   release_execution_maintainer_decision: ADR-0101
   release_identifier_artifact_plan: ADR-0102
   release_execution_final_authorization: ADR-0103
+  first_alpha_user_discovery_loop: ADR-0104
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: first_alpha_user_discovery
+  current_phase: first_alpha_feedback_intake_surfaces
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0196
+  next_ready_work_item: W-0197
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5962,18 +5963,35 @@ identity_session_boundary:
     rule: W-0195 recorded final maintainer go authorization for v0.1.0-alpha.1, source archive only, and README user-acquisition refresh while preserving runtime, protocol, generated-output, migration, dependency, hosted deployment, broad artifact, and direct compatibility deferrals.
 
   first_alpha_user_discovery:
-    status: next_ready
+    status: completed
     milestone: M-124
-    next_ready_work_item: W-0196
+    completed_work_item: W-0196
+    decision: ADR-0104
+    change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    next_milestone: M-125
+    next_ready_work_item: W-0197
     previous_completed_work_item: W-0195
     selected_direction: first_alpha_user_discovery
+    next_direction: first_alpha_feedback_intake_surfaces
     expected_change: changes/2026-05-21-define-first-alpha-user-discovery-loop
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
+    discovery_loop_standard: docs/first-alpha-user-discovery-loop.md
+    discovery_loop_standard_translation: docs/first-alpha-user-discovery-loop.zh-CN.md
     release_identifier: v0.1.0-alpha.1
+    source_first_alpha_release_available: true
+    user_discovery_loop_defined: true
+    target_developer_segments_recorded: true
+    outreach_surfaces_recorded: true
+    feedback_capture_recorded: true
+    review_questions_recorded: true
+    success_signals_recorded: true
+    stop_conditions_recorded: true
+    feedback_intake_surfaces_next_ready: true
     source_first_alpha_release_authorized: true
     additional_release_artifacts_authorized: false
     public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
     hosted_deployment_added: false
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
@@ -5985,7 +6003,37 @@ identity_session_boundary:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0196 should define a bounded user discovery loop without expanding release artifacts or runtime scope.
+    check_rule: runtime.first_alpha_user_discovery_loop
+    rule: W-0196 defined a bounded user discovery loop without executing announcements, expanding release artifacts, adding hosted deployment, or changing runtime scope.
+
+  first_alpha_feedback_intake_surfaces:
+    status: next_ready
+    milestone: M-125
+    next_ready_work_item: W-0197
+    previous_completed_work_item: W-0196
+    selected_direction: first_alpha_feedback_intake_surfaces
+    expected_change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    release_identifier: v0.1.0-alpha.1
+    source_first_alpha_release_available: true
+    user_discovery_loop_defined: true
+    feedback_intake_surfaces_prepared: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    additional_release_artifacts_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0197 should prepare repository-owned feedback intake surfaces without executing announcements or changing runtime scope.
 
 persistence_model:
   decision: ADR-0011

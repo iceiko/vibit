@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: v0.1_alpha_source_release_authorized
+  current_state: v0.1_alpha_user_discovery_loop_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0196
-  immediate_next_direction: first_alpha_user_discovery
+  immediate_next_work_item: W-0197
+  immediate_next_direction: first_alpha_feedback_intake_surfaces
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
@@ -3618,19 +3618,36 @@ phase_plan:
     check_rule: runtime.release_execution_final_authorization
     rule: W-0195 records final release execution authorization for the source-first alpha.
   phase_2dg_first_alpha_user_discovery:
-    status: next_ready
+    status: completed
     milestone: M-124
-    next_ready_work_item: W-0196
+    completed_work_item: W-0196
+    decision: ADR-0104
+    change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    next_milestone: M-125
+    next_ready_work_item: W-0197
     previous_completed_work_item: W-0195
     alpha_target_alignment: developer_experience
     selected_direction: first_alpha_user_discovery
+    next_direction: first_alpha_feedback_intake_surfaces
     expected_change: changes/2026-05-21-define-first-alpha-user-discovery-loop
     reference_mapping:
       nakama: First alpha user discovery should identify developers evaluating serious game backend capability and contribution paths.
       pitaya: First alpha user discovery should identify Go game server developers who value explicit routes, sessions, and maintainable server architecture.
+    discovery_loop_standard: docs/first-alpha-user-discovery-loop.md
+    discovery_loop_standard_translation: docs/first-alpha-user-discovery-loop.zh-CN.md
     release_identifier: v0.1.0-alpha.1
+    source_first_alpha_release_available: true
+    user_discovery_loop_defined: true
+    target_developer_segments_recorded: true
+    outreach_surfaces_recorded: true
+    feedback_capture_recorded: true
+    review_questions_recorded: true
+    success_signals_recorded: true
+    stop_conditions_recorded: true
+    feedback_intake_surfaces_next_ready: true
     additional_release_artifacts_authorized: false
     public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
     hosted_deployment_added: false
     runtime_behavior_added: false
     protocol_route_added: false
@@ -3641,7 +3658,37 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0196 should define a bounded first alpha user discovery loop without expanding release artifacts or runtime scope.
+    check_rule: runtime.first_alpha_user_discovery_loop
+    rule: W-0196 defined a bounded first alpha user discovery loop without expanding release artifacts or runtime scope.
+  phase_2dh_first_alpha_feedback_intake_surfaces:
+    status: next_ready
+    milestone: M-125
+    next_ready_work_item: W-0197
+    previous_completed_work_item: W-0196
+    alpha_target_alignment: developer_experience
+    selected_direction: first_alpha_feedback_intake_surfaces
+    expected_change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
+    reference_mapping:
+      nakama: Feedback intake surfaces should make early user and contributor reports actionable without overstating production readiness.
+      pitaya: Feedback intake surfaces should help Go game server developers report setup, route, session, and architecture friction.
+    release_identifier: v0.1.0-alpha.1
+    source_first_alpha_release_available: true
+    user_discovery_loop_defined: true
+    feedback_intake_surfaces_prepared: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0197 should prepare feedback intake surfaces without executing announcements or changing runtime scope.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

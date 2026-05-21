@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-124
+current_milestone: M-125
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: v0.1_alpha_source_release_authorized
+    current_release_state: v0.1_alpha_user_discovery_loop_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0196
+    next_ready_work_item: W-0197
     preferred_after_current:
-      - first_alpha_user_discovery
+      - first_alpha_feedback_intake_surfaces
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2307,7 +2307,7 @@ milestones:
 
   - id: M-124
     title: First Alpha User Discovery
-    status: active
+    status: completed
     goal: Turn the source-first v0.1 alpha release and refreshed README into a bounded loop for finding early developers and converting their friction into next work items.
     completion_criteria:
       - The first target developer segments and outreach surfaces are recorded.
@@ -2317,6 +2317,27 @@ milestones:
       - creating additional release artifacts
       - publishing binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, or hosted deployments
       - running broad public announcement campaigns without a bounded plan
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the first alpha user discovery loop in `docs/first-alpha-user-discovery-loop.md` and `docs/first-alpha-user-discovery-loop.zh-CN.md`, accepted `ADR-0104`, recorded target developer segments, outreach surfaces, feedback capture fields, review questions, success signals, and stop conditions, and preserved deferrals for public announcements beyond the GitHub release record, paid promotion, hosted deployments, additional release artifacts, runtime behavior, protocol routes, generated output, migrations, dependencies, operations/admin behavior, authentication/session behavior, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-125
+    title: First Alpha Feedback Intake Surfaces
+    status: active
+    goal: Prepare the smallest repository-owned surfaces for receiving early alpha user feedback before any broader outreach.
+    completion_criteria:
+      - The first feedback intake surface choice is recorded.
+      - Feedback guidance, redaction expectations, labels or templates, and triage posture are prepared without executing broad announcements.
+      - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, release artifact, public announcement, paid promotion, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -7106,8 +7127,10 @@ work_items:
   - id: W-0196
     milestone: M-124
     title: Define first alpha user discovery loop
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    commits:
+      - pending
     depends_on:
       - W-0195
     expected_change_id: define-first-alpha-user-discovery-loop
@@ -7126,3 +7149,28 @@ work_items:
       - Define the first alpha user discovery loop after the source-first release.
       - Record target developer segments, outreach surfaces, feedback capture, success signals, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the first alpha user discovery loop after `v0.1.0-alpha.1`, recorded the initial developer segments, allowed and deferred outreach surfaces, feedback capture fields, review questions, success signals, and stop conditions, accepted `ADR-0104`, added `runtime.first_alpha_user_discovery_loop` check coverage, and opened `W-0197 Prepare first alpha feedback intake surfaces` as the next-ready work item without executing announcements, adding hosted deployments, expanding release artifacts, or changing runtime scope.
+
+  - id: W-0197
+    milestone: M-125
+    title: Prepare first alpha feedback intake surfaces
+    status: next_ready
+    change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
+    depends_on:
+      - W-0196
+    expected_change_id: prepare-first-alpha-feedback-intake-surfaces
+    tier: tier_2_developer_experience
+    selected_direction: first_alpha_feedback_intake_surfaces
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0104
+      - ADR-0103
+      - ADR-0097
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Public announcements beyond the GitHub release record, paid promotion, hosted deployments, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Prepare the first repository-owned feedback intake surface for early alpha users.
+      - Record the intake format, feedback fields, redaction expectations, labels or templates, and triage posture.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, release artifact, public announcement, paid promotion, authentication/session, and direct compatibility deferrals unless explicitly authorized.

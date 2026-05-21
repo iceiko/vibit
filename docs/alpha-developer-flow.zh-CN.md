@@ -35,7 +35,7 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: first_alpha_user_discovery
+next_direction: first_alpha_feedback_intake_surfaces
 next_work_status: next_ready
 ```
 
@@ -152,7 +152,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`。下一步 work 是 `W-0196 Define first alpha user discovery loop`；它应定义如何找到早期开发者，同时不扩大 runtime behavior 或 release artifacts。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`。下一步 work 是 `W-0197 Prepare first alpha feedback intake surfaces`；它应准备一个有边界的 repository-owned early-user feedback 接收方式，同时不执行 broad announcements、不添加 hosted deployment、不扩大 release artifacts，也不改变 runtime behavior。
 
 ## 9. Deferred Work
 

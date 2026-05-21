@@ -123,6 +123,11 @@ Release authorization record 是：
 - `docs/release-execution-final-authorization.md`
 - `decisions/ADR-0103-release-execution-final-authorization.md`
 
+First alpha user discovery loop 是：
+
+- `docs/first-alpha-user-discovery-loop.md`
+- `decisions/ADR-0104-first-alpha-user-discovery-loop.md`
+
 ## 继续开发
 
 如果你是继续推进项目的 agent 或 contributor，先运行：
@@ -135,7 +140,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0196 Define first alpha user discovery loop
+W-0197 Prepare first alpha feedback intake surfaces
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -190,6 +195,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/release-execution-preparation-gate.md`：release execution preparation boundary。
 - `docs/release-execution-authorization-gate.md`：release execution authorization criteria。
 - `docs/release-execution-final-authorization.md`：final release authorization record。
+- `docs/first-alpha-user-discovery-loop.md`：first alpha user discovery loop。
 - `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
 - `changes/`：具体 change specs 和 verification records。
