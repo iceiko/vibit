@@ -100,17 +100,18 @@ purpose: >
   alpha_acceptance_checklist: ADR-0096
   package_alpha_developer_flow: ADR-0097
   release_publishing_decision_gate: ADR-0098
+  release_execution_preparation_gate: ADR-0099
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: release_execution_preparation_gate
+  current_phase: release_execution_authorization_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: false
-  next_ready_work_item: W-0191
+  next_ready_work_item: W-0192
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5676,13 +5677,65 @@ identity_session_boundary:
     rule: W-0190 defined the release publishing decision gate without publishing a release or creating release artifacts.
 
   release_execution_preparation_gate:
-    status: next_ready
+    status: completed
     milestone: M-119
-    next_ready_work_item: W-0191
+    completed_work_item: W-0191
+    decision: ADR-0099
+    change: changes/2026-05-21-define-release-execution-preparation-gate
+    next_milestone: M-120
+    next_ready_work_item: W-0192
     depends_on:
       - W-0190
     selected_direction: release_execution_preparation_gate
-    expected_change: changes/2026-05-21-define-release-execution-preparation-gate
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    gate_standard: docs/release-execution-preparation-gate.md
+    gate_standard_translation: docs/release-execution-preparation-gate.zh-CN.md
+    release_execution_preparation_gate_defined: true
+    release_declared: false
+    release_publishing_authorized_by_this_gate: false
+    release_execution_authorized_by_this_gate: false
+    release_packaging_authorized_by_this_gate: false
+    release_artifacts_created_by_this_gate: false
+    hosted_deployment_authorized_by_this_gate: false
+    release_execution_plan_defined: true
+    release_note_inputs_defined: true
+    artifact_plan_boundaries_defined: true
+    maintainer_approval_points_defined: true
+    rollback_stop_conditions_defined: true
+    release_identifier_selected: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_provenance_created: false
+    release_packaging_added: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    startup_configuration_semantics_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_direction: release_execution_authorization_gate
+    check_rule: runtime.release_execution_preparation_gate
+    rule: W-0191 defined the release execution preparation gate without publishing a release or creating release artifacts.
+
+  release_execution_authorization_gate:
+    status: next_ready
+    milestone: M-120
+    next_ready_work_item: W-0192
+    depends_on:
+      - W-0191
+    selected_direction: release_execution_authorization_gate
+    expected_change: changes/2026-05-21-define-release-execution-authorization-gate
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
     release_publishing_authorized_by_current_state: false
@@ -5699,7 +5752,7 @@ identity_session_boundary:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0191 should define the release execution preparation gate without publishing a release or creating release artifacts.
+    rule: W-0192 should define the release execution authorization gate without publishing a release or creating release artifacts.
 
 persistence_model:
   decision: ADR-0011

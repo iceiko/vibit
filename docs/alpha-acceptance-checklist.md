@@ -123,7 +123,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`. The next preferred contribution is to define the release execution preparation gate without publishing a release or creating release artifacts.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, and the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`. The next preferred contribution is to define the release execution authorization gate without publishing a release or creating release artifacts.
 
 ## 11. Release Deferrals
 
@@ -146,7 +146,8 @@ Current result:
 local_alpha_flow_checkable: true
 local_alpha_developer_flow_packaged: true
 release_publishing_decision_gate_defined: true
+release_execution_preparation_gate_defined: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_preparation_gate
+next_direction: release_execution_authorization_gate
 ```

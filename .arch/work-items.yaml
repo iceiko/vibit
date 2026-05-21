@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-119
+current_milestone: M-120
 
 release_targets:
   short_term:
@@ -15,9 +15,9 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0191
+    next_ready_work_item: W-0192
     preferred_after_current:
-      - release_execution_preparation_gate
+      - release_execution_authorization_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2202,7 +2202,7 @@ milestones:
 
   - id: M-119
     title: Release Execution Preparation Gate
-    status: active
+    status: completed
     goal: Prepare the decision framework for a future v0.1 alpha release execution step without publishing a release or creating release artifacts.
     completion_criteria:
       - The gate defines the future release execution plan, release-note inputs, artifact plan boundaries, maintainer approval points, and rollback or stop conditions.
@@ -2212,6 +2212,26 @@ milestones:
     non_goals:
       - publishing v0.1 alpha in the preparation gate
       - creating release tags, binaries, archives, containers, packages, checksums, or hosted deployments in the preparation gate
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `docs/release-execution-preparation-gate.md` and `docs/release-execution-preparation-gate.zh-CN.md` as the release execution preparation gate, recorded `ADR-0099`, and added repository check coverage through `runtime.release_execution_preparation_gate`. The gate defines planning inputs, release-note input boundaries, artifact plan boundaries, maintainer approval points, verification requirements, rollback notes, stop conditions, redaction expectations, and the next release execution authorization gate while preserving pre-alpha state, release publishing, release execution, release artifacts, hosted deployment, runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: M-120
+    title: Release Execution Authorization Gate
+    status: active
+    goal: Define authorization criteria for a future v0.1 alpha release execution step without publishing a release or creating release artifacts.
+    completion_criteria:
+      - The gate defines final go/no-go criteria, required verification state, release identifier review, artifact authorization boundaries, and maintainer approval requirements.
+      - The gate distinguishes authorization from creating release artifacts or publishing a release.
+      - The gate preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless separately authorized.
+      - The resulting authorization gate is covered by repository checks or explicit verification notes.
+    non_goals:
+      - publishing v0.1 alpha in the authorization gate
+      - creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments in the authorization gate
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -6828,7 +6848,7 @@ work_items:
   - id: W-0191
     milestone: M-119
     title: Define release execution preparation gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-define-release-execution-preparation-gate
     depends_on:
       - W-0190
@@ -6837,6 +6857,7 @@ work_items:
     selected_direction: release_execution_preparation_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0099
       - ADR-0098
       - ADR-0097
       - ADR-0096
@@ -6851,4 +6872,34 @@ work_items:
     completion:
       - Define the release execution preparation gate without publishing a release or creating release artifacts.
       - Specify release execution planning inputs, release-note boundaries, artifact plan boundaries, maintainer approval points, verification requirements, rollback notes, and stop conditions.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals.
+    completion_summary: Added the release execution preparation gate and Simplified Chinese translation, recorded `ADR-0099`, and added repository check coverage through `runtime.release_execution_preparation_gate`. The gate defines release execution planning inputs, release-note input boundaries, artifact plan boundaries, maintainer approval points, verification requirements, rollback notes, stop conditions, redaction expectations, and a next `release_execution_authorization_gate` direction while preserving pre-alpha state, release publishing, release execution, release artifact, hosted deployment, runtime, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: W-0192
+    milestone: M-120
+    title: Define release execution authorization gate
+    status: next_ready
+    change: changes/2026-05-21-define-release-execution-authorization-gate
+    depends_on:
+      - W-0191
+    expected_change_id: define-release-execution-authorization-gate
+    tier: tier_2_developer_experience
+    selected_direction: release_execution_authorization_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0099
+      - ADR-0098
+      - ADR-0097
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Publishing v0.1 alpha, choosing or creating release identifiers or tags, creating release binaries, archives, containers, packages, checksums, provenance files, or hosted deployments, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the release execution authorization gate without publishing a release or creating release artifacts.
+      - Specify final go/no-go criteria, release identifier review, artifact authorization boundaries, maintainer approval requirements, verification requirements, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals.

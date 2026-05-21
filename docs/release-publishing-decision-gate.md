@@ -46,7 +46,7 @@ direct_nakama_pitaya_api_compatibility_added: false
 next_direction: release_execution_preparation_gate
 ```
 
-The gate allows the project to proceed to a later release execution preparation gate. It does not authorize release execution.
+The gate allowed the project to proceed to the release execution preparation gate now recorded in `docs/release-execution-preparation-gate.md`. It does not authorize release execution.
 
 ## 3. Publishing Prerequisites
 
@@ -177,7 +177,7 @@ It does not copy Nakama or Pitaya APIs, release packaging, deployment model, clu
 The next bounded contribution is:
 
 ```text
-W-0191 Define release execution preparation gate
+W-0192 Define release execution authorization gate
 ```
 
-That future step may prepare a release execution plan, but it still must not publish a release or create release artifacts unless its own scope explicitly says so and the maintainer authorizes the ask-first boundary.
+`W-0191` completed the release execution preparation gate. The next step may define authorization criteria for release execution, but it still must not publish a release or create release artifacts unless its own scope explicitly says so and the maintainer authorizes the ask-first boundary.

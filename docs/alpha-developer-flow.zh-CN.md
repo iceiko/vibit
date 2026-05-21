@@ -28,7 +28,8 @@ release_declared: false
 release_publishing_authorized_by_this_document: false
 release_packaging_authorized_by_this_document: false
 release_publishing_decision_gate_defined: true
-next_direction: release_execution_preparation_gate
+release_execution_preparation_gate_defined: true
+next_direction: release_execution_authorization_gate
 ```
 
 Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，但发布 `v0.1 alpha` 仍需要后续明确 work item。
@@ -144,7 +145,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release publishing decision gate 之后，推荐的下一步 work 是 release execution preparation gate。该 future gate 可以准备 release execution mechanics，但本文档不发布 release，也不创建 release tags、binaries、archives、containers、packages 或 hosted deployments。
+Release execution preparation gate 之后，推荐的下一步 work 是 release execution authorization gate。该 future gate 可以定义 release execution 的 final go/no-go criteria，但本文档不发布 release，也不创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments。
 
 ## 9. Deferred Work
 

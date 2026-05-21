@@ -45,7 +45,7 @@ direct_nakama_pitaya_api_compatibility_added: false
 next_direction: release_execution_preparation_gate
 ```
 
-该 gate 允许项目进入后续 release execution preparation gate。它不授权 release execution。
+该 gate 允许项目进入现在记录于 `docs/release-execution-preparation-gate.md` 的 release execution preparation gate。它不授权 release execution。
 
 ## 3. Publishing Prerequisites
 
@@ -176,7 +176,7 @@ Nakama 和 Pitaya 都体现了严肃 server framework 应具备 coherent local d
 下一步 bounded contribution 是：
 
 ```text
-W-0191 Define release execution preparation gate
+W-0192 Define release execution authorization gate
 ```
 
-该 future step 可以准备 release execution plan，但仍不得发布 release 或创建 release artifacts，除非它自己的 scope 明确说明并且 maintainer 授权 ask-first boundary。
+`W-0191` 已完成 release execution preparation gate。下一步可以定义 release execution 的 authorization criteria，但仍不得发布 release 或创建 release artifacts，除非它自己的 scope 明确说明并且 maintainer 授权 ask-first boundary。
