@@ -109,5 +109,6 @@ Revisit this decision if maintainers choose a different release process, if rele
 
 ## Follow-Up
 
-- Advance `W-0192 Define release execution authorization gate`.
+- `W-0192 Define release execution authorization gate` is now complete.
+- The current blocked release-path work item is `W-0193 Confirm release execution maintainer decision`.
 - Keep release publication, release tags, binaries, archives, containers, packages, checksums, provenance files, hosted deployments, runtime changes, protocol changes, generated output, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, direct compatibility, and broad product expansion behind later explicit work items.

@@ -176,7 +176,7 @@ Nakama 和 Pitaya 都体现了严肃 server framework 应具备 coherent local d
 下一步 bounded contribution 是：
 
 ```text
-W-0192 Define release execution authorization gate
+W-0193 Confirm release execution maintainer decision
 ```
 
-`W-0191` 已完成 release execution preparation gate。下一步可以定义 release execution 的 authorization criteria，但仍不得发布 release 或创建 release artifacts，除非它自己的 scope 明确说明并且 maintainer 授权 ask-first boundary。
+`W-0191` 已完成 release execution preparation gate，`W-0192` 已完成 release execution authorization gate。下一步 blocked，直到 maintainer 明确选择 release execution go/no-go，并授权任何 release identifier、tag、artifact、hosted deployment、publication surface 或 release execution command。

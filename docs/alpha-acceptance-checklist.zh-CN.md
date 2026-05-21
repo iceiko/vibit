@@ -35,8 +35,8 @@ Review alpha flow 时使用这些状态：
 - [x] `README.md` 和 `README.zh-CN.md` 说明 vibit 是 agent-native server framework，并说明当前状态是 pre-alpha。
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
-- [x] `.arch/work-items.yaml` 在本 checklist 之后记录一个 next-ready continuation item。
-- [x] `node tools/vibit inspect next` 能识别下一步 bounded contribution。
+- [x] `.arch/work-items.yaml` 记录当前 continuation state。
+- [x] `node tools/vibit inspect next` 能识别当前 blocked maintainer decision step。
 
 ## 4. Local Prerequisites
 
@@ -122,14 +122,15 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`。下一步推荐 contribution 是定义 release execution authorization gate，但不发布 release，也不创建 release artifacts。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`。下一步 work blocked 在 `W-0193 Confirm release execution maintainer decision`；任何 release identifier、tag、artifact、hosted deployment、publication surface 或 release execution command 继续前，都需要 maintainer 明确 go/no-go authorization。
 
 ## 11. Release Deferrals
 
 以下内容继续 deferred，直到后续明确 work item 授权：
 
 - 发布 `v0.1 alpha`。
-- 创建 release tags、binaries、archives、containers、packages 或 hosted deployments。
+- 选择 release identifiers。
+- 创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments。
 - 添加 public local onboarding protocol route。
 - 添加 production signup、external identity providers、password login、account recovery、account merge 或 multi-device linking。
 - 添加 broad operations/admin behavior、metrics backend integration 或 production observability。
@@ -146,7 +147,9 @@ local_alpha_flow_checkable: true
 local_alpha_developer_flow_packaged: true
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
+release_execution_authorization_gate_defined: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_authorization_gate
+next_direction: release_execution_maintainer_decision
+next_work_status: blocked
 ```

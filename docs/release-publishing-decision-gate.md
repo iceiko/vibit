@@ -177,7 +177,7 @@ It does not copy Nakama or Pitaya APIs, release packaging, deployment model, clu
 The next bounded contribution is:
 
 ```text
-W-0192 Define release execution authorization gate
+W-0193 Confirm release execution maintainer decision
 ```
 
-`W-0191` completed the release execution preparation gate. The next step may define authorization criteria for release execution, but it still must not publish a release or create release artifacts unless its own scope explicitly says so and the maintainer authorizes the ask-first boundary.
+`W-0191` completed the release execution preparation gate, and `W-0192` completed the release execution authorization gate. The next step is blocked until the maintainer explicitly chooses release execution go/no-go and authorizes any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command.

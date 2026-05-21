@@ -36,8 +36,8 @@ Use these states when reviewing the alpha flow:
 - [x] `README.md` and `README.zh-CN.md` explain that vibit is an agent-native server framework and that the current state is pre-alpha.
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
-- [x] `.arch/work-items.yaml` records one next-ready continuation item after this checklist.
-- [x] `node tools/vibit inspect next` identifies the next bounded contribution step.
+- [x] `.arch/work-items.yaml` records the current continuation state.
+- [x] `node tools/vibit inspect next` identifies the current blocked maintainer decision step.
 
 ## 4. Local Prerequisites
 
@@ -123,14 +123,15 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, and the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`. The next preferred contribution is to define the release execution authorization gate without publishing a release or creating release artifacts.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, and the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`. The next work is blocked at `W-0193 Confirm release execution maintainer decision`; it requires explicit maintainer go/no-go authorization before any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command can proceed.
 
 ## 11. Release Deferrals
 
 The following remain deferred until a later explicit work item:
 
 - Publishing `v0.1 alpha`.
-- Creating release tags, binaries, archives, containers, packages, or hosted deployments.
+- Selecting release identifiers.
+- Creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments.
 - Adding a public local onboarding protocol route.
 - Adding production signup, external identity providers, password login, account recovery, account merge, or multi-device linking.
 - Adding broad operations/admin behavior, metrics backend integration, or production observability.
@@ -147,7 +148,9 @@ local_alpha_flow_checkable: true
 local_alpha_developer_flow_packaged: true
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
+release_execution_authorization_gate_defined: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_authorization_gate
+next_direction: release_execution_maintainer_decision
+next_work_status: blocked
 ```

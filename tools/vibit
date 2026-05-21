@@ -127,6 +127,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.package_alpha_developer_flow",
   "runtime.release_publishing_decision_gate",
   "runtime.release_execution_preparation_gate",
+  "runtime.release_execution_authorization_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -22563,7 +22564,7 @@ function checkRuntimeReleasePublishingDecisionGate(root, goFiles) {
       "Release Artifact Boundary",
       "Verification Requirements",
       "Stop Conditions",
-      workItemHasStatus(root, "W-0191", "completed") ? "W-0192 Define release execution authorization gate" : "W-0191 Define release execution preparation gate",
+      workItemHasStatus(root, "W-0192", "completed") ? "W-0193 Confirm release execution maintainer decision" : workItemHasStatus(root, "W-0191", "completed") ? "W-0192 Define release execution authorization gate" : "W-0191 Define release execution preparation gate",
     ],
     [gateTranslationPath]: [
       "release_publishing_decision_gate: defined",
@@ -22581,7 +22582,7 @@ function checkRuntimeReleasePublishingDecisionGate(root, goFiles) {
       "Release Artifact Boundary",
       "Verification Requirements",
       "Stop Conditions",
-      workItemHasStatus(root, "W-0191", "completed") ? "W-0192 Define release execution authorization gate" : "W-0191 Define release execution preparation gate",
+      workItemHasStatus(root, "W-0192", "completed") ? "W-0193 Confirm release execution maintainer decision" : workItemHasStatus(root, "W-0191", "completed") ? "W-0192 Define release execution authorization gate" : "W-0191 Define release execution preparation gate",
     ],
   };
   for (const [file, markers] of Object.entries(markersByFile)) {
@@ -22665,6 +22666,7 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
   const conversationPath = "conversations/2026-05-21-release-execution-preparation-gate.md";
   const gatePath = "docs/release-execution-preparation-gate.md";
   const gateTranslationPath = "docs/release-execution-preparation-gate.zh-CN.md";
+  const authorizationCompleted = workItemHasStatus(root, "W-0192", "completed");
 
   if (!workItemHasStatus(root, "W-0191", "completed")) {
     ok("release execution preparation gate is not completed yet", {
@@ -22708,7 +22710,7 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
     [".arch/work-items.yaml", "id: M-120"],
     [".arch/work-items.yaml", "title: Release Execution Authorization Gate"],
     [".arch/work-items.yaml", "id: W-0192"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", authorizationCompleted ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "release_execution_preparation_gate: ADR-0099"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "release_execution_preparation_gate:"],
@@ -22773,21 +22775,21 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
     ["README.zh-CN.md", "docs/release-execution-preparation-gate.md"],
     ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
     ["docs/alpha-developer-flow.md", "release_execution_preparation_gate_defined: true"],
-    ["docs/alpha-developer-flow.md", "next_direction: release_execution_authorization_gate"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-developer-flow.zh-CN.md", "release_execution_preparation_gate_defined: true"],
-    ["docs/alpha-developer-flow.zh-CN.md", "next_direction: release_execution_authorization_gate"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.md", "release_execution_preparation_gate_defined: true"],
-    ["docs/alpha-acceptance-checklist.md", "next_direction: release_execution_authorization_gate"],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.zh-CN.md", "release_execution_preparation_gate_defined: true"],
-    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_direction: release_execution_authorization_gate"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/runtime-runbook.md", "docs/release-execution-preparation-gate.md"],
     ["docs/runtime-runbook.md", "release execution authorization gate"],
     ["docs/runtime-runbook.zh-CN.md", "docs/release-execution-preparation-gate.md"],
     ["docs/runtime-runbook.zh-CN.md", "release execution authorization gate"],
     ["docs/release-publishing-decision-gate.md", "docs/release-execution-preparation-gate.md"],
-    ["docs/release-publishing-decision-gate.md", "W-0192 Define release execution authorization gate"],
+    ["docs/release-publishing-decision-gate.md", authorizationCompleted ? "W-0193 Confirm release execution maintainer decision" : "W-0192 Define release execution authorization gate"],
     ["docs/release-publishing-decision-gate.zh-CN.md", "docs/release-execution-preparation-gate.md"],
-    ["docs/release-publishing-decision-gate.zh-CN.md", "W-0192 Define release execution authorization gate"],
+    ["docs/release-publishing-decision-gate.zh-CN.md", authorizationCompleted ? "W-0193 Confirm release execution maintainer decision" : "W-0192 Define release execution authorization gate"],
     ["AGENTS.md", "runtime.release_execution_preparation_gate"],
     ["AGENTS.md", "W-0192"],
     ["AGENTS.zh-CN.md", "runtime.release_execution_preparation_gate"],
@@ -22809,7 +22811,7 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
       "runtime.release_execution_preparation_gate",
       "release_execution_authorized_by_this_gate: false",
       "release_artifacts_created_by_this_gate: false",
-      "W-0192 Define release execution authorization gate",
+      authorizationCompleted ? "W-0193 Confirm release execution maintainer decision" : "W-0192 Define release execution authorization gate",
       "Nakama",
       "Pitaya",
     ],
@@ -22878,7 +22880,7 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
       "Maintainer Approval Points",
       "Verification Requirements",
       "Rollback And Stop Conditions",
-      "W-0192 Define release execution authorization gate",
+      authorizationCompleted ? "W-0193 Confirm release execution maintainer decision" : "W-0192 Define release execution authorization gate",
     ],
     [gateTranslationPath]: [
       "release_execution_preparation_gate: defined",
@@ -22903,7 +22905,7 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
       "Maintainer Approval Points",
       "Verification Requirements",
       "Rollback And Stop Conditions",
-      "W-0192 Define release execution authorization gate",
+      authorizationCompleted ? "W-0193 Confirm release execution maintainer decision" : "W-0192 Define release execution authorization gate",
     ],
   };
   for (const [file, markers] of Object.entries(markersByFile)) {
@@ -22979,6 +22981,361 @@ function checkRuntimeReleaseExecutionPreparationGate(root, goFiles) {
   }
 
   ok("release execution preparation gate is completed while release publication, release execution, release artifacts, hosted deployment, runtime, protocol, generated-output, migration, dependency, operations, authentication/session, product-scope, and direct compatibility deferrals remain preserved", {
+    rule_id: ruleId,
+    artifact: gatePath,
+  });
+}
+
+function checkRuntimeReleaseExecutionAuthorizationGate(root, goFiles) {
+  const ruleId = "runtime.release_execution_authorization_gate";
+  const decisionPath = "decisions/ADR-0100-release-execution-authorization-gate.md";
+  const changePath = "changes/2026-05-21-define-release-execution-authorization-gate";
+  const conversationPath = "conversations/2026-05-21-release-execution-authorization-gate.md";
+  const gatePath = "docs/release-execution-authorization-gate.md";
+  const gateTranslationPath = "docs/release-execution-authorization-gate.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0192", "completed")) {
+    ok("release execution authorization gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    gatePath,
+    gateTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for release execution authorization gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for release execution authorization gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-120"],
+    [".arch/work-items.yaml", "title: Release Execution Authorization Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0192"],
+    [".arch/work-items.yaml", "ADR-0100"],
+    [".arch/work-items.yaml", "id: M-121"],
+    [".arch/work-items.yaml", "title: Release Execution Maintainer Decision"],
+    [".arch/work-items.yaml", "id: W-0193"],
+    [".arch/work-items.yaml", "status: blocked"],
+    [".arch/work-items.yaml", "block_reason:"],
+    [".arch/runtime.yaml", "release_execution_authorization_gate: ADR-0100"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "next_ready_work_item: null"],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "release_execution_authorization_gate:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0192"],
+    [".arch/runtime.yaml", "decision: ADR-0100"],
+    [".arch/runtime.yaml", "gate_standard: docs/release-execution-authorization-gate.md"],
+    [".arch/runtime.yaml", "gate_standard_translation: docs/release-execution-authorization-gate.zh-CN.md"],
+    [".arch/runtime.yaml", "release_execution_authorization_gate_defined: true"],
+    [".arch/runtime.yaml", "release_declared: false"],
+    [".arch/runtime.yaml", "release_publishing_authorized_by_this_gate: false"],
+    [".arch/runtime.yaml", "release_execution_authorized_by_this_gate: false"],
+    [".arch/runtime.yaml", "release_packaging_authorized_by_this_gate: false"],
+    [".arch/runtime.yaml", "release_artifacts_created_by_this_gate: false"],
+    [".arch/runtime.yaml", "hosted_deployment_authorized_by_this_gate: false"],
+    [".arch/runtime.yaml", "final_go_no_go_criteria_defined: true"],
+    [".arch/runtime.yaml", "required_verification_state_defined: true"],
+    [".arch/runtime.yaml", "release_identifier_review_defined: true"],
+    [".arch/runtime.yaml", "artifact_authorization_boundaries_defined: true"],
+    [".arch/runtime.yaml", "maintainer_approval_requirements_defined: true"],
+    [".arch/runtime.yaml", "stop_conditions_defined: true"],
+    [".arch/runtime.yaml", "release_identifier_selected: false"],
+    [".arch/runtime.yaml", "release_tag_created: false"],
+    [".arch/runtime.yaml", "release_binary_created: false"],
+    [".arch/runtime.yaml", "release_archive_created: false"],
+    [".arch/runtime.yaml", "release_container_created: false"],
+    [".arch/runtime.yaml", "release_package_created: false"],
+    [".arch/runtime.yaml", "release_checksum_created: false"],
+    [".arch/runtime.yaml", "release_provenance_created: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "broad_operations_admin_behavior_added: false"],
+    [".arch/runtime.yaml", "product_module_expansion_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "next_direction: release_execution_maintainer_decision"],
+    [".arch/runtime.yaml", "check_rule: runtime.release_execution_authorization_gate"],
+    [".arch/runtime.yaml", "release_execution_maintainer_decision:"],
+    [".arch/conventions.yaml", "release_execution_authorization_gate:"],
+    [".arch/conventions.yaml", "release_execution_authorization_gate_defined: true"],
+    [".arch/conventions.yaml", "check_rule: runtime.release_execution_authorization_gate"],
+    [".arch/conventions.yaml", "release_execution_maintainer_decision:"],
+    [".arch/contracts.yaml", "release_execution_authorization_gate:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.release_execution_authorization_gate"],
+    [".arch/contracts.yaml", "release_execution_maintainer_decision:"],
+    [".arch/reference.yaml", "phase_2dc_release_execution_authorization_gate"],
+    [".arch/reference.yaml", "check_rule: runtime.release_execution_authorization_gate"],
+    [".arch/reference.yaml", "phase_2dd_release_execution_maintainer_decision"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", "docs/release-execution-authorization-gate.md"],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "docs/release-execution-authorization-gate.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", "release_execution_authorization_gate_defined: true"],
+    ["docs/alpha-developer-flow.md", "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "release_execution_authorization_gate_defined: true"],
+    ["docs/alpha-developer-flow.zh-CN.md", "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "release_execution_authorization_gate_defined: true"],
+    ["docs/alpha-acceptance-checklist.md", "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "release_execution_authorization_gate_defined: true"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/runtime-runbook.md", "docs/release-execution-authorization-gate.md"],
+    ["docs/runtime-runbook.md", "blocked maintainer go/no-go decision"],
+    ["docs/runtime-runbook.zh-CN.md", "docs/release-execution-authorization-gate.md"],
+    ["docs/runtime-runbook.zh-CN.md", "blocked maintainer go/no-go decision"],
+    ["docs/release-execution-preparation-gate.md", "docs/release-execution-authorization-gate.md"],
+    ["docs/release-execution-preparation-gate.md", "W-0193 Confirm release execution maintainer decision"],
+    ["docs/release-execution-preparation-gate.zh-CN.md", "docs/release-execution-authorization-gate.md"],
+    ["docs/release-execution-preparation-gate.zh-CN.md", "W-0193 Confirm release execution maintainer decision"],
+    ["AGENTS.md", "runtime.release_execution_authorization_gate"],
+    ["AGENTS.md", "W-0193"],
+    ["AGENTS.zh-CN.md", "runtime.release_execution_authorization_gate"],
+    ["AGENTS.zh-CN.md", "W-0193"],
+    ["runtime/AGENTS.md", "runtime.release_execution_authorization_gate"],
+    ["runtime/AGENTS.md", "W-0193"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.release_execution_authorization_gate"],
+    ["runtime/AGENTS.zh-CN.md", "W-0193"],
+    ["rules/check-rules.json", "runtime.release_execution_authorization_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0100",
+      "docs/release-execution-authorization-gate.md",
+      "runtime.release_execution_authorization_gate",
+      "release_execution_authorized_by_this_gate: false",
+      "release_identifier_selected: false",
+      "release_artifacts_created_by_this_gate: false",
+      "W-0193 Confirm release execution maintainer decision",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0192",
+      "completed_milestone: M-120",
+      "previous_completed_work_item: W-0191",
+      "next_milestone: M-121",
+      "next_work_item: W-0193",
+      "next_work_item_status: blocked",
+      "release_execution_authorization_gate_defined: true",
+      "release_execution_authorization_gate_check_rule: runtime.release_execution_authorization_gate",
+      "gate_standard: docs/release-execution-authorization-gate.md",
+      "gate_standard_translation: docs/release-execution-authorization-gate.zh-CN.md",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_change: false",
+      "release_execution_authorized_by_this_change: false",
+      "release_packaging_authorized_by_this_change: false",
+      "release_artifacts_created_by_this_change: false",
+      "hosted_deployment_authorized_by_this_change: false",
+      "final_go_no_go_criteria_defined: true",
+      "required_verification_state_defined: true",
+      "release_identifier_review_defined: true",
+      "artifact_authorization_boundaries_defined: true",
+      "maintainer_approval_requirements_defined: true",
+      "stop_conditions_defined: true",
+      "release_identifier_selected: false",
+      "release_tag_created: false",
+      "release_binary_created: false",
+      "release_archive_created: false",
+      "release_container_created: false",
+      "release_package_created: false",
+      "release_checksum_created: false",
+      "release_provenance_created: false",
+      "hosted_deployment_added: false",
+      "runtime_behavior_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "broad_operations_admin_behavior_added: false",
+      "product_module_expansion_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+      "blocked_next_work_item: W-0193",
+    ],
+    [gatePath]: [
+      "release_execution_authorization_gate: defined",
+      "completed_work_item: W-0192",
+      "decision: ADR-0100",
+      "check_rule: runtime.release_execution_authorization_gate",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_gate: false",
+      "release_execution_authorized_by_this_gate: false",
+      "release_packaging_authorized_by_this_gate: false",
+      "release_artifacts_created_by_this_gate: false",
+      "hosted_deployment_authorized_by_this_gate: false",
+      "final_go_no_go_criteria_defined: true",
+      "required_verification_state_defined: true",
+      "release_identifier_review_defined: true",
+      "artifact_authorization_boundaries_defined: true",
+      "maintainer_approval_requirements_defined: true",
+      "stop_conditions_defined: true",
+      "release_identifier_selected: false",
+      "release_tag_created: false",
+      "release_binary_created: false",
+      "release_archive_created: false",
+      "release_container_created: false",
+      "release_package_created: false",
+      "release_checksum_created: false",
+      "release_provenance_created: false",
+      "next_direction: release_execution_maintainer_decision",
+      "Final Go/No-Go Criteria",
+      "Required Verification State",
+      "Release Identifier Review",
+      "Artifact Authorization Boundary",
+      "Maintainer Approval Requirements",
+      "Authorization Outcome",
+      "Stop Conditions",
+      "W-0193 Confirm release execution maintainer decision",
+    ],
+    [gateTranslationPath]: [
+      "release_execution_authorization_gate: defined",
+      "completed_work_item: W-0192",
+      "decision: ADR-0100",
+      "check_rule: runtime.release_execution_authorization_gate",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_gate: false",
+      "release_execution_authorized_by_this_gate: false",
+      "release_packaging_authorized_by_this_gate: false",
+      "release_artifacts_created_by_this_gate: false",
+      "hosted_deployment_authorized_by_this_gate: false",
+      "final_go_no_go_criteria_defined: true",
+      "required_verification_state_defined: true",
+      "release_identifier_review_defined: true",
+      "artifact_authorization_boundaries_defined: true",
+      "maintainer_approval_requirements_defined: true",
+      "stop_conditions_defined: true",
+      "release_identifier_selected: false",
+      "release_tag_created: false",
+      "release_binary_created: false",
+      "release_archive_created: false",
+      "release_container_created: false",
+      "release_package_created: false",
+      "release_checksum_created: false",
+      "release_provenance_created: false",
+      "next_direction: release_execution_maintainer_decision",
+      "Final Go/No-Go Criteria",
+      "Required Verification State",
+      "Release Identifier Review",
+      "Artifact Authorization Boundary",
+      "Maintainer Approval Requirements",
+      "Authorization Outcome",
+      "Stop Conditions",
+      "W-0193 Confirm release execution maintainer decision",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    gatePath,
+    gateTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /release_declared:\s*true/, label: "release declaration" },
+    { pattern: /release_publishing_authorized(?:_by_this_(?:gate|change))?:\s*true/, label: "release publishing authorization" },
+    { pattern: /release_execution_authorized(?:_by_this_(?:gate|change))?:\s*true/, label: "release execution authorization" },
+    { pattern: /release_packaging_authorized(?:_by_this_(?:gate|change))?:\s*true/, label: "release packaging authorization" },
+    { pattern: /release_artifacts_created(?:_by_this_(?:gate|change))?:\s*true/, label: "release artifact creation" },
+    { pattern: /hosted_deployment_authorized(?:_by_this_(?:gate|change))?:\s*true/, label: "hosted deployment authorization" },
+    { pattern: /release_identifier_selected:\s*true/, label: "release identifier selection" },
+    { pattern: /release_tag_created:\s*true/, label: "release tag creation" },
+    { pattern: /release_binary_created:\s*true/, label: "release binary creation" },
+    { pattern: /release_archive_created:\s*true/, label: "release archive creation" },
+    { pattern: /release_container_created:\s*true/, label: "release container creation" },
+    { pattern: /release_package_created:\s*true/, label: "release package creation" },
+    { pattern: /release_checksum_created:\s*true/, label: "release checksum creation" },
+    { pattern: /release_provenance_created:\s*true/, label: "release provenance creation" },
+    { pattern: /hosted_deployment_added:\s*true/, label: "hosted deployment" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /startup_configuration_semantics_changed:\s*true/, label: "startup configuration semantic change" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_added:\s*true/, label: "migration addition" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /\bpublished v0\.1 alpha\b|\bpublishes v0\.1 alpha\b/i, label: "release publication wording" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses release execution authorization gate boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\brelease_execution_authorization_gate\b|\brelease_execution_maintainer_decision\b|\bReleaseExecution\b|\bReleasePackage\b|\bReleaseArtifact\b|\bReleaseProvenance\b/, label: "release execution authorization or artifact runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for release execution authorization or release artifacts: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("release execution authorization gate is completed while release publication, release execution, release identifier selection, release artifacts, hosted deployment, runtime, protocol, generated-output, migration, dependency, operations, authentication/session, product-scope, and direct compatibility deferrals remain preserved", {
     rule_id: ruleId,
     artifact: gatePath,
   });
@@ -24659,6 +25016,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0192", "blocked_work_item: W-0193"],
     ["W-0191", "next_ready_work_item: W-0192"],
     ["W-0190", "next_ready_work_item: W-0191"],
     ["W-0189", "next_ready_work_item: W-0190"],
@@ -24679,11 +25037,15 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0192", "completed")) {
+    return "next_work_item: W-0193";
+  }
   return expectedRuntimeNextReadyWorkItem(root).replace("next_ready_work_item", "next_work_item");
 }
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0192", "release_execution_maintainer_decision"],
     ["W-0191", "release_execution_authorization_gate"],
     ["W-0190", "release_execution_preparation_gate"],
     ["W-0189", "release_publishing_decision_gate"],
@@ -24704,6 +25066,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0192", "W-0193 Confirm release execution maintainer decision"],
     ["W-0191", "W-0192 Define release execution authorization gate"],
     ["W-0190", "W-0191 Define release execution preparation gate"],
     ["W-0189", "W-0190 Define release publishing decision gate"],
@@ -24725,6 +25088,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0192", "current_phase: release_execution_maintainer_decision"],
     ["W-0191", "current_phase: release_execution_authorization_gate"],
     ["W-0190", "current_phase: release_execution_preparation_gate"],
     ["W-0189", "current_phase: release_publishing_decision_gate"],
@@ -25268,6 +25632,7 @@ function checkRuntime(root) {
   checkRuntimePackageAlphaDeveloperFlow(root, goFiles);
   checkRuntimeReleasePublishingDecisionGate(root, goFiles);
   checkRuntimeReleaseExecutionPreparationGate(root, goFiles);
+  checkRuntimeReleaseExecutionAuthorizationGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

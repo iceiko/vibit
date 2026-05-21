@@ -27,7 +27,7 @@ vibit 是一个开源 agent-native server framework，用于构建 AI coding age
 - Single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot。
 - 面向 agents 和 humans 的 `tools/vibit` checks 与 inspection commands。
 
-这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 已经记录本地 readiness state，`docs/alpha-developer-flow.md` 已把这些入口整理成一条 coherent local developer journey，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，并且 `docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary。当前最关键的剩余缺口是 release execution authorization gate。
+这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 已经记录本地 readiness state，`docs/alpha-developer-flow.md` 已把这些入口整理成一条 coherent local developer journey，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，并且 `docs/release-execution-authorization-gate.md` 已定义 release execution authorization criteria。Release execution 当前 blocked，等待 maintainer 明确 go/no-go decision。
 
 ## 本地试用
 
@@ -86,6 +86,8 @@ Release publishing decision gate 记录在 `docs/release-publishing-decision-gat
 
 Release execution preparation gate 记录在 `docs/release-execution-preparation-gate.md`。
 
+Release execution authorization gate 记录在 `docs/release-execution-authorization-gate.md`。
+
 `v0.1 alpha` 应让具备技术能力的开发者能够：
 
 - clone repo；
@@ -113,7 +115,8 @@ Release execution preparation gate 记录在 `docs/release-execution-preparation
 8. 整理 alpha developer flow，并记录 prerequisites。已完成。
 9. 定义 release publishing decision gate。已完成。
 10. 定义 release execution preparation gate。已完成。
-11. 定义 release execution authorization gate。
+11. 定义 release execution authorization gate。已完成。
+12. 确认 release execution maintainer decision。Blocked，直到 maintainer 明确 go/no-go authorization。
 
 运行 minimal local alpha request loop：
 
@@ -132,13 +135,13 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-在本 README 更新时，next ready item 是：
+在本 README 更新时，没有 next ready item。当前 blocked item 是：
 
 ```text
-W-0192 Define release execution authorization gate
+W-0193 Confirm release execution maintainer decision
 ```
 
-使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary 或 verification failure。
+使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
 
 ## Agent-Native 的含义
 
@@ -186,6 +189,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/alpha-developer-flow.md`：packaged local alpha developer journey。
 - `docs/release-publishing-decision-gate.md`：release publishing decision boundary。
 - `docs/release-execution-preparation-gate.md`：release execution preparation boundary。
+- `docs/release-execution-authorization-gate.md`：release execution authorization criteria。
 - `docs/alpha-acceptance-checklist.md`：本地 v0.1 alpha acceptance checklist。
 - `docs/runtime-runbook.md`：当前 runtime startup 和 verification notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。

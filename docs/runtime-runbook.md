@@ -189,7 +189,7 @@ The packaged local alpha developer journey is:
 docs/alpha-developer-flow.md
 ```
 
-It connects the README, this runbook, the redacted request-loop script, local status endpoints, the acceptance checklist, PostgreSQL manual setup posture, verification commands, and the next contribution path. The packaged flow exists now, `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary, and `docs/release-execution-preparation-gate.md` defines the release execution preparation boundary. The next gap is a release execution authorization gate, not release publishing or artifact creation itself.
+It connects the README, this runbook, the redacted request-loop script, local status endpoints, the acceptance checklist, PostgreSQL manual setup posture, verification commands, and the next contribution path. The packaged flow exists now, `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary, `docs/release-execution-preparation-gate.md` defines the release execution preparation boundary, and `docs/release-execution-authorization-gate.md` defines the release execution authorization gate criteria. The next gap is a blocked maintainer go/no-go decision, not release publishing or artifact creation itself.
 
 The local alpha acceptance checklist is:
 

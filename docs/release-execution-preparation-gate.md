@@ -197,10 +197,12 @@ Nakama and Pitaya demonstrate that serious server frameworks separate release re
 
 ## 11. Next Work
 
-The next bounded contribution is:
+`W-0192` has now defined the release execution authorization gate in `docs/release-execution-authorization-gate.md`.
+
+The next bounded contribution is blocked until the maintainer explicitly chooses release execution go/no-go:
 
 ```text
-W-0192 Define release execution authorization gate
+W-0193 Confirm release execution maintainer decision
 ```
 
-That future step may define authorization criteria for release execution, but it still must not publish a release or create release artifacts unless its own scope explicitly says so and the maintainer authorizes the ask-first boundary.
+That future step must not publish a release, select a release identifier, create release tags, or create release artifacts unless its own scope explicitly says so and the maintainer authorizes the ask-first boundary.

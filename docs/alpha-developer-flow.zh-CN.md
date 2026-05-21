@@ -29,10 +29,12 @@ release_publishing_authorized_by_this_document: false
 release_packaging_authorized_by_this_document: false
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
-next_direction: release_execution_authorization_gate
+release_execution_authorization_gate_defined: true
+next_direction: release_execution_maintainer_decision
+next_work_status: blocked
 ```
 
-Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，但发布 `v0.1 alpha` 仍需要后续明确 work item。
+Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，但发布 `v0.1 alpha` 和执行任何 release step 仍 blocked，等待 maintainer 明确 go/no-go decision。
 
 ## 3. 推荐 Journey
 
@@ -145,14 +147,15 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution preparation gate 之后，推荐的下一步 work 是 release execution authorization gate。该 future gate 可以定义 release execution 的 final go/no-go criteria，但本文档不发布 release，也不创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments。
+Release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`。下一步 work blocked 在 `W-0193 Confirm release execution maintainer decision`；maintainer 必须明确选择 go/no-go，并授权任何 release identifier、tag、artifact、hosted deployment、publication surface 或 release execution command 后，release execution 才能继续。
 
 ## 9. Deferred Work
 
 以下内容继续 deferred，直到后续明确 work item：
 
 - 发布 `v0.1 alpha`；
-- 创建 release tags、binaries、archives、containers、packages 或 hosted deployments；
+- 选择 release identifiers；
+- 创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments；
 - 添加 public local onboarding protocol route；
 - 添加 production signup、external identity providers、password login、account recovery、account merge 或 multi-device linking；
 - 添加 broad operations/admin behavior、metrics backend integration 或 production observability；

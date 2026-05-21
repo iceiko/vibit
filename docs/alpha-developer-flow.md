@@ -30,10 +30,12 @@ release_publishing_authorized_by_this_document: false
 release_packaging_authorized_by_this_document: false
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
-next_direction: release_execution_authorization_gate
+release_execution_authorization_gate_defined: true
+next_direction: release_execution_maintainer_decision
+next_work_status: blocked
 ```
 
-The repository remains pre-alpha. The packaged flow is ready for local review, but publishing `v0.1 alpha` remains behind a later explicit work item.
+The repository remains pre-alpha. The packaged flow is ready for local review, but publishing `v0.1 alpha` and executing any release step remain blocked behind an explicit maintainer go/no-go decision.
 
 ## 3. Recommended Journey
 
@@ -146,14 +148,15 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-After the release execution preparation gate, the preferred next work is a release execution authorization gate. That future gate may define final go/no-go criteria for release execution, but this document does not publish a release and does not create release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments.
+The release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`. The next work is blocked at `W-0193 Confirm release execution maintainer decision`; the maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
 
 ## 9. Deferred Work
 
 The following remain deferred until later explicit work items:
 
 - publishing `v0.1 alpha`,
-- creating release tags, binaries, archives, containers, packages, or hosted deployments,
+- selecting release identifiers,
+- creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments,
 - adding a public local onboarding protocol route,
 - adding production signup, external identity providers, password login, account recovery, account merge, or multi-device linking,
 - adding broad operations/admin behavior, metrics backend integration, or production observability,

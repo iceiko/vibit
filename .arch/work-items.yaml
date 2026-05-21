@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-120
+current_milestone: M-121
 
 release_targets:
   short_term:
@@ -15,9 +15,10 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0192
+    next_ready_work_item: null
+    blocked_work_item: W-0193
     preferred_after_current:
-      - release_execution_authorization_gate
+      - release_execution_maintainer_decision
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2222,7 +2223,7 @@ milestones:
 
   - id: M-120
     title: Release Execution Authorization Gate
-    status: active
+    status: completed
     goal: Define authorization criteria for a future v0.1 alpha release execution step without publishing a release or creating release artifacts.
     completion_criteria:
       - The gate defines final go/no-go criteria, required verification state, release identifier review, artifact authorization boundaries, and maintainer approval requirements.
@@ -2232,6 +2233,27 @@ milestones:
     non_goals:
       - publishing v0.1 alpha in the authorization gate
       - creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments in the authorization gate
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `docs/release-execution-authorization-gate.md` and `docs/release-execution-authorization-gate.zh-CN.md` as the release execution authorization gate, recorded `ADR-0100`, and added repository check coverage through `runtime.release_execution_authorization_gate`. The gate defines final go/no-go criteria, required verification state, release identifier review, artifact authorization boundaries, maintainer approval requirements, authorization outcome, stop conditions, redaction expectations, and a blocked next `release_execution_maintainer_decision` direction while preserving pre-alpha state, release publishing, release execution, release identifier selection, release artifacts, hosted deployment, runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: M-121
+    title: Release Execution Maintainer Decision
+    status: active
+    goal: Hold release execution at an explicit maintainer go/no-go decision before any release identifier, release artifact, tag, hosted deployment, or publication command can run.
+    completion_criteria:
+      - The maintainer explicitly chooses go or no-go for release execution.
+      - Any approved release identifier, artifact family, publication surface, and command set is recorded in a repository artifact before execution.
+      - A no-go decision records the reason and the next bounded remediation or deferral.
+      - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - implicitly publishing v0.1 alpha
+      - choosing release identifiers or tags without maintainer approval
+      - creating release binaries, archives, containers, packages, checksums, provenance files, or hosted deployments without explicit authorization
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -6880,7 +6902,7 @@ work_items:
   - id: W-0192
     milestone: M-120
     title: Define release execution authorization gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-define-release-execution-authorization-gate
     depends_on:
       - W-0191
@@ -6889,6 +6911,7 @@ work_items:
     selected_direction: release_execution_authorization_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0100
       - ADR-0099
       - ADR-0098
       - ADR-0097
@@ -6905,3 +6928,36 @@ work_items:
       - Define the release execution authorization gate without publishing a release or creating release artifacts.
       - Specify final go/no-go criteria, release identifier review, artifact authorization boundaries, maintainer approval requirements, verification requirements, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals.
+    completion_summary: Added the release execution authorization gate and Simplified Chinese translation, recorded `ADR-0100`, and added repository check coverage through `runtime.release_execution_authorization_gate`. The gate defines final go/no-go criteria, required verification state, release identifier review, artifact authorization boundaries, maintainer approval requirements, authorization outcome, stop conditions, redaction expectations, and a blocked next `release_execution_maintainer_decision` direction while preserving pre-alpha state, release publishing, release execution, release identifier selection, release artifact, hosted deployment, runtime, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals.
+
+  - id: W-0193
+    milestone: M-121
+    title: Confirm release execution maintainer decision
+    status: blocked
+    change: changes/2026-05-21-confirm-release-execution-maintainer-decision
+    depends_on:
+      - W-0192
+    expected_change_id: confirm-release-execution-maintainer-decision
+    tier: tier_2_developer_experience
+    selected_direction: release_execution_maintainer_decision
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0100
+      - ADR-0099
+      - ADR-0098
+      - ADR-0097
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    block_reason: Maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
+    ask_first:
+      - Publishing v0.1 alpha, choosing or creating release identifiers or tags, creating release binaries, archives, containers, packages, checksums, provenance files, hosted deployments, GitHub release records, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Record an explicit maintainer go/no-go release execution decision.
+      - If go, record the approved release identifier, artifact families, publication surface, verification state, known warnings, command boundaries, and stop conditions before any execution command runs.
+      - If no-go, record the reason and next bounded remediation or deferral.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.

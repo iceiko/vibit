@@ -1,0 +1,175 @@
+schema_version: 0.1
+change_id: define-release-execution-authorization-gate
+date: 2026-05-21
+type: docs
+status: verified
+
+summary: Define the release execution authorization gate without declaring a release, publishing a release, selecting a release identifier, or creating release artifacts.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0100
+  referenced:
+    - ADR-0099
+    - ADR-0098
+    - ADR-0097
+    - ADR-0096
+    - ADR-0095
+    - ADR-0094
+    - ADR-0093
+    - ADR-0092
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0192
+  completed_milestone: M-120
+  previous_completed_work_item: W-0191
+  next_milestone: M-121
+  next_work_item: W-0193
+  next_work_item_status: blocked
+  tier: tier_2_developer_experience
+  selected_direction: release_execution_authorization_gate
+  next_direction: release_execution_maintainer_decision
+  release_execution_authorization_gate_defined: true
+  release_execution_authorization_gate_decision: ADR-0100
+  release_execution_authorization_gate_check_rule: runtime.release_execution_authorization_gate
+  gate_standard: docs/release-execution-authorization-gate.md
+  gate_standard_translation: docs/release-execution-authorization-gate.zh-CN.md
+  release_declared: false
+  release_publishing_authorized_by_this_change: false
+  release_execution_authorized_by_this_change: false
+  release_packaging_authorized_by_this_change: false
+  release_artifacts_created_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  final_go_no_go_criteria_defined: true
+  required_verification_state_defined: true
+  release_identifier_review_defined: true
+  artifact_authorization_boundaries_defined: true
+  maintainer_approval_requirements_defined: true
+  stop_conditions_defined: true
+  release_identifier_selected: false
+  release_tag_created: false
+  release_binary_created: false
+  release_archive_created: false
+  release_container_created: false
+  release_package_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  authorization_criteria:
+    - final_go_no_go_criteria
+    - required_verification_state
+    - release_identifier_review
+    - artifact_authorization_boundaries
+    - maintainer_approval_requirements
+    - stop_conditions
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+  blocked_next_work_item: W-0193
+  blocked_next_reason: Maintainer must explicitly choose go/no-go and authorize any release identifier, artifact, or publication boundary before release execution can proceed.
+  known_deferrals:
+    - release_execution_maintainer_decision
+    - release_publishing
+    - release_identifier_selection
+    - release_tags
+    - release_binaries
+    - release_archives
+    - release_containers
+    - release_packages
+    - release_checksums
+    - release_provenance
+    - hosted_deployments
+    - protocol_changes
+    - generated_output_changes
+    - migrations
+    - dependencies
+    - broad_operations_admin_behavior
+    - direct_nakama_pitaya_api_compatibility
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/release-execution-authorization-gate.md records the release execution authorization criteria boundary.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  release_identifier_selected: false
+  release_artifacts_created: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-release-execution-authorization-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+  status: Verified

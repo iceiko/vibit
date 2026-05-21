@@ -3364,7 +3364,7 @@ phase_plan:
     completed_work_item: W-0191
     decision: ADR-0099
     change: changes/2026-05-21-define-release-execution-preparation-gate
-    next_ready_work_item: W-0192
+    next_completed_work_item: W-0192
     previous_completed_work_item: W-0190
     alpha_target_alignment: developer_experience
     selected_direction: release_execution_preparation_gate
@@ -3408,17 +3408,70 @@ phase_plan:
     check_rule: runtime.release_execution_preparation_gate
     rule: W-0191 defined the release execution preparation gate without direct compatibility, release publishing, or release artifacts.
   phase_2dc_release_execution_authorization_gate:
-    status: next_ready
+    status: completed
     milestone: M-120
-    next_ready_work_item: W-0192
+    completed_work_item: W-0192
+    decision: ADR-0100
+    change: changes/2026-05-21-define-release-execution-authorization-gate
+    blocked_work_item: W-0193
     previous_completed_work_item: W-0191
     alpha_target_alignment: developer_experience
     selected_direction: release_execution_authorization_gate
-    expected_change: changes/2026-05-21-define-release-execution-authorization-gate
     reference_mapping:
       nakama: A release execution authorization gate should make release go/no-go criteria explicit before artifact creation or publication.
       pitaya: A release execution authorization gate should keep runtime architecture, artifact, and deployment boundaries explicit before release execution.
+    gate_standard: docs/release-execution-authorization-gate.md
+    gate_standard_translation: docs/release-execution-authorization-gate.zh-CN.md
+    release_execution_authorization_gate_defined: true
+    release_declared: false
+    release_publishing_authorized_by_this_gate: false
+    release_execution_authorized_by_this_gate: false
+    release_packaging_authorized_by_this_gate: false
+    release_artifacts_created_by_this_gate: false
+    hosted_deployment_authorized_by_this_gate: false
+    final_go_no_go_criteria_defined: true
+    required_verification_state_defined: true
+    release_identifier_review_defined: true
+    artifact_authorization_boundaries_defined: true
+    maintainer_approval_requirements_defined: true
+    stop_conditions_defined: true
+    release_identifier_selected: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_provenance_created: false
+    release_packaging_added: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_direction: release_execution_maintainer_decision
+    check_rule: runtime.release_execution_authorization_gate
+    rule: W-0192 defined the release execution authorization gate without direct compatibility, release publishing, release identifier selection, or release artifacts.
+  phase_2dd_release_execution_maintainer_decision:
+    status: blocked
+    milestone: M-121
+    blocked_work_item: W-0193
+    previous_completed_work_item: W-0192
+    alpha_target_alignment: developer_experience
+    selected_direction: release_execution_maintainer_decision
+    expected_change: changes/2026-05-21-confirm-release-execution-maintainer-decision
+    reference_mapping:
+      nakama: A release execution maintainer decision should separate release go/no-go authorization from artifact creation and hosted deployment.
+      pitaya: A release execution maintainer decision should keep release commands, runtime architecture, and deployment boundaries explicit.
+    block_reason: Maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
     release_publishing_authorized_by_current_state: false
+    release_execution_authorized_by_current_state: false
+    release_identifier_selected: false
     release_declared: false
     release_packaging_added: false
     hosted_deployment_added: false
@@ -3431,7 +3484,7 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0192 should define the release execution authorization gate without direct compatibility, release publishing, or release artifacts.
+    rule: W-0193 is blocked until explicit maintainer go/no-go authorization; it does not imply direct compatibility, release publishing, or release artifacts.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

@@ -196,10 +196,12 @@ Nakama 和 Pitaya 都体现了严肃 server framework 应分离 release readines
 
 ## 11. Next Work
 
-下一步 bounded contribution 是：
+`W-0192` 现在已经在 `docs/release-execution-authorization-gate.md` 中定义 release execution authorization gate。
+
+下一步 bounded contribution blocked，直到 maintainer 明确选择 release execution go/no-go：
 
 ```text
-W-0192 Define release execution authorization gate
+W-0193 Confirm release execution maintainer decision
 ```
 
-该 future step 可以定义 release execution 的 authorization criteria，但仍不得发布 release 或创建 release artifacts，除非它自己的 scope 明确说明并且 maintainer 授权 ask-first boundary。
+该 future step 仍不得发布 release、选择 release identifier、创建 release tags 或创建 release artifacts，除非它自己的 scope 明确说明并且 maintainer 授权 ask-first boundary。
