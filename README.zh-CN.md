@@ -116,7 +116,8 @@ Release execution authorization gate 记录在 `docs/release-execution-authoriza
 9. 定义 release publishing decision gate。已完成。
 10. 定义 release execution preparation gate。已完成。
 11. 定义 release execution authorization gate。已完成。
-12. 确认 release execution maintainer decision。Blocked，直到 maintainer 明确 go/no-go authorization。
+12. 确认 release execution maintainer decision。已完成，结果是 go to release identifier and artifact planning。
+13. 定义 release identifier and artifact plan。Next ready。
 
 运行 minimal local alpha request loop：
 
@@ -135,10 +136,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-在本 README 更新时，没有 next ready item。当前 blocked item 是：
+在本 README 更新时，当前 next ready item 是：
 
 ```text
-W-0193 Confirm release execution maintainer decision
+W-0194 Define release identifier and artifact plan
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。

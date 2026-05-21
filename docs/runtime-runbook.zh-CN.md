@@ -188,7 +188,7 @@ Packaged local alpha developer journey 是：
 docs/alpha-developer-flow.md
 ```
 
-它把 README、本 runbook、redacted request-loop script、local status endpoints、acceptance checklist、PostgreSQL manual setup posture、verification commands 和下一步 contribution path 连接起来。Packaged flow 现在已经存在，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，`docs/release-execution-authorization-gate.md` 已定义 release execution authorization gate criteria；下一处缺口是 blocked maintainer go/no-go decision，而不是 release publishing 或 artifact creation 本身。
+它把 README、本 runbook、redacted request-loop script、local status endpoints、acceptance checklist、PostgreSQL manual setup posture、verification commands 和下一步 contribution path 连接起来。Packaged flow 现在已经存在，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，`docs/release-execution-authorization-gate.md` 已定义 release execution authorization gate criteria，`docs/release-execution-maintainer-decision.md` 已记录 maintainer go decision 以继续 planning；下一处缺口是 release identifier and artifact plan，而不是 release publishing 或 artifact creation 本身。
 
 Local alpha acceptance checklist 是：
 

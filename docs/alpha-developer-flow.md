@@ -31,11 +31,12 @@ release_packaging_authorized_by_this_document: false
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
-next_direction: release_execution_maintainer_decision
-next_work_status: blocked
+release_execution_maintainer_decision_recorded: true
+next_direction: release_identifier_artifact_plan
+next_work_status: next_ready
 ```
 
-The repository remains pre-alpha. The packaged flow is ready for local review, but publishing `v0.1 alpha` and executing any release step remain blocked behind an explicit maintainer go/no-go decision.
+The repository remains pre-alpha. The packaged flow is ready for local review, and the maintainer decision now allows the next release-path planning step. Publishing `v0.1 alpha`, selecting the final release identifier, creating tags or artifacts, and executing release commands remain deferred to later explicit work items.
 
 ## 3. Recommended Journey
 
@@ -148,7 +149,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`. The next work is blocked at `W-0193 Confirm release execution maintainer decision`; the maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
+The release execution maintainer decision is now recorded in `docs/release-execution-maintainer-decision.md`. The next work is `W-0194 Define release identifier and artifact plan`; it may plan the identifier and artifact/publication surface but must not create tags, artifacts, hosted deployments, GitHub release records, or release publication commands.
 
 ## 9. Deferred Work
 

@@ -203,10 +203,10 @@ Nakama 和 Pitaya 都体现了严肃 server framework 应分离 release readines
 
 ## 12. Next Work
 
-下一步 bounded work 会 blocked，直到 maintainer 明确选择做 go/no-go release execution decision：
+`W-0193 Confirm release execution maintainer decision` 现在已经在 `docs/release-execution-maintainer-decision.md` 中记录 maintainer go decision。下一步 bounded work 是：
 
 ```text
-W-0193 Confirm release execution maintainer decision
+W-0194 Define release identifier and artifact plan
 ```
 
-该 future decision 可以选择 go 或 no-go。它仍不得创建 release tags、artifacts、hosted deployments 或 published release records，除非它自己的 scope 明确授权这些 actions，并且 maintainer 批准 ask-first boundary。
+该 future planning step 仍不得创建 release tags、artifacts、hosted deployments 或 published release records，除非后续 execution scope 明确授权这些 actions，并且 maintainer 批准 ask-first boundary。

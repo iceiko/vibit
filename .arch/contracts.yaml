@@ -587,7 +587,7 @@ implemented_wire_and_runtime_slices:
     completed_work_item: W-0192
     decision: ADR-0100
     change: changes/2026-05-21-define-release-execution-authorization-gate
-    blocked_work_item: W-0193
+    next_work_item: W-0193
     selected_direction: release_execution_authorization_gate
     contract_changes_expected: false
     gate_standard: docs/release-execution-authorization-gate.md
@@ -629,17 +629,38 @@ implemented_wire_and_runtime_slices:
     check_rule: runtime.release_execution_authorization_gate
     rule: W-0192 defined the release execution authorization gate without contract changes, release publishing, release identifier selection, or release artifacts.
   release_execution_maintainer_decision:
-    status: blocked
-    blocked_work_item: W-0193
+    status: completed
+    completed_work_item: W-0193
+    decision: ADR-0101
+    change: changes/2026-05-21-confirm-release-execution-maintainer-decision
+    next_ready_work_item: W-0194
     previous_completed_work_item: W-0192
     selected_direction: release_execution_maintainer_decision
+    next_direction: release_identifier_artifact_plan
     contract_changes_expected: false
-    expected_change: changes/2026-05-21-confirm-release-execution-maintainer-decision
-    block_reason: Maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
+    decision_standard: docs/release-execution-maintainer-decision.md
+    decision_standard_translation: docs/release-execution-maintainer-decision.zh-CN.md
+    release_execution_maintainer_decision_recorded: true
+    maintainer_decision: go_to_release_identifier_artifact_plan
+    maintainer_approval_recorded: true
+    release_execution_path_may_continue: true
     release_declared: false
-    release_publishing_authorized_by_current_state: false
-    release_execution_authorized_by_current_state: false
+    release_publishing_authorized_by_this_decision: false
+    release_execution_commands_authorized_by_this_decision: false
+    release_identifier_approved_by_this_decision: false
+    release_tag_authorized_by_this_decision: false
+    release_artifacts_authorized_by_this_decision: false
+    release_packaging_authorized_by_this_decision: false
+    hosted_deployment_authorized_by_this_decision: false
+    github_release_authorized_by_this_decision: false
     release_identifier_selected: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_provenance_created: false
     release_packaging_added: false
     hosted_deployment_added: false
     runtime_behavior_added: false
@@ -652,7 +673,33 @@ implemented_wire_and_runtime_slices:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0193 is blocked until explicit maintainer go/no-go authorization; no contract changes are expected unless separately scoped.
+    check_rule: runtime.release_execution_maintainer_decision
+    rule: W-0193 recorded the maintainer go decision without contract changes, release identifier approval, release command authorization, or release artifacts.
+  release_identifier_artifact_plan:
+    status: next_ready
+    next_ready_work_item: W-0194
+    previous_completed_work_item: W-0193
+    selected_direction: release_identifier_artifact_plan
+    contract_changes_expected: false
+    expected_change: changes/2026-05-21-define-release-identifier-artifact-plan
+    release_declared: false
+    release_publishing_authorized_by_current_state: false
+    release_execution_commands_authorized_by_current_state: false
+    release_identifier_selected: false
+    release_tag_created: false
+    release_artifacts_created: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0194 may define release identifier and artifact plan without contract changes or release artifacts.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current blocked maintainer decision step.
+- [x] `node tools/vibit inspect next` identifies the current release identifier and artifact planning step.
 
 ## 4. Local Prerequisites
 
@@ -123,7 +123,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, and the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`. The next work is blocked at `W-0193 Confirm release execution maintainer decision`; it requires explicit maintainer go/no-go authorization before any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command can proceed.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, and the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`. The next work is `W-0194 Define release identifier and artifact plan`; it may plan release identifier and artifact/publication scope, but it must not create release identifiers, tags, artifacts, hosted deployments, GitHub release records, publication surfaces, or release execution commands.
 
 ## 11. Release Deferrals
 
@@ -149,8 +149,9 @@ local_alpha_developer_flow_packaged: true
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
+release_execution_maintainer_decision_recorded: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_maintainer_decision
-next_work_status: blocked
+next_direction: release_identifier_artifact_plan
+next_work_status: next_ready
 ```

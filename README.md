@@ -116,7 +116,8 @@ Recommended next sequence:
 9. Define the release publishing decision gate. Completed.
 10. Define the release execution preparation gate. Completed.
 11. Define the release execution authorization gate. Completed.
-12. Confirm the release execution maintainer decision. Blocked until explicit maintainer go/no-go authorization.
+12. Confirm the release execution maintainer decision. Completed as go to release identifier and artifact planning.
+13. Define the release identifier and artifact plan. Next ready.
 
 Run the minimal local alpha request loop with:
 
@@ -135,10 +136,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-At the time of this README update, there is no next ready item. The current blocked item is:
+At the time of this README update, the current next ready item is:
 
 ```text
-W-0193 Confirm release execution maintainer decision
+W-0194 Define release identifier and artifact plan
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.

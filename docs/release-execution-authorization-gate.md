@@ -204,10 +204,10 @@ Nakama and Pitaya demonstrate that serious server frameworks separate release re
 
 ## 12. Next Work
 
-The next bounded work is blocked until the maintainer explicitly chooses to make a go/no-go release execution decision:
+`W-0193 Confirm release execution maintainer decision` has now recorded the maintainer go decision in `docs/release-execution-maintainer-decision.md`. The next bounded work is:
 
 ```text
-W-0193 Confirm release execution maintainer decision
+W-0194 Define release identifier and artifact plan
 ```
 
-That future decision may choose go or no-go. It still must not create release tags, artifacts, hosted deployments, or published release records unless its scope explicitly authorizes those actions and the maintainer approves the ask-first boundary.
+That future planning step still must not create release tags, artifacts, hosted deployments, or published release records unless a later execution scope explicitly authorizes those actions and the maintainer approves the ask-first boundary.

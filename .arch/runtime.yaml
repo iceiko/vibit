@@ -102,18 +102,18 @@ purpose: >
   release_publishing_decision_gate: ADR-0098
   release_execution_preparation_gate: ADR-0099
   release_execution_authorization_gate: ADR-0100
+  release_execution_maintainer_decision: ADR-0101
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: release_execution_maintainer_decision
+  current_phase: release_identifier_artifact_plan
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: false
-  next_ready_work_item: null
-  blocked_work_item: W-0193
+  next_ready_work_item: W-0194
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5737,7 +5737,7 @@ identity_session_boundary:
     decision: ADR-0100
     change: changes/2026-05-21-define-release-execution-authorization-gate
     next_milestone: M-121
-    blocked_work_item: W-0193
+    next_work_item: W-0193
     depends_on:
       - W-0191
     selected_direction: release_execution_authorization_gate
@@ -5783,19 +5783,43 @@ identity_session_boundary:
     rule: W-0192 defined the release execution authorization gate without publishing a release, selecting a release identifier, or creating release artifacts.
 
   release_execution_maintainer_decision:
-    status: blocked
+    status: completed
     milestone: M-121
-    blocked_work_item: W-0193
+    completed_work_item: W-0193
+    decision: ADR-0101
+    change: changes/2026-05-21-confirm-release-execution-maintainer-decision
+    next_milestone: M-122
+    next_ready_work_item: W-0194
     previous_completed_work_item: W-0192
     selected_direction: release_execution_maintainer_decision
-    expected_change: changes/2026-05-21-confirm-release-execution-maintainer-decision
+    next_direction: release_identifier_artifact_plan
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
-    block_reason: Maintainer must explicitly choose go/no-go and authorize any release identifier, tag, artifact, hosted deployment, publication surface, or release execution command before release execution can proceed.
-    release_publishing_authorized_by_current_state: false
-    release_execution_authorized_by_current_state: false
-    release_identifier_selected: false
+    decision_standard: docs/release-execution-maintainer-decision.md
+    decision_standard_translation: docs/release-execution-maintainer-decision.zh-CN.md
+    release_execution_maintainer_decision_recorded: true
+    maintainer_decision: go_to_release_identifier_artifact_plan
+    maintainer_approval_recorded: true
+    release_execution_path_may_continue: true
+    known_warning_accepted_for_planning:
+      - runtime.identity_boundary
     release_declared: false
+    release_publishing_authorized_by_this_decision: false
+    release_execution_commands_authorized_by_this_decision: false
+    release_identifier_approved_by_this_decision: false
+    release_tag_authorized_by_this_decision: false
+    release_artifacts_authorized_by_this_decision: false
+    release_packaging_authorized_by_this_decision: false
+    hosted_deployment_authorized_by_this_decision: false
+    github_release_authorized_by_this_decision: false
+    release_identifier_selected: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_provenance_created: false
     release_packaging_added: false
     hosted_deployment_added: false
     runtime_behavior_added: false
@@ -5808,7 +5832,36 @@ identity_session_boundary:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0193 is blocked until the maintainer explicitly chooses release execution go/no-go and authorizes any release identifier, artifact, or publication boundary.
+    check_rule: runtime.release_execution_maintainer_decision
+    rule: W-0193 recorded the maintainer go decision as permission to continue to release identifier and artifact planning, without approving release execution commands or creating release artifacts.
+
+  release_identifier_artifact_plan:
+    status: next_ready
+    milestone: M-122
+    next_ready_work_item: W-0194
+    previous_completed_work_item: W-0193
+    selected_direction: release_identifier_artifact_plan
+    expected_change: changes/2026-05-21-define-release-identifier-artifact-plan
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    release_declared: false
+    release_publishing_authorized_by_current_state: false
+    release_execution_commands_authorized_by_current_state: false
+    release_identifier_selected: false
+    release_tag_created: false
+    release_artifacts_created: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0194 may define a release identifier and artifact plan but must not create tags, artifacts, GitHub releases, hosted deployments, or publication commands.
 
 persistence_model:
   decision: ADR-0011

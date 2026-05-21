@@ -30,11 +30,12 @@ release_packaging_authorized_by_this_document: false
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
-next_direction: release_execution_maintainer_decision
-next_work_status: blocked
+release_execution_maintainer_decision_recorded: true
+next_direction: release_identifier_artifact_plan
+next_work_status: next_ready
 ```
 
-Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，但发布 `v0.1 alpha` 和执行任何 release step 仍 blocked，等待 maintainer 明确 go/no-go decision。
+Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，maintainer decision 现在允许进入下一步 release-path planning。发布 `v0.1 alpha`、选择最终 release identifier、创建 tags 或 artifacts、执行 release commands 仍 deferred 到后续明确 work items。
 
 ## 3. 推荐 Journey
 
@@ -147,7 +148,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`。下一步 work blocked 在 `W-0193 Confirm release execution maintainer decision`；maintainer 必须明确选择 go/no-go，并授权任何 release identifier、tag、artifact、hosted deployment、publication surface 或 release execution command 后，release execution 才能继续。
+Release execution maintainer decision 现在已经记录在 `docs/release-execution-maintainer-decision.md`。下一步 work 是 `W-0194 Define release identifier and artifact plan`；它可以规划 identifier 和 artifact/publication surface，但不得创建 tags、artifacts、hosted deployments、GitHub release records 或 release publication commands。
 
 ## 9. Deferred Work
 

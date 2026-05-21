@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 blocked maintainer decision step。
+- [x] `node tools/vibit inspect next` 能识别当前 release identifier and artifact planning step。
 
 ## 4. Local Prerequisites
 
@@ -122,7 +122,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`。下一步 work blocked 在 `W-0193 Confirm release execution maintainer decision`；任何 release identifier、tag、artifact、hosted deployment、publication surface 或 release execution command 继续前，都需要 maintainer 明确 go/no-go authorization。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`。下一步 work 是 `W-0194 Define release identifier and artifact plan`；它可以规划 release identifier 和 artifact/publication scope，但不得创建 release identifiers、tags、artifacts、hosted deployments、GitHub release records、publication surfaces 或 release execution commands。
 
 ## 11. Release Deferrals
 
@@ -148,8 +148,9 @@ local_alpha_developer_flow_packaged: true
 release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
+release_execution_maintainer_decision_recorded: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_maintainer_decision
-next_work_status: blocked
+next_direction: release_identifier_artifact_plan
+next_work_status: next_ready
 ```
