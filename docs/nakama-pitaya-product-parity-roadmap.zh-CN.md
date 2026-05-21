@@ -153,7 +153,8 @@ current_near_term_priority: protocol_logout_and_connection_lifecycle
 phase_2p_prototype_ready_foundation: next_product_stage
 standard: docs/product-maturity-milestones.md
 execution_plan: docs/prototype-ready-foundation-execution-plan.md
-next_work_item: W-0199 Define prototype-ready local development path gate
+local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
+next_work_item: W-0200 Implement prototype-ready local development path package
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-127
+current_milestone: M-128
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: prototype_ready_foundation_execution_plan_defined
+    current_release_state: prototype_ready_local_development_path_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0199
+    next_ready_work_item: W-0200
     preferred_after_current:
-      - prototype_ready_local_development_path_gate
+      - prototype_ready_local_development_path_package
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2372,7 +2372,7 @@ milestones:
 
   - id: M-127
     title: Prototype Ready Local Development Path Gate
-    status: active
+    status: completed
     goal: Define the gate for a repeatable local development path that can later improve setup, migrations, configuration, and example flow for prototype authors.
     completion_criteria:
       - The local development path gate is recorded.
@@ -2383,6 +2383,30 @@ milestones:
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding broad product modules
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the prototype-ready local development path gate in `docs/prototype-ready-local-development-path-gate.md` and `docs/prototype-ready-local-development-path-gate.zh-CN.md`, accepted `ADR-0107`, recorded supported local prerequisites, startup expectations, migration expectations, configuration and secret posture, example-flow shape, allowed future write areas, verification expectations, and stop conditions, added `runtime.prototype_ready_local_development_path_gate` check coverage, opened `W-0200 Implement prototype-ready local development path package`, and preserved deferrals for runtime behavior, protocol routes, Protobuf sources or generated output, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-128
+    title: Prototype Ready Local Development Path Package
+    status: active
+    goal: Package a repeatable source-first local development path for prototype authors using the gate recorded in M-127.
+    completion_criteria:
+      - The local development path package is recorded and linked from contributor entry points.
+      - The package improves setup, startup, migration, configuration, secret redaction, example-flow, and verification ergonomics using docs, scripts, examples, static checks, or focused verification of existing behavior.
+      - The package preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - changing production runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding migrations or dependencies
+      - adding automatic startup migration behavior
       - adding hosted deployments or demos
       - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
       - executing public announcements beyond the GitHub release record
@@ -7256,8 +7280,10 @@ work_items:
   - id: W-0199
     milestone: M-127
     title: Define prototype-ready local development path gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
+    commits:
+      - pending
     depends_on:
       - W-0198
     expected_change_id: define-prototype-ready-local-development-path-gate
@@ -7265,6 +7291,7 @@ work_items:
     selected_direction: prototype_ready_local_development_path_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0107
       - ADR-0106
       - ADR-0105
       - ADR-0097
@@ -7275,4 +7302,30 @@ work_items:
     completion:
       - Define the gate for the prototype-ready local development path.
       - Record supported prerequisites, startup expectations, migration expectations, configuration and secret posture, example-flow shape, allowed future write areas, verification expectations, and stop conditions.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the prototype-ready local development path gate, recorded supported prerequisites, startup expectations, migration expectations, configuration and secret posture, example-flow shape, allowed future write areas, verification expectations, and stop conditions in `docs/prototype-ready-local-development-path-gate.md`, accepted `ADR-0107`, added `runtime.prototype_ready_local_development_path_gate` check coverage, and selected `W-0200 Implement prototype-ready local development path package` as the next-ready work item without changing runtime behavior, protocol/generated output/migrations/dependencies, broadening operations/admin, changing authentication/session behavior, adding hosted deployments, expanding release artifacts, executing announcements, running paid promotion, adding broad product modules, or adding direct compatibility.
+
+  - id: W-0200
+    milestone: M-128
+    title: Implement prototype-ready local development path package
+    status: next_ready
+    change: changes/2026-05-22-implement-prototype-ready-local-development-path-package
+    depends_on:
+      - W-0199
+    expected_change_id: implement-prototype-ready-local-development-path-package
+    tier: tier_2_developer_experience
+    selected_direction: prototype_ready_local_development_path_package
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0107
+      - ADR-0106
+      - ADR-0105
+      - ADR-0097
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Implement the prototype-ready local development path package inside the W-0199 gate.
+      - Package setup, startup, migration, configuration, secret redaction, example-flow, and verification ergonomics using docs, scripts, examples, static checks, or focused verification of existing behavior.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless explicitly authorized.

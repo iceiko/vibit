@@ -35,7 +35,7 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: prototype_ready_local_development_path_gate
+next_direction: prototype_ready_local_development_path_package
 next_work_status: next_ready
 ```
 
@@ -152,7 +152,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`。下一步 work 是 `W-0199 Define prototype-ready local development path gate`；它应先定义 setup、migrations、configuration 和 example flow 的 gate，再进入实现改动。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`。下一步 work 是 `W-0200 Implement prototype-ready local development path package`；它应在 gate 内打包 setup、migrations、configuration、secret redaction、example flow 和 verification ergonomics，再进入更宽的产品改动。
 
 ## 9. Deferred Work
 

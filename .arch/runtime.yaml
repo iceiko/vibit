@@ -108,18 +108,19 @@ purpose: >
   first_alpha_user_discovery_loop: ADR-0104
   first_alpha_feedback_intake_surfaces: ADR-0105
   prototype_ready_foundation_execution_plan: ADR-0106
+  prototype_ready_local_development_path_gate: ADR-0107
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: prototype_ready_local_development_path_gate
+  current_phase: prototype_ready_local_development_path_package
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0199
+  next_ready_work_item: W-0200
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
@@ -6109,17 +6110,39 @@ identity_session_boundary:
     rule: W-0198 defined the first prototype-ready foundation execution plan and selected the local development path gate without implementing runtime scope or expanding release/outreach surfaces.
 
   prototype_ready_local_development_path_gate:
-    status: next_ready
+    status: completed
     milestone: M-127
-    next_ready_work_item: W-0199
+    completed_work_item: W-0199
+    decision: ADR-0107
+    change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
+    next_milestone: M-128
+    next_ready_work_item: W-0200
     previous_completed_work_item: W-0198
     selected_direction: prototype_ready_local_development_path_gate
+    next_direction: prototype_ready_local_development_path_package
     expected_change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
     target_stage: prototype_ready_foundation
+    gate_standard: docs/prototype-ready-local-development-path-gate.md
+    gate_standard_translation: docs/prototype-ready-local-development-path-gate.zh-CN.md
+    source_execution_plan: docs/prototype-ready-foundation-execution-plan.md
+    source_stage: source_first_alpha
+    source_release_identifier: v0.1.0-alpha.1
     planning_only: true
     gate_only: true
+    prototype_ready_local_development_path_gate_defined: true
+    future_implementation_work_item: W-0200
+    future_implementation_direction: prototype_ready_local_development_path_package
+    supported_prerequisites_recorded: true
+    startup_expectations_recorded: true
+    migration_expectations_recorded: true
+    configuration_secret_posture_recorded: true
+    example_flow_shape_recorded: true
+    allowed_future_write_areas_recorded: true
+    verification_expectations_recorded: true
+    stop_conditions_recorded: true
+    docs_scripts_examples_checks_only_future_scope: true
     local_setup_path_targeted: true
     migration_path_targeted: true
     configuration_secret_posture_targeted: true
@@ -6138,7 +6161,38 @@ identity_session_boundary:
     public_announcements_beyond_github_release_authorized: false
     paid_promotion_authorized: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0199 should define the local development path gate before any prototype-ready implementation changes.
+    check_rule: runtime.prototype_ready_local_development_path_gate
+    rule: W-0199 defined the local development path gate before any prototype-ready implementation changes.
+
+  prototype_ready_local_development_path_package:
+    status: next_ready
+    milestone: M-128
+    next_ready_work_item: W-0200
+    previous_completed_work_item: W-0199
+    selected_direction: prototype_ready_local_development_path_package
+    expected_change: changes/2026-05-22-implement-prototype-ready-local-development-path-package
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    target_stage: prototype_ready_foundation
+    gate_decision: ADR-0107
+    gate_standard: docs/prototype-ready-local-development-path-gate.md
+    package_goal: source_first_local_development_path
+    docs_scripts_examples_checks_scope: true
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    hosted_deployment_added: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0200 should package the local development path without changing runtime, protocol, migration, dependency, release, hosted deployment, broad product, authentication/session, or direct compatibility scope.
 
 persistence_model:
   decision: ADR-0011

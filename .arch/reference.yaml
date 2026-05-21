@@ -30,15 +30,17 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: prototype_ready_foundation_execution_plan_defined
+  current_state: prototype_ready_local_development_path_gate_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0199
-  immediate_next_direction: prototype_ready_local_development_path_gate
+  immediate_next_work_item: W-0200
+  immediate_next_direction: prototype_ready_local_development_path_package
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   prototype_ready_foundation_execution_plan_translation: docs/prototype-ready-foundation-execution-plan.zh-CN.md
+  prototype_ready_local_development_path_gate_standard: docs/prototype-ready-local-development-path-gate.md
+  prototype_ready_local_development_path_gate_translation: docs/prototype-ready-local-development-path-gate.zh-CN.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
@@ -3763,19 +3765,37 @@ phase_plan:
     check_rule: runtime.prototype_ready_foundation_execution_plan
     rule: W-0198 defined the prototype-ready foundation execution plan without implementing runtime or product module scope.
   phase_2dj_prototype_ready_local_development_path_gate:
-    status: next_ready
+    status: completed
     milestone: M-127
-    next_ready_work_item: W-0199
+    completed_work_item: W-0199
+    decision: ADR-0107
+    change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
+    next_milestone: M-128
+    next_ready_work_item: W-0200
     previous_completed_work_item: W-0198
     alpha_target_alignment: prototype_ready_foundation
     selected_direction: prototype_ready_local_development_path_gate
+    next_direction: prototype_ready_local_development_path_package
     expected_change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
     reference_mapping:
       nakama: The local development path gate should make setup, configuration, migrations, and examples credible before shared online-service expansion.
       pitaya: The local development path gate should preserve Go server lifecycle clarity and explicit local runtime ergonomics before broader routing or push work.
     target_stage: prototype_ready_foundation
+    gate_standard: docs/prototype-ready-local-development-path-gate.md
+    gate_standard_translation: docs/prototype-ready-local-development-path-gate.zh-CN.md
     planning_only: true
     gate_only: true
+    prototype_ready_local_development_path_gate_defined: true
+    future_implementation_work_item: W-0200
+    future_implementation_direction: prototype_ready_local_development_path_package
+    supported_prerequisites_recorded: true
+    startup_expectations_recorded: true
+    migration_expectations_recorded: true
+    configuration_secret_posture_recorded: true
+    example_flow_shape_recorded: true
+    allowed_future_write_areas_recorded: true
+    verification_expectations_recorded: true
+    stop_conditions_recorded: true
     local_setup_path_targeted: true
     migration_path_targeted: true
     configuration_secret_posture_targeted: true
@@ -3793,7 +3813,37 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0199 should define the prototype-ready local development path gate before implementation scope.
+    check_rule: runtime.prototype_ready_local_development_path_gate
+    rule: W-0199 defined the prototype-ready local development path gate before implementation scope.
+  phase_2dk_prototype_ready_local_development_path_package:
+    status: next_ready
+    milestone: M-128
+    next_ready_work_item: W-0200
+    previous_completed_work_item: W-0199
+    alpha_target_alignment: prototype_ready_foundation
+    selected_direction: prototype_ready_local_development_path_package
+    expected_change: changes/2026-05-22-implement-prototype-ready-local-development-path-package
+    reference_mapping:
+      nakama: The local development path package should make example and setup ergonomics good enough for serious prototype authors before broader service expansion.
+      pitaya: The local development path package should preserve explicit Go server lifecycle and local runtime ergonomics before broader routing or push work.
+    target_stage: prototype_ready_foundation
+    gate_decision: ADR-0107
+    gate_standard: docs/prototype-ready-local-development-path-gate.md
+    docs_scripts_examples_checks_scope: true
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0200 should package the local development path before later storage, messaging, verification, or operations slices.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

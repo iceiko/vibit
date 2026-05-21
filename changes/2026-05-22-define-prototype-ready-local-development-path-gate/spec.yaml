@@ -1,0 +1,166 @@
+schema_version: 0.1
+change_id: define-prototype-ready-local-development-path-gate
+date: 2026-05-22
+type: docs
+status: verified
+
+summary: Define the gate for a repeatable prototype-ready local development path and open the package implementation work item.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0107
+  referenced:
+    - ADR-0106
+    - ADR-0105
+    - ADR-0097
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0199
+  completed_milestone: M-127
+  previous_completed_work_item: W-0198
+  next_milestone: M-128
+  next_work_item: W-0200
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: prototype_ready_local_development_path_gate
+  next_direction: prototype_ready_local_development_path_package
+  prototype_ready_local_development_path_gate_defined: true
+  prototype_ready_local_development_path_gate_decision: ADR-0107
+  prototype_ready_local_development_path_gate_check_rule: runtime.prototype_ready_local_development_path_gate
+  gate_standard: docs/prototype-ready-local-development-path-gate.md
+  gate_standard_translation: docs/prototype-ready-local-development-path-gate.zh-CN.md
+  source_execution_plan: docs/prototype-ready-foundation-execution-plan.md
+  source_release_identifier: v0.1.0-alpha.1
+  source_stage: source_first_alpha
+  target_stage: prototype_ready_foundation
+  future_implementation_work_item: W-0200
+  future_implementation_direction: prototype_ready_local_development_path_package
+  supported_prerequisites_recorded: true
+  startup_expectations_recorded: true
+  migration_expectations_recorded: true
+  configuration_secret_posture_recorded: true
+  example_flow_shape_recorded: true
+  allowed_future_write_areas_recorded: true
+  verification_expectations_recorded: true
+  stop_conditions_recorded: true
+  planning_only: true
+  gate_only: true
+  docs_scripts_examples_checks_only_future_scope: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-prototype-ready-local-development-path-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - runtime_or_protocol_scope_requires_authorization
+    - protobuf_or_generated_output_requires_authorization
+    - migration_or_dependency_requires_authorization
+    - automatic_startup_migration_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - broad_product_module_requires_authorization
+    - direct_compatibility_requires_authorization
+    - secret_or_redaction_risk
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/prototype-ready-local-development-path-gate.md records the local development path gate.
+    - docs/prototype-ready-local-development-path-gate.zh-CN.md provides the paired Simplified Chinese translation.
+    - ADR-0107 records the local development path gate decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-prototype-ready-local-development-path-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

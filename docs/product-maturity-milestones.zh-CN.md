@@ -184,15 +184,15 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-Prototype-ready execution plan 之后的下一个产品方向是：
+Local development path gate 之后的下一个产品方向是：
 
 ```text
-W-0199 Define prototype-ready local development path gate
+W-0200 Implement prototype-ready local development path package
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`。下一项 work 应先定义可重复 local development path 的 gate，再进入实现改动。它应让 setup、migrations、configuration 和 example flow 对后续 prototype-ready implementation slices 足够可信。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`。下一项 work 应在这个 gate 内打包可重复 local development path。它应让 setup、migrations、configuration、secret redaction、example flow 和 verification ergonomics 对后续 prototype-ready implementation slices 足够可信。
 
-上一项方向 `W-0198 Define prototype-ready foundation execution plan` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 的追溯记录。
+上一项方向 `W-0198 Define prototype-ready foundation execution plan` 和 `W-0199 Define prototype-ready local development path gate` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 gate 的追溯记录。
 
 已记录的候选重点仍包括：
 

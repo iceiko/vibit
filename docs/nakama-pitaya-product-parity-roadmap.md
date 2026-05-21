@@ -153,7 +153,8 @@ Status:
 phase_2p_prototype_ready_foundation: next_product_stage
 standard: docs/product-maturity-milestones.md
 execution_plan: docs/prototype-ready-foundation-execution-plan.md
-next_work_item: W-0199 Define prototype-ready local development path gate
+local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
+next_work_item: W-0200 Implement prototype-ready local development path package
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.

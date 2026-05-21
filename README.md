@@ -140,6 +140,11 @@ The prototype-ready foundation execution plan is:
 - `docs/prototype-ready-foundation-execution-plan.md`
 - `decisions/ADR-0106-prototype-ready-foundation-execution-plan.md`
 
+The prototype-ready local development path gate is:
+
+- `docs/prototype-ready-local-development-path-gate.md`
+- `decisions/ADR-0107-prototype-ready-local-development-path-gate.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -152,7 +157,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0199 Define prototype-ready local development path gate
+W-0200 Implement prototype-ready local development path package
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
