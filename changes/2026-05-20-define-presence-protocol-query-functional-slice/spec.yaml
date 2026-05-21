@@ -1,0 +1,164 @@
+schema_version: 0.1
+change_id: define-presence-protocol-query-functional-slice
+date: 2026-05-20
+type: feature
+status: verified
+
+summary: Add the first bounded protected protocol query over the server-owned registry-backed player presence snapshot.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0087
+  referenced:
+    - ADR-0086
+    - ADR-0085
+    - ADR-0084
+    - ADR-0082
+    - ADR-0078
+    - ADR-0053
+    - ADR-0018
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added:
+      - runtime.presence.GetPlayerPresence
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - PRESENCE_QUERY_FORBIDDEN
+      - PRESENCE_QUERY_UNAVAILABLE
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+protocol:
+  routes_added:
+    - runtime.presence.GetPlayerPresence
+  route_kind: query
+  route_protection_posture: request_token_required
+  proof_carrier_posture: existing_authenticated_request_wrapper
+  protobuf_sources_changed:
+    - proto/vibit/presence/v1/presence.proto
+  generated_outputs_changed:
+    - runtime/internal/generated/proto/vibit/presence/v1/presence.pb.go
+  existing_envelope_changed: false
+  presence_subscription_added: false
+  presence_broadcast_added: false
+  room_presence_added: false
+  party_presence_added: false
+  match_presence_added: false
+
+data:
+  migrations_required: false
+  migration_sources: []
+  durable_presence_store_added: false
+  ownership_changes:
+    - Application-owned presence query handler reads the existing active connection registry snapshot.
+    - Protobuf protocol adapter owns wire/domain payload mapping for the presence query.
+    - PostgreSQL startup composition registers the query route where the presence lifecycle registry exists.
+    - WebSocket transport remains credential-neutral and does not own presence semantics.
+
+runtime:
+  completed_work_item: W-0178
+  completed_milestone: M-106
+  next_milestone: null
+  next_work_item: null
+  tier: tier_2_functional
+  gate_density_strategy: ADR-0082
+  presence_protocol_query_functional_slice_completed: true
+  presence_protocol_query_functional_slice_decision: ADR-0087
+  presence_protocol_query_functional_slice_check_rule: runtime.presence_protocol_query_functional_slice
+  presence_owner: runtime/internal/app/presence
+  presence_snapshot_source: runtime/internal/app/connection
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  startup_composition_owner: runtime/cmd/vibit-server
+  changed_source:
+    - runtime/internal/app/route_authentication.go
+    - runtime/internal/app/presence/presence.go
+    - runtime/internal/app/presence/presence_test.go
+    - runtime/internal/platform/protocol/protobuf/presence_bridge.go
+    - runtime/internal/platform/protocol/protobuf/presence_bridge_test.go
+    - runtime/internal/platform/protocol/protobuf/payload_registry.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_request_test.go
+    - runtime/cmd/vibit-server/main.go
+    - runtime/cmd/vibit-server/main_test.go
+  first_presence_protocol_behavior: protected_self_player_presence_query_from_active_bound_connections
+  protocol_presence_query_added: true
+  presence_query_self_only: true
+  presence_query_uses_request_token_proof: true
+  presence_query_uses_bound_identity_proof: false
+  presence_query_uses_session_validated_proof: false
+  presence_query_reads_registry_snapshot: true
+  presence_query_exposes_access_token_record_ids: false
+  presence_query_mutates_presence_state: false
+  presence_subscription_added: false
+  presence_broadcast_added: false
+  durable_distributed_presence_added: false
+  chat_added: false
+  friends_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  reconnect_token_added: false
+  resume_token_added: false
+  logout_triggered_socket_close_added: false
+  runtime_session_revocation_added: false
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  boundary:
+    allowed:
+      - Add one request-token protected self-player presence query.
+      - Return online/offline status, active connection count, bounded active connection metadata, runtime session ids, last_seen_at, and observed_at from server-owned registry state.
+      - Register the query in PostgreSQL startup composition where the active connection registry is available.
+      - Keep presence single-process and non-durable in this first protocol slice.
+    forbidden:
+      - Add presence subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, new dependencies, or direct Nakama/Pitaya API compatibility.
+      - Treat client-supplied player_id or session_id metadata as presence proof.
+      - Expose access-token record ids in the protocol response.
+      - Move presence ownership into WebSocket transport, authentication service behavior, inventory, or player modules.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: true
+  generated_outputs_changed: true
+  dependencies_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - buf generate
+    - cd runtime && go test ./internal/app/presence ./internal/platform/protocol/protobuf ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit check generated --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check change define-presence-protocol-query-functional-slice --json
+    - node tools/vibit inspect next
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-106
+current_milestone: M-116
 
 release_targets:
   short_term:
@@ -15,14 +15,10 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0178
+    next_ready_work_item: W-0188
     preferred_after_current:
-      - first_local_onboarding_device_credential_issuance
-      - authenticated_gameplay_e2e
-      - runtime_runbook_refresh
-      - minimal_example_client_or_request_loop
-      - health_readiness_version_config_surface
       - alpha_acceptance_checklist_or_check
+      - package_alpha_developer_flow
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -1969,7 +1965,7 @@ milestones:
 
   - id: M-106
     title: Presence Protocol Query Functional Slice
-    status: active
+    status: completed
     goal: Expose the server-owned presence lifecycle snapshot through the first bounded protected protocol query.
     completion_criteria:
       - The slice records the presence protocol query boundary in its change spec before implementation.
@@ -1983,6 +1979,7 @@ milestones:
       - making logout automatically close sockets
       - revoking runtime sessions
       - adding durable or distributed presence
+    completion_summary: Implemented the first protected presence protocol query as a Tier 2 functional slice. `runtime.presence.GetPlayerPresence` now exposes the existing server-owned registry-backed player presence snapshot through `vibit.presence.v1` Protobuf messages and generated Go output. The route uses the existing request-token wrapper, is self-only for the authenticated player, returns bounded online/offline connection metadata and runtime session ids, and does not expose access-token record ids. No subscription, broadcast, durable/distributed presence, chat, social, matchmaking, match runtime, dependency, direct compatibility, logout-triggered close, or runtime session revocation was added.
 
   - id: M-107
     title: v0.1 Alpha Goal And Long Term Product Target
@@ -2002,6 +1999,167 @@ milestones:
       - adding health/readiness/version endpoints
       - adding direct Nakama/Pitaya API compatibility
     completion_summary: Added `docs/v0.1-alpha-goal.md`, its Simplified Chinese translation, `ADR-0086`, a conversation log, README updates, and manifest/guide pointers. The repository now records `v0.1 alpha` as the short-term release target and an AI-era Nakama/Pitaya-class server framework as the long-term product target while keeping `M-106/W-0178` as the immediate next ready work item.
+
+  - id: M-108
+    title: Next Alpha Direction Selection
+    status: completed
+    goal: Select the next bounded alpha-enabling work item after the protected presence protocol query.
+    completion_criteria:
+      - The next alpha-enabling direction is selected from `docs/v0.1-alpha-goal.md` or a maintainer redirect.
+      - The chosen direction is recorded with a bounded next-ready work item.
+      - Ask-first boundaries are preserved for release publishing, broad product modules, dependencies, operations posture, direct Nakama/Pitaya API compatibility, durable/distributed runtime behavior, and security-sensitive authentication/session changes.
+    non_goals:
+      - publishing v0.1 alpha
+      - adding unbounded runtime behavior
+      - adding dependencies without adoption records
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_local_onboarding_device_credential_issuance_gate` as the next alpha-enabling direction after the protected presence protocol query. Because local onboarding/device credential issuance is security-sensitive credential behavior, the next step is a gate-only work item, not immediate implementation.
+
+  - id: M-109
+    title: Local Onboarding Device Credential Issuance Gate
+    status: completed
+    goal: Define the first local onboarding and device credential issuance boundary before adding any runtime behavior.
+    completion_criteria:
+      - The gate defines the first local onboarding surface candidate, ownership, and allowed implementation area.
+      - The gate defines how player account creation, raw device credential generation, verifier digest storage, one-time presentation, redaction, and unit-of-work ordering must behave in a later implementation.
+      - The gate preserves deferrals for production signup, external identity providers, password login, account recovery, multi-device linking, protocol routes, generated output, migrations, dependencies, release publishing, and direct Nakama/Pitaya API compatibility unless explicitly authorized.
+      - The resulting future implementation work item is bounded and checkable.
+    non_goals:
+      - implementing onboarding or credential issuance
+      - generating or displaying raw credentials
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - publishing v0.1 alpha
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the first local onboarding/device credential issuance gate in `docs/local-onboarding-device-credential-issuance-gate.md` and `ADR-0089`. The gate selects a future local-only application service under `runtime/internal/app/authentication`, requires player account creation and digest-only credential storage in one unit of work, requires one-time raw credential presentation only after commit, and preserves public signup, protocol route, generated output, migration, dependency, release, and direct Nakama/Pitaya compatibility deferrals.
+
+  - id: M-110
+    title: Local Onboarding Device Credential Issuance Implementation
+    status: completed
+    goal: Implement the first local-only application service slice that creates a player account and issues a device credential under the W-0181 gate.
+    completion_criteria:
+      - The implementation stays under the gate-authorized local application service boundary.
+      - The service creates an active player account and active device credential record in the same application-owned unit of work.
+      - The service generates server-issued device credential material, computes credential lookup and verifier digests, stores only digest material and metadata, and returns raw credential text only once after commit.
+      - Focused tests cover ordering, digest-only storage, redaction, failure handling, and no login-route account creation.
+      - Public signup, protocol routes, generated output, migrations, dependencies, access-token issuance from onboarding, runtime session creation from onboarding, production identity providers, account recovery, multi-device linking, release publishing, and direct Nakama/Pitaya compatibility remain deferred.
+    non_goals:
+      - adding public signup or production account creation
+      - adding protocol routes, Protobuf sources, or generated output
+      - adding migrations, repository interface changes, or dependencies
+      - issuing access tokens or runtime sessions from onboarding
+      - changing existing login route account-creation behavior
+      - adding external identity providers, password login, account recovery, account merge, or multi-device linking
+      - publishing v0.1 alpha
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the local-only `OnboardLocalPlayerWithDeviceCredential` application service under `runtime/internal/app/authentication`. The service validates the request before unit-of-work, generates server-issued device credential material, computes credential lookup and verifier digests, creates an active player account and active digest-only credential record in one unit of work, and returns raw credential text only after unit-of-work success. Focused tests cover ordering, digest-only storage, redaction, failure handling, no token/session issuance, and unchanged login-route account creation behavior. No protocol route, generated output, migration, repository interface change, dependency, production signup, external identity, password login, recovery, multi-device linking, release artifact, or direct compatibility was added.
+
+  - id: M-111
+    title: Next Alpha Direction Selection After Local Onboarding
+    status: completed
+    goal: Select the next alpha-enabling direction after local onboarding/device credential issuance implementation.
+    completion_criteria:
+      - The next direction is selected from the v0.1 alpha preferred queue or a maintainer redirect.
+      - The selected direction preserves release publishing, protocol expansion, generated output, migration, dependency, production signup, external identity, password login, account recovery, multi-device linking, direct Nakama/Pitaya API compatibility, and broad product modules behind explicit future work unless selected.
+      - The resulting next ready work item is bounded and checkable.
+    non_goals:
+      - implementing authenticated gameplay E2E in the direction-selection step
+      - refreshing the runtime runbook in the direction-selection step
+      - adding a client script, health surface, release artifact, dependency, protocol route, or direct compatibility in the direction-selection step
+    completion_summary: Selected `define_authenticated_gameplay_e2e_slice` as the next alpha-enabling direction after local onboarding implementation. The next step is a bounded functional slice to prove onboarding -> login -> connection binding -> protected inventory -> presence query -> logout as one documented local flow without adding production signup, broad product modules, dependencies, release artifacts, or direct Nakama/Pitaya API compatibility in the direction-selection step.
+
+  - id: M-112
+    title: Authenticated Gameplay E2E Functional Slice
+    status: completed
+    goal: Define and prove the first authenticated local gameplay end-to-end path across existing onboarding, login, connection binding, protected inventory, presence query, and logout capabilities.
+    completion_criteria:
+      - The slice records the authenticated gameplay E2E boundary in its change spec before implementation.
+      - The flow starts from local onboarding/device credential issuance and exercises the existing protocol-authenticated gameplay path.
+      - The implementation, if added in the slice, remains bounded to E2E verification, local documentation, or request-loop proof over existing capabilities unless separately authorized.
+      - Protocol expansion, generated output, migrations, dependencies, release publishing, production signup, external identity, password login, account recovery, multi-device linking, direct Nakama/Pitaya API compatibility, and broad product modules remain behind explicit ask-first boundaries unless the W-0184 spec scopes them.
+      - The resulting state is checkable through focused tests, docs, scripts, or repository checks.
+    non_goals:
+      - adding new gameplay modules beyond the existing inventory proof slice
+      - adding public signup or production identity behavior
+      - adding new protocol routes unless the W-0184 change spec explicitly scopes them
+      - adding migrations or dependencies
+      - publishing v0.1 alpha
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added a focused protocol-level Go E2E proof that composes local onboarding, device credential login, first-message connection binding, protected inventory grant/read, protected presence query, logout, and post-logout protected-route rejection using existing runtime capabilities. The slice added no production runtime behavior, protocol routes, Protobuf sources, generated output, migrations, repository interfaces, dependencies, release artifacts, production signup, broad product modules, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-113
+    title: Runtime Runbook Alpha Path Refresh
+    status: completed
+    goal: Refresh runtime runbook guidance around the now-proven local authenticated gameplay alpha path.
+    completion_criteria:
+      - The runbook describes the current local alpha path accurately enough for a developer to prepare configuration, understand prerequisites, and follow the proven onboarding -> login -> connection binding -> protected inventory -> presence query -> logout flow.
+      - The runbook distinguishes in-memory test proof from PostgreSQL-backed runtime operation.
+      - Secret, verifier key, raw credential, raw token, and DSN handling remain redacted and environment-driven.
+      - The refresh does not add runtime behavior, protocol routes, generated output, migrations, dependencies, release artifacts, production signup, broad product modules, or direct Nakama/Pitaya API compatibility.
+      - The resulting runbook state is covered by repository checks and verification notes.
+    non_goals:
+      - adding a runnable client or request-loop script
+      - changing runtime startup behavior
+      - adding protocol routes, Protobuf sources, generated output, migrations, or dependencies
+      - publishing v0.1 alpha
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Refreshed `docs/runtime-runbook.md` and `docs/runtime-runbook.zh-CN.md` around the proven local alpha path. The runbook now distinguishes memory bootstrap from PostgreSQL alpha runtime composition, documents verifier key environment handling and redaction rules, points to the focused authenticated gameplay E2E proof, and states that local onboarding remains application-service-only rather than a public protocol route. No runtime behavior, startup configuration semantics, protocol route, Protobuf source, generated output, migration, dependency, release artifact, production signup, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-114
+    title: Minimal Example Client Or Request Loop
+    status: completed
+    goal: Add the smallest developer-facing local example or request-loop script that exercises the proven alpha path without expanding protocol, persistence, identity, release, or product scope.
+    completion_criteria:
+      - The example or script follows the documented local alpha path or clearly records why part of the path is still not externally runnable.
+      - The example keeps raw credentials, raw tokens, verifier keys, DSNs, digests, and transport metadata redacted.
+      - The example does not add production signup, new protocol routes, generated output, migrations, dependencies, broad product modules, release artifacts, or direct Nakama/Pitaya API compatibility.
+      - The example is covered by repository checks or explicit verification notes.
+    non_goals:
+      - changing runtime behavior
+      - changing startup configuration semantics
+      - adding public protocol onboarding
+      - adding Protobuf sources or generated output
+      - adding migrations or dependencies
+      - publishing v0.1 alpha
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `examples/local-alpha-request-loop.sh` as the minimal local alpha request-loop script. The script runs the existing authenticated gameplay E2E proof, prints a redacted path summary, and does not add runtime behavior, startup semantics, public protocol onboarding, Protobuf sources, generated output, migrations, dependencies, release artifacts, production signup, broad product modules, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-115
+    title: Health Readiness Version Config Surface
+    status: completed
+    goal: Add the smallest local health/readiness/version/config surface needed for alpha troubleshooting without expanding protocol, persistence, release, operations, or product scope.
+    completion_criteria:
+      - The surface helps a local developer understand whether the runtime can start and which alpha posture is active.
+      - The surface avoids leaking raw credentials, raw tokens, verifier keys, DSNs, digests, transport metadata, or internal secret configuration.
+      - The surface does not add broad operations/admin behavior, observability dependencies, release packaging, product modules, generated output, migrations, or direct Nakama/Pitaya API compatibility.
+      - The surface is covered by repository checks or explicit verification notes.
+    non_goals:
+      - production observability
+      - admin console
+      - metrics backend integration
+      - changing authentication or session behavior
+      - adding Protobuf sources or generated output
+      - adding migrations or dependencies
+      - publishing v0.1 alpha
+    completion_summary: Added minimal JSON `/healthz`, `/readyz`, `/version`, and `/configz` endpoints to the runtime HTTP mux. The surface reports process health, readiness posture, pre-alpha version, runtime store posture, WebSocket path, local request-loop script path, PostgreSQL configuration presence, authentication configuration requirement, and explicit secret-redaction posture without exposing verifier keys, raw credentials, raw tokens, DSNs, digests, headers, cookies, query strings, subprotocol values, remote addresses, or concrete transport metadata. No broad operations/admin behavior, observability dependency, authentication/session behavior change, startup configuration semantic change, Protobuf source, generated output, migration, release artifact, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-116
+    title: Alpha Acceptance Checklist
+    status: active
+    goal: Add a concise alpha acceptance checklist or equivalent check that lets maintainers and contributors judge whether the v0.1 alpha developer flow is ready without publishing a release.
+    completion_criteria:
+      - The checklist covers clone, prerequisites, migrations, local configuration, local onboarding posture, login, connection binding, protected inventory, presence query, logout, status endpoints, checks, redaction, and contribution entry points.
+      - The checklist distinguishes completed alpha prerequisites from release-publishing work that remains deferred.
+      - The checklist avoids adding runtime behavior, protocol changes, generated output, migrations, dependencies, broad operations/admin behavior, product modules, or direct Nakama/Pitaya API compatibility.
+      - The resulting checklist is covered by repository checks or explicit verification notes.
+    non_goals:
+      - publishing v0.1 alpha
+      - release packaging
+      - adding runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - adding direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -6231,7 +6389,7 @@ work_items:
   - id: W-0178
     milestone: M-106
     title: Define presence protocol query functional slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-20-define-presence-protocol-query-functional-slice
     depends_on:
       - W-0177
@@ -6239,12 +6397,18 @@ work_items:
     tier: tier_2_functional
     selected_direction: define_presence_protocol_query_functional_slice
     gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0082
+      - ADR-0085
+      - ADR-0086
+      - ADR-0087
     ask_first:
       - Selecting presence subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect tokens, resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, or broad product module expansion.
     completion:
       - Create a change spec that embeds the presence protocol query boundary instead of creating a separate confirmation gate.
       - Define and implement the smallest protected presence query over the existing server-owned registry-backed player presence snapshot.
       - Preserve subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, dependencies, direct Nakama/Pitaya API compatibility, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, durable/distributed presence, and broad product behavior behind ask-first boundaries.
+    completion_summary: Added the protected self-player `runtime.presence.GetPlayerPresence` query over server-owned active connection registry state. The slice added `vibit.presence.v1` Protobuf messages, generated Go output through Buf, application-owned presence query handlers, protocol bridge mapping, PostgreSQL startup registration, and focused tests. It preserved deferrals for subscriptions, broadcasts, cross-player presence visibility, durable/distributed presence, chat, friends, groups, parties, matchmaking, match runtime, cluster, SDK, operations/admin behavior, reconnect/resume tokens, logout-triggered socket close, runtime session revocation, dependencies, broad product behavior, and direct Nakama/Pitaya API compatibility.
 
   - id: W-0179
     milestone: M-107
@@ -6269,3 +6433,275 @@ work_items:
       - Update README, AGENTS, runtime runbook wording, and manifests with target pointers.
       - Keep W-0178 as the only next_ready work item.
     completion_summary: Documented `v0.1 alpha` as the short-term developer-usable release target and AI-era Nakama/Pitaya-class server framework as the long-term target. No runtime behavior, protocol shape, generated output, migration, dependency, direct API compatibility, or release artifact was added.
+
+  - id: W-0180
+    milestone: M-108
+    title: Select local onboarding device credential issuance gate
+    status: completed
+    change: changes/2026-05-21-select-local-onboarding-device-credential-issuance-gate
+    depends_on:
+      - W-0178
+      - W-0179
+    expected_change_id: select-local-onboarding-device-credential-issuance-gate
+    tier: tier_1_security_critical
+    selected_direction: define_local_onboarding_device_credential_issuance_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0082
+      - ADR-0086
+      - ADR-0087
+      - ADR-0088
+    candidate_directions:
+      - define_local_onboarding_device_credential_issuance_gate
+      - define_authenticated_gameplay_e2e_slice
+      - refresh_runtime_runbook_for_alpha
+      - add_minimal_example_client_or_request_loop
+      - define_health_readiness_version_config_surface
+      - define_alpha_acceptance_checklist
+    next_milestone: M-109
+    next_ready_work_item: W-0181
+    ask_first:
+      - Implementing local onboarding, generating or displaying raw credentials, creating player accounts through a new flow, writing credential records through a new flow, adding protocol routes, generated output, migrations, dependencies, release publishing, production signup, external identity providers, password login, account recovery, multi-device linking, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Select the next alpha-enabling direction after W-0178.
+      - Prefer first local onboarding/device credential issuance because it is the next blocking alpha capability after presence query.
+      - Create a gate-only work item because credential issuance is security-sensitive.
+      - Preserve implementation, protocol, generated output, migration, dependency, release, and direct compatibility deferrals.
+    completion_summary: Selected `define_local_onboarding_device_credential_issuance_gate` and created `M-109/W-0181` as the next ready gate-only work item. No runtime behavior, protocol messages, generated output, migration, dependency, release artifact, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0181
+    milestone: M-109
+    title: Define local onboarding device credential issuance gate
+    status: completed
+    change: changes/2026-05-21-define-local-onboarding-device-credential-issuance-gate
+    depends_on:
+      - W-0180
+    expected_change_id: define-local-onboarding-device-credential-issuance-gate
+    tier: tier_1_security_critical
+    selected_direction: define_local_onboarding_device_credential_issuance_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0082
+      - ADR-0088
+      - ADR-0086
+      - ADR-0051
+      - ADR-0047
+      - ADR-0043
+      - ADR-0042
+      - ADR-0032
+      - ADR-0030
+      - ADR-0023
+    ask_first:
+      - Implementing onboarding or credential issuance behavior, choosing a production signup model, exposing a public protocol route, adding generated output, adding migrations, changing credential schema, adding dependencies, adding external identity providers, adding password login, adding account recovery, adding multi-device linking, publishing a release, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the first local onboarding/device credential issuance boundary before implementation.
+      - Specify future ownership, allowed files, repository handoff, material generation, digest computation, one-time raw credential presentation, redaction, and fail-closed behavior.
+      - Define future tests and repository checks for the implementation slice.
+      - Preserve production signup, external identity, password login, account recovery, multi-device linking, protocol route, generated output, migration, dependency, release, and direct compatibility deferrals.
+    completion_summary: Added `docs/local-onboarding-device-credential-issuance-gate.md`, its Simplified Chinese translation, `ADR-0089`, and repository check coverage for `runtime.local_onboarding_device_credential_issuance_gate`. The gate defines a future local-only application service method candidate, unit-of-work ordering, use of existing material/digest helpers and repository methods, one-time raw credential presentation after commit, digest-only storage, redaction, tests, and explicit deferrals. No onboarding behavior, credential generation/display, player account creation flow, credential record write flow, protocol route, generated output, migration, dependency, release artifact, production signup, external identity, password login, account recovery, multi-device linking, or direct compatibility was added.
+
+  - id: W-0182
+    milestone: M-110
+    title: Implement local onboarding device credential issuance
+    status: completed
+    change: changes/2026-05-21-implement-local-onboarding-device-credential-issuance
+    depends_on:
+      - W-0181
+    expected_change_id: implement-local-onboarding-device-credential-issuance
+    tier: tier_1_security_critical
+    selected_direction: implement_local_onboarding_device_credential_issuance
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0090
+      - ADR-0089
+      - ADR-0088
+      - ADR-0086
+      - ADR-0051
+      - ADR-0049
+      - ADR-0048
+      - ADR-0047
+      - ADR-0043
+      - ADR-0042
+      - ADR-0032
+      - ADR-0030
+      - ADR-0023
+    ask_first:
+      - Exposing onboarding through a public protocol route, changing Protobuf sources or generated output, adding migrations, changing repository interfaces, adding dependencies, choosing a production signup model, making the existing login route create accounts, issuing access tokens or runtime sessions from onboarding, adding external identity providers, adding password login, adding account recovery, adding account merge, adding multi-device linking, publishing a release, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Implement only the local application service behavior authorized by `docs/local-onboarding-device-credential-issuance-gate.md`.
+      - Create active player account and active device credential record in one application-owned unit of work.
+      - Generate device credential material with explicit entropy reader, compute credential lookup and verifier digests, store only digest material, and return raw credential text only after commit.
+      - Add focused tests for ordering, digest-only storage, one-time return, fail-closed behavior, redaction, and unchanged login-route account creation behavior.
+      - Preserve protocol route, generated output, migration, dependency, production signup, external identity, password login, recovery, multi-device, release, and direct compatibility deferrals.
+    completion_summary: Added `OnboardLocalPlayerWithDeviceCredential`, local onboarding request/result vocabulary, explicit device credential entropy and id generator dependencies, startup dependency composition, and focused tests. The service uses `GenerateDeviceCredentialMaterial`, credential lookup/verifier digest helpers, `CreatePlayerAccount`, and `StoreCredential` in the same unit of work. It stores only digests, returns raw credential text only after commit, does not issue access tokens or runtime sessions, and leaves the existing login route non-creating.
+
+  - id: W-0183
+    milestone: M-111
+    title: Select next alpha direction after local onboarding
+    status: completed
+    change: changes/2026-05-21-select-next-alpha-direction-after-local-onboarding
+    depends_on:
+      - W-0182
+    expected_change_id: select-next-alpha-direction-after-local-onboarding
+    tier: tier_2_direction_selection
+    candidate_directions:
+      - define_authenticated_gameplay_e2e_slice
+      - refresh_runtime_runbook_for_alpha
+      - add_minimal_example_client_or_request_loop
+      - define_health_readiness_version_config_surface
+      - define_alpha_acceptance_checklist
+    recommended_direction: define_authenticated_gameplay_e2e_slice
+    selected_direction: define_authenticated_gameplay_e2e_slice
+    next_milestone: M-112
+    next_ready_work_item: W-0184
+    related_decisions:
+      - ADR-0091
+      - ADR-0090
+      - ADR-0089
+      - ADR-0088
+      - ADR-0087
+      - ADR-0086
+      - ADR-0084
+      - ADR-0082
+    ask_first:
+      - Implementing authenticated gameplay E2E, adding protocol routes, adding generated output, changing migrations, adding dependencies, publishing a release, selecting direct Nakama/Pitaya API compatibility, production signup, external identity providers, password login, account recovery, multi-device linking, broad product module expansion, or skipping required verification in the direction-selection step.
+    completion:
+      - Select the next alpha-enabling direction after local onboarding implementation.
+      - Prefer authenticated gameplay E2E because onboarding, login, connection binding, protected inventory, presence query, and logout now exist as separate pieces but are not yet proven as one documented flow.
+      - Preserve implementation, protocol, generated output, migration, dependency, release, production identity, recovery, multi-device, and direct compatibility deferrals unless the selected next item explicitly scopes them.
+    completion_summary: Selected `define_authenticated_gameplay_e2e_slice` as the next alpha-enabling direction and created `M-112/W-0184` as the next ready bounded functional slice. No runtime behavior, protocol route, generated output, migration, dependency, release artifact, production signup, external identity provider, password login, account recovery, multi-device linking, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0184
+    milestone: M-112
+    title: Define authenticated gameplay E2E slice
+    status: completed
+    change: changes/2026-05-21-define-authenticated-gameplay-e2e-slice
+    depends_on:
+      - W-0183
+    expected_change_id: define-authenticated-gameplay-e2e-slice
+    tier: tier_2_functional
+    selected_direction: define_authenticated_gameplay_e2e_slice
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0092
+      - ADR-0091
+      - ADR-0090
+      - ADR-0087
+      - ADR-0086
+      - ADR-0084
+      - ADR-0082
+    ask_first:
+      - Adding new protocol routes outside the existing alpha flow, changing Protobuf sources or generated output, adding migrations, changing repository interfaces, adding dependencies, publishing a release, choosing production signup, adding external identity providers, password login, account recovery, account merge, multi-device linking, adding chat/social/matchmaking/match runtime modules, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define and, if scoped by the change spec, prove the first authenticated gameplay E2E path across local onboarding, login, connection binding, protected inventory, presence query, and logout.
+      - Prefer using existing runtime capabilities and focused request-loop or test coverage before adding any new protocol surface.
+      - Document local prerequisites, proof material handling, redaction expectations, and known deferrals.
+      - Preserve protocol expansion, generated output, migration, dependency, release, production identity, recovery, multi-device, broad product module, and direct compatibility deferrals unless explicitly scoped by the W-0184 change spec.
+    completion_summary: Defined the authenticated gameplay E2E boundary in the change spec and added `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go` as the focused proof. The test starts with local onboarding, logs in through the existing protocol route, binds the connection, exercises protected inventory grant/read and protected presence query through `AuthenticatedRequest`, logs out through the existing logout route, and verifies the revoked token is rejected on a later protected request. No production runtime behavior, protocol route, Protobuf source, generated output, migration, repository interface, dependency, release artifact, production signup, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0185
+    milestone: M-113
+    title: Refresh runtime runbook for alpha path
+    status: completed
+    change: changes/2026-05-21-refresh-runtime-runbook-for-alpha
+    depends_on:
+      - W-0184
+    expected_change_id: refresh-runtime-runbook-for-alpha
+    tier: tier_2_documentation
+    selected_direction: refresh_runtime_runbook_for_alpha
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0093
+      - ADR-0092
+      - ADR-0091
+      - ADR-0090
+      - ADR-0087
+      - ADR-0086
+      - ADR-0084
+      - ADR-0082
+    ask_first:
+      - Adding runtime behavior, changing startup configuration semantics, adding protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, publishing a release, choosing production signup, adding external identity providers, password login, account recovery, account merge, multi-device linking, adding chat/social/matchmaking/match runtime modules, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Refresh `docs/runtime-runbook.md` and its Simplified Chinese translation around the now-proven local authenticated gameplay alpha path.
+      - Document prerequisites, environment configuration, verifier key handling, PostgreSQL operation posture, in-memory test proof posture, and redaction expectations.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, release, production identity, recovery, multi-device, broad product module, and direct compatibility deferrals.
+    completion_summary: Refreshed the runtime runbook and Simplified Chinese translation around the proven local alpha path. The runbook now documents memory vs PostgreSQL runtime posture, verifier key requirements, the focused authenticated gameplay E2E proof, application-service-only local onboarding, protected route proof carriers, logout behavior, post-logout rejection, and redaction rules.
+
+  - id: W-0186
+    milestone: M-114
+    title: Add minimal example client or request-loop script
+    status: completed
+    change: changes/2026-05-21-add-minimal-example-client-or-request-loop-script
+    depends_on:
+      - W-0185
+    expected_change_id: add-minimal-example-client-or-request-loop-script
+    tier: tier_2_developer_experience
+    selected_direction: add_minimal_example_client_or_request_loop
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0093
+      - ADR-0092
+      - ADR-0091
+      - ADR-0090
+      - ADR-0087
+      - ADR-0086
+      - ADR-0084
+      - ADR-0082
+    ask_first:
+      - Adding runtime behavior, changing startup configuration semantics, adding public protocol onboarding, changing Protobuf sources or generated output, adding migrations, adding dependencies, publishing a release, choosing production signup, adding external identity providers, password login, account recovery, account merge, multi-device linking, adding chat/social/matchmaking/match runtime modules, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Add the smallest local example client or request-loop script that helps a developer exercise the alpha path described in the runbook.
+      - Preserve verifier key, raw credential, raw token, digest, DSN, and transport metadata redaction expectations.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, release, production identity, recovery, multi-device, broad product module, and direct compatibility deferrals.
+    completion_summary: Added `examples/local-alpha-request-loop.sh` as the minimal local alpha request-loop script. The script wraps the existing focused authenticated gameplay E2E proof, prints only a redacted path summary and test status, and leaves public onboarding, live PostgreSQL client behavior, runtime behavior changes, startup semantics, Protobuf/generated output, migrations, dependencies, release publishing, production signup, broad product modules, and direct Nakama/Pitaya API compatibility deferred.
+
+  - id: W-0187
+    milestone: M-115
+    title: Add health/readiness/version/config surface
+    status: completed
+    change: changes/2026-05-21-add-health-readiness-version-config-surface
+    depends_on:
+      - W-0186
+    expected_change_id: add-health-readiness-version-config-surface
+    tier: tier_2_developer_experience
+    selected_direction: health_readiness_version_config_surface
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Adding broad operations/admin behavior, adding observability dependencies, exposing secrets or DSNs, changing authentication/session behavior, changing startup configuration semantics, adding Protobuf sources or generated output, adding migrations, publishing a release, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Add the smallest health/readiness/version/config surface that helps a developer troubleshoot local alpha startup.
+      - Preserve redaction of verifier keys, raw credentials, raw tokens, digests, DSNs, transport metadata, and secret configuration.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, release, production operations, broad product module, and direct compatibility deferrals unless explicitly scoped.
+    completion_summary: Added minimal JSON `/healthz`, `/readyz`, `/version`, and `/configz` endpoints to `runtime/cmd/vibit-server`. The endpoints use the existing HTTP mux and standard library JSON encoding, expose only redacted local alpha troubleshooting posture, and are covered by focused tests plus the `runtime.health_readiness_version_config_surface` repository check. The slice did not add broad operations/admin behavior, observability dependencies, authentication/session behavior changes, startup configuration semantic changes, Protobuf sources, generated output, migrations, dependencies, release artifacts, broad product modules, or direct Nakama/Pitaya API compatibility.
+
+  - id: W-0188
+    milestone: M-116
+    title: Add alpha acceptance checklist
+    status: next_ready
+    change: changes/2026-05-21-add-alpha-acceptance-checklist
+    depends_on:
+      - W-0187
+    expected_change_id: add-alpha-acceptance-checklist
+    tier: tier_2_developer_experience
+    selected_direction: alpha_acceptance_checklist
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Publishing v0.1 alpha, adding release packaging, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Add a concise alpha acceptance checklist or equivalent check for the developer-usable v0.1 alpha flow.
+      - Cover prerequisites, local configuration, migration posture, local onboarding status, login, connection binding, protected inventory, presence query, logout, status endpoints, redaction, verification commands, and contribution entry points.
+      - Preserve release publishing, release packaging, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.

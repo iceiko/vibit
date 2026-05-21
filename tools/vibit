@@ -115,6 +115,14 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.reconnect_connection_epoch_functional_slice",
   "runtime.protocol_session_carrier_functional_slice",
   "runtime.presence_lifecycle_functional_slice",
+  "runtime.presence_protocol_query_functional_slice",
+  "runtime.local_onboarding_device_credential_issuance_gate",
+  "runtime.local_onboarding_device_credential_issuance_implementation",
+  "runtime.next_alpha_direction_authenticated_gameplay_e2e_slice",
+  "runtime.authenticated_gameplay_e2e_functional_slice",
+  "runtime.runtime_runbook_alpha_path_refresh",
+  "runtime.minimal_example_client_or_request_loop",
+  "runtime.health_readiness_version_config_surface",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -6355,14 +6363,28 @@ function checkRuntimeMetadataOnlyIdentityBoundaries(root, goFiles) {
       });
       continue;
     }
+    if (file === "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go" && workItemHasStatus(root, "W-0184", "completed")) {
+      ok(`${file} uses fake player repositories only for the W-0184 authenticated gameplay E2E proof`, {
+        rule_id: "runtime.identity_boundary",
+        artifact: file,
+      });
+      continue;
+    }
     const text = readText(path.join(root, file));
     const importsPlayer = importsWithPrefix(text, "github.com/iceiko/vibit/runtime/internal/modules/player").length > 0;
     const mentionsPlayerAccountPersistence = /\b(player_accounts|player_account_events|CreatePlayerAccountMutation|PlayerAccountCreated)\b/.test(text);
     if (importsPlayer && mentionsPlayerAccountPersistence) {
-      fail(`${file} contains player account persistence behavior outside the PostgreSQL adapter boundary`, {
-        rule_id: "runtime.identity_boundary",
-        artifact: file,
-      });
+      if (file === "runtime/internal/app/authentication/service.go" && workItemHasStatus(root, "W-0182", "completed")) {
+        ok(`${file} uses player account lifecycle mutation only through the W-0182 local onboarding application service boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      } else {
+        fail(`${file} contains player account persistence behavior outside the PostgreSQL adapter boundary`, {
+          rule_id: "runtime.identity_boundary",
+          artifact: file,
+        });
+      }
     }
   }
 
@@ -10131,7 +10153,7 @@ function checkRuntimeAuthenticationServiceBehaviorImplementationGate(root, goFil
 
     const sourceWithoutComments = sourceWithoutGoComments(sourceText);
     const forbiddenServicePatterns = [
-      { pattern: /\bGenerateDeviceCredentialMaterial\b/, label: "credential issuance inside authentication service" },
+      { pattern: /\bGenerateDeviceCredentialMaterial\b/, label: "credential issuance inside authentication service", allowedAfterWorkItem: "W-0182" },
       { pattern: /\bRevokeToken\b/, label: "token revocation inside authentication service before W-0158", allowedAfterWorkItem: "W-0158" },
       { pattern: /\bRevokeCredential\b/, label: "credential revocation inside W-0109 service slice" },
       { pattern: /\bgithub\.com\/iceiko\/vibit\/runtime\/internal\/platform\/persistence\/postgres\b/, label: "PostgreSQL adapter import inside skeleton service" },
@@ -16143,8 +16165,8 @@ function checkRuntimeSessionCreationCompositionImplementation(root, goFiles) {
     [sourcePath]: [
       "type SessionIDGenerator interface",
       "GenerateSessionID(context.Context)",
-      "SessionIDGenerator     SessionIDGenerator",
-      "sessionIDGenerator     SessionIDGenerator",
+      "SessionIDGenerator",
+      "sessionIDGenerator",
       "NewSessionRepository() (session.Repository, error)",
       "CreateRuntimeSession",
       "session.CreateRuntimeSessionMutation",
@@ -16165,7 +16187,8 @@ function checkRuntimeSessionCreationCompositionImplementation(root, goFiles) {
       "SessionValidated false",
     ],
     [startupPath]: [
-      "SessionIDGenerator:     randomSessionIDGenerator{}",
+      "SessionIDGenerator:",
+      "randomSessionIDGenerator{}",
       "type randomSessionIDGenerator struct{}",
       "func (randomSessionIDGenerator) GenerateSessionID(context.Context) (string, error)",
       "runtime-session-",
@@ -18800,7 +18823,7 @@ function checkRuntimeProtocolLogoutRouteGate(root, goFiles) {
     [".arch/work-items.yaml", "title: Protocol Logout Route Implementation"],
     [".arch/work-items.yaml", "id: W-0170"],
     [".arch/work-items.yaml", "title: Implement protocol logout route"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    ...(implementationCompleted ? [] : [[".arch/work-items.yaml", "status: next_ready"]]),
     [".arch/runtime.yaml", "protocol_logout_route_gate: ADR-0079"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "check_rule: runtime.protocol_logout_route_gate"],
@@ -19014,6 +19037,7 @@ function checkRuntimeProtocolLogoutRouteGate(root, goFiles) {
 function checkRuntimeProtocolLogoutRouteImplementation(root, goFiles) {
   const ruleId = "runtime.protocol_logout_route_implementation";
   const changePath = "changes/2026-05-18-implement-protocol-logout-route";
+  const nextDirectionCompleted = workItemHasStatus(root, "W-0171", "completed");
 
   if (!workItemHasStatus(root, "W-0170", "completed")) {
     ok("protocol logout route implementation is not completed yet", {
@@ -19067,7 +19091,7 @@ function checkRuntimeProtocolLogoutRouteImplementation(root, goFiles) {
     [".arch/work-items.yaml", "title: Next Direction Confirmation After Protocol Logout Route Implementation"],
     [".arch/work-items.yaml", "id: W-0171"],
     [".arch/work-items.yaml", "title: Confirm next direction after protocol logout route implementation"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    ...(nextDirectionCompleted ? [] : [[".arch/work-items.yaml", "status: next_ready"]]),
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "protocol_logout_route_implementation_completed: true"],
     [".arch/conventions.yaml", "protocol_logout_route_implementation_completed: true"],
@@ -19681,6 +19705,7 @@ function checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles) {
   const changePath = "changes/2026-05-20-define-reconnect-connection-epoch-functional-slice";
   const decisionPath = "decisions/ADR-0083-reconnect-connection-epoch-functional-slice.md";
   const conversationPath = "conversations/2026-05-20-reconnect-connection-epoch-functional-slice.md";
+  const nextSliceCompleted = workItemHasStatus(root, "W-0176", "completed");
 
   if (!workItemHasStatus(root, "W-0175", "completed")) {
     ok("reconnect connection epoch functional slice is not completed yet", {
@@ -19727,7 +19752,7 @@ function checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles) {
     [".arch/work-items.yaml", "title: Protocol Session Carrier Functional Slice"],
     [".arch/work-items.yaml", "id: W-0176"],
     [".arch/work-items.yaml", "title: Define protocol session carrier functional slice"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    ...(nextSliceCompleted ? [] : [[".arch/work-items.yaml", "status: next_ready"]]),
     [".arch/work-items.yaml", "tier: tier_2_functional"],
     [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
@@ -19868,6 +19893,7 @@ function checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles) {
   const changePath = "changes/2026-05-20-define-protocol-session-carrier-functional-slice";
   const decisionPath = "decisions/ADR-0084-protocol-session-carrier-functional-slice.md";
   const conversationPath = "conversations/2026-05-20-protocol-session-carrier-functional-slice.md";
+  const nextSliceCompleted = workItemHasStatus(root, "W-0177", "completed");
 
   if (!workItemHasStatus(root, "W-0176", "completed")) {
     ok("protocol session carrier functional slice is not completed yet", {
@@ -19915,7 +19941,7 @@ function checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles) {
     [".arch/work-items.yaml", "title: Presence Lifecycle Functional Slice"],
     [".arch/work-items.yaml", "id: W-0177"],
     [".arch/work-items.yaml", "title: Define presence lifecycle functional slice"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    ...(nextSliceCompleted ? [] : [[".arch/work-items.yaml", "status: next_ready"]]),
     [".arch/work-items.yaml", "tier: tier_2_functional"],
     [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
@@ -20059,6 +20085,7 @@ function checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles) {
   const changePath = "changes/2026-05-20-define-presence-lifecycle-functional-slice";
   const decisionPath = "decisions/ADR-0085-presence-lifecycle-functional-slice.md";
   const conversationPath = "conversations/2026-05-20-presence-lifecycle-functional-slice.md";
+  const nextSliceCompleted = workItemHasStatus(root, "W-0178", "completed");
 
   if (!workItemHasStatus(root, "W-0177", "completed")) {
     ok("presence lifecycle functional slice is not completed yet", {
@@ -20109,7 +20136,7 @@ function checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles) {
     [".arch/work-items.yaml", "title: Presence Protocol Query Functional Slice"],
     [".arch/work-items.yaml", "id: W-0178"],
     [".arch/work-items.yaml", "title: Define presence protocol query functional slice"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    ...(nextSliceCompleted ? [] : [[".arch/work-items.yaml", "status: next_ready"]]),
     [".arch/work-items.yaml", "tier: tier_2_functional"],
     [".arch/work-items.yaml", "gate_density_strategy: ADR-0082"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
@@ -20282,6 +20309,1538 @@ function checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles) {
   ok("presence lifecycle functional slice is completed with registry-backed player online/offline snapshots and no protocol/subscription/durable presence side effects", {
     rule_id: ruleId,
     artifact: "runtime",
+  });
+}
+
+function checkRuntimePresenceProtocolQueryFunctionalSlice(root, goFiles) {
+  const ruleId = "runtime.presence_protocol_query_functional_slice";
+  const changePath = "changes/2026-05-20-define-presence-protocol-query-functional-slice";
+  const decisionPath = "decisions/ADR-0087-presence-protocol-query-functional-slice.md";
+  const conversationPath = "conversations/2026-05-20-presence-protocol-query-functional-slice.md";
+
+  if (!workItemHasStatus(root, "W-0178", "completed")) {
+    ok("presence protocol query functional slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    decisionPath,
+    conversationPath,
+    "proto/vibit/presence/v1/presence.proto",
+    "runtime/internal/generated/proto/vibit/presence/v1/presence.pb.go",
+    "runtime/internal/app/presence/presence.go",
+    "runtime/internal/app/presence/presence_test.go",
+    "runtime/internal/platform/protocol/protobuf/presence_bridge.go",
+    "runtime/internal/platform/protocol/protobuf/presence_bridge_test.go",
+    "runtime/internal/platform/protocol/protobuf/authenticated_request_test.go",
+    "runtime/cmd/vibit-server/main.go",
+    "runtime/cmd/vibit-server/main_test.go",
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for presence protocol query functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for presence protocol query functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-106"],
+    [".arch/work-items.yaml", "title: Presence Protocol Query Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0178"],
+    [".arch/work-items.yaml", "title: Define presence protocol query functional slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0087"],
+    [".arch/work-items.yaml", "status: active"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "presence_protocol_query_functional_slice:"],
+    [".arch/runtime.yaml", "presence_protocol_query_functional_slice_completed: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.presence_protocol_query_functional_slice"],
+    [".arch/runtime.yaml", "public_presence_route: runtime.presence.GetPlayerPresence"],
+    [".arch/runtime.yaml", "protocol_source_added: proto/vibit/presence/v1/presence.proto"],
+    [".arch/runtime.yaml", "generated_go_output_added: runtime/internal/generated/proto/vibit/presence/v1/presence.pb.go"],
+    [".arch/runtime.yaml", "presence_query_self_only: true"],
+    [".arch/runtime.yaml", "presence_query_exposes_access_token_record_ids: false"],
+    [".arch/runtime.yaml", "presence_subscription_added: false"],
+    [".arch/runtime.yaml", "durable_distributed_presence_added: false"],
+    [".arch/conventions.yaml", "presence_protocol_query_functional_slice_completed: true"],
+    [".arch/contracts.yaml", "presence_protocol_query_functional_slice:"],
+    [".arch/contracts.yaml", "public_presence_route: runtime.presence.GetPlayerPresence"],
+    [".arch/reference.yaml", "phase_2cp_presence_protocol_query_functional_slice"],
+    [".arch/reference.yaml", "first_presence_protocol_behavior: protected_self_player_presence_query_from_active_bound_connections"],
+    ["rules/check-rules.json", "runtime.presence_protocol_query_functional_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "define_presence_protocol_query_functional_slice",
+      "runtime.presence_protocol_query_functional_slice",
+      "runtime.presence.GetPlayerPresence",
+      "self-only",
+      "AuthenticatedRequest",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0178",
+      "completed_milestone: M-106",
+      "presence_protocol_query_functional_slice_check_rule: runtime.presence_protocol_query_functional_slice",
+      "first_presence_protocol_behavior: protected_self_player_presence_query_from_active_bound_connections",
+      "protocol_presence_query_added: true",
+      "presence_query_self_only: true",
+      "presence_query_uses_request_token_proof: true",
+      "presence_query_exposes_access_token_record_ids: false",
+      "presence_subscription_added: false",
+      "presence_broadcast_added: false",
+      "durable_distributed_presence_added: false",
+      "dependencies_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    "proto/vibit/presence/v1/presence.proto": [
+      "package vibit.presence.v1;",
+      "GetPlayerPresenceRequest",
+      "GetPlayerPresenceResponse",
+      "PresenceConnection",
+      "PresenceStatus",
+      "runtime/internal/generated/proto/vibit/presence/v1;presencev1",
+    ],
+    "runtime/internal/generated/proto/vibit/presence/v1/presence.pb.go": [
+      "Code generated by protoc-gen-go. DO NOT EDIT.",
+      "source: vibit/presence/v1/presence.proto",
+      "type GetPlayerPresenceRequest struct",
+      "type GetPlayerPresenceResponse struct",
+      "type PresenceConnection struct",
+      "type PresenceStatus int32",
+    ],
+    "runtime/internal/app/presence/presence.go": [
+      "GetPlayerPresenceRoute",
+      "runtime.presence",
+      "QueryGetPlayerPresence",
+      "PresenceForPlayer",
+      "presence query may only target the authenticated player",
+      "ErrorCodePresenceQueryForbidden",
+    ],
+    "runtime/internal/app/presence/presence_test.go": [
+      "TestGetPlayerPresenceReturnsSelfPresenceSnapshot",
+      "TestGetPlayerPresenceRejectsCrossPlayerQuery",
+      "TestGetPlayerPresenceRejectsMetadataOnlyIdentity",
+      "TestGetPlayerPresenceFailsClosedWhenRegistryUnavailable",
+    ],
+    "runtime/internal/platform/protocol/protobuf/presence_bridge.go": [
+      "routeRequestWithPresencePayload",
+      "protoPayloadFromPresenceRoute",
+      "GetPlayerPresenceRoute",
+      "GetPlayerPresenceResponse",
+      "protoPresenceStatus",
+    ],
+    "runtime/internal/platform/protocol/protobuf/authenticated_request_test.go": [
+      "TestFrameHandlerProtectedPresenceQueryUsesValidatedSelfIdentity",
+      "vibit.presence.v1.GetPlayerPresenceResponse",
+      "want online self presence",
+    ],
+    "runtime/cmd/vibit-server/main.go": [
+      "registerPresenceRoutes",
+      "apppresence.Handlers",
+      "connectionRegistry",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "proto/vibit/presence/v1/presence.proto",
+      patterns: [
+        { pattern: /\bSubscribe\b|\bBroadcast\b|\bStream\b|\bChat\b|\bFriend\b|\bGroup\b|\bParty\b|\bMatchmaking\b|\bMatchRuntime\b/i, label: "presence proto expanding into subscriptions, broadcasts, social, or match behavior" },
+        { pattern: /\baccess_token\b|\btoken_record\b|\bverifier\b|\bdigest\b|\bcredential\b/i, label: "presence proto exposing token, credential, verifier, or digest material" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/presence/presence.go",
+      patterns: [
+        { pattern: /\bSubscribe\b|\bBroadcast\b|\bChat\b|\bFriend\b|\bGroup\b|\bParty\b|\bMatchmaking\b|\bMatchRuntime\b/, label: "presence app expanding into subscriptions, broadcasts, social, or match behavior" },
+        { pattern: /\bAccessTokenRecordID\b|\bRawAccessToken\b|\bVerifierDigest\b|\bLookupDigest\b|\bVerifierKeyID\b/, label: "presence app exposing token record or verifier internals" },
+        { pattern: /\bpgx\b|\bpostgres\b|\bwebsocket\b|\bcoder\/websocket\b/, label: "presence app importing persistence or transport concerns" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/transport/ws/server.go",
+      patterns: [
+        { pattern: /\bPresence\b|\bGetPlayerPresence\b|\bAuthorization\b|\bCookie\b|\bBearer\b|\bAccessToken\b/, label: "transport-owned presence or credential behavior" },
+      ],
+    },
+    {
+      file: "runtime/internal/app/authentication/service.go",
+      patterns: [
+        { pattern: /\bGetPlayerPresence\b|\bPresenceForPlayer\b|\bPresenceStatus\b|\bSubscribePresence\b|\bBroadcastPresence\b/, label: "authentication service owning presence query behavior" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, rule.file)));
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} stays inside presence protocol query functional slice boundary`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses presence protocol query functional slice boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("presence protocol query functional slice is completed with a protected self-player query and no subscription/broadcast/durable/social side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
+function checkRuntimeLocalOnboardingDeviceCredentialIssuanceGate(root, goFiles) {
+  const ruleId = "runtime.local_onboarding_device_credential_issuance_gate";
+  const standardPath = "docs/local-onboarding-device-credential-issuance-gate.md";
+  const standardTranslationPath = "docs/local-onboarding-device-credential-issuance-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0089-local-onboarding-device-credential-issuance-gate.md";
+  const changePath = "changes/2026-05-21-define-local-onboarding-device-credential-issuance-gate";
+  const conversationPath = "conversations/2026-05-21-local-onboarding-device-credential-issuance-gate.md";
+
+  if (!workItemHasStatus(root, "W-0181", "completed")) {
+    ok("local onboarding device credential issuance gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for local onboarding device credential issuance gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for local onboarding device credential issuance gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-109"],
+    [".arch/work-items.yaml", "title: Local Onboarding Device Credential Issuance Gate"],
+    [".arch/work-items.yaml", "id: W-0181"],
+    [".arch/work-items.yaml", "title: Define local onboarding device credential issuance gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0089"],
+    [".arch/work-items.yaml", "id: M-110"],
+    [".arch/work-items.yaml", "title: Local Onboarding Device Credential Issuance Implementation"],
+    [".arch/work-items.yaml", "id: W-0182"],
+    [".arch/work-items.yaml", "title: Implement local onboarding device credential issuance"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0185", "completed") ? "status: completed" : "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance_gate:"],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.local_onboarding_device_credential_issuance_gate"],
+    [".arch/runtime.yaml", "future_implementation_work_item: W-0182"],
+    [".arch/runtime.yaml", "future_service_owner: runtime/internal/app/authentication"],
+    [".arch/runtime.yaml", "future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential"],
+    [".arch/runtime.yaml", "first_surface_candidate: local_developer_onboarding_application_service"],
+    [".arch/runtime.yaml", "surface_visibility: local_only_not_public_signup"],
+    [".arch/runtime.yaml", "player_account_repository_method: CreatePlayerAccount"],
+    [".arch/runtime.yaml", "authentication_repository_method: StoreCredential"],
+    [".arch/runtime.yaml", "credential_material_helper: GenerateDeviceCredentialMaterial"],
+    [".arch/runtime.yaml", "credential_lookup_digest_helper: ComputeCredentialLookupDigest"],
+    [".arch/runtime.yaml", "credential_verifier_digest_helper: ComputeCredentialVerifierDigest"],
+    [".arch/runtime.yaml", "one_time_raw_credential_presentation_required: true"],
+    [".arch/runtime.yaml", "digest_only_credential_record_storage_required: true"],
+    [".arch/runtime.yaml", "same_unit_of_work_required: true"],
+    [".arch/runtime.yaml", "existing_login_route_account_creation_behavior_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/conventions.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
+    [".arch/conventions.yaml", "check_rule: runtime.local_onboarding_device_credential_issuance_gate"],
+    [".arch/contracts.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
+    [".arch/contracts.yaml", "check_rule: runtime.local_onboarding_device_credential_issuance_gate"],
+    [".arch/reference.yaml", "phase_2cr_local_onboarding_device_credential_issuance_gate"],
+    [".arch/reference.yaml", "phase_2cs_local_onboarding_device_credential_issuance_implementation"],
+    ["modules/authentication/module.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
+    ["modules/authentication/module.yaml", "future_repository_method: StoreCredential"],
+    ["modules/authentication/module.yaml", "raw_credential_storage_allowed: false"],
+    ["modules/player/module.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
+    ["modules/player/module.yaml", "future_repository_method: CreatePlayerAccount"],
+    ["modules/player/module.yaml", "player_accounts_remain_credential_free: true"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : (workItemHasStatus(root, "W-0182", "completed") ? "next_work_item: W-0183" : "next_work_item: W-0182")))))],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : (workItemHasStatus(root, "W-0182", "completed") ? "W-0183 Select next alpha direction after local onboarding" : "W-0182 Implement local onboarding device credential issuance")))))],
+    ["AGENTS.md", "M-109 Local Onboarding Device Credential Issuance Gate"],
+    ["AGENTS.md", "M-110 Local Onboarding Device Credential Issuance Implementation"],
+    ["AGENTS.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["AGENTS.zh-CN.md", "M-109 Local Onboarding Device Credential Issuance Gate"],
+    ["runtime/AGENTS.md", "M-110 Local Onboarding Device Credential Issuance Implementation"],
+    ["runtime/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["runtime/AGENTS.zh-CN.md", "M-110 Local Onboarding Device Credential Issuance Implementation"],
+    ["modules/authentication/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["modules/authentication/AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["modules/player/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["modules/player/AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_gate"],
+    ["rules/check-rules.json", "runtime.local_onboarding_device_credential_issuance_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "local_onboarding_device_credential_issuance_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0181"],
+    [standardPath, "future_implementation_work_item: W-0182"],
+    [standardPath, "check_rule: runtime.local_onboarding_device_credential_issuance_gate"],
+    [standardPath, "first_surface_candidate: local_developer_onboarding_application_service"],
+    [standardPath, "future_service_owner: runtime/internal/app/authentication"],
+    [standardPath, "future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential"],
+    [standardPath, "GenerateDeviceCredentialMaterial"],
+    [standardPath, "ComputeCredentialLookupDigest"],
+    [standardPath, "ComputeCredentialVerifierDigest"],
+    [standardPath, "return_raw_device_credential_text_once_after_commit"],
+    [standardPath, "existing_login_route_account_creation_behavior_changed: false"],
+    [standardPath, "local_onboarding_returns_access_token: false"],
+    [standardPath, "public_protocol_route: forbidden_by_this_gate"],
+    [standardPath, "production_signup: forbidden_by_this_gate"],
+    [standardPath, "Runtime Go tests and Buf generation are not required"],
+    [standardTranslationPath, "local_onboarding_device_credential_issuance_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "completed_work_item: W-0181"],
+    [standardTranslationPath, "future_implementation_work_item: W-0182"],
+    [standardTranslationPath, "check_rule: runtime.local_onboarding_device_credential_issuance_gate"],
+    [standardTranslationPath, "first_surface_candidate: local_developer_onboarding_application_service"],
+    [standardTranslationPath, "future_service_owner: runtime/internal/app/authentication"],
+    [standardTranslationPath, "future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential"],
+    [standardTranslationPath, "GenerateDeviceCredentialMaterial"],
+    [standardTranslationPath, "ComputeCredentialLookupDigest"],
+    [standardTranslationPath, "ComputeCredentialVerifierDigest"],
+    [standardTranslationPath, "return_raw_device_credential_text_once_after_commit"],
+    [standardTranslationPath, "existing_login_route_account_creation_behavior_changed: false"],
+    [standardTranslationPath, "local_onboarding_returns_access_token: false"],
+    [standardTranslationPath, "public_protocol_route: forbidden_by_this_gate"],
+    [standardTranslationPath, "production_signup: forbidden_by_this_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0089",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "GenerateDeviceCredentialMaterial",
+      "ComputeCredentialLookupDigest",
+      "ComputeCredentialVerifierDigest",
+      "runtime.local_onboarding_device_credential_issuance_gate",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0181",
+      "completed_milestone: M-109",
+      "next_milestone: M-110",
+      "next_work_item: W-0182",
+      "local_onboarding_device_credential_issuance_gate_check_rule: runtime.local_onboarding_device_credential_issuance_gate",
+      "future_service_owner: runtime/internal/app/authentication",
+      "future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential",
+      "one_time_raw_credential_presentation_required: true",
+      "digest_only_credential_record_storage_required: true",
+      "implementation_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  if (!workItemHasStatus(root, "W-0182", "completed")) {
+    const forbiddenRuntimeFiles = [
+      "proto/vibit/authentication/v1/authentication.proto",
+      "runtime/internal/app/authentication/service.go",
+      "runtime/internal/platform/protocol/protobuf/authentication_bridge.go",
+      "runtime/internal/platform/protocol/protobuf/payload_registry.go",
+      "runtime/cmd/vibit-server/main.go",
+    ];
+    const forbiddenPatterns = [
+      { pattern: /\bOnboardLocalPlayerWithDeviceCredential\b/, label: "local onboarding service implementation" },
+      { pattern: /\bLocalOnboarding\b|\bOnboardLocal\b|\bIssueDeviceCredential\b|\bDeviceCredentialIssuance\b/, label: "local onboarding or credential issuance runtime surface" },
+      { pattern: /\bCreateLocalPlayer\b|\bCreatePlayerWithDeviceCredential\b/, label: "local player creation runtime surface" },
+    ];
+    for (const file of forbiddenRuntimeFiles) {
+      if (!isFile(root, file)) {
+        continue;
+      }
+      const rawText = readText(path.join(root, file));
+      const text = file.endsWith(".go") ? sourceWithoutGoComments(rawText) : rawText;
+      const matches = textMatchesAny(text, forbiddenPatterns, root);
+      if (matches.length === 0) {
+        ok(`${file} has no local onboarding credential issuance implementation before W-0182`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+      for (const match of matches) {
+        fail(`${file} crosses local onboarding device credential issuance gate with ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  } else {
+    ok("local onboarding device credential issuance implementation is authorized after completed W-0182", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+  }
+
+  ok("local onboarding device credential issuance gate is completed without runtime onboarding, protocol, generated-output, migration, dependency, production signup, or direct compatibility side effects", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
+function checkRuntimeLocalOnboardingDeviceCredentialIssuanceImplementation(root, goFiles) {
+  const ruleId = "runtime.local_onboarding_device_credential_issuance_implementation";
+  const decisionPath = "decisions/ADR-0090-local-onboarding-device-credential-issuance-implementation.md";
+  const changePath = "changes/2026-05-21-implement-local-onboarding-device-credential-issuance";
+  const conversationPath = "conversations/2026-05-21-local-onboarding-device-credential-issuance-implementation.md";
+  const servicePath = "runtime/internal/app/authentication/service.go";
+  const serviceTestPath = "runtime/internal/app/authentication/service_test.go";
+  const startupPath = "runtime/cmd/vibit-server/main.go";
+  const startupTestPath = "runtime/cmd/vibit-server/main_test.go";
+
+  if (!workItemHasStatus(root, "W-0182", "completed")) {
+    ok("local onboarding device credential issuance implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for local onboarding device credential issuance implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for local onboarding device credential issuance implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-110"],
+    [".arch/work-items.yaml", "title: Local Onboarding Device Credential Issuance Implementation"],
+    [".arch/work-items.yaml", "id: W-0182"],
+    [".arch/work-items.yaml", "title: Implement local onboarding device credential issuance"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0090"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0183", "completed") ? "id: M-112" : "id: M-111"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0183", "completed") ? "title: Authenticated Gameplay E2E Functional Slice" : "title: Next Alpha Direction Selection After Local Onboarding"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0183", "completed") ? "id: W-0184" : "id: W-0183"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0183", "completed") ? "title: Define authenticated gameplay E2E slice" : "title: Select next alpha direction after local onboarding"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0186", "completed") ? "status: completed" : "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance_implementation:"],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance_implemented: true"],
+    [".arch/runtime.yaml", "check_rule: runtime.local_onboarding_device_credential_issuance_implementation"],
+    [".arch/runtime.yaml", "service_method: OnboardLocalPlayerWithDeviceCredential"],
+    [".arch/runtime.yaml", "device_credential_material_generation_added: true"],
+    [".arch/runtime.yaml", "credential_lookup_digest_computation_added: true"],
+    [".arch/runtime.yaml", "credential_verifier_digest_computation_added: true"],
+    [".arch/runtime.yaml", "player_account_creation_added: true"],
+    [".arch/runtime.yaml", "credential_record_storage_added: true"],
+    [".arch/runtime.yaml", "digest_only_credential_storage_required: true"],
+    [".arch/runtime.yaml", "one_time_raw_credential_presentation_after_commit: true"],
+    [".arch/runtime.yaml", "startup_dependency_composition_added: true"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "access_token_issuance_from_onboarding_added: false"],
+    [".arch/runtime.yaml", "runtime_session_creation_from_onboarding_added: false"],
+    [".arch/runtime.yaml", "existing_login_route_account_creation_behavior_changed: false"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0183", "completed") ? "authenticated_gameplay_e2e_functional_slice:" : "next_alpha_direction_after_local_onboarding:"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_ready_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_ready_work_item: W-0184" : "next_ready_work_item: W-0183"))))],
+    [".arch/runtime.yaml", "recommended_direction: define_authenticated_gameplay_e2e_slice"],
+    [".arch/conventions.yaml", "local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation"],
+    [".arch/contracts.yaml", "local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation"],
+    [".arch/reference.yaml", "phase_2cs_local_onboarding_device_credential_issuance_implementation"],
+    [".arch/reference.yaml", workItemHasStatus(root, "W-0183", "completed") ? "phase_2cu_authenticated_gameplay_e2e_functional_slice" : "phase_2ct_next_alpha_direction_after_local_onboarding"],
+    ["modules/authentication/module.yaml", "local_onboarding_device_credential_issuance_implementation:"],
+    ["modules/authentication/module.yaml", "application_service_uses_store_credential: true"],
+    ["modules/authentication/module.yaml", "raw_credential_storage_allowed: false"],
+    ["modules/player/module.yaml", "local_onboarding_device_credential_issuance_implementation:"],
+    ["modules/player/module.yaml", "application_service_uses_create_player_account: true"],
+    ["modules/player/module.yaml", "player_accounts_remain_credential_free: true"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : "next_work_item: W-0183"))))],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : "W-0183 Select next alpha direction after local onboarding"))))],
+    ["AGENTS.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["AGENTS.md", "M-111 Next Alpha Direction Selection After Local Onboarding"],
+    ["AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["runtime/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["runtime/AGENTS.md", "M-111 Next Alpha Direction Selection After Local Onboarding"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["modules/authentication/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["modules/authentication/AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["modules/player/AGENTS.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["modules/player/AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
+    ["rules/check-rules.json", "runtime.local_onboarding_device_credential_issuance_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0090",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "GenerateDeviceCredentialMaterial",
+      "ComputeCredentialLookupDigest",
+      "ComputeCredentialVerifierDigest",
+      "CreatePlayerAccount",
+      "StoreCredential",
+      "does not issue an access token or runtime session from onboarding",
+      "does not expose onboarding through WebSocket, Protobuf, HTTP, CLI",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0182",
+      "completed_milestone: M-110",
+      "next_milestone: M-111",
+      "next_work_item: W-0183",
+      "local_onboarding_device_credential_issuance_implemented: true",
+      "local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation",
+      "service_method: OnboardLocalPlayerWithDeviceCredential",
+      "protocol_route_added: false",
+      "http_route_added: false",
+      "cli_surface_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "repository_interface_changed: false",
+      "dependency_added: false",
+      "access_token_issuance_from_onboarding_added: false",
+      "runtime_session_creation_from_onboarding_added: false",
+      "existing_login_route_account_creation_behavior_changed: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [servicePath]: [
+      "OperationOnboardLocalPlayerWithDeviceCredential",
+      "FailureClassInvalidRequest",
+      "PublicErrorAuthenticationOnboardingInvalid",
+      "PublicErrorAuthenticationOnboardingUnavailable",
+      "type LocalOnboardingDeviceCredentialIssuanceRequest struct",
+      "type LocalOnboardingDeviceCredentialIssuanceResult struct",
+      "LocalOnboardingDeviceCredentialIssuanceStatusCreated",
+      "func (s Service) OnboardLocalPlayerWithDeviceCredential",
+      "GenerateDeviceCredentialMaterial(s.deviceCredentialRandom)",
+      "ComputeCredentialLookupDigest(s.verifierKeySet, rawDeviceCredential)",
+      "ComputeCredentialVerifierDigest(s.verifierKeySet, rawDeviceCredential)",
+      "authenticationOnboardingUnitOfWork",
+      "repositories.NewPlayerAccountRepository()",
+      "repositories.NewAuthenticationRepository()",
+      "playerRepository.CreatePlayerAccount",
+      "authenticationRepository.StoreCredential",
+      "CredentialLookupDigest:   credentialLookupDigest.Bytes()",
+      "CredentialVerifierDigest: credentialVerifierDigest.Bytes()",
+      "DeviceCredential:   deviceCredentialMaterial.Text()",
+    ],
+    [serviceTestPath]: [
+      "TestOnboardLocalPlayerWithDeviceCredentialRejectsInvalidRequestWithoutUnitOfWork",
+      "TestOnboardLocalPlayerWithDeviceCredentialCreatesPlayerAndCredentialAfterCommit",
+      "TestOnboardLocalPlayerWithDeviceCredentialDoesNotReturnCredentialOnFailures",
+      "TestOnboardLocalPlayerWithDeviceCredentialDoesNotIssueTokenOrSession",
+      "login CreatePlayerAccount calls = %d, want 0",
+      "StoreCredential mutation leaks raw device credential material",
+      "onboarding touched token/session capabilities",
+    ],
+    [startupPath]: [
+      "DeviceCredentialRandom:        rand.Reader",
+      "PlayerIDGenerator:             randomPlayerIDGenerator{}",
+      "PlayerAccountEventIDGenerator: randomPlayerAccountEventIDGenerator{}",
+      "CredentialRecordIDGenerator:   randomCredentialRecordIDGenerator{}",
+      "type randomPlayerIDGenerator struct{}",
+      "type randomPlayerAccountEventIDGenerator struct{}",
+      "type randomCredentialRecordIDGenerator struct{}",
+    ],
+    [startupTestPath]: [
+      "TestRandomLocalOnboardingIDGeneratorShapes",
+      "randomPlayerIDGenerator{}",
+      "randomPlayerAccountEventIDGenerator{}",
+      "randomCredentialRecordIDGenerator{}",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    {
+      file: "proto/vibit/authentication/v1/authentication.proto",
+      patterns: [
+        { pattern: /\bOnboard\b|\bOnboarding\b|\bIssueDeviceCredential\b|\bCreatePlayerWithDeviceCredential\b/i, label: "authentication proto onboarding route or message" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/protocol/protobuf/authentication_bridge.go",
+      patterns: [
+        { pattern: /\bOnboardLocalPlayerWithDeviceCredential\b|\bLocalOnboarding\b|\bIssueDeviceCredential\b/i, label: "protobuf authentication bridge onboarding exposure" },
+      ],
+    },
+    {
+      file: "runtime/internal/platform/protocol/protobuf/payload_registry.go",
+      patterns: [
+        { pattern: /\bOnboardLocalPlayerWithDeviceCredential\b|\bLocalOnboarding\b|\bIssueDeviceCredential\b/i, label: "protobuf payload registry onboarding exposure" },
+      ],
+    },
+    {
+      file: startupPath,
+      patterns: [
+        { pattern: /\bOnboardLocalPlayerWithDeviceCredential\b|\bLocalOnboarding\b|\bIssueDeviceCredential\b|\bRegisterOnboard\b|\bRegisterLocalOnboard\b/i, label: "startup public onboarding route exposure" },
+      ],
+    },
+  ];
+  for (const rule of forbiddenMarkers) {
+    if (!isFile(root, rule.file)) {
+      continue;
+    }
+    const rawText = readText(path.join(root, rule.file));
+    const text = rule.file.endsWith(".go") ? sourceWithoutGoComments(rawText) : rawText;
+    const matches = textMatchesAny(text, rule.patterns, root);
+    if (matches.length === 0) {
+      ok(`${rule.file} has no public/protocol local onboarding exposure`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+    for (const match of matches) {
+      fail(`${rule.file} crosses local onboarding implementation boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: rule.file,
+      });
+    }
+  }
+
+  ok("local onboarding device credential issuance implementation is completed as a local application service with digest-only storage and no public onboarding route", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
+function checkRuntimeNextAlphaDirectionAuthenticatedGameplayE2ESlice(root, goFiles) {
+  const ruleId = "runtime.next_alpha_direction_authenticated_gameplay_e2e_slice";
+  const decisionPath = "decisions/ADR-0091-next-alpha-direction-authenticated-gameplay-e2e-slice.md";
+  const changePath = "changes/2026-05-21-select-next-alpha-direction-after-local-onboarding";
+  const conversationPath = "conversations/2026-05-21-next-alpha-direction-authenticated-gameplay-e2e-slice.md";
+
+  if (!workItemHasStatus(root, "W-0183", "completed")) {
+    ok("next alpha direction authenticated gameplay E2E selection is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for next alpha direction authenticated gameplay E2E selection`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for next alpha direction authenticated gameplay E2E selection`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-111"],
+    [".arch/work-items.yaml", "title: Next Alpha Direction Selection After Local Onboarding"],
+    [".arch/work-items.yaml", "id: W-0183"],
+    [".arch/work-items.yaml", "title: Select next alpha direction after local onboarding"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0091"],
+    [".arch/work-items.yaml", "selected_direction: define_authenticated_gameplay_e2e_slice"],
+    [".arch/work-items.yaml", "id: M-112"],
+    [".arch/work-items.yaml", "title: Authenticated Gameplay E2E Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0184"],
+    [".arch/work-items.yaml", "title: Define authenticated gameplay E2E slice"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0184", "completed") ? "status: completed" : "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "next_alpha_direction_after_local_onboarding:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0183"],
+    [".arch/runtime.yaml", "decision: ADR-0091"],
+    [".arch/runtime.yaml", "selected_direction: define_authenticated_gameplay_e2e_slice"],
+    [".arch/runtime.yaml", "next_ready_work_item: W-0184"],
+    [".arch/runtime.yaml", "authenticated_gameplay_e2e_functional_slice:"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0184", "completed") ? "proven_flow:" : "planned_flow:"],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance"],
+    [".arch/runtime.yaml", "device_credential_login"],
+    [".arch/runtime.yaml", "first_message_connection_binding"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0184", "completed") ? "protected_inventory_read" : "protected_inventory_request"],
+    [".arch/runtime.yaml", "protected_presence_query"],
+    [".arch/runtime.yaml", "logout"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "authenticated_gameplay_e2e_functional_slice:"],
+    [".arch/contracts.yaml", "authenticated_gameplay_e2e_functional_slice:"],
+    [".arch/reference.yaml", "phase_2cu_authenticated_gameplay_e2e_functional_slice"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : "next_work_item: W-0184")))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : (workItemHasStatus(root, "W-0184", "completed") ? "refresh_runtime_runbook_for_alpha" : "define_authenticated_gameplay_e2e_slice")))],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : "W-0184 Define authenticated gameplay E2E slice")))],
+    ["AGENTS.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
+    ["AGENTS.zh-CN.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
+    ["runtime/AGENTS.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
+    ["runtime/AGENTS.zh-CN.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
+    ["rules/check-rules.json", "runtime.next_alpha_direction_authenticated_gameplay_e2e_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0091",
+      "define_authenticated_gameplay_e2e_slice",
+      "local onboarding -> login -> connection binding -> protected inventory -> presence query -> logout",
+      "does not implement the E2E flow",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0183",
+      "completed_milestone: M-111",
+      "previous_completed_work_item: W-0182",
+      "next_milestone: M-112",
+      "next_work_item: W-0184",
+      "selected_direction: define_authenticated_gameplay_e2e_slice",
+      "authenticated_gameplay_e2e_slice_selected: true",
+      "implementation_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  ok("next alpha direction selects authenticated gameplay E2E without implementing runtime, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
+function checkRuntimeAuthenticatedGameplayE2EFunctionalSlice(root, goFiles) {
+  const ruleId = "runtime.authenticated_gameplay_e2e_functional_slice";
+  const decisionPath = "decisions/ADR-0092-authenticated-gameplay-e2e-functional-slice.md";
+  const changePath = "changes/2026-05-21-define-authenticated-gameplay-e2e-slice";
+  const conversationPath = "conversations/2026-05-21-authenticated-gameplay-e2e-functional-slice.md";
+  const proofTestPath = "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go";
+
+  if (!workItemHasStatus(root, "W-0184", "completed")) {
+    ok("authenticated gameplay E2E functional slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    proofTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for authenticated gameplay E2E functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for authenticated gameplay E2E functional slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-112"],
+    [".arch/work-items.yaml", "title: Authenticated Gameplay E2E Functional Slice"],
+    [".arch/work-items.yaml", "id: W-0184"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0092"],
+    [".arch/work-items.yaml", "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
+    [".arch/work-items.yaml", "id: M-113"],
+    [".arch/work-items.yaml", "title: Runtime Runbook Alpha Path Refresh"],
+    [".arch/work-items.yaml", "id: W-0185"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0186", "completed") ? "status: completed" : "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "authenticated_gameplay_e2e_functional_slice: ADR-0092"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "current_phase: alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "current_phase: health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "current_phase: minimal_example_client_or_request_loop" : "current_phase: runtime_runbook_alpha_path_refresh"))],
+    [".arch/runtime.yaml", "completed_work_item: W-0184"],
+    [".arch/runtime.yaml", "decision: ADR-0092"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : "next_ready_work_item: W-0185"))],
+    [".arch/runtime.yaml", "proven_flow:"],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance"],
+    [".arch/runtime.yaml", "device_credential_login"],
+    [".arch/runtime.yaml", "first_message_connection_binding"],
+    [".arch/runtime.yaml", "protected_inventory_grant"],
+    [".arch/runtime.yaml", "protected_inventory_read"],
+    [".arch/runtime.yaml", "protected_presence_query"],
+    [".arch/runtime.yaml", "post_logout_protected_request_rejected"],
+    [".arch/runtime.yaml", proofTestPath],
+    [".arch/runtime.yaml", "existing_capabilities_only: true"],
+    [".arch/runtime.yaml", "production_runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/conventions.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/contracts.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/reference.yaml", "phase_2cv_runtime_runbook_alpha_path_refresh"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : "next_work_item: W-0185"))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : "refresh_runtime_runbook_for_alpha"))],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : "W-0185 Refresh runtime runbook for alpha path"))],
+    ["AGENTS.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
+    ["AGENTS.md", "W-0185"],
+    ["AGENTS.zh-CN.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
+    ["AGENTS.zh-CN.md", "W-0185"],
+    ["runtime/AGENTS.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
+    ["runtime/AGENTS.md", "W-0185"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
+    ["runtime/AGENTS.zh-CN.md", "W-0185"],
+    ["rules/check-rules.json", "runtime.authenticated_gameplay_e2e_functional_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0092",
+      "local onboarding -> login -> connection binding -> protected inventory -> presence query -> logout",
+      "post-logout protected-route rejection",
+      "does not add production runtime behavior",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0184",
+      "completed_milestone: M-112",
+      "previous_completed_work_item: W-0183",
+      "next_milestone: M-113",
+      "next_work_item: W-0185",
+      "authenticated_gameplay_e2e_functional_slice_proven: true",
+      "authenticated_gameplay_e2e_functional_slice_check_rule: runtime.authenticated_gameplay_e2e_functional_slice",
+      "proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go",
+      "existing_capabilities_only: true",
+      "production_runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [proofTestPath]: [
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "AuthenticateWithDeviceCredentialRequest",
+      "BindConnectionRequest",
+      "GrantItemRequest",
+      "GetInventoryRequest",
+      "GetPlayerPresenceRequest",
+      "LogoutAccessTokenRequest",
+      "ErrorCodeAuthenticationTokenInvalid",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const productionFiles = goFiles.filter((file) => !file.endsWith("_test.go"));
+  const forbiddenMarkers = [
+    {
+      label: "production E2E helper should remain test-only",
+      pattern: /authenticated[_-]?gameplay[_-]?e2e/i,
+    },
+  ];
+  for (const file of productionFiles) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    const matches = textMatchesAny(text, forbiddenMarkers, root);
+    for (const match of matches) {
+      fail(`${file} appears to add production authenticated gameplay E2E surface: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("authenticated gameplay E2E is proven by a focused test over existing capabilities without production runtime, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: proofTestPath,
+  });
+}
+
+function checkRuntimeRunbookAlphaPathRefresh(root, goFiles) {
+  const ruleId = "runtime.runtime_runbook_alpha_path_refresh";
+  const decisionPath = "decisions/ADR-0093-runtime-runbook-alpha-path-refresh.md";
+  const changePath = "changes/2026-05-21-refresh-runtime-runbook-for-alpha";
+  const conversationPath = "conversations/2026-05-21-runtime-runbook-alpha-path-refresh.md";
+  const runbookPath = "docs/runtime-runbook.md";
+  const runbookTranslationPath = "docs/runtime-runbook.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0185", "completed")) {
+    ok("runtime runbook alpha path refresh is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    runbookPath,
+    runbookTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for runtime runbook alpha path refresh`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for runtime runbook alpha path refresh`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-113"],
+    [".arch/work-items.yaml", "title: Runtime Runbook Alpha Path Refresh"],
+    [".arch/work-items.yaml", "id: W-0185"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0093"],
+    [".arch/work-items.yaml", "id: M-114"],
+    [".arch/work-items.yaml", "title: Minimal Example Client Or Request Loop"],
+    [".arch/work-items.yaml", "id: W-0186"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "runtime_runbook_alpha_path_refresh: ADR-0093"],
+    [".arch/runtime.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0185"],
+    [".arch/runtime.yaml", "decision: ADR-0093"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : "next_ready_work_item: W-0186")],
+    [".arch/runtime.yaml", "documented_flow:"],
+    [".arch/runtime.yaml", "local_onboarding_device_credential_issuance"],
+    [".arch/runtime.yaml", "post_logout_protected_request_rejected"],
+    [".arch/runtime.yaml", "memory_runtime_posture: bootstrap_inventory_only"],
+    [".arch/runtime.yaml", "postgres_runtime_posture: current_alpha_runtime_composition"],
+    [".arch/runtime.yaml", "local_onboarding_public_protocol_route_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "startup_configuration_semantics_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "check_rule: runtime.runtime_runbook_alpha_path_refresh"],
+    [".arch/runtime.yaml", "minimal_example_client_or_request_loop:"],
+    [".arch/conventions.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/conventions.yaml", "check_rule: runtime.runtime_runbook_alpha_path_refresh"],
+    [".arch/conventions.yaml", "minimal_example_client_or_request_loop:"],
+    [".arch/contracts.yaml", "runtime_runbook_alpha_path_refresh:"],
+    [".arch/contracts.yaml", "check_rule: runtime.runtime_runbook_alpha_path_refresh"],
+    [".arch/contracts.yaml", "minimal_example_client_or_request_loop:"],
+    [".arch/reference.yaml", "phase_2cv_runtime_runbook_alpha_path_refresh"],
+    [".arch/reference.yaml", "phase_2cw_minimal_example_client_or_request_loop"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : "next_work_item: W-0186")],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : "add_minimal_example_client_or_request_loop")],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : "W-0186 Add minimal example client or request-loop script")],
+    ["AGENTS.md", "runtime.runtime_runbook_alpha_path_refresh"],
+    ["AGENTS.md", "W-0186"],
+    ["AGENTS.zh-CN.md", "runtime.runtime_runbook_alpha_path_refresh"],
+    ["AGENTS.zh-CN.md", "W-0186"],
+    ["runtime/AGENTS.md", "runtime.runtime_runbook_alpha_path_refresh"],
+    ["runtime/AGENTS.md", "W-0186"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.runtime_runbook_alpha_path_refresh"],
+    ["runtime/AGENTS.zh-CN.md", "W-0186"],
+    ["rules/check-rules.json", "runtime.runtime_runbook_alpha_path_refresh"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0093",
+      "local onboarding -> device credential login -> connection binding -> protected inventory -> protected presence -> logout -> post-logout protected request rejection",
+      "application service method and is not yet a public protocol route",
+      "runtime.runtime_runbook_alpha_path_refresh",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0185",
+      "completed_milestone: M-113",
+      "previous_completed_work_item: W-0184",
+      "next_milestone: M-114",
+      "next_work_item: W-0186",
+      "runtime_runbook_alpha_path_refresh_completed: true",
+      "runtime_runbook_alpha_path_refresh_check_rule: runtime.runtime_runbook_alpha_path_refresh",
+      "memory_runtime_posture: bootstrap_inventory_only",
+      "postgres_runtime_posture: current_alpha_runtime_composition",
+      "local_onboarding_public_protocol_route_added: false",
+      "runtime_behavior_added: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [runbookPath]: [
+      "VIBIT_RUNTIME_STORE=memory",
+      "VIBIT_RUNTIME_STORE=postgres",
+      "Local onboarding now exists as an application service method",
+      "not a public WebSocket, Protobuf, HTTP, CLI, or startup auto-creation surface",
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "vibit.authentication.v1.AuthenticatedRequest",
+      "Do not record or commit",
+      "Raw device credential text or bytes",
+      "Raw access tokens",
+      "Verifier key values",
+    ],
+    [runbookTranslationPath]: [
+      "VIBIT_RUNTIME_STORE=memory",
+      "VIBIT_RUNTIME_STORE=postgres",
+      "Local onboarding 现在作为 application service method",
+      "它不是 public WebSocket、Protobuf、HTTP、CLI 或 startup auto-creation surface",
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "vibit.authentication.v1.AuthenticatedRequest",
+      "不要记录或提交",
+      "Raw device credential text 或 bytes",
+      "Raw access tokens",
+      "Verifier key values",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  ok("runtime runbook is refreshed around the proven local alpha path without runtime, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: runbookPath,
+  });
+}
+
+function checkRuntimeMinimalExampleClientOrRequestLoop(root, goFiles) {
+  const ruleId = "runtime.minimal_example_client_or_request_loop";
+  const decisionPath = "decisions/ADR-0094-minimal-alpha-request-loop-script.md";
+  const changePath = "changes/2026-05-21-add-minimal-example-client-or-request-loop-script";
+  const conversationPath = "conversations/2026-05-21-minimal-alpha-request-loop-script.md";
+  const scriptPath = "examples/local-alpha-request-loop.sh";
+  const proofTestPath = "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go";
+
+  if (!workItemHasStatus(root, "W-0186", "completed")) {
+    ok("minimal example client or request-loop script is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    scriptPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for minimal alpha request-loop script`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for minimal alpha request-loop script`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-114"],
+    [".arch/work-items.yaml", "title: Minimal Example Client Or Request Loop"],
+    [".arch/work-items.yaml", "id: W-0186"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0094"],
+    [".arch/work-items.yaml", scriptPath],
+    [".arch/work-items.yaml", "id: M-115"],
+    [".arch/work-items.yaml", "title: Health Readiness Version Config Surface"],
+    [".arch/work-items.yaml", "id: W-0187"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "minimal_example_client_or_request_loop: ADR-0094"],
+    [".arch/runtime.yaml", "completed_work_item: W-0186"],
+    [".arch/runtime.yaml", "decision: ADR-0094"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : "next_ready_work_item: W-0187"],
+    [".arch/runtime.yaml", "example_script: examples/local-alpha-request-loop.sh"],
+    [".arch/runtime.yaml", "proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
+    [".arch/runtime.yaml", "script_runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "startup_configuration_semantics_changed: false"],
+    [".arch/runtime.yaml", "public_protocol_onboarding_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "check_rule: runtime.minimal_example_client_or_request_loop"],
+    [".arch/runtime.yaml", "health_readiness_version_config_surface:"],
+    [".arch/conventions.yaml", "minimal_example_client_or_request_loop:"],
+    [".arch/conventions.yaml", "check_rule: runtime.minimal_example_client_or_request_loop"],
+    [".arch/conventions.yaml", "health_readiness_version_config_surface:"],
+    [".arch/contracts.yaml", "minimal_example_client_or_request_loop:"],
+    [".arch/contracts.yaml", "check_rule: runtime.minimal_example_client_or_request_loop"],
+    [".arch/contracts.yaml", "health_readiness_version_config_surface:"],
+    [".arch/reference.yaml", "phase_2cw_minimal_example_client_or_request_loop"],
+    [".arch/reference.yaml", "phase_2cx_health_readiness_version_config_surface"],
+    ["docs/runtime-runbook.md", "examples/local-alpha-request-loop.sh"],
+    ["docs/runtime-runbook.md", "local alpha request-loop script"],
+    ["docs/runtime-runbook.zh-CN.md", "examples/local-alpha-request-loop.sh"],
+    ["docs/runtime-runbook.zh-CN.md", "local alpha request-loop script"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : "next_work_item: W-0187"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : "health_readiness_version_config_surface"],
+    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface"],
+    ["README.md", "examples/local-alpha-request-loop.sh"],
+    ["README.zh-CN.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface"],
+    ["README.zh-CN.md", "examples/local-alpha-request-loop.sh"],
+    ["AGENTS.md", "runtime.minimal_example_client_or_request_loop"],
+    ["AGENTS.md", "W-0187"],
+    ["AGENTS.zh-CN.md", "runtime.minimal_example_client_or_request_loop"],
+    ["AGENTS.zh-CN.md", "W-0187"],
+    ["runtime/AGENTS.md", "runtime.minimal_example_client_or_request_loop"],
+    ["runtime/AGENTS.md", "W-0187"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.minimal_example_client_or_request_loop"],
+    ["runtime/AGENTS.zh-CN.md", "W-0187"],
+    ["rules/check-rules.json", "runtime.minimal_example_client_or_request_loop"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0094",
+      "examples/local-alpha-request-loop.sh",
+      "request-loop proof wrapper",
+      "not a product SDK",
+      "runtime.minimal_example_client_or_request_loop",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0186",
+      "completed_milestone: M-114",
+      "previous_completed_work_item: W-0185",
+      "next_milestone: M-115",
+      "next_work_item: W-0187",
+      "minimal_example_client_or_request_loop_completed: true",
+      "minimal_example_client_or_request_loop_check_rule: runtime.minimal_example_client_or_request_loop",
+      "example_script: examples/local-alpha-request-loop.sh",
+      "script_runtime_behavior_added: false",
+      "runtime_behavior_added: false",
+      "startup_configuration_semantics_changed: false",
+      "public_protocol_onboarding_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [scriptPath]: [
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "redaction:",
+      "raw credentials",
+      "access tokens",
+      "digests",
+      "verifier keys",
+      "DSNs",
+      "transport metadata",
+      "go test ./internal/platform/protocol/protobuf",
+    ],
+    [proofTestPath]: [
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "GetPlayerPresenceRequest",
+      "LogoutAccessTokenRequest",
+      "ErrorCodeAuthenticationTokenInvalid",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const scriptText = isFile(root, scriptPath) ? readText(path.join(root, scriptPath)) : "";
+  const forbiddenScriptMarkers = [
+    { pattern: /VIBIT_POSTGRES_DSN\s*=/, label: "hard-coded PostgreSQL DSN" },
+    { pattern: /VIBIT_AUTHENTICATION_.*KEY.*=/, label: "hard-coded verifier key" },
+    { pattern: /CredentialProof\s*=/, label: "hard-coded credential proof" },
+    { pattern: /AccessToken\s*=/, label: "hard-coded access token" },
+  ];
+  for (const match of textMatchesAny(scriptText, forbiddenScriptMarkers, root)) {
+    fail(`${scriptPath} includes ${match.label}`, {
+      rule_id: ruleId,
+      artifact: scriptPath,
+    });
+  }
+
+  ok("minimal alpha request-loop script wraps the existing redacted E2E proof without runtime, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: scriptPath,
+  });
+}
+
+function checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles) {
+  const ruleId = "runtime.health_readiness_version_config_surface";
+  const decisionPath = "decisions/ADR-0095-health-readiness-version-config-surface.md";
+  const changePath = "changes/2026-05-21-add-health-readiness-version-config-surface";
+  const conversationPath = "conversations/2026-05-21-health-readiness-version-config-surface.md";
+  const serverPath = "runtime/cmd/vibit-server/main.go";
+  const serverTestPath = "runtime/cmd/vibit-server/main_test.go";
+
+  if (!workItemHasStatus(root, "W-0187", "completed")) {
+    ok("health/readiness/version/config surface is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    serverPath,
+    serverTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for health/readiness/version/config surface`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for health/readiness/version/config surface`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-115"],
+    [".arch/work-items.yaml", "title: Health Readiness Version Config Surface"],
+    [".arch/work-items.yaml", "id: W-0187"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0095"],
+    [".arch/work-items.yaml", "id: M-116"],
+    [".arch/work-items.yaml", "title: Alpha Acceptance Checklist"],
+    [".arch/work-items.yaml", "id: W-0188"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "health_readiness_version_config_surface: ADR-0095"],
+    [".arch/runtime.yaml", "health_readiness_version_config_surface:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0187"],
+    [".arch/runtime.yaml", "decision: ADR-0095"],
+    [".arch/runtime.yaml", "next_ready_work_item: W-0188"],
+    [".arch/runtime.yaml", "alpha_acceptance_checklist:"],
+    [".arch/runtime.yaml", "runtime_behavior_scope: minimal_local_troubleshooting_surface"],
+    [".arch/runtime.yaml", "redacted_config_surface: true"],
+    [".arch/runtime.yaml", "secret_values_exposed: false"],
+    [".arch/runtime.yaml", "dsn_values_exposed: false"],
+    [".arch/runtime.yaml", "raw_credential_values_exposed: false"],
+    [".arch/runtime.yaml", "raw_token_values_exposed: false"],
+    [".arch/runtime.yaml", "digest_values_exposed: false"],
+    [".arch/runtime.yaml", "transport_metadata_values_exposed: false"],
+    [".arch/runtime.yaml", "broad_operations_admin_behavior_added: false"],
+    [".arch/runtime.yaml", "observability_dependency_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "startup_configuration_semantics_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "release_published: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "check_rule: runtime.health_readiness_version_config_surface"],
+    [".arch/conventions.yaml", "health_readiness_version_config_surface:"],
+    [".arch/conventions.yaml", "check_rule: runtime.health_readiness_version_config_surface"],
+    [".arch/conventions.yaml", "alpha_acceptance_checklist:"],
+    [".arch/contracts.yaml", "health_readiness_version_config_surface:"],
+    [".arch/contracts.yaml", "check_rule: runtime.health_readiness_version_config_surface"],
+    [".arch/contracts.yaml", "alpha_acceptance_checklist:"],
+    [".arch/reference.yaml", "phase_2cx_health_readiness_version_config_surface"],
+    [".arch/reference.yaml", "phase_2cy_alpha_acceptance_checklist"],
+    ["docs/runtime-runbook.md", "/healthz"],
+    ["docs/runtime-runbook.md", "/readyz"],
+    ["docs/runtime-runbook.md", "/version"],
+    ["docs/runtime-runbook.md", "/configz"],
+    ["docs/runtime-runbook.md", "redacted posture"],
+    ["docs/runtime-runbook.zh-CN.md", "/healthz"],
+    ["docs/runtime-runbook.zh-CN.md", "/readyz"],
+    ["docs/runtime-runbook.zh-CN.md", "/version"],
+    ["docs/runtime-runbook.zh-CN.md", "/configz"],
+    ["docs/runtime-runbook.zh-CN.md", "redacted posture"],
+    ["docs/v0.1-alpha-goal.md", "next_work_item: W-0188"],
+    ["docs/v0.1-alpha-goal.md", "alpha_acceptance_checklist"],
+    ["README.md", "W-0188 Add alpha acceptance checklist"],
+    ["README.md", "/configz"],
+    ["README.zh-CN.md", "W-0188 Add alpha acceptance checklist"],
+    ["README.zh-CN.md", "/configz"],
+    ["AGENTS.md", "runtime.health_readiness_version_config_surface"],
+    ["AGENTS.md", "W-0188"],
+    ["AGENTS.zh-CN.md", "runtime.health_readiness_version_config_surface"],
+    ["AGENTS.zh-CN.md", "W-0188"],
+    ["runtime/AGENTS.md", "runtime.health_readiness_version_config_surface"],
+    ["runtime/AGENTS.md", "W-0188"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.health_readiness_version_config_surface"],
+    ["runtime/AGENTS.zh-CN.md", "W-0188"],
+    ["rules/check-rules.json", "runtime.health_readiness_version_config_surface"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0095",
+      "/healthz",
+      "/readyz",
+      "/version",
+      "/configz",
+      "redacted posture",
+      "runtime.health_readiness_version_config_surface",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0187",
+      "completed_milestone: M-115",
+      "previous_completed_work_item: W-0186",
+      "next_milestone: M-116",
+      "next_work_item: W-0188",
+      "health_readiness_version_config_surface_completed: true",
+      "health_readiness_version_config_surface_check_rule: runtime.health_readiness_version_config_surface",
+      "redacted_config_surface: true",
+      "secret_values_exposed: false",
+      "dsn_values_exposed: false",
+      "raw_credential_values_exposed: false",
+      "raw_token_values_exposed: false",
+      "digest_values_exposed: false",
+      "transport_metadata_values_exposed: false",
+      "broad_operations_admin_behavior_added: false",
+      "observability_dependency_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [serverPath]: [
+      "healthPath",
+      "\"/healthz\"",
+      "readinessPath = \"/readyz\"",
+      "versionPath",
+      "\"/version\"",
+      "configPath",
+      "\"/configz\"",
+      "runtimeVersion",
+      "\"0.1.0-pre-alpha\"",
+      "type runtimeInfo struct",
+      "runtimeInfoFromEnv",
+      "registerStatusHandlers",
+      "writeStatusJSON",
+      "secrets_redacted",
+      "postgres_configured",
+      "authentication_config_required",
+    ],
+    [serverTestPath]: [
+      "TestStatusEndpointsExposeLocalTroubleshootingSurface",
+      "TestRuntimeInfoFromEnvReportsPostgresPostureWithoutSecretValues",
+      "healthPath",
+      "readinessPath",
+      "versionPath",
+      "configPath",
+      "postgres://user:password@example.invalid:5432/vibit",
+      "sensitive-audience",
+      "UNRELATED_TRANSPORT_HEADER",
+      "UNRELATED_TRANSPORT_ADDRESS",
+      "secrets_redacted",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [serverPath, serverTestPath];
+  const forbiddenPatterns = [
+    { pattern: /prometheus|opentelemetry|otel|metrics/i, label: "observability dependency or metrics surface" },
+    { pattern: /\bAdmin\b|\bDashboard\b|\bConsole\b/, label: "broad admin surface" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    const patterns = file === serverTestPath
+      ? forbiddenPatterns.filter((item) => item.label !== "transport metadata exposure")
+      : forbiddenPatterns;
+    for (const match of textMatchesAny(text, patterns, root)) {
+      fail(`${file} crosses health/readiness/version/config surface boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("health/readiness/version/config surface is completed as a minimal redacted local alpha troubleshooting surface without broad operations, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: serverPath,
   });
 }
 
@@ -21960,6 +23519,15 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0187", "current_phase: alpha_acceptance_checklist"],
+    ["W-0186", "current_phase: health_readiness_version_config_surface"],
+    ["W-0185", "current_phase: minimal_example_client_or_request_loop"],
+    ["W-0184", "current_phase: runtime_runbook_alpha_path_refresh"],
+    ["W-0183", "current_phase: authenticated_gameplay_e2e_functional_slice"],
+    ["W-0182", "current_phase: next_alpha_direction_selection_after_local_onboarding"],
+    ["W-0181", "current_phase: local_onboarding_device_credential_issuance_implementation"],
+    ["W-0180", "current_phase: local_onboarding_device_credential_issuance_gate"],
+    ["W-0178", "current_phase: next_alpha_direction_selection"],
     ["W-0177", "current_phase: presence_protocol_query_functional_slice"],
     ["W-0176", "current_phase: presence_lifecycle_functional_slice"],
     ["W-0175", "current_phase: protocol_session_carrier_functional_slice"],
@@ -22478,6 +24046,14 @@ function checkRuntime(root) {
   checkRuntimeReconnectConnectionEpochFunctionalSlice(root, goFiles);
   checkRuntimeProtocolSessionCarrierFunctionalSlice(root, goFiles);
   checkRuntimePresenceLifecycleFunctionalSlice(root, goFiles);
+  checkRuntimePresenceProtocolQueryFunctionalSlice(root, goFiles);
+  checkRuntimeLocalOnboardingDeviceCredentialIssuanceGate(root, goFiles);
+  checkRuntimeLocalOnboardingDeviceCredentialIssuanceImplementation(root, goFiles);
+  checkRuntimeNextAlphaDirectionAuthenticatedGameplayE2ESlice(root, goFiles);
+  checkRuntimeAuthenticatedGameplayE2EFunctionalSlice(root, goFiles);
+  checkRuntimeRunbookAlphaPathRefresh(root, goFiles);
+  checkRuntimeMinimalExampleClientOrRequestLoop(root, goFiles);
+  checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

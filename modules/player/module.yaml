@@ -310,6 +310,51 @@ persistence:
       - display_name
       - account_state
       - requested_by
+    local_onboarding_device_credential_issuance_gate:
+      local_onboarding_device_credential_issuance_gate_defined: true
+      local_onboarding_device_credential_issuance_gate_decision: ADR-0089
+      local_onboarding_device_credential_issuance_gate_standard: docs/local-onboarding-device-credential-issuance-gate.md
+      local_onboarding_device_credential_issuance_gate_check_rule: runtime.local_onboarding_device_credential_issuance_gate
+      local_onboarding_device_credential_issuance_gate_work_item: W-0181
+      future_implementation_work_item: W-0182
+      future_service_owner: runtime/internal/app/authentication
+      player_module_role: storage_neutral_player_account_lifecycle_repository
+      future_repository_method: CreatePlayerAccount
+      same_unit_of_work_with_device_credential_required: true
+      player_accounts_remain_credential_free: true
+      player_account_events_remain_credential_free: true
+      authentication_module_owns_credential_records: true
+      raw_credential_storage_allowed_in_player_tables: false
+      login_route_account_creation_behavior_changed: false
+      public_protocol_route_added: false
+      protobuf_source_added: false
+      generated_output_added: false
+      migration_added: false
+      dependency_added: false
+      production_signup_added: false
+      direct_nakama_pitaya_api_compatibility_added: false
+    local_onboarding_device_credential_issuance_implementation:
+      local_onboarding_device_credential_issuance_implemented: true
+      local_onboarding_device_credential_issuance_implementation_decision: ADR-0090
+      local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+      local_onboarding_device_credential_issuance_implementation_work_item: W-0182
+      service_owner: runtime/internal/app/authentication
+      player_module_role: storage_neutral_player_account_lifecycle_repository
+      application_service_uses_create_player_account: true
+      player_account_creation_added: true
+      same_unit_of_work_with_device_credential_required: true
+      player_accounts_remain_credential_free: true
+      player_account_events_remain_credential_free: true
+      authentication_module_owns_credential_records: true
+      raw_credential_storage_allowed_in_player_tables: false
+      public_protocol_route_added: false
+      protobuf_source_added: false
+      generated_output_added: false
+      migration_added: false
+      repository_interface_changed: false
+      dependency_added: false
+      production_signup_added: false
+      direct_nakama_pitaya_api_compatibility_added: false
 
 handwritten:
   extension_points:

@@ -1,0 +1,93 @@
+schema_version: 0.1
+change_id: select-next-alpha-direction-after-local-onboarding
+date: 2026-05-21
+type: standard
+status: verified
+
+summary: Select authenticated gameplay E2E as the next alpha-enabling direction after local onboarding implementation.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0091
+  referenced:
+    - ADR-0090
+    - ADR-0089
+    - ADR-0088
+    - ADR-0087
+    - ADR-0086
+    - ADR-0084
+    - ADR-0082
+
+selected_direction: define_authenticated_gameplay_e2e_slice
+
+candidate_directions:
+  - define_authenticated_gameplay_e2e_slice
+  - refresh_runtime_runbook_for_alpha
+  - add_minimal_example_client_or_request_loop
+  - define_health_readiness_version_config_surface
+  - define_alpha_acceptance_checklist
+
+runtime:
+  completed_work_item: W-0183
+  completed_milestone: M-111
+  previous_completed_work_item: W-0182
+  next_milestone: M-112
+  next_work_item: W-0184
+  next_work_item_status: next_ready
+  tier: tier_2_direction_selection
+  gate_density_strategy: ADR-0082
+  selected_direction: define_authenticated_gameplay_e2e_slice
+  authenticated_gameplay_e2e_slice_selected: true
+  future_work_item: W-0184
+  future_change_id: define-authenticated-gameplay-e2e-slice
+  planned_flow:
+    - local_onboarding_device_credential_issuance
+    - device_credential_login
+    - first_message_connection_binding
+    - protected_inventory_request
+    - protected_presence_query
+    - logout
+  implementation_authorized_by_this_change: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  production_signup_added: false
+  external_identity_provider_added: false
+  password_login_added: false
+  account_recovery_added: false
+  multi_device_linking_added: false
+  broad_product_module_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change select-next-alpha-direction-after-local-onboarding --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

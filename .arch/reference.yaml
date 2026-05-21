@@ -3044,13 +3044,21 @@ phase_plan:
       - direct_nakama_pitaya_api_compatibility
     rule: W-0177 added server-owned player presence lifecycle state from active bound connection records before protocol query, subscriptions, chat, social, matchmaking, and match runtime expansion.
   phase_2cp_presence_protocol_query_functional_slice:
-    status: active
+    status: completed
     milestone: M-106
-    next_ready_work_item: W-0178
+    completed_work_item: W-0178
+    decision: ADR-0087
     previous_completed_work_item: W-0177
     tier: tier_2_functional
     gate_density_strategy: ADR-0082
     selected_direction: define_presence_protocol_query_functional_slice
+    check_rule: runtime.presence_protocol_query_functional_slice
+    first_presence_protocol_behavior: protected_self_player_presence_query_from_active_bound_connections
+    public_presence_route: runtime.presence.GetPlayerPresence
+    protocol_presence_query_added: true
+    presence_query_self_only: true
+    durable_distributed_presence_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
     deferred:
       - presence_subscription
       - presence_broadcast
@@ -3067,7 +3075,201 @@ phase_plan:
       - resume_tokens
       - runtime_session_revocation
       - direct_nakama_pitaya_api_compatibility
-    rule: After server-owned presence lifecycle exists, a protected protocol presence query is the next bounded product-parity slice before subscriptions, chat, social, matchmaking, and match runtime expansion.
+    rule: W-0178 added a protected self-player presence protocol query before subscriptions, broadcasts, chat, social, matchmaking, match runtime, durable/distributed presence, and direct compatibility.
+  phase_2cq_next_alpha_direction_local_onboarding_device_credential_issuance_gate:
+    status: completed
+    milestone: M-108
+    completed_work_item: W-0180
+    decision: ADR-0088
+    selected_direction: define_local_onboarding_device_credential_issuance_gate
+    next_milestone: M-109
+    next_ready_work_item: W-0181
+    alpha_target_alignment: first_local_onboarding_device_credential_issuance
+    security_gate_required: true
+    runtime_behavior_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0180 selects the next alpha direction after presence query while keeping credential issuance implementation behind a gate.
+  phase_2cr_local_onboarding_device_credential_issuance_gate:
+    status: completed
+    milestone: M-109
+    completed_work_item: W-0181
+    decision: ADR-0089
+    standard: docs/local-onboarding-device-credential-issuance-gate.md
+    check_rule: runtime.local_onboarding_device_credential_issuance_gate
+    selected_direction: define_local_onboarding_device_credential_issuance_gate
+    tier: tier_1_security_critical
+    future_implementation_work_item: W-0182
+    focus:
+      - local_onboarding
+      - device_credential_issuance
+      - one_time_secret_presentation
+      - digest_only_storage
+      - alpha_developer_entrypoint
+    future_surface_visibility: local_only_not_public_signup
+    existing_login_route_account_creation_behavior_changed: false
+    public_protocol_route_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0181 defines local onboarding and device credential issuance before authenticated alpha E2E work without adding public signup or direct compatibility.
+  phase_2cs_local_onboarding_device_credential_issuance_implementation:
+    status: completed
+    milestone: M-110
+    completed_work_item: W-0182
+    decision: ADR-0090
+    check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+    selected_direction: implement_local_onboarding_device_credential_issuance
+    gate_decision: ADR-0089
+    alpha_target_alignment: first_local_onboarding_device_credential_issuance
+    focus:
+      - local_only_application_service
+      - player_account_creation
+      - device_credential_generation
+      - digest_only_credential_storage
+      - one_time_secret_presentation
+    local_onboarding_device_credential_issuance_implemented: true
+    local_only_application_service_added: true
+    protocol_route_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    access_token_issuance_from_onboarding_added: false
+    runtime_session_creation_from_onboarding_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0182 provides the local alpha credential entrypoint while preserving protocol, schema, dependency, production signup, and direct compatibility deferrals.
+  phase_2ct_next_alpha_direction_after_local_onboarding:
+    status: completed
+    milestone: M-111
+    completed_work_item: W-0183
+    decision: ADR-0091
+    change: changes/2026-05-21-select-next-alpha-direction-after-local-onboarding
+    previous_completed_work_item: W-0182
+    selected_direction: define_authenticated_gameplay_e2e_slice
+    next_milestone: M-112
+    next_ready_work_item: W-0184
+    alpha_target_alignment: authenticated_gameplay_e2e
+    recommended_direction: define_authenticated_gameplay_e2e_slice
+    candidate_directions:
+      - define_authenticated_gameplay_e2e_slice
+      - refresh_runtime_runbook_for_alpha
+      - add_minimal_example_client_or_request_loop
+      - define_health_readiness_version_config_surface
+      - define_alpha_acceptance_checklist
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0183 selected authenticated gameplay E2E as the next alpha direction after local onboarding without jumping to broad product modules or direct compatibility.
+  phase_2cu_authenticated_gameplay_e2e_functional_slice:
+    status: completed
+    milestone: M-112
+    completed_work_item: W-0184
+    decision: ADR-0092
+    change: changes/2026-05-21-define-authenticated-gameplay-e2e-slice
+    next_milestone: M-113
+    next_ready_work_item: W-0186
+    previous_completed_work_item: W-0183
+    alpha_target_alignment: authenticated_gameplay_e2e
+    selected_direction: define_authenticated_gameplay_e2e_slice
+    reference_mapping:
+      nakama: A developer-usable game backend needs a coherent authenticate-then-play loop before broad product modules.
+      pitaya: The flow should preserve transport, protocol, application, and domain separation while proving route composition.
+    proven_flow:
+      - local_onboarding_device_credential_issuance
+      - device_credential_login
+      - first_message_connection_binding
+      - protected_inventory_grant
+      - protected_inventory_read
+      - protected_presence_query
+      - logout
+      - post_logout_protected_request_rejected
+    proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    existing_capabilities_only: true
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0184 proved an authenticated local gameplay path without copying Nakama or Pitaya APIs.
+  phase_2cv_runtime_runbook_alpha_path_refresh:
+    status: completed
+    milestone: M-113
+    completed_work_item: W-0185
+    decision: ADR-0093
+    change: changes/2026-05-21-refresh-runtime-runbook-for-alpha
+    next_milestone: M-114
+    next_ready_work_item: W-0186
+    previous_completed_work_item: W-0184
+    alpha_target_alignment: runbook_refresh
+    selected_direction: refresh_runtime_runbook_for_alpha
+    reference_mapping:
+      nakama: Developer onboarding needs accurate local setup and request-flow documentation before broader modules are useful.
+      pitaya: Operational guidance should preserve transport, protocol, application, and domain separation.
+    target_documents:
+      - docs/runtime-runbook.md
+      - docs/runtime-runbook.zh-CN.md
+    documented_flow:
+      - local_onboarding_device_credential_issuance
+      - device_credential_login
+      - first_message_connection_binding
+      - protected_inventory_grant
+      - protected_inventory_read
+      - protected_presence_query
+      - logout
+      - post_logout_protected_request_rejected
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.runtime_runbook_alpha_path_refresh
+    rule: W-0185 refreshed runtime runbook guidance for the proven alpha path without adding direct compatibility.
+  phase_2cw_minimal_example_client_or_request_loop:
+    status: completed
+    milestone: M-114
+    completed_work_item: W-0186
+    decision: ADR-0094
+    next_ready_work_item: W-0187
+    previous_completed_work_item: W-0185
+    alpha_target_alignment: developer_experience
+    selected_direction: add_minimal_example_client_or_request_loop
+    example_script: examples/local-alpha-request-loop.sh
+    reference_mapping:
+      nakama: Developer-facing examples should make the authenticate-then-play loop easy to try before broader modules are added.
+      pitaya: The example should preserve transport, protocol, application, and domain separation rather than hiding behavior in transport.
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.minimal_example_client_or_request_loop
+    rule: W-0186 added the smallest local request-loop script without direct compatibility.
+  phase_2cx_health_readiness_version_config_surface:
+    status: completed
+    milestone: M-115
+    completed_work_item: W-0187
+    decision: ADR-0095
+    next_ready_work_item: W-0188
+    previous_completed_work_item: W-0186
+    alpha_target_alignment: developer_experience
+    selected_direction: health_readiness_version_config_surface
+    endpoints:
+      - /healthz
+      - /readyz
+      - /version
+      - /configz
+    reference_mapping:
+      nakama: Health and configuration visibility should make local runtime troubleshooting easier before alpha release packaging.
+      pitaya: Runtime status surfaces should preserve separation from gameplay route behavior and avoid broad operations expansion.
+    broad_operations_admin_behavior_added: false
+    observability_dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.health_readiness_version_config_surface
+    rule: W-0187 added the smallest local health/readiness/version/config surface without direct compatibility.
+  phase_2cy_alpha_acceptance_checklist:
+    status: next_ready
+    milestone: M-116
+    next_ready_work_item: W-0188
+    previous_completed_work_item: W-0187
+    alpha_target_alignment: developer_experience
+    selected_direction: alpha_acceptance_checklist
+    reference_mapping:
+      nakama: Release-readiness guidance should help contributors verify the local developer flow before broader product modules are added.
+      pitaya: Acceptance guidance should preserve explicit runtime, protocol, and operations boundaries instead of hiding gaps in examples.
+    release_publishing_authorized: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0188 should add an alpha acceptance checklist without direct compatibility or release publishing.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

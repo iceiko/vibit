@@ -1,0 +1,125 @@
+schema_version: 0.1
+change_id: define-local-onboarding-device-credential-issuance-gate
+date: 2026-05-21
+type: standard
+status: verified
+
+summary: Define the security gate for the first local onboarding flow that creates a player account and issues a device credential.
+
+affected_modules:
+  - runtime
+  - authentication
+  - player
+  - reference
+
+decisions:
+  added:
+    - ADR-0089
+  referenced:
+    - ADR-0088
+    - ADR-0086
+    - ADR-0082
+    - ADR-0051
+    - ADR-0049
+    - ADR-0048
+    - ADR-0047
+    - ADR-0043
+    - ADR-0042
+    - ADR-0032
+    - ADR-0030
+    - ADR-0023
+
+runtime:
+  completed_work_item: W-0181
+  completed_milestone: M-109
+  next_milestone: M-110
+  next_work_item: W-0182
+  next_work_item_status: next_ready
+  tier: tier_1_security_critical
+  gate_density_strategy: ADR-0082
+  local_onboarding_device_credential_issuance_gate_defined: true
+  local_onboarding_device_credential_issuance_gate_decision: ADR-0089
+  local_onboarding_device_credential_issuance_gate_standard: docs/local-onboarding-device-credential-issuance-gate.md
+  local_onboarding_device_credential_issuance_gate_check_rule: runtime.local_onboarding_device_credential_issuance_gate
+  future_implementation_work_item: W-0182
+  future_service_owner: runtime/internal/app/authentication
+  future_source: runtime/internal/app/authentication/service.go
+  future_tests: runtime/internal/app/authentication/service_test.go
+  future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential
+  first_surface_candidate: local_developer_onboarding_application_service
+  surface_visibility: local_only_not_public_signup
+  player_account_repository_method: CreatePlayerAccount
+  authentication_repository_method: StoreCredential
+  credential_material_helper: GenerateDeviceCredentialMaterial
+  credential_lookup_digest_helper: ComputeCredentialLookupDigest
+  credential_verifier_digest_helper: ComputeCredentialVerifierDigest
+  one_time_raw_credential_presentation_required: true
+  digest_only_credential_record_storage_required: true
+  same_unit_of_work_required: true
+  existing_login_route_account_creation_behavior_changed: false
+  local_onboarding_returns_access_token: false
+  implementation_authorized_by_this_change: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  production_signup_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - Future local onboarding is application-owned under runtime/internal/app/authentication.
+    - Future player account creation must use the player repository through the application unit-of-work.
+    - Future credential record storage must use the authentication repository through the application unit-of-work.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change define-local-onboarding-device-credential-issuance-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

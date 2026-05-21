@@ -20,15 +20,17 @@ import (
 type Operation string
 
 const (
-	OperationAuthenticateWithDeviceCredential Operation = "AuthenticateWithDeviceCredential"
-	OperationValidateAccessToken              Operation = "ValidateAccessToken"
-	OperationLogoutAccessToken                Operation = "LogoutAccessToken"
-	OperationRefreshAccessToken               Operation = "RefreshAccessToken"
+	OperationOnboardLocalPlayerWithDeviceCredential Operation = "OnboardLocalPlayerWithDeviceCredential"
+	OperationAuthenticateWithDeviceCredential       Operation = "AuthenticateWithDeviceCredential"
+	OperationValidateAccessToken                    Operation = "ValidateAccessToken"
+	OperationLogoutAccessToken                      Operation = "LogoutAccessToken"
+	OperationRefreshAccessToken                     Operation = "RefreshAccessToken"
 )
 
 type FailureClass string
 
 const (
+	FailureClassInvalidRequest         FailureClass = "invalid_request"
 	FailureClassNotImplemented         FailureClass = "not_implemented"
 	FailureClassRefreshNotSupported    FailureClass = "refresh_not_supported"
 	FailureClassMissingProof           FailureClass = "missing_proof"
@@ -50,6 +52,8 @@ const (
 type PublicErrorCode string
 
 const (
+	PublicErrorAuthenticationOnboardingInvalid     PublicErrorCode = "AUTHENTICATION_ONBOARDING_INVALID"
+	PublicErrorAuthenticationOnboardingUnavailable PublicErrorCode = "AUTHENTICATION_ONBOARDING_UNAVAILABLE"
 	PublicErrorAuthenticationProofMissing          PublicErrorCode = "AUTHENTICATION_PROOF_MISSING"
 	PublicErrorAuthenticationProofMalformed        PublicErrorCode = "AUTHENTICATION_PROOF_MALFORMED"
 	PublicErrorAuthenticationCredentialInvalid     PublicErrorCode = "AUTHENTICATION_CREDENTIAL_INVALID"
@@ -68,16 +72,19 @@ const (
 	verifierAlgorithmHMACSHA256V1       = "vibit_hmac_sha256_v1"
 	verifierVersionV1                   = 1
 	defaultRequestedBy                  = "authentication_service"
+	defaultLocalOnboardingRequestedBy   = "local_onboarding"
 	logoutReasonPresentedAccessToken    = "logout_presented_access_token"
 )
 
 var (
-	errMissingDeviceCredentialProof   = errors.New("authentication service: missing device credential proof")
-	errMalformedDeviceCredentialProof = errors.New("authentication service: malformed device credential proof")
-	errMissingAuthenticationUOW       = errors.New("authentication service: authentication unit-of-work capability is required")
-	errMissingDependency              = errors.New("authentication service: dependency is required")
-	errInvalidDependency              = errors.New("authentication service: dependency is invalid")
-	errMalformedRuntimeSessionID      = errors.New("authentication service: generated runtime session id is malformed")
+	errMissingDeviceCredentialProof      = errors.New("authentication service: missing device credential proof")
+	errMalformedDeviceCredentialProof    = errors.New("authentication service: malformed device credential proof")
+	errMissingLocalOnboardingDisplayName = errors.New("authentication service: local onboarding display name is required")
+	errMissingAuthenticationUOW          = errors.New("authentication service: authentication unit-of-work capability is required")
+	errMissingDependency                 = errors.New("authentication service: dependency is required")
+	errInvalidDependency                 = errors.New("authentication service: dependency is invalid")
+	errMalformedRuntimeSessionID         = errors.New("authentication service: generated runtime session id is malformed")
+	errMalformedGeneratedID              = errors.New("authentication service: generated id is malformed")
 )
 
 type ServiceError struct {
@@ -127,26 +134,46 @@ type SessionIDGenerator interface {
 	GenerateSessionID(context.Context) (string, error)
 }
 
+type PlayerIDGenerator interface {
+	GeneratePlayerID(context.Context) (string, error)
+}
+
+type PlayerAccountEventIDGenerator interface {
+	GeneratePlayerAccountEventID(context.Context) (string, error)
+}
+
+type CredentialRecordIDGenerator interface {
+	GenerateCredentialRecordID(context.Context) (string, error)
+}
+
 type ServiceDependencies struct {
-	UnitOfWorkRunner       UnitOfWorkRunner
-	VerifierKeySet         VerifierKeySet
-	AccessTokenRandom      io.Reader
-	Clock                  Clock
-	TokenRecordIDGenerator TokenRecordIDGenerator
-	SessionIDGenerator     SessionIDGenerator
-	AccessTokenLifetime    time.Duration
-	TokenAudience          string
+	UnitOfWorkRunner              UnitOfWorkRunner
+	VerifierKeySet                VerifierKeySet
+	AccessTokenRandom             io.Reader
+	DeviceCredentialRandom        io.Reader
+	Clock                         Clock
+	TokenRecordIDGenerator        TokenRecordIDGenerator
+	SessionIDGenerator            SessionIDGenerator
+	PlayerIDGenerator             PlayerIDGenerator
+	PlayerAccountEventIDGenerator PlayerAccountEventIDGenerator
+	CredentialRecordIDGenerator   CredentialRecordIDGenerator
+	AccessTokenLifetime           time.Duration
+	TokenAudience                 string
 }
 
 type Service struct {
-	unitOfWorkRunner       UnitOfWorkRunner
-	verifierKeySet         VerifierKeySet
-	accessTokenRandom      io.Reader
-	clock                  Clock
-	tokenRecordIDGenerator TokenRecordIDGenerator
-	sessionIDGenerator     SessionIDGenerator
-	accessTokenLifetime    time.Duration
-	tokenAudience          string
+	unitOfWorkRunner              UnitOfWorkRunner
+	verifierKeySet                VerifierKeySet
+	accessTokenRandom             io.Reader
+	deviceCredentialRandom        io.Reader
+	clock                         Clock
+	tokenRecordIDGenerator        TokenRecordIDGenerator
+	sessionIDGenerator            SessionIDGenerator
+	playerIDGenerator             PlayerIDGenerator
+	playerAccountEventIDGenerator PlayerAccountEventIDGenerator
+	credentialRecordIDGenerator   CredentialRecordIDGenerator
+	accessTokenLifetime           time.Duration
+	tokenAudience                 string
 }
 
 func NewService(dependencies ServiceDependencies) (Service, error) {
@@ -170,6 +197,14 @@ func NewService(dependencies ServiceDependencies) (Service, error) {
 			Operation:  "NewService",
 			Class:      FailureClassDependencyUnavailable,
 			PublicCode: PublicErrorAuthenticationCredentialUnavailable,
+			Err:        errMissingDependency,
+		}
+	}
+	if isNilInterface(dependencies.DeviceCredentialRandom) {
+		return Service{}, &ServiceError{
+			Operation:  "NewService",
+			Class:      FailureClassDependencyUnavailable,
+			PublicCode: PublicErrorAuthenticationOnboardingUnavailable,
 			Err:        errMissingDependency,
 		}
 	}
@@ -197,6 +232,30 @@ func NewService(dependencies ServiceDependencies) (Service, error) {
 			Err:        errMissingDependency,
 		}
 	}
+	if isNilInterface(dependencies.PlayerIDGenerator) {
+		return Service{}, &ServiceError{
+			Operation:  "NewService",
+			Class:      FailureClassDependencyUnavailable,
+			PublicCode: PublicErrorAuthenticationOnboardingUnavailable,
+			Err:        errMissingDependency,
+		}
+	}
+	if isNilInterface(dependencies.PlayerAccountEventIDGenerator) {
+		return Service{}, &ServiceError{
+			Operation:  "NewService",
+			Class:      FailureClassDependencyUnavailable,
+			PublicCode: PublicErrorAuthenticationOnboardingUnavailable,
+			Err:        errMissingDependency,
+		}
+	}
+	if isNilInterface(dependencies.CredentialRecordIDGenerator) {
+		return Service{}, &ServiceError{
+			Operation:  "NewService",
+			Class:      FailureClassDependencyUnavailable,
+			PublicCode: PublicErrorAuthenticationOnboardingUnavailable,
+			Err:        errMissingDependency,
+		}
+	}
 	if dependencies.AccessTokenLifetime <= 0 {
 		return Service{}, &ServiceError{
 			Operation:  "NewService",
@@ -215,14 +274,18 @@ func NewService(dependencies ServiceDependencies) (Service, error) {
 		}
 	}
 	return Service{
-		unitOfWorkRunner:       dependencies.UnitOfWorkRunner,
-		verifierKeySet:         dependencies.VerifierKeySet,
-		accessTokenRandom:      dependencies.AccessTokenRandom,
-		clock:                  dependencies.Clock,
-		tokenRecordIDGenerator: dependencies.TokenRecordIDGenerator,
-		sessionIDGenerator:     dependencies.SessionIDGenerator,
-		accessTokenLifetime:    dependencies.AccessTokenLifetime,
-		tokenAudience:          tokenAudience,
+		unitOfWorkRunner:              dependencies.UnitOfWorkRunner,
+		verifierKeySet:                dependencies.VerifierKeySet,
+		accessTokenRandom:             dependencies.AccessTokenRandom,
+		deviceCredentialRandom:        dependencies.DeviceCredentialRandom,
+		clock:                         dependencies.Clock,
+		tokenRecordIDGenerator:        dependencies.TokenRecordIDGenerator,
+		sessionIDGenerator:            dependencies.SessionIDGenerator,
+		playerIDGenerator:             dependencies.PlayerIDGenerator,
+		playerAccountEventIDGenerator: dependencies.PlayerAccountEventIDGenerator,
+		credentialRecordIDGenerator:   dependencies.CredentialRecordIDGenerator,
+		accessTokenLifetime:           dependencies.AccessTokenLifetime,
+		tokenAudience:                 tokenAudience,
 	}, nil
 }
 
@@ -270,6 +333,156 @@ type AuthenticationResult struct {
 	SessionExpiresAt   time.Time
 	TokenRecordID      string
 	CredentialRecordID string
+}
+
+type LocalOnboardingDeviceCredentialIssuanceRequest struct {
+	DisplayName string
+	RequestedBy string
+}
+
+type LocalOnboardingDeviceCredentialIssuanceStatus string
+
+const (
+	LocalOnboardingDeviceCredentialIssuanceStatusRejected LocalOnboardingDeviceCredentialIssuanceStatus = "rejected"
+	LocalOnboardingDeviceCredentialIssuanceStatusCreated  LocalOnboardingDeviceCredentialIssuanceStatus = "created"
+)
+
+type LocalOnboardingDeviceCredentialIssuanceResult struct {
+	Status             LocalOnboardingDeviceCredentialIssuanceStatus
+	PublicErrorCode    PublicErrorCode
+	FailureClass       FailureClass
+	PlayerID           string
+	CredentialRecordID string
+	DeviceCredential   string
+	CreatedAt          time.Time
+}
+
+func (s Service) OnboardLocalPlayerWithDeviceCredential(ctx context.Context, request LocalOnboardingDeviceCredentialIssuanceRequest) (LocalOnboardingDeviceCredentialIssuanceResult, error) {
+	displayName, requestedBy, err := normalizeLocalOnboardingRequest(request)
+	if err != nil {
+		return rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingInvalid, FailureClassInvalidRequest),
+			serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassInvalidRequest, PublicErrorAuthenticationOnboardingInvalid, err)
+	}
+	deviceCredentialMaterial, err := GenerateDeviceCredentialMaterial(s.deviceCredentialRandom)
+	if err != nil {
+		return rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+	}
+	rawDeviceCredential := deviceCredentialMaterial.RawBytes()
+	defer zeroBytes(rawDeviceCredential)
+
+	credentialLookupDigest, err := ComputeCredentialLookupDigest(s.verifierKeySet, rawDeviceCredential)
+	if err != nil {
+		return rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+	}
+	credentialVerifierDigest, err := ComputeCredentialVerifierDigest(s.verifierKeySet, rawDeviceCredential)
+	if err != nil {
+		return rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+	}
+
+	var createdPlayerID string
+	var createdCredentialRecordID string
+	var createdAt time.Time
+	var failedResult LocalOnboardingDeviceCredentialIssuanceResult
+	err = s.unitOfWorkRunner.WithinUnitOfWork(ctx, func(runCtx context.Context, unit tx.UnitOfWork) error {
+		repositories, ok := unit.(authenticationOnboardingUnitOfWork)
+		if !ok {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, errMissingAuthenticationUOW)
+		}
+
+		playerRepository, err := repositories.NewPlayerAccountRepository()
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+		authenticationRepository, err := repositories.NewAuthenticationRepository()
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+
+		playerID, err := s.generatedPlayerID(runCtx)
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+		playerEventID, err := s.generatedPlayerAccountEventID(runCtx)
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+		credentialRecordID, err := s.generatedCredentialRecordID(runCtx)
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+
+		occurredAt := s.clock.Now().UTC()
+		if occurredAt.IsZero() {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, errInvalidDependency)
+		}
+
+		account, err := playerRepository.CreatePlayerAccount(runCtx, playermodule.CreatePlayerAccountMutation{
+			EventID:      playerEventID,
+			OccurredAt:   occurredAt,
+			PlayerID:     playerID,
+			DisplayName:  displayName,
+			AccountState: playermodule.AccountStateActive,
+			RequestedBy:  requestedBy,
+		})
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+		if account.AccountState != playermodule.AccountStateActive {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassPlayerAccountNotActive)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassPlayerAccountNotActive, PublicErrorAuthenticationOnboardingUnavailable, nil)
+		}
+
+		credential, err := authenticationRepository.StoreCredential(runCtx, authenticationmodule.StoreCredentialMutation{
+			CredentialRecordID:       credentialRecordID,
+			PlayerID:                 account.PlayerID,
+			CredentialKind:           credentialKindDeviceCredentialLogin,
+			CredentialLookupDigest:   credentialLookupDigest.Bytes(),
+			CredentialVerifierDigest: credentialVerifierDigest.Bytes(),
+			VerifierAlgorithm:        verifierAlgorithmHMACSHA256V1,
+			VerifierVersion:          verifierVersionV1,
+			VerifierKeyID:            s.verifierKeySet.KeySetID(),
+			OccurredAt:               occurredAt,
+			RequestedBy:              requestedBy,
+		})
+		if err != nil {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+		}
+		if credential.CredentialStatus != authenticationmodule.CredentialStatusActive {
+			failedResult = rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassCredentialNotActive)
+			return serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassCredentialNotActive, PublicErrorAuthenticationOnboardingUnavailable, nil)
+		}
+
+		createdPlayerID = account.PlayerID
+		createdCredentialRecordID = credential.CredentialRecordID
+		createdAt = occurredAt
+		return nil
+	})
+	if err != nil {
+		if failedResult.Status != "" {
+			return failedResult, err
+		}
+		return rejectedLocalOnboardingDeviceCredentialIssuanceResult(PublicErrorAuthenticationOnboardingUnavailable, FailureClassDependencyUnavailable),
+			serviceFailure(OperationOnboardLocalPlayerWithDeviceCredential, FailureClassDependencyUnavailable, PublicErrorAuthenticationOnboardingUnavailable, err)
+	}
+	return LocalOnboardingDeviceCredentialIssuanceResult{
+		Status:             LocalOnboardingDeviceCredentialIssuanceStatusCreated,
+		PlayerID:           createdPlayerID,
+		CredentialRecordID: createdCredentialRecordID,
+		DeviceCredential:   deviceCredentialMaterial.Text(),
+		CreatedAt:          createdAt,
+	}, nil
 }
 
 func (s Service) AuthenticateWithDeviceCredential(ctx context.Context, request DeviceCredentialAuthenticationRequest) (AuthenticationResult, error) {
@@ -763,6 +976,11 @@ type authenticationLoginUnitOfWork interface {
 	NewSessionRepository() (session.Repository, error)
 }
 
+type authenticationOnboardingUnitOfWork interface {
+	NewAuthenticationRepository() (authenticationmodule.Repository, error)
+	NewPlayerAccountRepository() (playermodule.Repository, error)
+}
+
 type authenticationValidationUnitOfWork interface {
 	NewAuthenticationRepository() (authenticationmodule.Repository, error)
 	NewPlayerAccountRepository() (playermodule.Repository, error)
@@ -846,6 +1064,14 @@ func rejectedAuthenticationResult(publicCode PublicErrorCode, failureClass Failu
 	}
 }
 
+func rejectedLocalOnboardingDeviceCredentialIssuanceResult(publicCode PublicErrorCode, failureClass FailureClass) LocalOnboardingDeviceCredentialIssuanceResult {
+	return LocalOnboardingDeviceCredentialIssuanceResult{
+		Status:          LocalOnboardingDeviceCredentialIssuanceStatusRejected,
+		PublicErrorCode: publicCode,
+		FailureClass:    failureClass,
+	}
+}
+
 func rejectedLogoutAccessTokenResult(publicCode PublicErrorCode, failureClass FailureClass) LogoutAccessTokenResult {
 	return LogoutAccessTokenResult{
 		Status:          LogoutStatusRejected,
@@ -853,6 +1079,42 @@ func rejectedLogoutAccessTokenResult(publicCode PublicErrorCode, failureClass Fa
 		FailureClass:    failureClass,
 		LogoutScope:     LogoutScopeUnspecified,
 	}
+}
+
+func normalizeLocalOnboardingRequest(request LocalOnboardingDeviceCredentialIssuanceRequest) (string, string, error) {
+	displayName := strings.TrimSpace(request.DisplayName)
+	if displayName == "" {
+		return "", "", errMissingLocalOnboardingDisplayName
+	}
+	requestedBy := strings.TrimSpace(request.RequestedBy)
+	if requestedBy == "" {
+		requestedBy = defaultLocalOnboardingRequestedBy
+	}
+	return displayName, requestedBy, nil
+}
+
+func (s Service) generatedPlayerID(ctx context.Context) (string, error) {
+	playerID, err := s.playerIDGenerator.GeneratePlayerID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return normalizeGeneratedID(playerID)
+}
+
+func (s Service) generatedPlayerAccountEventID(ctx context.Context) (string, error) {
+	eventID, err := s.playerAccountEventIDGenerator.GeneratePlayerAccountEventID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return normalizeGeneratedID(eventID)
+}
+
+func (s Service) generatedCredentialRecordID(ctx context.Context) (string, error) {
+	credentialRecordID, err := s.credentialRecordIDGenerator.GenerateCredentialRecordID(ctx)
+	if err != nil {
+		return "", err
+	}
+	return normalizeGeneratedID(credentialRecordID)
 }
 
 func (s Service) generatedRuntimeSessionID(ctx context.Context) (string, error) {
@@ -863,6 +1125,14 @@ func (s Service) generatedRuntimeSessionID(ctx context.Context) (string, error) 
 	trimmed := strings.TrimSpace(sessionID)
 	if trimmed == "" || trimmed != sessionID {
 		return "", errMalformedRuntimeSessionID
+	}
+	return trimmed, nil
+}
+
+func normalizeGeneratedID(value string) (string, error) {
+	trimmed := strings.TrimSpace(value)
+	if trimmed == "" || trimmed != value {
+		return "", errMalformedGeneratedID
 	}
 	return trimmed, nil
 }

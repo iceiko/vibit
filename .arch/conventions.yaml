@@ -3989,13 +3989,296 @@ presence_lifecycle_functional_slice:
   next_ready_work_item: W-0178
 
 presence_protocol_query_functional_slice:
-  status: active
+  status: completed
   milestone: M-106
-  next_ready_work_item: W-0178
+  completed_work_item: W-0178
+  decision: ADR-0087
   previous_completed_work_item: W-0177
   tier: tier_2_functional
   gate_density_strategy: ADR-0082
   selected_direction: define_presence_protocol_query_functional_slice
+  presence_protocol_query_functional_slice_completed: true
+  check_rule: runtime.presence_protocol_query_functional_slice
+  public_presence_route: runtime.presence.GetPlayerPresence
+  protocol_presence_query_added: true
+  protocol_source_added: proto/vibit/presence/v1/presence.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/presence/v1/presence.pb.go
+  presence_query_self_only: true
+  presence_query_exposes_access_token_record_ids: false
+  presence_subscription_added: false
+  presence_broadcast_added: false
+  durable_distributed_presence_added: false
+  next_ready_work_item: null
+
+next_alpha_direction_local_onboarding_device_credential_issuance_gate:
+  status: completed
+  milestone: M-108
+  completed_work_item: W-0180
+  decision: ADR-0088
+  selected_direction: define_local_onboarding_device_credential_issuance_gate
+  tier: tier_1_security_critical
+  gate_density_strategy: ADR-0082
+  next_milestone: M-109
+  next_ready_work_item: W-0181
+  implementation_authorized_by_this_selection: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+
+local_onboarding_device_credential_issuance_gate:
+  status: completed
+  milestone: M-109
+  completed_work_item: W-0181
+  decision: ADR-0089
+  standard: docs/local-onboarding-device-credential-issuance-gate.md
+  translation: docs/local-onboarding-device-credential-issuance-gate.zh-CN.md
+  check_rule: runtime.local_onboarding_device_credential_issuance_gate
+  selected_direction: define_local_onboarding_device_credential_issuance_gate
+  tier: tier_1_security_critical
+  gate_density_strategy: ADR-0082
+  local_onboarding_device_credential_issuance_gate_defined: true
+  implementation_authorized_by_this_standard: false
+  boundary_location: changes/2026-05-21-define-local-onboarding-device-credential-issuance-gate
+  future_implementation_work_item: W-0182
+  future_service_owner: runtime/internal/app/authentication
+  future_source: runtime/internal/app/authentication/service.go
+  future_tests: runtime/internal/app/authentication/service_test.go
+  future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential
+  first_surface_candidate: local_developer_onboarding_application_service
+  surface_visibility: local_only_not_public_signup
+  player_account_repository_method: CreatePlayerAccount
+  authentication_repository_method: StoreCredential
+  credential_material_helper: GenerateDeviceCredentialMaterial
+  credential_lookup_digest_helper: ComputeCredentialLookupDigest
+  credential_verifier_digest_helper: ComputeCredentialVerifierDigest
+  one_time_raw_credential_presentation_required: true
+  digest_only_credential_record_storage_required: true
+  same_unit_of_work_required: true
+  existing_login_route_account_creation_behavior_changed: false
+  local_onboarding_returns_access_token: false
+  local_onboarding_creates_runtime_session: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  production_signup_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+local_onboarding_device_credential_issuance_implementation:
+  status: completed
+  milestone: M-110
+  completed_work_item: W-0182
+  decision: ADR-0090
+  change: changes/2026-05-21-implement-local-onboarding-device-credential-issuance
+  check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+  depends_on:
+    - W-0181
+  selected_direction: implement_local_onboarding_device_credential_issuance
+  gate_decision: ADR-0089
+  gate_standard: docs/local-onboarding-device-credential-issuance-gate.md
+  tier: tier_1_security_critical
+  gate_density_strategy: ADR-0082
+  service_owner: runtime/internal/app/authentication
+  service_source: runtime/internal/app/authentication/service.go
+  service_tests: runtime/internal/app/authentication/service_test.go
+  service_method: OnboardLocalPlayerWithDeviceCredential
+  local_onboarding_device_credential_issuance_implemented: true
+  local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+  device_credential_material_generation_added: true
+  credential_lookup_digest_computation_added: true
+  credential_verifier_digest_computation_added: true
+  player_account_creation_added: true
+  credential_record_storage_added: true
+  one_time_raw_credential_presentation_after_commit: true
+  digest_only_credential_storage_required: true
+  startup_dependency_composition_added: true
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  production_signup_added: false
+  access_token_issuance_from_onboarding_added: false
+  runtime_session_creation_from_onboarding_added: false
+  existing_login_route_account_creation_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+next_alpha_direction_after_local_onboarding:
+  status: completed
+  milestone: M-111
+  completed_work_item: W-0183
+  decision: ADR-0091
+  change: changes/2026-05-21-select-next-alpha-direction-after-local-onboarding
+  selected_direction: define_authenticated_gameplay_e2e_slice
+  next_milestone: M-112
+  next_ready_work_item: W-0184
+  depends_on:
+    - W-0182
+  recommended_direction: define_authenticated_gameplay_e2e_slice
+  candidate_directions:
+    - define_authenticated_gameplay_e2e_slice
+    - refresh_runtime_runbook_for_alpha
+    - add_minimal_example_client_or_request_loop
+    - define_health_readiness_version_config_surface
+    - define_alpha_acceptance_checklist
+  implementation_authorized_by_this_selection: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+authenticated_gameplay_e2e_functional_slice:
+  status: completed
+  milestone: M-112
+  completed_work_item: W-0184
+  decision: ADR-0092
+  change: changes/2026-05-21-define-authenticated-gameplay-e2e-slice
+  next_milestone: M-113
+  next_ready_work_item: W-0186
+  depends_on:
+    - W-0183
+  selected_direction: define_authenticated_gameplay_e2e_slice
+  tier: tier_2_functional
+  proven_flow:
+    - local_onboarding_device_credential_issuance
+    - device_credential_login
+    - first_message_connection_binding
+    - protected_inventory_grant
+    - protected_inventory_read
+    - protected_presence_query
+    - logout
+    - post_logout_protected_request_rejected
+  proof_surface: focused_go_protocol_e2e_test
+  proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  existing_capabilities_only: true
+  production_runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+runtime_runbook_alpha_path_refresh:
+  status: completed
+  milestone: M-113
+  completed_work_item: W-0185
+  decision: ADR-0093
+  change: changes/2026-05-21-refresh-runtime-runbook-for-alpha
+  next_milestone: M-114
+  next_ready_work_item: W-0186
+  depends_on:
+    - W-0184
+  selected_direction: refresh_runtime_runbook_for_alpha
+  tier: tier_2_documentation
+  target_documents:
+    - docs/runtime-runbook.md
+    - docs/runtime-runbook.zh-CN.md
+  documented_flow:
+    - local_onboarding_device_credential_issuance
+    - device_credential_login
+    - first_message_connection_binding
+    - protected_inventory_grant
+    - protected_inventory_read
+    - protected_presence_query
+    - logout
+    - post_logout_protected_request_rejected
+  proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  memory_runtime_posture: bootstrap_inventory_only
+  postgres_runtime_posture: current_alpha_runtime_composition
+  local_onboarding_public_protocol_route_added: false
+  runtime_behavior_added: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  check_rule: runtime.runtime_runbook_alpha_path_refresh
+
+minimal_example_client_or_request_loop:
+  status: completed
+  milestone: M-114
+  completed_work_item: W-0186
+  decision: ADR-0094
+  next_ready_work_item: W-0188
+  depends_on:
+    - W-0185
+  selected_direction: add_minimal_example_client_or_request_loop
+  change: changes/2026-05-21-add-minimal-example-client-or-request-loop-script
+  tier: tier_2_developer_experience
+  example_script: examples/local-alpha-request-loop.sh
+  runtime_behavior_added: false
+  startup_configuration_semantics_changed: false
+  public_protocol_onboarding_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  check_rule: runtime.minimal_example_client_or_request_loop
+
+health_readiness_version_config_surface:
+  status: completed
+  milestone: M-115
+  completed_work_item: W-0187
+  decision: ADR-0095
+  next_ready_work_item: W-0188
+  depends_on:
+    - W-0186
+  selected_direction: health_readiness_version_config_surface
+  change: changes/2026-05-21-add-health-readiness-version-config-surface
+  tier: tier_2_developer_experience
+  endpoints:
+    - /healthz
+    - /readyz
+    - /version
+    - /configz
+  secret_redaction_required: true
+  redacted_config_surface: true
+  broad_operations_admin_behavior_added: false
+  observability_dependency_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  check_rule: runtime.health_readiness_version_config_surface
+
+alpha_acceptance_checklist:
+  status: next_ready
+  milestone: M-116
+  next_ready_work_item: W-0188
+  depends_on:
+    - W-0187
+  selected_direction: alpha_acceptance_checklist
+  expected_change: changes/2026-05-21-add-alpha-acceptance-checklist
+  tier: tier_2_developer_experience
+  release_publishing_authorized: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:
   first_reference_language: Go

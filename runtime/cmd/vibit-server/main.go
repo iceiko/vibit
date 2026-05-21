@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"encoding/json"
 	"errors"
 	"fmt"
 	"log"
@@ -16,6 +17,7 @@ import (
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
+	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/platform/persistence/postgres"
 	vibitprotobuf "github.com/iceiko/vibit/runtime/internal/platform/protocol/protobuf"
@@ -23,9 +25,16 @@ import (
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 )
 
-const websocketPath = "/v1/ws"
+const (
+	websocketPath = "/v1/ws"
+	healthPath    = "/healthz"
+	readinessPath = "/readyz"
+	versionPath   = "/version"
+	configPath    = "/configz"
+)
 
 const (
+	runtimeVersion             = "0.1.0-pre-alpha"
 	envRuntimeStore            = "VIBIT_RUNTIME_STORE"
 	envAuthAccessTokenLifetime = "VIBIT_AUTH_ACCESS_TOKEN_TTL"
 	envAuthTokenAudience       = "VIBIT_AUTH_TOKEN_AUDIENCE"
@@ -68,18 +77,22 @@ func newServer(addr string) (*http.Server, error) {
 }
 
 func newHTTPHandler() (http.Handler, error) {
+	return newHTTPHandlerWithRuntimeInfo(runtimeInfoFromEnv(nil, runtimeStoreMemory, false))
+}
+
+func newHTTPHandlerWithRuntimeInfo(info runtimeInfo) (http.Handler, error) {
 	dispatcher, err := bootstrap.NewInMemoryInventoryDispatcher()
 	if err != nil {
 		return nil, err
 	}
-	return newHTTPHandlerWithDispatcher(dispatcher, nil, nil, nil), nil
+	return newHTTPHandlerWithDispatcher(dispatcher, nil, nil, nil, info), nil
 }
 
 func newHTTPHandlerFromEnv(ctx context.Context, lookup func(string) (string, bool)) (http.Handler, func(), error) {
 	store := runtimeStoreFromEnv(lookup)
 	switch store {
 	case runtimeStoreMemory:
-		handler, err := newHTTPHandler()
+		handler, err := newHTTPHandlerWithRuntimeInfo(runtimeInfoFromEnv(lookup, runtimeStoreMemory, false))
 		return handler, func() {}, err
 	case runtimeStorePostgres:
 		return newPostgresHTTPHandler(ctx, lookup)
@@ -125,6 +138,12 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 		return nil, func() {}, err
 	}
 
+	connectionRegistry := appconnection.NewInMemoryRegistry(nil)
+	if err := registerPresenceRoutes(persistentDispatcher, connectionRegistry); err != nil {
+		pool.Close()
+		return nil, func() {}, err
+	}
+
 	transactionalDispatcher := app.TransactionalDispatcher{
 		Dispatcher: persistentDispatcher,
 		Runner:     transactionRunner,
@@ -133,7 +152,6 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 			app.LogoutAccessTokenRoute(),
 		},
 	}
-	connectionRegistry := appconnection.NewInMemoryRegistry(nil)
 	connectionBinder := registryConnectionBinder{
 		binder:   authComposition.ConnectionBinder,
 		registry: connectionRegistry,
@@ -143,7 +161,12 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 		authComposition.RouteProtector,
 		connectionBinder,
 		connectionLifecycleRegistryObserver{registry: connectionRegistry},
+		runtimeInfoFromEnv(lookup, runtimeStorePostgres, true),
 	), pool.Close, nil
+}
+
+func registerPresenceRoutes(dispatcher *app.Dispatcher, registry *appconnection.InMemoryRegistry) error {
+	return (apppresence.Handlers{Registry: registry}).RegisterRoutes(dispatcher)
 }
 
 func newHTTPHandlerWithDispatcher(
@@ -151,9 +174,11 @@ func newHTTPHandlerWithDispatcher(
 	routeProtector vibitprotobuf.RouteProtector,
 	connectionBinder vibitprotobuf.ConnectionBinder,
 	lifecycle ws.ConnectionLifecycleObserver,
+	info runtimeInfo,
 ) http.Handler {
 	protocolHandler := newProtocolFrameHandlerWithDispatcher(dispatcher, routeProtector, connectionBinder)
 	mux := http.NewServeMux()
+	registerStatusHandlers(mux, info)
 	mux.Handle(websocketPath, &ws.Server{
 		Handler:   websocketProtocolHandler{handler: protocolHandler},
 		Lifecycle: lifecycle,
@@ -185,6 +210,74 @@ func runtimeStoreFromEnv(lookup func(string) (string, bool)) string {
 	return runtimeStoreMemory
 }
 
+type runtimeInfo struct {
+	Version                      string
+	RuntimeStore                 string
+	WebSocketPath                string
+	LocalAlphaRequestLoopScript  string
+	PostgresConfigured           bool
+	AuthenticationConfigRequired bool
+	SecretsRedacted              bool
+}
+
+func runtimeInfoFromEnv(lookup func(string) (string, bool), store string, authenticationConfigRequired bool) runtimeInfo {
+	return runtimeInfo{
+		Version:                      runtimeVersion,
+		RuntimeStore:                 store,
+		WebSocketPath:                websocketPath,
+		LocalAlphaRequestLoopScript:  "examples/local-alpha-request-loop.sh",
+		PostgresConfigured:           envPresent(lookup, postgres.EnvDatabaseURL),
+		AuthenticationConfigRequired: authenticationConfigRequired,
+		SecretsRedacted:              true,
+	}
+}
+
+func envPresent(lookup func(string) (string, bool), name string) bool {
+	if lookup == nil {
+		return false
+	}
+	value, ok := lookup(name)
+	return ok && strings.TrimSpace(value) != ""
+}
+
+func registerStatusHandlers(mux *http.ServeMux, info runtimeInfo) {
+	mux.HandleFunc(healthPath, func(w http.ResponseWriter, r *http.Request) {
+		writeStatusJSON(w, http.StatusOK, map[string]any{
+			"status":  "ok",
+			"service": "vibit-runtime",
+		})
+	})
+	mux.HandleFunc(readinessPath, func(w http.ResponseWriter, r *http.Request) {
+		writeStatusJSON(w, http.StatusOK, map[string]any{
+			"status":         "ready",
+			"runtime_store":  info.RuntimeStore,
+			"websocket_path": info.WebSocketPath,
+		})
+	})
+	mux.HandleFunc(versionPath, func(w http.ResponseWriter, r *http.Request) {
+		writeStatusJSON(w, http.StatusOK, map[string]any{
+			"version": info.Version,
+			"status":  "pre_alpha",
+		})
+	})
+	mux.HandleFunc(configPath, func(w http.ResponseWriter, r *http.Request) {
+		writeStatusJSON(w, http.StatusOK, map[string]any{
+			"runtime_store":                  info.RuntimeStore,
+			"websocket_path":                 info.WebSocketPath,
+			"local_alpha_request_loop":       info.LocalAlphaRequestLoopScript,
+			"postgres_configured":            info.PostgresConfigured,
+			"authentication_config_required": info.AuthenticationConfigRequired,
+			"secrets_redacted":               info.SecretsRedacted,
+		})
+	})
+}
+
+func writeStatusJSON(w http.ResponseWriter, status int, payload map[string]any) {
+	w.Header().Set("Content-Type", "application/json")
+	w.WriteHeader(status)
+	_ = json.NewEncoder(w).Encode(payload)
+}
+
 type authenticationStartupComposition struct {
 	RouteProtector   app.RouteProtector
 	ConnectionBinder app.ConnectionBinder
@@ -198,14 +291,18 @@ func newAuthenticationStartupComposition(lookup func(string) (string, bool), uni
 	}
 
 	service, err := appauth.NewService(appauth.ServiceDependencies{
-		UnitOfWorkRunner:       unitOfWorkRunner,
-		VerifierKeySet:         cfg.VerifierKeySet,
-		AccessTokenRandom:      rand.Reader,
-		Clock:                  systemAuthClock{},
-		TokenRecordIDGenerator: randomTokenRecordIDGenerator{},
-		SessionIDGenerator:     randomSessionIDGenerator{},
-		AccessTokenLifetime:    cfg.AccessTokenLifetime,
-		TokenAudience:          cfg.TokenAudience,
+		UnitOfWorkRunner:              unitOfWorkRunner,
+		VerifierKeySet:                cfg.VerifierKeySet,
+		AccessTokenRandom:             rand.Reader,
+		DeviceCredentialRandom:        rand.Reader,
+		Clock:                         systemAuthClock{},
+		TokenRecordIDGenerator:        randomTokenRecordIDGenerator{},
+		SessionIDGenerator:            randomSessionIDGenerator{},
+		PlayerIDGenerator:             randomPlayerIDGenerator{},
+		PlayerAccountEventIDGenerator: randomPlayerAccountEventIDGenerator{},
+		CredentialRecordIDGenerator:   randomCredentialRecordIDGenerator{},
+		AccessTokenLifetime:           cfg.AccessTokenLifetime,
+		TokenAudience:                 cfg.TokenAudience,
 	})
 	if err != nil {
 		return authenticationStartupComposition{}, err
@@ -303,6 +400,36 @@ func (randomSessionIDGenerator) GenerateSessionID(context.Context) (string, erro
 		return "", fmt.Errorf("authentication startup: generate runtime session id: %w", err)
 	}
 	return "runtime-session-" + hex.EncodeToString(raw[:]), nil
+}
+
+type randomPlayerIDGenerator struct{}
+
+func (randomPlayerIDGenerator) GeneratePlayerID(context.Context) (string, error) {
+	var raw [16]byte
+	if _, err := rand.Read(raw[:]); err != nil {
+		return "", fmt.Errorf("authentication startup: generate player id: %w", err)
+	}
+	return "player-" + hex.EncodeToString(raw[:]), nil
+}
+
+type randomPlayerAccountEventIDGenerator struct{}
+
+func (randomPlayerAccountEventIDGenerator) GeneratePlayerAccountEventID(context.Context) (string, error) {
+	var raw [16]byte
+	if _, err := rand.Read(raw[:]); err != nil {
+		return "", fmt.Errorf("authentication startup: generate player account event id: %w", err)
+	}
+	return "player-account-event-" + hex.EncodeToString(raw[:]), nil
+}
+
+type randomCredentialRecordIDGenerator struct{}
+
+func (randomCredentialRecordIDGenerator) GenerateCredentialRecordID(context.Context) (string, error) {
+	var raw [16]byte
+	if _, err := rand.Read(raw[:]); err != nil {
+		return "", fmt.Errorf("authentication startup: generate credential record id: %w", err)
+	}
+	return "auth-credential-" + hex.EncodeToString(raw[:]), nil
 }
 
 type websocketProtocolHandler struct {

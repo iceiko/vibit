@@ -1718,6 +1718,72 @@ persistence:
       - authentication_device_credentials
       - authentication_access_tokens
 
+  local_onboarding_device_credential_issuance_gate:
+    local_onboarding_device_credential_issuance_gate_defined: true
+    local_onboarding_device_credential_issuance_gate_decision: ADR-0089
+    local_onboarding_device_credential_issuance_gate_standard: docs/local-onboarding-device-credential-issuance-gate.md
+    local_onboarding_device_credential_issuance_gate_check_rule: runtime.local_onboarding_device_credential_issuance_gate
+    local_onboarding_device_credential_issuance_gate_work_item: W-0181
+    future_implementation_work_item: W-0182
+    future_service_owner: runtime/internal/app/authentication
+    future_service_method_candidate: OnboardLocalPlayerWithDeviceCredential
+    module_role: storage_neutral_credential_record_mutation_vocabulary
+    authentication_module_owns_onboarding_service: false
+    application_service_may_use_repository: true
+    future_repository_method: StoreCredential
+    credential_material_helper: GenerateDeviceCredentialMaterial
+    credential_lookup_digest_helper: ComputeCredentialLookupDigest
+    credential_verifier_digest_helper: ComputeCredentialVerifierDigest
+    one_time_raw_credential_presentation_required: true
+    digest_only_credential_record_storage_required: true
+    same_unit_of_work_with_player_account_required: true
+    raw_credential_storage_allowed: false
+    login_route_account_creation_behavior_changed: false
+    public_protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    production_signup_added: false
+    external_identity_provider_added: false
+    password_login_added: false
+    account_recovery_added: false
+    multi_device_linking_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  local_onboarding_device_credential_issuance_implementation:
+    local_onboarding_device_credential_issuance_implemented: true
+    local_onboarding_device_credential_issuance_implementation_decision: ADR-0090
+    local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+    local_onboarding_device_credential_issuance_implementation_work_item: W-0182
+    service_owner: runtime/internal/app/authentication
+    service_method: OnboardLocalPlayerWithDeviceCredential
+    module_role: storage_neutral_credential_record_mutation_vocabulary
+    authentication_module_owns_onboarding_service: false
+    application_service_uses_store_credential: true
+    credential_material_helper_used_by_application_service: GenerateDeviceCredentialMaterial
+    credential_lookup_digest_helper_used_by_application_service: ComputeCredentialLookupDigest
+    credential_verifier_digest_helper_used_by_application_service: ComputeCredentialVerifierDigest
+    credential_record_storage_added: true
+    digest_only_credential_record_storage_required: true
+    raw_credential_storage_allowed: false
+    same_unit_of_work_with_player_account_required: true
+    one_time_raw_credential_presentation_after_commit: true
+    public_protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    repository_interface_changed: false
+    dependency_added: false
+    access_token_issuance_from_onboarding_added: false
+    runtime_session_creation_from_onboarding_added: false
+    existing_login_route_account_creation_behavior_changed: false
+    production_signup_added: false
+    external_identity_provider_added: false
+    password_login_added: false
+    account_recovery_added: false
+    multi_device_linking_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+
 tests:
   required:
     - runtime/internal/modules/authentication/repository_test.go

@@ -27,7 +27,7 @@ vibit 是一个开源 agent-native server framework，用于构建 AI coding age
 - Single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot。
 - 面向 agents 和 humans 的 `tools/vibit` checks 与 inspection commands。
 
-这还不是完成态 alpha。当前最关键缺口是干净的 onboarding/device credential issuance flow、公开 presence query、最小 example client 或 request-loop script、围绕当前 authentication/session flow 刷新的 runbook，以及 alpha acceptance checklist。
+这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface。当前最关键的剩余缺口是 alpha acceptance checklist。
 
 ## 本地试用
 
@@ -62,9 +62,15 @@ Runtime 默认监听 `:8080`，并挂载：
 
 ```text
 /v1/ws
+/healthz
+/readyz
+/version
+/configz
 ```
 
 该 endpoint 期望 binary WebSocket messages，其中包含 `vibit.protocol.v1.Envelope` Protobuf bytes。这个 gameplay endpoint 不接受 JSON。
+
+`/healthz`、`/readyz`、`/version` 和 `/configz` 是小型 JSON troubleshooting endpoints。`/configz` 只报告 redacted runtime posture，不暴露 verifier keys、raw credentials、raw tokens、DSNs、digests、headers、cookies、query strings、subprotocol values、remote addresses 或 concrete transport metadata。
 
 PostgreSQL runtime path 更完整，但它需要 migrations、`VIBIT_POSTGRES_DSN` 和 authentication verifier key environment variables。当前 operational notes 见 `docs/runtime-runbook.md`。Runbook 是 v0.1 alpha hardening path 的一部分，应视为开发文档，而不是已打磨的 release guide。
 
@@ -89,13 +95,21 @@ PostgreSQL runtime path 更完整，但它需要 migrations、`VIBIT_POSTGRES_DS
 
 推荐下一步顺序：
 
-1. 完成 `W-0178`：protected presence protocol query。
-2. 添加 first local onboarding/device credential issuance。
-3. 证明 onboarding -> login -> bind connection -> protected inventory -> presence query -> logout 的 end-to-end path。
-4. 围绕真实 alpha path 刷新 runtime runbook。
-5. 添加最小 example client 或 request-loop script。
-6. 添加 health/readiness/version/config surfaces。
+1. 完成 `W-0178`：protected presence protocol query。已完成。
+2. 先定义并添加 first local onboarding/device credential issuance。已完成。
+3. 选择并证明 onboarding -> login -> bind connection -> protected inventory -> presence query -> logout 的 end-to-end path。已完成。
+4. 围绕真实 alpha path 刷新 runtime runbook。已完成。
+5. 添加最小 example client 或 request-loop script。已完成。
+6. 添加 health/readiness/version/config surfaces。已完成。
 7. 添加 alpha acceptance checklist 或 check。
+
+运行 minimal local alpha request loop：
+
+```bash
+examples/local-alpha-request-loop.sh
+```
+
+它包装 focused authenticated gameplay E2E proof，并且不会打印 raw credentials、raw access tokens、verifier keys、DSNs、digests 或 transport metadata。
 
 ## 继续开发
 
@@ -109,7 +123,7 @@ node tools/vibit check work --json
 在本 README 更新时，next ready item 是：
 
 ```text
-W-0178 Define presence protocol query functional slice
+W-0188 Add alpha acceptance checklist
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary 或 verification failure。

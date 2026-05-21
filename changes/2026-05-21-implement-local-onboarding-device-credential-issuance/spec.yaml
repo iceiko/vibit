@@ -1,0 +1,139 @@
+schema_version: 0.1
+change_id: implement-local-onboarding-device-credential-issuance
+date: 2026-05-21
+type: feature
+status: verified
+
+summary: Implement the first local-only application service behavior that creates a player account and issues a device credential.
+
+affected_modules:
+  - runtime
+  - authentication
+  - player
+  - reference
+
+decisions:
+  added:
+    - ADR-0090
+  referenced:
+    - ADR-0089
+    - ADR-0088
+    - ADR-0086
+    - ADR-0051
+    - ADR-0049
+    - ADR-0048
+    - ADR-0047
+    - ADR-0043
+    - ADR-0042
+    - ADR-0032
+    - ADR-0030
+    - ADR-0023
+
+runtime:
+  go_code_added: true
+  completed_work_item: W-0182
+  completed_milestone: M-110
+  next_milestone: M-111
+  next_work_item: W-0183
+  next_work_item_status: next_ready
+  tier: tier_1_security_critical
+  gate_density_strategy: ADR-0082
+  local_onboarding_device_credential_issuance_implemented: true
+  local_onboarding_device_credential_issuance_implementation_decision: ADR-0090
+  local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation
+  gate_decision: ADR-0089
+  gate_standard: docs/local-onboarding-device-credential-issuance-gate.md
+  service_owner: runtime/internal/app/authentication
+  service_source: runtime/internal/app/authentication/service.go
+  service_tests: runtime/internal/app/authentication/service_test.go
+  startup_dependency_composition_source: runtime/cmd/vibit-server/main.go
+  service_method: OnboardLocalPlayerWithDeviceCredential
+  request_type: LocalOnboardingDeviceCredentialIssuanceRequest
+  result_type: LocalOnboardingDeviceCredentialIssuanceResult
+  surface_visibility: local_only_application_service
+  protocol_route_added: false
+  http_route_added: false
+  cli_surface_added: false
+  startup_auto_onboarding_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  repository_interface_changed: false
+  dependency_added: false
+  production_signup_added: false
+  device_credential_material_generation_added: true
+  credential_lookup_digest_computation_added: true
+  credential_verifier_digest_computation_added: true
+  player_account_creation_added: true
+  credential_record_storage_added: true
+  digest_only_credential_storage_required: true
+  one_time_raw_credential_presentation_after_commit: true
+  access_token_issuance_from_onboarding_added: false
+  runtime_session_creation_from_onboarding_added: false
+  existing_login_route_account_creation_behavior_changed: false
+  external_identity_provider_added: false
+  password_login_added: false
+  account_recovery_added: false
+  multi_device_linking_added: false
+  release_publishing_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added:
+      - AUTHENTICATION_ONBOARDING_INVALID
+      - AUTHENTICATION_ONBOARDING_UNAVAILABLE
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - Local onboarding behavior is application-owned under runtime/internal/app/authentication.
+    - Player account lifecycle remains owned by the player repository.
+    - Credential verifier records remain owned by the authentication repository.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - cd runtime && go test ./internal/app/authentication ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change implement-local-onboarding-device-credential-issuance --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

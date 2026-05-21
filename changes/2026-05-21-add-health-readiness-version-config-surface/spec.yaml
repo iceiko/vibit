@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: add-health-readiness-version-config-surface
+date: 2026-05-21
+type: feature
+status: verified
+
+summary: Add minimal redacted health, readiness, version, and config endpoints to the runtime HTTP server.
+
+affected_modules:
+  - runtime
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0095
+  referenced:
+    - ADR-0094
+    - ADR-0093
+    - ADR-0092
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0187
+  completed_milestone: M-115
+  previous_completed_work_item: W-0186
+  next_milestone: M-116
+  next_work_item: W-0188
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: health_readiness_version_config_surface
+  health_readiness_version_config_surface_completed: true
+  health_readiness_version_config_surface_decision: ADR-0095
+  health_readiness_version_config_surface_check_rule: runtime.health_readiness_version_config_surface
+  endpoints:
+    - /healthz
+    - /readyz
+    - /version
+    - /configz
+  owner: runtime/cmd/vibit-server
+  runtime_version: 0.1.0-pre-alpha
+  redacted_config_surface: true
+  secret_values_exposed: false
+  dsn_values_exposed: false
+  raw_credential_values_exposed: false
+  raw_token_values_exposed: false
+  digest_values_exposed: false
+  transport_metadata_values_exposed: false
+  broad_operations_admin_behavior_added: false
+  observability_dependency_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  release_published: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  known_deferrals:
+    - alpha_acceptance_checklist
+    - production_observability
+    - admin_console
+    - metrics_backend_integration
+    - release_packaging
+    - direct_nakama_pitaya_api_compatibility
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - runtime/cmd/vibit-server owns the first local HTTP troubleshooting surface.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - cd runtime && go test ./cmd/vibit-server
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change add-health-readiness-version-config-surface --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

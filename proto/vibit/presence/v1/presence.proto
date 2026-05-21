@@ -1,0 +1,38 @@
+syntax = "proto3";
+
+package vibit.presence.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1;presencev1";
+
+// @source changes/2026-05-20-define-presence-protocol-query-functional-slice/spec.yaml
+// @source decisions/ADR-0087-presence-protocol-query-functional-slice.md
+// @source decisions/ADR-0085-presence-lifecycle-functional-slice.md
+
+message GetPlayerPresenceRequest {
+  string player_id = 1;
+}
+
+message GetPlayerPresenceResponse {
+  string player_id = 1;
+  PresenceStatus presence_status = 2;
+  int32 connection_count = 3;
+  repeated PresenceConnection active_connections = 4;
+  repeated string runtime_session_ids = 5;
+  string last_seen_at = 6;
+  string observed_at = 7;
+}
+
+message PresenceConnection {
+  string connection_id = 1;
+  uint64 connection_epoch = 2;
+  string runtime_session_id = 3;
+  string last_seen_at = 4;
+  string opened_at = 5;
+  string bound_at = 6;
+}
+
+enum PresenceStatus {
+  PRESENCE_STATUS_UNSPECIFIED = 0;
+  PRESENCE_STATUS_OFFLINE = 1;
+  PRESENCE_STATUS_ONLINE = 2;
+}

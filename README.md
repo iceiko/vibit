@@ -27,7 +27,7 @@ The repository has moved beyond a pure design phase. Current implemented foundat
 - Single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot.
 - `tools/vibit` checks and inspection commands for agents and humans.
 
-This is not yet a finished alpha. The most important missing pieces are a clean onboarding/device credential issuance flow, a public presence query, a minimal example client or request-loop script, refreshed runbook coverage for the current authentication/session flow, and an alpha acceptance checklist.
+This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, and the runtime exposes a small health/readiness/version/config surface. The most important remaining missing piece is an alpha acceptance checklist.
 
 ## Try It Locally
 
@@ -62,9 +62,15 @@ The runtime listens on `:8080` by default and mounts:
 
 ```text
 /v1/ws
+/healthz
+/readyz
+/version
+/configz
 ```
 
 The endpoint expects binary WebSocket messages containing `vibit.protocol.v1.Envelope` Protobuf bytes. JSON is not accepted on this gameplay endpoint.
+
+`/healthz`, `/readyz`, `/version`, and `/configz` are small JSON troubleshooting endpoints. `/configz` reports only redacted runtime posture, not verifier keys, raw credentials, raw tokens, DSNs, digests, headers, cookies, query strings, subprotocol values, remote addresses, or concrete transport metadata.
 
 The PostgreSQL runtime path is more complete, but it requires migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md` for the current operational notes. The runbook is part of the v0.1 alpha hardening path and should be treated as development documentation, not a polished release guide.
 
@@ -89,13 +95,21 @@ The durable target is recorded in `docs/v0.1-alpha-goal.md`.
 
 Recommended next sequence:
 
-1. Complete `W-0178`: protected presence protocol query.
-2. Add first local onboarding/device credential issuance.
-3. Prove onboarding -> login -> bind connection -> protected inventory -> presence query -> logout end to end.
-4. Refresh the runtime runbook around the actual alpha path.
-5. Add a minimal example client or request-loop script.
-6. Add health/readiness/version/config surfaces.
+1. Complete `W-0178`: protected presence protocol query. Completed.
+2. Define and add first local onboarding/device credential issuance. Completed.
+3. Select and prove onboarding -> login -> bind connection -> protected inventory -> presence query -> logout end to end. Completed.
+4. Refresh the runtime runbook around the actual alpha path. Completed.
+5. Add a minimal example client or request-loop script. Completed.
+6. Add health/readiness/version/config surfaces. Completed.
 7. Add an alpha acceptance checklist or check.
+
+Run the minimal local alpha request loop with:
+
+```bash
+examples/local-alpha-request-loop.sh
+```
+
+It wraps the focused authenticated gameplay E2E proof and does not print raw credentials, raw access tokens, verifier keys, DSNs, digests, or transport metadata.
 
 ## Continue Development
 
@@ -109,7 +123,7 @@ node tools/vibit check work --json
 At the time of this README update, the next ready item is:
 
 ```text
-W-0178 Define presence protocol query functional slice
+W-0188 Add alpha acceptance checklist
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary or verification failure.

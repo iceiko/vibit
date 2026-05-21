@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"encoding/base64"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"regexp"
@@ -12,6 +13,7 @@ import (
 
 	"github.com/iceiko/vibit/runtime/internal/app"
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
+	"github.com/iceiko/vibit/runtime/internal/platform/persistence/postgres"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 )
 
@@ -31,6 +33,73 @@ func TestWebSocketEndpointIsMounted(t *testing.T) {
 
 	if response.StatusCode == http.StatusNotFound {
 		t.Fatal("/v1/ws returned 404, want mounted WebSocket endpoint")
+	}
+}
+
+func TestStatusEndpointsExposeLocalTroubleshootingSurface(t *testing.T) {
+	handler, err := newHTTPHandler()
+	if err != nil {
+		t.Fatalf("newHTTPHandler() error = %v, want nil", err)
+	}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	health := getJSON(t, server.URL+healthPath)
+	if health["status"] != "ok" || health["service"] != "vibit-runtime" {
+		t.Fatalf("health response = %#v, want ok vibit runtime health", health)
+	}
+
+	readiness := getJSON(t, server.URL+readinessPath)
+	if readiness["status"] != "ready" ||
+		readiness["runtime_store"] != runtimeStoreMemory ||
+		readiness["websocket_path"] != websocketPath {
+		t.Fatalf("readiness response = %#v, want ready memory runtime", readiness)
+	}
+
+	version := getJSON(t, server.URL+versionPath)
+	if version["version"] != runtimeVersion || version["status"] != "pre_alpha" {
+		t.Fatalf("version response = %#v, want pre-alpha runtime version", version)
+	}
+
+	config := getJSON(t, server.URL+configPath)
+	if config["runtime_store"] != runtimeStoreMemory ||
+		config["websocket_path"] != websocketPath ||
+		config["local_alpha_request_loop"] != "examples/local-alpha-request-loop.sh" ||
+		config["postgres_configured"] != false ||
+		config["authentication_config_required"] != false ||
+		config["secrets_redacted"] != true {
+		t.Fatalf("config response = %#v, want redacted memory alpha config posture", config)
+	}
+}
+
+func TestRuntimeInfoFromEnvReportsPostgresPostureWithoutSecretValues(t *testing.T) {
+	secretValues := authStartupEnv(map[string]string{
+		postgres.EnvDatabaseURL:       "postgres://user:password@example.invalid:5432/vibit",
+		envAuthAccessTokenLifetime:    "30m",
+		envAuthTokenAudience:          "sensitive-audience",
+		"UNRELATED_TRANSPORT_HEADER":  "secret-header",
+		"UNRELATED_TRANSPORT_ADDRESS": "10.0.0.1:1234",
+	})
+	handler, err := newHTTPHandlerWithRuntimeInfo(runtimeInfoFromEnv(mapLookup(secretValues), runtimeStorePostgres, true))
+	if err != nil {
+		t.Fatalf("newHTTPHandlerWithRuntimeInfo() error = %v, want nil", err)
+	}
+	server := httptest.NewServer(handler)
+	defer server.Close()
+
+	body := getRaw(t, server.URL+configPath)
+	for name, value := range secretValues {
+		if value != "" && strings.Contains(body, value) {
+			t.Fatalf("config endpoint leaked %s value %q in %q", name, value, body)
+		}
+	}
+
+	config := decodeJSON(t, body)
+	if config["runtime_store"] != runtimeStorePostgres ||
+		config["postgres_configured"] != true ||
+		config["authentication_config_required"] != true ||
+		config["secrets_redacted"] != true {
+		t.Fatalf("config response = %#v, want redacted postgres posture", config)
 	}
 }
 
@@ -272,6 +341,32 @@ func TestRandomSessionIDGeneratorShape(t *testing.T) {
 	}
 }
 
+func TestRandomLocalOnboardingIDGeneratorShapes(t *testing.T) {
+	playerID, err := (randomPlayerIDGenerator{}).GeneratePlayerID(context.Background())
+	if err != nil {
+		t.Fatalf("GeneratePlayerID() error = %v, want nil", err)
+	}
+	if !regexp.MustCompile(`^player-[0-9a-f]{32}$`).MatchString(playerID) {
+		t.Fatalf("GeneratePlayerID() = %q, want player- plus 32 lowercase hex chars", playerID)
+	}
+
+	eventID, err := (randomPlayerAccountEventIDGenerator{}).GeneratePlayerAccountEventID(context.Background())
+	if err != nil {
+		t.Fatalf("GeneratePlayerAccountEventID() error = %v, want nil", err)
+	}
+	if !regexp.MustCompile(`^player-account-event-[0-9a-f]{32}$`).MatchString(eventID) {
+		t.Fatalf("GeneratePlayerAccountEventID() = %q, want player-account-event- plus 32 lowercase hex chars", eventID)
+	}
+
+	credentialRecordID, err := (randomCredentialRecordIDGenerator{}).GenerateCredentialRecordID(context.Background())
+	if err != nil {
+		t.Fatalf("GenerateCredentialRecordID() error = %v, want nil", err)
+	}
+	if !regexp.MustCompile(`^auth-credential-[0-9a-f]{32}$`).MatchString(credentialRecordID) {
+		t.Fatalf("GenerateCredentialRecordID() = %q, want auth-credential- plus 32 lowercase hex chars", credentialRecordID)
+	}
+}
+
 type routeDispatcherFunc func(context.Context, app.RouteRequest) (app.ApplicationResult, error)
 
 func (f routeDispatcherFunc) Dispatch(ctx context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
@@ -323,4 +418,39 @@ func mapLookup(values map[string]string) func(string) (string, bool) {
 		value, ok := values[name]
 		return value, ok
 	}
+}
+
+func getJSON(t *testing.T, url string) map[string]any {
+	t.Helper()
+	return decodeJSON(t, getRaw(t, url))
+}
+
+func getRaw(t *testing.T, url string) string {
+	t.Helper()
+	response, err := http.Get(url)
+	if err != nil {
+		t.Fatalf("GET %s error = %v, want response", url, err)
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		t.Fatalf("GET %s status = %d, want 200", url, response.StatusCode)
+	}
+	var decoded any
+	if err := json.NewDecoder(response.Body).Decode(&decoded); err != nil {
+		t.Fatalf("decode %s response error = %v, want JSON", url, err)
+	}
+	encoded, err := json.Marshal(decoded)
+	if err != nil {
+		t.Fatalf("re-encode %s response error = %v, want JSON", url, err)
+	}
+	return string(encoded)
+}
+
+func decodeJSON(t *testing.T, body string) map[string]any {
+	t.Helper()
+	var payload map[string]any
+	if err := json.Unmarshal([]byte(body), &payload); err != nil {
+		t.Fatalf("json.Unmarshal(%q) error = %v, want object", body, err)
+	}
+	return payload
 }

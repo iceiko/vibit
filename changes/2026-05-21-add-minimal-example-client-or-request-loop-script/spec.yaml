@@ -1,0 +1,135 @@
+schema_version: 0.1
+change_id: add-minimal-example-client-or-request-loop-script
+date: 2026-05-21
+type: tooling
+status: verified
+
+summary: Add the smallest local alpha request-loop script over the existing authenticated gameplay E2E proof.
+
+affected_modules:
+  - runtime
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0094
+  referenced:
+    - ADR-0093
+    - ADR-0092
+    - ADR-0091
+    - ADR-0090
+    - ADR-0087
+    - ADR-0086
+    - ADR-0084
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0186
+  completed_milestone: M-114
+  previous_completed_work_item: W-0185
+  next_milestone: M-115
+  next_work_item: W-0187
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: add_minimal_example_client_or_request_loop
+  minimal_example_client_or_request_loop_completed: true
+  minimal_example_client_or_request_loop_decision: ADR-0094
+  minimal_example_client_or_request_loop_check_rule: runtime.minimal_example_client_or_request_loop
+  example_script: examples/local-alpha-request-loop.sh
+  proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  proof_test_name: TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout
+  script_runtime_behavior_added: false
+  runtime_behavior_added: false
+  startup_configuration_semantics_changed: false
+  public_protocol_onboarding_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  repository_interface_changed: false
+  dependency_added: false
+  release_published: false
+  production_signup_added: false
+  external_identity_provider_added: false
+  password_login_added: false
+  account_recovery_added: false
+  account_merge_added: false
+  multi_device_linking_added: false
+  broad_product_module_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  redaction_expectations:
+    - raw_device_credentials_not_printed
+    - raw_access_tokens_not_printed
+    - verifier_keys_not_printed
+    - dsn_not_printed
+    - digests_not_printed
+    - transport_metadata_not_printed
+  known_deferrals:
+    - public_protocol_onboarding_route
+    - live_postgresql_example_client
+    - health_readiness_version_config_surface
+    - alpha_acceptance_checklist
+    - production_signup
+    - external_identity_providers
+    - password_login
+    - account_recovery
+    - account_merge
+    - multi_device_linking
+    - chat_social_matchmaking_match_runtime_modules
+    - direct_nakama_pitaya_api_compatibility
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - examples/local-alpha-request-loop.sh is the minimal local alpha request-loop entry point.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - examples/local-alpha-request-loop.sh
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change add-minimal-example-client-or-request-loop-script --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

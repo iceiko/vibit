@@ -8,8 +8,10 @@ import (
 
 	"github.com/iceiko/vibit/runtime/internal/app"
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
+	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
+	presencev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"google.golang.org/protobuf/proto"
@@ -257,6 +259,106 @@ func TestFrameHandlerValidTokenDecodesInnerPayloadAfterValidation(t *testing.T) 
 	}
 	if response.GetPayloadType() != "vibit.inventory.v1.GetInventoryResponse" {
 		t.Fatalf("response PayloadType = %q, want GetInventoryResponse", response.GetPayloadType())
+	}
+}
+
+func TestFrameHandlerProtectedPresenceQueryUsesValidatedSelfIdentity(t *testing.T) {
+	var validatorCalled bool
+	var received app.RouteRequest
+	route := apppresence.GetPlayerPresenceRoute()
+	handler := FrameHandler{
+		Dispatcher: requestLoopDispatcherFunc(func(_ context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
+			received = request
+			payload, ok := request.Payload.(apppresence.GetPlayerPresenceRequest)
+			if !ok {
+				t.Fatalf("request Payload = %T, want GetPlayerPresenceRequest", request.Payload)
+			}
+			if payload.PlayerID != "player-1" {
+				t.Fatalf("presence request payload = %#v, want player-1", payload)
+			}
+			observedAt := requestLoopClock{}.Now()
+			return app.ApplicationResult{
+				RequestID: request.RequestID,
+				Route:     request.Route,
+				Target:    request.Target,
+				Session:   request.Session,
+				Identity:  request.Identity,
+				Payload: apppresence.GetPlayerPresenceResult{
+					PlayerID:        "player-1",
+					Status:          apppresence.PresenceStatusOnline,
+					ConnectionCount: 1,
+					ObservedAt:      observedAt,
+					ActiveConnections: []apppresence.PresenceConnection{{
+						ConnectionID:     "ws-1",
+						ConnectionEpoch:  7,
+						RuntimeSessionID: "session-1",
+						OpenedAt:         observedAt,
+					}},
+					RuntimeSessionIDs: []string{"session-1"},
+				},
+			}, nil
+		}),
+		RouteProtector: app.NewRouteProtector(routeTokenValidatorFunc(func(_ context.Context, request app.RouteAccessTokenValidationRequest) (app.RouteAccessTokenValidationResult, error) {
+			validatorCalled = true
+			if request.Route != route || request.ConnectionID != "ws-1" || request.ConnectionEpoch != 7 {
+				t.Fatalf("validator request = %#v, want presence route and frame/session metadata", request)
+			}
+			identity := app.ValidatedPlayerIdentity("player-1", app.Session{
+				ConnectionID:    request.ConnectionID,
+				ConnectionEpoch: request.ConnectionEpoch,
+				PlayerID:        "metadata-player",
+			})
+			identity.SessionValidated = false
+			return app.RouteAccessTokenValidationResult{
+				Valid:    true,
+				Identity: identity,
+			}, nil
+		})),
+	}
+
+	responses, err := handler.HandleFrame(context.Background(), FrameRequest{
+		ConnectionID: "ws-1",
+		Payload: mustMarshalAuthenticatedEnvelope(t, route, "redacted-token-text", &presencev1.GetPlayerPresenceRequest{
+			PlayerId: "player-1",
+		}),
+	})
+	if err != nil {
+		t.Fatalf("HandleFrame() error = %v, want nil", err)
+	}
+	if !validatorCalled {
+		t.Fatal("validator was not called")
+	}
+	if received.PayloadType != "vibit.presence.v1.GetPlayerPresenceRequest" {
+		t.Fatalf("received PayloadType = %q, want presence request payload type", received.PayloadType)
+	}
+	if received.Identity.Status != app.IdentityValidationValidated ||
+		received.Identity.PlayerID != "player-1" ||
+		!received.Identity.PlayerIDValidated ||
+		received.Identity.SessionValidated {
+		t.Fatalf("received Identity = %#v, want validated player identity with SessionValidated=false", received.Identity)
+	}
+
+	response := mustUnmarshalSingleResponse(t, responses)
+	if response.GetKind() != protocolv1.MessageKind_MESSAGE_KIND_QUERY {
+		t.Fatalf("response kind = %v, want query", response.GetKind())
+	}
+	if response.GetPayloadType() != "vibit.presence.v1.GetPlayerPresenceResponse" {
+		t.Fatalf("response payload_type = %q, want presence response", response.GetPayloadType())
+	}
+	responsePayload, err := DecodePayload(response.GetPayloadType(), response.GetPayload())
+	if err != nil {
+		t.Fatalf("DecodePayload(presence response) error = %v, want nil", err)
+	}
+	presenceResponse, ok := responsePayload.(*presencev1.GetPlayerPresenceResponse)
+	if !ok {
+		t.Fatalf("response payload = %T, want GetPlayerPresenceResponse", responsePayload)
+	}
+	if presenceResponse.GetPlayerId() != "player-1" ||
+		presenceResponse.GetPresenceStatus() != presencev1.PresenceStatus_PRESENCE_STATUS_ONLINE ||
+		presenceResponse.GetConnectionCount() != 1 ||
+		len(presenceResponse.GetActiveConnections()) != 1 ||
+		presenceResponse.GetActiveConnections()[0].GetConnectionId() != "ws-1" {
+		t.Fatalf("presence response = %#v, want online self presence", presenceResponse)
 	}
 }
 

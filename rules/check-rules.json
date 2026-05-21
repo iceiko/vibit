@@ -1012,6 +1012,70 @@
       "agent_guidance": "Read ADR-0082, ADR-0085, and the W-0177 change spec before changing presence lifecycle behavior. Keep presence state in runtime/internal/app/connection, keep WebSocket transport credential-neutral, keep startup composition as the adapter layer, and do not add Protobuf presence messages, generated output, protocol presence queries, subscriptions, broadcasts, chat, friends, groups, parties, matchmaking, match runtime, durable/distributed presence, reconnect/resume tokens, logout-triggered close, runtime session revocation, dependencies, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.presence_protocol_query_functional_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Presence protocol query functional slice",
+      "description": "The first presence protocol query functional slice must expose only a protected self-player query over server-owned registry-backed presence, keep transport credential-neutral, avoid access-token record id disclosure, and stay separated from subscriptions, broadcasts, durable/distributed presence, social modules, matchmaking, match runtime, dependencies, and direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0082, ADR-0085, ADR-0087, and the W-0178 change spec before changing presence protocol query behavior. Keep query behavior in runtime/internal/app/presence, keep snapshot state in runtime/internal/app/connection, keep wire mapping in runtime/internal/platform/protocol/protobuf, use the existing authenticated request wrapper for proof, and do not add subscriptions, broadcasts, cross-player visibility, durable/distributed presence, chat, friends, groups, parties, matchmaking, match runtime, reconnect/resume tokens, logout-triggered close, runtime session revocation, dependencies, operations/admin behavior, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.local_onboarding_device_credential_issuance_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Local onboarding device credential issuance gate",
+      "description": "The local onboarding device credential issuance gate must define the future local-only application service boundary before any onboarding behavior, raw credential presentation, player account creation flow, credential record write flow, protocol route, generated output, migration, dependency, production signup, or direct Nakama/Pitaya compatibility is added.",
+      "agent_guidance": "Read ADR-0089 and docs/local-onboarding-device-credential-issuance-gate.md before implementing local onboarding. Keep future behavior application-owned under runtime/internal/app/authentication, use the existing player and authentication repositories through the unit-of-work boundary, use GenerateDeviceCredentialMaterial plus credential digest helpers, store only digest material, return raw credential text only once after commit, and do not add public protocol routes, Protobuf sources, generated output, migrations, dependencies, production signup, external identity providers, password login, account recovery, multi-device linking, access-token issuance from onboarding, runtime session creation from onboarding, release artifacts, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.local_onboarding_device_credential_issuance_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Local onboarding device credential issuance implementation",
+      "description": "The local onboarding device credential issuance implementation must stay local to the application service, create the player account and digest-only device credential record in one unit of work, return raw credential text only after commit, and avoid public protocol routes, generated output, migrations, repository interface changes, dependencies, access-token issuance, runtime session creation, production signup, or direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0090, ADR-0089, and the W-0182 change spec before changing local onboarding behavior. Keep OnboardLocalPlayerWithDeviceCredential under runtime/internal/app/authentication, use GenerateDeviceCredentialMaterial and credential digest helpers, use CreatePlayerAccount and StoreCredential through unit-of-work repositories, preserve digest-only storage and one-time raw credential presentation after commit, keep AuthenticateWithDeviceCredential non-creating, and do not expose onboarding through WebSocket, Protobuf, HTTP, CLI, startup auto-creation, generated output, migrations, new dependencies, production signup, external identity providers, password login, account recovery, multi-device linking, release artifacts, or direct Nakama/Pitaya API compatibility without a later bounded work item."
+    },
+    {
+      "rule_id": "runtime.next_alpha_direction_authenticated_gameplay_e2e_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Next alpha direction authenticated gameplay E2E slice",
+      "description": "The next alpha direction after local onboarding must select a bounded authenticated gameplay E2E slice without implementing runtime behavior, protocol routes, generated output, migrations, dependencies, release publishing, production signup, broad product modules, or direct Nakama/Pitaya compatibility in the direction-selection step.",
+      "agent_guidance": "Read ADR-0091, docs/v0.1-alpha-goal.md, and the W-0183 change spec before changing the next alpha direction. Keep W-0183 direction-only, queue W-0184 as the bounded authenticated gameplay E2E slice, and preserve protocol expansion, generated output, migrations, dependencies, release publishing, production signup, external identity providers, password login, account recovery, multi-device linking, broad product modules, and direct Nakama/Pitaya API compatibility behind explicit future work."
+    },
+    {
+      "rule_id": "runtime.authenticated_gameplay_e2e_functional_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Authenticated gameplay E2E functional slice",
+      "description": "The authenticated gameplay E2E functional slice must prove local onboarding, protocol login, connection binding, protected inventory, protected presence, logout, and post-logout rejection through existing runtime capabilities without adding production runtime behavior, protocol routes, generated output, migrations, dependencies, release artifacts, broad product modules, or direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0092, ADR-0091, and the W-0184 change spec before changing authenticated gameplay E2E behavior. Keep the proof in focused tests or local request-loop evidence over existing capabilities, keep local onboarding as an application service rather than a public route, use existing authenticated request wrapping for protected routes, and do not add production runtime behavior, protocol expansion, Protobuf sources, generated output, migrations, dependencies, release publishing, production signup, external identity providers, password login, account recovery, account merge, multi-device linking, chat/social/matchmaking/match runtime modules, broad product modules, or direct Nakama/Pitaya API compatibility without a later bounded work item."
+    },
+    {
+      "rule_id": "runtime.runtime_runbook_alpha_path_refresh",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Runtime runbook alpha path refresh",
+      "description": "The runtime runbook alpha path refresh must document the proven local alpha flow, memory vs PostgreSQL runtime posture, verifier key handling, redaction expectations, and local onboarding's application-service-only status without adding runtime behavior, protocol routes, generated output, migrations, dependencies, release artifacts, broad product modules, or direct Nakama/Pitaya compatibility.",
+      "agent_guidance": "Read ADR-0093, ADR-0092, and the W-0185 change spec before changing runbook guidance. Keep docs/runtime-runbook.md and docs/runtime-runbook.zh-CN.md accurate about the proven flow, use placeholders for secrets, state that local onboarding is not a public protocol route, and do not add runtime behavior, public onboarding, protocol expansion, Protobuf sources, generated output, migrations, dependencies, release publishing, production signup, broad product modules, or direct Nakama/Pitaya API compatibility in this slice."
+    },
+    {
+      "rule_id": "runtime.minimal_example_client_or_request_loop",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Minimal example client or request-loop script",
+      "description": "The minimal example client or request-loop script must provide a small local alpha path entry point over existing capabilities while keeping raw credentials, raw tokens, verifier keys, DSNs, digests, and transport metadata redacted and avoiding runtime behavior, protocol, generated output, migration, dependency, release, broad product module, or direct compatibility changes.",
+      "agent_guidance": "Read ADR-0094, ADR-0093, and the W-0186 change spec before changing the alpha request-loop example. Keep examples/local-alpha-request-loop.sh as a redacted wrapper around the existing authenticated gameplay E2E proof unless a later work item authorizes a broader client, do not hard-code secrets or DSNs, and do not add public protocol onboarding, Protobuf sources, generated output, migrations, dependencies, release publishing, production signup, broad product modules, or direct Nakama/Pitaya API compatibility in this slice."
+    },
+    {
+      "rule_id": "runtime.health_readiness_version_config_surface",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Health readiness version config surface",
+      "description": "The health/readiness/version/config surface must provide only a small redacted local alpha troubleshooting surface while avoiding broad operations/admin behavior, observability dependencies, secret disclosure, authentication/session behavior changes, startup semantic changes, protocol routes, generated output, migrations, dependencies, release publishing, broad product modules, or direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Read ADR-0095 and the W-0187 change spec before changing runtime status endpoints. Keep /healthz, /readyz, /version, and /configz under runtime/cmd/vibit-server, expose only redacted runtime posture, test that DSNs, verifier keys, raw credentials, raw tokens, digests, token audiences, headers, cookies, query strings, subprotocol values, remote addresses, and transport metadata are not exposed, and do not broaden this into a production operations API, admin console, metrics backend, protocol route, generated output, migration, dependency, release artifact, product module, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

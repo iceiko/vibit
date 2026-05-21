@@ -32,6 +32,9 @@ func RouteRequestWithDomainPayload(request app.RouteRequest) (app.RouteRequest, 
 	if authenticationRequest, handled, err := routeRequestWithAuthenticationPayload(request); handled || err != nil {
 		return authenticationRequest, err
 	}
+	if presenceRequest, handled, err := routeRequestWithPresencePayload(request); handled || err != nil {
+		return presenceRequest, err
+	}
 
 	switch request.Route {
 	case inventory.GrantItemRoute():
@@ -125,6 +128,9 @@ func protoPayloadFromRouteAndPayload(route app.RouteKey, payload any) (proto.Mes
 	}
 	if connectionBindingPayload, handled, err := protoPayloadFromConnectionBindingRoute(route, payload); handled || err != nil {
 		return connectionBindingPayload, err
+	}
+	if presencePayload, handled, err := protoPayloadFromPresenceRoute(route, payload); handled || err != nil {
+		return presencePayload, err
 	}
 
 	switch route {
