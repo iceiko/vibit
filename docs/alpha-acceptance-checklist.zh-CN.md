@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 release identifier and artifact planning step。
+- [x] `node tools/vibit inspect next` 能识别当前 blocked final release authorization step。
 
 ## 4. Local Prerequisites
 
@@ -122,14 +122,14 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`。下一步 work 是 `W-0194 Define release identifier and artifact plan`；它可以规划 release identifier 和 artifact/publication scope，但不得创建 release identifiers、tags、artifacts、hosted deployments、GitHub release records、publication surfaces 或 release execution commands。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`。下一步 work blocked 在 `W-0195 Confirm release execution final authorization`；任何 release identifiers for execution、tags、artifacts、hosted deployments、GitHub release records、publication surfaces 或 release execution commands 之前，都必须记录 final maintainer approval 或 no-go。
 
 ## 11. Release Deferrals
 
 以下内容继续 deferred，直到后续明确 work item 授权：
 
 - 发布 `v0.1 alpha`。
-- 选择 release identifiers。
+- 选择 release identifiers for execution。
 - 创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments。
 - 添加 public local onboarding protocol route。
 - 添加 production signup、external identity providers、password login、account recovery、account merge 或 multi-device linking。
@@ -149,8 +149,10 @@ release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
+release_identifier_artifact_plan_defined: true
+proposed_release_identifier: v0.1.0-alpha.1
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_identifier_artifact_plan
-next_work_status: next_ready
+next_direction: release_execution_final_authorization
+next_work_status: blocked
 ```

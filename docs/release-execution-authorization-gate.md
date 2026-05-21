@@ -211,3 +211,5 @@ W-0194 Define release identifier and artifact plan
 ```
 
 That future planning step still must not create release tags, artifacts, hosted deployments, or published release records unless a later execution scope explicitly authorizes those actions and the maintainer approves the ask-first boundary.
+
+`W-0194` has now recorded the planning result in `docs/release-identifier-artifact-plan.md`. The queue is intentionally blocked at `W-0195 Confirm release execution final authorization` before any release-producing command may run.

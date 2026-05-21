@@ -210,3 +210,5 @@ W-0194 Define release identifier and artifact plan
 ```
 
 该 future planning step 仍不得创建 release tags、artifacts、hosted deployments 或 published release records，除非后续 execution scope 明确授权这些 actions，并且 maintainer 批准 ask-first boundary。
+
+`W-0194` 现在已经在 `docs/release-identifier-artifact-plan.md` 中记录 planning result。队列有意 blocked 在 `W-0195 Confirm release execution final authorization`，任何 release-producing command 运行前都必须经过该步骤。

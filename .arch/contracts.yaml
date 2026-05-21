@@ -676,16 +676,62 @@ implemented_wire_and_runtime_slices:
     check_rule: runtime.release_execution_maintainer_decision
     rule: W-0193 recorded the maintainer go decision without contract changes, release identifier approval, release command authorization, or release artifacts.
   release_identifier_artifact_plan:
-    status: next_ready
-    next_ready_work_item: W-0194
+    status: completed
+    completed_work_item: W-0194
+    decision: ADR-0102
+    change: changes/2026-05-21-define-release-identifier-artifact-plan
+    blocked_work_item: W-0195
     previous_completed_work_item: W-0193
     selected_direction: release_identifier_artifact_plan
+    next_direction: release_execution_final_authorization
     contract_changes_expected: false
     expected_change: changes/2026-05-21-define-release-identifier-artifact-plan
+    plan_standard: docs/release-identifier-artifact-plan.md
+    plan_standard_translation: docs/release-identifier-artifact-plan.zh-CN.md
+    release_identifier_artifact_plan_defined: true
+    proposed_release_identifier: v0.1.0-alpha.1
+    release_identifier_conflict_checked: true
+    release_identifier_conflict_found: false
+    release_declared: false
+    release_publishing_authorized_by_this_plan: false
+    release_execution_commands_authorized_by_this_plan: false
+    release_tag_authorized_by_this_plan: false
+    release_artifacts_authorized_by_this_plan: false
+    release_packaging_authorized_by_this_plan: false
+    hosted_deployment_authorized_by_this_plan: false
+    github_release_authorized_by_this_plan: false
+    release_tag_created: false
+    release_binary_created: false
+    release_archive_created: false
+    release_container_created: false
+    release_package_created: false
+    release_checksum_created: false
+    release_provenance_created: false
+    release_artifacts_created: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.release_identifier_artifact_plan
+    rule: W-0194 defined release identifier and artifact plan without contract changes or release artifacts.
+  release_execution_final_authorization:
+    status: blocked
+    blocked_work_item: W-0195
+    previous_completed_work_item: W-0194
+    selected_direction: release_execution_final_authorization
+    contract_changes_expected: false
+    expected_change: changes/2026-05-21-confirm-release-execution-final-authorization
+    proposed_release_identifier: v0.1.0-alpha.1
     release_declared: false
     release_publishing_authorized_by_current_state: false
     release_execution_commands_authorized_by_current_state: false
-    release_identifier_selected: false
     release_tag_created: false
     release_artifacts_created: false
     hosted_deployment_added: false
@@ -699,7 +745,7 @@ implemented_wire_and_runtime_slices:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0194 may define release identifier and artifact plan without contract changes or release artifacts.
+    rule: W-0195 is blocked pending final maintainer authorization and must not change contracts.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

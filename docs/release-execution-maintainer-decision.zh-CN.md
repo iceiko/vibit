@@ -88,6 +88,8 @@ W-0194 Define release identifier and artifact plan
 
 该 work item 可以提议或定义 release identifier 和 artifact plan，但仍不得创建 tag、GitHub release、binary、archive、container、package、checksum、provenance file、hosted deployment 或 public release announcement，除非后续 work item 明确授权 execution。
 
+`W-0194` 现在已经在 `docs/release-identifier-artifact-plan.md` 中记录该 plan，proposed identifier 是 `v0.1.0-alpha.1`。下一步是 `W-0195 Confirm release execution final authorization`，而不是 release execution。
+
 ## 5. Verification State
 
 这个 decision record 应使用以下命令检查：
@@ -130,4 +132,3 @@ runtime.identity_boundary on runtime/internal/platform/persistence/postgres/auth
 ## 8. Reference Alignment
 
 Nakama 和 Pitaya 都把 release decisions 与 artifact creation、deployment mechanics 分开。本 decision 沿用这种纪律，同时保留 vibit 的 agent-native workflow，并且不采用 direct Nakama/Pitaya APIs、packaging models、deployment models 或 compatibility promises。
-

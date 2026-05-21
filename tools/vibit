@@ -129,6 +129,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.release_execution_preparation_gate",
   "runtime.release_execution_authorization_gate",
   "runtime.release_execution_maintainer_decision",
+  "runtime.release_identifier_artifact_plan",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -22995,6 +22996,7 @@ function checkRuntimeReleaseExecutionAuthorizationGate(root, goFiles) {
   const gatePath = "docs/release-execution-authorization-gate.md";
   const gateTranslationPath = "docs/release-execution-authorization-gate.zh-CN.md";
   const maintainerDecisionCompleted = workItemHasStatus(root, "W-0193", "completed");
+  const identifierPlanCompleted = workItemHasStatus(root, "W-0194", "completed");
 
   if (!workItemHasStatus(root, "W-0192", "completed")) {
     ok("release execution authorization gate is not completed yet", {
@@ -23093,31 +23095,31 @@ function checkRuntimeReleaseExecutionAuthorizationGate(root, goFiles) {
     [".arch/reference.yaml", "check_rule: runtime.release_execution_authorization_gate"],
     [".arch/reference.yaml", "phase_2dd_release_execution_maintainer_decision"],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
-    ["docs/v0.1-alpha-goal.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
-    ["docs/v0.1-alpha-goal.zh-CN.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
     ["README.md", "docs/release-execution-authorization-gate.md"],
     ["README.md", expectedReadmeNextWorkItemTitle(root)],
     ["README.zh-CN.md", "docs/release-execution-authorization-gate.md"],
     ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
     ["docs/alpha-developer-flow.md", "release_execution_authorization_gate_defined: true"],
-    ["docs/alpha-developer-flow.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-developer-flow.zh-CN.md", "release_execution_authorization_gate_defined: true"],
-    ["docs/alpha-developer-flow.zh-CN.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.md", "release_execution_authorization_gate_defined: true"],
-    ["docs/alpha-acceptance-checklist.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.zh-CN.md", "release_execution_authorization_gate_defined: true"],
-    ["docs/alpha-acceptance-checklist.zh-CN.md", maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : maintainerDecisionCompleted ? "next_work_status: next_ready" : "next_work_status: blocked"],
     ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/runtime-runbook.md", "docs/release-execution-authorization-gate.md"],
-    ["docs/runtime-runbook.md", maintainerDecisionCompleted ? "release identifier and artifact plan" : "blocked maintainer go/no-go decision"],
+    ["docs/runtime-runbook.md", identifierPlanCompleted ? "final maintainer authorization" : maintainerDecisionCompleted ? "release identifier and artifact plan" : "blocked maintainer go/no-go decision"],
     ["docs/runtime-runbook.zh-CN.md", "docs/release-execution-authorization-gate.md"],
-    ["docs/runtime-runbook.zh-CN.md", maintainerDecisionCompleted ? "release identifier and artifact plan" : "blocked maintainer go/no-go decision"],
+    ["docs/runtime-runbook.zh-CN.md", identifierPlanCompleted ? "final maintainer authorization" : maintainerDecisionCompleted ? "release identifier and artifact plan" : "blocked maintainer go/no-go decision"],
     ["docs/release-execution-preparation-gate.md", "docs/release-execution-authorization-gate.md"],
     ["docs/release-execution-preparation-gate.md", maintainerDecisionCompleted ? "W-0194 Define release identifier and artifact plan" : "W-0193 Confirm release execution maintainer decision"],
     ["docs/release-execution-preparation-gate.zh-CN.md", "docs/release-execution-authorization-gate.md"],
@@ -23348,6 +23350,7 @@ function checkRuntimeReleaseExecutionMaintainerDecision(root, goFiles) {
   const conversationPath = "conversations/2026-05-21-release-execution-maintainer-decision.md";
   const standardPath = "docs/release-execution-maintainer-decision.md";
   const standardTranslationPath = "docs/release-execution-maintainer-decision.zh-CN.md";
+  const identifierPlanCompleted = workItemHasStatus(root, "W-0194", "completed");
 
   if (!workItemHasStatus(root, "W-0193", "completed")) {
     ok("release execution maintainer decision is not completed yet", {
@@ -23391,7 +23394,7 @@ function checkRuntimeReleaseExecutionMaintainerDecision(root, goFiles) {
     [".arch/work-items.yaml", "id: M-122"],
     [".arch/work-items.yaml", "title: Release Identifier And Artifact Plan"],
     [".arch/work-items.yaml", "id: W-0194"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", identifierPlanCompleted ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "release_execution_maintainer_decision: ADR-0101"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
@@ -23445,29 +23448,29 @@ function checkRuntimeReleaseExecutionMaintainerDecision(root, goFiles) {
     [".arch/reference.yaml", "check_rule: runtime.release_execution_maintainer_decision"],
     [".arch/reference.yaml", "phase_2de_release_identifier_artifact_plan"],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
-    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
-    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
     ["README.md", expectedReadmeNextWorkItemTitle(root)],
     ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
     ["docs/alpha-developer-flow.md", "release_execution_maintainer_decision_recorded: true"],
-    ["docs/alpha-developer-flow.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-developer-flow.zh-CN.md", "release_execution_maintainer_decision_recorded: true"],
-    ["docs/alpha-developer-flow.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.md", "release_execution_maintainer_decision_recorded: true"],
-    ["docs/alpha-acceptance-checklist.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/alpha-acceptance-checklist.zh-CN.md", "release_execution_maintainer_decision_recorded: true"],
-    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", identifierPlanCompleted ? "next_work_status: blocked" : "next_work_status: next_ready"],
     ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/runtime-runbook.md", "docs/release-execution-maintainer-decision.md"],
-    ["docs/runtime-runbook.md", "release identifier and artifact plan"],
+    ["docs/runtime-runbook.md", identifierPlanCompleted ? "final maintainer authorization" : "release identifier and artifact plan"],
     ["docs/runtime-runbook.zh-CN.md", "docs/release-execution-maintainer-decision.md"],
-    ["docs/runtime-runbook.zh-CN.md", "release identifier and artifact plan"],
+    ["docs/runtime-runbook.zh-CN.md", identifierPlanCompleted ? "final maintainer authorization" : "release identifier and artifact plan"],
     ["docs/release-execution-authorization-gate.md", "W-0194 Define release identifier and artifact plan"],
     ["docs/release-execution-authorization-gate.zh-CN.md", "W-0194 Define release identifier and artifact plan"],
     ["AGENTS.md", "runtime.release_execution_maintainer_decision"],
@@ -23644,6 +23647,331 @@ function checkRuntimeReleaseExecutionMaintainerDecision(root, goFiles) {
   }
 
   ok("release execution maintainer decision is recorded while release publication, release execution commands, release identifier approval, release tags, release artifacts, hosted deployment, runtime, protocol, generated-output, migration, dependency, operations, authentication/session, product-scope, and direct compatibility deferrals remain preserved", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
+function checkRuntimeReleaseIdentifierArtifactPlan(root, goFiles) {
+  const ruleId = "runtime.release_identifier_artifact_plan";
+  const decisionPath = "decisions/ADR-0102-release-identifier-artifact-plan.md";
+  const changePath = "changes/2026-05-21-define-release-identifier-artifact-plan";
+  const conversationPath = "conversations/2026-05-21-release-identifier-artifact-plan.md";
+  const standardPath = "docs/release-identifier-artifact-plan.md";
+  const standardTranslationPath = "docs/release-identifier-artifact-plan.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0194", "completed")) {
+    ok("release identifier and artifact plan is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for release identifier and artifact plan`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for release identifier and artifact plan`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-122"],
+    [".arch/work-items.yaml", "title: Release Identifier And Artifact Plan"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0194"],
+    [".arch/work-items.yaml", "ADR-0102"],
+    [".arch/work-items.yaml", "id: M-123"],
+    [".arch/work-items.yaml", "title: Release Execution Final Authorization"],
+    [".arch/work-items.yaml", "id: W-0195"],
+    [".arch/work-items.yaml", "status: blocked"],
+    [".arch/runtime.yaml", "release_identifier_artifact_plan: ADR-0102"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "release_identifier_artifact_plan:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0194"],
+    [".arch/runtime.yaml", "decision: ADR-0102"],
+    [".arch/runtime.yaml", "plan_standard: docs/release-identifier-artifact-plan.md"],
+    [".arch/runtime.yaml", "plan_standard_translation: docs/release-identifier-artifact-plan.zh-CN.md"],
+    [".arch/runtime.yaml", "release_identifier_artifact_plan_defined: true"],
+    [".arch/runtime.yaml", "proposed_release_identifier: v0.1.0-alpha.1"],
+    [".arch/runtime.yaml", "release_identifier_conflict_checked: true"],
+    [".arch/runtime.yaml", "release_identifier_conflict_found: false"],
+    [".arch/runtime.yaml", "local_v0_1_tags_found: false"],
+    [".arch/runtime.yaml", "remote_origin_v0_1_tags_found: false"],
+    [".arch/runtime.yaml", "github_release_record_for_v0_1_0_alpha_1_found: false"],
+    [".arch/runtime.yaml", "github_release_record_lookup_status: 404_not_found"],
+    [".arch/runtime.yaml", "release_identifier_selected_for_execution: false"],
+    [".arch/runtime.yaml", "source_first_release_surface_planned: true"],
+    [".arch/runtime.yaml", "future_git_tag_planned: true"],
+    [".arch/runtime.yaml", "future_github_release_record_planned: true"],
+    [".arch/runtime.yaml", "future_release_notes_planned: true"],
+    [".arch/runtime.yaml", "future_hosting_platform_source_archive_planned: true"],
+    [".arch/runtime.yaml", "release_declared: false"],
+    [".arch/runtime.yaml", "release_publishing_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "release_execution_commands_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "release_tag_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "release_artifacts_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "release_packaging_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "hosted_deployment_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "github_release_authorized_by_this_plan: false"],
+    [".arch/runtime.yaml", "release_tag_created: false"],
+    [".arch/runtime.yaml", "release_binary_created: false"],
+    [".arch/runtime.yaml", "release_archive_created: false"],
+    [".arch/runtime.yaml", "release_container_created: false"],
+    [".arch/runtime.yaml", "release_package_created: false"],
+    [".arch/runtime.yaml", "release_checksum_created: false"],
+    [".arch/runtime.yaml", "release_provenance_created: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "broad_operations_admin_behavior_added: false"],
+    [".arch/runtime.yaml", "product_module_expansion_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "next_direction: release_execution_final_authorization"],
+    [".arch/runtime.yaml", "check_rule: runtime.release_identifier_artifact_plan"],
+    [".arch/runtime.yaml", "release_execution_final_authorization:"],
+    [".arch/runtime.yaml", "blocked_work_item: W-0195"],
+    [".arch/conventions.yaml", "release_identifier_artifact_plan:"],
+    [".arch/conventions.yaml", "release_identifier_artifact_plan_defined: true"],
+    [".arch/conventions.yaml", "check_rule: runtime.release_identifier_artifact_plan"],
+    [".arch/conventions.yaml", "release_execution_final_authorization:"],
+    [".arch/contracts.yaml", "release_identifier_artifact_plan:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.release_identifier_artifact_plan"],
+    [".arch/contracts.yaml", "release_execution_final_authorization:"],
+    [".arch/reference.yaml", "phase_2de_release_identifier_artifact_plan"],
+    [".arch/reference.yaml", "check_rule: runtime.release_identifier_artifact_plan"],
+    [".arch/reference.yaml", "phase_2df_release_execution_final_authorization"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: blocked"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", "release_identifier_artifact_plan_defined: true"],
+    ["docs/alpha-developer-flow.md", "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "release_identifier_artifact_plan_defined: true"],
+    ["docs/alpha-developer-flow.zh-CN.md", "next_work_status: blocked"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "release_identifier_artifact_plan_defined: true"],
+    ["docs/alpha-acceptance-checklist.md", "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "release_identifier_artifact_plan_defined: true"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_work_status: blocked"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/runtime-runbook.md", "docs/release-identifier-artifact-plan.md"],
+    ["docs/runtime-runbook.md", "final maintainer authorization"],
+    ["docs/runtime-runbook.zh-CN.md", "docs/release-identifier-artifact-plan.md"],
+    ["docs/runtime-runbook.zh-CN.md", "final maintainer authorization"],
+    ["docs/release-execution-maintainer-decision.md", "docs/release-identifier-artifact-plan.md"],
+    ["docs/release-execution-maintainer-decision.md", "W-0195 Confirm release execution final authorization"],
+    ["docs/release-execution-maintainer-decision.zh-CN.md", "docs/release-identifier-artifact-plan.md"],
+    ["docs/release-execution-maintainer-decision.zh-CN.md", "W-0195 Confirm release execution final authorization"],
+    ["AGENTS.md", "runtime.release_identifier_artifact_plan"],
+    ["AGENTS.md", "W-0195"],
+    ["AGENTS.zh-CN.md", "runtime.release_identifier_artifact_plan"],
+    ["AGENTS.zh-CN.md", "W-0195"],
+    ["runtime/AGENTS.md", "runtime.release_identifier_artifact_plan"],
+    ["runtime/AGENTS.md", "W-0195"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.release_identifier_artifact_plan"],
+    ["runtime/AGENTS.zh-CN.md", "W-0195"],
+    ["rules/check-rules.json", "runtime.release_identifier_artifact_plan"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0102",
+      "docs/release-identifier-artifact-plan.md",
+      "runtime.release_identifier_artifact_plan",
+      "proposed_release_identifier: v0.1.0-alpha.1",
+      "release_identifier_conflict_checked: true",
+      "release_identifier_conflict_found: false",
+      "release_identifier_selected_for_execution: false",
+      "release_execution_commands_authorized_by_this_plan: false",
+      "release_artifacts_authorized_by_this_plan: false",
+      "W-0195 Confirm release execution final authorization",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0194",
+      "completed_milestone: M-122",
+      "previous_completed_work_item: W-0193",
+      "next_milestone: M-123",
+      "next_work_item: W-0195",
+      "next_work_item_status: blocked",
+      "release_identifier_artifact_plan_defined: true",
+      "release_identifier_artifact_plan_check_rule: runtime.release_identifier_artifact_plan",
+      "plan_standard: docs/release-identifier-artifact-plan.md",
+      "plan_standard_translation: docs/release-identifier-artifact-plan.zh-CN.md",
+      "proposed_release_identifier: v0.1.0-alpha.1",
+      "release_identifier_conflict_checked: true",
+      "release_identifier_conflict_found: false",
+      "local_v0_1_tags_found: false",
+      "remote_origin_v0_1_tags_found: false",
+      "github_release_record_for_v0_1_0_alpha_1_found: false",
+      "github_release_record_lookup_status: 404_not_found",
+      "release_identifier_selected_for_execution: false",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_change: false",
+      "release_execution_commands_authorized_by_this_change: false",
+      "release_tag_authorized_by_this_change: false",
+      "release_artifacts_authorized_by_this_change: false",
+      "github_release_authorized_by_this_change: false",
+      "release_tag_created: false",
+      "release_binary_created: false",
+      "release_archive_created: false",
+      "release_container_created: false",
+      "release_package_created: false",
+      "release_checksum_created: false",
+      "release_provenance_created: false",
+      "runtime_behavior_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "broad_operations_admin_behavior_added: false",
+      "product_module_expansion_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+      "blocked_work_item: W-0195",
+    ],
+    [standardPath]: [
+      "release_identifier_artifact_plan: defined",
+      "completed_work_item: W-0194",
+      "decision: ADR-0102",
+      "check_rule: runtime.release_identifier_artifact_plan",
+      "proposed_release_identifier: v0.1.0-alpha.1",
+      "release_identifier_conflict_checked: true",
+      "release_identifier_conflict_found: false",
+      "release_identifier_selected_for_execution: false",
+      "release_execution_commands_authorized_by_this_plan: false",
+      "release_artifacts_authorized_by_this_plan: false",
+      "next_direction: release_execution_final_authorization",
+      "W-0195 Confirm release execution final authorization",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "release_identifier_artifact_plan: defined",
+      "completed_work_item: W-0194",
+      "decision: ADR-0102",
+      "check_rule: runtime.release_identifier_artifact_plan",
+      "proposed_release_identifier: v0.1.0-alpha.1",
+      "release_identifier_conflict_checked: true",
+      "release_identifier_conflict_found: false",
+      "release_identifier_selected_for_execution: false",
+      "release_execution_commands_authorized_by_this_plan: false",
+      "release_artifacts_authorized_by_this_plan: false",
+      "next_direction: release_execution_final_authorization",
+      "W-0195 Confirm release execution final authorization",
+      "Stop Conditions",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /release_declared:\s*true/, label: "release declaration" },
+    { pattern: /release_publishing_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "release publishing authorization" },
+    { pattern: /release_execution_commands_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "release execution command authorization" },
+    { pattern: /release_identifier_selected(?:_for_execution)?:\s*true/, label: "release identifier execution selection" },
+    { pattern: /release_tag_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "release tag authorization" },
+    { pattern: /release_artifacts_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "release artifact authorization" },
+    { pattern: /release_packaging_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "release packaging authorization" },
+    { pattern: /hosted_deployment_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "hosted deployment authorization" },
+    { pattern: /github_release_authorized(?:_by_this_(?:plan|change))?:\s*true/, label: "GitHub release authorization" },
+    { pattern: /release_tag_created:\s*true/, label: "release tag creation" },
+    { pattern: /release_binary_created:\s*true/, label: "release binary creation" },
+    { pattern: /release_archive_created:\s*true/, label: "release archive creation" },
+    { pattern: /release_container_created:\s*true/, label: "release container creation" },
+    { pattern: /release_package_created:\s*true/, label: "release package creation" },
+    { pattern: /release_checksum_created:\s*true/, label: "release checksum creation" },
+    { pattern: /release_provenance_created:\s*true/, label: "release provenance creation" },
+    { pattern: /hosted_deployment_added:\s*true/, label: "hosted deployment" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /startup_configuration_semantics_changed:\s*true/, label: "startup configuration semantic change" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_added:\s*true/, label: "migration addition" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /\bpublished v0\.1 alpha\b|\bpublishes v0\.1 alpha\b/i, label: "release publication wording" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses release identifier artifact plan boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\brelease_identifier_artifact_plan\b|\brelease_execution_final_authorization\b|\bv0\.1\.0-alpha\.1\b|\bReleaseExecution\b|\bReleasePackage\b|\bReleaseArtifact\b|\bReleaseProvenance\b/, label: "release planning or artifact runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for release identifier artifact planning or release artifacts: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("release identifier and artifact plan is defined while release publication, execution commands, tag creation, release artifacts, hosted deployment, runtime, protocol, generated-output, migration, dependency, operations, authentication/session, product-scope, and direct compatibility deferrals remain preserved", {
     rule_id: ruleId,
     artifact: standardPath,
   });
@@ -25324,6 +25652,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0194", "blocked_work_item: W-0195"],
     ["W-0193", "next_ready_work_item: W-0194"],
     ["W-0192", "blocked_work_item: W-0193"],
     ["W-0191", "next_ready_work_item: W-0192"],
@@ -25346,6 +25675,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0194", "completed")) {
+    return "next_work_item: W-0195";
+  }
   if (workItemHasStatus(root, "W-0193", "completed")) {
     return "next_work_item: W-0194";
   }
@@ -25357,6 +25689,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0194", "release_execution_final_authorization"],
     ["W-0193", "release_identifier_artifact_plan"],
     ["W-0192", "release_execution_maintainer_decision"],
     ["W-0191", "release_execution_authorization_gate"],
@@ -25379,6 +25712,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0194", "W-0195 Confirm release execution final authorization"],
     ["W-0193", "W-0194 Define release identifier and artifact plan"],
     ["W-0192", "W-0193 Confirm release execution maintainer decision"],
     ["W-0191", "W-0192 Define release execution authorization gate"],
@@ -25402,6 +25736,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0194", "current_phase: release_execution_final_authorization"],
     ["W-0193", "current_phase: release_identifier_artifact_plan"],
     ["W-0192", "current_phase: release_execution_maintainer_decision"],
     ["W-0191", "current_phase: release_execution_authorization_gate"],
@@ -25949,6 +26284,7 @@ function checkRuntime(root) {
   checkRuntimeReleaseExecutionPreparationGate(root, goFiles);
   checkRuntimeReleaseExecutionAuthorizationGate(root, goFiles);
   checkRuntimeReleaseExecutionMaintainerDecision(root, goFiles);
+  checkRuntimeReleaseIdentifierArtifactPlan(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

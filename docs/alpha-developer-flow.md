@@ -32,11 +32,13 @@ release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
-next_direction: release_identifier_artifact_plan
-next_work_status: next_ready
+release_identifier_artifact_plan_defined: true
+proposed_release_identifier: v0.1.0-alpha.1
+next_direction: release_execution_final_authorization
+next_work_status: blocked
 ```
 
-The repository remains pre-alpha. The packaged flow is ready for local review, and the maintainer decision now allows the next release-path planning step. Publishing `v0.1 alpha`, selecting the final release identifier, creating tags or artifacts, and executing release commands remain deferred to later explicit work items.
+The repository remains pre-alpha. The packaged flow is ready for local review, and the release identifier plan now proposes `v0.1.0-alpha.1` with a source-first future artifact surface. Publishing `v0.1 alpha`, selecting the identifier for execution, creating tags or artifacts, and executing release commands remain blocked on later explicit maintainer authorization.
 
 ## 3. Recommended Journey
 
@@ -149,14 +151,14 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is now recorded in `docs/release-execution-maintainer-decision.md`. The next work is `W-0194 Define release identifier and artifact plan`; it may plan the identifier and artifact/publication surface but must not create tags, artifacts, hosted deployments, GitHub release records, or release publication commands.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, and the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`. The next work is blocked at `W-0195 Confirm release execution final authorization`; it must record final maintainer approval or no-go before any tag, artifact, hosted deployment, GitHub release record, or release publication command.
 
 ## 9. Deferred Work
 
 The following remain deferred until later explicit work items:
 
 - publishing `v0.1 alpha`,
-- selecting release identifiers,
+- selecting release identifiers for execution,
 - creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments,
 - adding a public local onboarding protocol route,
 - adding production signup, external identity providers, password login, account recovery, account merge, or multi-device linking,

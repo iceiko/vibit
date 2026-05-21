@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-122
+current_milestone: M-123
 
 release_targets:
   short_term:
@@ -15,9 +15,9 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0194
+    blocked_work_item: W-0195
     preferred_after_current:
-      - release_identifier_artifact_plan
+      - release_execution_final_authorization
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2263,7 +2263,7 @@ milestones:
 
   - id: M-122
     title: Release Identifier And Artifact Plan
-    status: active
+    status: completed
     goal: Define the proposed v0.1 alpha release identifier and smallest artifact/publication plan before any release command creates public artifacts.
     completion_criteria:
       - The release identifier proposal is recorded and checked for existing tag or release conflicts without creating the tag.
@@ -2275,6 +2275,27 @@ milestones:
       - creating release tags
       - creating release binaries, archives, containers, packages, checksums, provenance files, or hosted deployments
       - creating GitHub release records
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Recorded the proposed `v0.1.0-alpha.1` release identifier, checked local tags, remote tags, and GitHub release records for conflicts without creating anything, and defined the smallest future release surface as tag plus GitHub release record/source archive while deferring binaries, packages, containers, checksums, provenance, hosted deployments, publication commands, runtime behavior, protocol routes, generated output, migrations, dependencies, operations/admin behavior, authentication/session changes, broad product modules, and direct compatibility.
+
+  - id: M-123
+    title: Release Execution Final Authorization
+    status: active
+    goal: Hold release execution at a final maintainer authorization point after the release identifier and artifact plan is defined.
+    completion_criteria:
+      - The maintainer explicitly approves or rejects executing the planned release commands.
+      - Any approved execution command, release identifier, tag action, artifact family, GitHub release record, and publication surface is recorded before commands run.
+      - Required verification results, known warnings, stop conditions, and rollback posture are reviewed.
+      - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - publishing v0.1 alpha without final maintainer authorization
+      - creating or pushing release tags without final maintainer authorization
+      - creating release binaries, archives, containers, packages, checksums, provenance files, hosted deployments, or GitHub release records without final maintainer authorization
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -6991,7 +7012,7 @@ work_items:
   - id: W-0194
     milestone: M-122
     title: Define release identifier and artifact plan
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-define-release-identifier-artifact-plan
     depends_on:
       - W-0193
@@ -7000,6 +7021,7 @@ work_items:
     selected_direction: release_identifier_artifact_plan
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0102
       - ADR-0101
       - ADR-0100
       - ADR-0099
@@ -7018,4 +7040,39 @@ work_items:
       - Define the proposed release identifier and artifact/publication plan without creating release artifacts.
       - Check and record whether the proposed identifier conflicts with existing repository tags or release records without creating or pushing anything.
       - Record approved, deferred, and forbidden artifact families, command boundaries, verification requirements, known warnings, redaction rules, and stop conditions for any later execution step.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the proposed release identifier as `v0.1.0-alpha.1`, recorded no local tag, remote tag, or GitHub release-record conflict as of 2026-05-21, and planned the smallest later release surface as a Git tag plus GitHub release record/source archive only after final maintainer authorization. Binaries, packages, containers, checksums, provenance, hosted deployments, publication commands, runtime behavior, protocol routes, generated output, migrations, dependencies, operations/admin behavior, authentication/session changes, broad product modules, and direct Nakama/Pitaya compatibility remain deferred.
+
+  - id: W-0195
+    milestone: M-123
+    title: Confirm release execution final authorization
+    status: blocked
+    change: changes/2026-05-21-confirm-release-execution-final-authorization
+    depends_on:
+      - W-0194
+    expected_change_id: confirm-release-execution-final-authorization
+    tier: tier_2_developer_experience
+    selected_direction: release_execution_final_authorization
+    gate_density_strategy: ADR-0082
+    block_reason: Final release execution would create public release state such as tags, GitHub release records, source archives, or publication records and requires explicit maintainer authorization after reviewing the release identifier and artifact plan.
+    related_decisions:
+      - ADR-0102
+      - ADR-0101
+      - ADR-0100
+      - ADR-0099
+      - ADR-0098
+      - ADR-0097
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Creating or pushing release tags, publishing v0.1 alpha, creating release binaries, archives, containers, packages, checksums, provenance files, hosted deployments, GitHub release records, running release publication commands, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Record a final maintainer go/no-go decision for executing the planned release commands.
+      - If go, record the exact authorized release identifier, tag action, GitHub release record action, artifact families, command boundaries, verification state, known warnings, and stop conditions before running any release-producing command.
+      - If no-go, record the reason and next bounded remediation or deferral.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.

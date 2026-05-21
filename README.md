@@ -27,7 +27,7 @@ The repository has moved beyond a pure design phase. Current implemented foundat
 - Single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot.
 - `tools/vibit` checks and inspection commands for agents and humans.
 
-This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, the runtime exposes a small health/readiness/version/config surface, the alpha acceptance checklist records the local readiness state, `docs/alpha-developer-flow.md` packages those entry points into one coherent local developer journey, `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary, `docs/release-execution-preparation-gate.md` defines the release execution preparation boundary, and `docs/release-execution-authorization-gate.md` defines the release execution authorization criteria. Release execution is currently blocked on an explicit maintainer go/no-go decision.
+This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, the runtime exposes a small health/readiness/version/config surface, the alpha acceptance checklist records the local readiness state, `docs/alpha-developer-flow.md` packages those entry points into one coherent local developer journey, `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary, `docs/release-execution-preparation-gate.md` defines the release execution preparation boundary, `docs/release-execution-authorization-gate.md` defines the release execution authorization criteria, `docs/release-execution-maintainer-decision.md` records the go-to-plan decision, and `docs/release-identifier-artifact-plan.md` defines the proposed `v0.1.0-alpha.1` identifier and source-first artifact plan. Release execution is currently blocked on final maintainer authorization before any tag, release record, or artifact can be created.
 
 ## Try It Locally
 
@@ -88,6 +88,10 @@ The release execution preparation gate is recorded in `docs/release-execution-pr
 
 The release execution authorization gate is recorded in `docs/release-execution-authorization-gate.md`.
 
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`.
+
+The release identifier and artifact plan is recorded in `docs/release-identifier-artifact-plan.md`.
+
 `v0.1 alpha` should let a technically capable developer:
 
 - clone the repo,
@@ -117,7 +121,8 @@ Recommended next sequence:
 10. Define the release execution preparation gate. Completed.
 11. Define the release execution authorization gate. Completed.
 12. Confirm the release execution maintainer decision. Completed as go to release identifier and artifact planning.
-13. Define the release identifier and artifact plan. Next ready.
+13. Define the release identifier and artifact plan. Completed with proposed identifier `v0.1.0-alpha.1`.
+14. Confirm release execution final authorization. Blocked pending maintainer decision.
 
 Run the minimal local alpha request loop with:
 
@@ -136,10 +141,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-At the time of this README update, the current next ready item is:
+At the time of this README update, there is no next ready item because release execution is intentionally blocked at:
 
 ```text
-W-0194 Define release identifier and artifact plan
+W-0195 Confirm release execution final authorization
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.

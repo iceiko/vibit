@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current release identifier and artifact planning step.
+- [x] `node tools/vibit inspect next` identifies the current blocked final release authorization step.
 
 ## 4. Local Prerequisites
 
@@ -123,14 +123,14 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, and the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`. The next work is `W-0194 Define release identifier and artifact plan`; it may plan release identifier and artifact/publication scope, but it must not create release identifiers, tags, artifacts, hosted deployments, GitHub release records, publication surfaces, or release execution commands.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, and the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`. The next work is blocked at `W-0195 Confirm release execution final authorization`; it must record final maintainer approval or no-go before creating release identifiers for execution, tags, artifacts, hosted deployments, GitHub release records, publication surfaces, or release execution commands.
 
 ## 11. Release Deferrals
 
 The following remain deferred until a later explicit work item:
 
 - Publishing `v0.1 alpha`.
-- Selecting release identifiers.
+- Selecting release identifiers for execution.
 - Creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments.
 - Adding a public local onboarding protocol route.
 - Adding production signup, external identity providers, password login, account recovery, account merge, or multi-device linking.
@@ -150,8 +150,10 @@ release_publishing_decision_gate_defined: true
 release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
+release_identifier_artifact_plan_defined: true
+proposed_release_identifier: v0.1.0-alpha.1
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: release_identifier_artifact_plan
-next_work_status: next_ready
+next_direction: release_execution_final_authorization
+next_work_status: blocked
 ```

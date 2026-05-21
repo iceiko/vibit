@@ -89,6 +89,8 @@ W-0194 Define release identifier and artifact plan
 
 That work item may propose or define the release identifier and artifact plan, but it still must not create a tag, GitHub release, binary, archive, container, package, checksum, provenance file, hosted deployment, or public release announcement unless a later work item explicitly authorizes execution.
 
+`W-0194` has now recorded that plan in `docs/release-identifier-artifact-plan.md` with proposed identifier `v0.1.0-alpha.1`. The next step is `W-0195 Confirm release execution final authorization`, not release execution.
+
 ## 5. Verification State
 
 The decision record should be checked with:
@@ -131,4 +133,3 @@ Stop before release execution if any of these occur:
 ## 8. Reference Alignment
 
 Nakama and Pitaya both separate release decisions from artifact creation and deployment mechanics. This decision follows that discipline while preserving vibit's agent-native workflow and without adopting direct Nakama/Pitaya APIs, packaging models, deployment models, or compatibility promises.
-

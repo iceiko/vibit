@@ -27,7 +27,7 @@ vibit 是一个开源 agent-native server framework，用于构建 AI coding age
 - Single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot。
 - 面向 agents 和 humans 的 `tools/vibit` checks 与 inspection commands。
 
-这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 已经记录本地 readiness state，`docs/alpha-developer-flow.md` 已把这些入口整理成一条 coherent local developer journey，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，并且 `docs/release-execution-authorization-gate.md` 已定义 release execution authorization criteria。Release execution 当前 blocked，等待 maintainer 明确 go/no-go decision。
+这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 已经记录本地 readiness state，`docs/alpha-developer-flow.md` 已把这些入口整理成一条 coherent local developer journey，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，`docs/release-execution-authorization-gate.md` 已定义 release execution authorization criteria，`docs/release-execution-maintainer-decision.md` 已记录 go-to-plan decision，`docs/release-identifier-artifact-plan.md` 已定义 proposed `v0.1.0-alpha.1` identifier 和 source-first artifact plan。Release execution 当前 blocked，等待 final maintainer authorization，之后才可以创建 tag、release record 或 artifact。
 
 ## 本地试用
 
@@ -88,6 +88,10 @@ Release execution preparation gate 记录在 `docs/release-execution-preparation
 
 Release execution authorization gate 记录在 `docs/release-execution-authorization-gate.md`。
 
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`。
+
+Release identifier and artifact plan 记录在 `docs/release-identifier-artifact-plan.md`。
+
 `v0.1 alpha` 应让具备技术能力的开发者能够：
 
 - clone repo；
@@ -117,7 +121,8 @@ Release execution authorization gate 记录在 `docs/release-execution-authoriza
 10. 定义 release execution preparation gate。已完成。
 11. 定义 release execution authorization gate。已完成。
 12. 确认 release execution maintainer decision。已完成，结果是 go to release identifier and artifact planning。
-13. 定义 release identifier and artifact plan。Next ready。
+13. 定义 release identifier and artifact plan。已完成，proposed identifier 是 `v0.1.0-alpha.1`。
+14. 确认 release execution final authorization。Blocked，等待 maintainer decision。
 
 运行 minimal local alpha request loop：
 
@@ -136,10 +141,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-在本 README 更新时，当前 next ready item 是：
+在本 README 更新时，当前没有 next ready item，因为 release execution 被有意阻塞在：
 
 ```text
-W-0194 Define release identifier and artifact plan
+W-0195 Confirm release execution final authorization
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
