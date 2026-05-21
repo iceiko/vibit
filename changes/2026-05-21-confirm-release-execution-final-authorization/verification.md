@@ -44,9 +44,9 @@ git status --short --branch
 
 ## Release Execution Results
 
-The following remain pending until the verified commit is created and pushed:
-
-- Git tag creation.
-- Git tag push.
-- GitHub Release creation.
-- Source archive availability through GitHub.
+- Main push succeeded for commit `30e868803796e261651069eeafb8b5e526ac2260`.
+- Annotated Git tag `v0.1.0-alpha.1` was created and pushed.
+- Remote tag `refs/tags/v0.1.0-alpha.1^{}` resolves to `30e868803796e261651069eeafb8b5e526ac2260`.
+- GitHub Release `v0.1.0-alpha.1` was created with id `327144724`.
+- GitHub Release URL: `https://github.com/iceiko/vibit/releases/tag/v0.1.0-alpha.1`.
+- GitHub source archive is available through the release/tag page.

@@ -11,5 +11,5 @@
 - [x] Runtime, protocol, generated output, migration, dependency, operations/admin, authentication/session, broad product module, and direct compatibility deferrals preserved.
 - [x] Conflict checks completed immediately before release execution.
 - [x] Verification commands completed.
-- [ ] Git tag created and pushed.
-- [ ] GitHub Release created.
+- [x] Git tag created and pushed.
+- [x] GitHub Release created.
