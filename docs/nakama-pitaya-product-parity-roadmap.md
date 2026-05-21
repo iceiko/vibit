@@ -106,7 +106,7 @@ Current completed foundation:
 Current gap:
 
 - The source-first alpha is visible, but the next product stage still needs an explicit prototype-ready foundation execution plan.
-- The route from the current feedback intake loop into storage objects, messaging/push, richer examples, operations inspection, social, competitive, matchmaking, match runtime, SDKs, and distributed runtime must be sequenced through product maturity milestones.
+- The prototype-ready foundation execution plan is recorded, and the next work must define the local development path gate before implementation slices broaden shared online services.
 
 ## 5. Phase Plan
 
@@ -152,7 +152,8 @@ Status:
 ```text
 phase_2p_prototype_ready_foundation: next_product_stage
 standard: docs/product-maturity-milestones.md
-next_work_item: W-0198 Define prototype-ready foundation execution plan
+execution_plan: docs/prototype-ready-foundation-execution-plan.md
+next_work_item: W-0199 Define prototype-ready local development path gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.

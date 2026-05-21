@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-126
+current_milestone: M-127
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: v0.1_alpha_feedback_intake_prepared
+    current_release_state: prototype_ready_foundation_execution_plan_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0198
+    next_ready_work_item: W-0199
     preferred_after_current:
-      - prototype_ready_foundation_execution_plan
+      - prototype_ready_local_development_path_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2349,7 +2349,7 @@ milestones:
 
   - id: M-126
     title: Prototype Ready Foundation Execution Plan
-    status: active
+    status: completed
     goal: Define the smallest execution plan that moves vibit from source-first alpha toward a prototype-ready game/backend foundation.
     completion_criteria:
       - The first prototype-ready execution plan is recorded.
@@ -2367,6 +2367,29 @@ milestones:
       - adding migrations or dependencies
       - adding broad operations/admin behavior
       - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the first prototype-ready foundation execution plan in `docs/prototype-ready-foundation-execution-plan.md` and `docs/prototype-ready-foundation-execution-plan.zh-CN.md`, accepted `ADR-0106`, selected `prototype_ready_local_development_path_gate` as the first execution slice, opened `W-0199 Define prototype-ready local development path gate`, and preserved deferrals for runtime behavior, protocol routes, Protobuf sources or generated output, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-127
+    title: Prototype Ready Local Development Path Gate
+    status: active
+    goal: Define the gate for a repeatable local development path that can later improve setup, migrations, configuration, and example flow for prototype authors.
+    completion_criteria:
+      - The local development path gate is recorded.
+      - The gate defines supported prerequisites, startup expectations, migration expectations, configuration and secret posture, example-flow shape, allowed future write areas, verification expectations, and stop conditions.
+      - The gate preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing local development path behavior in the gate slice
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding broad product modules
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -7205,8 +7228,10 @@ work_items:
   - id: W-0198
     milestone: M-126
     title: Define prototype-ready foundation execution plan
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-define-prototype-ready-foundation-execution-plan
+    commits:
+      - pending
     depends_on:
       - W-0197
     expected_change_id: define-prototype-ready-foundation-execution-plan
@@ -7214,6 +7239,7 @@ work_items:
     selected_direction: prototype_ready_foundation_execution_plan
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0106
       - ADR-0105
       - ADR-0104
       - ADR-0097
@@ -7225,3 +7251,28 @@ work_items:
       - Define the first prototype-ready foundation execution plan after the feedback intake surface is prepared.
       - Record the recommended sequence, candidate work items, maturity-stage mapping, success criteria, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, release artifact, public announcement, paid promotion, authentication/session, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the first prototype-ready foundation execution plan, recorded the recommended Stage 2 sequence, candidate work families, maturity mapping, Nakama/Pitaya capability mapping, success criteria, and stop conditions in `docs/prototype-ready-foundation-execution-plan.md`, accepted `ADR-0106`, added `runtime.prototype_ready_foundation_execution_plan` check coverage, and selected `W-0199 Define prototype-ready local development path gate` as the next-ready work item without changing runtime behavior, protocol/generated output/migrations/dependencies, broadening operations/admin, changing authentication/session behavior, adding hosted deployments, expanding release artifacts, executing announcements, running paid promotion, adding broad product modules, or adding direct compatibility.
+
+  - id: W-0199
+    milestone: M-127
+    title: Define prototype-ready local development path gate
+    status: next_ready
+    change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
+    depends_on:
+      - W-0198
+    expected_change_id: define-prototype-ready-local-development-path-gate
+    tier: tier_2_developer_experience
+    selected_direction: prototype_ready_local_development_path_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0106
+      - ADR-0105
+      - ADR-0097
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the gate for the prototype-ready local development path.
+      - Record supported prerequisites, startup expectations, migration expectations, configuration and secret posture, example-flow shape, allowed future write areas, verification expectations, and stop conditions.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless explicitly authorized.

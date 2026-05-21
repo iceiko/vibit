@@ -135,6 +135,11 @@ The first alpha feedback intake surface and product maturity milestones are:
 - `docs/product-maturity-milestones.md`
 - `decisions/ADR-0105-first-alpha-feedback-intake-and-product-maturity-milestones.md`
 
+The prototype-ready foundation execution plan is:
+
+- `docs/prototype-ready-foundation-execution-plan.md`
+- `decisions/ADR-0106-prototype-ready-foundation-execution-plan.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -147,7 +152,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0198 Define prototype-ready foundation execution plan
+W-0199 Define prototype-ready local development path gate
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.

@@ -30,13 +30,15 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: v0.1_alpha_user_discovery_loop_defined
+  current_state: prototype_ready_foundation_execution_plan_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0198
-  immediate_next_direction: prototype_ready_foundation_execution_plan
+  immediate_next_work_item: W-0199
+  immediate_next_direction: prototype_ready_local_development_path_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
+  prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
+  prototype_ready_foundation_execution_plan_translation: docs/prototype-ready-foundation-execution-plan.zh-CN.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
@@ -3714,19 +3716,37 @@ phase_plan:
     check_rule: runtime.first_alpha_feedback_intake_surfaces
     rule: W-0197 prepared feedback intake surfaces and product maturity milestones without executing announcements or changing runtime scope.
   phase_2di_prototype_ready_foundation_execution_plan:
-    status: next_ready
+    status: completed
     milestone: M-126
-    next_ready_work_item: W-0198
+    completed_work_item: W-0198
+    decision: ADR-0106
+    change: changes/2026-05-22-define-prototype-ready-foundation-execution-plan
+    next_milestone: M-127
+    next_ready_work_item: W-0199
     previous_completed_work_item: W-0197
     alpha_target_alignment: product_maturity
     selected_direction: prototype_ready_foundation_execution_plan
+    next_direction: prototype_ready_local_development_path_gate
     expected_change: changes/2026-05-22-define-prototype-ready-foundation-execution-plan
     reference_mapping:
       nakama: The prototype-ready plan should identify the smallest shared online-service and developer-experience path toward serious game backend prototyping.
       pitaya: The prototype-ready plan should preserve Go server lifecycle and routing boundaries while selecting the next usable foundation slice.
     product_maturity_milestones_defined: true
+    execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
+    execution_plan_standard_translation: docs/prototype-ready-foundation-execution-plan.zh-CN.md
+    source_stage: source_first_alpha
+    source_release_identifier: v0.1.0-alpha.1
     target_stage: prototype_ready_foundation
     planning_only: true
+    prototype_ready_foundation_execution_plan_defined: true
+    recommended_sequence_recorded: true
+    candidate_work_items_recorded: true
+    maturity_stage_mapping_recorded: true
+    nakama_pitaya_capability_mapping_recorded: true
+    success_criteria_recorded: true
+    stop_conditions_recorded: true
+    selected_first_execution_slice: prototype_ready_local_development_path_gate
+    prototype_ready_local_development_path_gate_next_ready: true
     additional_release_artifacts_authorized: false
     public_announcements_beyond_github_release_authorized: false
     paid_promotion_authorized: false
@@ -3740,7 +3760,40 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0198 should define the prototype-ready foundation execution plan without implementing runtime or product module scope.
+    check_rule: runtime.prototype_ready_foundation_execution_plan
+    rule: W-0198 defined the prototype-ready foundation execution plan without implementing runtime or product module scope.
+  phase_2dj_prototype_ready_local_development_path_gate:
+    status: next_ready
+    milestone: M-127
+    next_ready_work_item: W-0199
+    previous_completed_work_item: W-0198
+    alpha_target_alignment: prototype_ready_foundation
+    selected_direction: prototype_ready_local_development_path_gate
+    expected_change: changes/2026-05-22-define-prototype-ready-local-development-path-gate
+    reference_mapping:
+      nakama: The local development path gate should make setup, configuration, migrations, and examples credible before shared online-service expansion.
+      pitaya: The local development path gate should preserve Go server lifecycle clarity and explicit local runtime ergonomics before broader routing or push work.
+    target_stage: prototype_ready_foundation
+    planning_only: true
+    gate_only: true
+    local_setup_path_targeted: true
+    migration_path_targeted: true
+    configuration_secret_posture_targeted: true
+    example_flow_targeted: true
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0199 should define the prototype-ready local development path gate before implementation scope.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

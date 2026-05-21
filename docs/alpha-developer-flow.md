@@ -36,7 +36,7 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: prototype_ready_foundation_execution_plan
+next_direction: prototype_ready_local_development_path_gate
 next_work_status: next_ready
 ```
 
@@ -153,7 +153,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, and product maturity milestones are recorded in `docs/product-maturity-milestones.md`. The next work is `W-0198 Define prototype-ready foundation execution plan`; it should define the smallest path from source-first alpha toward prototype-ready foundation without executing broad announcements, adding hosted deployment, expanding release artifacts, or changing runtime behavior.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, and the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`. The next work is `W-0199 Define prototype-ready local development path gate`; it should define the gate for making setup, migrations, configuration, and example flow credible before implementation changes.
 
 ## 9. Deferred Work
 

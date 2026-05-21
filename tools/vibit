@@ -133,6 +133,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.release_execution_final_authorization",
   "runtime.first_alpha_user_discovery_loop",
   "runtime.first_alpha_feedback_intake_surfaces",
+  "runtime.prototype_ready_foundation_execution_plan",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -24887,6 +24888,293 @@ function checkRuntimeFirstAlphaFeedbackIntakeSurfaces(root, goFiles) {
   });
 }
 
+function checkRuntimePrototypeReadyFoundationExecutionPlan(root, goFiles) {
+  const ruleId = "runtime.prototype_ready_foundation_execution_plan";
+  const decisionPath = "decisions/ADR-0106-prototype-ready-foundation-execution-plan.md";
+  const changePath = "changes/2026-05-22-define-prototype-ready-foundation-execution-plan";
+  const conversationPath = "conversations/2026-05-22-prototype-ready-foundation-execution-plan.md";
+  const standardPath = "docs/prototype-ready-foundation-execution-plan.md";
+  const standardTranslationPath = "docs/prototype-ready-foundation-execution-plan.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0198", "completed")) {
+    ok("prototype-ready foundation execution plan is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for prototype-ready foundation execution plan`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for prototype-ready foundation execution plan`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-126"],
+    [".arch/work-items.yaml", "title: Prototype Ready Foundation Execution Plan"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0198"],
+    [".arch/work-items.yaml", "ADR-0106"],
+    [".arch/work-items.yaml", "id: M-127"],
+    [".arch/work-items.yaml", "title: Prototype Ready Local Development Path Gate"],
+    [".arch/work-items.yaml", "id: W-0199"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "prototype_ready_foundation_execution_plan: ADR-0106"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "prototype_ready_foundation_execution_plan:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0198"],
+    [".arch/runtime.yaml", "decision: ADR-0106"],
+    [".arch/runtime.yaml", "execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md"],
+    [".arch/runtime.yaml", "execution_plan_standard_translation: docs/prototype-ready-foundation-execution-plan.zh-CN.md"],
+    [".arch/runtime.yaml", "prototype_ready_foundation_execution_plan_defined: true"],
+    [".arch/runtime.yaml", "recommended_sequence_recorded: true"],
+    [".arch/runtime.yaml", "candidate_work_items_recorded: true"],
+    [".arch/runtime.yaml", "maturity_stage_mapping_recorded: true"],
+    [".arch/runtime.yaml", "nakama_pitaya_capability_mapping_recorded: true"],
+    [".arch/runtime.yaml", "success_criteria_recorded: true"],
+    [".arch/runtime.yaml", "stop_conditions_recorded: true"],
+    [".arch/runtime.yaml", "selected_first_execution_slice: prototype_ready_local_development_path_gate"],
+    [".arch/runtime.yaml", "prototype_ready_local_development_path_gate_next_ready: true"],
+    [".arch/runtime.yaml", "public_announcements_beyond_github_release_authorized: false"],
+    [".arch/runtime.yaml", "paid_promotion_authorized: false"],
+    [".arch/runtime.yaml", "additional_release_artifacts_authorized: false"],
+    [".arch/runtime.yaml", "hosted_deployment_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "broad_operations_admin_behavior_added: false"],
+    [".arch/runtime.yaml", "product_module_expansion_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "check_rule: runtime.prototype_ready_foundation_execution_plan"],
+    [".arch/runtime.yaml", "prototype_ready_local_development_path_gate:"],
+    [".arch/conventions.yaml", "prototype_ready_foundation_execution_plan:"],
+    [".arch/conventions.yaml", "prototype_ready_foundation_execution_plan_defined: true"],
+    [".arch/conventions.yaml", "check_rule: runtime.prototype_ready_foundation_execution_plan"],
+    [".arch/conventions.yaml", "prototype_ready_local_development_path_gate:"],
+    [".arch/contracts.yaml", "prototype_ready_foundation_execution_plan:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.prototype_ready_foundation_execution_plan"],
+    [".arch/contracts.yaml", "prototype_ready_local_development_path_gate:"],
+    [".arch/reference.yaml", "phase_2di_prototype_ready_foundation_execution_plan"],
+    [".arch/reference.yaml", "check_rule: runtime.prototype_ready_foundation_execution_plan"],
+    [".arch/reference.yaml", "phase_2dj_prototype_ready_local_development_path_gate"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["docs/alpha-developer-flow.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["docs/alpha-developer-flow.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["docs/alpha-developer-flow.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["docs/alpha-acceptance-checklist.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "docs/prototype-ready-foundation-execution-plan.md"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", "W-0199 Define prototype-ready local development path gate"],
+    ["docs/product-maturity-milestones.zh-CN.md", "W-0199 Define prototype-ready local development path gate"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "W-0199 Define prototype-ready local development path gate"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", "W-0199 Define prototype-ready local development path gate"],
+    ["AGENTS.md", "runtime.prototype_ready_foundation_execution_plan"],
+    ["AGENTS.md", "W-0199"],
+    ["AGENTS.zh-CN.md", "runtime.prototype_ready_foundation_execution_plan"],
+    ["AGENTS.zh-CN.md", "W-0199"],
+    ["runtime/AGENTS.md", "runtime.prototype_ready_foundation_execution_plan"],
+    ["runtime/AGENTS.md", "W-0199"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.prototype_ready_foundation_execution_plan"],
+    ["runtime/AGENTS.zh-CN.md", "W-0199"],
+    ["rules/check-rules.json", "runtime.prototype_ready_foundation_execution_plan"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0106",
+      "docs/prototype-ready-foundation-execution-plan.md",
+      "runtime.prototype_ready_foundation_execution_plan",
+      "completed_work_item: W-0198",
+      "next_direction: prototype_ready_local_development_path_gate",
+      "W-0199 Define prototype-ready local development path gate",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0198",
+      "completed_milestone: M-126",
+      "previous_completed_work_item: W-0197",
+      "next_milestone: M-127",
+      "next_work_item: W-0199",
+      "next_work_item_status: next_ready",
+      "prototype_ready_foundation_execution_plan_defined: true",
+      "prototype_ready_foundation_execution_plan_check_rule: runtime.prototype_ready_foundation_execution_plan",
+      "execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md",
+      "source_stage: source_first_alpha",
+      "target_stage: prototype_ready_foundation",
+      "recommended_sequence_recorded: true",
+      "candidate_work_items_recorded: true",
+      "maturity_stage_mapping_recorded: true",
+      "nakama_pitaya_capability_mapping_recorded: true",
+      "success_criteria_recorded: true",
+      "stop_conditions_recorded: true",
+      "selected_first_execution_slice: prototype_ready_local_development_path_gate",
+      "prototype_ready_local_development_path_gate_next_ready: true",
+      "public_announcements_beyond_github_release_authorized_by_this_change: false",
+      "paid_promotion_authorized_by_this_change: false",
+      "additional_release_artifacts_authorized_by_this_change: false",
+      "hosted_deployment_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "broad_operations_admin_behavior_added: false",
+      "product_module_expansion_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [standardPath]: [
+      "prototype_ready_foundation_execution_plan: defined",
+      "completed_work_item: W-0198",
+      "decision: ADR-0106",
+      "check_rule: runtime.prototype_ready_foundation_execution_plan",
+      "source_stage: source_first_alpha",
+      "target_stage: prototype_ready_foundation",
+      "recommended_sequence_recorded: true",
+      "candidate_work_items_recorded: true",
+      "maturity_stage_mapping_recorded: true",
+      "nakama_pitaya_capability_mapping_recorded: true",
+      "selected_first_execution_slice: prototype_ready_local_development_path_gate",
+      "W-0199 Define prototype-ready local development path gate",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "prototype_ready_foundation_execution_plan: defined",
+      "completed_work_item: W-0198",
+      "decision: ADR-0106",
+      "check_rule: runtime.prototype_ready_foundation_execution_plan",
+      "source_stage: source_first_alpha",
+      "target_stage: prototype_ready_foundation",
+      "recommended_sequence_recorded: true",
+      "candidate_work_items_recorded: true",
+      "maturity_stage_mapping_recorded: true",
+      "nakama_pitaya_capability_mapping_recorded: true",
+      "selected_first_execution_slice: prototype_ready_local_development_path_gate",
+      "W-0199 Define prototype-ready local development path gate",
+      "Stop Conditions",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /public_announcements_beyond_github_release_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "public announcement authorization" },
+    { pattern: /public_announcement_executed:\s*true/, label: "public announcement execution" },
+    { pattern: /paid_promotion_(?:authorized|executed)(?:_by_this_(?:decision|change))?:\s*true/, label: "paid promotion" },
+    { pattern: /hosted_deployment_(?:authorized|added)(?:_by_this_(?:decision|change))?:\s*true/, label: "hosted deployment" },
+    { pattern: /additional_release_artifacts_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "additional release artifacts" },
+    { pattern: /release_binary_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release binary" },
+    { pattern: /release_package_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release package" },
+    { pattern: /release_container_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release container" },
+    { pattern: /release_checksum_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release checksum" },
+    { pattern: /release_provenance_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release provenance" },
+    { pattern: /release_signing_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release signing" },
+    { pattern: /install_script_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "install script" },
+    { pattern: /registry_publication_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "registry publication" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /startup_configuration_semantics_changed:\s*true/, label: "startup configuration semantic change" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_added:\s*true/, label: "migration addition" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses prototype-ready execution plan boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bprototype_ready_foundation_execution_plan\b|\bprototype_ready_local_development_path_gate\b|\bPrototypeReady\b|\bLocalDevelopmentPath\b|\bPaidPromotion\b|\bHostedDemo\b|\bReleaseArtifact\b/, label: "prototype-ready planning runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for prototype-ready planning: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("prototype-ready foundation execution plan is defined while runtime, protocol, generated-output, migration, dependency, operations, authentication/session, artifact, hosted deployment, announcement, paid promotion, product-scope, and direct compatibility deferrals remain preserved", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -26562,6 +26850,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0198", "next_ready_work_item: W-0199"],
     ["W-0197", "next_ready_work_item: W-0198"],
     ["W-0195", "next_ready_work_item: W-0196"],
     ["W-0196", "next_ready_work_item: W-0197"],
@@ -26588,6 +26877,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0198", "completed")) {
+    return "next_work_item: W-0199";
+  }
   if (workItemHasStatus(root, "W-0197", "completed")) {
     return "next_work_item: W-0198";
   }
@@ -26611,6 +26903,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0198", "prototype_ready_local_development_path_gate"],
     ["W-0197", "prototype_ready_foundation_execution_plan"],
     ["W-0196", "first_alpha_feedback_intake_surfaces"],
     ["W-0195", "first_alpha_user_discovery"],
@@ -26637,6 +26930,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0198", "W-0199 Define prototype-ready local development path gate"],
     ["W-0197", "W-0198 Define prototype-ready foundation execution plan"],
     ["W-0196", "W-0197 Prepare first alpha feedback intake surfaces"],
     ["W-0195", "W-0196 Define first alpha user discovery loop"],
@@ -26664,6 +26958,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0198", "current_phase: prototype_ready_local_development_path_gate"],
     ["W-0197", "current_phase: prototype_ready_foundation_execution_plan"],
     ["W-0196", "current_phase: first_alpha_feedback_intake_surfaces"],
     ["W-0195", "current_phase: first_alpha_user_discovery"],
@@ -27219,6 +27514,7 @@ function checkRuntime(root) {
   checkRuntimeReleaseExecutionFinalAuthorization(root, goFiles);
   checkRuntimeFirstAlphaUserDiscoveryLoop(root, goFiles);
   checkRuntimeFirstAlphaFeedbackIntakeSurfaces(root, goFiles);
+  checkRuntimePrototypeReadyFoundationExecutionPlan(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

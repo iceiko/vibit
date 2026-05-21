@@ -185,15 +185,17 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after preparing feedback intake is:
+The next product direction after the prototype-ready execution plan is:
 
 ```text
-W-0198 Define prototype-ready foundation execution plan
+W-0199 Define prototype-ready local development path gate
 ```
 
-The next plan should choose the smallest sequence that moves vibit from source-first alpha toward prototype-ready foundation. It should use early feedback where available, but it should not block forever waiting for feedback before defining the first prototype-ready execution plan.
+The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`. The next work should define the gate for a repeatable local development path before implementation changes. It should make setup, migrations, configuration, and example flow credible enough for later prototype-ready implementation slices.
 
-Candidate focus areas:
+The prior direction `W-0198 Define prototype-ready foundation execution plan` is completed and remains the trace from feedback intake into the Stage 2 execution plan.
+
+The recorded candidate focus areas remain:
 
 - reduce local setup friction;
 - add a clearer example client or example app path;
@@ -202,7 +204,7 @@ Candidate focus areas:
 - strengthen concurrency and failure-path verification for the existing authenticated loop;
 - define the minimum operations inspection surface needed before serious prototype use.
 
-The plan must preserve ask-first boundaries for runtime behavior, protocol, generated output, migrations, dependencies, operations/admin breadth, release artifacts, hosted deployments, public announcements, authentication/session behavior changes, broad product modules, and direct Nakama/Pitaya compatibility.
+Future work must preserve ask-first boundaries for runtime behavior, protocol, generated output, migrations, dependencies, operations/admin breadth, release artifacts, hosted deployments, public announcements, authentication/session behavior changes, broad product modules, and direct Nakama/Pitaya compatibility.
 
 ## 8. Non-Authorization
 

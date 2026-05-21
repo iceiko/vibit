@@ -106,7 +106,7 @@ parity_capability_families:
 当前缺口：
 
 - Source-first alpha 已经可见，但下一产品阶段仍需要明确的 prototype-ready foundation execution plan。
-- 从当前 feedback intake loop 走向 storage objects、messaging/push、更完整 examples、operations inspection、social、competitive、matchmaking、match runtime、SDKs 和 distributed runtime 的路径，需要通过 product maturity milestones 排序。
+- Prototype-ready foundation execution plan 已记录，下一项 work 必须先定义 local development path gate，再进入扩大 shared online services 的 implementation slices。
 
 ## 5. 阶段计划
 
@@ -152,7 +152,8 @@ current_near_term_priority: protocol_logout_and_connection_lifecycle
 ```text
 phase_2p_prototype_ready_foundation: next_product_stage
 standard: docs/product-maturity-milestones.md
-next_work_item: W-0198 Define prototype-ready foundation execution plan
+execution_plan: docs/prototype-ready-foundation-execution-plan.md
+next_work_item: W-0199 Define prototype-ready local development path gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。

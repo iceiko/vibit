@@ -184,15 +184,17 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-准备好反馈入口后的下一个产品方向是：
+Prototype-ready execution plan 之后的下一个产品方向是：
 
 ```text
-W-0198 Define prototype-ready foundation execution plan
+W-0199 Define prototype-ready local development path gate
 ```
 
-下一份计划应选择最小序列，把 vibit 从 source-first alpha 推向 prototype-ready foundation。它应尽可能使用 early feedback，但不应永远等待反馈才定义第一份 prototype-ready execution plan。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`。下一项 work 应先定义可重复 local development path 的 gate，再进入实现改动。它应让 setup、migrations、configuration 和 example flow 对后续 prototype-ready implementation slices 足够可信。
 
-候选重点：
+上一项方向 `W-0198 Define prototype-ready foundation execution plan` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 的追溯记录。
+
+已记录的候选重点仍包括：
 
 - 降低 local setup friction；
 - 添加更清晰的 example client 或 example app path；
@@ -201,7 +203,7 @@ W-0198 Define prototype-ready foundation execution plan
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。
 
-该计划必须保留 runtime behavior、protocol、generated output、migrations、dependencies、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
+后续 work 必须保留 runtime behavior、protocol、generated output、migrations、dependencies、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
 
 ## 8. 非授权声明
 

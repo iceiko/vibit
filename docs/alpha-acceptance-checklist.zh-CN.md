@@ -122,7 +122,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`。下一步 work 是 `W-0198 Define prototype-ready foundation execution plan`。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`。下一步 work 是 `W-0199 Define prototype-ready local development path gate`。
 
 ## 11. Release Deferrals
 
@@ -154,6 +154,6 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
-next_direction: prototype_ready_foundation_execution_plan
+next_direction: prototype_ready_local_development_path_gate
 next_work_status: next_ready
 ```
