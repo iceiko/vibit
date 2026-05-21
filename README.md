@@ -1,62 +1,73 @@
 # vibit
 
-vibit is an open-source agent-native server framework for building backends that AI coding agents can understand, extend, verify, and maintain from first principles.
+vibit is an open-source **agent-native server framework** for building backends that AI coding agents and human developers can understand, extend, verify, and maintain from first principles.
 
-Status: pre-alpha, building toward `v0.1 alpha`
+Latest source alpha: `v0.1.0-alpha.1`
 
-The short-term target is a first developer-usable `v0.1 alpha`: a single-node, PostgreSQL-backed, WebSocket + Protobuf game backend runtime that real developers can run locally, inspect, and use as a contribution starting point.
+This is an early alpha for developers who want to inspect the architecture, run the first authenticated gameplay loop locally, and help shape an AI-maintainable backend framework. It is not a production server distribution yet.
 
-The long-term target is an AI-era Nakama or Pitaya: the same class of serious game/backend server capability, adapted around vibit's agent-native maintainability model. This does not mean direct Nakama or Pitaya API compatibility.
+## Why Try It
 
-## What Exists Today
+Most backend frameworks were designed before AI coding agents became part of the engineering loop. They may be powerful, but their architecture rules, ownership boundaries, change history, and verification paths are often scattered across code, docs, issues, and maintainer memory.
+
+vibit is testing a stricter model:
+
+- architecture rules live in machine-readable manifests;
+- changes are bounded by work items, specs, ADRs, and verification records;
+- public behavior is contract-first;
+- generated output is traceable;
+- module ownership is explicit;
+- agents can inspect the next safe task with `tools/vibit`;
+- humans can audit why a change exists without reading old chats.
+
+The first domain focus is game/backend servers. The long-term target is an AI-era Nakama/Pitaya-class open-source backend framework, adapted around agent-native maintainability rather than direct API compatibility.
+
+## Try The Alpha
+
+Fastest source checkout path:
+
+```bash
+git clone https://github.com/iceiko/vibit.git
+cd vibit
+node tools/vibit check all
+cd runtime && go test ./...
+cd .. && examples/local-alpha-request-loop.sh
+```
+
+What this proves today:
+
+- repository architecture checks run through `tools/vibit`;
+- Go runtime tests pass;
+- the local alpha request loop exercises the authenticated gameplay path;
+- the script avoids printing raw credentials, raw access tokens, verifier keys, DSNs, digests, or transport metadata.
+
+Prerequisites:
+
+- Go;
+- Node.js;
+- PostgreSQL for the persistent runtime path;
+- Buf and Protobuf tooling only when regenerating Protobuf output.
+
+## What Exists
 
 The repository has moved beyond a pure design phase. Current implemented foundation includes:
 
-- Agent-readable governance: `CONSTITUTION.md`, `AGENTS.md`, change specs, ADRs, conversation logs, and machine-readable architecture manifests.
-- A Go runtime under `runtime/`.
-- A WebSocket gameplay endpoint at `/v1/ws`.
-- A Protobuf envelope and generated Go Protobuf output.
-- PostgreSQL migration sources and platform persistence adapters.
-- An inventory proof slice.
-- Player account persistence boundaries and adapters.
-- Device credential login service behavior and protocol route.
-- Opaque access-token validation for protected routes.
-- Logout service behavior and protocol route.
-- Runtime session persistence and response session metadata.
-- First-message WebSocket connection binding.
-- Single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot.
+- Go runtime under `runtime/`;
+- WebSocket gameplay endpoint at `/v1/ws`;
+- Protobuf envelope and generated Go Protobuf output;
+- PostgreSQL migration sources and platform persistence adapters;
+- inventory proof slice;
+- player account persistence boundaries and adapters;
+- local onboarding/device credential issuance for development;
+- device credential login service behavior and protocol route;
+- opaque access-token validation for protected routes;
+- runtime session persistence and response session metadata;
+- first-message WebSocket connection binding;
+- protected inventory and protected presence query path;
+- logout service behavior and protocol route;
+- single-process active connection lifecycle, close handoff, reconnect epoch handling, and presence lifecycle snapshot;
+- health, readiness, version, and redacted config endpoints;
 - `tools/vibit` checks and inspection commands for agents and humans.
-
-This is not yet a finished alpha. The authenticated gameplay end-to-end path is now proven in a focused Go test, the runbook and request-loop script exist, the runtime exposes a small health/readiness/version/config surface, the alpha acceptance checklist records the local readiness state, `docs/alpha-developer-flow.md` packages those entry points into one coherent local developer journey, `docs/release-publishing-decision-gate.md` defines the release publishing decision boundary, `docs/release-execution-preparation-gate.md` defines the release execution preparation boundary, `docs/release-execution-authorization-gate.md` defines the release execution authorization criteria, `docs/release-execution-maintainer-decision.md` records the go-to-plan decision, and `docs/release-identifier-artifact-plan.md` defines the proposed `v0.1.0-alpha.1` identifier and source-first artifact plan. Release execution is currently blocked on final maintainer authorization before any tag, release record, or artifact can be created.
-
-## Try It Locally
-
-Prerequisites for the current development workflow:
-
-- Go, for the runtime.
-- Node.js, for `tools/vibit`.
-- PostgreSQL, when using the persistent runtime path.
-- Buf and Protobuf tooling, when regenerating Protobuf output.
-
-Run the repository checks:
-
-```bash
-node tools/vibit check all
-```
-
-Run the Go runtime tests:
-
-```bash
-cd runtime
-go test ./...
-```
-
-Start the bootstrap in-memory runtime:
-
-```bash
-cd runtime
-go run ./cmd/vibit-server
-```
 
 The runtime listens on `:8080` by default and mounts:
 
@@ -68,69 +79,49 @@ The runtime listens on `:8080` by default and mounts:
 /configz
 ```
 
-The endpoint expects binary WebSocket messages containing `vibit.protocol.v1.Envelope` Protobuf bytes. JSON is not accepted on this gameplay endpoint.
+`/v1/ws` expects binary WebSocket messages containing `vibit.protocol.v1.Envelope` Protobuf bytes. JSON is not accepted on this gameplay endpoint.
 
 `/healthz`, `/readyz`, `/version`, and `/configz` are small JSON troubleshooting endpoints. `/configz` reports only redacted runtime posture, not verifier keys, raw credentials, raw tokens, DSNs, digests, headers, cookies, query strings, subprotocol values, remote addresses, or concrete transport metadata.
 
-The PostgreSQL runtime path is more complete, but it requires migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md` for the current operational notes. The runbook is part of the v0.1 alpha hardening path and should be treated as development documentation, not a polished release guide.
+## Who This Is For
 
-## Next Target: v0.1 Alpha
+Try vibit now if you:
 
-The durable target is recorded in `docs/v0.1-alpha-goal.md`.
+- build or operate game/backend servers;
+- have used or evaluated Nakama, Pitaya, Colyseus, Pomelo, Agones, or custom Go backends;
+- want AI coding agents to make safer changes in a serious backend codebase;
+- care about explicit architecture, contracts, generated structure, tests, and durable decision records;
+- want to help define the first useful agent-native server framework shape before it hardens.
 
-The current local acceptance checklist is recorded in `docs/alpha-acceptance-checklist.md`.
+This alpha is not yet for production deployment, plug-and-play SDK use, hosted operations, or teams looking for packaged binaries and containers.
 
-The packaged local developer journey is recorded in `docs/alpha-developer-flow.md`.
+## Current Limits
 
-The release publishing decision gate is recorded in `docs/release-publishing-decision-gate.md`.
+`v0.1.0-alpha.1` is source-first:
 
-The release execution preparation gate is recorded in `docs/release-execution-preparation-gate.md`.
+- no release binaries;
+- no packages;
+- no container images;
+- no checksum files;
+- no provenance or signing artifacts;
+- no hosted deployment;
+- no install script;
+- no SDK package;
+- no direct Nakama/Pitaya API compatibility promise.
 
-The release execution authorization gate is recorded in `docs/release-execution-authorization-gate.md`.
+The PostgreSQL runtime path is the most complete local path, but it still expects development setup: migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md`.
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`.
+## Release Notes
 
-The release identifier and artifact plan is recorded in `docs/release-identifier-artifact-plan.md`.
+Release notes for the source alpha live at:
 
-`v0.1 alpha` should let a technically capable developer:
+- `docs/releases/v0.1.0-alpha.1.md`
+- `docs/releases/v0.1.0-alpha.1.zh-CN.md`
 
-- clone the repo,
-- prepare local config without committing secrets,
-- apply or verify required PostgreSQL migrations,
-- create or obtain a first device credential,
-- login through the protocol route,
-- receive an opaque access token and runtime session metadata,
-- bind a WebSocket connection,
-- call a protected inventory route,
-- query presence,
-- logout,
-- run checks,
-- and identify a concrete next contribution.
+The release authorization record is:
 
-Recommended next sequence:
-
-1. Complete `W-0178`: protected presence protocol query. Completed.
-2. Define and add first local onboarding/device credential issuance. Completed.
-3. Select and prove onboarding -> login -> bind connection -> protected inventory -> presence query -> logout end to end. Completed.
-4. Refresh the runtime runbook around the actual alpha path. Completed.
-5. Add a minimal example client or request-loop script. Completed.
-6. Add health/readiness/version/config surfaces. Completed.
-7. Add an alpha acceptance checklist or check. Completed.
-8. Package the alpha developer flow and document prerequisites. Completed.
-9. Define the release publishing decision gate. Completed.
-10. Define the release execution preparation gate. Completed.
-11. Define the release execution authorization gate. Completed.
-12. Confirm the release execution maintainer decision. Completed as go to release identifier and artifact planning.
-13. Define the release identifier and artifact plan. Completed with proposed identifier `v0.1.0-alpha.1`.
-14. Confirm release execution final authorization. Blocked pending maintainer decision.
-
-Run the minimal local alpha request loop with:
-
-```bash
-examples/local-alpha-request-loop.sh
-```
-
-It wraps the focused authenticated gameplay E2E proof and does not print raw credentials, raw access tokens, verifier keys, DSNs, digests, or transport metadata.
+- `docs/release-execution-final-authorization.md`
+- `decisions/ADR-0103-release-execution-final-authorization.md`
 
 ## Continue Development
 
@@ -141,10 +132,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-At the time of this README update, there is no next ready item because release execution is intentionally blocked at:
+The current next work item is:
 
 ```text
-W-0195 Confirm release execution final authorization
+W-0196 Define first alpha user discovery loop
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
@@ -155,14 +146,14 @@ Agent-native does not primarily mean that the server has AI features.
 
 It means the codebase is designed so AI coding agents can work inside it reliably:
 
-- architecture rules are explicit,
-- module ownership is declared,
-- public behavior is contract-first,
-- generated structure is traceable,
-- business rules are tested,
-- change workflow is bounded,
-- repository state is checkable,
-- and project memory is stored in durable artifacts instead of chat history.
+- architecture rules are explicit;
+- module ownership is declared;
+- public behavior is contract-first;
+- generated structure is traceable;
+- business rules are tested;
+- change workflow is bounded;
+- repository state is checkable;
+- project memory is stored in durable artifacts instead of chat history.
 
 AI gameplay features such as NPC agents, memory, model routing, tool calling, and simulations may become extensions later. They are not the foundation.
 
@@ -193,11 +184,13 @@ Important entry points:
 - `.arch/reference.yaml`: Nakama/Pitaya reference and product parity planning.
 - `docs/v0.1-alpha-goal.md`: short-term alpha and long-term product target.
 - `docs/alpha-developer-flow.md`: packaged local alpha developer journey.
+- `docs/alpha-acceptance-checklist.md`: local v0.1 alpha acceptance checklist.
+- `docs/runtime-runbook.md`: current runtime startup and verification notes.
 - `docs/release-publishing-decision-gate.md`: release publishing decision boundary.
 - `docs/release-execution-preparation-gate.md`: release execution preparation boundary.
 - `docs/release-execution-authorization-gate.md`: release execution authorization criteria.
-- `docs/alpha-acceptance-checklist.md`: local v0.1 alpha acceptance checklist.
-- `docs/runtime-runbook.md`: current runtime startup and verification notes.
+- `docs/release-execution-final-authorization.md`: final release authorization record.
+- `docs/releases/v0.1.0-alpha.1.md`: alpha release notes.
 - `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
 - `changes/`: concrete change specs and verification records.
 - `conversations/`: durable maintainer-agent project memory.

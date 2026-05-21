@@ -32,12 +32,14 @@ release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
 release_identifier_artifact_plan_defined: true
+release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
-next_direction: release_execution_final_authorization
-next_work_status: blocked
+authorized_release_identifier: v0.1.0-alpha.1
+next_direction: first_alpha_user_discovery
+next_work_status: next_ready
 ```
 
-Repository 仍是 pre-alpha。Packaged flow 已准备好进行 local review，release identifier plan 现在提出 `v0.1.0-alpha.1` 和 source-first future artifact surface。发布 `v0.1 alpha`、选择 identifier for execution、创建 tags 或 artifacts、执行 release commands 仍 blocked，等待后续明确 maintainer authorization。
+Repository 已获得 `v0.1.0-alpha.1` 的 source-first alpha authorization。Packaged flow 已准备好进行 local review，授权 release surface 仍只包括 Git tag、GitHub release record、release notes 和 GitHub source archive。Binaries、packages、containers、checksums、signing/provenance artifacts、hosted deployment、install scripts、registry publication，以及 GitHub release record 之外的 public announcements 继续 deferred。
 
 ## 3. 推荐 Journey
 
@@ -150,7 +152,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`。下一步 work blocked 在 `W-0195 Confirm release execution final authorization`；任何 tag、artifact、hosted deployment、GitHub release record 或 release publication command 之前都必须记录 final maintainer approval 或 no-go。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`。下一步 work 是 `W-0196 Define first alpha user discovery loop`；它应定义如何找到早期开发者，同时不扩大 runtime behavior 或 release artifacts。
 
 ## 9. Deferred Work
 

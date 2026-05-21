@@ -123,15 +123,14 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, and the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`. The next work is blocked at `W-0195 Confirm release execution final authorization`; it must record final maintainer approval or no-go before creating release identifiers for execution, tags, artifacts, hosted deployments, GitHub release records, publication surfaces, or release execution commands.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, and final authorization is recorded in `docs/release-execution-final-authorization.md`. The next work is `W-0196 Define first alpha user discovery loop`.
 
 ## 11. Release Deferrals
 
 The following remain deferred until a later explicit work item:
 
-- Publishing `v0.1 alpha`.
-- Selecting release identifiers for execution.
-- Creating release tags, binaries, archives, containers, packages, checksums, provenance files, or hosted deployments.
+- Creating additional release artifacts beyond the GitHub source archive.
+- Creating release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publications, or hosted deployments.
 - Adding a public local onboarding protocol route.
 - Adding production signup, external identity providers, password login, account recovery, account merge, or multi-device linking.
 - Adding broad operations/admin behavior, metrics backend integration, or production observability.
@@ -151,9 +150,11 @@ release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
 release_identifier_artifact_plan_defined: true
+release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
-release_declared: false
-release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_final_authorization
-next_work_status: blocked
+authorized_release_identifier: v0.1.0-alpha.1
+release_declared: true
+release_publishing_authorized_by_this_checklist: true
+next_direction: first_alpha_user_discovery
+next_work_status: next_ready
 ```

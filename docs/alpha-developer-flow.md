@@ -33,12 +33,14 @@ release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
 release_identifier_artifact_plan_defined: true
+release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
-next_direction: release_execution_final_authorization
-next_work_status: blocked
+authorized_release_identifier: v0.1.0-alpha.1
+next_direction: first_alpha_user_discovery
+next_work_status: next_ready
 ```
 
-The repository remains pre-alpha. The packaged flow is ready for local review, and the release identifier plan now proposes `v0.1.0-alpha.1` with a source-first future artifact surface. Publishing `v0.1 alpha`, selecting the identifier for execution, creating tags or artifacts, and executing release commands remain blocked on later explicit maintainer authorization.
+The repository has a source-first alpha authorization for `v0.1.0-alpha.1`. The packaged flow is ready for local review, and the authorized release surface remains Git tag, GitHub release record, release notes, and GitHub source archive only. Binaries, packages, containers, checksums, signing/provenance artifacts, hosted deployment, install scripts, registry publication, and public announcements beyond the GitHub release record remain deferred.
 
 ## 3. Recommended Journey
 
@@ -151,7 +153,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, and the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`. The next work is blocked at `W-0195 Confirm release execution final authorization`; it must record final maintainer approval or no-go before any tag, artifact, hosted deployment, GitHub release record, or release publication command.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, and final authorization is recorded in `docs/release-execution-final-authorization.md`. The next work is `W-0196 Define first alpha user discovery loop`; it should define how to find early developers without expanding runtime behavior or release artifacts.
 
 ## 9. Deferred Work
 

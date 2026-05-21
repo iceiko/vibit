@@ -1,0 +1,183 @@
+schema_version: 0.1
+change_id: confirm-release-execution-final-authorization
+date: 2026-05-21
+type: docs
+status: verified
+
+summary: Record final maintainer go authorization for the source-first v0.1.0-alpha.1 release, refresh README for user trial, and prepare the authorized tag plus GitHub release surface.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0103
+  referenced:
+    - ADR-0102
+    - ADR-0101
+    - ADR-0100
+    - ADR-0099
+    - ADR-0098
+    - ADR-0097
+    - ADR-0096
+    - ADR-0095
+    - ADR-0094
+    - ADR-0093
+    - ADR-0092
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0195
+  completed_milestone: M-123
+  previous_completed_work_item: W-0194
+  next_milestone: M-124
+  next_work_item: W-0196
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: release_execution_final_authorization
+  next_direction: first_alpha_user_discovery
+  release_execution_final_authorization_recorded: true
+  release_execution_final_authorization_decision: ADR-0103
+  release_execution_final_authorization_check_rule: runtime.release_execution_final_authorization
+  authorization_standard: docs/release-execution-final-authorization.md
+  authorization_standard_translation: docs/release-execution-final-authorization.zh-CN.md
+  maintainer_decision: go
+  authorized_release_identifier: v0.1.0-alpha.1
+  release_identifier_selected_for_execution: true
+  release_declared: true
+  release_publishing_authorized_by_this_change: true
+  release_execution_commands_authorized_by_this_change: true
+  release_tag_authorized_by_this_change: true
+  github_release_authorized_by_this_change: true
+  release_notes_authorized_by_this_change: true
+  hosting_platform_source_archive_authorized_by_this_change: true
+  release_artifacts_authorized_by_this_change: source_archive_only
+  release_binary_authorized_by_this_change: false
+  release_package_authorized_by_this_change: false
+  release_container_authorized_by_this_change: false
+  release_checksum_authorized_by_this_change: false
+  release_provenance_authorized_by_this_change: false
+  release_signing_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  install_script_authorized_by_this_change: false
+  registry_publication_authorized_by_this_change: false
+  public_announcement_authorized_by_this_change: github_release_record_only
+  readme_user_acquisition_refresh_authorized: true
+  release_notes_file: docs/releases/v0.1.0-alpha.1.md
+  release_notes_translation: docs/releases/v0.1.0-alpha.1.zh-CN.md
+  release_tag_to_create_after_verification: v0.1.0-alpha.1
+  github_release_to_create_after_verification: v0.1.0-alpha.1
+  local_v0_1_tags_found_before_execution: false
+  remote_origin_v0_1_tags_found_before_execution: false
+  github_release_record_for_v0_1_0_alpha_1_found_before_execution: false
+  release_tag_created: pending_after_verification
+  github_release_created: pending_after_verification
+  release_binary_created: false
+  release_archive_created: source_archive_hosting_platform_only
+  release_container_created: false
+  release_package_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change confirm-release-execution-final-authorization --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+    - git status --short --branch
+    - git tag --list 'v0.1*'
+    - git ls-remote --tags origin 'refs/tags/v0.1*'
+    - GitHub release lookup for v0.1.0-alpha.1
+  known_warning_accepted_for_release:
+    - runtime.identity_boundary
+  stop_conditions:
+    - version_conflict
+    - verification_failure
+    - new_untriaged_warning
+    - target_commit_changed_after_verification
+    - unredacted_secret_in_release_notes_or_readme
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/release-execution-final-authorization.md records final release authorization.
+    - docs/releases/v0.1.0-alpha.1.md records release notes.
+    - README.md is refreshed as the external alpha user entry point.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: true
+  release_identifier_selected: true
+  release_artifacts_authorized: source_archive_only
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change confirm-release-execution-final-authorization --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+  status: Verified

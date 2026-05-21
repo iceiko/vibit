@@ -104,17 +104,19 @@ purpose: >
   release_execution_authorization_gate: ADR-0100
   release_execution_maintainer_decision: ADR-0101
   release_identifier_artifact_plan: ADR-0102
+  release_execution_final_authorization: ADR-0103
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: release_execution_final_authorization
+  current_phase: first_alpha_user_discovery
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
-  release_declared: false
-  blocked_work_item: W-0195
+  release_declared: true
+  release_identifier: v0.1.0-alpha.1
+  next_ready_work_item: W-0196
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5897,20 +5899,54 @@ identity_session_boundary:
     rule: W-0194 defined proposed release identifier v0.1.0-alpha.1 and a source-first future artifact plan without creating tags, artifacts, GitHub releases, hosted deployments, or publication commands.
 
   release_execution_final_authorization:
-    status: blocked
+    status: completed
     milestone: M-123
-    blocked_work_item: W-0195
+    completed_work_item: W-0195
+    decision: ADR-0103
+    change: changes/2026-05-21-confirm-release-execution-final-authorization
+    next_milestone: M-124
+    next_ready_work_item: W-0196
     previous_completed_work_item: W-0194
     selected_direction: release_execution_final_authorization
+    next_direction: first_alpha_user_discovery
     expected_change: changes/2026-05-21-confirm-release-execution-final-authorization
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
-    proposed_release_identifier: v0.1.0-alpha.1
-    release_declared: false
-    release_publishing_authorized_by_current_state: false
-    release_execution_commands_authorized_by_current_state: false
-    release_tag_created: false
-    release_artifacts_created: false
+    authorization_standard: docs/release-execution-final-authorization.md
+    authorization_standard_translation: docs/release-execution-final-authorization.zh-CN.md
+    release_execution_final_authorization_recorded: true
+    maintainer_decision: go
+    authorized_release_identifier: v0.1.0-alpha.1
+    release_identifier_selected_for_execution: true
+    release_declared: true
+    release_publishing_authorized_by_this_decision: true
+    release_execution_commands_authorized_by_this_decision: true
+    release_tag_authorized_by_this_decision: true
+    github_release_authorized_by_this_decision: true
+    release_notes_authorized_by_this_decision: true
+    hosting_platform_source_archive_authorized_by_this_decision: true
+    release_artifacts_authorized_by_this_decision: source_archive_only
+    release_binary_authorized_by_this_decision: false
+    release_package_authorized_by_this_decision: false
+    release_container_authorized_by_this_decision: false
+    release_checksum_authorized_by_this_decision: false
+    release_provenance_authorized_by_this_decision: false
+    release_signing_authorized_by_this_decision: false
+    hosted_deployment_authorized_by_this_decision: false
+    install_script_authorized_by_this_decision: false
+    registry_publication_authorized_by_this_decision: false
+    public_announcement_authorized_by_this_decision: github_release_record_only
+    readme_user_acquisition_refresh_authorized: true
+    release_notes_file: docs/releases/v0.1.0-alpha.1.md
+    release_notes_translation: docs/releases/v0.1.0-alpha.1.zh-CN.md
+    release_tag_created: pending_after_verification
+    github_release_created: pending_after_verification
+    release_artifacts_created: source_archive_hosting_platform_only
+    release_binary_created: false
+    release_package_created: false
+    release_container_created: false
+    release_checksum_created: false
+    release_provenance_created: false
     hosted_deployment_added: false
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
@@ -5922,7 +5958,34 @@ identity_session_boundary:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0195 is blocked until the maintainer explicitly authorizes or rejects release execution after reviewing the release identifier and artifact plan.
+    check_rule: runtime.release_execution_final_authorization
+    rule: W-0195 recorded final maintainer go authorization for v0.1.0-alpha.1, source archive only, and README user-acquisition refresh while preserving runtime, protocol, generated-output, migration, dependency, hosted deployment, broad artifact, and direct compatibility deferrals.
+
+  first_alpha_user_discovery:
+    status: next_ready
+    milestone: M-124
+    next_ready_work_item: W-0196
+    previous_completed_work_item: W-0195
+    selected_direction: first_alpha_user_discovery
+    expected_change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    release_identifier: v0.1.0-alpha.1
+    source_first_alpha_release_authorized: true
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0196 should define a bounded user discovery loop without expanding release artifacts or runtime scope.
 
 persistence_model:
   decision: ADR-0011

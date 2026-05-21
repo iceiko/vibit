@@ -122,15 +122,14 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`。下一步 work blocked 在 `W-0195 Confirm release execution final authorization`；任何 release identifiers for execution、tags、artifacts、hosted deployments、GitHub release records、publication surfaces 或 release execution commands 之前，都必须记录 final maintainer approval 或 no-go。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`。下一步 work 是 `W-0196 Define first alpha user discovery loop`。
 
 ## 11. Release Deferrals
 
 以下内容继续 deferred，直到后续明确 work item 授权：
 
-- 发布 `v0.1 alpha`。
-- 选择 release identifiers for execution。
-- 创建 release tags、binaries、archives、containers、packages、checksums、provenance files 或 hosted deployments。
+- 创建 GitHub source archive 之外的 additional release artifacts。
+- 创建 release binaries、packages、containers、checksums、provenance files、signing artifacts、install scripts、registry publications 或 hosted deployments。
 - 添加 public local onboarding protocol route。
 - 添加 production signup、external identity providers、password login、account recovery、account merge 或 multi-device linking。
 - 添加 broad operations/admin behavior、metrics backend integration 或 production observability。
@@ -150,9 +149,11 @@ release_execution_preparation_gate_defined: true
 release_execution_authorization_gate_defined: true
 release_execution_maintainer_decision_recorded: true
 release_identifier_artifact_plan_defined: true
+release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
-release_declared: false
-release_publishing_authorized_by_this_checklist: false
-next_direction: release_execution_final_authorization
-next_work_status: blocked
+authorized_release_identifier: v0.1.0-alpha.1
+release_declared: true
+release_publishing_authorized_by_this_checklist: true
+next_direction: first_alpha_user_discovery
+next_work_status: next_ready
 ```

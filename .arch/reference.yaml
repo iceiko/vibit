@@ -30,10 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: pre_alpha
-  release_declared: false
-  immediate_next_work_item: W-0178
-  immediate_next_direction: define_presence_protocol_query_functional_slice
+  current_state: v0.1_alpha_source_release_authorized
+  release_declared: true
+  release_identifier: v0.1.0-alpha.1
+  immediate_next_work_item: W-0196
+  immediate_next_direction: first_alpha_user_discovery
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
@@ -3571,22 +3572,38 @@ phase_plan:
     check_rule: runtime.release_identifier_artifact_plan
     rule: W-0194 defined release identifier and artifact planning without creating release artifacts or direct compatibility.
   phase_2df_release_execution_final_authorization:
-    status: blocked
+    status: completed
     milestone: M-123
-    blocked_work_item: W-0195
+    completed_work_item: W-0195
+    decision: ADR-0103
+    change: changes/2026-05-21-confirm-release-execution-final-authorization
+    next_milestone: M-124
+    next_ready_work_item: W-0196
     previous_completed_work_item: W-0194
     alpha_target_alignment: developer_experience
     selected_direction: release_execution_final_authorization
+    next_direction: first_alpha_user_discovery
     expected_change: changes/2026-05-21-confirm-release-execution-final-authorization
     reference_mapping:
       nakama: Final release execution authorization should review public release state and artifact choices before publication.
       pitaya: Final release execution authorization should keep release commands and deployment posture explicit.
-    proposed_release_identifier: v0.1.0-alpha.1
-    release_publishing_authorized_by_current_state: false
-    release_execution_commands_authorized_by_current_state: false
-    release_declared: false
-    release_tag_created: false
-    release_artifacts_created: false
+    authorization_standard: docs/release-execution-final-authorization.md
+    release_execution_final_authorization_recorded: true
+    maintainer_decision: go
+    authorized_release_identifier: v0.1.0-alpha.1
+    release_identifier_selected_for_execution: true
+    release_publishing_authorized_by_this_decision: true
+    release_execution_commands_authorized_by_this_decision: true
+    release_declared: true
+    release_tag_created: pending_after_verification
+    github_release_created: pending_after_verification
+    release_artifacts_created: source_archive_hosting_platform_only
+    release_artifacts_authorized_by_this_decision: source_archive_only
+    release_binary_created: false
+    release_package_created: false
+    release_container_created: false
+    release_checksum_created: false
+    release_provenance_created: false
     release_packaging_added: false
     hosted_deployment_added: false
     runtime_behavior_added: false
@@ -3598,7 +3615,33 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0195 blocks release execution until final maintainer authorization is recorded.
+    check_rule: runtime.release_execution_final_authorization
+    rule: W-0195 records final release execution authorization for the source-first alpha.
+  phase_2dg_first_alpha_user_discovery:
+    status: next_ready
+    milestone: M-124
+    next_ready_work_item: W-0196
+    previous_completed_work_item: W-0195
+    alpha_target_alignment: developer_experience
+    selected_direction: first_alpha_user_discovery
+    expected_change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    reference_mapping:
+      nakama: First alpha user discovery should identify developers evaluating serious game backend capability and contribution paths.
+      pitaya: First alpha user discovery should identify Go game server developers who value explicit routes, sessions, and maintainable server architecture.
+    release_identifier: v0.1.0-alpha.1
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0196 should define a bounded first alpha user discovery loop without expanding release artifacts or runtime scope.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

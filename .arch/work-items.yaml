@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-123
+current_milestone: M-124
 
 release_targets:
   short_term:
@@ -13,11 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pre_alpha
-    release_declared: false
-    blocked_work_item: W-0195
+    current_release_state: v0.1_alpha_source_release_authorized
+    release_declared: true
+    release_identifier: v0.1.0-alpha.1
+    next_ready_work_item: W-0196
     preferred_after_current:
-      - release_execution_final_authorization
+      - first_alpha_user_discovery
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2285,7 +2286,7 @@ milestones:
 
   - id: M-123
     title: Release Execution Final Authorization
-    status: active
+    status: completed
     goal: Hold release execution at a final maintainer authorization point after the release identifier and artifact plan is defined.
     completion_criteria:
       - The maintainer explicitly approves or rejects executing the planned release commands.
@@ -2296,6 +2297,26 @@ milestones:
       - publishing v0.1 alpha without final maintainer authorization
       - creating or pushing release tags without final maintainer authorization
       - creating release binaries, archives, containers, packages, checksums, provenance files, hosted deployments, or GitHub release records without final maintainer authorization
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Recorded the maintainer's final `go` authorization for `v0.1.0-alpha.1`, accepted `ADR-0103`, authorized creating and pushing the Git tag, authorized creating the GitHub release record, limited artifacts to the GitHub source archive, refreshed README as the external alpha user entry point, added release notes, and preserved deferrals for binaries, packages, containers, checksums, signing/provenance, hosted deployments, install scripts, registry publication, announcements beyond the GitHub release record, runtime behavior, protocol routes, generated output, migrations, dependencies, operations/admin behavior, authentication/session behavior, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-124
+    title: First Alpha User Discovery
+    status: active
+    goal: Turn the source-first v0.1 alpha release and refreshed README into a bounded loop for finding early developers and converting their friction into next work items.
+    completion_criteria:
+      - The first target developer segments and outreach surfaces are recorded.
+      - The feedback loop, success signals, and stop conditions are defined before public announcements beyond the GitHub release record.
+      - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - creating additional release artifacts
+      - publishing binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, or hosted deployments
+      - running broad public announcement campaigns without a bounded plan
       - changing runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -7048,7 +7069,7 @@ work_items:
   - id: W-0195
     milestone: M-123
     title: Confirm release execution final authorization
-    status: blocked
+    status: completed
     change: changes/2026-05-21-confirm-release-execution-final-authorization
     depends_on:
       - W-0194
@@ -7056,8 +7077,8 @@ work_items:
     tier: tier_2_developer_experience
     selected_direction: release_execution_final_authorization
     gate_density_strategy: ADR-0082
-    block_reason: Final release execution would create public release state such as tags, GitHub release records, source archives, or publication records and requires explicit maintainer authorization after reviewing the release identifier and artifact plan.
     related_decisions:
+      - ADR-0103
       - ADR-0102
       - ADR-0101
       - ADR-0100
@@ -7077,4 +7098,29 @@ work_items:
       - Record a final maintainer go/no-go decision for executing the planned release commands.
       - If go, record the exact authorized release identifier, tag action, GitHub release record action, artifact families, command boundaries, verification state, known warnings, and stop conditions before running any release-producing command.
       - If no-go, record the reason and next bounded remediation or deferral.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Recorded final maintainer authorization as `go` for `v0.1.0-alpha.1`, authorized creating and pushing Git tag `v0.1.0-alpha.1`, authorized creating GitHub Release `v0.1.0-alpha.1`, limited release artifacts to the GitHub source archive, accepted the existing `runtime.identity_boundary` warning for release execution, refreshed README to make the source alpha more attractive for developers to try, and preserved deferrals for binaries, packages, containers, checksums, signing/provenance, hosted deployments, install scripts, registry publication, announcements beyond the GitHub release record, runtime behavior, protocol routes, generated output, migrations, dependencies, operations/admin behavior, authentication/session behavior, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: W-0196
+    milestone: M-124
+    title: Define first alpha user discovery loop
+    status: next_ready
+    change: changes/2026-05-21-define-first-alpha-user-discovery-loop
+    depends_on:
+      - W-0195
+    expected_change_id: define-first-alpha-user-discovery-loop
+    tier: tier_2_developer_experience
+    selected_direction: first_alpha_user_discovery
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0103
+      - ADR-0102
+      - ADR-0097
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Public announcements beyond the GitHub release record, paid promotion, hosted deployments, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the first alpha user discovery loop after the source-first release.
+      - Record target developer segments, outreach surfaces, feedback capture, success signals, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, and direct compatibility deferrals unless explicitly authorized.

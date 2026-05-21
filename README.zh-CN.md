@@ -1,62 +1,73 @@
 # vibit
 
-vibit 是一个开源 agent-native server framework，用于构建 AI coding agents 能从第一性原理理解、扩展、验证和维护的后端系统。
+vibit 是一个开源 **agent-native server framework**，用于构建 AI coding agents 和人类开发者都能从第一性原理理解、扩展、验证和维护的后端系统。
 
-状态：pre-alpha，正在推进 `v0.1 alpha`
+最新 source alpha：`v0.1.0-alpha.1`
 
-短期目标是做出第一个 developer-usable `v0.1 alpha`：一个 single-node、PostgreSQL-backed、WebSocket + Protobuf game backend runtime，让真实开发者能在本地运行、检查，并把它作为加入开发的起点。
+这是一个面向开发者的早期 alpha：适合检查架构、在本地跑通第一条 authenticated gameplay loop，并参与塑造一个 AI-maintainable backend framework。它还不是 production server distribution。
 
-长期目标是成为 AI 时代的 Nakama 或 Pitaya：同一产品级别的严肃 game/backend server capability，但围绕 vibit 的 agent-native maintainability 模型重构。这不表示 direct Nakama 或 Pitaya API compatibility。
+## 为什么值得试
+
+大多数 backend frameworks 设计时，AI coding agents 还不是工程流程的一部分。它们可能很强，但 architecture rules、ownership boundaries、change history 和 verification paths 往往散落在代码、文档、issues 和 maintainer 记忆里。
+
+vibit 正在验证一种更严格的模型：
+
+- architecture rules 存在 machine-readable manifests 中；
+- changes 由 work items、specs、ADRs 和 verification records 约束；
+- public behavior 是 contract-first；
+- generated output 可追溯；
+- module ownership 是显式的；
+- agents 可以用 `tools/vibit` 检查下一步安全任务；
+- humans 不需要翻旧聊天记录也能审计一个变更为什么存在。
+
+第一个领域重点是 game/backend servers。长期目标是成为 AI 时代的 Nakama/Pitaya-class open-source backend framework，但围绕 agent-native maintainability 重新组织，而不是追求 direct API compatibility。
+
+## 试用 Alpha
+
+最快 source checkout 路径：
+
+```bash
+git clone https://github.com/iceiko/vibit.git
+cd vibit
+node tools/vibit check all
+cd runtime && go test ./...
+cd .. && examples/local-alpha-request-loop.sh
+```
+
+今天这条路径能证明：
+
+- repository architecture checks 可以通过 `tools/vibit` 运行；
+- Go runtime tests 可以运行；
+- local alpha request loop 会跑通 authenticated gameplay path；
+- script 不会打印 raw credentials、raw access tokens、verifier keys、DSNs、digests 或 transport metadata。
+
+Prerequisites：
+
+- Go；
+- Node.js；
+- PostgreSQL，用于 persistent runtime path；
+- Buf 和 Protobuf tooling，仅在重新生成 Protobuf output 时需要。
 
 ## 当前已有内容
 
 本仓库已经不只是纯设计阶段。当前实现基础包括：
 
-- Agent-readable governance：`CONSTITUTION.md`、`AGENTS.md`、change specs、ADRs、conversation logs 和 machine-readable architecture manifests。
-- `runtime/` 下的 Go runtime。
-- `/v1/ws` WebSocket gameplay endpoint。
-- Protobuf envelope 和生成的 Go Protobuf output。
-- PostgreSQL migration sources 和 platform persistence adapters。
-- Inventory proof slice。
-- Player account persistence boundaries 和 adapters。
-- Device credential login service behavior 和 protocol route。
-- Protected routes 的 opaque access-token validation。
-- Logout service behavior 和 protocol route。
-- Runtime session persistence 和 response session metadata。
-- First-message WebSocket connection binding。
-- Single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot。
+- `runtime/` 下的 Go runtime；
+- `/v1/ws` WebSocket gameplay endpoint；
+- Protobuf envelope 和 generated Go Protobuf output；
+- PostgreSQL migration sources 和 platform persistence adapters；
+- inventory proof slice；
+- player account persistence boundaries 和 adapters；
+- development 用 local onboarding/device credential issuance；
+- device credential login service behavior 和 protocol route；
+- protected routes 的 opaque access-token validation；
+- runtime session persistence 和 response session metadata；
+- first-message WebSocket connection binding；
+- protected inventory 和 protected presence query path；
+- logout service behavior 和 protocol route；
+- single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot；
+- health、readiness、version 和 redacted config endpoints；
 - 面向 agents 和 humans 的 `tools/vibit` checks 与 inspection commands。
-
-这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 已经记录本地 readiness state，`docs/alpha-developer-flow.md` 已把这些入口整理成一条 coherent local developer journey，`docs/release-publishing-decision-gate.md` 已定义 release publishing decision boundary，`docs/release-execution-preparation-gate.md` 已定义 release execution preparation boundary，`docs/release-execution-authorization-gate.md` 已定义 release execution authorization criteria，`docs/release-execution-maintainer-decision.md` 已记录 go-to-plan decision，`docs/release-identifier-artifact-plan.md` 已定义 proposed `v0.1.0-alpha.1` identifier 和 source-first artifact plan。Release execution 当前 blocked，等待 final maintainer authorization，之后才可以创建 tag、release record 或 artifact。
-
-## 本地试用
-
-当前开发工作流 prerequisites：
-
-- Go，用于 runtime。
-- Node.js，用于 `tools/vibit`。
-- PostgreSQL，用于 persistent runtime path。
-- Buf 和 Protobuf tooling，用于重新生成 Protobuf output。
-
-运行仓库检查：
-
-```bash
-node tools/vibit check all
-```
-
-运行 Go runtime tests：
-
-```bash
-cd runtime
-go test ./...
-```
-
-启动 bootstrap in-memory runtime：
-
-```bash
-cd runtime
-go run ./cmd/vibit-server
-```
 
 Runtime 默认监听 `:8080`，并挂载：
 
@@ -68,69 +79,49 @@ Runtime 默认监听 `:8080`，并挂载：
 /configz
 ```
 
-该 endpoint 期望 binary WebSocket messages，其中包含 `vibit.protocol.v1.Envelope` Protobuf bytes。这个 gameplay endpoint 不接受 JSON。
+`/v1/ws` 期望 binary WebSocket messages，其中包含 `vibit.protocol.v1.Envelope` Protobuf bytes。这个 gameplay endpoint 不接受 JSON。
 
 `/healthz`、`/readyz`、`/version` 和 `/configz` 是小型 JSON troubleshooting endpoints。`/configz` 只报告 redacted runtime posture，不暴露 verifier keys、raw credentials、raw tokens、DSNs、digests、headers、cookies、query strings、subprotocol values、remote addresses 或 concrete transport metadata。
 
-PostgreSQL runtime path 更完整，但它需要 migrations、`VIBIT_POSTGRES_DSN` 和 authentication verifier key environment variables。当前 operational notes 见 `docs/runtime-runbook.md`。Runbook 是 v0.1 alpha hardening path 的一部分，应视为开发文档，而不是已打磨的 release guide。
+## 适合谁
 
-## 下一目标：v0.1 Alpha
+如果你符合下面任意一项，现在就值得试 vibit：
 
-持久目标记录在 `docs/v0.1-alpha-goal.md`。
+- 你构建或运营 game/backend servers；
+- 你用过或评估过 Nakama、Pitaya、Colyseus、Pomelo、Agones 或 custom Go backends；
+- 你希望 AI coding agents 在严肃 backend codebase 中更安全地改代码；
+- 你关心 explicit architecture、contracts、generated structure、tests 和 durable decision records；
+- 你想在形态固化前参与定义第一个有用的 agent-native server framework。
 
-当前 local acceptance checklist 记录在 `docs/alpha-acceptance-checklist.md`。
+这个 alpha 还不适合 production deployment、plug-and-play SDK use、hosted operations，或需要 packaged binaries/containers 的团队。
 
-Packaged local developer journey 记录在 `docs/alpha-developer-flow.md`。
+## 当前限制
 
-Release publishing decision gate 记录在 `docs/release-publishing-decision-gate.md`。
+`v0.1.0-alpha.1` 是 source-first：
 
-Release execution preparation gate 记录在 `docs/release-execution-preparation-gate.md`。
+- 没有 release binaries；
+- 没有 packages；
+- 没有 container images；
+- 没有 checksum files；
+- 没有 provenance 或 signing artifacts；
+- 没有 hosted deployment；
+- 没有 install script；
+- 没有 SDK package；
+- 没有 direct Nakama/Pitaya API compatibility 承诺。
 
-Release execution authorization gate 记录在 `docs/release-execution-authorization-gate.md`。
+PostgreSQL runtime path 是目前最完整的本地路径，但仍然需要 development setup：migrations、`VIBIT_POSTGRES_DSN` 和 authentication verifier key environment variables。见 `docs/runtime-runbook.md`。
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`。
+## Release Notes
 
-Release identifier and artifact plan 记录在 `docs/release-identifier-artifact-plan.md`。
+Source alpha release notes 位于：
 
-`v0.1 alpha` 应让具备技术能力的开发者能够：
+- `docs/releases/v0.1.0-alpha.1.md`
+- `docs/releases/v0.1.0-alpha.1.zh-CN.md`
 
-- clone repo；
-- 准备 local config 且不提交 secrets；
-- apply 或 verify required PostgreSQL migrations；
-- 创建或获得 first device credential；
-- 通过 protocol route 登录；
-- 获得 opaque access token 和 runtime session metadata；
-- bind WebSocket connection；
-- 调用 protected inventory route；
-- 查询 presence；
-- logout；
-- 运行 checks；
-- 找到明确的下一步 contribution。
+Release authorization record 是：
 
-推荐下一步顺序：
-
-1. 完成 `W-0178`：protected presence protocol query。已完成。
-2. 先定义并添加 first local onboarding/device credential issuance。已完成。
-3. 选择并证明 onboarding -> login -> bind connection -> protected inventory -> presence query -> logout 的 end-to-end path。已完成。
-4. 围绕真实 alpha path 刷新 runtime runbook。已完成。
-5. 添加最小 example client 或 request-loop script。已完成。
-6. 添加 health/readiness/version/config surfaces。已完成。
-7. 添加 alpha acceptance checklist 或 check。已完成。
-8. 整理 alpha developer flow，并记录 prerequisites。已完成。
-9. 定义 release publishing decision gate。已完成。
-10. 定义 release execution preparation gate。已完成。
-11. 定义 release execution authorization gate。已完成。
-12. 确认 release execution maintainer decision。已完成，结果是 go to release identifier and artifact planning。
-13. 定义 release identifier and artifact plan。已完成，proposed identifier 是 `v0.1.0-alpha.1`。
-14. 确认 release execution final authorization。Blocked，等待 maintainer decision。
-
-运行 minimal local alpha request loop：
-
-```bash
-examples/local-alpha-request-loop.sh
-```
-
-它包装 focused authenticated gameplay E2E proof，并且不会打印 raw credentials、raw access tokens、verifier keys、DSNs、digests 或 transport metadata。
+- `docs/release-execution-final-authorization.md`
+- `decisions/ADR-0103-release-execution-final-authorization.md`
 
 ## 继续开发
 
@@ -141,10 +132,10 @@ node tools/vibit inspect next
 node tools/vibit check work --json
 ```
 
-在本 README 更新时，当前没有 next ready item，因为 release execution 被有意阻塞在：
+当前 next work item 是：
 
 ```text
-W-0195 Confirm release execution final authorization
+W-0196 Define first alpha user discovery loop
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -193,11 +184,13 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `.arch/reference.yaml`：Nakama/Pitaya reference 和 product parity planning。
 - `docs/v0.1-alpha-goal.md`：短期 alpha 和长期产品目标。
 - `docs/alpha-developer-flow.md`：packaged local alpha developer journey。
+- `docs/alpha-acceptance-checklist.md`：本地 v0.1 alpha acceptance checklist。
+- `docs/runtime-runbook.md`：当前 runtime startup 和 verification notes。
 - `docs/release-publishing-decision-gate.md`：release publishing decision boundary。
 - `docs/release-execution-preparation-gate.md`：release execution preparation boundary。
 - `docs/release-execution-authorization-gate.md`：release execution authorization criteria。
-- `docs/alpha-acceptance-checklist.md`：本地 v0.1 alpha acceptance checklist。
-- `docs/runtime-runbook.md`：当前 runtime startup 和 verification notes。
+- `docs/release-execution-final-authorization.md`：final release authorization record。
+- `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
 - `changes/`：具体 change specs 和 verification records。
 - `conversations/`：持久 maintainer-agent project memory。
