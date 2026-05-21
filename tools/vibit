@@ -123,6 +123,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.runtime_runbook_alpha_path_refresh",
   "runtime.minimal_example_client_or_request_loop",
   "runtime.health_readiness_version_config_surface",
+  "runtime.alpha_acceptance_checklist",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -20610,8 +20611,8 @@ function checkRuntimeLocalOnboardingDeviceCredentialIssuanceGate(root, goFiles) 
     ["modules/player/module.yaml", "local_onboarding_device_credential_issuance_gate_defined: true"],
     ["modules/player/module.yaml", "future_repository_method: CreatePlayerAccount"],
     ["modules/player/module.yaml", "player_accounts_remain_credential_free: true"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : (workItemHasStatus(root, "W-0182", "completed") ? "next_work_item: W-0183" : "next_work_item: W-0182")))))],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : (workItemHasStatus(root, "W-0182", "completed") ? "W-0183 Select next alpha direction after local onboarding" : "W-0182 Implement local onboarding device credential issuance")))))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : (workItemHasStatus(root, "W-0182", "completed") ? "next_work_item: W-0183" : "next_work_item: W-0182"))))))],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : (workItemHasStatus(root, "W-0182", "completed") ? "W-0183 Select next alpha direction after local onboarding" : "W-0182 Implement local onboarding device credential issuance"))))))],
     ["AGENTS.md", "M-109 Local Onboarding Device Credential Issuance Gate"],
     ["AGENTS.md", "M-110 Local Onboarding Device Credential Issuance Implementation"],
     ["AGENTS.md", "runtime.local_onboarding_device_credential_issuance_gate"],
@@ -20827,7 +20828,7 @@ function checkRuntimeLocalOnboardingDeviceCredentialIssuanceImplementation(root,
     [".arch/runtime.yaml", "runtime_session_creation_from_onboarding_added: false"],
     [".arch/runtime.yaml", "existing_login_route_account_creation_behavior_changed: false"],
     [".arch/runtime.yaml", workItemHasStatus(root, "W-0183", "completed") ? "authenticated_gameplay_e2e_functional_slice:" : "next_alpha_direction_after_local_onboarding:"],
-    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_ready_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_ready_work_item: W-0184" : "next_ready_work_item: W-0183"))))],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "next_ready_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_ready_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_ready_work_item: W-0184" : "next_ready_work_item: W-0183")))))],
     [".arch/runtime.yaml", "recommended_direction: define_authenticated_gameplay_e2e_slice"],
     [".arch/conventions.yaml", "local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation"],
     [".arch/contracts.yaml", "local_onboarding_device_credential_issuance_implementation_check_rule: runtime.local_onboarding_device_credential_issuance_implementation"],
@@ -20839,8 +20840,8 @@ function checkRuntimeLocalOnboardingDeviceCredentialIssuanceImplementation(root,
     ["modules/player/module.yaml", "local_onboarding_device_credential_issuance_implementation:"],
     ["modules/player/module.yaml", "application_service_uses_create_player_account: true"],
     ["modules/player/module.yaml", "player_accounts_remain_credential_free: true"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : "next_work_item: W-0183"))))],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : "W-0183 Select next alpha direction after local onboarding"))))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : (workItemHasStatus(root, "W-0183", "completed") ? "next_work_item: W-0184" : "next_work_item: W-0183")))))],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : (workItemHasStatus(root, "W-0183", "completed") ? "W-0184 Define authenticated gameplay E2E slice" : "W-0183 Select next alpha direction after local onboarding")))))],
     ["AGENTS.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
     ["AGENTS.md", "M-111 Next Alpha Direction Selection After Local Onboarding"],
     ["AGENTS.zh-CN.md", "runtime.local_onboarding_device_credential_issuance_implementation"],
@@ -21071,9 +21072,9 @@ function checkRuntimeNextAlphaDirectionAuthenticatedGameplayE2ESlice(root, goFil
     [".arch/conventions.yaml", "authenticated_gameplay_e2e_functional_slice:"],
     [".arch/contracts.yaml", "authenticated_gameplay_e2e_functional_slice:"],
     [".arch/reference.yaml", "phase_2cu_authenticated_gameplay_e2e_functional_slice"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : "next_work_item: W-0184")))],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : (workItemHasStatus(root, "W-0184", "completed") ? "refresh_runtime_runbook_for_alpha" : "define_authenticated_gameplay_e2e_slice")))],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : "W-0184 Define authenticated gameplay E2E slice")))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : (workItemHasStatus(root, "W-0184", "completed") ? "next_work_item: W-0185" : "next_work_item: W-0184"))))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "package_alpha_developer_flow" : (workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : (workItemHasStatus(root, "W-0184", "completed") ? "refresh_runtime_runbook_for_alpha" : "define_authenticated_gameplay_e2e_slice"))))],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : (workItemHasStatus(root, "W-0184", "completed") ? "W-0185 Refresh runtime runbook for alpha path" : "W-0184 Define authenticated gameplay E2E slice"))))],
     ["AGENTS.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
     ["AGENTS.zh-CN.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
     ["runtime/AGENTS.md", "M-112 Authenticated Gameplay E2E Functional Slice"],
@@ -21175,10 +21176,10 @@ function checkRuntimeAuthenticatedGameplayE2EFunctionalSlice(root, goFiles) {
     [".arch/work-items.yaml", workItemHasStatus(root, "W-0186", "completed") ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "authenticated_gameplay_e2e_functional_slice: ADR-0092"],
-    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "current_phase: alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "current_phase: health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "current_phase: minimal_example_client_or_request_loop" : "current_phase: runtime_runbook_alpha_path_refresh"))],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "current_phase: package_alpha_developer_flow" : (workItemHasStatus(root, "W-0187", "completed") ? "current_phase: alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "current_phase: health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "current_phase: minimal_example_client_or_request_loop" : "current_phase: runtime_runbook_alpha_path_refresh")))],
     [".arch/runtime.yaml", "completed_work_item: W-0184"],
     [".arch/runtime.yaml", "decision: ADR-0092"],
-    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : "next_ready_work_item: W-0185"))],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "next_ready_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_ready_work_item: W-0186" : "next_ready_work_item: W-0185")))],
     [".arch/runtime.yaml", "proven_flow:"],
     [".arch/runtime.yaml", "local_onboarding_device_credential_issuance"],
     [".arch/runtime.yaml", "device_credential_login"],
@@ -21200,9 +21201,9 @@ function checkRuntimeAuthenticatedGameplayE2EFunctionalSlice(root, goFiles) {
     [".arch/conventions.yaml", "runtime_runbook_alpha_path_refresh:"],
     [".arch/contracts.yaml", "runtime_runbook_alpha_path_refresh:"],
     [".arch/reference.yaml", "phase_2cv_runtime_runbook_alpha_path_refresh"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : "next_work_item: W-0185"))],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : "refresh_runtime_runbook_for_alpha"))],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : "W-0185 Refresh runtime runbook for alpha path"))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : (workItemHasStatus(root, "W-0185", "completed") ? "next_work_item: W-0186" : "next_work_item: W-0185")))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "package_alpha_developer_flow" : (workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : (workItemHasStatus(root, "W-0185", "completed") ? "add_minimal_example_client_or_request_loop" : "refresh_runtime_runbook_for_alpha")))],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : (workItemHasStatus(root, "W-0185", "completed") ? "W-0186 Add minimal example client or request-loop script" : "W-0185 Refresh runtime runbook for alpha path")))],
     ["AGENTS.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
     ["AGENTS.md", "W-0185"],
     ["AGENTS.zh-CN.md", "runtime.authenticated_gameplay_e2e_functional_slice"],
@@ -21342,7 +21343,7 @@ function checkRuntimeRunbookAlphaPathRefresh(root, goFiles) {
     [".arch/runtime.yaml", "runtime_runbook_alpha_path_refresh:"],
     [".arch/runtime.yaml", "completed_work_item: W-0185"],
     [".arch/runtime.yaml", "decision: ADR-0093"],
-    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : "next_ready_work_item: W-0186")],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "next_ready_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_ready_work_item: W-0187" : "next_ready_work_item: W-0186"))],
     [".arch/runtime.yaml", "documented_flow:"],
     [".arch/runtime.yaml", "local_onboarding_device_credential_issuance"],
     [".arch/runtime.yaml", "post_logout_protected_request_rejected"],
@@ -21366,9 +21367,9 @@ function checkRuntimeRunbookAlphaPathRefresh(root, goFiles) {
     [".arch/contracts.yaml", "minimal_example_client_or_request_loop:"],
     [".arch/reference.yaml", "phase_2cv_runtime_runbook_alpha_path_refresh"],
     [".arch/reference.yaml", "phase_2cw_minimal_example_client_or_request_loop"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : "next_work_item: W-0186")],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : "add_minimal_example_client_or_request_loop")],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : "W-0186 Add minimal example client or request-loop script")],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : (workItemHasStatus(root, "W-0186", "completed") ? "next_work_item: W-0187" : "next_work_item: W-0186"))],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "package_alpha_developer_flow" : (workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "health_readiness_version_config_surface" : "add_minimal_example_client_or_request_loop"))],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : (workItemHasStatus(root, "W-0186", "completed") ? "W-0187 Add health/readiness/version/config surface" : "W-0186 Add minimal example client or request-loop script"))],
     ["AGENTS.md", "runtime.runtime_runbook_alpha_path_refresh"],
     ["AGENTS.md", "W-0186"],
     ["AGENTS.zh-CN.md", "runtime.runtime_runbook_alpha_path_refresh"],
@@ -21504,7 +21505,7 @@ function checkRuntimeMinimalExampleClientOrRequestLoop(root, goFiles) {
     [".arch/runtime.yaml", "minimal_example_client_or_request_loop: ADR-0094"],
     [".arch/runtime.yaml", "completed_work_item: W-0186"],
     [".arch/runtime.yaml", "decision: ADR-0094"],
-    [".arch/runtime.yaml", workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : "next_ready_work_item: W-0187"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "next_ready_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_ready_work_item: W-0188" : "next_ready_work_item: W-0187")],
     [".arch/runtime.yaml", "example_script: examples/local-alpha-request-loop.sh"],
     [".arch/runtime.yaml", "proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
     [".arch/runtime.yaml", "script_runtime_behavior_added: false"],
@@ -21530,11 +21531,11 @@ function checkRuntimeMinimalExampleClientOrRequestLoop(root, goFiles) {
     ["docs/runtime-runbook.md", "local alpha request-loop script"],
     ["docs/runtime-runbook.zh-CN.md", "examples/local-alpha-request-loop.sh"],
     ["docs/runtime-runbook.zh-CN.md", "local alpha request-loop script"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : "next_work_item: W-0187"],
-    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : "health_readiness_version_config_surface"],
-    ["README.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : (workItemHasStatus(root, "W-0187", "completed") ? "next_work_item: W-0188" : "next_work_item: W-0187")],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "package_alpha_developer_flow" : (workItemHasStatus(root, "W-0187", "completed") ? "alpha_acceptance_checklist" : "health_readiness_version_config_surface")],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface")],
     ["README.md", "examples/local-alpha-request-loop.sh"],
-    ["README.zh-CN.md", workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface"],
+    ["README.zh-CN.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : (workItemHasStatus(root, "W-0187", "completed") ? "W-0188 Add alpha acceptance checklist" : "W-0187 Add health/readiness/version/config surface")],
     ["README.zh-CN.md", "examples/local-alpha-request-loop.sh"],
     ["AGENTS.md", "runtime.minimal_example_client_or_request_loop"],
     ["AGENTS.md", "W-0187"],
@@ -21675,13 +21676,13 @@ function checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles) {
     [".arch/work-items.yaml", "id: M-116"],
     [".arch/work-items.yaml", "title: Alpha Acceptance Checklist"],
     [".arch/work-items.yaml", "id: W-0188"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0188", "completed") ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", "health_readiness_version_config_surface: ADR-0095"],
     [".arch/runtime.yaml", "health_readiness_version_config_surface:"],
     [".arch/runtime.yaml", "completed_work_item: W-0187"],
     [".arch/runtime.yaml", "decision: ADR-0095"],
-    [".arch/runtime.yaml", "next_ready_work_item: W-0188"],
+    [".arch/runtime.yaml", workItemHasStatus(root, "W-0188", "completed") ? "next_ready_work_item: W-0189" : "next_ready_work_item: W-0188"],
     [".arch/runtime.yaml", "alpha_acceptance_checklist:"],
     [".arch/runtime.yaml", "runtime_behavior_scope: minimal_local_troubleshooting_surface"],
     [".arch/runtime.yaml", "redacted_config_surface: true"],
@@ -21721,11 +21722,11 @@ function checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles) {
     ["docs/runtime-runbook.zh-CN.md", "/version"],
     ["docs/runtime-runbook.zh-CN.md", "/configz"],
     ["docs/runtime-runbook.zh-CN.md", "redacted posture"],
-    ["docs/v0.1-alpha-goal.md", "next_work_item: W-0188"],
-    ["docs/v0.1-alpha-goal.md", "alpha_acceptance_checklist"],
-    ["README.md", "W-0188 Add alpha acceptance checklist"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "next_work_item: W-0189" : "next_work_item: W-0188"],
+    ["docs/v0.1-alpha-goal.md", workItemHasStatus(root, "W-0188", "completed") ? "package_alpha_developer_flow" : "alpha_acceptance_checklist"],
+    ["README.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : "W-0188 Add alpha acceptance checklist"],
     ["README.md", "/configz"],
-    ["README.zh-CN.md", "W-0188 Add alpha acceptance checklist"],
+    ["README.zh-CN.md", workItemHasStatus(root, "W-0188", "completed") ? "W-0189 Package alpha developer flow" : "W-0188 Add alpha acceptance checklist"],
     ["README.zh-CN.md", "/configz"],
     ["AGENTS.md", "runtime.health_readiness_version_config_surface"],
     ["AGENTS.md", "W-0188"],
@@ -21841,6 +21842,267 @@ function checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles) {
   ok("health/readiness/version/config surface is completed as a minimal redacted local alpha troubleshooting surface without broad operations, protocol, generated-output, migration, dependency, release, or direct compatibility changes", {
     rule_id: ruleId,
     artifact: serverPath,
+  });
+}
+
+function checkRuntimeAlphaAcceptanceChecklist(root, goFiles) {
+  const ruleId = "runtime.alpha_acceptance_checklist";
+  const decisionPath = "decisions/ADR-0096-alpha-acceptance-checklist.md";
+  const changePath = "changes/2026-05-21-add-alpha-acceptance-checklist";
+  const conversationPath = "conversations/2026-05-21-alpha-acceptance-checklist.md";
+  const checklistPath = "docs/alpha-acceptance-checklist.md";
+  const checklistTranslationPath = "docs/alpha-acceptance-checklist.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0188", "completed")) {
+    ok("alpha acceptance checklist is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    checklistPath,
+    checklistTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for alpha acceptance checklist`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for alpha acceptance checklist`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-116"],
+    [".arch/work-items.yaml", "title: Alpha Acceptance Checklist"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0188"],
+    [".arch/work-items.yaml", "ADR-0096"],
+    [".arch/work-items.yaml", "id: M-117"],
+    [".arch/work-items.yaml", "title: Package Alpha Developer Flow"],
+    [".arch/work-items.yaml", "id: W-0189"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", "alpha_acceptance_checklist: ADR-0096"],
+    [".arch/runtime.yaml", "alpha_acceptance_checklist:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0188"],
+    [".arch/runtime.yaml", "decision: ADR-0096"],
+    [".arch/runtime.yaml", "next_ready_work_item: W-0189"],
+    [".arch/runtime.yaml", "package_alpha_developer_flow:"],
+    [".arch/runtime.yaml", "checklist: docs/alpha-acceptance-checklist.md"],
+    [".arch/runtime.yaml", "checklist_translation: docs/alpha-acceptance-checklist.zh-CN.md"],
+    [".arch/runtime.yaml", "local_alpha_flow_checkable: true"],
+    [".arch/runtime.yaml", "release_declared: false"],
+    [".arch/runtime.yaml", "release_publishing_authorized: false"],
+    [".arch/runtime.yaml", "release_packaging_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "startup_configuration_semantics_changed: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "broad_operations_admin_behavior_added: false"],
+    [".arch/runtime.yaml", "product_module_expansion_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "check_rule: runtime.alpha_acceptance_checklist"],
+    [".arch/conventions.yaml", "alpha_acceptance_checklist:"],
+    [".arch/conventions.yaml", "check_rule: runtime.alpha_acceptance_checklist"],
+    [".arch/conventions.yaml", "package_alpha_developer_flow:"],
+    [".arch/contracts.yaml", "alpha_acceptance_checklist:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.alpha_acceptance_checklist"],
+    [".arch/contracts.yaml", "package_alpha_developer_flow:"],
+    [".arch/reference.yaml", "phase_2cy_alpha_acceptance_checklist"],
+    [".arch/reference.yaml", "check_rule: runtime.alpha_acceptance_checklist"],
+    [".arch/reference.yaml", "phase_2cz_package_alpha_developer_flow"],
+    ["docs/v0.1-alpha-goal.md", "next_work_item: W-0189"],
+    ["docs/v0.1-alpha-goal.md", "package_alpha_developer_flow"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_item: W-0189"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "package_alpha_developer_flow"],
+    ["README.md", "docs/alpha-acceptance-checklist.md"],
+    ["README.md", "W-0189 Package alpha developer flow"],
+    ["README.zh-CN.md", "docs/alpha-acceptance-checklist.md"],
+    ["README.zh-CN.md", "W-0189 Package alpha developer flow"],
+    ["docs/runtime-runbook.md", "docs/alpha-acceptance-checklist.md"],
+    ["docs/runtime-runbook.md", "alpha developer flow packaged"],
+    ["docs/runtime-runbook.zh-CN.md", "docs/alpha-acceptance-checklist.md"],
+    ["docs/runtime-runbook.zh-CN.md", "alpha developer flow"],
+    ["AGENTS.md", "runtime.alpha_acceptance_checklist"],
+    ["AGENTS.md", "W-0189"],
+    ["AGENTS.zh-CN.md", "runtime.alpha_acceptance_checklist"],
+    ["AGENTS.zh-CN.md", "W-0189"],
+    ["runtime/AGENTS.md", "runtime.alpha_acceptance_checklist"],
+    ["runtime/AGENTS.md", "W-0189"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.alpha_acceptance_checklist"],
+    ["runtime/AGENTS.zh-CN.md", "W-0189"],
+    ["rules/check-rules.json", "runtime.alpha_acceptance_checklist"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0096",
+      "alpha acceptance checklist",
+      "release publishing",
+      "runtime.alpha_acceptance_checklist",
+      "Nakama",
+      "Pitaya",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0188",
+      "completed_milestone: M-116",
+      "previous_completed_work_item: W-0187",
+      "next_milestone: M-117",
+      "next_work_item: W-0189",
+      "alpha_acceptance_checklist_completed: true",
+      "alpha_acceptance_checklist_check_rule: runtime.alpha_acceptance_checklist",
+      "checklist: docs/alpha-acceptance-checklist.md",
+      "checklist_translation: docs/alpha-acceptance-checklist.zh-CN.md",
+      "local_alpha_flow_checkable: true",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_change: false",
+      "release_packaging_added: false",
+      "runtime_behavior_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "broad_operations_admin_behavior_added: false",
+      "product_module_expansion_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [checklistPath]: [
+      "Repository Intake",
+      "Local Prerequisites",
+      "Configuration And Secret Handling",
+      "Database And Migration Posture",
+      "Runtime Surface",
+      "Authenticated Gameplay Flow",
+      "Verification Commands",
+      "Contribution Entry Point",
+      "Release Deferrals",
+      "local_alpha_flow_checkable: true",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_checklist: false",
+      "next_direction: package_alpha_developer_flow",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "runtime.authentication.AuthenticateWithDeviceCredential",
+      "runtime.authentication.BindConnection",
+      "runtime.presence.GetPlayerPresence",
+      "runtime.authentication.LogoutAccessToken",
+      "/healthz",
+      "/readyz",
+      "/version",
+      "/configz",
+      "examples/local-alpha-request-loop.sh",
+    ],
+    [checklistTranslationPath]: [
+      "Repository Intake",
+      "Local Prerequisites",
+      "Configuration And Secret Handling",
+      "Database And Migration Posture",
+      "Runtime Surface",
+      "Authenticated Gameplay Flow",
+      "Verification Commands",
+      "Contribution Entry Point",
+      "Release Deferrals",
+      "local_alpha_flow_checkable: true",
+      "release_declared: false",
+      "release_publishing_authorized_by_this_checklist: false",
+      "next_direction: package_alpha_developer_flow",
+      "OnboardLocalPlayerWithDeviceCredential",
+      "runtime.authentication.AuthenticateWithDeviceCredential",
+      "runtime.authentication.BindConnection",
+      "runtime.presence.GetPlayerPresence",
+      "runtime.authentication.LogoutAccessToken",
+      "/healthz",
+      "/readyz",
+      "/version",
+      "/configz",
+      "examples/local-alpha-request-loop.sh",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    checklistPath,
+    checklistTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /release_declared:\s*true/, label: "release declaration" },
+    { pattern: /release_publishing_authorized(?:_by_this_(?:checklist|change))?:\s*true/, label: "release publishing authorization" },
+    { pattern: /release_packaging_added:\s*true/, label: "release packaging" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_added:\s*true/, label: "migration addition" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /\bpublished v0\.1 alpha\b|\bpublishes v0\.1 alpha\b/i, label: "release publication wording" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses alpha acceptance checklist boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\balpha_acceptance_checklist\b|\bpackage_alpha_developer_flow\b|\bReleasePublishing\b|\bReleasePackage\b/, label: "alpha checklist or release packaging runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for alpha acceptance or release packaging: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("alpha acceptance checklist is completed with local readiness criteria and release/runtime/protocol/generated-output/migration/dependency/product-scope deferrals preserved", {
+    rule_id: ruleId,
+    artifact: checklistPath,
   });
 }
 
@@ -23519,6 +23781,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0188", "current_phase: package_alpha_developer_flow"],
     ["W-0187", "current_phase: alpha_acceptance_checklist"],
     ["W-0186", "current_phase: health_readiness_version_config_surface"],
     ["W-0185", "current_phase: minimal_example_client_or_request_loop"],
@@ -24054,6 +24317,7 @@ function checkRuntime(root) {
   checkRuntimeRunbookAlphaPathRefresh(root, goFiles);
   checkRuntimeMinimalExampleClientOrRequestLoop(root, goFiles);
   checkRuntimeHealthReadinessVersionConfigSurface(root, goFiles);
+  checkRuntimeAlphaAcceptanceChecklist(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

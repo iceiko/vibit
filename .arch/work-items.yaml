@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-116
+current_milestone: M-117
 
 release_targets:
   short_term:
@@ -15,10 +15,10 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0188
+    next_ready_work_item: W-0189
     preferred_after_current:
-      - alpha_acceptance_checklist_or_check
       - package_alpha_developer_flow
+      - release_publishing_decision_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2145,7 +2145,7 @@ milestones:
 
   - id: M-116
     title: Alpha Acceptance Checklist
-    status: active
+    status: completed
     goal: Add a concise alpha acceptance checklist or equivalent check that lets maintainers and contributors judge whether the v0.1 alpha developer flow is ready without publishing a release.
     completion_criteria:
       - The checklist covers clone, prerequisites, migrations, local configuration, local onboarding posture, login, connection binding, protected inventory, presence query, logout, status endpoints, checks, redaction, and contribution entry points.
@@ -2155,6 +2155,25 @@ milestones:
     non_goals:
       - publishing v0.1 alpha
       - release packaging
+      - adding runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `docs/alpha-acceptance-checklist.md` and `docs/alpha-acceptance-checklist.zh-CN.md` as the local v0.1 alpha acceptance checklist. The checklist covers repository intake, local prerequisites, configuration and redaction posture, migration posture, runtime surfaces, authenticated gameplay flow, verification commands, contribution entry point, and release deferrals. It does not declare or publish a release, add release packaging, change runtime behavior, change protocol routes, change Protobuf sources or generated output, add migrations, add dependencies, broaden operations/admin behavior, change authentication/session behavior, expand product modules, or select direct Nakama/Pitaya API compatibility.
+
+  - id: M-117
+    title: Package Alpha Developer Flow
+    status: active
+    goal: Package the existing alpha developer flow documentation and entry points into a coherent local developer journey without publishing a release or adding runtime behavior.
+    completion_criteria:
+      - README, runbook, request-loop script, status endpoints, acceptance checklist, and contribution path fit together as one developer journey.
+      - The packaged flow distinguishes local proof, manual PostgreSQL setup, deferred public onboarding, and release-publishing work.
+      - The packaging preserves secret redaction and avoids adding runtime behavior, protocol changes, generated output, migrations, dependencies, broad operations/admin behavior, product modules, or direct Nakama/Pitaya API compatibility.
+      - The resulting packaged flow is covered by repository checks or explicit verification notes.
+    non_goals:
+      - publishing v0.1 alpha
+      - creating release tags or binaries
       - adding runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -6684,7 +6703,7 @@ work_items:
   - id: W-0188
     milestone: M-116
     title: Add alpha acceptance checklist
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-add-alpha-acceptance-checklist
     depends_on:
       - W-0187
@@ -6693,6 +6712,7 @@ work_items:
     selected_direction: alpha_acceptance_checklist
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0096
       - ADR-0095
       - ADR-0094
       - ADR-0093
@@ -6705,3 +6725,30 @@ work_items:
       - Add a concise alpha acceptance checklist or equivalent check for the developer-usable v0.1 alpha flow.
       - Cover prerequisites, local configuration, migration posture, local onboarding status, login, connection binding, protected inventory, presence query, logout, status endpoints, redaction, verification commands, and contribution entry points.
       - Preserve release publishing, release packaging, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.
+    completion_summary: Added the alpha acceptance checklist and Simplified Chinese translation, recorded `ADR-0096`, and added repository check coverage through `runtime.alpha_acceptance_checklist`. The checklist classifies ready, manual, deferred, and blocked acceptance states for the local developer flow and preserves release publishing, release packaging, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.
+
+  - id: W-0189
+    milestone: M-117
+    title: Package alpha developer flow
+    status: next_ready
+    change: changes/2026-05-21-package-alpha-developer-flow
+    depends_on:
+      - W-0188
+    expected_change_id: package-alpha-developer-flow
+    tier: tier_2_developer_experience
+    selected_direction: package_alpha_developer_flow
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Publishing v0.1 alpha, creating release tags or binaries, adding hosted deployments, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Package the existing alpha developer flow documentation and entry points into a coherent local developer journey.
+      - Align README, runbook, request-loop script, status endpoints, acceptance checklist, and contribution path.
+      - Preserve release publishing, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.

@@ -182,6 +182,14 @@ examples/local-alpha-request-loop.sh
 
 当前 public protocol 不包含 local onboarding route。直接运行 PostgreSQL server process 的开发者，仍需要未来 local tool、request-loop script 或受控 seed path 来调用 local onboarding 并获得第一个 device credential。该 follow-up 在本 runbook refresh 之后继续排队。
 
+Local alpha acceptance checklist 是：
+
+```text
+docs/alpha-acceptance-checklist.md
+```
+
+它记录哪些 alpha items 是 ready、manual、deferred 或 blocked。它不是 release declaration，也不授权 release packaging。
+
 ## Manual Verification Paths
 
 ### Bootstrap Memory Path
@@ -211,6 +219,16 @@ cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticat
 
 这是当前完整 local alpha flow 的最佳证明。它不需要 live PostgreSQL，也不会打印 raw credentials 或 tokens。
 
+### Alpha Acceptance Checklist
+
+阅读当前 checklist：
+
+```bash
+sed -n '1,220p' docs/alpha-acceptance-checklist.md
+```
+
+在 packaging 或 publishing work 前，确认 ready、manual、deferred 和 blocked 状态。该 checklist 保持 release publishing、release packaging、public local onboarding、production signup、broad operations/admin behavior、broad product modules 和 direct Nakama/Pitaya API compatibility deferred。
+
 ### PostgreSQL Runtime Path
 
 对 PostgreSQL process path：
@@ -236,7 +254,8 @@ Process path 当前暴露 login、binding、protected inventory、protected pres
 - 普通 server startup 不会自动 apply PostgreSQL migrations。
 - Optional live PostgreSQL verification 定义在 `docs/postgresql-verification-environment.md`；它要求 `VIBIT_POSTGRES_TEST_DSN`，且不属于默认 server startup。
 - Generated route registration 尚未实现；route registration 仍是 handwritten startup/bootstrap code。
-- v0.1 alpha path 仍需要 alpha acceptance checklist。
+- v0.1 alpha path 已有 `docs/alpha-acceptance-checklist.md` 作为 alpha acceptance checklist。
+- v0.1 alpha path 仍需要把 alpha developer flow 整理成一条 coherent local developer journey。
 - Production signup、external identity providers、password login、account recovery、account merge、multi-device linking、direct Nakama/Pitaya API compatibility 和 broad product modules 仍然 deferred。
 
 这些是第一版 request loop 的 bootstrap assumptions，不是长期 production policy。

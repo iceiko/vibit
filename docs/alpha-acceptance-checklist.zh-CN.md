@@ -1,0 +1,143 @@
+# Alpha Acceptance Checklist 中文版
+
+状态：Draft v0.1
+最后更新：2026-05-21
+范围：vibit 的本地 v0.1 alpha acceptance criteria
+说明：本文件是 `docs/alpha-acceptance-checklist.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
+
+本 checklist 不是 release declaration。它是给 maintainer 和 contributor 使用的验收清单，用于判断本地 `v0.1 alpha` developer flow 是否已经准备好进入后续 package 和 publish 工作。
+
+## 1. 目的
+
+第一版 alpha 在发布前应先做到 developer-usable。本 checklist 定义本地 flow 要被接受为 alpha-ready 需要满足的条件：
+
+- contributor 能理解 vibit 是什么；
+- 能准备 local prerequisites 和 configuration；
+- 能运行或验证当前 runtime；
+- 能理解 authenticated gameplay flow；
+- 能运行 repository checks；
+- 能确认 secrets 仍被 redacted；
+- 能找到下一步 contribution entry point。
+
+本 checklist 不授权 release publishing、release packaging、runtime behavior changes、protocol changes、generated output changes、migrations、dependencies、broad operations/admin behavior、product module expansion 或 direct Nakama/Pitaya API compatibility。
+
+## 2. Checklist 状态
+
+Review alpha flow 时使用这些状态：
+
+- `Ready`：repository 已包含所需 artifact 或 behavior，并且由 tests、checks 或明确 documentation 验证。
+- `Manual`：该步骤需要 developer 执行 local setup，例如安装工具或 apply migrations。
+- `Deferred`：该项有意不属于 first alpha，或等待后续 work item。
+- `Blocked`：该项解决前不能接受 alpha。
+
+## 3. Repository Intake
+
+- [x] `README.md` 和 `README.zh-CN.md` 说明 vibit 是 agent-native server framework，并说明当前状态是 pre-alpha。
+- [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
+- [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
+- [x] `.arch/work-items.yaml` 在本 checklist 之后记录一个 next-ready continuation item。
+- [x] `node tools/vibit inspect next` 能识别下一步 bounded contribution。
+
+## 4. Local Prerequisites
+
+- [ ] Manual：安装 Go，用于 runtime tests 和 local server execution。
+- [ ] Manual：安装 Node.js，用于 `tools/vibit` checks。
+- [ ] Manual：测试 persistent runtime path 时可用 PostgreSQL。
+- [ ] Manual：重新生成 Protobuf output 时可用 Buf 和 Protobuf tooling。
+- [x] `docs/runtime-runbook.md` 已记录 memory 和 PostgreSQL startup paths。
+- [x] 默认 repository checks 不要求 live PostgreSQL。
+
+## 5. Configuration And Secret Handling
+
+- [x] `VIBIT_RUNTIME_STORE=memory` 仍是默认 bootstrap path。
+- [x] `VIBIT_RUNTIME_STORE=postgres` 已记录为当前 alpha runtime composition。
+- [x] PostgreSQL runtime startup 要求 `VIBIT_POSTGRES_DSN` 和 verifier key environment variables。
+- [x] Verifier key material、raw device credentials、raw access tokens、DSNs、digests、headers、cookies、query strings、subprotocol values、remote addresses 和 concrete transport metadata 都被记录为不是 log-safe。
+- [x] Local alpha request-loop script 不打印 raw credentials、raw tokens、verifier keys、DSNs、digests 或 transport metadata。
+- [x] `/configz` 只报告 redacted posture，并包含 `secrets_redacted: true`。
+
+## 6. Database And Migration Posture
+
+- [x] PostgreSQL migration sources 位于 `runtime/migrations/postgres`。
+- [x] 普通 runtime startup 不会自动 apply migrations。
+- [x] Repository runtime tooling 已提供 migration apply/status tooling。
+- [ ] Manual：使用 `VIBIT_RUNTIME_STORE=postgres` 前准备 local PostgreSQL database。
+- [ ] Manual：在 fresh PostgreSQL database 上使用前，apply 或 verify required SQL migrations。
+- [ ] Manual：optional live PostgreSQL verification 使用 `VIBIT_POSTGRES_TEST_DSN` 和 disposable database。
+
+## 7. Runtime Surface
+
+- [x] Gameplay WebSocket endpoint 是 `/v1/ws`。
+- [x] `/v1/ws` 期望 binary `vibit.protocol.v1.Envelope` Protobuf bytes，不接受 JSON。
+- [x] `/healthz` 报告 process health。
+- [x] `/readyz` 报告 readiness posture、runtime store 和 WebSocket path。
+- [x] `/version` 报告 pre-alpha runtime version。
+- [x] `/configz` 只报告 redacted runtime posture。
+- [x] 这些 HTTP status endpoints 是 local troubleshooting surfaces，不是 production operations API、admin console、metrics backend 或 gameplay protocol route。
+
+## 8. Authenticated Gameplay Flow
+
+- [x] Local onboarding 作为 application service behavior 存在：`OnboardLocalPlayerWithDeviceCredential`。
+- [x] Local onboarding 没有暴露为 public WebSocket、Protobuf、HTTP、CLI 或 startup auto-creation surface。
+- [x] Device credential login 通过 `runtime.authentication.AuthenticateWithDeviceCredential` protocol route 暴露。
+- [x] Login 返回 opaque access token 和 runtime session metadata。
+- [x] First-message connection binding 通过 `runtime.authentication.BindConnection` protocol route 暴露。
+- [x] Protected inventory grant/read requests 使用 `AuthenticatedRequest`。
+- [x] Protected presence query 可通过 `runtime.presence.GetPlayerPresence` 使用。
+- [x] Logout 通过 `runtime.authentication.LogoutAccessToken` protocol route 暴露。
+- [x] 使用同一 token 的 logout 后 protected request 会被拒绝。
+- [x] Focused authenticated gameplay E2E test 证明 onboarding -> login -> connection binding -> protected inventory -> presence query -> logout -> post-logout rejection。
+
+## 9. Verification Commands
+
+除特别说明外，从 repository root 运行：
+
+```bash
+node tools/vibit inspect next
+node tools/vibit check work --json
+node tools/vibit check all --json
+git diff --check
+cd runtime && go test ./...
+examples/local-alpha-request-loop.sh
+```
+
+Optional focused checks：
+
+```bash
+cd runtime && go test ./cmd/vibit-server
+cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout -v
+```
+
+Optional live PostgreSQL verification 仍是 opt-in，并要求 disposable database：
+
+```bash
+cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit_test?sslmode=disable' VIBIT_POSTGRES_TEST_ALLOW_DESTRUCTIVE=1 go test ./internal/platform/protocol/protobuf -run TestPostgresPersistentInventoryRequestLoop -v
+```
+
+## 10. Contribution Entry Point
+
+本 checklist 存在后，下一步推荐 contribution 是整理 alpha developer flow documentation 和 entry points，但不发布 release。该后续工作应让 README、runbook、request-loop script、status endpoints、acceptance checklist 和 contribution path 组合成一条完整 developer journey。
+
+## 11. Release Deferrals
+
+以下内容继续 deferred，直到后续明确 work item 授权：
+
+- 发布 `v0.1 alpha`。
+- 创建 release tags、binaries、archives、containers、packages 或 hosted deployments。
+- 添加 public local onboarding protocol route。
+- 添加 production signup、external identity providers、password login、account recovery、account merge 或 multi-device linking。
+- 添加 broad operations/admin behavior、metrics backend integration 或 production observability。
+- 添加 chat、friends、groups、parties、matchmaking、match runtime、SDKs、distributed runtime 或 direct Nakama/Pitaya API compatibility。
+
+## 12. Current Acceptance Result
+
+Local alpha flow 已经可以检查，并接近进入 packaging；但 repository 仍是 pre-alpha，直到后续 release-publishing work item 明确声明。
+
+当前结果：
+
+```text
+local_alpha_flow_checkable: true
+release_declared: false
+release_publishing_authorized_by_this_checklist: false
+next_direction: package_alpha_developer_flow
+```

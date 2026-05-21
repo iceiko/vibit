@@ -97,17 +97,18 @@ purpose: >
   runtime_runbook_alpha_path_refresh: ADR-0093
   minimal_example_client_or_request_loop: ADR-0094
   health_readiness_version_config_surface: ADR-0095
+  alpha_acceptance_checklist: ADR-0096
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: alpha_acceptance_checklist
+  current_phase: package_alpha_developer_flow
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: false
-  next_ready_work_item: W-0188
+  next_ready_work_item: W-0189
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5541,13 +5542,56 @@ identity_session_boundary:
     rule: W-0187 added the smallest local health/readiness/version/config surface without broad operations, dependency, release, or product expansion.
 
   alpha_acceptance_checklist:
-    status: next_ready
+    status: completed
     milestone: M-116
-    next_ready_work_item: W-0188
+    completed_work_item: W-0188
+    decision: ADR-0096
+    change: changes/2026-05-21-add-alpha-acceptance-checklist
+    next_milestone: M-117
+    next_ready_work_item: W-0189
     depends_on:
       - W-0187
     selected_direction: alpha_acceptance_checklist
-    expected_change: changes/2026-05-21-add-alpha-acceptance-checklist
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    checklist: docs/alpha-acceptance-checklist.md
+    checklist_translation: docs/alpha-acceptance-checklist.zh-CN.md
+    local_alpha_flow_checkable: true
+    release_declared: false
+    release_publishing_authorized: false
+    release_packaging_added: false
+    checklist_covers:
+      - repository_intake
+      - local_prerequisites
+      - configuration_and_secret_handling
+      - database_and_migration_posture
+      - runtime_surface
+      - authenticated_gameplay_flow
+      - verification_commands
+      - contribution_entry_point
+      - release_deferrals
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    startup_configuration_semantics_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.alpha_acceptance_checklist
+    rule: W-0188 added an alpha acceptance checklist without publishing a release or expanding runtime/product scope.
+
+  package_alpha_developer_flow:
+    status: next_ready
+    milestone: M-117
+    next_ready_work_item: W-0189
+    depends_on:
+      - W-0188
+    selected_direction: package_alpha_developer_flow
+    expected_change: changes/2026-05-21-package-alpha-developer-flow
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
     release_publishing_authorized: false
@@ -5558,7 +5602,7 @@ identity_session_boundary:
     migration_added: false
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0188 should add an alpha acceptance checklist or equivalent check without publishing a release or expanding runtime/product scope.
+    rule: W-0189 should package the existing alpha developer flow into a coherent local developer journey without publishing a release or expanding runtime/product scope.
 
 persistence_model:
   decision: ADR-0011

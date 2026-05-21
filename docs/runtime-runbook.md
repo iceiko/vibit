@@ -183,6 +183,14 @@ Current alpha path details:
 
 The current public protocol does not include a local onboarding route. A developer who runs the PostgreSQL server process directly still needs a future local tool, request-loop script, or controlled seed path to call local onboarding and obtain the first device credential. That follow-up is tracked after this runbook refresh.
 
+The local alpha acceptance checklist is:
+
+```text
+docs/alpha-acceptance-checklist.md
+```
+
+It records which alpha items are ready, manual, deferred, or blocked. It is not a release declaration and does not authorize release packaging.
+
 ## Manual Verification Paths
 
 ### Bootstrap Memory Path
@@ -212,6 +220,16 @@ cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticat
 
 This is the current best proof of the complete local alpha flow. It does not require live PostgreSQL and does not print raw credentials or tokens.
 
+### Alpha Acceptance Checklist
+
+Read the current checklist:
+
+```bash
+sed -n '1,220p' docs/alpha-acceptance-checklist.md
+```
+
+Confirm the ready, manual, deferred, and blocked states before packaging or publishing work. The checklist keeps release publishing, release packaging, public local onboarding, production signup, broad operations/admin behavior, broad product modules, and direct Nakama/Pitaya API compatibility deferred.
+
 ### PostgreSQL Runtime Path
 
 For the PostgreSQL process path:
@@ -237,7 +255,8 @@ The process path currently exposes login, binding, protected inventory, protecte
 - PostgreSQL migrations are not applied automatically during normal server startup.
 - Optional live PostgreSQL verification is defined in `docs/postgresql-verification-environment.md`; it requires `VIBIT_POSTGRES_TEST_DSN` and is not part of default server startup.
 - Generated route registration is not implemented yet; route registration remains handwritten startup/bootstrap code.
-- The v0.1 alpha path still needs an alpha acceptance checklist.
+- The v0.1 alpha path has an alpha acceptance checklist at `docs/alpha-acceptance-checklist.md`.
+- The v0.1 alpha path still needs the alpha developer flow packaged into one coherent local developer journey.
 - Production signup, external identity providers, password login, account recovery, account merge, multi-device linking, direct Nakama/Pitaya API compatibility, and broad product modules remain deferred.
 
 These are bootstrap assumptions for the first request loop, not long-term production policy.

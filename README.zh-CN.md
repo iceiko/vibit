@@ -27,7 +27,7 @@ vibit 是一个开源 agent-native server framework，用于构建 AI coding age
 - Single-process active connection lifecycle、close handoff、reconnect epoch handling 和 presence lifecycle snapshot。
 - 面向 agents 和 humans 的 `tools/vibit` checks 与 inspection commands。
 
-这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface。当前最关键的剩余缺口是 alpha acceptance checklist。
+这还不是完成态 alpha。Authenticated gameplay end-to-end path 现在已经通过 focused Go test 证明，runbook 和 request-loop script 已存在，runtime 也暴露了一个很小的 health/readiness/version/config surface，alpha acceptance checklist 也已经记录本地 readiness state。当前最关键的剩余缺口是把这些入口整理成一条 coherent developer flow。
 
 ## 本地试用
 
@@ -78,6 +78,8 @@ PostgreSQL runtime path 更完整，但它需要 migrations、`VIBIT_POSTGRES_DS
 
 持久目标记录在 `docs/v0.1-alpha-goal.md`。
 
+当前 local acceptance checklist 记录在 `docs/alpha-acceptance-checklist.md`。
+
 `v0.1 alpha` 应让具备技术能力的开发者能够：
 
 - clone repo；
@@ -101,7 +103,8 @@ PostgreSQL runtime path 更完整，但它需要 migrations、`VIBIT_POSTGRES_DS
 4. 围绕真实 alpha path 刷新 runtime runbook。已完成。
 5. 添加最小 example client 或 request-loop script。已完成。
 6. 添加 health/readiness/version/config surfaces。已完成。
-7. 添加 alpha acceptance checklist 或 check。
+7. 添加 alpha acceptance checklist 或 check。已完成。
+8. 整理 alpha developer flow，并记录 prerequisites。
 
 运行 minimal local alpha request loop：
 
@@ -123,7 +126,7 @@ node tools/vibit check work --json
 在本 README 更新时，next ready item 是：
 
 ```text
-W-0188 Add alpha acceptance checklist
+W-0189 Package alpha developer flow
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary 或 verification failure。
@@ -171,6 +174,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `.arch/runtime.yaml`：runtime readiness 和 implementation state。
 - `.arch/reference.yaml`：Nakama/Pitaya reference 和 product parity planning。
 - `docs/v0.1-alpha-goal.md`：短期 alpha 和长期产品目标。
+- `docs/alpha-acceptance-checklist.md`：本地 v0.1 alpha acceptance checklist。
 - `docs/runtime-runbook.md`：当前 runtime startup 和 verification notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
 - `changes/`：具体 change specs 和 verification records。
