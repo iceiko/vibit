@@ -105,8 +105,8 @@ parity_capability_families:
 
 当前缺口：
 
-- Product parity target 尚未表示成可检查路线图。
-- 从 lifecycle foundation 走向 presence、messaging、social、competitive、matchmaking、match runtime、operations、SDKs 和 distributed runtime 的路径不够明确。
+- Source-first alpha 已经可见，但下一产品阶段仍需要明确的 prototype-ready foundation execution plan。
+- 从当前 feedback intake loop 走向 storage objects、messaging/push、更完整 examples、operations inspection、social、competitive、matchmaking、match runtime、SDKs 和 distributed runtime 的路径，需要通过 product maturity milestones 排序。
 
 ## 5. 阶段计划
 
@@ -144,6 +144,29 @@ current_near_term_priority: protocol_logout_and_connection_lifecycle
 - Chat、streams、realtime messaging。
 - Server push 和 broadcast vocabulary。
 - 面向 players、sessions、tokens、active connections 的 admin inspection。
+
+### Phase 2P：Prototype-Ready Foundation
+
+状态：
+
+```text
+phase_2p_prototype_ready_foundation: next_product_stage
+standard: docs/product-maturity-milestones.md
+next_work_item: W-0198 Define prototype-ready foundation execution plan
+```
+
+目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
+
+候选工作：
+
+- 降低 local setup、migration 和 configuration friction。
+- 添加更清晰的 example client 或 example app path。
+- 定义超出 inventory proof slice 的 first general storage-object behavior。
+- 定义第一版 realtime messaging、stream、broadcast 或 server-push behavior。
+- 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
+- 定义 serious prototype 使用前需要的最小 operations inspection surface。
+
+这一阶段不声明 production readiness。它选择下一批最小 product-useful slices，同时保留 source-alpha honesty 和现有 ask-first boundaries。
 
 ### Phase 4：Social And Competitive Modules
 

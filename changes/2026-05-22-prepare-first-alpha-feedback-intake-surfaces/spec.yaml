@@ -1,0 +1,164 @@
+schema_version: 0.1
+change_id: prepare-first-alpha-feedback-intake-surfaces
+date: 2026-05-22
+type: docs
+status: verified
+
+summary: Prepare the first alpha feedback intake surface and record product maturity milestones from source alpha to prototype-ready, production-candidate, and Nakama/Pitaya-class stages.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0105
+  referenced:
+    - ADR-0104
+    - ADR-0103
+    - ADR-0097
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0197
+  completed_milestone: M-125
+  previous_completed_work_item: W-0196
+  next_milestone: M-126
+  next_work_item: W-0198
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: first_alpha_feedback_intake_surfaces
+  next_direction: prototype_ready_foundation_execution_plan
+  first_alpha_feedback_intake_surfaces_prepared: true
+  first_alpha_feedback_intake_surfaces_decision: ADR-0105
+  first_alpha_feedback_intake_surfaces_check_rule: runtime.first_alpha_feedback_intake_surfaces
+  feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
+  feedback_intake_standard_translation: docs/first-alpha-feedback-intake-surfaces.zh-CN.md
+  feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
+  product_maturity_milestones_defined: true
+  product_maturity_milestones_standard: docs/product-maturity-milestones.md
+  product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
+  release_identifier: v0.1.0-alpha.1
+  source_first_alpha_release_available: true
+  user_discovery_loop_defined: true
+  issue_template_added: true
+  feedback_fields_recorded: true
+  redaction_expectations_recorded: true
+  triage_labels_recorded: true
+  product_maturity_mapping_recorded: true
+  stage_1_source_first_alpha: reached
+  stage_2_prototype_ready_foundation: next_product_stage
+  stage_3_single_node_production_candidate_foundation: planned
+  stage_4_nakama_pitaya_class_product: long_term_target
+  prototype_ready_foundation_execution_plan_next_ready: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change prepare-first-alpha-feedback-intake-surfaces --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - runtime_or_protocol_scope_requires_authorization
+    - secret_or_redaction_feedback
+    - feedback_surface_confuses_maturity_stage
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/first-alpha-feedback-intake-surfaces.md records the first alpha feedback intake surface.
+    - docs/first-alpha-feedback-intake-surfaces.zh-CN.md provides the paired Simplified Chinese translation.
+    - docs/product-maturity-milestones.md records source alpha, prototype-ready, production-candidate, and product-class stages.
+    - docs/product-maturity-milestones.zh-CN.md provides the paired Simplified Chinese translation.
+    - .github/ISSUE_TEMPLATE/alpha-feedback.yml provides the repository-owned feedback intake form.
+    - ADR-0105 records the feedback-intake and product-maturity decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change prepare-first-alpha-feedback-intake-surfaces --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

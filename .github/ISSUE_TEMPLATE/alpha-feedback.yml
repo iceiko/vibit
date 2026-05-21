@@ -1,0 +1,115 @@
+name: Alpha feedback
+description: Report source alpha friction, prototype gaps, or product-readiness blockers.
+title: "[alpha feedback]: "
+labels:
+  - alpha-feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying vibit `v0.1.0-alpha.1`.
+
+        Do not paste raw device credentials, raw access tokens, verifier keys, PostgreSQL DSNs with credentials, digests, headers, cookies, query strings, WebSocket subprotocol values, remote addresses, private environment files, GitHub tokens, or other secrets. Redact command output before sharing it.
+  - type: dropdown
+    id: developer_segment
+    attributes:
+      label: Developer segment
+      description: Pick the closest match.
+      options:
+        - Go game/backend developer
+        - Nakama/Pitaya/Colyseus/Pomelo/Agones evaluator
+        - AI-agent backend engineer
+        - Open-source contributor
+        - Prototype builder
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: attempted_action
+    attributes:
+      label: What did you try?
+      options:
+        - Read README
+        - Clone repository
+        - Run node tools/vibit check all
+        - Run Go tests
+        - Run examples/local-alpha-request-loop.sh
+        - Start runtime manually
+        - Inspect architecture or ADRs
+        - Evaluate contribution path
+        - Compare with another game backend framework
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: outcome
+    attributes:
+      label: Outcome
+      options:
+        - Completed
+        - Blocked
+        - Abandoned
+        - Unclear
+    validations:
+      required: true
+  - type: dropdown
+    id: first_blocker
+    attributes:
+      label: First blocker
+      description: What blocked or slowed you first?
+      options:
+        - Prerequisite or tool setup
+        - Command failure
+        - Documentation confusion
+        - Concept or positioning confusion
+        - Runtime gap
+        - Missing game backend feature
+        - Trust, safety, or production-readiness concern
+        - Packaging, container, SDK, or install friction
+        - No blocker
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: maturity_bucket
+    attributes:
+      label: Product maturity bucket
+      description: Choose the stage this feedback most affects.
+      options:
+        - source_alpha_friction
+        - prototype_ready_gap
+        - production_candidate_gap
+        - product_class_gap
+        - out_of_scope_for_now
+        - unsure
+    validations:
+      required: true
+  - type: textarea
+    id: details
+    attributes:
+      label: What happened?
+      description: Include short redacted commands, page names, or error summaries. Do not paste secrets.
+      placeholder: |
+        I ran `node tools/vibit check all` from the repository root and...
+    validations:
+      required: true
+  - type: textarea
+    id: expected_next_step
+    attributes:
+      label: What would make vibit worth a second try?
+      description: Name the smallest docs fix, setup fix, example, or capability that would unblock you.
+    validations:
+      required: true
+  - type: input
+    id: comparison
+    attributes:
+      label: Optional comparison context
+      description: If relevant, name the framework or backend stack you are comparing against.
+      placeholder: Nakama, Pitaya, Colyseus, Pomelo, Agones, custom Go backend, etc.
+  - type: checkboxes
+    id: redaction
+    attributes:
+      label: Redaction check
+      options:
+        - label: I removed raw credentials, raw tokens, verifier keys, DSNs with credentials, digests, headers, cookies, query strings, WebSocket subprotocol values, remote addresses, private environment files, GitHub tokens, and other secrets.
+          required: true

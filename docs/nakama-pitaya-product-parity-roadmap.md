@@ -105,8 +105,8 @@ Current completed foundation:
 
 Current gap:
 
-- The product parity target is not yet represented as a checkable roadmap.
-- The route from lifecycle foundation into presence, messaging, social, competitive, matchmaking, match runtime, operations, SDKs, and distributed runtime is not yet explicit enough for future agents.
+- The source-first alpha is visible, but the next product stage still needs an explicit prototype-ready foundation execution plan.
+- The route from the current feedback intake loop into storage objects, messaging/push, richer examples, operations inspection, social, competitive, matchmaking, match runtime, SDKs, and distributed runtime must be sequenced through product maturity milestones.
 
 ## 5. Phase Plan
 
@@ -144,6 +144,29 @@ Candidate work:
 - Chat, streams, and realtime messaging.
 - Server push and broadcast vocabulary.
 - Admin inspection for players, sessions, tokens, and active connections.
+
+### Phase 2P: Prototype-Ready Foundation
+
+Status:
+
+```text
+phase_2p_prototype_ready_foundation: next_product_stage
+standard: docs/product-maturity-milestones.md
+next_work_item: W-0198 Define prototype-ready foundation execution plan
+```
+
+Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
+
+Candidate work:
+
+- Reduce local setup, migration, and configuration friction.
+- Add a clearer example client or example app path.
+- Define first general storage-object behavior beyond the inventory proof slice.
+- Define first realtime messaging, stream, broadcast, or server-push behavior.
+- Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
+- Define the minimal operations inspection surface needed before serious prototype use.
+
+This phase does not declare production readiness. It selects the next smallest product-useful slices while preserving source-alpha honesty and the existing ask-first boundaries.
 
 ### Phase 4: Social And Competitive Modules
 

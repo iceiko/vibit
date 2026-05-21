@@ -128,6 +128,13 @@ The first alpha user discovery loop is:
 - `docs/first-alpha-user-discovery-loop.md`
 - `decisions/ADR-0104-first-alpha-user-discovery-loop.md`
 
+The first alpha feedback intake surface and product maturity milestones are:
+
+- `.github/ISSUE_TEMPLATE/alpha-feedback.yml`
+- `docs/first-alpha-feedback-intake-surfaces.md`
+- `docs/product-maturity-milestones.md`
+- `decisions/ADR-0105-first-alpha-feedback-intake-and-product-maturity-milestones.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -140,7 +147,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0197 Prepare first alpha feedback intake surfaces
+W-0198 Define prototype-ready foundation execution plan
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
@@ -196,6 +203,8 @@ Important entry points:
 - `docs/release-execution-authorization-gate.md`: release execution authorization criteria.
 - `docs/release-execution-final-authorization.md`: final release authorization record.
 - `docs/first-alpha-user-discovery-loop.md`: first alpha user discovery loop.
+- `docs/first-alpha-feedback-intake-surfaces.md`: first alpha feedback intake surface.
+- `docs/product-maturity-milestones.md`: source alpha, prototype-ready, production-candidate, and product-class milestones.
 - `docs/releases/v0.1.0-alpha.1.md`: alpha release notes.
 - `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
 - `changes/`: concrete change specs and verification records.

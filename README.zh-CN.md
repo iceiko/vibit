@@ -128,6 +128,13 @@ First alpha user discovery loop 是：
 - `docs/first-alpha-user-discovery-loop.md`
 - `decisions/ADR-0104-first-alpha-user-discovery-loop.md`
 
+First alpha feedback intake surface 和 product maturity milestones 是：
+
+- `.github/ISSUE_TEMPLATE/alpha-feedback.yml`
+- `docs/first-alpha-feedback-intake-surfaces.md`
+- `docs/product-maturity-milestones.md`
+- `decisions/ADR-0105-first-alpha-feedback-intake-and-product-maturity-milestones.md`
+
 ## 继续开发
 
 如果你是继续推进项目的 agent 或 contributor，先运行：
@@ -140,7 +147,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0197 Prepare first alpha feedback intake surfaces
+W-0198 Define prototype-ready foundation execution plan
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -196,6 +203,8 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/release-execution-authorization-gate.md`：release execution authorization criteria。
 - `docs/release-execution-final-authorization.md`：final release authorization record。
 - `docs/first-alpha-user-discovery-loop.md`：first alpha user discovery loop。
+- `docs/first-alpha-feedback-intake-surfaces.md`：first alpha feedback intake surface。
+- `docs/product-maturity-milestones.md`：source alpha、prototype-ready、production-candidate 和 product-class milestones。
 - `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
 - `changes/`：具体 change specs 和 verification records。

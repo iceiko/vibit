@@ -36,7 +36,7 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: first_alpha_feedback_intake_surfaces
+next_direction: prototype_ready_foundation_execution_plan
 next_work_status: next_ready
 ```
 
@@ -153,7 +153,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, and the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`. The next work is `W-0197 Prepare first alpha feedback intake surfaces`; it should prepare a bounded repository-owned way to receive early-user feedback without executing broad announcements, adding hosted deployment, expanding release artifacts, or changing runtime behavior.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, and product maturity milestones are recorded in `docs/product-maturity-milestones.md`. The next work is `W-0198 Define prototype-ready foundation execution plan`; it should define the smallest path from source-first alpha toward prototype-ready foundation without executing broad announcements, adding hosted deployment, expanding release artifacts, or changing runtime behavior.
 
 ## 9. Deferred Work
 

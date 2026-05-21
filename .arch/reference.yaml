@@ -33,8 +33,10 @@ release_target:
   current_state: v0.1_alpha_user_discovery_loop_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0197
-  immediate_next_direction: first_alpha_feedback_intake_surfaces
+  immediate_next_work_item: W-0198
+  immediate_next_direction: prototype_ready_foundation_execution_plan
+  product_maturity_milestones_standard: docs/product-maturity-milestones.md
+  product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
@@ -3661,20 +3663,41 @@ phase_plan:
     check_rule: runtime.first_alpha_user_discovery_loop
     rule: W-0196 defined a bounded first alpha user discovery loop without expanding release artifacts or runtime scope.
   phase_2dh_first_alpha_feedback_intake_surfaces:
-    status: next_ready
+    status: completed
     milestone: M-125
-    next_ready_work_item: W-0197
+    completed_work_item: W-0197
+    decision: ADR-0105
+    change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
+    next_milestone: M-126
+    next_ready_work_item: W-0198
     previous_completed_work_item: W-0196
     alpha_target_alignment: developer_experience
     selected_direction: first_alpha_feedback_intake_surfaces
+    next_direction: prototype_ready_foundation_execution_plan
     expected_change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
     reference_mapping:
       nakama: Feedback intake surfaces should make early user and contributor reports actionable without overstating production readiness.
       pitaya: Feedback intake surfaces should help Go game server developers report setup, route, session, and architecture friction.
+    feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
+    feedback_intake_standard_translation: docs/first-alpha-feedback-intake-surfaces.zh-CN.md
+    feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
+    product_maturity_milestones_standard: docs/product-maturity-milestones.md
+    product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
     release_identifier: v0.1.0-alpha.1
     source_first_alpha_release_available: true
     user_discovery_loop_defined: true
-    feedback_intake_surfaces_prepared: false
+    feedback_intake_surfaces_prepared: true
+    product_maturity_milestones_defined: true
+    issue_template_added: true
+    feedback_fields_recorded: true
+    redaction_expectations_recorded: true
+    triage_labels_recorded: true
+    product_maturity_mapping_recorded: true
+    stage_1_source_first_alpha: reached
+    stage_2_prototype_ready_foundation: next_product_stage
+    stage_3_single_node_production_candidate_foundation: planned
+    stage_4_nakama_pitaya_class_product: long_term_target
+    prototype_ready_foundation_execution_plan_next_ready: true
     additional_release_artifacts_authorized: false
     public_announcements_beyond_github_release_authorized: false
     paid_promotion_authorized: false
@@ -3688,7 +3711,36 @@ phase_plan:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0197 should prepare feedback intake surfaces without executing announcements or changing runtime scope.
+    check_rule: runtime.first_alpha_feedback_intake_surfaces
+    rule: W-0197 prepared feedback intake surfaces and product maturity milestones without executing announcements or changing runtime scope.
+  phase_2di_prototype_ready_foundation_execution_plan:
+    status: next_ready
+    milestone: M-126
+    next_ready_work_item: W-0198
+    previous_completed_work_item: W-0197
+    alpha_target_alignment: product_maturity
+    selected_direction: prototype_ready_foundation_execution_plan
+    expected_change: changes/2026-05-22-define-prototype-ready-foundation-execution-plan
+    reference_mapping:
+      nakama: The prototype-ready plan should identify the smallest shared online-service and developer-experience path toward serious game backend prototyping.
+      pitaya: The prototype-ready plan should preserve Go server lifecycle and routing boundaries while selecting the next usable foundation slice.
+    product_maturity_milestones_defined: true
+    target_stage: prototype_ready_foundation
+    planning_only: true
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0198 should define the prototype-ready foundation execution plan without implementing runtime or product module scope.
   phase_3_core_game_backend_modules:
     status: planned
     focus:

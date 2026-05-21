@@ -123,7 +123,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, and the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`. The next work is `W-0197 Prepare first alpha feedback intake surfaces`.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, and product maturity milestones are recorded in `docs/product-maturity-milestones.md`. The next work is `W-0198 Define prototype-ready foundation execution plan`.
 
 ## 11. Release Deferrals
 
@@ -155,6 +155,6 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
-next_direction: first_alpha_feedback_intake_surfaces
+next_direction: prototype_ready_foundation_execution_plan
 next_work_status: next_ready
 ```

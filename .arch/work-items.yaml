@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-125
+current_milestone: M-126
 
 release_targets:
   short_term:
@@ -13,15 +13,16 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: v0.1_alpha_user_discovery_loop_defined
+    current_release_state: v0.1_alpha_feedback_intake_prepared
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0197
+    next_ready_work_item: W-0198
     preferred_after_current:
-      - first_alpha_feedback_intake_surfaces
+      - prototype_ready_foundation_execution_plan
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
+    maturity_standard: docs/product-maturity-milestones.md
     near_term_standard: docs/v0.1-alpha-goal.md
     goal: Become an AI-era Nakama/Pitaya-class open-source game/backend server framework without accidental direct API compatibility.
     direct_api_compatibility_goal: false
@@ -2327,13 +2328,36 @@ milestones:
 
   - id: M-125
     title: First Alpha Feedback Intake Surfaces
-    status: active
+    status: completed
     goal: Prepare the smallest repository-owned surfaces for receiving early alpha user feedback before any broader outreach.
     completion_criteria:
       - The first feedback intake surface choice is recorded.
       - Feedback guidance, redaction expectations, labels or templates, and triage posture are prepared without executing broad announcements.
       - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, release artifact, public announcement, paid promotion, and direct compatibility deferrals remain preserved unless separately authorized.
     non_goals:
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - changing runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - changing authentication/session behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Prepared the first repository-owned alpha feedback intake surface at `.github/ISSUE_TEMPLATE/alpha-feedback.yml`, documented feedback fields, redaction expectations, triage labels, product maturity mapping, and triage posture in `docs/first-alpha-feedback-intake-surfaces.md` and its Simplified Chinese translation, recorded product maturity milestones from source-first alpha to prototype-ready foundation, single-node production-candidate foundation, and Nakama/Pitaya-class product in `docs/product-maturity-milestones.md`, accepted `ADR-0105`, added `runtime.first_alpha_feedback_intake_surfaces` check coverage, and opened `W-0198 Define prototype-ready foundation execution plan` without executing announcements, adding hosted deployment, expanding release artifacts, or changing runtime scope.
+
+  - id: M-126
+    title: Prototype Ready Foundation Execution Plan
+    status: active
+    goal: Define the smallest execution plan that moves vibit from source-first alpha toward a prototype-ready game/backend foundation.
+    completion_criteria:
+      - The first prototype-ready execution plan is recorded.
+      - The plan chooses a bounded sequence across setup friction, example/client ergonomics, shared online services, storage, messaging/push, verification, or operations inspection.
+      - The plan maps candidate work to product maturity milestones and Nakama/Pitaya capability families without claiming production readiness.
+      - Runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, authentication/session, release artifact, public announcement, paid promotion, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - implementing prototype-ready runtime behavior in the planning slice
       - executing public announcements beyond the GitHub release record
       - running paid promotion
       - adding hosted deployments or demos
@@ -7154,8 +7178,10 @@ work_items:
   - id: W-0197
     milestone: M-125
     title: Prepare first alpha feedback intake surfaces
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-prepare-first-alpha-feedback-intake-surfaces
+    commits:
+      - pending
     depends_on:
       - W-0196
     expected_change_id: prepare-first-alpha-feedback-intake-surfaces
@@ -7173,4 +7199,29 @@ work_items:
     completion:
       - Prepare the first repository-owned feedback intake surface for early alpha users.
       - Record the intake format, feedback fields, redaction expectations, labels or templates, and triage posture.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, release artifact, public announcement, paid promotion, authentication/session, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Prepared `.github/ISSUE_TEMPLATE/alpha-feedback.yml` as the first repository-owned alpha feedback intake surface, recorded intake format, redaction expectations, triage labels, product maturity buckets, and stop conditions in `docs/first-alpha-feedback-intake-surfaces.md`, recorded source-first alpha, prototype-ready foundation, single-node production-candidate foundation, and Nakama/Pitaya-class product stages in `docs/product-maturity-milestones.md`, accepted `ADR-0105`, added `runtime.first_alpha_feedback_intake_surfaces` check coverage, and opened `W-0198 Define prototype-ready foundation execution plan` without executing public announcements, paid promotion, hosted deployments, expanding release artifacts, changing runtime behavior, changing protocol/generated output/migrations/dependencies, broadening operations/admin, changing authentication/session behavior, adding broad product modules, or adding direct compatibility.
+
+  - id: W-0198
+    milestone: M-126
+    title: Define prototype-ready foundation execution plan
+    status: next_ready
+    change: changes/2026-05-22-define-prototype-ready-foundation-execution-plan
+    depends_on:
+      - W-0197
+    expected_change_id: define-prototype-ready-foundation-execution-plan
+    tier: tier_2_developer_experience
+    selected_direction: prototype_ready_foundation_execution_plan
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0105
+      - ADR-0104
+      - ADR-0097
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Public announcements beyond the GitHub release record, paid promotion, hosted deployments, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, broad operations/admin behavior, authentication/session behavior changes, direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the first prototype-ready foundation execution plan after the feedback intake surface is prepared.
+      - Record the recommended sequence, candidate work items, maturity-stage mapping, success criteria, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, release artifact, public announcement, paid promotion, authentication/session, and direct compatibility deferrals unless explicitly authorized.
