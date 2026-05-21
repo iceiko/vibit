@@ -154,16 +154,17 @@ phase_2p_prototype_ready_foundation: next_product_stage
 standard: docs/product-maturity-milestones.md
 execution_plan: docs/prototype-ready-foundation-execution-plan.md
 local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
-next_work_item: W-0200 Implement prototype-ready local development path package
+local_development_path_package: docs/prototype-ready-local-development-path-package.md
+next_work_item: W-0201 Define storage objects behavior gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
 
 Candidate work:
 
-- Reduce local setup, migration, and configuration friction.
+- Reduce local setup, migration, and configuration friction. Completed by `W-0200`.
 - Add a clearer example client or example app path.
-- Define first general storage-object behavior beyond the inventory proof slice.
+- Define first general storage-object behavior beyond the inventory proof slice. Next.
 - Define first realtime messaging, stream, broadcast, or server-push behavior.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.

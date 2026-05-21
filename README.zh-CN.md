@@ -41,6 +41,12 @@ cd .. && examples/local-alpha-request-loop.sh
 - local alpha request loop 会跑通 authenticated gameplay path；
 - script 不会打印 raw credentials、raw access tokens、verifier keys、DSNs、digests 或 transport metadata。
 
+已打包的 prototype-ready local path 是：
+
+- `docs/prototype-ready-local-development-path-package.md`
+- `examples/README.md`
+- `examples/local.prototype.env.example`
+
 Prerequisites：
 
 - Go；
@@ -110,6 +116,7 @@ Runtime 默认监听 `:8080`，并挂载：
 - 没有 direct Nakama/Pitaya API compatibility 承诺。
 
 PostgreSQL runtime path 是目前最完整的本地路径，但仍然需要 development setup：migrations、`VIBIT_POSTGRES_DSN` 和 authentication verifier key environment variables。见 `docs/runtime-runbook.md`。
+当前已打包的 local path 见 `docs/prototype-ready-local-development-path-package.md`。
 
 ## Release Notes
 
@@ -145,6 +152,11 @@ Prototype-ready local development path gate 是：
 - `docs/prototype-ready-local-development-path-gate.md`
 - `decisions/ADR-0107-prototype-ready-local-development-path-gate.md`
 
+Prototype-ready local development path package 是：
+
+- `docs/prototype-ready-local-development-path-package.md`
+- `decisions/ADR-0108-prototype-ready-local-development-path-package.md`
+
 ## 继续开发
 
 如果你是继续推进项目的 agent 或 contributor，先运行：
@@ -157,7 +169,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0200 Implement prototype-ready local development path package
+W-0201 Define storage objects behavior gate
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -215,8 +227,10 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/first-alpha-user-discovery-loop.md`：first alpha user discovery loop。
 - `docs/first-alpha-feedback-intake-surfaces.md`：first alpha feedback intake surface。
 - `docs/product-maturity-milestones.md`：source alpha、prototype-ready、production-candidate 和 product-class milestones。
+- `docs/prototype-ready-local-development-path-package.md`：可重复 source-first local development path。
 - `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
+- `examples/README.md`：local examples 和 redacted configuration template guidance。
 - `changes/`：具体 change specs 和 verification records。
 - `conversations/`：持久 maintainer-agent project memory。
 - `decisions/`：Agent Decision Records。

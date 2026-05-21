@@ -185,15 +185,15 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the local development path gate is:
+The next product direction after the local development path package is:
 
 ```text
-W-0200 Implement prototype-ready local development path package
+W-0201 Define storage objects behavior gate
 ```
 
-The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, and the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`. The next work should package the repeatable local development path inside that gate. It should make setup, migrations, configuration, secret redaction, example flow, and verification ergonomics credible enough for later prototype-ready implementation slices.
+The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, and the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`. The next work should define the first general storage-object behavior beyond the inventory proof slice before implementation.
 
-The prior directions `W-0198 Define prototype-ready foundation execution plan` and `W-0199 Define prototype-ready local development path gate` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first gate.
+The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, and `W-0200 Implement prototype-ready local development path package` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first package.
 
 The recorded candidate focus areas remain:
 

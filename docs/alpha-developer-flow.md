@@ -36,11 +36,15 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: prototype_ready_local_development_path_package
+prototype_ready_local_development_path_package_implemented: true
+prototype_ready_local_development_path_package: docs/prototype-ready-local-development-path-package.md
+next_direction: storage_objects_behavior_gate
 next_work_status: next_ready
 ```
 
 The repository has a source-first alpha authorization for `v0.1.0-alpha.1`. The packaged flow is ready for local review, and the authorized release surface remains Git tag, GitHub release record, release notes, and GitHub source archive only. Binaries, packages, containers, checksums, signing/provenance artifacts, hosted deployment, install scripts, registry publication, and public announcements beyond the GitHub release record remain deferred.
+
+The prototype-ready local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`. Its example and local placeholder configuration entry points are `examples/README.md` and `examples/local.prototype.env.example`.
 
 ## 3. Recommended Journey
 
@@ -70,7 +74,8 @@ examples/local-alpha-request-loop.sh
 ```
 
 8. Use `docs/runtime-runbook.md` when starting the server manually or evaluating the PostgreSQL runtime path.
-9. Use `.arch/work-items.yaml` and `node tools/vibit inspect next` to find the next bounded contribution.
+9. Read `docs/prototype-ready-local-development-path-package.md` when evaluating the repeatable source-first local path.
+10. Use `.arch/work-items.yaml` and `node tools/vibit inspect next` to find the next bounded contribution.
 
 ## 4. Runtime Entry Points
 
@@ -153,7 +158,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, and the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`. The next work is `W-0200 Implement prototype-ready local development path package`; it should package setup, migrations, configuration, secret redaction, example flow, and verification ergonomics inside the gate before broader product changes.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, and the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`. The next work is `W-0201 Define storage objects behavior gate`; it should define the first general storage-object behavior beyond the inventory proof slice before implementation.
 
 ## 9. Deferred Work
 

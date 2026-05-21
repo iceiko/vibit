@@ -41,6 +41,12 @@ What this proves today:
 - the local alpha request loop exercises the authenticated gameplay path;
 - the script avoids printing raw credentials, raw access tokens, verifier keys, DSNs, digests, or transport metadata.
 
+The packaged prototype-ready local path is:
+
+- `docs/prototype-ready-local-development-path-package.md`
+- `examples/README.md`
+- `examples/local.prototype.env.example`
+
 Prerequisites:
 
 - Go;
@@ -110,6 +116,7 @@ This alpha is not yet for production deployment, plug-and-play SDK use, hosted o
 - no direct Nakama/Pitaya API compatibility promise.
 
 The PostgreSQL runtime path is the most complete local path, but it still expects development setup: migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md`.
+For the current packaged local path, see `docs/prototype-ready-local-development-path-package.md`.
 
 ## Release Notes
 
@@ -145,6 +152,11 @@ The prototype-ready local development path gate is:
 - `docs/prototype-ready-local-development-path-gate.md`
 - `decisions/ADR-0107-prototype-ready-local-development-path-gate.md`
 
+The prototype-ready local development path package is:
+
+- `docs/prototype-ready-local-development-path-package.md`
+- `decisions/ADR-0108-prototype-ready-local-development-path-package.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -157,7 +169,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0200 Implement prototype-ready local development path package
+W-0201 Define storage objects behavior gate
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
@@ -215,8 +227,10 @@ Important entry points:
 - `docs/first-alpha-user-discovery-loop.md`: first alpha user discovery loop.
 - `docs/first-alpha-feedback-intake-surfaces.md`: first alpha feedback intake surface.
 - `docs/product-maturity-milestones.md`: source alpha, prototype-ready, production-candidate, and product-class milestones.
+- `docs/prototype-ready-local-development-path-package.md`: repeatable source-first local development path.
 - `docs/releases/v0.1.0-alpha.1.md`: alpha release notes.
 - `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
+- `examples/README.md`: local examples and redacted configuration template guidance.
 - `changes/`: concrete change specs and verification records.
 - `conversations/`: durable maintainer-agent project memory.
 - `decisions/`: Agent Decision Records.

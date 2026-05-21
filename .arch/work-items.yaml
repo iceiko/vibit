@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-128
+current_milestone: M-129
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: prototype_ready_local_development_path_gate_defined
+    current_release_state: prototype_ready_local_development_path_package_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0200
+    next_ready_work_item: W-0201
     preferred_after_current:
-      - prototype_ready_local_development_path_package
+      - storage_objects_behavior_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2395,7 +2395,7 @@ milestones:
 
   - id: M-128
     title: Prototype Ready Local Development Path Package
-    status: active
+    status: completed
     goal: Package a repeatable source-first local development path for prototype authors using the gate recorded in M-127.
     completion_criteria:
       - The local development path package is recorded and linked from contributor entry points.
@@ -2414,6 +2414,29 @@ milestones:
       - changing authentication/session behavior
       - adding broad operations/admin behavior
       - adding broad product modules
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the prototype-ready local development path package in `docs/prototype-ready-local-development-path-package.md` and `docs/prototype-ready-local-development-path-package.zh-CN.md`, added example entry points and a redacted placeholder local environment template under `examples/`, added `.gitignore` guardrails for private local env files, accepted `ADR-0108`, added `runtime.prototype_ready_local_development_path_package` check coverage, opened `W-0201 Define storage objects behavior gate`, and preserved deferrals for runtime behavior, protocol routes, Protobuf sources or generated output, migrations, dependencies, automatic startup migrations, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-129
+    title: Storage Objects Behavior Gate
+    status: active
+    goal: Define the first general storage-object behavior beyond the inventory proof slice before implementation.
+    completion_criteria:
+      - The first storage objects behavior gate is recorded.
+      - The gate defines object ownership, key/scope posture, read/write behavior, permission posture, conflict semantics, protocol/data expectations, verification expectations, and stop conditions before implementation.
+      - The gate preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding migrations or dependencies
+      - changing repository interfaces or storage adapters
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -7308,8 +7331,10 @@ work_items:
   - id: W-0200
     milestone: M-128
     title: Implement prototype-ready local development path package
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-implement-prototype-ready-local-development-path-package
+    commits:
+      - pending
     depends_on:
       - W-0199
     expected_change_id: implement-prototype-ready-local-development-path-package
@@ -7328,4 +7353,30 @@ work_items:
     completion:
       - Implement the prototype-ready local development path package inside the W-0199 gate.
       - Package setup, startup, migration, configuration, secret redaction, example-flow, and verification ergonomics using docs, scripts, examples, static checks, or focused verification of existing behavior.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Implemented the prototype-ready local development path package, recorded the fast source checkout path, supported prerequisites, redacted local configuration template, `.gitignore` secret guardrails, migration expectations, startup guidance, request-loop proof, verification commands, and stop conditions in `docs/prototype-ready-local-development-path-package.md`, accepted `ADR-0108`, added `examples/README.md`, `examples/README.zh-CN.md`, and `examples/local.prototype.env.example`, added `runtime.prototype_ready_local_development_path_package` check coverage, and selected `W-0201 Define storage objects behavior gate` as the next-ready work item without changing runtime behavior, protocol/generated output/migrations/dependencies, automatic startup migrations, broadening operations/admin, changing authentication/session behavior, adding hosted deployments, expanding release artifacts, executing announcements, running paid promotion, adding broad product modules, or adding direct compatibility.
+
+  - id: W-0201
+    milestone: M-129
+    title: Define storage objects behavior gate
+    status: next_ready
+    change: changes/2026-05-22-define-storage-objects-behavior-gate
+    depends_on:
+      - W-0200
+    expected_change_id: define-storage-objects-behavior-gate
+    tier: tier_2_functional
+    selected_direction: storage_objects_behavior_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0108
+      - ADR-0107
+      - ADR-0106
+      - ADR-0078
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, repository interface changes, storage adapter changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, or broad product module expansion beyond the storage-objects gate definition.
+    completion:
+      - Define the first storage objects behavior gate beyond the inventory proof slice.
+      - Record ownership, scope/key posture, read/write semantics, permissions, conflict behavior, protocol/data expectations, verification expectations, and stop conditions.
       - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, and direct compatibility deferrals unless explicitly authorized.

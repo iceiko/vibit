@@ -135,6 +135,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.first_alpha_feedback_intake_surfaces",
   "runtime.prototype_ready_foundation_execution_plan",
   "runtime.prototype_ready_local_development_path_gate",
+  "runtime.prototype_ready_local_development_path_package",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -25469,6 +25470,322 @@ function checkRuntimePrototypeReadyLocalDevelopmentPathGate(root, goFiles) {
   });
 }
 
+function checkRuntimePrototypeReadyLocalDevelopmentPathPackage(root, goFiles) {
+  const ruleId = "runtime.prototype_ready_local_development_path_package";
+  const decisionPath = "decisions/ADR-0108-prototype-ready-local-development-path-package.md";
+  const changePath = "changes/2026-05-22-implement-prototype-ready-local-development-path-package";
+  const conversationPath = "conversations/2026-05-22-prototype-ready-local-development-path-package.md";
+  const standardPath = "docs/prototype-ready-local-development-path-package.md";
+  const standardTranslationPath = "docs/prototype-ready-local-development-path-package.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0200", "completed")) {
+    ok("prototype-ready local development path package is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    standardPath,
+    standardTranslationPath,
+    "examples/README.md",
+    "examples/README.zh-CN.md",
+    "examples/local.prototype.env.example",
+    ".gitignore",
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for prototype-ready local development path package`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for prototype-ready local development path package`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-128"],
+    [".arch/work-items.yaml", "title: Prototype Ready Local Development Path Package"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0200"],
+    [".arch/work-items.yaml", "ADR-0108"],
+    [".arch/work-items.yaml", "id: M-129"],
+    [".arch/work-items.yaml", "title: Storage Objects Behavior Gate"],
+    [".arch/work-items.yaml", "id: W-0201"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "prototype_ready_local_development_path_package: ADR-0108"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "prototype_ready_local_development_path_package:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0200"],
+    [".arch/runtime.yaml", "decision: ADR-0108"],
+    [".arch/runtime.yaml", "package_standard: docs/prototype-ready-local-development-path-package.md"],
+    [".arch/runtime.yaml", "package_standard_translation: docs/prototype-ready-local-development-path-package.zh-CN.md"],
+    [".arch/runtime.yaml", "prototype_ready_local_development_path_package_implemented: true"],
+    [".arch/runtime.yaml", "quick_source_path_recorded: true"],
+    [".arch/runtime.yaml", "prerequisite_check_recorded: true"],
+    [".arch/runtime.yaml", "redacted_local_configuration_template_added: true"],
+    [".arch/runtime.yaml", "gitignore_local_secret_guard_added: true"],
+    [".arch/runtime.yaml", "migration_expectations_packaged: true"],
+    [".arch/runtime.yaml", "runtime_startup_guidance_packaged: true"],
+    [".arch/runtime.yaml", "example_flow_script_recorded: true"],
+    [".arch/runtime.yaml", "request_loop_proof_recorded: true"],
+    [".arch/runtime.yaml", "verification_commands_recorded: true"],
+    [".arch/runtime.yaml", "stop_conditions_recorded: true"],
+    [".arch/runtime.yaml", "storage_objects_behavior_gate:"],
+    [".arch/runtime.yaml", "check_rule: runtime.prototype_ready_local_development_path_package"],
+    [".arch/conventions.yaml", "prototype_ready_local_development_path_package:"],
+    [".arch/conventions.yaml", "prototype_ready_local_development_path_package_implemented: true"],
+    [".arch/conventions.yaml", "check_rule: runtime.prototype_ready_local_development_path_package"],
+    [".arch/conventions.yaml", "storage_objects_behavior_gate:"],
+    [".arch/contracts.yaml", "prototype_ready_local_development_path_package:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.prototype_ready_local_development_path_package"],
+    [".arch/contracts.yaml", "storage_objects_behavior_gate:"],
+    [".arch/reference.yaml", "phase_2dk_prototype_ready_local_development_path_package"],
+    [".arch/reference.yaml", "check_rule: runtime.prototype_ready_local_development_path_package"],
+    [".arch/reference.yaml", "phase_2dl_storage_objects_behavior_gate"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["README.md", "examples/local.prototype.env.example"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["README.zh-CN.md", "examples/local.prototype.env.example"],
+    ["docs/alpha-developer-flow.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/alpha-developer-flow.md", "examples/local.prototype.env.example"],
+    ["docs/alpha-developer-flow.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/alpha-developer-flow.zh-CN.md", "examples/local.prototype.env.example"],
+    ["docs/alpha-developer-flow.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/alpha-acceptance-checklist.md", "examples/local.prototype.env.example"],
+    ["docs/alpha-acceptance-checklist.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "examples/local.prototype.env.example"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", "docs/prototype-ready-local-development-path-package.md"],
+    ["AGENTS.md", "runtime.prototype_ready_local_development_path_package"],
+    ["AGENTS.md", "W-0201"],
+    ["AGENTS.zh-CN.md", "runtime.prototype_ready_local_development_path_package"],
+    ["AGENTS.zh-CN.md", "W-0201"],
+    ["runtime/AGENTS.md", "runtime.prototype_ready_local_development_path_package"],
+    ["runtime/AGENTS.md", "W-0201"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.prototype_ready_local_development_path_package"],
+    ["runtime/AGENTS.zh-CN.md", "W-0201"],
+    ["rules/check-rules.json", "runtime.prototype_ready_local_development_path_package"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0108",
+      "docs/prototype-ready-local-development-path-package.md",
+      "runtime.prototype_ready_local_development_path_package",
+      "completed_work_item: W-0200",
+      "next_work_item: W-0201",
+      "next_direction: storage_objects_behavior_gate",
+      "W-0201 Define storage objects behavior gate",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0200",
+      "completed_milestone: M-128",
+      "previous_completed_work_item: W-0199",
+      "next_milestone: M-129",
+      "next_work_item: W-0201",
+      "next_work_item_status: next_ready",
+      "prototype_ready_local_development_path_package_implemented: true",
+      "prototype_ready_local_development_path_package_check_rule: runtime.prototype_ready_local_development_path_package",
+      "package_standard: docs/prototype-ready-local-development-path-package.md",
+      "redacted_local_configuration_template_added: true",
+      "gitignore_local_secret_guard_added: true",
+      "migration_expectations_packaged: true",
+      "runtime_startup_guidance_packaged: true",
+      "request_loop_proof_recorded: true",
+      "docs_scripts_examples_checks_only_scope: true",
+      "public_announcements_beyond_github_release_authorized_by_this_change: false",
+      "paid_promotion_authorized_by_this_change: false",
+      "additional_release_artifacts_authorized_by_this_change: false",
+      "hosted_deployment_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "authentication_session_behavior_changed: false",
+      "startup_configuration_semantics_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "broad_operations_admin_behavior_added: false",
+      "product_module_expansion_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [standardPath]: [
+      "prototype_ready_local_development_path_package: implemented",
+      "completed_work_item: W-0200",
+      "decision: ADR-0108",
+      "check_rule: runtime.prototype_ready_local_development_path_package",
+      "gate_decision: ADR-0107",
+      "redacted_local_configuration_template_added: true",
+      "gitignore_local_secret_guard_added: true",
+      "migration_expectations_packaged: true",
+      "runtime_startup_guidance_packaged: true",
+      "request_loop_proof_recorded: true",
+      "W-0201 Define storage objects behavior gate",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "prototype_ready_local_development_path_package: implemented",
+      "completed_work_item: W-0200",
+      "decision: ADR-0108",
+      "check_rule: runtime.prototype_ready_local_development_path_package",
+      "gate_decision: ADR-0107",
+      "redacted_local_configuration_template_added: true",
+      "gitignore_local_secret_guard_added: true",
+      "migration_expectations_packaged: true",
+      "runtime_startup_guidance_packaged: true",
+      "request_loop_proof_recorded: true",
+      "W-0201 Define storage objects behavior gate",
+      "Stop Conditions",
+    ],
+    ["examples/README.md"]: [
+      "examples/local-alpha-request-loop.sh",
+      "examples/local.prototype.env.example",
+      "raw credentials",
+      "raw access tokens",
+      "verifier keys",
+      "DSNs",
+    ],
+    ["examples/README.zh-CN.md"]: [
+      "examples/local-alpha-request-loop.sh",
+      "local.prototype.env.example",
+      "raw credentials",
+      "raw access tokens",
+      "verifier keys",
+      "DSNs",
+    ],
+    ["examples/local.prototype.env.example"]: [
+      "VIBIT_RUNTIME_STORE=postgres",
+      "VIBIT_POSTGRES_DSN=postgres://<local-user>:<local-password>@127.0.0.1:5432/<local-db>?sslmode=disable",
+      "VIBIT_AUTH_VERIFIER_KEY_SET_ID=<local-key-set-id>",
+      "VIBIT_AUTH_CREDENTIAL_LOOKUP_KEY=<base64-32-byte-minimum-local-key>",
+      "VIBIT_AUTH_TOKEN_VERIFIER_KEY=<base64-32-byte-minimum-local-key>",
+    ],
+    [".gitignore"]: [
+      ".vibit.local.env",
+      ".env.local",
+      ".env.*.local",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    "examples/README.md",
+    "examples/README.zh-CN.md",
+    "examples/local.prototype.env.example",
+  ];
+  const forbiddenPatterns = [
+    { pattern: /public_announcements_beyond_github_release_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "public announcement authorization" },
+    { pattern: /public_announcement_executed:\s*true/, label: "public announcement execution" },
+    { pattern: /paid_promotion_(?:authorized|executed)(?:_by_this_(?:decision|change))?:\s*true/, label: "paid promotion" },
+    { pattern: /hosted_deployment_(?:authorized|added)(?:_by_this_(?:decision|change))?:\s*true/, label: "hosted deployment" },
+    { pattern: /additional_release_artifacts_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "additional release artifacts" },
+    { pattern: /release_binary_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release binary" },
+    { pattern: /release_package_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release package" },
+    { pattern: /release_container_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release container" },
+    { pattern: /release_checksum_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release checksum" },
+    { pattern: /release_provenance_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release provenance" },
+    { pattern: /release_signing_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "release signing" },
+    { pattern: /install_script_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "install script" },
+    { pattern: /registry_publication_(?:authorized|created)(?:_by_this_(?:decision|change))?:\s*true/, label: "registry publication" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /startup_configuration_semantics_changed:\s*true/, label: "startup configuration semantic change" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_added:\s*true/, label: "migration addition" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /repository_interface_changed:\s*true/, label: "repository interface change" },
+    { pattern: /storage_adapter_changed:\s*true/, label: "storage adapter change" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+/, label: "GitHub token-like text" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses prototype-ready local development path package boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bprototype_ready_local_development_path_package\b|\bPrototypeReady\b|\bLocalDevelopmentPath\b|\bHostedDemo\b|\bReleaseArtifact\b|\bPaidPromotion\b/, label: "prototype-ready local development package runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for prototype-ready local development path package: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("prototype-ready local development path package is implemented while runtime, protocol, generated-output, migration, dependency, operations, authentication/session, artifact, hosted deployment, announcement, paid promotion, product-scope, and direct compatibility deferrals remain preserved", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -27144,6 +27461,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0200", "next_ready_work_item: W-0201"],
     ["W-0199", "next_ready_work_item: W-0200"],
     ["W-0198", "next_ready_work_item: W-0199"],
     ["W-0197", "next_ready_work_item: W-0198"],
@@ -27172,6 +27490,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0200", "completed")) {
+    return "next_work_item: W-0201";
+  }
   if (workItemHasStatus(root, "W-0199", "completed")) {
     return "next_work_item: W-0200";
   }
@@ -27201,6 +27522,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0200", "storage_objects_behavior_gate"],
     ["W-0199", "prototype_ready_local_development_path_package"],
     ["W-0198", "prototype_ready_local_development_path_gate"],
     ["W-0197", "prototype_ready_foundation_execution_plan"],
@@ -27229,6 +27551,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0200", "W-0201 Define storage objects behavior gate"],
     ["W-0199", "W-0200 Implement prototype-ready local development path package"],
     ["W-0198", "W-0199 Define prototype-ready local development path gate"],
     ["W-0197", "W-0198 Define prototype-ready foundation execution plan"],
@@ -27258,6 +27581,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0200", "current_phase: storage_objects_behavior_gate"],
     ["W-0199", "current_phase: prototype_ready_local_development_path_package"],
     ["W-0198", "current_phase: prototype_ready_local_development_path_gate"],
     ["W-0197", "current_phase: prototype_ready_foundation_execution_plan"],
@@ -27817,6 +28141,7 @@ function checkRuntime(root) {
   checkRuntimeFirstAlphaFeedbackIntakeSurfaces(root, goFiles);
   checkRuntimePrototypeReadyFoundationExecutionPlan(root, goFiles);
   checkRuntimePrototypeReadyLocalDevelopmentPathGate(root, goFiles);
+  checkRuntimePrototypeReadyLocalDevelopmentPathPackage(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

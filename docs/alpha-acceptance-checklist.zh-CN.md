@@ -36,7 +36,8 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 blocked final release authorization step。
+- [x] `node tools/vibit inspect next` 能识别当前 `W-0201 Define storage objects behavior gate` continuation step。
+- [x] `docs/prototype-ready-local-development-path-package.md` 已打包可重复 source-first local path。
 
 ## 4. Local Prerequisites
 
@@ -52,6 +53,8 @@ Review alpha flow 时使用这些状态：
 - [x] `VIBIT_RUNTIME_STORE=memory` 仍是默认 bootstrap path。
 - [x] `VIBIT_RUNTIME_STORE=postgres` 已记录为当前 alpha runtime composition。
 - [x] PostgreSQL runtime startup 要求 `VIBIT_POSTGRES_DSN` 和 verifier key environment variables。
+- [x] `examples/local.prototype.env.example` 提供 placeholder-only local configuration checklist。
+- [x] `.gitignore` 会忽略 `.vibit.local.env`、`.env.local` 和 `.env.*.local`。
 - [x] Verifier key material、raw device credentials、raw access tokens、DSNs、digests、headers、cookies、query strings、subprotocol values、remote addresses 和 concrete transport metadata 都被记录为不是 log-safe。
 - [x] Local alpha request-loop script 不打印 raw credentials、raw tokens、verifier keys、DSNs、digests 或 transport metadata。
 - [x] `/configz` 只报告 redacted posture，并包含 `secrets_redacted: true`。
@@ -122,7 +125,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`。下一步 work 是 `W-0200 Implement prototype-ready local development path package`。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`。下一步 work 是 `W-0201 Define storage objects behavior gate`。
 
 ## 11. Release Deferrals
 
@@ -154,6 +157,7 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
-next_direction: prototype_ready_local_development_path_package
+prototype_ready_local_development_path_package_implemented: true
+next_direction: storage_objects_behavior_gate
 next_work_status: next_ready
 ```

@@ -35,11 +35,15 @@ release_identifier_artifact_plan_defined: true
 release_execution_final_authorization_recorded: true
 proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
-next_direction: prototype_ready_local_development_path_package
+prototype_ready_local_development_path_package_implemented: true
+prototype_ready_local_development_path_package: docs/prototype-ready-local-development-path-package.md
+next_direction: storage_objects_behavior_gate
 next_work_status: next_ready
 ```
 
 Repository 已获得 `v0.1.0-alpha.1` 的 source-first alpha authorization。Packaged flow 已准备好进行 local review，授权 release surface 仍只包括 Git tag、GitHub release record、release notes 和 GitHub source archive。Binaries、packages、containers、checksums、signing/provenance artifacts、hosted deployment、install scripts、registry publication，以及 GitHub release record 之外的 public announcements 继续 deferred。
+
+Prototype-ready local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`。它的 example 和 local placeholder configuration 入口是 `examples/README.md` 和 `examples/local.prototype.env.example`。
 
 ## 3. 推荐 Journey
 
@@ -69,7 +73,8 @@ examples/local-alpha-request-loop.sh
 ```
 
 8. 手动启动 server 或评估 PostgreSQL runtime path 时，使用 `docs/runtime-runbook.md`。
-9. 使用 `.arch/work-items.yaml` 和 `node tools/vibit inspect next` 找到下一步 bounded contribution。
+9. 评估可重复 source-first local path 时，阅读 `docs/prototype-ready-local-development-path-package.md`。
+10. 使用 `.arch/work-items.yaml` 和 `node tools/vibit inspect next` 找到下一步 bounded contribution。
 
 ## 4. Runtime Entry Points
 
@@ -152,7 +157,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`。下一步 work 是 `W-0200 Implement prototype-ready local development path package`；它应在 gate 内打包 setup、migrations、configuration、secret redaction、example flow 和 verification ergonomics，再进入更宽的产品改动。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`。下一步 work 是 `W-0201 Define storage objects behavior gate`；它应在 implementation 之前定义 inventory proof slice 之外的第一版 general storage-object behavior。
 
 ## 9. Deferred Work
 

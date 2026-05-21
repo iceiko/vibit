@@ -37,7 +37,8 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current blocked final release authorization step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0201 Define storage objects behavior gate` continuation step.
+- [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
 
@@ -53,6 +54,8 @@ Use these states when reviewing the alpha flow:
 - [x] `VIBIT_RUNTIME_STORE=memory` remains the default bootstrap path.
 - [x] `VIBIT_RUNTIME_STORE=postgres` is documented as the current alpha runtime composition.
 - [x] PostgreSQL runtime startup requires `VIBIT_POSTGRES_DSN` and verifier key environment variables.
+- [x] `examples/local.prototype.env.example` provides a placeholder-only local configuration checklist.
+- [x] `.gitignore` ignores `.vibit.local.env`, `.env.local`, and `.env.*.local`.
 - [x] Verifier key material, raw device credentials, raw access tokens, DSNs, digests, headers, cookies, query strings, subprotocol values, remote addresses, and concrete transport metadata are documented as not log-safe.
 - [x] The local alpha request-loop script does not print raw credentials, raw tokens, verifier keys, DSNs, digests, or transport metadata.
 - [x] `/configz` reports only redacted posture and includes `secrets_redacted: true`.
@@ -123,7 +126,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, and the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`. The next work is `W-0200 Implement prototype-ready local development path package`.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, and the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`. The next work is `W-0201 Define storage objects behavior gate`.
 
 ## 11. Release Deferrals
 
@@ -155,6 +158,7 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
-next_direction: prototype_ready_local_development_path_package
+prototype_ready_local_development_path_package_implemented: true
+next_direction: storage_objects_behavior_gate
 next_work_status: next_ready
 ```
