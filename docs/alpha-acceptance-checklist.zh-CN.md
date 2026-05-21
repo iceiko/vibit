@@ -5,7 +5,7 @@
 范围：vibit 的本地 v0.1 alpha acceptance criteria
 说明：本文件是 `docs/alpha-acceptance-checklist.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
-本 checklist 不是 release declaration。它是给 maintainer 和 contributor 使用的验收清单，用于判断本地 `v0.1 alpha` developer flow 是否已经准备好进入后续 package 和 publish 工作。
+本 checklist 不是 release declaration。它是给 maintainer 和 contributor 使用的验收清单，用于判断本地 `v0.1 alpha` developer flow 是否已经准备好进行 local inspection，并供后续考虑 publishing。
 
 ## 1. 目的
 
@@ -116,7 +116,13 @@ cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit
 
 ## 10. Contribution Entry Point
 
-本 checklist 存在后，下一步推荐 contribution 是整理 alpha developer flow documentation 和 entry points，但不发布 release。该后续工作应让 README、runbook、request-loop script、status endpoints、acceptance checklist 和 contribution path 组合成一条完整 developer journey。
+Alpha developer flow 现在已经 packaged 在：
+
+```text
+docs/alpha-developer-flow.md
+```
+
+下一步推荐 contribution 是定义 release publishing decision gate，但不发布 release。该 gate 应在未来任何 release-publishing work 前，决定 prerequisites、release artifact boundaries、verification requirements 和 stop conditions。
 
 ## 11. Release Deferrals
 
@@ -131,13 +137,14 @@ cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit
 
 ## 12. Current Acceptance Result
 
-Local alpha flow 已经可以检查，并接近进入 packaging；但 repository 仍是 pre-alpha，直到后续 release-publishing work item 明确声明。
+Local alpha flow 已经可以检查，并已 packaged 供 local developer review；但 repository 仍是 pre-alpha，直到后续 release-publishing work item 明确声明。
 
 当前结果：
 
 ```text
 local_alpha_flow_checkable: true
+local_alpha_developer_flow_packaged: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: package_alpha_developer_flow
+next_direction: release_publishing_decision_gate
 ```

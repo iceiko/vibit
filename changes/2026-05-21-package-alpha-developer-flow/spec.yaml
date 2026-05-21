@@ -1,0 +1,133 @@
+schema_version: 0.1
+change_id: package-alpha-developer-flow
+date: 2026-05-21
+type: docs
+status: verified
+
+summary: Package the existing local alpha developer flow into one coherent contributor journey without declaring or publishing a release.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0097
+  referenced:
+    - ADR-0096
+    - ADR-0095
+    - ADR-0094
+    - ADR-0093
+    - ADR-0092
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0189
+  completed_milestone: M-117
+  previous_completed_work_item: W-0188
+  next_milestone: M-118
+  next_work_item: W-0190
+  next_work_item_status: next_ready
+  tier: tier_2_developer_experience
+  selected_direction: package_alpha_developer_flow
+  package_alpha_developer_flow_completed: true
+  package_alpha_developer_flow_decision: ADR-0097
+  package_alpha_developer_flow_check_rule: runtime.package_alpha_developer_flow
+  packaged_flow: docs/alpha-developer-flow.md
+  packaged_flow_translation: docs/alpha-developer-flow.zh-CN.md
+  local_alpha_developer_flow_packaged: true
+  release_declared: false
+  release_publishing_authorized_by_this_change: false
+  release_packaging_authorized_by_this_change: false
+  release_packaging_added: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  startup_configuration_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  packaged_flow_connects:
+    - README.md
+    - docs/runtime-runbook.md
+    - examples/local-alpha-request-loop.sh
+    - /healthz
+    - /readyz
+    - /version
+    - /configz
+    - docs/alpha-acceptance-checklist.md
+    - node tools/vibit inspect next
+  known_deferrals:
+    - release_publishing_decision_gate
+    - release_publishing
+    - release_packaging
+    - hosted_deployments
+    - public_local_onboarding_protocol_route
+    - production_signup
+    - broad_operations_admin_behavior
+    - direct_nakama_pitaya_api_compatibility
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  ownership_changes:
+    - docs/alpha-developer-flow.md records the packaged local alpha developer journey.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit check change package-alpha-developer-flow --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./cmd/vibit-server
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+    - git diff --check
+  status: Verified

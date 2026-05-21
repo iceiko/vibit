@@ -180,7 +180,15 @@ examples/local-alpha-request-loop.sh
 7. `runtime.authentication.LogoutAccessToken` 只 revoke presented access token。
 8. 后续如果继续用同一个 revoked token 访问 protected route，会被拒绝。
 
-当前 public protocol 不包含 local onboarding route。直接运行 PostgreSQL server process 的开发者，仍需要未来 local tool、request-loop script 或受控 seed path 来调用 local onboarding 并获得第一个 device credential。该 follow-up 在本 runbook refresh 之后继续排队。
+当前 public protocol 不包含 local onboarding route。直接运行 PostgreSQL server process 的开发者，仍需要未来 local tool、request-loop script 或受控 seed path 来调用 local onboarding 并获得第一个 device credential。
+
+Packaged local alpha developer journey 是：
+
+```text
+docs/alpha-developer-flow.md
+```
+
+它把 README、本 runbook、redacted request-loop script、local status endpoints、acceptance checklist、PostgreSQL manual setup posture、verification commands 和下一步 contribution path 连接起来。Packaged flow 现在已经存在；下一处缺口是 release publishing decision gate，而不是 release publishing 本身。
 
 Local alpha acceptance checklist 是：
 

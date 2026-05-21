@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-117
+current_milestone: M-118
 
 release_targets:
   short_term:
@@ -15,9 +15,8 @@ release_targets:
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
     current_release_state: pre_alpha
     release_declared: false
-    next_ready_work_item: W-0189
+    next_ready_work_item: W-0190
     preferred_after_current:
-      - package_alpha_developer_flow
       - release_publishing_decision_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
@@ -2164,7 +2163,7 @@ milestones:
 
   - id: M-117
     title: Package Alpha Developer Flow
-    status: active
+    status: completed
     goal: Package the existing alpha developer flow documentation and entry points into a coherent local developer journey without publishing a release or adding runtime behavior.
     completion_criteria:
       - README, runbook, request-loop script, status endpoints, acceptance checklist, and contribution path fit together as one developer journey.
@@ -2174,6 +2173,26 @@ milestones:
     non_goals:
       - publishing v0.1 alpha
       - creating release tags or binaries
+      - adding runtime behavior
+      - adding protocol routes or generated output
+      - adding migrations or dependencies
+      - adding broad operations/admin behavior
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Added `docs/alpha-developer-flow.md` and `docs/alpha-developer-flow.zh-CN.md` as the packaged local alpha developer journey. The flow connects README intake, v0.1 alpha goal, alpha acceptance checklist, runtime runbook, status endpoints, the redacted local request-loop script, PostgreSQL manual setup posture, verification commands, redaction rules, and the next contribution entry point. It does not declare or publish a release, add release packaging, create release artifacts, add hosted deployments, change runtime behavior, change protocol routes, change Protobuf sources or generated output, add migrations, add dependencies, broaden operations/admin behavior, change authentication/session behavior, expand product modules, or select direct Nakama/Pitaya API compatibility.
+
+  - id: M-118
+    title: Release Publishing Decision Gate
+    status: active
+    goal: Decide whether and how to publish v0.1 alpha without publishing it in the gate step.
+    completion_criteria:
+      - The gate defines release-publishing prerequisites, release artifact boundaries, verification requirements, and stop conditions.
+      - The gate distinguishes a decision to publish later from the act of publishing.
+      - The gate preserves runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, and direct compatibility deferrals unless separately authorized.
+      - The resulting decision gate is covered by repository checks or explicit verification notes.
+    non_goals:
+      - publishing v0.1 alpha in the gate slice
+      - creating release tags or binaries in the gate slice
+      - creating hosted deployments
       - adding runtime behavior
       - adding protocol routes or generated output
       - adding migrations or dependencies
@@ -6730,7 +6749,7 @@ work_items:
   - id: W-0189
     milestone: M-117
     title: Package alpha developer flow
-    status: next_ready
+    status: completed
     change: changes/2026-05-21-package-alpha-developer-flow
     depends_on:
       - W-0188
@@ -6739,6 +6758,7 @@ work_items:
     selected_direction: package_alpha_developer_flow
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0097
       - ADR-0096
       - ADR-0095
       - ADR-0094
@@ -6752,3 +6772,31 @@ work_items:
       - Package the existing alpha developer flow documentation and entry points into a coherent local developer journey.
       - Align README, runbook, request-loop script, status endpoints, acceptance checklist, and contribution path.
       - Preserve release publishing, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.
+    completion_summary: Added the packaged alpha developer flow and Simplified Chinese translation, recorded `ADR-0097`, and added repository check coverage through `runtime.package_alpha_developer_flow`. The package connects README, goal, runbook, request-loop script, status endpoints, acceptance checklist, redaction rules, PostgreSQL manual setup posture, verification commands, and contribution continuation into one local developer journey while preserving release publishing, release packaging, hosted deployment, runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, and direct compatibility deferrals.
+
+  - id: W-0190
+    milestone: M-118
+    title: Define release publishing decision gate
+    status: next_ready
+    change: changes/2026-05-21-define-release-publishing-decision-gate
+    depends_on:
+      - W-0189
+    expected_change_id: define-release-publishing-decision-gate
+    tier: tier_2_developer_experience
+    selected_direction: release_publishing_decision_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0097
+      - ADR-0096
+      - ADR-0095
+      - ADR-0094
+      - ADR-0093
+      - ADR-0092
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Publishing v0.1 alpha, creating release tags or binaries, adding hosted deployments, adding runtime behavior, changing protocol routes, changing Protobuf sources or generated output, adding migrations, adding dependencies, broadening operations/admin behavior, changing authentication/session behavior, selecting direct Nakama/Pitaya API compatibility, or broad product module expansion.
+    completion:
+      - Define the release publishing decision gate without publishing a release.
+      - Specify release-publishing prerequisites, release artifact boundaries, verification requirements, and stop conditions.
+      - Preserve runtime behavior, protocol, generated output, migration, dependency, operations/admin, broad product module, hosted deployment, and direct compatibility deferrals.

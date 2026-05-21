@@ -181,7 +181,15 @@ Current alpha path details:
 7. `runtime.authentication.LogoutAccessToken` revokes only the presented access token.
 8. A later protected request using the same revoked token is rejected.
 
-The current public protocol does not include a local onboarding route. A developer who runs the PostgreSQL server process directly still needs a future local tool, request-loop script, or controlled seed path to call local onboarding and obtain the first device credential. That follow-up is tracked after this runbook refresh.
+The current public protocol does not include a local onboarding route. A developer who runs the PostgreSQL server process directly still needs a future local tool, request-loop script, or controlled seed path to call local onboarding and obtain the first device credential.
+
+The packaged local alpha developer journey is:
+
+```text
+docs/alpha-developer-flow.md
+```
+
+It connects the README, this runbook, the redacted request-loop script, local status endpoints, the acceptance checklist, PostgreSQL manual setup posture, verification commands, and the next contribution path. The packaged flow exists now; the next gap is a release publishing decision gate, not release publishing itself.
 
 The local alpha acceptance checklist is:
 

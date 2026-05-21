@@ -6,7 +6,7 @@ Scope: Local v0.1 alpha acceptance criteria for vibit
 
 The paired Simplified Chinese translation is `docs/alpha-acceptance-checklist.zh-CN.md`. The English file is authoritative.
 
-This checklist is not a release declaration. It is the maintainer-facing and contributor-facing checklist for deciding whether the local `v0.1 alpha` developer flow is ready to package and publish later.
+This checklist is not a release declaration. It is the maintainer-facing and contributor-facing checklist for deciding whether the local `v0.1 alpha` developer flow is ready to inspect locally and consider for later publishing.
 
 ## 1. Purpose
 
@@ -117,7 +117,13 @@ cd runtime && VIBIT_POSTGRES_TEST_DSN='postgres://user:pass@127.0.0.1:5432/vibit
 
 ## 10. Contribution Entry Point
 
-After this checklist exists, the next preferred contribution is to package the alpha developer flow documentation and entry points without publishing a release. That follow-up should make the README, runbook, request-loop script, status endpoints, acceptance checklist, and contribution path fit together as a single developer journey.
+The alpha developer flow is now packaged in:
+
+```text
+docs/alpha-developer-flow.md
+```
+
+The next preferred contribution is to define the release publishing decision gate without publishing a release. That gate should decide prerequisites, release artifact boundaries, verification requirements, and stop conditions before any future release-publishing work.
 
 ## 11. Release Deferrals
 
@@ -132,13 +138,14 @@ The following remain deferred until a later explicit work item:
 
 ## 12. Current Acceptance Result
 
-The local alpha flow is checkable and close to packaging, but the repository is still pre-alpha until a later release-publishing work item explicitly declares otherwise.
+The local alpha flow is checkable and packaged for local developer review, but the repository is still pre-alpha until a later release-publishing work item explicitly declares otherwise.
 
 Current result:
 
 ```text
 local_alpha_flow_checkable: true
+local_alpha_developer_flow_packaged: true
 release_declared: false
 release_publishing_authorized_by_this_checklist: false
-next_direction: package_alpha_developer_flow
+next_direction: release_publishing_decision_gate
 ```

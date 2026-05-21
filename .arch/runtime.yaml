@@ -98,17 +98,18 @@ purpose: >
   minimal_example_client_or_request_loop: ADR-0094
   health_readiness_version_config_surface: ADR-0095
   alpha_acceptance_checklist: ADR-0096
+  package_alpha_developer_flow: ADR-0097
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: package_alpha_developer_flow
+  current_phase: release_publishing_decision_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: false
-  next_ready_work_item: W-0189
+  next_ready_work_item: W-0190
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -5585,16 +5586,64 @@ identity_session_boundary:
     rule: W-0188 added an alpha acceptance checklist without publishing a release or expanding runtime/product scope.
 
   package_alpha_developer_flow:
-    status: next_ready
+    status: completed
     milestone: M-117
-    next_ready_work_item: W-0189
+    completed_work_item: W-0189
+    decision: ADR-0097
+    change: changes/2026-05-21-package-alpha-developer-flow
+    next_milestone: M-118
+    next_ready_work_item: W-0190
     depends_on:
       - W-0188
     selected_direction: package_alpha_developer_flow
-    expected_change: changes/2026-05-21-package-alpha-developer-flow
     tier: tier_2_developer_experience
     gate_density_strategy: ADR-0082
+    packaged_flow: docs/alpha-developer-flow.md
+    packaged_flow_translation: docs/alpha-developer-flow.zh-CN.md
+    local_alpha_developer_flow_packaged: true
+    release_declared: false
     release_publishing_authorized: false
+    release_packaging_authorized: false
+    release_packaging_added: false
+    hosted_deployment_added: false
+    packaged_flow_connects:
+      - README.md
+      - docs/runtime-runbook.md
+      - examples/local-alpha-request-loop.sh
+      - /healthz
+      - /readyz
+      - /version
+      - /configz
+      - docs/alpha-acceptance-checklist.md
+      - node tools/vibit inspect next
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    startup_configuration_semantics_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    check_rule: runtime.package_alpha_developer_flow
+    rule: W-0189 packaged the existing alpha developer flow into a coherent local developer journey without publishing a release or expanding runtime/product scope.
+
+  release_publishing_decision_gate:
+    status: next_ready
+    milestone: M-118
+    next_ready_work_item: W-0190
+    depends_on:
+      - W-0189
+    selected_direction: release_publishing_decision_gate
+    expected_change: changes/2026-05-21-define-release-publishing-decision-gate
+    tier: tier_2_developer_experience
+    gate_density_strategy: ADR-0082
+    release_publishing_authorized_by_current_state: false
+    release_declared: false
+    release_packaging_added: false
+    hosted_deployment_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false
@@ -5602,7 +5651,7 @@ identity_session_boundary:
     migration_added: false
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0189 should package the existing alpha developer flow into a coherent local developer journey without publishing a release or expanding runtime/product scope.
+    rule: W-0190 should define the release publishing decision gate without publishing a release or creating release artifacts.
 
 persistence_model:
   decision: ADR-0011

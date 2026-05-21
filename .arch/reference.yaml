@@ -3288,17 +3288,25 @@ phase_plan:
     check_rule: runtime.alpha_acceptance_checklist
     rule: W-0188 added an alpha acceptance checklist without direct compatibility or release publishing.
   phase_2cz_package_alpha_developer_flow:
-    status: next_ready
+    status: completed
     milestone: M-117
-    next_ready_work_item: W-0189
+    completed_work_item: W-0189
+    decision: ADR-0097
+    change: changes/2026-05-21-package-alpha-developer-flow
+    next_ready_work_item: W-0190
     previous_completed_work_item: W-0188
     alpha_target_alignment: developer_experience
     selected_direction: package_alpha_developer_flow
-    expected_change: changes/2026-05-21-package-alpha-developer-flow
+    packaged_flow: docs/alpha-developer-flow.md
+    packaged_flow_translation: docs/alpha-developer-flow.zh-CN.md
     reference_mapping:
       nakama: Developer-flow packaging should make local setup and contribution entry points coherent without broadening the product surface.
       pitaya: Developer-flow packaging should clarify runtime entry points while preserving protocol, runtime, and operations boundaries.
+    local_alpha_developer_flow_packaged: true
+    release_declared: false
     release_publishing_authorized: false
+    release_packaging_added: false
+    hosted_deployment_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false
@@ -3306,7 +3314,31 @@ phase_plan:
     migration_added: false
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0189 should package the alpha developer flow without direct compatibility or release publishing.
+    check_rule: runtime.package_alpha_developer_flow
+    rule: W-0189 packaged the alpha developer flow without direct compatibility or release publishing.
+  phase_2da_release_publishing_decision_gate:
+    status: next_ready
+    milestone: M-118
+    next_ready_work_item: W-0190
+    previous_completed_work_item: W-0189
+    alpha_target_alignment: developer_experience
+    selected_direction: release_publishing_decision_gate
+    expected_change: changes/2026-05-21-define-release-publishing-decision-gate
+    reference_mapping:
+      nakama: A release decision gate should separate local developer readiness from public release mechanics and support expectations.
+      pitaya: A release decision gate should preserve runtime architecture boundaries while deciding publication readiness.
+    release_publishing_authorized_by_current_state: false
+    release_declared: false
+    release_packaging_added: false
+    hosted_deployment_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0190 should define the release publishing decision gate without direct compatibility, release publishing, or release artifacts.
   phase_3_core_game_backend_modules:
     status: planned
     focus:
