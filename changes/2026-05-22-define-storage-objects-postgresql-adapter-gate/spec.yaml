@@ -1,0 +1,181 @@
+schema_version: 0.1
+change_id: define-storage-objects-postgresql-adapter-gate
+date: 2026-05-22
+type: docs
+status: verified
+
+summary: Define the storage objects PostgreSQL adapter gate without adding adapter implementation, SQL execution, runtime behavior, protocol routes, generated output, dependencies, or migration changes.
+
+affected_modules:
+  - runtime
+  - storage
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0114
+  referenced:
+    - ADR-0113
+    - ADR-0112
+    - ADR-0111
+    - ADR-0110
+    - ADR-0109
+    - ADR-0108
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0206
+  completed_milestone: M-134
+  previous_completed_work_item: W-0205
+  next_milestone: M-135
+  next_work_item: W-0207
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: storage_objects_postgresql_adapter_gate
+  next_direction: storage_objects_postgresql_adapter_implementation
+  storage_objects_postgresql_adapter_gate_defined: true
+  storage_objects_postgresql_adapter_gate_decision: ADR-0114
+  storage_objects_postgresql_adapter_gate_standard: docs/storage-objects-postgresql-adapter-gate.md
+  storage_objects_postgresql_adapter_gate_translation: docs/storage-objects-postgresql-adapter-gate.zh-CN.md
+  storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate
+  source_repository_interface_decision: ADR-0113
+  source_repository_interface: runtime/internal/modules/storage.Repository
+  source_repository_interface_source: runtime/internal/modules/storage/repository.go
+  source_migration_source_decision: ADR-0111
+  source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+  storage_objects_logical_table: storage_objects
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+  future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+  unit_of_work_handoff_required: true
+  constructor_expectations_recorded: true
+  sql_mapping_posture_recorded: true
+  transaction_handoff_recorded: true
+  error_mapping_recorded: true
+  test_expectations_recorded: true
+  stop_conditions_recorded: true
+  adapter_gate_only: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  storage_adapter_added: false
+  postgresql_adapter_added: false
+  sql_execution_added: false
+  unit_of_work_factory_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.storage_objects_postgresql_adapter_gate
+    - node tools/vibit check change define-storage-objects-postgresql-adapter-gate --json
+    - node tools/vibit check module storage --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - storage_adapter_implementation_requires_separate_work_item
+    - sql_execution_requires_separate_work_item
+    - unit_of_work_factory_requires_separate_work_item
+    - runtime_or_protocol_scope_requires_authorization
+    - protobuf_or_generated_output_requires_authorization
+    - migration_change_requires_authorization
+    - dependency_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - broad_product_module_requires_authorization
+    - object_blob_storage_requires_authorization
+    - s3_compatible_object_storage_requires_authorization
+    - direct_compatibility_requires_authorization
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_table_referenced:
+    - storage_objects
+  ownership_changes:
+    - runtime/internal/platform/persistence/postgres recorded as future storage object PostgreSQL adapter owner
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.storage_objects_postgresql_adapter_gate
+    - node tools/vibit check change define-storage-objects-postgresql-adapter-gate --json
+    - node tools/vibit check module storage --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check

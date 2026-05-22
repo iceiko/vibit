@@ -1,0 +1,321 @@
+schema_version: 0.1
+module: storage
+category: domain
+status: draft
+summary: Owns player-owned small JSON storage object repository vocabulary, storage-neutral value types, completed PostgreSQL adapter handoff, application-owned runtime behavior, and own-player storage object protocol routes while large object/blob storage, S3-compatible storage, and direct Nakama/Pitaya API compatibility remain deferred.
+
+decisions:
+  - ADR-0109
+  - ADR-0110
+  - ADR-0111
+  - ADR-0112
+  - ADR-0113
+  - ADR-0114
+  - ADR-0115
+  - ADR-0116
+  - ADR-0117
+  - ADR-0118
+  - ADR-0119
+
+owns:
+  entities:
+    - storage_object
+  data:
+    - player_owned_small_json_storage_objects
+    - planned_storage_objects_table
+  permissions: []
+  does_not_own:
+    entities:
+      - player_account
+      - authentication_credential
+      - runtime_session
+      - websocket_connection
+      - inventory
+      - large_blob_object
+      - s3_object
+    data:
+      - player_accounts
+      - authentication_credentials
+      - runtime_sessions
+      - websocket_connection_state
+      - inventory_records
+      - large_object_blob_storage
+      - s3_compatible_object_storage
+
+public_api:
+  status: storage_repository_interface_postgresql_adapter_runtime_behavior_and_protocol_route_implementation_completed
+  commands:
+    - PutOwnStorageObject
+    - DeleteOwnStorageObject
+  queries:
+    - GetOwnStorageObject
+    - ListOwnStorageObjects
+  repository_interface:
+    owner: runtime/internal/modules/storage
+    interface: runtime/internal/modules/storage.Repository
+    source: runtime/internal/modules/storage/repository.go
+    tests: runtime/internal/modules/storage/repository_test.go
+    capabilities:
+      - CreateStorageObject
+      - GetStorageObject
+      - ListStorageObjects
+      - UpdateStorageObject
+      - DeleteStorageObject
+  vocabulary:
+    owner_kind:
+      - player
+    status:
+      - active
+      - deleted
+    conflict_classes:
+      - object_already_exists
+      - object_not_found
+      - version_mismatch
+      - invalid_expected_version
+      - owner_scope_mismatch
+      - deleted_object
+      - storage_unavailable
+
+events:
+  publishes: []
+  subscribes: []
+
+errors:
+  owns:
+    - storage_object_repository_errors
+  schemas:
+    status: not_ratified
+    rule: Repository errors are storage-neutral Go vocabulary only until public storage object runtime contracts are ratified.
+
+permission_schemas:
+  status: not_ratified
+  rule: Route-scoped permissions remain deferred until storage objects runtime behavior and protocol routes are separately authorized.
+
+dependencies:
+  allowed: []
+  forbidden:
+    - direct_websocket_library
+    - direct_protobuf_runtime
+    - direct_postgresql_driver
+    - direct_s3_sdk
+    - direct_minio_client
+    - authentication
+    - session
+    - inventory
+  external_reference_boundaries:
+    player_id:
+      owner: player
+      standard: docs/storage-objects-behavior-gate.md
+      decision: ADR-0109
+      rule: Storage object owner_id may identify a player owner, but this module does not authenticate, validate, create, or own player accounts or runtime sessions.
+
+invariants:
+  - storage_object_owner_kind_first_posture_is_player
+  - storage_object_identity_is_owner_collection_key
+  - storage_object_value_must_be_top_level_json_object
+  - storage_object_version_must_be_positive
+  - storage_object_errors_must_be_redacted
+  - storage_object_repository_interface_must_remain_storage_neutral
+  - storage_object_module_must_not_own_large_blob_or_s3_storage
+  - storage_object_protocol_routes_must_use_validated_request_identity
+  - storage_object_protocol_routes_must_not_accept_client_supplied_owner_id
+
+generated:
+  files: []
+  directories: []
+  planned_outputs:
+    go_typed_contracts: []
+    protobuf_message_shapes: []
+    websocket_dispatch_shapes: []
+    test_fixtures: []
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  status: protocol_route_implementation_completed_contract_source_deferred
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  wire_schema_status: storage_proto_generated
+  runtime_storage_handlers_added: true
+  protocol_routes_added: true
+  protobuf_source_added: true
+  generated_output_added: true
+  storage_objects_repository_interface_implementation_completed: true
+  storage_objects_repository_interface_implementation_decision: ADR-0113
+  storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation
+  storage_objects_postgresql_adapter_gate_defined: true
+  storage_objects_postgresql_adapter_gate_decision: ADR-0114
+  storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate
+  storage_objects_postgresql_adapter_gate_work_item: W-0206
+  storage_objects_postgresql_adapter_implementation_completed: true
+  storage_objects_postgresql_adapter_implementation_decision: ADR-0115
+  storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation
+  storage_objects_postgresql_adapter_implementation_work_item: W-0207
+  storage_objects_runtime_behavior_gate_defined: true
+  storage_objects_runtime_behavior_gate_decision: ADR-0116
+  storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate
+  storage_objects_runtime_behavior_gate_work_item: W-0208
+  storage_objects_runtime_behavior_implementation_completed: true
+  storage_objects_runtime_behavior_implementation_decision: ADR-0117
+  storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation
+  storage_objects_runtime_behavior_implementation_work_item: W-0209
+  storage_objects_protocol_route_gate_defined: true
+  storage_objects_protocol_route_gate_decision: ADR-0118
+  storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate
+  storage_objects_protocol_route_gate_work_item: W-0210
+  storage_objects_protocol_route_implementation_completed: true
+  storage_objects_protocol_route_implementation_decision: ADR-0119
+  storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+  storage_objects_protocol_route_implementation_work_item: W-0211
+  protocol_source: proto/vibit/storage/v1/storage.proto
+  generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+  protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+  protocol_bridge_test: runtime/internal/platform/protocol/protobuf/storage_bridge_test.go
+  application_handler: runtime/internal/app/bootstrap/storage.go
+  application_handler_test: runtime/internal/app/bootstrap/storage_test.go
+  route_keys_source: runtime/internal/app/storage/routes.go
+  postgres_startup_route_registration: runtime/cmd/vibit-server/main.go
+  protocol_route_next_work_item: W-0211
+  current_protocol_route_next_work_item: W-0212
+  future_protocol_route_implementation_work_item: W-0211
+  future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation
+  future_protocol_route_local_proof_work_item: W-0212
+  future_protocol_route_local_proof_direction: storage_objects_protocol_route_local_proof
+  future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go
+  candidate_routes_recorded: true
+  first_payload_package: vibit.storage.v1
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  client_supplied_owner_id_allowed: false
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  runtime_behavior_owner_candidate: runtime/internal/app
+  runtime_behavior_package_candidate: runtime/internal/app/storage
+  runtime_behavior_owner: runtime/internal/app/storage
+  runtime_behavior_source: runtime/internal/app/storage/service.go
+  runtime_behavior_test: runtime/internal/app/storage/service_test.go
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  route_policy_requirement: request_token_required
+  storage_objects_repository_interface_work_item: W-0205
+  repository_owner: runtime/internal/modules/storage
+  repository_interface: runtime/internal/modules/storage.Repository
+  repository_source: runtime/internal/modules/storage/repository.go
+  repository_tests: runtime/internal/modules/storage/repository_test.go
+  storage_adapter_added: true
+  postgresql_adapter_added: true
+  sql_execution_added: true
+  postgres_adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+  postgres_adapter_test: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+  historical_stage_status:
+    repository_interface_implementation:
+      work_item: W-0205
+      runtime_behavior_added: false
+    postgresql_adapter_gate:
+      work_item: W-0206
+      runtime_behavior_added: false
+    runtime_behavior_gate:
+      work_item: W-0208
+      runtime_behavior_next_work_item: W-0209
+      runtime_behavior_added: false
+    protocol_route_gate:
+      work_item: W-0210
+      protocol_route_added: false
+      protobuf_source_added: false
+      generated_output_added: false
+    protocol_route_implementation:
+      work_item: W-0211
+      protocol_route_added: true
+      protobuf_source_added: true
+      generated_output_added: true
+  current_stage_status:
+    work_item: W-0211
+    protocol_route_next_work_item: W-0211
+    current_protocol_route_next_work_item: W-0212
+    protocol_route_implementation_completed: true
+  runtime_behavior_added: true
+  runtime_handlers_added: true
+  protocol_route_added: true
+  generated_output_added: true
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+persistence:
+  postgresql_schema:
+    decision: ADR-0111
+    repository_boundary_decision: ADR-0112
+    repository_interface_implementation_decision: ADR-0113
+    status: migration_source_added_repository_interface_postgresql_adapter_runtime_behavior_and_protocol_route_implementation_completed
+    migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    logical_table: storage_objects
+    repository_interface_added: true
+    repository_interface_source: runtime/internal/modules/storage/repository.go
+    repository_interface_tests: runtime/internal/modules/storage/repository_test.go
+    postgres_adapter_gate_work_item: W-0206
+    postgres_adapter_gate_defined: true
+    postgres_adapter_gate_decision: ADR-0114
+    postgres_adapter_implementation_work_item: W-0207
+    postgres_adapter_implementation_decision: ADR-0115
+    postgres_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgres_adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    postgres_adapter_test: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+    postgres_adapter_added: true
+    sql_execution_added: true
+    runtime_behavior_added: true
+    runtime_behavior_gate_work_item: W-0208
+    runtime_behavior_implementation_work_item: W-0209
+    runtime_behavior_implementation_decision: ADR-0117
+    runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation
+    runtime_behavior_source: runtime/internal/app/storage/service.go
+    runtime_behavior_test: runtime/internal/app/storage/service_test.go
+    runtime_behavior_next_work_item: W-0209
+    protocol_route_gate_work_item: W-0210
+    protocol_route_gate_defined: true
+    protocol_route_gate_decision: ADR-0118
+    protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate
+    protocol_route_implementation_work_item: W-0211
+    protocol_route_implementation_decision: ADR-0119
+    protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+    protocol_route_next_work_item: W-0211
+    current_protocol_route_next_work_item: W-0212
+
+handwritten:
+  extension_points:
+    repositories:
+      - storage_object_repository_interface
+    application_services:
+      - storage_object_runtime_behavior_service
+    protocol_routes:
+      - storage.GetOwnStorageObject
+      - storage.ListOwnStorageObjects
+      - storage.PutOwnStorageObject
+      - storage.DeleteOwnStorageObject
+    tests:
+      - storage_object_repository_interface_tests
+      - storage_object_protocol_route_tests
+
+tests:
+  required:
+    - repository_interface_storage_neutrality_tests
+    - storage_object_value_normalization_tests
+    - storage_object_input_normalization_tests
+    - storage_object_conflict_redaction_tests
+    - architecture_tests
+    - runtime_behavior_service_identity_and_conflict_tests
+    - protocol_route_mapping_and_redaction_tests
+
+check_rules:
+  - runtime.storage_objects_repository_boundary
+  - runtime.storage_objects_repository_interface_implementation
+  - runtime.storage_objects_postgresql_adapter_gate
+  - runtime.storage_objects_postgresql_adapter_implementation
+  - runtime.storage_objects_runtime_behavior_gate
+  - runtime.storage_objects_runtime_behavior_implementation
+  - runtime.storage_objects_protocol_route_gate
+  - runtime.storage_objects_protocol_route_implementation

@@ -10,6 +10,7 @@ import (
 	"github.com/iceiko/vibit/runtime/internal/modules/authentication"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/modules/player"
+	"github.com/iceiko/vibit/runtime/internal/modules/storage"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgxpool"
@@ -132,4 +133,12 @@ func (u UnitOfWork) NewSessionRepository() (session.Repository, error) {
 		return nil, err
 	}
 	return NewSessionRepositoryForUnitOfWork(executor), nil
+}
+
+func (u UnitOfWork) NewStorageObjectRepository() (storage.Repository, error) {
+	executor, err := u.Executor()
+	if err != nil {
+		return nil, err
+	}
+	return NewStorageObjectRepositoryForUnitOfWork(executor), nil
 }

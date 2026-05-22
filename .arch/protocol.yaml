@@ -68,8 +68,8 @@ wire_format:
   format: protobuf
   source_root: proto
   generated_go_output: runtime/internal/generated/proto
-  source_status: envelope_inventory_and_player_sources_created
-  generated_go_output_status: envelope_inventory_and_player_proto_generated
+  source_status: envelope_inventory_player_authentication_presence_and_storage_sources_created
+  generated_go_output_status: envelope_inventory_player_authentication_presence_and_storage_proto_generated
   generated_output_standard: docs/generated-output.md
   generated_output_check: node tools/vibit check generated
   owner: runtime/internal/platform/protocol/protobuf
@@ -247,6 +247,30 @@ first_runtime_slice:
     - reconnect_replay
     - presence
     - streams
+
+storage_objects_protocol_route_implementation:
+  status: completed
+  completed_work_item: W-0211
+  decision: ADR-0119
+  source_gate_decision: ADR-0118
+  protocol_source: proto/vibit/storage/v1/storage.proto
+  generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+  protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+  application_handler: runtime/internal/app/bootstrap/storage.go
+  route_keys_source: runtime/internal/app/storage/routes.go
+  route_family:
+    - storage.GetOwnStorageObject
+    - storage.ListOwnStorageObjects
+    - storage.PutOwnStorageObject
+    - storage.DeleteOwnStorageObject
+  first_payload_package: vibit.storage.v1
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  client_supplied_owner_id_allowed: false
+  metadata_only_player_id_allowed_as_proof: false
+  nakama_reference_mapping: durable_player_owned_storage_object_capability
+  pitaya_reference_mapping: route_session_protocol_adapter_handler_backend_separation
+  direct_nakama_pitaya_api_compatibility_added: false
 
 verification:
   check_command: node tools/vibit check protocol

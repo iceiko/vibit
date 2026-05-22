@@ -18,6 +18,7 @@ import (
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
+	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/platform/persistence/postgres"
 	vibitprotobuf "github.com/iceiko/vibit/runtime/internal/platform/protocol/protobuf"
@@ -144,12 +145,27 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 		return nil, func() {}, err
 	}
 
+	storageService, err := appstorage.NewService(appstorage.ServiceDependencies{
+		UnitOfWorkRunner:  transactionRunner,
+		ObjectIDGenerator: randomStorageObjectIDGenerator{},
+	})
+	if err != nil {
+		pool.Close()
+		return nil, func() {}, err
+	}
+	if err := (bootstrap.StorageRouteHandlers{Service: storageService}).RegisterRoutes(persistentDispatcher); err != nil {
+		pool.Close()
+		return nil, func() {}, err
+	}
+
 	transactionalDispatcher := app.TransactionalDispatcher{
 		Dispatcher: persistentDispatcher,
 		Runner:     transactionRunner,
 		BypassRoutes: []app.RouteKey{
 			app.AuthenticateWithDeviceCredentialRoute(),
 			app.LogoutAccessTokenRoute(),
+			appstorage.PutOwnStorageObjectRoute(),
+			appstorage.DeleteOwnStorageObjectRoute(),
 		},
 	}
 	connectionBinder := registryConnectionBinder{
@@ -430,6 +446,16 @@ func (randomCredentialRecordIDGenerator) GenerateCredentialRecordID(context.Cont
 		return "", fmt.Errorf("authentication startup: generate credential record id: %w", err)
 	}
 	return "auth-credential-" + hex.EncodeToString(raw[:]), nil
+}
+
+type randomStorageObjectIDGenerator struct{}
+
+func (randomStorageObjectIDGenerator) GenerateStorageObjectID(context.Context) (string, error) {
+	var raw [16]byte
+	if _, err := rand.Read(raw[:]); err != nil {
+		return "", fmt.Errorf("storage startup: generate storage object id: %w", err)
+	}
+	return "storage-object-" + hex.EncodeToString(raw[:]), nil
 }
 
 type websocketProtocolHandler struct {

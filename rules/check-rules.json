@@ -1212,6 +1212,62 @@
       "agent_guidance": "Read docs/storage-objects-repository-boundary.md and ADR-0112; the future owner candidate is runtime/internal/modules/storage and the future PostgreSQL adapter owner is runtime/internal/platform/persistence/postgres, but this gate must not create runtime/internal/modules/storage, add repository interface implementation, add SQL execution, add PostgreSQL adapters, change migrations, add protocol routes, add Protobuf sources or generated output, add dependencies, change authentication/session behavior, add hosted deployments or release artifacts, run public announcements beyond the GitHub release record, run paid promotion, add large object/blob storage, add S3-compatible object storage, or add direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.storage_objects_repository_interface_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects repository interface implementation",
+      "description": "The storage objects repository interface implementation must add only storage-neutral Go repository interface shapes, value types, normalizers, typed redacted errors, module manifest guidance, and focused tests under runtime/internal/modules/storage while preserving PostgreSQL adapters, SQL execution, protocol, generated-output, runtime behavior, dependency, migration, authentication/session, hosted deployment, release artifact, announcement, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Treat runtime/internal/modules/storage.Repository as storage-neutral module-owned vocabulary only. Do not expand W-0205 into runtime behavior, protocol routes, Protobuf sources or generated output, PostgreSQL adapters, SQL execution, migration changes, dependency additions, authentication/session behavior, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.storage_objects_postgresql_adapter_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects PostgreSQL adapter gate",
+      "description": "The storage objects PostgreSQL adapter gate must define only future PostgreSQL adapter ownership, constructor and unit-of-work expectations, SQL mapping posture, transaction handoff, error mapping, tests, and stop conditions while preserving adapter implementation, SQL execution, protocol, generated-output, runtime behavior, dependency, migration, authentication/session, hosted deployment, release artifact, announcement, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-postgresql-adapter-gate.md and ADR-0114 before implementing storage object PostgreSQL persistence. W-0206 may define only the gate; do not add runtime/internal/platform/persistence/postgres/storage_object_repository.go, SQL execution, unit-of-work factory wiring, protocol routes, Protobuf sources or generated output, migration changes, dependencies, runtime handlers, authentication/session behavior, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.storage_objects_postgresql_adapter_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects PostgreSQL adapter implementation",
+      "description": "The storage objects PostgreSQL adapter implementation must map runtime/internal/modules/storage.Repository to the existing storage_objects PostgreSQL table with redacted errors, version-aware conflicts, soft-delete behavior, unit-of-work executor handoff, and focused tests while preserving runtime, protocol, generated-output, dependency, migration, authentication/session, hosted deployment, release artifact, announcement, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-postgresql-adapter-gate.md, ADR-0114, and ADR-0115 before changing storage object PostgreSQL persistence. W-0207 may implement only runtime/internal/platform/persistence/postgres/storage_object_repository.go, focused adapter tests, and unit-of-work repository handoff; do not add runtime handlers, protocol routes, Protobuf sources or generated output, migration changes, dependencies, authentication/session behavior, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.storage_objects_runtime_behavior_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects runtime behavior gate",
+      "description": "The storage objects runtime behavior gate must define only future application-owned runtime behavior ownership, validated request identity owner derivation, metadata-only identity refusal, permission posture, validation, conflict mapping, route-policy expectations, unit-of-work handoff, tests, and stop conditions while preserving runtime implementation, handlers, startup wiring, protocol, generated-output, repository-interface, PostgreSQL-adapter, dependency, migration, authentication/session, hosted deployment, release artifact, announcement, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-runtime-behavior-gate.md and ADR-0116 before implementing storage object runtime behavior. W-0208 may define only the gate; do not add runtime/internal/app/storage service code, runtime handlers, startup wiring, protocol routes, Protobuf sources or generated output, repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility. Future behavior must derive owner_id from validated request identity and must not treat metadata-only player_id or session_id as proof."
+    },
+    {
+      "rule_id": "runtime.storage_objects_runtime_behavior_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects runtime behavior implementation",
+      "description": "The storage objects runtime behavior implementation must add only application-owned service behavior under runtime/internal/app/storage, derive owner identity from validated request identity, reject metadata-only identity before repository access, validate inputs, map conflicts to redacted public error classes, and use unit-of-work storage repository handoff while preserving protocol routes, Protobuf sources, generated output, repository-interface changes, PostgreSQL adapter changes, dependencies, migrations, authentication/session changes, hosted deployments, release artifacts, announcements, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-runtime-behavior-gate.md, ADR-0116, and ADR-0117 before changing storage object runtime behavior. W-0209 may implement only runtime/internal/app/storage service behavior and focused tests. Do not add runtime handlers or route registration, startup wiring, protocol routes, Protobuf sources or generated output, repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility. The service must derive owner_id from validated player request identity and must not treat metadata-only player_id or session_id as proof."
+    },
+    {
+      "rule_id": "runtime.storage_objects_protocol_route_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects protocol route gate",
+      "description": "The storage objects protocol route gate must define only the future own-player storage object protocol route family, message-shape posture, protected-route identity handoff, protocol adapter ownership, generated-output expectations, redaction rules, tests, Nakama/Pitaya reference mapping, and stop conditions while preserving route implementation, Protobuf sources, generated output, startup wiring, repository-interface changes, PostgreSQL adapter changes, dependencies, migrations, authentication/session changes, hosted deployments, release artifacts, announcements, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-protocol-route-gate.md, ADR-0118, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing storage object protocol routes. W-0210 may define only the gate; do not add proto/vibit/storage/v1/storage.proto, runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go, runtime/internal/platform/protocol/protobuf/storage_bridge.go, runtime/internal/app/bootstrap/storage.go, startup wiring, repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility. Future W-0211 work must preserve Nakama-inspired storage object capability coverage and Pitaya-inspired route/session/handler separation without copying either public API."
+    },
+    {
+      "rule_id": "runtime.storage_objects_protocol_route_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects protocol route implementation",
+      "description": "The storage objects protocol route implementation must expose only the own-player get/list/put/delete route family authorized by ADR-0118 through Protobuf source/generated output, protocol bridge mapping, application route handlers, PostgreSQL startup registration, and focused tests while preserving application-owned service behavior, metadata-only identity refusal, request-token protection, redacted errors, and repository/adapter/migration/dependency/authentication/session/direct-compatibility deferrals.",
+      "agent_guidance": "Read ADR-0118, ADR-0119, docs/storage-objects-protocol-route-gate.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing storage object protocol routes. W-0211 may add proto/vibit/storage/v1/storage.proto, generated Go protobuf output from buf, runtime/internal/platform/protocol/protobuf/storage_bridge.go, runtime/internal/app/bootstrap/storage.go, runtime/internal/app/storage/routes.go, startup registration, and focused tests for storage.GetOwnStorageObject, storage.ListOwnStorageObjects, storage.PutOwnStorageObject, and storage.DeleteOwnStorageObject. Do not add public ACLs, cross-owner access, admin search, group/guild/party/room/match scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, large object/blob storage, S3-compatible storage, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, paid promotion, public announcements beyond the GitHub release record, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

@@ -68,11 +68,58 @@ modules:
     agent_guides:
       en: modules/inventory/AGENTS.md
       zh-CN: modules/inventory/AGENTS.zh-CN.md
+  - name: storage
+    category: domain
+    status: draft
+    manifest: modules/storage/module.yaml
+    agent_guides:
+      en: modules/storage/AGENTS.md
+      zh-CN: modules/storage/AGENTS.zh-CN.md
+    boundary:
+      standard: docs/storage-objects-repository-boundary.md
+      decision: ADR-0112
+      implementation_decision: ADR-0113
+      runtime_behavior_gate_decision: ADR-0116
+      runtime_behavior_implementation_decision: ADR-0117
+      protocol_route_gate_decision: ADR-0118
+      status: repository_interface_postgresql_adapter_runtime_behavior_and_protocol_route_gate_completed_route_implementation_deferred
+      runtime_repository_interface: runtime/internal/modules/storage/repository.go
+      runtime_repository_tests: runtime/internal/modules/storage/repository_test.go
+      postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+      postgres_adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+      postgres_adapter_test: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+      runtime_behavior_owner: runtime/internal/app/storage
+      runtime_behavior_source: runtime/internal/app/storage/service.go
+      runtime_behavior_test: runtime/internal/app/storage/service_test.go
+      protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md
+      protocol_route_gate_translation: docs/storage-objects-protocol-route-gate.zh-CN.md
+      protocol_route_implementation_decision: ADR-0119
+      protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+      protocol_source: proto/vibit/storage/v1/storage.proto
+      generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+      protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+      application_handler: runtime/internal/app/bootstrap/storage.go
+      protocol_route_next_work_item: W-0212
+    owns:
+      - player_owned_small_json_storage_objects
+      - storage_object_repository_interface_vocabulary
+    does_not_own:
+      - websocket_connection_mechanics
+      - authentication_scheme
+      - token_format
+      - credential_storage
+      - runtime_session_storage
+      - large_object_blob_storage
+      - s3_compatible_object_storage
+      - direct_nakama_pitaya_api_compatibility
 
 prototype_candidate_modules:
   - name: inventory
     category: domain
     reason: Proves item ownership, capacity invariants, and event-driven changes.
+  - name: storage
+    category: domain
+    reason: Proves general player-owned small JSON game-state storage with optimistic version conflicts.
   - name: currency
     category: domain
     reason: Proves transactional balance changes and anti-duplication rules.
@@ -127,3 +174,14 @@ module_boundaries:
       - token_format_before_authentication_decision
       - credential_storage_before_authentication_decision
       - runtime_session_storage_before_session_validation_decision
+  - name: storage
+    status: repository_interface_implemented_adapter_behavior_deferred
+    standard: docs/storage-objects-repository-boundary.md
+    decision: ADR-0112
+    implementation_decision: ADR-0113
+    manifest: modules/storage/module.yaml
+    runtime_repository_interface: runtime/internal/modules/storage/repository.go
+    runtime_repository_tests: runtime/internal/modules/storage/repository_test.go
+    postgres_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go

@@ -35,6 +35,9 @@ func RouteRequestWithDomainPayload(request app.RouteRequest) (app.RouteRequest, 
 	if presenceRequest, handled, err := routeRequestWithPresencePayload(request); handled || err != nil {
 		return presenceRequest, err
 	}
+	if storageRequest, handled, err := routeRequestWithStoragePayload(request); handled || err != nil {
+		return storageRequest, err
+	}
 
 	switch request.Route {
 	case inventory.GrantItemRoute():
@@ -131,6 +134,9 @@ func protoPayloadFromRouteAndPayload(route app.RouteKey, payload any) (proto.Mes
 	}
 	if presencePayload, handled, err := protoPayloadFromPresenceRoute(route, payload); handled || err != nil {
 		return presencePayload, err
+	}
+	if storagePayload, handled, err := protoPayloadFromStorageRoute(route, payload); handled || err != nil {
+		return storagePayload, err
 	}
 
 	switch route {

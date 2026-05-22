@@ -367,6 +367,16 @@ func TestRandomLocalOnboardingIDGeneratorShapes(t *testing.T) {
 	}
 }
 
+func TestRandomStorageObjectIDGeneratorShape(t *testing.T) {
+	id, err := (randomStorageObjectIDGenerator{}).GenerateStorageObjectID(context.Background())
+	if err != nil {
+		t.Fatalf("GenerateStorageObjectID() error = %v, want nil", err)
+	}
+	if !regexp.MustCompile(`^storage-object-[0-9a-f]{32}$`).MatchString(id) {
+		t.Fatalf("GenerateStorageObjectID() = %q, want storage-object- plus 32 lowercase hex chars", id)
+	}
+}
+
 type routeDispatcherFunc func(context.Context, app.RouteRequest) (app.ApplicationResult, error)
 
 func (f routeDispatcherFunc) Dispatch(ctx context.Context, request app.RouteRequest) (app.ApplicationResult, error) {

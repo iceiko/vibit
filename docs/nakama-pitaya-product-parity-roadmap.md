@@ -158,7 +158,12 @@ local_development_path_package: docs/prototype-ready-local-development-path-pack
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
 storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
 storage_objects_repository_boundary: docs/storage-objects-repository-boundary.md
-next_work_item: W-0205 Implement storage-neutral storage objects repository interface
+storage_objects_runtime_behavior_implementation: runtime/internal/app/storage/service.go
+storage_objects_protocol_route_gate: docs/storage-objects-protocol-route-gate.md
+storage_objects_protocol_route_gate_decision: ADR-0118
+storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.proto
+storage_objects_protocol_route_implementation_decision: ADR-0119
+next_work_item: W-0212 Prove storage objects protocol route in local alpha request flow
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -171,7 +176,11 @@ Candidate work:
 - Define first storage objects persistence schema posture. Completed by `W-0202`.
 - Add the first storage objects migration source. Completed by `W-0203`.
 - Define the storage objects repository boundary. Completed by `W-0204`.
-- Implement the storage-neutral storage objects repository interface. Next.
+- Implement the storage-neutral storage objects repository interface. Completed by `W-0205`.
+- Define and implement the storage objects PostgreSQL adapter. Completed by `W-0206` and `W-0207`.
+- Define and implement storage objects runtime behavior. Completed by `W-0208` and `W-0209`.
+- Define and implement the storage objects protocol route family. Completed by `W-0210` and `W-0211`.
+- Prove storage object routes through the local alpha request flow. Next.
 - Define first realtime messaging, stream, broadcast, or server-push behavior.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.

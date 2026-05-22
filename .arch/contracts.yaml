@@ -1132,11 +1132,11 @@ implemented_wire_and_runtime_slices:
     completed_work_item: W-0204
     decision: ADR-0112
     change: changes/2026-05-22-define-storage-objects-repository-boundary
-    next_milestone: M-133
-    next_ready_work_item: W-0205
+    next_milestone: M-134
+    next_ready_work_item: W-0206
     previous_completed_work_item: W-0203
     selected_direction: storage_objects_repository_boundary
-    next_direction: storage_objects_repository_interface_implementation
+    next_direction: storage_objects_postgresql_adapter_gate
     contract_changes_expected: false
     expected_change: changes/2026-05-22-define-storage-objects-repository-boundary
     target_stage: prototype_ready_foundation
@@ -1183,21 +1183,44 @@ implemented_wire_and_runtime_slices:
     check_rule: runtime.storage_objects_repository_boundary
     rule: W-0204 defined repository boundary vocabulary only, without contract, adapter, protocol, generated output, or runtime behavior changes.
   storage_objects_repository_interface_implementation:
-    status: next_ready
-    next_ready_work_item: W-0205
+    status: completed
+    completed_work_item: W-0205
+    decision: ADR-0113
+    change: changes/2026-05-22-implement-storage-objects-repository-interface
+    next_milestone: M-135
+    next_ready_work_item: W-0207
     previous_completed_work_item: W-0204
     selected_direction: storage_objects_repository_interface_implementation
+    next_direction: storage_objects_postgresql_adapter_implementation
     contract_changes_expected: false
     expected_change: changes/2026-05-22-implement-storage-objects-repository-interface
     target_stage: prototype_ready_foundation
     source_repository_boundary_decision: ADR-0112
     source_repository_boundary_standard: docs/storage-objects-repository-boundary.md
     planned_scope: repository_interface_implementation_only
-    future_repository_owner_candidate: runtime/internal/modules/storage
-    future_repository_interface_candidate: runtime/internal/modules/storage.Repository
+    storage_objects_repository_interface_implementation_completed: true
+    storage_objects_repository_interface_implementation_decision: ADR-0113
+    storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation
+    storage_objects_repository_interface_implementation_work_item: W-0205
+    storage_objects_repository_owner: runtime/internal/modules/storage
+    storage_objects_repository_interface: runtime/internal/modules/storage.Repository
+    storage_objects_repository_interface_source: runtime/internal/modules/storage/repository.go
+    storage_objects_repository_interface_tests: runtime/internal/modules/storage/repository_test.go
+    storage_objects_repository_interface_added: true
+    storage_objects_repository_value_types_added: true
+    storage_objects_repository_normalizers_added: true
     source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
     storage_objects_logical_table: storage_objects
     storage_adapter_implemented: false
+    storage_objects_repository_postgresql_adapter_added: false
+    storage_objects_repository_sql_execution_added: false
+    storage_objects_repository_runtime_behavior_added: false
+    storage_objects_repository_protocol_route_added: false
+    storage_objects_repository_protobuf_source_added: false
+    storage_objects_repository_generated_output_added: false
+    storage_objects_repository_dependencies_added: false
+    storage_objects_repository_migration_changed: false
+    storage_objects_repository_direct_nakama_pitaya_api_compatibility_added: false
     sql_execution_added: false
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
@@ -1216,6 +1239,273 @@ implemented_wire_and_runtime_slices:
     s3_compatible_object_storage_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0205 should add storage-neutral repository interface shapes only, without contract, adapter, protocol, generated output, or runtime behavior changes.
+  storage_objects_postgresql_adapter_gate:
+    status: completed
+    completed_work_item: W-0206
+    decision: ADR-0114
+    change: changes/2026-05-22-define-storage-objects-postgresql-adapter-gate
+    next_milestone: M-135
+    next_ready_work_item: W-0207
+    previous_completed_work_item: W-0205
+    selected_direction: storage_objects_postgresql_adapter_gate
+    next_direction: storage_objects_postgresql_adapter_implementation
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-define-storage-objects-postgresql-adapter-gate
+    target_stage: prototype_ready_foundation
+    source_repository_interface_decision: ADR-0113
+    source_repository_interface: runtime/internal/modules/storage.Repository
+    source_repository_interface_source: runtime/internal/modules/storage/repository.go
+    source_migration_source_decision: ADR-0111
+    source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    gate_standard: docs/storage-objects-postgresql-adapter-gate.md
+    gate_standard_translation: docs/storage-objects-postgresql-adapter-gate.zh-CN.md
+    storage_objects_postgresql_adapter_gate_defined: true
+    storage_objects_postgresql_adapter_gate_decision: ADR-0114
+    storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate
+    storage_objects_postgresql_adapter_gate_work_item: W-0206
+    planned_scope: postgresql_adapter_gate_only
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    storage_objects_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+    storage_objects_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    storage_objects_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+    storage_objects_logical_table: storage_objects
+    constructor_expectations_recorded: true
+    unit_of_work_handoff_required: true
+    transaction_handoff_recorded: true
+    sql_mapping_posture_recorded: true
+    error_mapping_recorded: true
+    test_expectations_recorded: true
+    stop_conditions_recorded: true
+    adapter_gate_only: true
+    storage_adapter_added: false
+    postgresql_adapter_added: false
+    storage_objects_postgresql_adapter_added: false
+    sql_execution_added: false
+    storage_objects_sql_execution_added: false
+    unit_of_work_factory_added: false
+    runtime_behavior_added: false
+    storage_objects_runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    migration_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    hosted_deployment_added: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    storage_objects_direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0206 should define only the storage objects PostgreSQL adapter gate before adapter implementation, protocol, generated output, or runtime behavior changes.
+  storage_objects_postgresql_adapter_implementation:
+    status: completed
+    completed_work_item: W-0207
+    decision: ADR-0115
+    change: changes/2026-05-22-implement-storage-objects-postgresql-adapter
+    next_milestone: M-136
+    next_ready_work_item: W-0208
+    previous_completed_work_item: W-0206
+    selected_direction: storage_objects_postgresql_adapter_implementation
+    next_direction: storage_objects_runtime_behavior_gate
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-implement-storage-objects-postgresql-adapter
+    target_stage: prototype_ready_foundation
+    source_adapter_gate_decision: ADR-0114
+    source_adapter_gate_standard: docs/storage-objects-postgresql-adapter-gate.md
+    storage_objects_postgresql_adapter_implementation_completed: true
+    storage_objects_postgresql_adapter_implementation_decision: ADR-0115
+    storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation
+    storage_objects_postgresql_adapter_implementation_work_item: W-0207
+    adapter_owner: runtime/internal/platform/persistence/postgres
+    adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    adapter_tests: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go
+    unit_of_work_repository_handoff_added: true
+    storage_objects_postgresql_adapter_added: true
+    storage_objects_sql_execution_added: true
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0207 should implement only the storage objects PostgreSQL adapter before runtime, protocol, generated output, migration, or dependency changes.
+  storage_objects_runtime_behavior_gate:
+    status: completed
+    completed_work_item: W-0208
+    decision: ADR-0116
+    change: changes/2026-05-22-define-storage-objects-runtime-behavior-gate
+    next_milestone: M-137
+    next_ready_work_item: W-0209
+    previous_completed_work_item: W-0207
+    selected_direction: storage_objects_runtime_behavior_gate
+    next_direction: storage_objects_runtime_behavior_implementation
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-define-storage-objects-runtime-behavior-gate
+    target_stage: prototype_ready_foundation
+    source_adapter_implementation_decision: ADR-0115
+    source_adapter: runtime/internal/platform/persistence/postgres/storage_object_repository.go
+    planned_scope: runtime_behavior_gate_only
+    storage_objects_runtime_behavior_gate_defined: true
+    storage_objects_runtime_behavior_gate_decision: ADR-0116
+    storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate
+    storage_objects_runtime_behavior_gate_work_item: W-0208
+    storage_objects_runtime_behavior_owner: runtime/internal/app
+    storage_objects_runtime_behavior_package_candidate: runtime/internal/app/storage
+    storage_objects_metadata_only_player_id_allowed_as_proof: false
+    storage_objects_metadata_only_session_id_allowed_as_proof: false
+    storage_objects_route_policy_requirement: request_token_required
+    runtime_behavior_added: false
+    runtime_handlers_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    storage_objects_runtime_behavior_added: false
+    storage_objects_protocol_route_added: false
+    storage_objects_generated_output_added: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    storage_objects_direct_nakama_pitaya_api_compatibility_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0208 should define only the storage objects runtime behavior gate before runtime, protocol, generated output, migration, or dependency changes.
+  storage_objects_runtime_behavior_implementation:
+    status: completed
+    next_ready_work_item: W-0210
+    previous_completed_work_item: W-0208
+    selected_direction: storage_objects_runtime_behavior_implementation
+    next_direction: storage_objects_protocol_route_gate
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-implement-storage-objects-runtime-behavior
+    target_stage: prototype_ready_foundation
+    storage_objects_runtime_behavior_implementation_completed: true
+    storage_objects_runtime_behavior_implementation_decision: ADR-0117
+    storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation
+    source_runtime_behavior_gate_decision: ADR-0116
+    source_runtime_behavior_gate_standard: docs/storage-objects-runtime-behavior-gate.md
+    storage_objects_runtime_behavior_owner: runtime/internal/app/storage
+    runtime_behavior_source: runtime/internal/app/storage/service.go
+    runtime_behavior_test: runtime/internal/app/storage/service_test.go
+    storage_objects_metadata_only_player_id_allowed_as_proof: false
+    runtime_behavior_added: true
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    storage_objects_protocol_route_added: false
+    storage_objects_generated_output_added: false
+    storage_objects_direct_nakama_pitaya_api_compatibility_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0209 should implement only application-owned storage objects runtime behavior before protocol, generated output, migration, dependency, or authentication/session changes.
+  storage_objects_protocol_route_gate:
+    status: completed
+    completed_work_item: W-0210
+    decision: ADR-0118
+    change: changes/2026-05-22-define-storage-objects-protocol-route-gate
+    next_milestone: M-139
+    next_ready_work_item: W-0211
+    previous_completed_work_item: W-0209
+    selected_direction: storage_objects_protocol_route_gate
+    next_direction: storage_objects_protocol_route_implementation
+    expected_change: changes/2026-05-22-define-storage-objects-protocol-route-gate
+    contract_changes_expected: false
+    target_stage: prototype_ready_foundation
+    source_runtime_behavior_implementation_decision: ADR-0117
+    source_runtime_behavior_implementation: runtime/internal/app/storage/service.go
+    protocol_route_gate_defined: true
+    storage_objects_protocol_route_gate_decision: ADR-0118
+    storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate
+    future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto
+    future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+    future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+    future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go
+    future_protocol_route_implementation_work_item: W-0211
+    future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation
+    candidate_routes_recorded: true
+    first_payload_package: vibit.storage.v1
+    route_policy_requirement: request_token_required
+    authenticated_wrapper_required: true
+    metadata_only_player_id_allowed_as_proof: false
+    client_supplied_owner_id_allowed: false
+    nakama_reference_mapping_recorded: true
+    pitaya_reference_mapping_recorded: true
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    startup_wiring_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0210 should define only the storage objects protocol route gate before route implementation or generated output.
+  storage_objects_protocol_route_implementation:
+    status: completed
+    completed_work_item: W-0211
+    decision: ADR-0119
+    change: changes/2026-05-22-implement-storage-objects-protocol-route
+    next_milestone: M-140
+    next_ready_work_item: W-0212
+    previous_completed_work_item: W-0210
+    selected_direction: storage_objects_protocol_route_implementation
+    expected_change: changes/2026-05-22-implement-storage-objects-protocol-route
+    contract_changes_expected: true
+    target_stage: prototype_ready_foundation
+    source_protocol_route_gate_decision: ADR-0118
+    source_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md
+    storage_objects_protocol_route_implementation_completed: true
+    storage_objects_protocol_route_implementation_decision: ADR-0119
+    storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+    storage_objects_protocol_source_added: true
+    storage_objects_protocol_source: proto/vibit/storage/v1/storage.proto
+    storage_objects_generated_output_added: true
+    storage_objects_generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+    storage_objects_protocol_bridge_added: true
+    storage_objects_protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+    storage_objects_application_handler_added: true
+    storage_objects_application_handler: runtime/internal/app/bootstrap/storage.go
+    storage_objects_route_keys_source: runtime/internal/app/storage/routes.go
+    storage_objects_postgres_startup_registration_added: true
+    storage_objects_transaction_bypass_added: true
+    storage_objects_authenticated_wrapper_required: true
+    storage_objects_metadata_only_player_id_allowed_as_proof: false
+    storage_objects_client_supplied_owner_id_allowed: false
+    storage_objects_protocol_route_added: true
+    storage_objects_direct_nakama_pitaya_api_compatibility_added: false
+    protocol_route_implementation_completed: true
+    rule: W-0211 may implement only the storage objects protocol route surface authorized by ADR-0118.
+  storage_objects_protocol_route_local_proof:
+    status: next_ready
+    next_ready_work_item: W-0212
+    previous_completed_work_item: W-0211
+    selected_direction: storage_objects_protocol_route_local_proof
+    expected_change: changes/2026-05-22-prove-storage-objects-protocol-route-local-flow
+    contract_changes_expected: false
+    target_stage: prototype_ready_foundation
+    source_protocol_route_implementation_decision: ADR-0119
+    protocol_shape_change_allowed: false
+    runtime_behavior_change_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0212 should prove the completed storage objects protocol route in the local alpha request flow without adding new protocol shape or direct compatibility.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128
@@ -3005,3 +3295,55 @@ modules:
     permissions:
       - id: inventory_permissions
         path: contracts/inventory/permissions/inventory_permissions.yaml
+  storage:
+    status: protocol_route_implementation_completed_contract_source_deferred
+    module_manifest: modules/storage/module.yaml
+    decisions:
+      - ADR-0109
+      - ADR-0110
+      - ADR-0111
+      - ADR-0112
+      - ADR-0113
+      - ADR-0114
+      - ADR-0115
+      - ADR-0116
+      - ADR-0117
+      - ADR-0118
+      - ADR-0119
+    repository_interface:
+      owner: runtime/internal/modules/storage
+      interface: runtime/internal/modules/storage.Repository
+      source: runtime/internal/modules/storage/repository.go
+      tests: runtime/internal/modules/storage/repository_test.go
+      implementation_completed: true
+      implementation_work_item: W-0205
+      implementation_check_rule: runtime.storage_objects_repository_interface_implementation
+    persistence_schema:
+      logical_table: storage_objects
+      migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+      postgresql_adapter_added: true
+      sql_execution_added: true
+    protocol_routes:
+      source: proto/vibit/storage/v1/storage.proto
+      generated_go: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
+      bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+      handler: runtime/internal/app/bootstrap/storage.go
+      implementation_work_item: W-0211
+      implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+      authenticated_wrapper_required: true
+      metadata_only_player_id_allowed_as_proof: false
+      direct_nakama_pitaya_api_compatibility_added: false
+    commands:
+      - id: PutOwnStorageObject
+        path: proto/vibit/storage/v1/storage.proto
+      - id: DeleteOwnStorageObject
+        path: proto/vibit/storage/v1/storage.proto
+    queries:
+      - id: GetOwnStorageObject
+        path: proto/vibit/storage/v1/storage.proto
+      - id: ListOwnStorageObjects
+        path: proto/vibit/storage/v1/storage.proto
+    events: []
+    errors: []
+    permissions: []
+    rule: Storage has own-player get/list/put/delete Protobuf routes and application handlers. Semantic contract source files, events, permissions, ACLs, cross-owner access, large object/blob storage, S3-compatible storage, and direct compatibility remain deferred.

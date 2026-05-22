@@ -189,7 +189,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0205 Implement storage-neutral storage objects repository interface
+W-0212 Prove storage objects protocol route in local alpha request flow
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.

@@ -1,0 +1,90 @@
+syntax = "proto3";
+
+package vibit.storage.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1;storagev1";
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+// @source proto/vibit/storage/v1/storage.proto
+// @route storage.GetOwnStorageObject
+// @route storage.ListOwnStorageObjects
+// @route storage.PutOwnStorageObject
+// @route storage.DeleteOwnStorageObject
+
+message StorageObject {
+  string collection = 1;
+  string key = 2;
+  string value_json = 3;
+  int64 version = 4;
+  string created_at = 5;
+  string updated_at = 6;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message GetOwnStorageObjectRequest {
+  string collection = 1;
+  string key = 2;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message GetOwnStorageObjectResponse {
+  StorageObject object = 1;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message ListOwnStorageObjectsRequest {
+  string collection = 1;
+  int32 limit = 2;
+  string after_key = 3;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message ListOwnStorageObjectsResponse {
+  repeated StorageObject objects = 1;
+  string next_key = 2;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message PutOwnStorageObjectRequest {
+  string collection = 1;
+  string key = 2;
+  string value_json = 3;
+  optional int64 expected_version = 4;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message PutOwnStorageObjectResponse {
+  StorageObject object = 1;
+  int64 version = 2;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message DeleteOwnStorageObjectRequest {
+  string collection = 1;
+  string key = 2;
+  optional int64 expected_version = 3;
+}
+
+// @source docs/storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0118-storage-objects-protocol-route-gate.md
+// @source decisions/ADR-0119-storage-objects-protocol-route-implementation.md
+message DeleteOwnStorageObjectResponse {
+  bool deleted = 1;
+  int64 version = 2;
+}

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-132
+current_milestone: M-140
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: storage_objects_repository_boundary_defined
+    current_release_state: storage_objects_protocol_route_implementation_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0205
+    next_ready_work_item: W-0212
     preferred_after_current:
-      - storage_objects_repository_interface_implementation
+      - storage_objects_protocol_route_local_proof
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2515,7 +2515,7 @@ milestones:
 
   - id: M-133
     title: Storage Objects Repository Interface Implementation
-    status: active
+    status: completed
     goal: Implement the storage-neutral storage objects repository interface after the repository boundary, without adding PostgreSQL adapter behavior, protocol, or runtime behavior.
     completion_criteria:
       - The storage-neutral storage objects repository interface is implemented under the authorized storage module owner.
@@ -2530,6 +2530,190 @@ milestones:
       - adding dependencies
       - changing migrations
       - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the storage-neutral storage objects repository interface under `runtime/internal/modules/storage`, added module-owned value types, create/read/list/update/delete input and result vocabulary, version and conflict helpers, redacted repository errors, normalization helpers, focused unit tests, storage module manifest and guides, accepted `ADR-0113`, added `runtime.storage_objects_repository_interface_implementation` check coverage, and selected `W-0206 Define storage objects PostgreSQL adapter gate` as the next-ready work item without adding PostgreSQL storage adapters, SQL execution behavior, runtime behavior, protocol routes, Protobuf sources or generated output, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-134
+    title: Storage Objects PostgreSQL Adapter Gate
+    status: completed
+    goal: Define the storage objects PostgreSQL adapter gate after the storage-neutral repository interface, without adding adapter implementation, SQL execution behavior, protocol, or runtime behavior.
+    completion_criteria:
+      - The storage objects PostgreSQL adapter gate is recorded.
+      - The gate defines future PostgreSQL adapter ownership, constructor and unit-of-work expectations, SQL mapping posture, transaction handoff, error mapping, tests, and stop conditions before implementation.
+      - The gate preserves PostgreSQL adapter implementation, SQL execution behavior, runtime behavior, protocol, generated output, dependency, migration, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding PostgreSQL storage adapters
+      - adding SQL execution behavior
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the storage objects PostgreSQL adapter gate in `docs/storage-objects-postgresql-adapter-gate.md` and `docs/storage-objects-postgresql-adapter-gate.zh-CN.md`, accepted `ADR-0114`, recorded future owner `runtime/internal/platform/persistence/postgres`, future adapter source and test candidates, constructor and unit-of-work expectations, SQL mapping posture, transaction handoff, error mapping, future tests, stop conditions, `runtime.storage_objects_postgresql_adapter_gate` check coverage, and selected `W-0207 Implement storage objects PostgreSQL adapter` as the next-ready work item without adding PostgreSQL storage adapters, SQL execution behavior, runtime behavior, protocol routes, Protobuf sources or generated output, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-135
+    title: Storage Objects PostgreSQL Adapter Implementation
+    status: completed
+    goal: Implement the storage objects PostgreSQL adapter after the adapter gate, without adding runtime behavior, protocol routes, generated output, migrations, or dependency changes.
+    completion_criteria:
+      - The storage objects PostgreSQL adapter implements the storage-neutral repository interface under the authorized platform persistence owner.
+      - The implementation maps create/read/list/update/delete behavior to the existing `storage_objects` table with version-aware conflicts, redacted errors, and focused tests.
+      - The slice preserves runtime behavior, protocol, generated output, dependency, migration, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the storage objects PostgreSQL adapter under `runtime/internal/platform/persistence/postgres`, added `runtime/internal/platform/persistence/postgres/storage_object_repository.go` and focused fake-executor tests in `runtime/internal/platform/persistence/postgres/storage_object_repository_test.go`, added unit-of-work repository handoff through `UnitOfWork.NewStorageObjectRepository`, mapped create/read/list/update/delete to the existing `storage_objects` table with active-row filtering, version-aware conflicts, soft-delete behavior, redacted storage module errors, and accepted `ADR-0115` plus `runtime.storage_objects_postgresql_adapter_implementation` check coverage. Runtime behavior, protocol routes, Protobuf sources/generated output, dependencies, migration changes, authentication/session behavior, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct compatibility remain deferred.
+
+  - id: M-136
+    title: Storage Objects Runtime Behavior Gate
+    status: completed
+    goal: Define the storage objects runtime behavior gate after the PostgreSQL adapter, without adding runtime handlers, protocol routes, generated output, migrations, or dependency changes.
+    completion_criteria:
+      - The storage objects runtime behavior gate records owner identity derivation, request identity requirements, permissions, validation, conflict semantics, route-policy expectations, service/application ownership, and stop conditions before runtime behavior implementation.
+      - The gate preserves protocol routes, Protobuf source/generated output, dependency, migration, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+      - The next implementation queue remains bounded and does not treat metadata-only player identity as authenticated proof.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - changing storage object repository interfaces or PostgreSQL adapters
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the storage objects runtime behavior gate in `docs/storage-objects-runtime-behavior-gate.md` and `docs/storage-objects-runtime-behavior-gate.zh-CN.md`, accepted `ADR-0116`, recorded future application owner `runtime/internal/app`, candidate package `runtime/internal/app/storage`, future service source and test candidates, validated request identity owner derivation, metadata-only `player_id` and `session_id` refusal, route-policy expectation `request_token_required`, permission, validation, conflict, unit-of-work handoff, redaction, future tests, stop conditions, and `runtime.storage_objects_runtime_behavior_gate` check coverage. Runtime behavior implementation, runtime handlers, startup wiring, protocol routes, Protobuf sources/generated output, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct compatibility remain deferred.
+
+  - id: M-137
+    title: Storage Objects Runtime Behavior Implementation
+    status: completed
+    goal: Implement storage objects runtime behavior after the runtime behavior gate, without adding protocol routes, generated output, migrations, dependencies, or authentication/session changes.
+    completion_criteria:
+      - The storage objects runtime behavior implementation derives player ownership from validated request identity and rejects metadata-only identity before repository access.
+      - The implementation composes storage repository operations through application-owned service behavior with validation, conflict mapping, redaction, and unit-of-work handoff tests.
+      - The slice preserves protocol routes, Protobuf source/generated output, dependency, migration, repository-interface, PostgreSQL-adapter, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - changing storage object repository interfaces or PostgreSQL adapters
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented application-owned storage objects runtime behavior under `runtime/internal/app/storage`, added `Service`, own-object get/list/put/delete operations, validated request identity owner derivation, metadata-only identity refusal before repository access, collection/key/value/list/expected-version validation, redacted public error mapping, unit-of-work repository handoff through `NewStorageObjectRepository`, focused fake-repository tests, accepted `ADR-0117`, and registered `runtime.storage_objects_runtime_behavior_implementation`. Protocol routes, Protobuf sources/generated output, runtime handlers, startup wiring, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct compatibility remain deferred.
+
+  - id: M-138
+    title: Storage Objects Protocol Route Gate
+    status: completed
+    goal: Define the storage objects protocol route gate after application runtime behavior, without adding route implementation, generated output, startup wiring, migrations, dependencies, or authentication/session changes.
+    completion_criteria:
+      - The gate records future storage object route names, message-shape posture, protected-route policy, protocol adapter ownership, generated-output expectations, and stop conditions before exposing runtime behavior over WebSocket/Protobuf.
+      - The gate preserves route implementation, Protobuf source/generated output, dependency, migration, repository-interface, PostgreSQL-adapter, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+      - Metadata-only identity remains rejected by future protocol handlers.
+    non_goals:
+      - implementing storage object protocol routes
+      - adding Protobuf source files or generated output
+      - registering runtime handlers or startup composition
+      - changing storage object service behavior
+      - changing storage object repository interfaces or PostgreSQL adapters
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined `docs/storage-objects-protocol-route-gate.md` and `docs/storage-objects-protocol-route-gate.zh-CN.md`, accepted `ADR-0118`, registered `runtime.storage_objects_protocol_route_gate`, and recorded future client-facing storage object routes, request/response message-shape posture, protected-route policy, authenticated-wrapper and validated request identity handoff, metadata-only identity refusal, protocol adapter ownership, generated-output expectations, redaction expectations, required future tests, and Nakama/Pitaya reference mapping. The gate adapts Nakama storage object capability expectations and Pitaya route/session/handler separation without adding route implementation, Protobuf sources/generated output, runtime handlers, startup wiring, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility.
+
+  - id: M-139
+    title: Storage Objects Protocol Route Implementation
+    status: completed
+    goal: Implement storage objects protocol routes after the route gate, without broadening storage scope, changing authentication/session behavior, adding migrations, adding dependencies, or adopting direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The implementation exposes the W-0210 route family through explicit WebSocket/Protobuf route registration, generated output, and protocol bridge mapping.
+      - The implementation preserves validated request identity handoff, metadata-only identity refusal, protected-route policy, redacted error mapping, and application-owned service behavior.
+      - The slice preserves repository-interface, PostgreSQL-adapter, migration, dependency, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - adding public ACLs or cross-owner access
+      - adding admin search
+      - adding group/guild/party/room/match storage scopes
+      - adding batch writes
+      - adding JSON patch or merge semantics
+      - adding TTL or script hooks
+      - changing storage object service behavior beyond route mapping
+      - changing storage object repository interfaces or PostgreSQL adapters
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the own-player storage object protocol route family authorized by `ADR-0118`, added `proto/vibit/storage/v1/storage.proto`, generated Go Protobuf output under `runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go`, route keys under `runtime/internal/app/storage/routes.go`, application route handlers under `runtime/internal/app/bootstrap/storage.go`, protocol bridge mapping under `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, PostgreSQL startup registration, transaction bypass for service-owned write routes, focused route/bridge/protected-route/startup tests, accepted `ADR-0119`, and registered `runtime.storage_objects_protocol_route_implementation`. The implementation exposes `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject` while preserving validated request identity handoff, metadata-only identity refusal, request-token protection, redacted errors, application-owned service behavior, repository interface, PostgreSQL adapter, migration, dependency, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, large object/blob storage, S3-compatible storage, and direct Nakama/Pitaya API compatibility deferrals.
+
+  - id: M-140
+    title: Storage Objects Protocol Route Local Proof
+    status: active
+    goal: Prove the completed storage objects protocol route in the local alpha request flow without broadening route semantics, changing protocol shape, changing authentication/session behavior, or adding direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The local alpha request flow can demonstrate authenticated own-player storage object put/get/list/delete behavior through the existing WebSocket/Protobuf path.
+      - The proof records exact local prerequisites, commands, expected request/response shape, and redaction expectations for contributors.
+      - The proof preserves protocol shape, storage service behavior, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session semantics, hosted deployment, release artifact, public announcement, paid promotion, object/blob storage, S3-compatible storage, ACL, batch, hook, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - adding new protocol messages or routes
+      - changing storage object service behavior
+      - changing storage object repository interfaces or PostgreSQL adapters
+      - changing migrations
+      - adding dependencies
+      - changing authentication/session behavior
+      - adding public ACLs or cross-owner access
+      - adding admin search
+      - adding group/guild/party/room/match storage scopes
+      - adding batch writes
+      - adding JSON patch or merge semantics
+      - adding TTL or script hooks
       - adding broad operations/admin behavior
       - adding hosted deployments or demos
       - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
@@ -7572,7 +7756,7 @@ work_items:
   - id: W-0205
     milestone: M-133
     title: Implement storage-neutral storage objects repository interface
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-implement-storage-objects-repository-interface
     depends_on:
       - W-0204
@@ -7595,3 +7779,224 @@ work_items:
       - Implement the storage-neutral storage objects repository interface under `runtime/internal/modules/storage`.
       - Define module-owned value types, create/read/list/update/delete input and result vocabulary, version/conflict helpers, redacted errors, and focused tests.
       - Preserve storage adapters, SQL execution, protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Implemented `runtime/internal/modules/storage.Repository` as a storage-neutral interface with `StorageObject`, owner, identity, value, status, version, create/read/list/update/delete input and result types, optimistic conflict classes, redacted repository errors, normalization helpers, and focused tests in `runtime/internal/modules/storage/repository_test.go`. Added storage module manifest and guides, accepted `ADR-0113`, registered `runtime.storage_objects_repository_interface_implementation`, and kept PostgreSQL adapters, SQL execution, runtime behavior, protocol routes, Protobuf sources/generated output, dependencies, migration changes, authentication/session behavior, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct compatibility deferred.
+
+  - id: W-0206
+    milestone: M-134
+    title: Define storage objects PostgreSQL adapter gate
+    status: completed
+    change: changes/2026-05-22-define-storage-objects-postgresql-adapter-gate
+    depends_on:
+      - W-0205
+    expected_change_id: define-storage-objects-postgresql-adapter-gate
+    tier: tier_2_data
+    selected_direction: storage_objects_postgresql_adapter_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0078
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - PostgreSQL storage adapter implementation, SQL execution behavior, runtime behavior changes, protocol route changes, Protobuf source or generated output changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product module expansion beyond the storage-objects PostgreSQL adapter gate.
+    completion:
+      - Define the storage objects PostgreSQL adapter gate after the storage-neutral repository interface.
+      - Record future adapter owner, constructor and unit-of-work expectations, SQL mapping posture, transaction handoff, error mapping, test expectations, and stop conditions.
+      - Preserve adapter implementation, SQL execution, protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the storage objects PostgreSQL adapter gate, accepted `ADR-0114`, added `docs/storage-objects-postgresql-adapter-gate.md` and its Simplified Chinese translation, registered `runtime.storage_objects_postgresql_adapter_gate`, recorded future adapter owner `runtime/internal/platform/persistence/postgres`, source candidate `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, test candidate `runtime/internal/platform/persistence/postgres/storage_object_repository_test.go`, constructor and unit-of-work expectations, SQL mapping posture, transaction handoff, redacted error mapping, future tests, and stop conditions. PostgreSQL storage adapter implementation, SQL execution, runtime behavior, protocol routes, Protobuf sources/generated output, dependencies, migration changes, authentication/session behavior, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct compatibility remain deferred.
+
+  - id: W-0207
+    milestone: M-135
+    title: Implement storage objects PostgreSQL adapter
+    status: completed
+    change: changes/2026-05-22-implement-storage-objects-postgresql-adapter
+    depends_on:
+      - W-0206
+    expected_change_id: implement-storage-objects-postgresql-adapter
+    tier: tier_2_data
+    selected_direction: storage_objects_postgresql_adapter_implementation
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior changes, protocol route changes, Protobuf source or generated output changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product module expansion beyond the storage-objects PostgreSQL adapter implementation.
+    completion:
+      - Implement the storage objects PostgreSQL adapter under `runtime/internal/platform/persistence/postgres`.
+      - Map `runtime/internal/modules/storage.Repository` to the existing `storage_objects` table with redacted errors, version-aware conflicts, soft-delete behavior, and focused tests.
+      - Preserve protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Implemented `runtime/internal/platform/persistence/postgres/storage_object_repository.go` and `runtime/internal/platform/persistence/postgres/storage_object_repository_test.go`, mapping `runtime/internal/modules/storage.Repository` to the existing `storage_objects` table through caller-supplied unit-of-work executors. The adapter covers create/read/list/update/delete, active-row filtering, deterministic list pagination, expected-version checks, version increments, soft deletes, row scanning through storage normalizers, redacted storage repository errors, fake-executor tests, no live PostgreSQL requirement, and `UnitOfWork.NewStorageObjectRepository`. No storage object runtime handlers, protocol routes, Protobuf sources/generated output, dependencies, migration changes, authentication/session behavior, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility were added.
+
+  - id: W-0208
+    milestone: M-136
+    title: Define storage objects runtime behavior gate
+    status: completed
+    change: changes/2026-05-22-define-storage-objects-runtime-behavior-gate
+    depends_on:
+      - W-0207
+    expected_change_id: define-storage-objects-runtime-behavior-gate
+    tier: tier_2_functional
+    selected_direction: storage_objects_runtime_behavior_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0116
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior implementation, protocol route changes, Protobuf source or generated output changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product module expansion beyond the storage-objects runtime behavior gate.
+    completion:
+      - Define the storage objects runtime behavior gate after the PostgreSQL adapter.
+      - Record owner identity derivation, request identity requirements, permissions, validation, conflict semantics, route-policy expectations, service/application ownership, and stop conditions.
+      - Preserve runtime implementation, protocol routes, generated output, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined `docs/storage-objects-runtime-behavior-gate.md` and `docs/storage-objects-runtime-behavior-gate.zh-CN.md`, accepted `ADR-0116`, registered `runtime.storage_objects_runtime_behavior_gate`, and recorded future application-owned storage object service behavior under `runtime/internal/app`, candidate package `runtime/internal/app/storage`, validated request identity owner derivation, refusal to treat metadata-only `player_id` or `session_id` as proof, `request_token_required` route-policy posture, validation, permission, conflict mapping, redaction, unit-of-work repository handoff, future tests, and stop conditions. No storage object runtime behavior implementation, runtime handlers, startup wiring, protocol routes, Protobuf sources/generated output, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility were added.
+
+  - id: W-0209
+    milestone: M-137
+    title: Implement storage objects runtime behavior
+    status: completed
+    change: changes/2026-05-22-implement-storage-objects-runtime-behavior
+    depends_on:
+      - W-0208
+    expected_change_id: implement-storage-objects-runtime-behavior
+    tier: tier_2_functional
+    selected_direction: storage_objects_runtime_behavior_implementation
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0117
+      - ADR-0116
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Protocol route changes, Protobuf source or generated output changes, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, public ACLs, admin search, group/guild/party/room/match storage scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, or broad product module expansion beyond the storage-objects runtime behavior implementation.
+    completion:
+      - Implement storage objects runtime behavior under the application-owned boundary ratified by `ADR-0116`.
+      - Derive storage object owner identity from validated request identity and reject metadata-only `player_id` or `session_id` before repository access.
+      - Compose repository operations with validation, conflict mapping, redaction, and unit-of-work handoff while preserving protocol, generated output, repository-interface, adapter, dependency, migration, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, and direct compatibility deferrals.
+    completion_summary: Implemented `runtime/internal/app/storage/service.go` and `runtime/internal/app/storage/service_test.go` with application-owned own-object get/list/put/delete behavior. The service derives `player` ownership from validated `app.RequestIdentity`, rejects metadata-only `player_id` and `session_id` before unit-of-work or repository access, validates collection/key/value JSON/value size/list pagination/expected version inputs, maps storage repository conflicts to redacted public error codes, and obtains `runtime/internal/modules/storage.Repository` through unit-of-work `NewStorageObjectRepository`. No protocol routes, Protobuf sources/generated output, runtime handlers, startup wiring, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility were added.
+
+  - id: W-0210
+    milestone: M-138
+    title: Define storage objects protocol route gate
+    status: completed
+    change: changes/2026-05-22-define-storage-objects-protocol-route-gate
+    depends_on:
+      - W-0209
+    expected_change_id: define-storage-objects-protocol-route-gate
+    tier: tier_2_protocol
+    selected_direction: storage_objects_protocol_route_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0117
+      - ADR-0116
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Protocol route implementation, Protobuf source or generated output changes, startup wiring, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, public ACLs, admin search, group/guild/party/room/match storage scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, or broad product module expansion beyond the storage-objects protocol route gate.
+    completion:
+      - Define the storage objects protocol route gate after application runtime behavior.
+      - Record candidate route names, request/response shape expectations, protected-route policy, protocol adapter ownership, generated-output expectations, and stop conditions.
+      - Preserve route implementation, Protobuf/generated output, startup wiring, repository-interface, adapter, dependency, migration, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, and direct compatibility deferrals.
+    completion_summary: Defined `docs/storage-objects-protocol-route-gate.md` and `docs/storage-objects-protocol-route-gate.zh-CN.md`, accepted `ADR-0118`, registered `runtime.storage_objects_protocol_route_gate`, and recorded future routes `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject`, candidate `vibit.storage.v1` Protobuf message shapes, protected-route policy `request_token_required`, authenticated-wrapper and validated request identity handoff, metadata-only `player_id` and `session_id` refusal, no client-supplied owner ids, protocol adapter/application handler/startup ownership, generated-output expectations, redaction rules, required future tests, and Nakama/Pitaya reference mapping. No route implementation, Protobuf source/generated output, startup wiring, runtime handlers, repository interface changes, PostgreSQL adapter changes, dependencies, migrations, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility were added.
+
+  - id: W-0211
+    milestone: M-139
+    title: Implement storage objects protocol route
+    status: completed
+    change: changes/2026-05-22-implement-storage-objects-protocol-route
+    depends_on:
+      - W-0210
+    expected_change_id: implement-storage-objects-protocol-route
+    tier: tier_2_protocol
+    selected_direction: storage_objects_protocol_route_implementation
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0118
+      - ADR-0117
+      - ADR-0116
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, route-protection semantic changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, public ACLs, admin search, group/guild/party/room/match storage scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, or broad product module expansion beyond the storage-objects protocol route implementation.
+    completion:
+      - Implement the storage objects protocol route family authorized by `ADR-0118`.
+      - Add Protobuf source/generated output, protocol bridge mapping, route registration, and focused tests for own-player get/list/put/delete routes.
+      - Preserve application-owned service behavior, metadata-only identity refusal, protected-route policy, redacted errors, and repository/adapter/migration/dependency/authentication/session/direct-compatibility deferrals.
+    completion_summary: Implemented the own-player storage object protocol route family with route keys `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject`; added `vibit.storage.v1` Protobuf source and generated Go output through Buf; added protocol bridge mapping, payload registry integration, application bootstrap route handlers, PostgreSQL startup route registration, and transaction bypass for storage writes because the storage service owns its unit of work. Focused tests cover get/list/put/delete payload mapping, optional expected versions, response mapping, redacted handler errors, request identity handoff, protected-route authentication wrapper enforcement, and startup object-id generation. No repository interface changes, PostgreSQL adapter changes, migration changes, dependency additions, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, public ACLs, cross-owner access, admin search, group/guild/party/room/match scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility were added.
+
+  - id: W-0212
+    milestone: M-140
+    title: Prove storage objects protocol route in local alpha request flow
+    status: next_ready
+    change: changes/2026-05-22-prove-storage-objects-protocol-route-local-flow
+    depends_on:
+      - W-0211
+    expected_change_id: prove-storage-objects-protocol-route-local-flow
+    tier: tier_2_protocol
+    selected_direction: storage_objects_protocol_route_local_proof
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0119
+      - ADR-0118
+      - ADR-0117
+      - ADR-0116
+      - ADR-0115
+      - ADR-0114
+      - ADR-0113
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - New protocol messages or routes, storage service behavior changes, repository interface changes, PostgreSQL adapter changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, route-protection semantic changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, public ACLs, admin search, group/guild/party/room/match storage scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, or broad product module expansion beyond proving the storage-objects protocol route in the local alpha request flow.
+    completion:
+      - Add a narrow local proof for the completed storage objects protocol route family using the existing WebSocket/Protobuf request flow.
+      - Record exact prerequisites, commands, expected request/response shape, redaction expectations, and Nakama/Pitaya alignment notes for own-player storage object put/get/list/delete.
+      - Preserve protocol shape, storage service behavior, repository/adapter/migration/dependency/authentication/session/direct-compatibility deferrals, and avoid broad product module expansion.

@@ -158,7 +158,12 @@ local_development_path_package: docs/prototype-ready-local-development-path-pack
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
 storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
 storage_objects_repository_boundary: docs/storage-objects-repository-boundary.md
-next_work_item: W-0205 Implement storage-neutral storage objects repository interface
+storage_objects_runtime_behavior_implementation: runtime/internal/app/storage/service.go
+storage_objects_protocol_route_gate: docs/storage-objects-protocol-route-gate.md
+storage_objects_protocol_route_gate_decision: ADR-0118
+storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.proto
+storage_objects_protocol_route_implementation_decision: ADR-0119
+next_work_item: W-0212 Prove storage objects protocol route in local alpha request flow
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -171,7 +176,11 @@ next_work_item: W-0205 Implement storage-neutral storage objects repository inte
 - 定义第一版 storage objects persistence schema posture。已由 `W-0202` 完成。
 - 添加第一版 storage objects migration source。已由 `W-0203` 完成。
 - 定义 storage objects repository boundary。已由 `W-0204` 完成。
-- 实现 storage-neutral storage objects repository interface。Next。
+- 实现 storage-neutral storage objects repository interface。已由 `W-0205` 完成。
+- 定义并实现 storage objects PostgreSQL adapter。已由 `W-0206` 和 `W-0207` 完成。
+- 定义并实现 storage objects runtime behavior。已由 `W-0208` 和 `W-0209` 完成。
+- 定义并实现 storage objects protocol route family。已由 `W-0210` 和 `W-0211` 完成。
+- 通过 local alpha request flow 证明 storage object routes。Next。
 - 定义第一版 realtime messaging、stream、broadcast 或 server-push behavior。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。

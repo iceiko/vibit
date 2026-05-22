@@ -140,6 +140,13 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.storage_objects_persistence_schema_gate",
   "runtime.storage_objects_migration_source",
   "runtime.storage_objects_repository_boundary",
+  "runtime.storage_objects_repository_interface_implementation",
+  "runtime.storage_objects_postgresql_adapter_gate",
+  "runtime.storage_objects_postgresql_adapter_implementation",
+  "runtime.storage_objects_runtime_behavior_gate",
+  "runtime.storage_objects_runtime_behavior_implementation",
+  "runtime.storage_objects_protocol_route_gate",
+  "runtime.storage_objects_protocol_route_implementation",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -1272,6 +1279,13 @@ function discoverContractRegistryEntries(root) {
   });
 }
 
+function isProtoBackedStorageContractEntry(entry) {
+  return entry &&
+    entry.module === "storage" &&
+    ["commands", "queries"].includes(entry.normalized_type) &&
+    entry.path === "proto/vibit/storage/v1/storage.proto";
+}
+
 function registryModuleBlock(registry, moduleName) {
   const lines = registry.split(/\r?\n/);
   const moduleIndex = lines.findIndex((line) => line.trim() === `${moduleName}:`);
@@ -1303,6 +1317,12 @@ function isBoundaryOnlyContractModule(registry, moduleName, moduleManifest) {
   const block = registryModuleBlock(registry, moduleName);
   return block.includes("status: boundary_only_no_public_contracts_yet")
     || moduleManifest.includes("status: boundary_only_no_public_contracts_yet");
+}
+
+function isContractSourceDeferredModule(registry, moduleName, moduleManifest) {
+  const block = registryModuleBlock(registry, moduleName);
+  return block.includes("contract_source_deferred")
+    || moduleManifest.includes("contract_source_deferred");
 }
 
 function playerWireContractsAreRatified(root) {
@@ -3696,6 +3716,44 @@ function checkContractSource(root, moduleName, contractType, expectedKind, entry
     });
     return;
   }
+  if (isProtoBackedStorageContractEntry({ ...entry, module: moduleName, normalized_type: contractType })) {
+    if (isFile(root, entry.path)) {
+      ok(`${entry.path} exists`, {
+        rule_id: "contract.source_exists",
+        artifact: entry.path,
+      });
+    } else {
+      fail(`${entry.path} is missing`, {
+        rule_id: "contract.source_exists",
+        artifact: entry.path,
+      });
+      return;
+    }
+
+    const protoText = readText(path.join(root, entry.path));
+    const requestMessage = `${entry.id}Request`;
+    const responseMessage = `${entry.id}Response`;
+    for (const marker of [
+      "package vibit.storage.v1;",
+      `message ${requestMessage}`,
+      `message ${responseMessage}`,
+      "@source decisions/ADR-0119-storage-objects-protocol-route-implementation.md",
+    ]) {
+      checkRequiredText(root, entry.path, marker, "contract.source_match", marker);
+    }
+    if (/owner_id|player_id|session_id|access_token|lookup_digest|verifier_digest|s3_bucket/i.test(protoText)) {
+      fail(`${entry.path} includes forbidden storage protocol proof or compatibility fields`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    } else {
+      ok(`${entry.path} keeps storage protocol route payload owner/proof neutral`, {
+        rule_id: "contract.source_match",
+        artifact: entry.path,
+      });
+    }
+    return;
+  }
   if (!pathStartsWith(entry.path, `contracts/${moduleName}/`)) {
     fail(`${entry.path} is outside contracts/${moduleName}/`, {
       rule_id: "contract.registry_entry",
@@ -4161,6 +4219,7 @@ function checkContracts(root) {
       ? readText(path.join(root, moduleManifestPath))
       : "";
     const boundaryOnlyContracts = isBoundaryOnlyContractModule(registry, moduleName, moduleManifest);
+    const contractSourceDeferred = isContractSourceDeferredModule(registry, moduleName, moduleManifest);
 
     if (registry.includes(`  ${moduleName}:`)) {
       ok(`${registryPath} registers module ${moduleName}`, {
@@ -4180,6 +4239,11 @@ function checkContracts(root) {
       if (entries.length > 0) {
         ok(`${registryPath} registers ${moduleName} ${contractType}`, {
           rule_id: "contract.registry_entry",
+          artifact: registryPath,
+        });
+      } else if (contractSourceDeferred) {
+        ok(`${registryPath} records ${moduleName} ${contractType} as deferred semantic contract source`, {
+          rule_id: "contract.deferred",
           artifact: registryPath,
         });
       } else if (boundaryOnlyContracts) {
@@ -4689,6 +4753,9 @@ function checkAgentTooling(root) {
 }
 
 function isGeneratedContractShapeEntry(entry) {
+  if (isProtoBackedStorageContractEntry(entry)) {
+    return false;
+  }
   if (!["commands", "queries", "events", "errors", "permissions"].includes(entry.normalized_type)) {
     return false;
   }
@@ -26165,6 +26232,18 @@ function checkRuntimeStorageObjectsBehaviorGate(root, goFiles) {
     { pattern: /\bstorage_objects_behavior_gate\b|\bStorageObject\b|\bStorageObjects\b|\bStorageObjectRepository\b|\bstorage_objects\b/, label: "storage objects behavior gate runtime code" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (workItemHasStatus(root, "W-0205", "completed") && pathStartsWith(file, "runtime/internal/modules/storage/")) {
+      continue;
+    }
+    if (workItemHasStatus(root, "W-0207", "completed") && pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    if (isStorageObjectsRuntimeBehaviorImplementationFile(root, file)) {
+      continue;
+    }
+    if (isStorageObjectsProtocolRouteImplementationFile(root, file)) {
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} appears to add runtime code for storage objects behavior gate: ${match.label}`, {
@@ -26488,6 +26567,18 @@ function checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles) {
     { pattern: /\bStorageObject\b|\bStorageObjects\b|\bStorageObjectRepository\b|\bstorage_objects\b|\bstorage_objects_persistence_schema_gate\b/, label: "storage objects persistence schema gate runtime code" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (workItemHasStatus(root, "W-0205", "completed") && pathStartsWith(file, "runtime/internal/modules/storage/")) {
+      continue;
+    }
+    if (workItemHasStatus(root, "W-0207", "completed") && pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    if (isStorageObjectsRuntimeBehaviorImplementationFile(root, file)) {
+      continue;
+    }
+    if (isStorageObjectsProtocolRouteImplementationFile(root, file)) {
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} appears to add runtime code for storage objects persistence schema gate: ${match.label}`, {
@@ -26730,6 +26821,15 @@ function checkRuntimeStorageObjectsMigrationSource(root, goFiles) {
     { pattern: /\bCreateStorageObject\b|\bGetStorageObject\b|\bUpdateStorageObject\b|\bDeleteStorageObject\b/, label: "storage object runtime behavior" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (workItemHasStatus(root, "W-0205", "completed") && pathStartsWith(file, "runtime/internal/modules/storage/")) {
+      continue;
+    }
+    if (workItemHasStatus(root, "W-0207", "completed") && pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    if (isStorageObjectsRuntimeBehaviorImplementationFile(root, file)) {
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} crosses storage objects migration-source-only boundary with ${match.label}`, {
@@ -26743,14 +26843,20 @@ function checkRuntimeStorageObjectsMigrationSource(root, goFiles) {
     artifact: "runtime",
   });
 
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
   const protoFiles = discoverFilesUnder(root, "proto")
     .filter((file) => file.endsWith(".proto"));
   const storageProto = protoFiles.find((file) => {
     const text = readText(path.join(root, file));
     return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
   });
-  if (storageProto) {
+  if (storageProto && !storageProtocolCompleted) {
     fail(`${storageProto} adds storage object protocol shape during migration-source-only slice`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
       rule_id: ruleId,
       artifact: storageProto,
     });
@@ -27039,6 +27145,12 @@ function checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles) {
     if (workItemHasStatus(root, "W-0205", "completed") && pathStartsWith(file, `${forbiddenRuntimeModulePath}/`)) {
       continue;
     }
+    if (workItemHasStatus(root, "W-0207", "completed") && pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    if (isStorageObjectsRuntimeBehaviorImplementationFile(root, file)) {
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} crosses storage objects repository-boundary-only scope with ${match.label}`, {
@@ -27055,27 +27167,39 @@ function checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles) {
       const text = sourceWithoutGoComments(readText(path.join(root, file)));
       return /\bstorage_objects\b|\bStorageObject\b/.test(text);
     });
-  for (const file of storageAdapterFiles) {
-    fail(`${file} adds storage object PostgreSQL adapter behavior during repository boundary gate`, {
-      rule_id: ruleId,
-      artifact: file,
-    });
-  }
   if (storageAdapterFiles.length === 0) {
     ok("no storage object PostgreSQL adapter behavior is added by the repository boundary gate", {
       rule_id: ruleId,
       artifact: "runtime/internal/platform/persistence/postgres",
     });
+  } else if (workItemHasStatus(root, "W-0207", "completed")) {
+    ok("storage object PostgreSQL adapter behavior is authorized after completed W-0207", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else {
+    for (const file of storageAdapterFiles) {
+      fail(`${file} adds storage object PostgreSQL adapter behavior during repository boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
   }
 
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
   const protoFiles = discoverFilesUnder(root, "proto")
     .filter((file) => file.endsWith(".proto"));
   const storageProto = protoFiles.find((file) => {
     const text = readText(path.join(root, file));
     return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
   });
-  if (storageProto) {
+  if (storageProto && !storageProtocolCompleted) {
     fail(`${storageProto} adds storage object protocol shape during repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
       rule_id: ruleId,
       artifact: storageProto,
     });
@@ -27085,6 +27209,2172 @@ function checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles) {
       artifact: "proto",
     });
   }
+}
+
+function checkRuntimeStorageObjectsRepositoryInterfaceImplementation(root, goFiles) {
+  const ruleId = "runtime.storage_objects_repository_interface_implementation";
+  const sourcePath = "runtime/internal/modules/storage/repository.go";
+  const testPath = "runtime/internal/modules/storage/repository_test.go";
+  const changePath = "changes/2026-05-22-implement-storage-objects-repository-interface";
+  const decisionPath = "decisions/ADR-0113-storage-objects-repository-interface-implementation.md";
+  const conversationPath = "conversations/2026-05-22-storage-objects-repository-interface-implementation.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0205", "completed")) {
+    ok("storage objects repository interface implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    sourcePath,
+    testPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+    moduleManifestPath,
+    moduleGuidePath,
+    moduleGuideTranslationPath,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects repository interface implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects repository interface implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  for (const dir of [
+    "modules/storage/commands",
+    "modules/storage/queries",
+    "modules/storage/events",
+    "modules/storage/models",
+    "modules/storage/repositories",
+    "modules/storage/policies",
+    "modules/storage/services",
+    "modules/storage/tests",
+  ]) {
+    if (isDirectory(root, dir)) {
+      ok(`${dir}/ exists for storage module`, {
+        rule_id: ruleId,
+        artifact: dir,
+      });
+    } else {
+      fail(`${dir}/ is missing for storage module`, {
+        rule_id: ruleId,
+        artifact: dir,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "storage_objects_repository_interface_implementation: ADR-0113"],
+    [".arch/runtime.yaml", "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation"],
+    [".arch/runtime.yaml", "repository_source: runtime/internal/modules/storage/repository.go"],
+    [".arch/runtime.yaml", "repository_tests: runtime/internal/modules/storage/repository_test.go"],
+    [".arch/conventions.yaml", "storage_objects_repository_interface_implementation:"],
+    [".arch/conventions.yaml", "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation"],
+    [".arch/contracts.yaml", "storage_objects_repository_interface_implementation_completed: true"],
+    [".arch/contracts.yaml", "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation"],
+    [".arch/reference.yaml", "phase_2dp_storage_objects_repository_interface_implementation"],
+    [".arch/reference.yaml", "phase_2dq_storage_objects_postgresql_adapter_gate"],
+    [".arch/work-items.yaml", "id: M-133"],
+    [".arch/work-items.yaml", "title: Storage Objects Repository Interface Implementation"],
+    [".arch/work-items.yaml", "id: W-0205"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: M-134"],
+    [".arch/work-items.yaml", "id: W-0206"],
+    [".arch/modules.yaml", "name: storage"],
+    [".arch/modules.yaml", "runtime_repository_interface: runtime/internal/modules/storage/repository.go"],
+    [moduleManifestPath, "storage_objects_repository_interface_implementation_completed: true"],
+    [moduleManifestPath, "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation"],
+    [moduleManifestPath, "repository_source: runtime/internal/modules/storage/repository.go"],
+    [moduleManifestPath, "repository_tests: runtime/internal/modules/storage/repository_test.go"],
+    [moduleGuidePath, "runtime.storage_objects_repository_interface_implementation"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_repository_interface_implementation"],
+    ["AGENTS.md", "runtime.storage_objects_repository_interface_implementation"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_repository_interface_implementation"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_repository_interface_implementation"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_repository_interface_implementation"],
+    ["rules/check-rules.json", "runtime.storage_objects_repository_interface_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "status: completed",
+      "completed_work_item: W-0205",
+      "decision: ADR-0113",
+      "repository_owner: runtime/internal/modules/storage",
+      "repository_interface: runtime/internal/modules/storage.Repository",
+      "repository_source: runtime/internal/modules/storage/repository.go",
+      "repository_tests: runtime/internal/modules/storage/repository_test.go",
+      "interface_added: true",
+      "value_types_added: true",
+      "normalizers_added: true",
+      "module_manifest_added: true",
+      "storage_adapter_added: false",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "status: completed",
+      "completed_work_item: W-0205",
+      "decision: ADR-0113",
+      "repository_owner: runtime/internal/modules/storage",
+      "repository_interface: runtime/internal/modules/storage.Repository",
+      "repository_source: runtime/internal/modules/storage/repository.go",
+      "repository_tests: runtime/internal/modules/storage/repository_test.go",
+      "interface_added: true",
+      "value_types_added: true",
+      "normalizers_added: true",
+      "storage_adapter_added: false",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "storage_objects_repository_interface_implementation_completed: true",
+      "storage_objects_repository_interface_implementation_decision: ADR-0113",
+      "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation",
+      "storage_objects_repository_interface_implementation_work_item: W-0205",
+      "storage_objects_repository_interface_source: runtime/internal/modules/storage/repository.go",
+      "storage_objects_repository_interface_tests: runtime/internal/modules/storage/repository_test.go",
+      "storage_objects_repository_owner: runtime/internal/modules/storage",
+      "storage_objects_repository_interface: runtime/internal/modules/storage.Repository",
+      "storage_objects_repository_interface_added: true",
+      "storage_objects_repository_value_types_added: true",
+      "storage_objects_repository_normalizers_added: true",
+      "storage_objects_repository_postgresql_adapter_added: false",
+      "storage_objects_repository_sql_execution_added: false",
+      "storage_objects_repository_runtime_behavior_added: false",
+      "storage_objects_repository_protocol_route_added: false",
+      "storage_objects_repository_protobuf_source_added: false",
+      "storage_objects_repository_generated_output_added: false",
+      "storage_objects_repository_dependencies_added: false",
+      "storage_objects_repository_migration_changed: false",
+      "storage_objects_repository_direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "module: storage",
+      "category: domain",
+      "storage_objects_repository_interface_implementation_completed: true",
+      "storage_objects_repository_interface_implementation_decision: ADR-0113",
+      "storage_objects_repository_interface_implementation_check_rule: runtime.storage_objects_repository_interface_implementation",
+      "repository_owner: runtime/internal/modules/storage",
+      "repository_interface: runtime/internal/modules/storage.Repository",
+      "repository_source: runtime/internal/modules/storage/repository.go",
+      "repository_tests: runtime/internal/modules/storage/repository_test.go",
+      ...(workItemHasStatus(root, "W-0207", "completed")
+        ? [
+            "storage_objects_postgresql_adapter_implementation_completed: true",
+            "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation",
+            "storage_adapter_added: true",
+            "postgresql_adapter_added: true",
+            "sql_execution_added: true",
+          ]
+        : [
+            "storage_adapter_added: false",
+            "postgresql_adapter_added: false",
+            "sql_execution_added: false",
+          ]),
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  if (isFile(root, sourcePath)) {
+    const sourceText = sourceWithoutGoComments(readText(path.join(root, sourcePath)));
+    const requiredSourceMarkers = [
+      "package storage",
+      "type OwnerKind string",
+      "OwnerKindPlayer OwnerKind = \"player\"",
+      "type StorageObjectStatus string",
+      "StorageObjectStatusActive  StorageObjectStatus = \"active\"",
+      "StorageObjectStatusDeleted StorageObjectStatus = \"deleted\"",
+      "type StorageObjectVersion int64",
+      "type StorageObjectOwner struct",
+      "type StorageObjectIdentity struct",
+      "type StorageObjectValue struct",
+      "type StorageObject struct",
+      "type CreateStorageObjectInput struct",
+      "type GetStorageObjectInput struct",
+      "type ListStorageObjectsInput struct",
+      "type ListStorageObjectsResult struct",
+      "type UpdateStorageObjectInput struct",
+      "type DeleteStorageObjectInput struct",
+      "type Repository interface",
+      "CreateStorageObject(context.Context, CreateStorageObjectInput) (StorageObject, error)",
+      "GetStorageObject(context.Context, GetStorageObjectInput) (StorageObject, error)",
+      "ListStorageObjects(context.Context, ListStorageObjectsInput) (ListStorageObjectsResult, error)",
+      "UpdateStorageObject(context.Context, UpdateStorageObjectInput) (StorageObject, error)",
+      "DeleteStorageObject(context.Context, DeleteStorageObjectInput) (StorageObject, error)",
+      "type StorageObjectConflictClass string",
+      "StorageObjectConflictVersionMismatch",
+      "type StorageObjectRepositoryError struct",
+      "func NormalizeStorageObjectRecord",
+      "func NormalizeCreateStorageObjectInput",
+      "func NormalizeGetStorageObjectInput",
+      "func NormalizeListStorageObjectsInput",
+      "func NormalizeUpdateStorageObjectInput",
+      "func NormalizeDeleteStorageObjectInput",
+      "func NormalizeStorageObjectOwner",
+      "func NormalizeStorageObjectIdentity",
+      "func NormalizeStorageObjectValue",
+    ];
+    for (const marker of requiredSourceMarkers) {
+      checkRequiredText(root, sourcePath, marker, ruleId, marker);
+    }
+
+    const forbiddenSourcePatterns = [
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/platform\/persistence\/postgres/, label: "direct PostgreSQL adapter import" },
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/platform\/transport\/ws/, label: "direct WebSocket transport import" },
+      { pattern: /github\.com\/iceiko\/vibit\/runtime\/internal\/generated\/proto/, label: "generated Protobuf import" },
+      { pattern: /\bpgx\b|\bsql\.DB\b|\bINSERT\b|\bSELECT\b|\bUPDATE\b|\bDELETE\b/i, label: "SQL or PostgreSQL adapter behavior" },
+      { pattern: /\bAuthorization\b|\bBearer\b|\bCookie\b|\bSec-WebSocket-Protocol\b/, label: "transport credential carrier" },
+      { pattern: /\braw_access_token\b|\braw_credential\b|\btoken_lookup_digest\b|\btoken_verifier_digest\b|\bcredential_lookup_digest\b|\bcredential_verifier_digest\b/i, label: "secret or digest material" },
+      { pattern: /\bBlob\b|\bBucket\b|\bS3\b|\bMinio\b|\bObjectStorage\b/, label: "large object or S3-compatible storage" },
+      { pattern: /\bNakama\b|\bPitaya\b/, label: "direct external API compatibility marker" },
+    ];
+    const forbiddenMatches = textMatchesAny(sourceText, forbiddenSourcePatterns);
+    if (forbiddenMatches.length === 0) {
+      ok(`${sourcePath} remains storage-neutral and behavior-free`, {
+        rule_id: ruleId,
+        artifact: sourcePath,
+      });
+    } else {
+      for (const match of forbiddenMatches) {
+        fail(`${sourcePath} violates storage objects repository interface boundary: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: sourcePath,
+        });
+      }
+    }
+  }
+
+  if (isFile(root, testPath)) {
+    const requiredTestMarkers = [
+      "TestRepositoryInterfaceIsStorageNeutral",
+      "TestOwnerKindAndObjectStatusAreClosedSets",
+      "TestNormalizeStorageObjectRecordTrimsAndCopiesValue",
+      "TestNormalizeStorageObjectRecordRejectsInvalidShape",
+      "TestNormalizeCreateStorageObjectInputDefaultsActiveVersionAndCopiesValue",
+      "TestNormalizeCreateStorageObjectInputRejectsInvalidShape",
+      "TestNormalizeGetListUpdateDeleteInputs",
+      "TestNormalizeListStorageObjectsInputRejectsInvalidPagination",
+      "TestConflictAndRepositoryErrorsAreTypedAndRedacted",
+      "TestStorageObjectHasNoSecretTransportOrBlobFields",
+    ];
+    for (const marker of requiredTestMarkers) {
+      checkRequiredText(root, testPath, marker, ruleId, marker);
+    }
+  }
+
+  const storageAdapterCompleted = workItemHasStatus(root, "W-0207", "completed");
+  const storageAdapterFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bstorage_objects\b|\bStorageObject\b/.test(text);
+    });
+  if (storageAdapterFiles.length === 0) {
+    ok("no storage object PostgreSQL adapter behavior is added by storage objects repository interface implementation", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (storageAdapterCompleted) {
+    ok("storage object PostgreSQL adapter behavior is authorized after completed adapter implementation", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else {
+    for (const file of storageAdapterFiles) {
+      fail(`${file} adds storage object PostgreSQL adapter behavior before adapter implementation is authorized`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto && !storageProtocolCompleted) {
+    fail(`${storageProto} adds storage object protocol shape during repository interface implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by storage objects repository interface implementation", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
+function checkRuntimeStorageObjectsPostgresqlAdapterGate(root, goFiles) {
+  const ruleId = "runtime.storage_objects_postgresql_adapter_gate";
+  const standardPath = "docs/storage-objects-postgresql-adapter-gate.md";
+  const standardTranslationPath = "docs/storage-objects-postgresql-adapter-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0114-storage-objects-postgresql-adapter-gate.md";
+  const changePath = "changes/2026-05-22-define-storage-objects-postgresql-adapter-gate";
+  const conversationPath = "conversations/2026-05-22-storage-objects-postgresql-adapter-gate.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0206", "completed")) {
+    ok("storage objects PostgreSQL adapter gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_gate: ADR-0114"],
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [".arch/runtime.yaml", "gate_standard: docs/storage-objects-postgresql-adapter-gate.md"],
+    [".arch/runtime.yaml", "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go"],
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_implementation:"],
+    [".arch/conventions.yaml", "storage_objects_postgresql_adapter_gate:"],
+    [".arch/conventions.yaml", "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [".arch/conventions.yaml", "storage_objects_postgresql_adapter_implementation:"],
+    [".arch/contracts.yaml", "storage_objects_postgresql_adapter_gate_defined: true"],
+    [".arch/contracts.yaml", "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [".arch/contracts.yaml", "storage_objects_postgresql_adapter_implementation:"],
+    [".arch/reference.yaml", "phase_2dq_storage_objects_postgresql_adapter_gate"],
+    [".arch/reference.yaml", "phase_2dr_storage_objects_postgresql_adapter_implementation"],
+    [".arch/work-items.yaml", "id: M-134"],
+    [".arch/work-items.yaml", "title: Storage Objects PostgreSQL Adapter Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0206"],
+    [".arch/work-items.yaml", "title: Define storage objects PostgreSQL adapter gate"],
+    [".arch/work-items.yaml", "id: M-135"],
+    [".arch/work-items.yaml", "title: Storage Objects PostgreSQL Adapter Implementation"],
+    [".arch/work-items.yaml", "id: W-0207"],
+    [".arch/work-items.yaml", "title: Implement storage objects PostgreSQL adapter"],
+    [moduleManifestPath, "storage_objects_postgresql_adapter_gate_defined: true"],
+    [moduleManifestPath, "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [moduleGuidePath, "runtime.storage_objects_postgresql_adapter_gate"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_postgresql_adapter_gate"],
+    ["AGENTS.md", "runtime.storage_objects_postgresql_adapter_gate"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_postgresql_adapter_gate"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_postgresql_adapter_gate"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_postgresql_adapter_gate"],
+    ["rules/check-rules.json", "runtime.storage_objects_postgresql_adapter_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "storage_objects_postgresql_adapter_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0206"],
+    [standardPath, "decision: ADR-0114"],
+    [standardPath, "check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [standardPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardPath, "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres"],
+    [standardPath, "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go"],
+    [standardPath, "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go"],
+    [standardPath, "storage_objects_logical_table: storage_objects"],
+    [standardPath, "unit_of_work_handoff_required: true"],
+    [standardPath, "sql_execution_added: false"],
+    [standardPath, "postgresql_adapter_added: false"],
+    [standardPath, "runtime_behavior_added: false"],
+    [standardPath, "protocol_route_added: false"],
+    [standardPath, "protobuf_source_added: false"],
+    [standardPath, "generated_output_added: false"],
+    [standardPath, "dependency_added: false"],
+    [standardPath, "large_object_blob_storage_added: false"],
+    [standardPath, "s3_compatible_object_storage_added: false"],
+    [standardPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardTranslationPath, "storage_objects_postgresql_adapter_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "completed_work_item: W-0206"],
+    [standardTranslationPath, "decision: ADR-0114"],
+    [standardTranslationPath, "check_rule: runtime.storage_objects_postgresql_adapter_gate"],
+    [standardTranslationPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardTranslationPath, "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres"],
+    [standardTranslationPath, "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go"],
+    [standardTranslationPath, "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go"],
+    [standardTranslationPath, "storage_objects_logical_table: storage_objects"],
+    [standardTranslationPath, "unit_of_work_handoff_required: true"],
+    [standardTranslationPath, "sql_execution_added: false"],
+    [standardTranslationPath, "postgresql_adapter_added: false"],
+    [standardTranslationPath, "runtime_behavior_added: false"],
+    [standardTranslationPath, "protocol_route_added: false"],
+    [standardTranslationPath, "protobuf_source_added: false"],
+    [standardTranslationPath, "generated_output_added: false"],
+    [standardTranslationPath, "dependency_added: false"],
+    [standardTranslationPath, "large_object_blob_storage_added: false"],
+    [standardTranslationPath, "s3_compatible_object_storage_added: false"],
+    [standardTranslationPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "storage_objects_postgresql_adapter_gate_decision: ADR-0114",
+      "storage_objects_postgresql_adapter_gate_standard: docs/storage-objects-postgresql-adapter-gate.md",
+      "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go",
+      "unit_of_work_handoff_required: true",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "storage_objects_postgresql_adapter_gate_decision: ADR-0114",
+      "storage_objects_postgresql_adapter_gate_standard: docs/storage-objects-postgresql-adapter-gate.md",
+      "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+      "unit_of_work_handoff_required: true",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "storage_objects_postgresql_adapter_gate_defined: true",
+      "storage_objects_postgresql_adapter_gate_decision: ADR-0114",
+      "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate",
+      "storage_objects_postgresql_adapter_gate_work_item: W-0206",
+      "storage_objects_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "storage_objects_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+      "storage_objects_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go",
+      "storage_objects_postgresql_adapter_added: false",
+      "storage_objects_sql_execution_added: false",
+      "storage_objects_runtime_behavior_added: false",
+      "storage_objects_direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "storage_objects_postgresql_adapter_gate_defined: true",
+      "storage_objects_postgresql_adapter_gate_decision: ADR-0114",
+      "storage_objects_postgresql_adapter_gate_check_rule: runtime.storage_objects_postgresql_adapter_gate",
+      "postgres_adapter_gate_work_item: W-0206",
+      "postgres_adapter_owner: runtime/internal/platform/persistence/postgres",
+      ...(workItemHasStatus(root, "W-0207", "completed")
+        ? [
+            "storage_objects_postgresql_adapter_implementation_completed: true",
+            "storage_objects_postgresql_adapter_implementation_decision: ADR-0115",
+            "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation",
+            "postgres_adapter_implementation_work_item: W-0207",
+            "postgres_adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+            "postgres_adapter_test: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go",
+            "postgres_adapter_added: true",
+            "sql_execution_added: true",
+          ]
+        : [
+            "postgres_adapter_implementation_next_work_item: W-0207",
+            "postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+            "postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go",
+            "postgres_adapter_added: false",
+            "sql_execution_added: false",
+          ]),
+      "runtime_behavior_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const adapterImplementationCompleted = workItemHasStatus(root, "W-0207", "completed");
+  const forbiddenAdapterFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => /storage_object/i.test(path.basename(file)));
+  if (forbiddenAdapterFiles.length === 0) {
+    ok("no storage object PostgreSQL adapter Go files are added by storage objects PostgreSQL adapter gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (adapterImplementationCompleted) {
+    ok("storage object PostgreSQL adapter Go files are authorized after completed W-0207", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else {
+    for (const file of forbiddenAdapterFiles) {
+      fail(`${file} adds storage object PostgreSQL adapter behavior before implementation is authorized`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bNewStorageObjectRepository\b/, label: "storage object repository constructor" },
+    { pattern: /\bINSERT INTO storage_objects\b|\bFROM storage_objects\b|\bUPDATE storage_objects\b|\bDELETE FROM storage_objects\b/i, label: "storage object SQL execution" },
+    { pattern: /\bRegisterStorageObject\b|\bStorageObjectHandler\b|\bStorageObjectRoute\b/, label: "storage object runtime or protocol route behavior" },
+  ];
+  for (const file of goFiles.filter((candidate) => !candidate.endsWith("_test.go"))) {
+    if (adapterImplementationCompleted && pathStartsWith(file, "runtime/internal/platform/persistence/postgres/")) {
+      continue;
+    }
+    if (isStorageObjectsRuntimeBehaviorImplementationFile(root, file)) {
+      continue;
+    }
+    const matches = textMatchesAny(sourceWithoutGoComments(readText(path.join(root, file))), forbiddenRuntimePatterns);
+    for (const match of matches) {
+      fail(`${file} crosses storage objects PostgreSQL adapter gate with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto && !storageProtocolCompleted) {
+    fail(`${storageProto} adds storage object protocol shape during PostgreSQL adapter gate`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by storage objects PostgreSQL adapter gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
+function checkRuntimeStorageObjectsPostgresqlAdapterImplementation(root, goFiles) {
+  const ruleId = "runtime.storage_objects_postgresql_adapter_implementation";
+  const sourcePath = "runtime/internal/platform/persistence/postgres/storage_object_repository.go";
+  const testPath = "runtime/internal/platform/persistence/postgres/storage_object_repository_test.go";
+  const runnerPath = "runtime/internal/platform/persistence/postgres/runner.go";
+  const decisionPath = "decisions/ADR-0115-storage-objects-postgresql-adapter-implementation.md";
+  const changePath = "changes/2026-05-22-implement-storage-objects-postgresql-adapter";
+  const conversationPath = "conversations/2026-05-22-storage-objects-postgresql-adapter-implementation.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0207", "completed")) {
+    ok("storage objects PostgreSQL adapter implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    sourcePath,
+    testPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-135"],
+    [".arch/work-items.yaml", "title: Storage Objects PostgreSQL Adapter Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0207"],
+    [".arch/work-items.yaml", "title: Implement storage objects PostgreSQL adapter"],
+    [".arch/work-items.yaml", "ADR-0115"],
+    [".arch/work-items.yaml", "id: M-136"],
+    [".arch/work-items.yaml", "title: Storage Objects Runtime Behavior Gate"],
+    [".arch/work-items.yaml", "id: W-0208"],
+    [".arch/work-items.yaml", "title: Define storage objects runtime behavior gate"],
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_implementation: ADR-0115"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_implementation_completed: true"],
+    [".arch/runtime.yaml", "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation"],
+    [".arch/runtime.yaml", `adapter_source: ${sourcePath}`],
+    [".arch/runtime.yaml", `adapter_tests: ${testPath}`],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_gate:"],
+    [".arch/conventions.yaml", "storage_objects_postgresql_adapter_implementation_completed: true"],
+    [".arch/conventions.yaml", "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_gate:"],
+    [".arch/contracts.yaml", "storage_objects_postgresql_adapter_implementation_completed: true"],
+    [".arch/contracts.yaml", "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_gate:"],
+    [".arch/reference.yaml", "phase_2dr_storage_objects_postgresql_adapter_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0115"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_postgresql_adapter_implementation"],
+    [".arch/reference.yaml", "phase_2ds_storage_objects_runtime_behavior_gate"],
+    [moduleManifestPath, "storage_objects_postgresql_adapter_implementation_completed: true"],
+    [moduleManifestPath, "storage_objects_postgresql_adapter_implementation_decision: ADR-0115"],
+    [moduleManifestPath, "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation"],
+    [moduleManifestPath, "postgres_adapter_source: runtime/internal/platform/persistence/postgres/storage_object_repository.go"],
+    [moduleManifestPath, "postgres_adapter_test: runtime/internal/platform/persistence/postgres/storage_object_repository_test.go"],
+    [moduleGuidePath, "runtime.storage_objects_postgresql_adapter_implementation"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_postgresql_adapter_implementation"],
+    ["AGENTS.md", "runtime.storage_objects_postgresql_adapter_implementation"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_postgresql_adapter_implementation"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_postgresql_adapter_implementation"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_postgresql_adapter_implementation"],
+    ["rules/check-rules.json", "runtime.storage_objects_postgresql_adapter_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [sourcePath]: [
+      "type StorageObjectRepository struct",
+      "var _ storage.Repository = (*StorageObjectRepository)(nil)",
+      "func NewStorageObjectRepositoryForUnitOfWork",
+      "func (r *StorageObjectRepository) CreateStorageObject",
+      "func (r *StorageObjectRepository) GetStorageObject",
+      "func (r *StorageObjectRepository) ListStorageObjects",
+      "func (r *StorageObjectRepository) UpdateStorageObject",
+      "func (r *StorageObjectRepository) DeleteStorageObject",
+      "INSERT INTO storage_objects",
+      "FROM storage_objects",
+      "UPDATE storage_objects",
+      "deleted_at IS NULL",
+      "version = version + 1",
+      "storage.NormalizeStorageObjectRecord",
+      "storage.StorageObjectRepositoryError",
+    ],
+    [testPath]: [
+      "TestStorageObjectRepositoryCreateInsertsActiveObject",
+      "TestStorageObjectRepositoryGetSelectsActiveObjectByOwnerIdentity",
+      "TestStorageObjectRepositoryListIsOwnerCollectionScopedAndOrdered",
+      "TestStorageObjectRepositoryUpdateChecksExpectedVersionAndIncrementsVersion",
+      "TestStorageObjectRepositoryDeleteSoftDeletesAndChecksExpectedVersion",
+      "TestStorageObjectRepositoryMapsErrorsAndRedactsDetails",
+      "TestStorageObjectRepositoryRejectsInvalidRows",
+      "TestStorageObjectRepositoryRequiresUnitOfWorkExecutor",
+      "TestStorageObjectRepositoryDefaultTestsDoNotRequireLivePostgreSQL",
+      "TestPostgresUnitOfWorkCreatesStorageObjectRepository",
+    ],
+    [runnerPath]: [
+      "func (u UnitOfWork) NewStorageObjectRepository() (storage.Repository, error)",
+      "return NewStorageObjectRepositoryForUnitOfWork(executor), nil",
+    ],
+    [decisionPath]: [
+      "ADR-0115",
+      "runtime/internal/platform/persistence/postgres/storage_object_repository.go",
+      "runtime.storage_objects_postgresql_adapter_implementation",
+      "M-135/W-0207",
+      "W-0208 Define storage objects runtime behavior gate",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0207",
+      "completed_milestone: M-135",
+      "previous_completed_work_item: W-0206",
+      "next_milestone: M-136",
+      "next_work_item: W-0208",
+      "next_work_item_status: next_ready",
+      "storage_objects_postgresql_adapter_implementation_completed: true",
+      "storage_objects_postgresql_adapter_implementation_decision: ADR-0115",
+      "storage_objects_postgresql_adapter_implementation_check_rule: runtime.storage_objects_postgresql_adapter_implementation",
+      "postgresql_adapter_added: true",
+      "sql_execution_added: true",
+      "unit_of_work_repository_handoff_added: true",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => ![sourcePath, runnerPath].includes(file))
+    .filter((file) => !isStorageObjectsRuntimeBehaviorImplementationFile(root, file))
+    .filter((file) => {
+      if (pathStartsWith(file, "runtime/internal/modules/storage/")) {
+        return false;
+      }
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bCreateStorageObject\b|\bGetStorageObject\b|\bListStorageObjects\b|\bUpdateStorageObject\b|\bDeleteStorageObject\b|\bStorageObjectHandler\b|\bStorageObjectRoute\b/.test(text);
+    });
+  for (const file of forbiddenRuntimeFiles) {
+    fail(`${file} adds storage object runtime behavior during PostgreSQL adapter implementation`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeFiles.length === 0) {
+    ok("no storage object runtime handlers or routes are added by PostgreSQL adapter implementation", {
+      rule_id: ruleId,
+      artifact: "runtime",
+    });
+  }
+
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto && !storageProtocolCompleted) {
+    fail(`${storageProto} adds storage object protocol shape during PostgreSQL adapter implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by PostgreSQL adapter implementation", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
+function checkRuntimeStorageObjectsRuntimeBehaviorGate(root, goFiles) {
+  const ruleId = "runtime.storage_objects_runtime_behavior_gate";
+  const standardPath = "docs/storage-objects-runtime-behavior-gate.md";
+  const standardTranslationPath = "docs/storage-objects-runtime-behavior-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0116-storage-objects-runtime-behavior-gate.md";
+  const changePath = "changes/2026-05-22-define-storage-objects-runtime-behavior-gate";
+  const conversationPath = "conversations/2026-05-22-storage-objects-runtime-behavior-gate.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0208", "completed")) {
+    ok("storage objects runtime behavior gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-136"],
+    [".arch/work-items.yaml", "title: Storage Objects Runtime Behavior Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0208"],
+    [".arch/work-items.yaml", "title: Define storage objects runtime behavior gate"],
+    [".arch/work-items.yaml", "ADR-0116"],
+    [".arch/work-items.yaml", "id: M-137"],
+    [".arch/work-items.yaml", "title: Storage Objects Runtime Behavior Implementation"],
+    [".arch/work-items.yaml", "id: W-0209"],
+    [".arch/work-items.yaml", "title: Implement storage objects runtime behavior"],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_gate: ADR-0116"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_gate_defined: true"],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_implementation:"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_gate_defined: true"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_implementation:"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_gate_defined: true"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_implementation:"],
+    [".arch/reference.yaml", "phase_2ds_storage_objects_runtime_behavior_gate"],
+    [".arch/reference.yaml", "decision: ADR-0116"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [".arch/reference.yaml", "phase_2dt_storage_objects_runtime_behavior_implementation"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_gate_defined: true"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_gate_decision: ADR-0116"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [moduleGuidePath, "runtime.storage_objects_runtime_behavior_gate"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_runtime_behavior_gate"],
+    ["AGENTS.md", "runtime.storage_objects_runtime_behavior_gate"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_runtime_behavior_gate"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_runtime_behavior_gate"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_runtime_behavior_gate"],
+    ["rules/check-rules.json", "runtime.storage_objects_runtime_behavior_gate"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "storage_objects_runtime_behavior_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0208"],
+    [standardPath, "decision: ADR-0116"],
+    [standardPath, "check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [standardPath, "source_adapter_implementation_decision: ADR-0115"],
+    [standardPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardPath, "future_runtime_owner_candidate: runtime/internal/app"],
+    [standardPath, "future_storage_application_package_candidate: runtime/internal/app/storage"],
+    [standardPath, "future_runtime_service_source_candidate: runtime/internal/app/storage/service.go"],
+    [standardPath, "request_identity_required: true"],
+    [standardPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardPath, "owner_id_source: validated_request_identity_player_id"],
+    [standardPath, "route_policy_requirement: request_token_required"],
+    [standardPath, "unit_of_work_handoff_required: true"],
+    [standardPath, "runtime_behavior_added: false"],
+    [standardPath, "runtime_handlers_added: false"],
+    [standardPath, "protocol_route_added: false"],
+    [standardPath, "protobuf_source_added: false"],
+    [standardPath, "generated_output_added: false"],
+    [standardPath, "repository_interface_changed: false"],
+    [standardPath, "postgresql_adapter_changed: false"],
+    [standardPath, "dependency_added: false"],
+    [standardPath, "migration_added: false"],
+    [standardPath, "authentication_session_behavior_changed: false"],
+    [standardPath, "large_object_blob_storage_added: false"],
+    [standardPath, "s3_compatible_object_storage_added: false"],
+    [standardPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardPath, "future_runtime_behavior_implementation_work_item: W-0209"],
+    [standardTranslationPath, "storage_objects_runtime_behavior_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "completed_work_item: W-0208"],
+    [standardTranslationPath, "decision: ADR-0116"],
+    [standardTranslationPath, "check_rule: runtime.storage_objects_runtime_behavior_gate"],
+    [standardTranslationPath, "source_adapter_implementation_decision: ADR-0115"],
+    [standardTranslationPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardTranslationPath, "future_runtime_owner_candidate: runtime/internal/app"],
+    [standardTranslationPath, "future_storage_application_package_candidate: runtime/internal/app/storage"],
+    [standardTranslationPath, "future_runtime_service_source_candidate: runtime/internal/app/storage/service.go"],
+    [standardTranslationPath, "request_identity_required: true"],
+    [standardTranslationPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardTranslationPath, "owner_id_source: validated_request_identity_player_id"],
+    [standardTranslationPath, "route_policy_requirement: request_token_required"],
+    [standardTranslationPath, "unit_of_work_handoff_required: true"],
+    [standardTranslationPath, "runtime_behavior_added: false"],
+    [standardTranslationPath, "runtime_handlers_added: false"],
+    [standardTranslationPath, "protocol_route_added: false"],
+    [standardTranslationPath, "protobuf_source_added: false"],
+    [standardTranslationPath, "generated_output_added: false"],
+    [standardTranslationPath, "repository_interface_changed: false"],
+    [standardTranslationPath, "postgresql_adapter_changed: false"],
+    [standardTranslationPath, "dependency_added: false"],
+    [standardTranslationPath, "migration_added: false"],
+    [standardTranslationPath, "authentication_session_behavior_changed: false"],
+    [standardTranslationPath, "large_object_blob_storage_added: false"],
+    [standardTranslationPath, "s3_compatible_object_storage_added: false"],
+    [standardTranslationPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardTranslationPath, "future_runtime_behavior_implementation_work_item: W-0209"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "storage_objects_runtime_behavior_gate_decision: ADR-0116",
+      "storage_objects_runtime_behavior_gate_standard: docs/storage-objects-runtime-behavior-gate.md",
+      "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate",
+      "future_runtime_owner_candidate: runtime/internal/app",
+      "future_storage_application_package_candidate: runtime/internal/app/storage",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "owner_id_source: validated_request_identity_player_id",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "storage_objects_runtime_behavior_gate_decision: ADR-0116",
+      "storage_objects_runtime_behavior_gate_standard: docs/storage-objects-runtime-behavior-gate.md",
+      "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate",
+      "future_runtime_owner_candidate: runtime/internal/app",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "storage_objects_runtime_behavior_gate_defined: true",
+      "storage_objects_runtime_behavior_gate_decision: ADR-0116",
+      "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate",
+      "storage_objects_runtime_behavior_gate_work_item: W-0208",
+      "storage_objects_runtime_behavior_owner: runtime/internal/app",
+      "storage_objects_metadata_only_player_id_allowed_as_proof: false",
+      "storage_objects_route_policy_requirement: request_token_required",
+      "storage_objects_runtime_behavior_added: false",
+      "storage_objects_protocol_route_added: false",
+      "storage_objects_generated_output_added: false",
+      "storage_objects_direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "storage_objects_runtime_behavior_gate_defined: true",
+      "storage_objects_runtime_behavior_gate_decision: ADR-0116",
+      "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate",
+      "runtime_behavior_gate_work_item: W-0208",
+      "runtime_behavior_next_work_item: W-0209",
+      "runtime_behavior_owner_candidate: runtime/internal/app",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0208",
+      "completed_milestone: M-136",
+      "previous_completed_work_item: W-0207",
+      "next_milestone: M-137",
+      "next_work_item: W-0209",
+      "next_work_item_status: next_ready",
+      "storage_objects_runtime_behavior_gate_defined: true",
+      "storage_objects_runtime_behavior_gate_decision: ADR-0116",
+      "storage_objects_runtime_behavior_gate_check_rule: runtime.storage_objects_runtime_behavior_gate",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "runtime_handlers_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const implementationCompleted = workItemHasStatus(root, "W-0209", "completed");
+  const forbiddenRuntimeServiceFiles = goFiles
+    .filter((file) => pathStartsWith(file, "runtime/internal/app/storage/"))
+    .filter((file) => !implementationCompleted);
+  for (const file of forbiddenRuntimeServiceFiles) {
+    fail(`${file} adds storage object runtime behavior before W-0209 is completed`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeServiceFiles.length === 0) {
+    ok("no storage object runtime service package is added by runtime behavior gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/app/storage",
+    });
+  }
+
+  const forbiddenRuntimePatterns = [
+    /\bStorageObjectService\b/,
+    /\bHandle(Get|List|Put|Delete)StorageObject\b/,
+    /\b(Get|List|Put|Delete)OwnStorageObject\b/,
+    /\bStorageObjectRoute\b/,
+  ];
+  const forbiddenRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => !implementationCompleted || !pathStartsWith(file, "runtime/internal/app/storage/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/modules/storage/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => !isStorageObjectsProtocolRouteImplementationFile(root, file))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return forbiddenRuntimePatterns.some((pattern) => pattern.test(text));
+    });
+  for (const file of forbiddenRuntimeFiles) {
+    fail(`${file} adds storage object runtime handlers or service behavior during runtime behavior gate`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeFiles.length === 0) {
+    ok("no storage object runtime handlers or service behavior are added by runtime behavior gate", {
+      rule_id: ruleId,
+      artifact: "runtime",
+    });
+  }
+
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto && !storageProtocolCompleted) {
+    fail(`${storageProto} adds storage object protocol shape during runtime behavior gate`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by runtime behavior gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
+function checkRuntimeStorageObjectsRuntimeBehaviorImplementation(root, goFiles) {
+  const ruleId = "runtime.storage_objects_runtime_behavior_implementation";
+  const decisionPath = "decisions/ADR-0117-storage-objects-runtime-behavior-implementation.md";
+  const changePath = "changes/2026-05-22-implement-storage-objects-runtime-behavior";
+  const conversationPath = "conversations/2026-05-22-storage-objects-runtime-behavior-implementation.md";
+  const servicePath = "runtime/internal/app/storage/service.go";
+  const serviceTestPath = "runtime/internal/app/storage/service_test.go";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!workItemHasStatus(root, "W-0209", "completed")) {
+    ok("storage objects runtime behavior implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    servicePath,
+    serviceTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-137"],
+    [".arch/work-items.yaml", "title: Storage Objects Runtime Behavior Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0209"],
+    [".arch/work-items.yaml", "title: Implement storage objects runtime behavior"],
+    [".arch/work-items.yaml", "ADR-0117"],
+    [".arch/work-items.yaml", "id: M-138"],
+    [".arch/work-items.yaml", "id: W-0210"],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_implementation: ADR-0117"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_implementation_completed: true"],
+    [".arch/runtime.yaml", "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_implementation_completed: true"],
+    [".arch/conventions.yaml", "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_implementation_completed: true"],
+    [".arch/contracts.yaml", "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation"],
+    [".arch/reference.yaml", "phase_2dt_storage_objects_runtime_behavior_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0117"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_runtime_behavior_implementation"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_implementation_completed: true"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_implementation_decision: ADR-0117"],
+    [moduleManifestPath, "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation"],
+    [moduleGuidePath, "runtime.storage_objects_runtime_behavior_implementation"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_runtime_behavior_implementation"],
+    ["AGENTS.md", "runtime.storage_objects_runtime_behavior_implementation"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_runtime_behavior_implementation"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_runtime_behavior_implementation"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_runtime_behavior_implementation"],
+    ["rules/check-rules.json", "runtime.storage_objects_runtime_behavior_implementation"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "storage_objects_runtime_behavior_implementation_decision: ADR-0117",
+      "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation",
+      "implementation_owner: runtime/internal/app/storage",
+      "runtime_service_source: runtime/internal/app/storage/service.go",
+      "runtime_service_test: runtime/internal/app/storage/service_test.go",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "owner_id_source: validated_request_identity_player_id",
+      "unit_of_work_handoff_used: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "storage_objects_runtime_behavior_implementation_decision: ADR-0117",
+      "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation",
+      "implementation_owner: runtime/internal/app/storage",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "unit_of_work_handoff_used: true",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "storage_objects_runtime_behavior_implementation_completed: true",
+      "storage_objects_runtime_behavior_implementation_decision: ADR-0117",
+      "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation",
+      "storage_objects_runtime_behavior_owner: runtime/internal/app/storage",
+      "storage_objects_metadata_only_player_id_allowed_as_proof: false",
+      "storage_objects_protocol_route_added: false",
+      "storage_objects_generated_output_added: false",
+      "storage_objects_direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "storage_objects_runtime_behavior_implementation_completed: true",
+      "storage_objects_runtime_behavior_implementation_decision: ADR-0117",
+      "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation",
+      "runtime_behavior_added: true",
+      "runtime_behavior_owner: runtime/internal/app/storage",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0209",
+      "completed_milestone: M-137",
+      "previous_completed_work_item: W-0208",
+      "storage_objects_runtime_behavior_implementation_completed: true",
+      "storage_objects_runtime_behavior_implementation_decision: ADR-0117",
+      "storage_objects_runtime_behavior_implementation_check_rule: runtime.storage_objects_runtime_behavior_implementation",
+      "runtime_behavior_added: true",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const serviceText = sourceWithoutGoComments(readText(path.join(root, servicePath)));
+  for (const requiredPattern of [
+    /\bfunc\s+\(s Service\)\s+GetOwnStorageObject\b/,
+    /\bfunc\s+\(s Service\)\s+ListOwnStorageObjects\b/,
+    /\bfunc\s+\(s Service\)\s+PutOwnStorageObject\b/,
+    /\bfunc\s+\(s Service\)\s+DeleteOwnStorageObject\b/,
+    /\bownerFromValidatedIdentity\b/,
+    /\bIdentityValidationValidated\b/,
+    /\bPlayerIDValidated\b/,
+    /\bNewStorageObjectRepository\b/,
+    /\bMaxStorageObjectValueJSONBytes\b/,
+    /\bPublicErrorStorageObjectForbidden\b/,
+    /\bPublicErrorStorageObjectVersionMismatch\b/,
+  ]) {
+    if (requiredPattern.test(serviceText)) {
+      ok(`storage runtime service includes ${requiredPattern}`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    } else {
+      fail(`${servicePath} is missing required storage runtime behavior ${requiredPattern}`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    }
+  }
+
+  const forbiddenImports = parseGoImports(serviceText)
+    .filter((importPath) => (
+      importPath.includes("/internal/platform/persistence/postgres") ||
+      importPath.includes("/internal/platform/transport/ws") ||
+      importPath.includes("/internal/platform/protocol/protobuf") ||
+      importPath.includes("/internal/generated/proto") ||
+      importPath.includes("github.com/jackc/pgx") ||
+      importPath.includes("github.com/coder/websocket")
+    ));
+  for (const importPath of forbiddenImports) {
+    fail(`${servicePath} imports forbidden storage runtime dependency ${importPath}`, {
+      rule_id: ruleId,
+      artifact: servicePath,
+    });
+  }
+  if (forbiddenImports.length === 0) {
+    ok("storage runtime service keeps platform/protocol dependencies out", {
+      rule_id: ruleId,
+      artifact: servicePath,
+    });
+  }
+
+  const forbiddenRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => file !== servicePath)
+    .filter((file) => !isStorageObjectsProtocolRouteImplementationFile(root, file))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\b(Get|List|Put|Delete)OwnStorageObject\b|\bStorageObjectOperationStatus\b/.test(text);
+    });
+  for (const file of forbiddenRuntimeFiles) {
+    fail(`${file} spreads storage object runtime behavior outside application service`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeFiles.length === 0) {
+    ok("storage object runtime behavior remains inside application service", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/app/storage",
+    });
+  }
+
+  const storageProtocolCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto && !storageProtocolCompleted) {
+    fail(`${storageProto} adds storage object protocol shape during runtime behavior implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && storageProtocolCompleted) {
+    ok(`${storageProto} is authorized after completed storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by runtime behavior implementation", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
+function checkRuntimeStorageObjectsProtocolRouteGate(root, goFiles) {
+  const ruleId = "runtime.storage_objects_protocol_route_gate";
+  const standardPath = "docs/storage-objects-protocol-route-gate.md";
+  const standardTranslationPath = "docs/storage-objects-protocol-route-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0118-storage-objects-protocol-route-gate.md";
+  const changePath = "changes/2026-05-22-define-storage-objects-protocol-route-gate";
+  const conversationPath = "conversations/2026-05-22-storage-objects-protocol-route-gate.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!storageObjectsProtocolRouteGateCompleted(root)) {
+    ok("storage objects protocol route gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-138"],
+    [".arch/work-items.yaml", "title: Storage Objects Protocol Route Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0210"],
+    [".arch/work-items.yaml", "title: Define storage objects protocol route gate"],
+    [".arch/work-items.yaml", "ADR-0118"],
+    [".arch/work-items.yaml", "id: M-139"],
+    [".arch/work-items.yaml", "title: Storage Objects Protocol Route Implementation"],
+    [".arch/work-items.yaml", "id: W-0211"],
+    [".arch/work-items.yaml", "title: Implement storage objects protocol route"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_gate: ADR-0118"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_gate:"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_gate:"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate"],
+    [".arch/reference.yaml", "phase_2du_storage_objects_protocol_route_gate"],
+    [".arch/reference.yaml", "phase_2dv_storage_objects_protocol_route_implementation"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_protocol_route_gate"],
+    [".arch/modules.yaml", "protocol_route_gate_decision: ADR-0118"],
+    [moduleManifestPath, "storage_objects_protocol_route_gate_defined: true"],
+    [moduleManifestPath, "storage_objects_protocol_route_gate_decision: ADR-0118"],
+    [moduleManifestPath, "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate"],
+    [moduleGuidePath, "runtime.storage_objects_protocol_route_gate"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_protocol_route_gate"],
+    ["AGENTS.md", "runtime.storage_objects_protocol_route_gate"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_gate"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_protocol_route_gate"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_gate"],
+    ["rules/check-rules.json", "runtime.storage_objects_protocol_route_gate"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "storage.GetOwnStorageObject",
+    "storage.ListOwnStorageObjects",
+    "storage.PutOwnStorageObject",
+    "storage.DeleteOwnStorageObject",
+  ];
+  const routeMarkerFiles = [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    ".arch/work-items.yaml",
+  ];
+  for (const file of routeMarkerFiles) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const requiredStandardText = [
+    [standardPath, "storage_objects_protocol_route_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0210"],
+    [standardPath, "decision: ADR-0118"],
+    [standardPath, "check_rule: runtime.storage_objects_protocol_route_gate"],
+    [standardPath, "source_runtime_behavior_implementation_decision: ADR-0117"],
+    [standardPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardPath, "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto"],
+    [standardPath, "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go"],
+    [standardPath, "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go"],
+    [standardPath, "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go"],
+    [standardPath, "route_policy_requirement: request_token_required"],
+    [standardPath, "authenticated_wrapper_required: true"],
+    [standardPath, "request_identity_source: validated_authenticated_request_identity"],
+    [standardPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardPath, "metadata_only_session_id_allowed_as_proof: false"],
+    [standardPath, "client_supplied_owner_id_allowed: false"],
+    [standardPath, "first_payload_package: vibit.storage.v1"],
+    [standardPath, "protobuf_envelope_change_status: unchanged"],
+    [standardPath, "websocket_transport_credential_neutral: true"],
+    [standardPath, "protocol_route_added: false"],
+    [standardPath, "protobuf_source_added: false"],
+    [standardPath, "generated_output_added: false"],
+    [standardPath, "startup_wiring_added: false"],
+    [standardPath, "repository_interface_changed: false"],
+    [standardPath, "postgresql_adapter_changed: false"],
+    [standardPath, "dependency_added: false"],
+    [standardPath, "migration_added: false"],
+    [standardPath, "authentication_session_behavior_changed: false"],
+    [standardPath, "large_object_blob_storage_added: false"],
+    [standardPath, "s3_compatible_object_storage_added: false"],
+    [standardPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardPath, "future_protocol_route_implementation_work_item: W-0211"],
+    [standardPath, "future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation"],
+    [standardPath, "Nakama reference mapping"],
+    [standardPath, "Pitaya reference mapping"],
+    [standardPath, "collection/key/value/version/list/read/write/delete"],
+    [standardPath, "acceptors, sessions, routes, serializers, handlers, and backend behavior"],
+    [standardTranslationPath, "storage_objects_protocol_route_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "completed_work_item: W-0210"],
+    [standardTranslationPath, "decision: ADR-0118"],
+    [standardTranslationPath, "check_rule: runtime.storage_objects_protocol_route_gate"],
+    [standardTranslationPath, "source_runtime_behavior_implementation_decision: ADR-0117"],
+    [standardTranslationPath, "repository_interface: runtime/internal/modules/storage.Repository"],
+    [standardTranslationPath, "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto"],
+    [standardTranslationPath, "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go"],
+    [standardTranslationPath, "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go"],
+    [standardTranslationPath, "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go"],
+    [standardTranslationPath, "route_policy_requirement: request_token_required"],
+    [standardTranslationPath, "authenticated_wrapper_required: true"],
+    [standardTranslationPath, "request_identity_source: validated_authenticated_request_identity"],
+    [standardTranslationPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardTranslationPath, "metadata_only_session_id_allowed_as_proof: false"],
+    [standardTranslationPath, "client_supplied_owner_id_allowed: false"],
+    [standardTranslationPath, "first_payload_package: vibit.storage.v1"],
+    [standardTranslationPath, "protobuf_envelope_change_status: unchanged"],
+    [standardTranslationPath, "websocket_transport_credential_neutral: true"],
+    [standardTranslationPath, "protocol_route_added: false"],
+    [standardTranslationPath, "protobuf_source_added: false"],
+    [standardTranslationPath, "generated_output_added: false"],
+    [standardTranslationPath, "startup_wiring_added: false"],
+    [standardTranslationPath, "repository_interface_changed: false"],
+    [standardTranslationPath, "postgresql_adapter_changed: false"],
+    [standardTranslationPath, "dependency_added: false"],
+    [standardTranslationPath, "migration_added: false"],
+    [standardTranslationPath, "authentication_session_behavior_changed: false"],
+    [standardTranslationPath, "large_object_blob_storage_added: false"],
+    [standardTranslationPath, "s3_compatible_object_storage_added: false"],
+    [standardTranslationPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardTranslationPath, "future_protocol_route_implementation_work_item: W-0211"],
+    [standardTranslationPath, "future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation"],
+    [standardTranslationPath, "Nakama reference mapping"],
+    [standardTranslationPath, "Pitaya reference mapping"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "protocol_route_gate_defined: true",
+      "storage_objects_protocol_route_gate_decision: ADR-0118",
+      "storage_objects_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md",
+      "storage_objects_protocol_route_gate_translation: docs/storage-objects-protocol-route-gate.zh-CN.md",
+      "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go",
+      "future_protocol_route_implementation_work_item: W-0211",
+      "future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.storage.v1",
+      "route_policy_requirement: request_token_required",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_owner_id_allowed: false",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "protocol_route_gate_defined: true",
+      "storage_objects_protocol_route_gate_decision: ADR-0118",
+      "storage_objects_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md",
+      "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.storage.v1",
+      "authenticated_wrapper_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "client_supplied_owner_id_allowed: false",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "protocol_route_gate_defined: true",
+      "storage_objects_protocol_route_gate_decision: ADR-0118",
+      "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go",
+      "future_protocol_route_implementation_work_item: W-0211",
+      "future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.storage.v1",
+      "authenticated_wrapper_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "client_supplied_owner_id_allowed: false",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/reference.yaml": [
+      "phase_2du_storage_objects_protocol_route_gate",
+      "check_rule: runtime.storage_objects_protocol_route_gate",
+      "future_protocol_route_implementation_work_item: W-0211",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "storage_objects_protocol_route_gate_defined: true",
+      "storage_objects_protocol_route_gate_decision: ADR-0118",
+      "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate",
+      "storage_objects_protocol_route_gate_work_item: W-0210",
+      "protocol_route_next_work_item: W-0211",
+      "future_protocol_route_implementation_work_item: W-0211",
+      "future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation",
+      "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.storage.v1",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_owner_id_allowed: false",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0210",
+      "completed_milestone: M-138",
+      "previous_completed_work_item: W-0209",
+      "next_milestone: M-139",
+      "next_work_item: W-0211",
+      "selected_direction: storage_objects_protocol_route_gate",
+      "next_direction: storage_objects_protocol_route_implementation",
+      "storage_objects_protocol_route_gate_defined: true",
+      "storage_objects_protocol_route_gate_decision: ADR-0118",
+      "storage_objects_protocol_route_gate_check_rule: runtime.storage_objects_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/storage.go",
+      "future_protocol_route_implementation_work_item: W-0211",
+      "candidate_routes:",
+      "first_payload_package: vibit.storage.v1",
+      "route_policy_requirement: request_token_required",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_owner_id_allowed: false",
+      "protobuf_envelope_change_status: unchanged",
+      "websocket_transport_credential_neutral: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "runtime_behavior_added: false",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const implementationCompleted = storageObjectsProtocolRouteImplementationCompleted(root);
+  for (const file of [
+    "proto/vibit/storage/v1/storage.proto",
+    "runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+    "runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+    "runtime/internal/app/bootstrap/storage.go",
+  ]) {
+    if (isFile(root, file) && !implementationCompleted) {
+      fail(`${file} exists during storage objects protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else if (isFile(root, file) && implementationCompleted) {
+      ok(`${file} exists after completed W-0211 storage objects protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      ok(`${file} is deferred by storage objects protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b|\bvibit\.storage\.v1\b/i.test(text);
+  });
+  if (storageProto && !implementationCompleted) {
+    fail(`${storageProto} adds storage object Protobuf shape during protocol route gate`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else if (storageProto && implementationCompleted) {
+    ok(`${storageProto} is authorized after completed W-0211 storage objects protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by protocol route gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const forbiddenRouteFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/app/storage/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/modules/storage/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => !isStorageObjectsProtocolRouteImplementationFile(root, file))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bstorage\.(GetOwnStorageObject|ListOwnStorageObjects|PutOwnStorageObject|DeleteOwnStorageObject)\b|\bRegisterStorageObject|\bStorageObjectRoute|\bStorageRouteHandlers\b|\bstorage_bridge\b/.test(text);
+    });
+  for (const file of forbiddenRouteFiles) {
+    fail(`${file} adds storage object route implementation during protocol route gate`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRouteFiles.length === 0) {
+    ok("no storage object route implementation is added by protocol route gate", {
+      rule_id: ruleId,
+      artifact: "runtime",
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/storage\b/, label: "Nakama storage REST path" },
+    { pattern: /\bnk\.storage_(read|write|delete|list)\b/, label: "Nakama runtime storage API name" },
+    { pattern: /\bStorageRead\b|\bStorageWrite\b|\bStorageDelete\b/, label: "Nakama storage API type name" },
+    { pattern: /\bpermission_read\b|\bpermission_write\b/, label: "Nakama permission field name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  const compatibilityFiles = [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    ".arch/reference.yaml",
+  ];
+  for (const file of compatibilityFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+}
+
+function checkRuntimeStorageObjectsProtocolRouteImplementation(root, goFiles) {
+  const ruleId = "runtime.storage_objects_protocol_route_implementation";
+  const decisionPath = "decisions/ADR-0119-storage-objects-protocol-route-implementation.md";
+  const changePath = "changes/2026-05-22-implement-storage-objects-protocol-route";
+  const conversationPath = "conversations/2026-05-22-storage-objects-protocol-route-implementation.md";
+  const protoPath = "proto/vibit/storage/v1/storage.proto";
+  const generatedPath = "runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go";
+  const routesPath = "runtime/internal/app/storage/routes.go";
+  const bootstrapPath = "runtime/internal/app/bootstrap/storage.go";
+  const bootstrapTestPath = "runtime/internal/app/bootstrap/storage_test.go";
+  const bridgePath = "runtime/internal/platform/protocol/protobuf/storage_bridge.go";
+  const bridgeTestPath = "runtime/internal/platform/protocol/protobuf/storage_bridge_test.go";
+  const mainPath = "runtime/cmd/vibit-server/main.go";
+  const mainTestPath = "runtime/cmd/vibit-server/main_test.go";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!storageObjectsProtocolRouteImplementationCompleted(root)) {
+    ok("storage objects protocol route implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    protoPath,
+    generatedPath,
+    routesPath,
+    bootstrapPath,
+    bootstrapTestPath,
+    bridgePath,
+    bridgeTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-139"],
+    [".arch/work-items.yaml", "title: Storage Objects Protocol Route Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0211"],
+    [".arch/work-items.yaml", "title: Implement storage objects protocol route"],
+    [".arch/work-items.yaml", "ADR-0119"],
+    [".arch/work-items.yaml", "id: M-140"],
+    [".arch/work-items.yaml", "id: W-0212"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_implementation: ADR-0119"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_implementation_completed: true"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_implementation_completed: true"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_implementation_completed: true"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation"],
+    [".arch/reference.yaml", "phase_2dv_storage_objects_protocol_route_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0119"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_protocol_route_implementation"],
+    [".arch/modules.yaml", "protocol_route_implementation_decision: ADR-0119"],
+    [moduleManifestPath, "storage_objects_protocol_route_implementation_completed: true"],
+    [moduleManifestPath, "storage_objects_protocol_route_implementation_decision: ADR-0119"],
+    [moduleManifestPath, "storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation"],
+    [moduleGuidePath, "runtime.storage_objects_protocol_route_implementation"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_protocol_route_implementation"],
+    ["AGENTS.md", "runtime.storage_objects_protocol_route_implementation"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_implementation"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_protocol_route_implementation"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_implementation"],
+    ["rules/check-rules.json", "runtime.storage_objects_protocol_route_implementation"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "storage.GetOwnStorageObject",
+    "storage.ListOwnStorageObjects",
+    "storage.PutOwnStorageObject",
+    "storage.DeleteOwnStorageObject",
+  ];
+  for (const file of [
+    protoPath,
+    routesPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    ".arch/work-items.yaml",
+  ]) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const markersByFile = {
+    [protoPath]: [
+      "package vibit.storage.v1;",
+      "option go_package = \"github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1;storagev1\";",
+      "message StorageObject",
+      "message GetOwnStorageObjectRequest",
+      "message GetOwnStorageObjectResponse",
+      "message ListOwnStorageObjectsRequest",
+      "message ListOwnStorageObjectsResponse",
+      "message PutOwnStorageObjectRequest",
+      "message PutOwnStorageObjectResponse",
+      "message DeleteOwnStorageObjectRequest",
+      "message DeleteOwnStorageObjectResponse",
+      "optional int64 expected_version",
+      "@source docs/storage-objects-protocol-route-gate.md",
+      "@source decisions/ADR-0118-storage-objects-protocol-route-gate.md",
+      "@source decisions/ADR-0119-storage-objects-protocol-route-implementation.md",
+    ],
+    [generatedPath]: [
+      "Code generated by protoc-gen-go. DO NOT EDIT.",
+      "source: vibit/storage/v1/storage.proto",
+    ],
+    [routesPath]: [
+      "QueryGetOwnStorageObject",
+      "QueryListOwnStorageObjects",
+      "CommandPutOwnStorageObject",
+      "CommandDeleteOwnStorageObject",
+      "GetOwnStorageObjectRoute",
+      "ListOwnStorageObjectsRoute",
+      "PutOwnStorageObjectRoute",
+      "DeleteOwnStorageObjectRoute",
+    ],
+    [bootstrapPath]: [
+      "type StorageService interface",
+      "type StorageRouteHandlers struct",
+      "RegisterRoutes",
+      "HandleGetOwnStorageObjectRoute",
+      "HandleListOwnStorageObjectsRoute",
+      "HandlePutOwnStorageObjectRoute",
+      "HandleDeleteOwnStorageObjectRoute",
+      "payload.Identity = request.Identity",
+      "storageApplicationError",
+      "PublicErrorStorageObjectInvalidRequest",
+      "PublicErrorStorageObjectUnavailable",
+    ],
+    [bridgePath]: [
+      "routeRequestWithStoragePayload",
+      "protoPayloadFromStorageRoute",
+      "GetOwnStorageObjectRequest",
+      "ListOwnStorageObjectsRequest",
+      "PutOwnStorageObjectRequest",
+      "DeleteOwnStorageObjectRequest",
+      "GetOwnStorageObjectResponse",
+      "ListOwnStorageObjectsResponse",
+      "PutOwnStorageObjectResponse",
+      "DeleteOwnStorageObjectResponse",
+      "storageVersionFromOptionalInt64",
+      "time.RFC3339Nano",
+    ],
+    [mainPath]: [
+      "appstorage.NewService",
+      "randomStorageObjectIDGenerator",
+      "bootstrap.StorageRouteHandlers",
+      "appstorage.PutOwnStorageObjectRoute()",
+      "appstorage.DeleteOwnStorageObjectRoute()",
+    ],
+    [mainTestPath]: [
+      "TestRandomStorageObjectIDGeneratorShape",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0211",
+      "completed_milestone: M-139",
+      "previous_completed_work_item: W-0210",
+      "next_milestone: M-140",
+      "next_work_item: W-0212",
+      "next_work_item_status: next_ready",
+      "storage_objects_protocol_route_implementation_completed: true",
+      "storage_objects_protocol_route_implementation_decision: ADR-0119",
+      "storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation",
+      "protocol_route_added: true",
+      "protobuf_source_added: true",
+      "generated_output_added: true",
+      "protocol_bridge_added: true",
+      "application_handler_added: true",
+      "postgres_startup_route_registration_added: true",
+      "transaction_bypass_added: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "authenticated_wrapper_required: true",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const protoText = isFile(root, protoPath) ? readText(path.join(root, protoPath)) : "";
+  const forbiddenProtoPatterns = [
+    { pattern: /\bowner_id\b/, label: "client-supplied owner id" },
+    { pattern: /\bplayer_id\b/, label: "client-supplied player id" },
+    { pattern: /\bsession_id\b/, label: "client-supplied session id" },
+    { pattern: /\baccess_token\b/, label: "credential carrier" },
+    { pattern: /\b(?:lookup|verifier)_digest\b/, label: "digest material" },
+    { pattern: /\bs3_bucket\b|\bbucket\b|\bblob\b/i, label: "blob/S3 storage field" },
+  ];
+  const protoMatches = textMatchesAny(protoText, forbiddenProtoPatterns);
+  if (protoMatches.length === 0) {
+    ok("storage proto omits owner, proof, digest, and blob/S3 fields", {
+      rule_id: ruleId,
+      artifact: protoPath,
+    });
+  } else {
+    for (const match of protoMatches) {
+      fail(`${protoPath} includes forbidden storage protocol field: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: protoPath,
+      });
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/storage\b/, label: "Nakama storage REST path" },
+    { pattern: /\bnk\.storage_(read|write|delete|list)\b/, label: "Nakama runtime storage API name" },
+    { pattern: /\bStorageRead\b|\bStorageWrite\b|\bStorageDelete\b/, label: "Nakama storage API type name" },
+    { pattern: /\bpermission_read\b|\bpermission_write\b/, label: "Nakama permission field name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [protoPath, routesPath, bootstrapPath, bridgePath, decisionPath, `${changePath}/spec.yaml`]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenGoImports = [
+    "github.com/jackc/pgx",
+    "github.com/coder/websocket",
+    "github.com/aws/",
+    "github.com/minio/",
+  ];
+  for (const file of [routesPath, bootstrapPath, bridgePath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const imports = parseGoImports(readText(path.join(root, file)));
+    for (const importPath of imports) {
+      if (forbiddenGoImports.some((prefix) => importPath.startsWith(prefix))) {
+        fail(`${file} imports forbidden protocol-route dependency ${importPath}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("storage objects protocol route implementation is bounded to own-player get/list/put/delete routes with generated Protobuf output, protected-route identity handoff, redacted errors, and Nakama/Pitaya-aligned capability/layering without direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
+  });
 }
 
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
@@ -28751,6 +31041,25 @@ function textMatchesAny(text, patterns, root) {
   });
 }
 
+function parseGoImports(text) {
+  const imports = [];
+  const blockMatch = text.match(/import\s*\(([\s\S]*?)\)/);
+  if (blockMatch) {
+    for (const line of blockMatch[1].split(/\r?\n/)) {
+      const match = line.match(/"([^"]+)"/);
+      if (match) {
+        imports.push(match[1]);
+      }
+    }
+  }
+  const singleImportPattern = /^import\s+(?:(?:[\w.]+)\s+)?"([^"]+)"/gm;
+  let match;
+  while ((match = singleImportPattern.exec(text)) !== null) {
+    imports.push(match[1]);
+  }
+  return imports;
+}
+
 function workItemHasStatus(root, workItemId, expectedStatus) {
   const state = loadWorkState(root);
   if (!state.exists || !state.indexes || !state.indexes.items_by_id) {
@@ -28760,8 +31069,52 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
   return Boolean(item && item.status === expectedStatus);
 }
 
+function storageObjectsRuntimeBehaviorImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0209", "completed");
+}
+
+function isStorageObjectsRuntimeBehaviorImplementationFile(root, file) {
+  return storageObjectsRuntimeBehaviorImplementationCompleted(root) &&
+    pathStartsWith(file, "runtime/internal/app/storage/");
+}
+
+function storageObjectsProtocolRouteGateCompleted(root) {
+  return workItemHasStatus(root, "W-0210", "completed");
+}
+
+function storageObjectsProtocolRouteImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0211", "completed");
+}
+
+function isStorageObjectsProtocolRouteImplementationFile(root, file) {
+  if (!storageObjectsProtocolRouteImplementationCompleted(root)) {
+    return false;
+  }
+  return [
+    "proto/vibit/storage/v1/storage.proto",
+    "runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go",
+    "runtime/internal/app/storage/routes.go",
+    "runtime/internal/app/bootstrap/storage.go",
+    "runtime/internal/platform/protocol/protobuf/storage_bridge.go",
+    "runtime/cmd/vibit-server/main.go",
+  ].includes(file) ||
+    pathStartsWith(file, "runtime/internal/app/bootstrap/") && /storage/i.test(path.basename(file)) ||
+    pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") && /storage_bridge/i.test(path.basename(file)) ||
+    file === "runtime/internal/platform/protocol/protobuf/inventory_bridge.go" ||
+    file === "runtime/internal/platform/protocol/protobuf/payload_registry.go" ||
+    file === "runtime/internal/platform/protocol/protobuf/authenticated_request_test.go" ||
+    file === "runtime/cmd/vibit-server/main_test.go";
+}
+
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0211", "next_ready_work_item: W-0212"],
+    ["W-0210", "next_ready_work_item: W-0211"],
+    ["W-0209", "next_ready_work_item: W-0210"],
+    ["W-0208", "next_ready_work_item: W-0209"],
+    ["W-0207", "next_ready_work_item: W-0208"],
+    ["W-0206", "next_ready_work_item: W-0207"],
+    ["W-0205", "next_ready_work_item: W-0206"],
     ["W-0204", "next_ready_work_item: W-0205"],
     ["W-0203", "next_ready_work_item: W-0204"],
     ["W-0202", "next_ready_work_item: W-0203"],
@@ -28795,6 +31148,27 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0211", "completed")) {
+    return "next_work_item: W-0212";
+  }
+  if (workItemHasStatus(root, "W-0210", "completed")) {
+    return "next_work_item: W-0211";
+  }
+  if (workItemHasStatus(root, "W-0209", "completed")) {
+    return "next_work_item: W-0210";
+  }
+  if (workItemHasStatus(root, "W-0208", "completed")) {
+    return "next_work_item: W-0209";
+  }
+  if (workItemHasStatus(root, "W-0207", "completed")) {
+    return "next_work_item: W-0208";
+  }
+  if (workItemHasStatus(root, "W-0206", "completed")) {
+    return "next_work_item: W-0207";
+  }
+  if (workItemHasStatus(root, "W-0205", "completed")) {
+    return "next_work_item: W-0206";
+  }
   if (workItemHasStatus(root, "W-0204", "completed")) {
     return "next_work_item: W-0205";
   }
@@ -28839,6 +31213,13 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0211", "storage_objects_protocol_route_local_proof"],
+    ["W-0210", "storage_objects_protocol_route_implementation"],
+    ["W-0209", "storage_objects_protocol_route_gate"],
+    ["W-0208", "storage_objects_runtime_behavior_implementation"],
+    ["W-0207", "storage_objects_runtime_behavior_gate"],
+    ["W-0206", "storage_objects_postgresql_adapter_implementation"],
+    ["W-0205", "storage_objects_postgresql_adapter_gate"],
     ["W-0204", "storage_objects_repository_interface_implementation"],
     ["W-0203", "storage_objects_repository_boundary"],
     ["W-0202", "storage_objects_migration_source"],
@@ -28872,6 +31253,13 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0211", "W-0212 Prove storage objects protocol route in local alpha request flow"],
+    ["W-0210", "W-0211 Implement storage objects protocol route"],
+    ["W-0209", "W-0210 Define storage objects protocol route gate"],
+    ["W-0208", "W-0209 Implement storage objects runtime behavior"],
+    ["W-0207", "W-0208 Define storage objects runtime behavior gate"],
+    ["W-0206", "W-0207 Implement storage objects PostgreSQL adapter"],
+    ["W-0205", "W-0206 Define storage objects PostgreSQL adapter gate"],
     ["W-0204", "W-0205 Implement storage-neutral storage objects repository interface"],
     ["W-0203", "W-0204 Define storage objects repository boundary"],
     ["W-0202", "W-0203 Add storage objects migration source"],
@@ -28906,6 +31294,13 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0211", "current_phase: storage_objects_protocol_route_local_proof"],
+    ["W-0210", "current_phase: storage_objects_protocol_route_implementation"],
+    ["W-0209", "current_phase: storage_objects_protocol_route_gate"],
+    ["W-0208", "current_phase: storage_objects_runtime_behavior_implementation"],
+    ["W-0207", "current_phase: storage_objects_runtime_behavior_gate"],
+    ["W-0206", "current_phase: storage_objects_postgresql_adapter_implementation"],
+    ["W-0205", "current_phase: storage_objects_postgresql_adapter_gate"],
     ["W-0204", "current_phase: storage_objects_repository_interface_implementation"],
     ["W-0203", "current_phase: storage_objects_repository_boundary"],
     ["W-0202", "current_phase: storage_objects_migration_source"],
@@ -29475,6 +31870,13 @@ function checkRuntime(root) {
   checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles);
   checkRuntimeStorageObjectsMigrationSource(root, goFiles);
   checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles);
+  checkRuntimeStorageObjectsRepositoryInterfaceImplementation(root, goFiles);
+  checkRuntimeStorageObjectsPostgresqlAdapterGate(root, goFiles);
+  checkRuntimeStorageObjectsPostgresqlAdapterImplementation(root, goFiles);
+  checkRuntimeStorageObjectsRuntimeBehaviorGate(root, goFiles);
+  checkRuntimeStorageObjectsRuntimeBehaviorImplementation(root, goFiles);
+  checkRuntimeStorageObjectsProtocolRouteGate(root, goFiles);
+  checkRuntimeStorageObjectsProtocolRouteImplementation(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

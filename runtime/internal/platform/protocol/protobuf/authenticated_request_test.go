@@ -9,11 +9,14 @@ import (
 	"github.com/iceiko/vibit/runtime/internal/app"
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
+	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
 	presencev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
+	storagev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
+	storagemodule "github.com/iceiko/vibit/runtime/internal/modules/storage"
 	"google.golang.org/protobuf/proto"
 )
 
@@ -359,6 +362,140 @@ func TestFrameHandlerProtectedPresenceQueryUsesValidatedSelfIdentity(t *testing.
 		len(presenceResponse.GetActiveConnections()) != 1 ||
 		presenceResponse.GetActiveConnections()[0].GetConnectionId() != "ws-1" {
 		t.Fatalf("presence response = %#v, want online self presence", presenceResponse)
+	}
+}
+
+func TestFrameHandlerProtectedStorageRouteRequiresAuthenticatedWrapper(t *testing.T) {
+	var dispatched bool
+	route := appstorage.GetOwnStorageObjectRoute()
+	handler := FrameHandler{
+		Dispatcher: requestLoopDispatcherFunc(func(context.Context, app.RouteRequest) (app.ApplicationResult, error) {
+			dispatched = true
+			return app.ApplicationResult{}, nil
+		}),
+		RouteProtector: app.NewRouteProtector(routeTokenValidatorFunc(func(context.Context, app.RouteAccessTokenValidationRequest) (app.RouteAccessTokenValidationResult, error) {
+			t.Fatal("validator was called without authenticated wrapper")
+			return app.RouteAccessTokenValidationResult{}, nil
+		})),
+	}
+
+	responses, err := handler.HandleFrame(context.Background(), FrameRequest{
+		ConnectionID: "ws-1",
+		Payload: mustMarshalEnvelope(t, route, &storagev1.GetOwnStorageObjectRequest{
+			Collection: "progress",
+			Key:        "tutorial",
+		}),
+	})
+	if err != nil {
+		t.Fatalf("HandleFrame() error = %v, want nil error envelope", err)
+	}
+	if dispatched {
+		t.Fatal("domain dispatcher was called, want route protection to stop dispatch")
+	}
+	response := mustUnmarshalSingleResponse(t, responses)
+	assertErrorEnvelope(t, response, app.ErrorCodeAuthenticationTokenMissing)
+}
+
+func TestFrameHandlerProtectedStorageRouteUsesValidatedIdentity(t *testing.T) {
+	var validatorCalled bool
+	var received app.RouteRequest
+	route := appstorage.PutOwnStorageObjectRoute()
+	handler := FrameHandler{
+		Dispatcher: requestLoopDispatcherFunc(func(_ context.Context, request app.RouteRequest) (app.ApplicationResult, error) {
+			received = request
+			payload, ok := request.Payload.(appstorage.PutOwnStorageObjectRequest)
+			if !ok {
+				t.Fatalf("request Payload = %T, want PutOwnStorageObjectRequest", request.Payload)
+			}
+			if payload.Collection != "progress" || payload.Key != "tutorial" || string(payload.ValueJSON) != `{"level":4}` {
+				t.Fatalf("storage request payload = %#v, want mapped put request", payload)
+			}
+			if payload.Identity.Status != "" {
+				t.Fatalf("storage payload Identity = %#v, want route handler to add identity later", payload.Identity)
+			}
+			return app.ApplicationResult{
+				RequestID: request.RequestID,
+				Route:     request.Route,
+				Target:    request.Target,
+				Session:   request.Session,
+				Identity:  request.Identity,
+				Payload: appstorage.StorageObjectResult{
+					Status: appstorage.StorageObjectOperationStatusStored,
+					Object: storagemodule.StorageObject{
+						Identity: storagemodule.StorageObjectIdentity{
+							Collection: "progress",
+							Key:        "tutorial",
+						},
+						Value: storagemodule.StorageObjectValue{
+							JSON: []byte(`{"level":4}`),
+						},
+						Version: 4,
+					},
+					Version: 4,
+				},
+			}, nil
+		}),
+		RouteProtector: app.NewRouteProtector(routeTokenValidatorFunc(func(_ context.Context, request app.RouteAccessTokenValidationRequest) (app.RouteAccessTokenValidationResult, error) {
+			validatorCalled = true
+			if request.Route != route || request.ConnectionID != "ws-1" || request.ConnectionEpoch != 7 {
+				t.Fatalf("validator request = %#v, want storage route and frame/session metadata", request)
+			}
+			identity := app.ValidatedPlayerIdentity("player-1", app.Session{
+				ConnectionID:    request.ConnectionID,
+				ConnectionEpoch: request.ConnectionEpoch,
+				PlayerID:        "metadata-player",
+			})
+			identity.SessionValidated = false
+			return app.RouteAccessTokenValidationResult{
+				Valid:    true,
+				Identity: identity,
+			}, nil
+		})),
+	}
+
+	responses, err := handler.HandleFrame(context.Background(), FrameRequest{
+		ConnectionID: "ws-1",
+		Payload: mustMarshalAuthenticatedEnvelope(t, route, "redacted-token-text", &storagev1.PutOwnStorageObjectRequest{
+			Collection: "progress",
+			Key:        "tutorial",
+			ValueJson:  `{"level":4}`,
+		}),
+	})
+	if err != nil {
+		t.Fatalf("HandleFrame() error = %v, want nil", err)
+	}
+	if !validatorCalled {
+		t.Fatal("validator was not called")
+	}
+	if received.PayloadType != "vibit.storage.v1.PutOwnStorageObjectRequest" {
+		t.Fatalf("received PayloadType = %q, want storage request payload type", received.PayloadType)
+	}
+	if received.Identity.Status != app.IdentityValidationValidated ||
+		received.Identity.PlayerID != "player-1" ||
+		!received.Identity.PlayerIDValidated ||
+		received.Identity.SessionValidated {
+		t.Fatalf("received Identity = %#v, want validated request-token identity", received.Identity)
+	}
+
+	response := mustUnmarshalSingleResponse(t, responses)
+	if response.GetKind() != protocolv1.MessageKind_MESSAGE_KIND_COMMAND {
+		t.Fatalf("response kind = %v, want command", response.GetKind())
+	}
+	if response.GetPayloadType() != "vibit.storage.v1.PutOwnStorageObjectResponse" {
+		t.Fatalf("response payload_type = %q, want storage put response", response.GetPayloadType())
+	}
+	responsePayload, err := DecodePayload(response.GetPayloadType(), response.GetPayload())
+	if err != nil {
+		t.Fatalf("DecodePayload(storage response) error = %v, want nil", err)
+	}
+	storageResponse, ok := responsePayload.(*storagev1.PutOwnStorageObjectResponse)
+	if !ok {
+		t.Fatalf("response payload = %T, want PutOwnStorageObjectResponse", responsePayload)
+	}
+	if storageResponse.GetVersion() != 4 ||
+		storageResponse.GetObject().GetCollection() != "progress" ||
+		storageResponse.GetObject().GetValueJson() != `{"level":4}` {
+		t.Fatalf("storage response = %#v, want mapped storage response", storageResponse)
 	}
 }
 

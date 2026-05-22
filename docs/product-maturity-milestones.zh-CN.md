@@ -187,18 +187,18 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 Local development path package 之后的下一个产品方向是：
 
 ```text
-W-0205 Implement storage-neutral storage objects repository interface
+W-0212 Prove storage objects protocol route in local alpha request flow
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`。下一项 work 应实现 storage-neutral storage objects repository interface，再进入 adapter、protocol 或 runtime behavior。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`，storage objects repository interface 已记录在 `runtime/internal/modules/storage/repository.go`，storage objects PostgreSQL adapter gate 已记录在 `docs/storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 已记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go`，storage objects runtime behavior gate 已记录在 `docs/storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 已记录在 `runtime/internal/app/storage/service.go`，storage objects protocol route gate 已记录在 `docs/storage-objects-protocol-route-gate.md` 和 `ADR-0118`，storage objects protocol route implementation 已记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `ADR-0119`。下一项 work 应通过 local alpha request flow 证明已完成的 storage object route surface，保留 Nakama-style storage object 能力覆盖和 Pitaya-style transport/session/handler 分离，但不添加 direct compatibility。
 
-上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source` 和 `W-0204 Define storage objects repository boundary` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
+上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source`、`W-0204 Define storage objects repository boundary`、`W-0205 Implement storage-neutral storage objects repository interface`、`W-0206 Define storage objects PostgreSQL adapter gate`、`W-0207 Implement storage objects PostgreSQL adapter`、`W-0208 Define storage objects runtime behavior gate`、`W-0209 Implement storage objects runtime behavior`、`W-0210 Define storage objects protocol route gate` 和 `W-0211 Implement storage objects protocol route` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability path 的追溯记录。
 
 已记录的候选重点仍包括：
 
 - 降低 local setup friction；
 - 添加更清晰的 example client 或 example app path；
-- 定义 storage objects repository boundary；
+- 通过 local alpha request flow 证明 storage objects protocol route；
 - 定义第一版 realtime messaging 或 server-push slice；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。
