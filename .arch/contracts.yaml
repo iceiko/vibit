@@ -980,14 +980,34 @@ implemented_wire_and_runtime_slices:
     check_rule: runtime.prototype_ready_local_development_path_package
     rule: W-0200 packaged the local development path without contract changes.
   storage_objects_behavior_gate:
-    status: next_ready
-    next_ready_work_item: W-0201
+    status: completed
+    completed_work_item: W-0201
+    decision: ADR-0109
+    change: changes/2026-05-22-define-storage-objects-behavior-gate
+    next_ready_work_item: W-0202
     previous_completed_work_item: W-0200
     selected_direction: storage_objects_behavior_gate
+    next_direction: storage_objects_persistence_schema_gate
     contract_changes_expected: false
     expected_change: changes/2026-05-22-define-storage-objects-behavior-gate
     target_stage: prototype_ready_foundation
-    planned_scope: gate_only
+    gate_standard: docs/storage-objects-behavior-gate.md
+    gate_standard_translation: docs/storage-objects-behavior-gate.zh-CN.md
+    first_scope_posture: player_owned_small_json_objects
+    object_identity_tuple: owner_kind_owner_id_collection_key
+    storage_objects_behavior_gate_defined: true
+    ownership_posture_recorded: true
+    scope_key_posture_recorded: true
+    read_write_semantics_recorded: true
+    permission_posture_recorded: true
+    conflict_semantics_recorded: true
+    protocol_expectations_recorded: true
+    data_expectations_recorded: true
+    verification_expectations_recorded: true
+    stop_conditions_recorded: true
+    future_schema_gate_work_item: W-0202
+    future_schema_gate_direction: storage_objects_persistence_schema_gate
+    gate_only_scope: true
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
     protocol_route_added: false
@@ -1000,7 +1020,30 @@ implemented_wire_and_runtime_slices:
     broad_operations_admin_behavior_added: false
     product_module_expansion_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0201 should define the storage objects behavior gate without adding contracts or runtime behavior.
+    check_rule: runtime.storage_objects_behavior_gate
+    rule: W-0201 defined the storage objects behavior gate without adding contracts or runtime behavior.
+  storage_objects_persistence_schema_gate:
+    status: next_ready
+    next_ready_work_item: W-0202
+    previous_completed_work_item: W-0201
+    selected_direction: storage_objects_persistence_schema_gate
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-define-storage-objects-persistence-schema-gate
+    target_stage: prototype_ready_foundation
+    planned_scope: schema_gate_only
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    repository_interface_changed: false
+    storage_adapter_changed: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0202 should define the storage objects persistence schema gate without adding contracts, migrations, adapters, protocol, or runtime behavior.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

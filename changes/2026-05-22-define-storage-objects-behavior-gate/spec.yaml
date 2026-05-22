@@ -1,0 +1,173 @@
+schema_version: 0.1
+change_id: define-storage-objects-behavior-gate
+date: 2026-05-22
+type: docs
+status: verified
+
+summary: Define the storage objects behavior gate and open the persistence schema gate.
+
+affected_modules:
+  - docs
+  - workflow
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0109
+  referenced:
+    - ADR-0108
+    - ADR-0107
+    - ADR-0106
+    - ADR-0078
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  completed_work_item: W-0201
+  completed_milestone: M-129
+  previous_completed_work_item: W-0200
+  next_milestone: M-130
+  next_work_item: W-0202
+  next_work_item_status: next_ready
+  tier: tier_2_functional
+  selected_direction: storage_objects_behavior_gate
+  next_direction: storage_objects_persistence_schema_gate
+  storage_objects_behavior_gate_defined: true
+  storage_objects_behavior_gate_decision: ADR-0109
+  storage_objects_behavior_gate_check_rule: runtime.storage_objects_behavior_gate
+  source_package_decision: ADR-0108
+  source_package_standard: docs/prototype-ready-local-development-path-package.md
+  gate_standard: docs/storage-objects-behavior-gate.md
+  gate_standard_translation: docs/storage-objects-behavior-gate.zh-CN.md
+  target_stage: prototype_ready_foundation
+  reference_capability_family: storage_objects_and_durable_game_state
+  first_scope_posture: player_owned_small_json_objects
+  object_identity_tuple: owner_kind_owner_id_collection_key
+  ownership_posture_recorded: true
+  scope_key_posture_recorded: true
+  read_write_semantics_recorded: true
+  permission_posture_recorded: true
+  conflict_semantics_recorded: true
+  protocol_expectations_recorded: true
+  data_expectations_recorded: true
+  verification_expectations_recorded: true
+  stop_conditions_recorded: true
+  gate_only_scope: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  repository_interface_changed: false
+  storage_adapter_changed: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit inspect rule runtime.storage_objects_behavior_gate
+    - node tools/vibit check change define-storage-objects-behavior-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - runtime_or_protocol_scope_requires_authorization
+    - protobuf_or_generated_output_requires_authorization
+    - migration_repository_or_adapter_requires_authorization
+    - dependency_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - broad_product_module_requires_authorization
+    - direct_compatibility_requires_authorization
+    - large_object_storage_requires_authorization
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  storage_adapters_changed: false
+  ownership_changes:
+    - docs/storage-objects-behavior-gate.md records the behavior gate.
+    - docs/storage-objects-behavior-gate.zh-CN.md provides the paired Simplified Chinese translation.
+    - ADR-0109 records the behavior decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next
+    - node tools/vibit inspect rule runtime.storage_objects_behavior_gate
+    - node tools/vibit check change define-storage-objects-behavior-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  status: Verified

@@ -157,6 +157,11 @@ Prototype-ready local development path package 是：
 - `docs/prototype-ready-local-development-path-package.md`
 - `decisions/ADR-0108-prototype-ready-local-development-path-package.md`
 
+Storage objects behavior gate 是：
+
+- `docs/storage-objects-behavior-gate.md`
+- `decisions/ADR-0109-storage-objects-behavior-gate.md`
+
 ## 继续开发
 
 如果你是继续推进项目的 agent 或 contributor，先运行：
@@ -169,7 +174,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0201 Define storage objects behavior gate
+W-0202 Define storage objects persistence schema gate
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -228,6 +233,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/first-alpha-feedback-intake-surfaces.md`：first alpha feedback intake surface。
 - `docs/product-maturity-milestones.md`：source alpha、prototype-ready、production-candidate 和 product-class milestones。
 - `docs/prototype-ready-local-development-path-package.md`：可重复 source-first local development path。
+- `docs/storage-objects-behavior-gate.md`：第一版 player-owned small storage objects behavior gate。
 - `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
 - `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
 - `examples/README.md`：local examples 和 redacted configuration template guidance。

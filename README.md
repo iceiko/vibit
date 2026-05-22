@@ -157,6 +157,11 @@ The prototype-ready local development path package is:
 - `docs/prototype-ready-local-development-path-package.md`
 - `decisions/ADR-0108-prototype-ready-local-development-path-package.md`
 
+The storage objects behavior gate is:
+
+- `docs/storage-objects-behavior-gate.md`
+- `decisions/ADR-0109-storage-objects-behavior-gate.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -169,7 +174,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0201 Define storage objects behavior gate
+W-0202 Define storage objects persistence schema gate
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
@@ -228,6 +233,7 @@ Important entry points:
 - `docs/first-alpha-feedback-intake-surfaces.md`: first alpha feedback intake surface.
 - `docs/product-maturity-milestones.md`: source alpha, prototype-ready, production-candidate, and product-class milestones.
 - `docs/prototype-ready-local-development-path-package.md`: repeatable source-first local development path.
+- `docs/storage-objects-behavior-gate.md`: first player-owned small storage objects behavior gate.
 - `docs/releases/v0.1.0-alpha.1.md`: alpha release notes.
 - `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
 - `examples/README.md`: local examples and redacted configuration template guidance.
