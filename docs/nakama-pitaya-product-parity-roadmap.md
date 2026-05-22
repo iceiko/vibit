@@ -156,7 +156,8 @@ execution_plan: docs/prototype-ready-foundation-execution-plan.md
 local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
 local_development_path_package: docs/prototype-ready-local-development-path-package.md
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
-next_work_item: W-0202 Define storage objects persistence schema gate
+storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
+next_work_item: W-0203 Add storage objects migration source
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.

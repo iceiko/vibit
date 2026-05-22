@@ -187,23 +187,23 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 Local development path package 之后的下一个产品方向是：
 
 ```text
-W-0202 Define storage objects persistence schema gate
+W-0203 Add storage objects migration source
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`。下一项 work 应先定义 storage objects 的第一版 persistence schema posture，再进入 migration source、repository、adapter、protocol 或 runtime implementation。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`。下一项 work 应只添加第一版 storage objects SQL migration source，再进入 repository、adapter、protocol 或 runtime implementation。
 
-上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package` 和 `W-0201 Define storage objects behavior gate` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
+上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate` 和 `W-0202 Define storage objects persistence schema gate` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
 
 已记录的候选重点仍包括：
 
 - 降低 local setup friction；
 - 添加更清晰的 example client 或 example app path；
-- 定义第一版 general storage-object persistence schema；
+- 添加第一版 storage objects migration source；
 - 定义第一版 realtime messaging 或 server-push slice；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。
 
-后续 work 必须保留 runtime behavior、protocol、generated output、migrations、dependencies、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
+后续 work 必须保留 runtime behavior、protocol、generated output、dependencies、repository interfaces、storage adapters、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules、large object/blob storage、S3-compatible object storage 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
 
 ## 8. 非授权声明
 

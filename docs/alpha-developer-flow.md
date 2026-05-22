@@ -38,7 +38,7 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 prototype_ready_local_development_path_package_implemented: true
 prototype_ready_local_development_path_package: docs/prototype-ready-local-development-path-package.md
-next_direction: storage_objects_persistence_schema_gate
+next_direction: storage_objects_migration_source
 next_work_status: next_ready
 ```
 
@@ -158,7 +158,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, and the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`. The next work is `W-0202 Define storage objects persistence schema gate`; it should define the first storage objects persistence schema posture before migrations, repositories, adapters, protocol, or runtime implementation.
+The release execution maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, and the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`. The next work is `W-0203 Add storage objects migration source`; it should add only the first storage objects SQL migration source before repositories, adapters, protocol, or runtime implementation.
 
 ## 9. Deferred Work
 

@@ -156,7 +156,8 @@ execution_plan: docs/prototype-ready-foundation-execution-plan.md
 local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
 local_development_path_package: docs/prototype-ready-local-development-path-package.md
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
-next_work_item: W-0202 Define storage objects persistence schema gate
+storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
+next_work_item: W-0203 Add storage objects migration source
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。

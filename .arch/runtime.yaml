@@ -111,22 +111,24 @@ purpose: >
   prototype_ready_local_development_path_gate: ADR-0107
   prototype_ready_local_development_path_package: ADR-0108
   storage_objects_behavior_gate: ADR-0109
+  storage_objects_persistence_schema_gate: ADR-0110
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: storage_objects_persistence_schema_gate
+  current_phase: storage_objects_migration_source
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0202
+  next_ready_work_item: W-0203
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   prototype_ready_local_development_path_package_standard: docs/prototype-ready-local-development-path-package.md
   storage_objects_behavior_gate_standard: docs/storage-objects-behavior-gate.md
+  storage_objects_persistence_schema_gate_standard: docs/storage-objects-persistence-schema-gate.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -6272,24 +6274,54 @@ identity_session_boundary:
     rule: W-0201 defined the storage objects behavior gate before implementation.
 
   storage_objects_persistence_schema_gate:
-    status: next_ready
+    status: completed
     milestone: M-130
-    next_ready_work_item: W-0202
+    completed_work_item: W-0202
+    decision: ADR-0110
+    change: changes/2026-05-22-define-storage-objects-persistence-schema-gate
+    next_milestone: M-131
+    next_ready_work_item: W-0203
     previous_completed_work_item: W-0201
     selected_direction: storage_objects_persistence_schema_gate
+    next_direction: storage_objects_migration_source
     expected_change: changes/2026-05-22-define-storage-objects-persistence-schema-gate
     tier: tier_2_data
     gate_density_strategy: ADR-0082
     target_stage: prototype_ready_foundation
     source_behavior_gate_decision: ADR-0109
     source_behavior_gate_standard: docs/storage-objects-behavior-gate.md
+    gate_standard: docs/storage-objects-persistence-schema-gate.md
+    gate_standard_translation: docs/storage-objects-persistence-schema-gate.zh-CN.md
+    check_rule: runtime.storage_objects_persistence_schema_gate
+    storage_objects_persistence_schema_gate_defined: true
+    storage_objects_persistence_schema_gate_decision: ADR-0110
+    storage_objects_persistence_schema_gate_standard: docs/storage-objects-persistence-schema-gate.md
+    storage_objects_persistence_schema_gate_check_rule: runtime.storage_objects_persistence_schema_gate
+    selected_first_storage_objects_store: postgres
+    future_storage_objects_logical_table: storage_objects
+    future_migration_source_candidate: runtime/migrations/postgres/000006_create_storage_objects.sql
+    future_repository_owner_candidate: runtime/internal/modules/storage
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    table_candidate_recorded: true
+    owner_identity_representation_recorded: true
+    collection_key_constraints_recorded: true
+    value_representation_recorded: true
+    version_representation_recorded: true
+    timestamp_posture_recorded: true
+    uniqueness_index_posture_recorded: true
+    redaction_posture_recorded: true
+    future_repository_adapter_boundaries_recorded: true
+    future_migration_source_candidate_recorded: true
     planned_scope: schema_gate_only
+    schema_gate_only: true
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
     protocol_route_added: false
     protobuf_source_added: false
     generated_output_added: false
     migration_added: false
+    migration_source_added: false
+    storage_objects_table_added: false
     dependency_added: false
     repository_interface_changed: false
     storage_adapter_changed: false
@@ -6299,8 +6331,43 @@ identity_session_boundary:
     additional_release_artifacts_authorized: false
     public_announcements_beyond_github_release_authorized: false
     paid_promotion_authorized: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0202 should define the storage objects persistence schema gate before adding migrations, repository interfaces, adapters, protocol, or runtime behavior.
+    rule: W-0202 defined the storage objects persistence schema gate before adding migration source, repository interfaces, adapters, protocol, or runtime behavior.
+
+  storage_objects_migration_source:
+    status: next_ready
+    milestone: M-131
+    next_ready_work_item: W-0203
+    previous_completed_work_item: W-0202
+    selected_direction: storage_objects_migration_source
+    expected_change: changes/2026-05-22-add-storage-objects-migration-source
+    tier: tier_2_data
+    gate_density_strategy: ADR-0082
+    target_stage: prototype_ready_foundation
+    source_schema_gate_decision: ADR-0110
+    source_schema_gate_standard: docs/storage-objects-persistence-schema-gate.md
+    migration_source_candidate: runtime/migrations/postgres/000006_create_storage_objects.sql
+    planned_scope: migration_source_only
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    repository_interface_changed: false
+    storage_adapter_changed: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    hosted_deployment_added: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0203 should add only the storage objects SQL migration source before repository interfaces, adapters, protocol, or runtime behavior.
 
 persistence_model:
   decision: ADR-0011

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-130
+current_milestone: M-131
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: storage_objects_behavior_gate_defined
+    current_release_state: storage_objects_persistence_schema_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0202
+    next_ready_work_item: W-0203
     preferred_after_current:
-      - storage_objects_persistence_schema_gate
+      - storage_objects_migration_source
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2442,7 +2442,7 @@ milestones:
 
   - id: M-130
     title: Storage Objects Persistence Schema Gate
-    status: active
+    status: completed
     goal: Define the first persistence schema posture for storage objects before adding migration source, repository interfaces, adapters, protocol, or runtime behavior.
     completion_criteria:
       - The storage objects persistence schema gate is recorded.
@@ -2461,6 +2461,30 @@ milestones:
       - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
       - executing public announcements beyond the GitHub release record
       - running paid promotion
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the storage objects persistence schema gate in `docs/storage-objects-persistence-schema-gate.md` and `docs/storage-objects-persistence-schema-gate.zh-CN.md`, accepted `ADR-0110`, recorded PostgreSQL as the first store, `storage_objects` as the future logical table, `runtime/migrations/postgres/000006_create_storage_objects.sql` as the future migration source candidate, player owner identity, collection/key constraints, JSONB value posture, BIGINT version posture, timestamp and soft-delete posture, active uniqueness/index posture, redaction rules, future repository/adapter boundaries, added `runtime.storage_objects_persistence_schema_gate` check coverage, opened `W-0203 Add storage objects migration source`, and preserved deferrals for SQL migration source creation, runtime behavior, protocol routes, Protobuf sources or generated output, dependencies, repository interfaces, storage adapters, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, and direct Nakama/Pitaya compatibility.
+
+  - id: M-131
+    title: Storage Objects Migration Source
+    status: active
+    goal: Add the first SQL migration source for storage objects after the schema gate, without adding repository interfaces, adapters, protocol, or runtime behavior.
+    completion_criteria:
+      - The `runtime/migrations/postgres/000006_create_storage_objects.sql` migration source exists and follows the storage objects persistence schema gate.
+      - The migration source records `storage_objects` ownership, identity, collection/key constraints, JSONB value representation, BIGINT version representation, timestamps, uniqueness/index posture, and redaction-sensitive forbidden fields.
+      - The slice preserves runtime behavior, protocol, generated output, dependency, repository implementation, storage adapter implementation, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding repository interfaces or storage adapters
+      - adding dependencies
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -7412,8 +7436,10 @@ work_items:
   - id: W-0202
     milestone: M-130
     title: Define storage objects persistence schema gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-define-storage-objects-persistence-schema-gate
+    commits:
+      - pending
     depends_on:
       - W-0201
     expected_change_id: define-storage-objects-persistence-schema-gate
@@ -7421,6 +7447,7 @@ work_items:
     selected_direction: storage_objects_persistence_schema_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0110
       - ADR-0109
       - ADR-0108
       - ADR-0078
@@ -7432,3 +7459,29 @@ work_items:
       - Define the first storage objects persistence schema gate.
       - Record table candidate, owner identity representation, collection/key constraints, value representation, version representation, timestamps, uniqueness/index posture, redaction posture, migration source candidate, and future repository/adapter boundaries.
       - Preserve runtime behavior, protocol, generated output, migration source, dependency, repository implementation, adapter implementation, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined the storage objects persistence schema gate, recorded PostgreSQL first-store posture, future `storage_objects` logical table, future migration source candidate `runtime/migrations/postgres/000006_create_storage_objects.sql`, player owner identity, collection/key constraints, JSONB value posture, BIGINT version posture, timestamp and soft-delete posture, active uniqueness/index posture, redaction posture, and future repository/adapter ownership candidates in `docs/storage-objects-persistence-schema-gate.md`, accepted `ADR-0110`, added `runtime.storage_objects_persistence_schema_gate` check coverage, and selected `W-0203 Add storage objects migration source` as the next-ready work item without adding SQL migration source, runtime behavior, protocol/generated output, dependencies, repository/storage adapters, operations/admin behavior, authentication/session behavior, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility.
+
+  - id: W-0203
+    milestone: M-131
+    title: Add storage objects migration source
+    status: next_ready
+    change: changes/2026-05-22-add-storage-objects-migration-source
+    depends_on:
+      - W-0202
+    expected_change_id: add-storage-objects-migration-source
+    tier: tier_2_data
+    selected_direction: storage_objects_migration_source
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0078
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - Runtime behavior changes, protocol route changes, Protobuf source or generated output changes, dependencies, repository interface implementation, storage adapter implementation, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product module expansion beyond the storage-objects migration source.
+    completion:
+      - Add `runtime/migrations/postgres/000006_create_storage_objects.sql`.
+      - Keep the SQL source aligned with `docs/storage-objects-persistence-schema-gate.md`.
+      - Preserve repository interfaces, storage adapters, protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.

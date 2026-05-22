@@ -162,6 +162,11 @@ The storage objects behavior gate is:
 - `docs/storage-objects-behavior-gate.md`
 - `decisions/ADR-0109-storage-objects-behavior-gate.md`
 
+The storage objects persistence schema gate is:
+
+- `docs/storage-objects-persistence-schema-gate.md`
+- `decisions/ADR-0110-storage-objects-persistence-schema-gate.md`
+
 ## Continue Development
 
 If you are an agent or contributor continuing the project, start with:
@@ -174,7 +179,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0202 Define storage objects persistence schema gate
+W-0203 Add storage objects migration source
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
