@@ -1081,17 +1081,33 @@ implemented_wire_and_runtime_slices:
     check_rule: runtime.storage_objects_persistence_schema_gate
     rule: W-0202 defined the storage objects persistence schema gate without adding contracts, migration source, adapters, protocol, or runtime behavior.
   storage_objects_migration_source:
-    status: next_ready
-    next_ready_work_item: W-0203
+    status: completed
+    completed_work_item: W-0203
+    decision: ADR-0111
+    change: changes/2026-05-22-add-storage-objects-migration-source
+    next_ready_work_item: W-0204
     previous_completed_work_item: W-0202
     selected_direction: storage_objects_migration_source
+    next_direction: storage_objects_repository_boundary
     contract_changes_expected: false
     expected_change: changes/2026-05-22-add-storage-objects-migration-source
     target_stage: prototype_ready_foundation
     source_schema_gate_decision: ADR-0110
     source_schema_gate_standard: docs/storage-objects-persistence-schema-gate.md
     migration_source_candidate: runtime/migrations/postgres/000006_create_storage_objects.sql
+    migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    storage_objects_migration_source_added: true
+    storage_objects_migration_source_decision: ADR-0111
+    storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source
+    storage_objects_table_added: true
+    storage_objects_logical_table: storage_objects
+    owner_kind_first_value: player
+    value_representation: JSONB
+    value_top_level_shape: object
+    version_representation: BIGINT
+    active_logical_identity_unique_index_added: true
     planned_scope: migration_source_only
+    migration_source_only: true
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
     protocol_route_added: false
@@ -1109,7 +1125,38 @@ implemented_wire_and_runtime_slices:
     large_object_blob_storage_added: false
     s3_compatible_object_storage_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0203 should add only the storage objects SQL migration source without adding contracts, adapters, protocol, or runtime behavior.
+    check_rule: runtime.storage_objects_migration_source
+    rule: W-0203 added only the storage objects SQL migration source without adding contracts, adapters, protocol, or runtime behavior.
+  storage_objects_repository_boundary:
+    status: next_ready
+    next_ready_work_item: W-0204
+    previous_completed_work_item: W-0203
+    selected_direction: storage_objects_repository_boundary
+    contract_changes_expected: false
+    expected_change: changes/2026-05-22-define-storage-objects-repository-boundary
+    target_stage: prototype_ready_foundation
+    source_migration_source_decision: ADR-0111
+    source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    planned_scope: repository_boundary_gate_only
+    repository_interface_implemented: false
+    storage_adapter_implemented: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    migration_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    hosted_deployment_added: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0204 should define repository boundary vocabulary only, without contract, adapter, protocol, generated output, or runtime behavior changes.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

@@ -157,7 +157,7 @@ local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
 local_development_path_package: docs/prototype-ready-local-development-path-package.md
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
 storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
-next_work_item: W-0203 Add storage objects migration source
+next_work_item: W-0204 Define storage objects repository boundary
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -167,7 +167,9 @@ next_work_item: W-0203 Add storage objects migration source
 - 降低 local setup、migration 和 configuration friction。已由 `W-0200` 完成。
 - 添加更清晰的 example client 或 example app path。
 - 定义超出 inventory proof slice 的 first general storage-object behavior。已由 `W-0201` 完成。
-- 定义第一版 storage objects persistence schema posture。Next。
+- 定义第一版 storage objects persistence schema posture。已由 `W-0202` 完成。
+- 添加第一版 storage objects migration source。已由 `W-0203` 完成。
+- 定义 storage objects repository boundary。Next。
 - 定义第一版 realtime messaging、stream、broadcast 或 server-push behavior。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。

@@ -138,6 +138,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.prototype_ready_local_development_path_package",
   "runtime.storage_objects_behavior_gate",
   "runtime.storage_objects_persistence_schema_gate",
+  "runtime.storage_objects_migration_source",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -5771,6 +5772,124 @@ function checkMigrations(root) {
     fail(`${runtimeSessionsMigration} is missing after runtime sessions migration source is marked added`, {
       rule_id: "migration.root",
       artifact: runtimeSessionsMigration,
+    });
+  }
+
+  const storageObjectsMigration = `${migrationRoot}/000006_create_storage_objects.sql`;
+  if (isFile(root, storageObjectsMigration)) {
+    const text = readText(path.join(root, storageObjectsMigration));
+    const requiredMarkers = [
+      "-- +goose Up",
+      "-- Module: storage",
+      "-- +goose Down",
+    ];
+    const requiredTables = [
+      "storage_objects",
+      "player_accounts",
+    ];
+    const requiredColumns = [
+      "object_id",
+      "owner_kind",
+      "owner_id",
+      "collection",
+      "object_key",
+      "value_json",
+      "version",
+      "created_at",
+      "updated_at",
+      "deleted_at",
+    ];
+    const requiredIndexes = [
+      "storage_objects_active_identity_uq",
+      "storage_objects_owner_collection_idx",
+      "storage_objects_updated_at_idx",
+    ];
+    const forbiddenPatterns = [
+      { pattern: /\braw_access_token\b/i, label: "raw access-token column" },
+      { pattern: /\braw_credential\b/i, label: "raw credential column" },
+      { pattern: /\bcredential_lookup_digest\b/i, label: "credential lookup digest column" },
+      { pattern: /\bcredential_verifier_digest\b/i, label: "credential verifier digest column" },
+      { pattern: /\btoken_lookup_digest\b/i, label: "token lookup digest column" },
+      { pattern: /\btoken_verifier_digest\b/i, label: "token verifier digest column" },
+      { pattern: /\bverifier_key\b/i, label: "verifier key column" },
+      { pattern: /\bwebsocket_connection_id\b/i, label: "WebSocket connection id column" },
+      { pattern: /\bwebsocket_subprotocol\b/i, label: "WebSocket subprotocol column" },
+      { pattern: /\bremote_address\b/i, label: "remote address column" },
+      { pattern: /\bblob_bytes\b/i, label: "blob bytes column" },
+      { pattern: /\bfile_path\b/i, label: "file path column" },
+      { pattern: /\bs3_bucket\b/i, label: "S3 bucket column" },
+      { pattern: /\bs3_object_key\b/i, label: "S3 object key column" },
+    ];
+    for (const marker of requiredMarkers) {
+      if (text.includes(marker)) {
+        ok(`${storageObjectsMigration} includes ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: storageObjectsMigration,
+        });
+      } else {
+        fail(`${storageObjectsMigration} is missing ${marker}`, {
+          rule_id: "migration.marker",
+          artifact: storageObjectsMigration,
+        });
+      }
+    }
+    for (const table of requiredTables) {
+      if (text.includes(table)) {
+        ok(`${storageObjectsMigration} references ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      } else {
+        fail(`${storageObjectsMigration} does not reference ${table}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      }
+    }
+    for (const column of requiredColumns) {
+      if (text.includes(column)) {
+        ok(`${storageObjectsMigration} references ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      } else {
+        fail(`${storageObjectsMigration} does not reference ${column}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      }
+    }
+    for (const indexName of requiredIndexes) {
+      if (text.includes(indexName)) {
+        ok(`${storageObjectsMigration} declares ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      } else {
+        fail(`${storageObjectsMigration} does not declare ${indexName}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      }
+    }
+    for (const { pattern, label } of forbiddenPatterns) {
+      if (pattern.test(text)) {
+        fail(`${storageObjectsMigration} includes ${label}, which is outside the storage objects migration-source slice`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      } else {
+        ok(`${storageObjectsMigration} does not include ${label}`, {
+          rule_id: "migration.ownership",
+          artifact: storageObjectsMigration,
+        });
+      }
+    }
+  } else if (isFile(root, ".arch/runtime.yaml") &&
+    readText(path.join(root, ".arch/runtime.yaml")).includes("storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source")) {
+    fail(`${storageObjectsMigration} is missing after storage objects migration source is marked added`, {
+      rule_id: "migration.root",
+      artifact: storageObjectsMigration,
     });
   }
 
@@ -26292,8 +26411,13 @@ function checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles) {
     }
   }
 
-  if (exists(root, forbiddenMigrationPath)) {
+  if (exists(root, forbiddenMigrationPath) && !workItemHasStatus(root, "W-0203", "completed")) {
     fail(`${forbiddenMigrationPath} must not be created by the storage objects persistence schema gate`, {
+      rule_id: ruleId,
+      artifact: forbiddenMigrationPath,
+    });
+  } else if (exists(root, forbiddenMigrationPath) && workItemHasStatus(root, "W-0203", "completed")) {
+    ok(`${forbiddenMigrationPath} exists after completed W-0203`, {
       rule_id: ruleId,
       artifact: forbiddenMigrationPath,
     });
@@ -26376,6 +26500,265 @@ function checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles) {
     rule_id: ruleId,
     artifact: standardPath,
   });
+}
+
+function checkRuntimeStorageObjectsMigrationSource(root, goFiles) {
+  const ruleId = "runtime.storage_objects_migration_source";
+  const migrationPath = "runtime/migrations/postgres/000006_create_storage_objects.sql";
+  const decisionPath = "decisions/ADR-0111-storage-objects-migration-source.md";
+  const changePath = "changes/2026-05-22-add-storage-objects-migration-source";
+  const conversationPath = "conversations/2026-05-22-storage-objects-migration-source.md";
+
+  if (!workItemHasStatus(root, "W-0203", "completed")) {
+    ok("storage objects migration source is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    migrationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects migration source`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects migration source`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-131"],
+    [".arch/work-items.yaml", "title: Storage Objects Migration Source"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0203"],
+    [".arch/work-items.yaml", "ADR-0111"],
+    [".arch/work-items.yaml", "id: M-132"],
+    [".arch/work-items.yaml", "title: Storage Objects Repository Boundary Gate"],
+    [".arch/work-items.yaml", "id: W-0204"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "storage_objects_migration_source: ADR-0111"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_migration_source:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0203"],
+    [".arch/runtime.yaml", "decision: ADR-0111"],
+    [".arch/runtime.yaml", "storage_objects_migration_source_added: true"],
+    [".arch/runtime.yaml", "storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source"],
+    [".arch/runtime.yaml", "migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql"],
+    [".arch/runtime.yaml", "storage_objects_table_added: true"],
+    [".arch/runtime.yaml", "storage_objects_logical_table: storage_objects"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "storage_adapter_changed: false"],
+    [".arch/runtime.yaml", "storage_objects_repository_boundary:"],
+    [".arch/conventions.yaml", "storage_objects_migration_source:"],
+    [".arch/conventions.yaml", "storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source"],
+    [".arch/conventions.yaml", "storage_objects_repository_boundary:"],
+    [".arch/contracts.yaml", "storage_objects_migration_source:"],
+    [".arch/contracts.yaml", "storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "storage_objects_repository_boundary:"],
+    [".arch/reference.yaml", "phase_2dn_storage_objects_migration_source"],
+    [".arch/reference.yaml", "decision: ADR-0111"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_migration_source"],
+    [".arch/reference.yaml", "phase_2do_storage_objects_repository_boundary"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0111-storage-objects-migration-source.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0111-storage-objects-migration-source.md"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "runtime/migrations/postgres/000006_create_storage_objects.sql"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "runtime/migrations/postgres/000006_create_storage_objects.sql"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.storage_objects_migration_source"],
+    ["AGENTS.md", "W-0204"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_migration_source"],
+    ["AGENTS.zh-CN.md", "W-0204"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_migration_source"],
+    ["runtime/AGENTS.md", "W-0204"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_migration_source"],
+    ["runtime/AGENTS.zh-CN.md", "W-0204"],
+    ["rules/check-rules.json", "runtime.storage_objects_migration_source"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0111",
+      "runtime/migrations/postgres/000006_create_storage_objects.sql",
+      "runtime.storage_objects_migration_source",
+      "M-131/W-0203",
+      "M-132/W-0204 Define storage objects repository boundary",
+      "This ADR does not add storage object repository interfaces",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0203",
+      "completed_milestone: M-131",
+      "previous_completed_work_item: W-0202",
+      "next_milestone: M-132",
+      "next_work_item: W-0204",
+      "next_work_item_status: next_ready",
+      "storage_objects_migration_source_added: true",
+      "storage_objects_migration_source_decision: ADR-0111",
+      "storage_objects_migration_source_check_rule: runtime.storage_objects_migration_source",
+      "migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql",
+      "storage_objects_table_added: true",
+      "repository_interface_changed: false",
+      "storage_adapter_changed: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const migrationText = isFile(root, migrationPath) ? readText(path.join(root, migrationPath)) : "";
+  for (const requiredText of [
+    "-- +goose Up",
+    "-- Module: storage",
+    "-- +goose Down",
+    "CREATE TABLE storage_objects",
+    "object_id TEXT PRIMARY KEY",
+    "owner_kind TEXT NOT NULL",
+    "owner_id TEXT NOT NULL",
+    "collection TEXT NOT NULL",
+    "object_key TEXT NOT NULL",
+    "value_json JSONB NOT NULL",
+    "version BIGINT NOT NULL DEFAULT 1",
+    "created_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+    "updated_at TIMESTAMPTZ NOT NULL DEFAULT now()",
+    "deleted_at TIMESTAMPTZ",
+    "REFERENCES player_accounts(player_id)",
+    "owner_kind = 'player'",
+    "length(btrim(collection)) > 0",
+    "length(collection) <= 128",
+    "length(btrim(object_key)) > 0",
+    "length(object_key) <= 256",
+    "jsonb_typeof(value_json) = 'object'",
+    "version > 0",
+    "updated_at >= created_at",
+    "deleted_at IS NULL OR deleted_at >= created_at",
+    "storage_objects_active_identity_uq",
+    "WHERE deleted_at IS NULL",
+    "storage_objects_owner_collection_idx",
+    "storage_objects_updated_at_idx",
+  ]) {
+    if (migrationText.includes(requiredText)) {
+      ok(`${migrationPath} includes ${requiredText}`, {
+        rule_id: ruleId,
+        artifact: migrationPath,
+      });
+    } else {
+      fail(`${migrationPath} is missing ${requiredText}`, {
+        rule_id: ruleId,
+        artifact: migrationPath,
+      });
+    }
+  }
+
+  const forbiddenMigrationPatterns = [
+    { pattern: /\braw_access_token\b/i, label: "raw access-token column" },
+    { pattern: /\braw_credential\b/i, label: "raw credential column" },
+    { pattern: /\bcredential_lookup_digest\b/i, label: "credential lookup digest column" },
+    { pattern: /\bcredential_verifier_digest\b/i, label: "credential verifier digest column" },
+    { pattern: /\btoken_lookup_digest\b/i, label: "token lookup digest column" },
+    { pattern: /\btoken_verifier_digest\b/i, label: "token verifier digest column" },
+    { pattern: /\bverifier_key\b/i, label: "verifier key column" },
+    { pattern: /\bwebsocket_connection_id\b/i, label: "WebSocket connection id column" },
+    { pattern: /\bwebsocket_subprotocol\b/i, label: "WebSocket subprotocol column" },
+    { pattern: /\bremote_address\b/i, label: "remote address column" },
+    { pattern: /\bblob_bytes\b/i, label: "blob bytes column" },
+    { pattern: /\bfile_path\b/i, label: "file path column" },
+    { pattern: /\bs3_bucket\b/i, label: "S3 bucket column" },
+    { pattern: /\bs3_object_key\b/i, label: "S3 object key column" },
+  ];
+  for (const { pattern, label } of forbiddenMigrationPatterns) {
+    if (pattern.test(migrationText)) {
+      fail(`${migrationPath} includes ${label}`, {
+        rule_id: ruleId,
+        artifact: migrationPath,
+      });
+    } else {
+      ok(`${migrationPath} does not include ${label}`, {
+        rule_id: ruleId,
+        artifact: migrationPath,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bStorageObjectRepository\b|\bNewStorageObjectRepository\b/, label: "storage object repository implementation" },
+    { pattern: /\bINSERT INTO storage_objects\b|\bFROM storage_objects\b|\bUPDATE storage_objects\b|\bDELETE FROM storage_objects\b/i, label: "storage object SQL behavior" },
+    { pattern: /\bCreateStorageObject\b|\bGetStorageObject\b|\bUpdateStorageObject\b|\bDeleteStorageObject\b/, label: "storage object runtime behavior" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} crosses storage objects migration-source-only boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+  ok("runtime Go source remains free of storage object repository, adapter, and behavior usage for W-0203", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto) {
+    fail(`${storageProto} adds storage object protocol shape during migration-source-only slice`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by storage objects migration source", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
 }
 
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
@@ -28053,6 +28436,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0203", "next_ready_work_item: W-0204"],
     ["W-0202", "next_ready_work_item: W-0203"],
     ["W-0201", "next_ready_work_item: W-0202"],
     ["W-0200", "next_ready_work_item: W-0201"],
@@ -28084,6 +28468,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0203", "completed")) {
+    return "next_work_item: W-0204";
+  }
   if (workItemHasStatus(root, "W-0202", "completed")) {
     return "next_work_item: W-0203";
   }
@@ -28122,6 +28509,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0203", "storage_objects_repository_boundary"],
     ["W-0202", "storage_objects_migration_source"],
     ["W-0201", "storage_objects_persistence_schema_gate"],
     ["W-0200", "storage_objects_behavior_gate"],
@@ -28153,6 +28541,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0203", "W-0204 Define storage objects repository boundary"],
     ["W-0202", "W-0203 Add storage objects migration source"],
     ["W-0201", "W-0202 Define storage objects persistence schema gate"],
     ["W-0200", "W-0201 Define storage objects behavior gate"],
@@ -28185,6 +28574,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0203", "current_phase: storage_objects_repository_boundary"],
     ["W-0202", "current_phase: storage_objects_migration_source"],
     ["W-0201", "current_phase: storage_objects_persistence_schema_gate"],
     ["W-0200", "current_phase: storage_objects_behavior_gate"],
@@ -28750,6 +29140,7 @@ function checkRuntime(root) {
   checkRuntimePrototypeReadyLocalDevelopmentPathPackage(root, goFiles);
   checkRuntimeStorageObjectsBehaviorGate(root, goFiles);
   checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles);
+  checkRuntimeStorageObjectsMigrationSource(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

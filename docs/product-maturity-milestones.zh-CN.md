@@ -187,18 +187,18 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 Local development path package 之后的下一个产品方向是：
 
 ```text
-W-0203 Add storage objects migration source
+W-0204 Define storage objects repository boundary
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`。下一项 work 应只添加第一版 storage objects SQL migration source，再进入 repository、adapter、protocol 或 runtime implementation。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`。下一项 work 应先定义 storage objects repository boundary，再进入 repository implementation、adapter、protocol 或 runtime behavior。
 
-上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate` 和 `W-0202 Define storage objects persistence schema gate` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
+上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate` 和 `W-0203 Add storage objects migration source` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
 
 已记录的候选重点仍包括：
 
 - 降低 local setup friction；
 - 添加更清晰的 example client 或 example app path；
-- 添加第一版 storage objects migration source；
+- 定义 storage objects repository boundary；
 - 定义第一版 realtime messaging 或 server-push slice；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。

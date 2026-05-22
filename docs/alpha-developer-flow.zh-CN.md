@@ -37,7 +37,7 @@ proposed_release_identifier: v0.1.0-alpha.1
 authorized_release_identifier: v0.1.0-alpha.1
 prototype_ready_local_development_path_package_implemented: true
 prototype_ready_local_development_path_package: docs/prototype-ready-local-development-path-package.md
-next_direction: storage_objects_migration_source
+next_direction: storage_objects_repository_boundary
 next_work_status: next_ready
 ```
 
@@ -157,7 +157,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`。下一步 work 是 `W-0203 Add storage objects migration source`；它应只添加第一版 storage objects SQL migration source，再进入 repositories、adapters、protocol 或 runtime implementation。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `decisions/ADR-0111-storage-objects-migration-source.md`。下一步 work 是 `W-0204 Define storage objects repository boundary`；它应先定义 storage-neutral repository boundary，再进入 repository implementation、adapters、protocol 或 runtime implementation。
 
 ## 9. Deferred Work
 
