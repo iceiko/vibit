@@ -188,12 +188,12 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 The next product direction after the local development path package is:
 
 ```text
-W-0204 Define storage objects repository boundary
+W-0205 Implement storage-neutral storage objects repository interface
 ```
 
-The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, and the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`. The next work should define the storage objects repository boundary before repository implementation, adapter, protocol, or runtime behavior.
+The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, and the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`. The next work should implement the storage-neutral storage objects repository interface before adapter, protocol, or runtime behavior.
 
-The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, `W-0200 Implement prototype-ready local development path package`, `W-0201 Define storage objects behavior gate`, `W-0202 Define storage objects persistence schema gate`, and `W-0203 Add storage objects migration source` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first product capability gate.
+The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, `W-0200 Implement prototype-ready local development path package`, `W-0201 Define storage objects behavior gate`, `W-0202 Define storage objects persistence schema gate`, `W-0203 Add storage objects migration source`, and `W-0204 Define storage objects repository boundary` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first product capability gate.
 
 The recorded candidate focus areas remain:
 

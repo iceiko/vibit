@@ -1204,6 +1204,14 @@
       "agent_guidance": "Treat runtime/migrations/postgres/000006_create_storage_objects.sql as an authorized migration source after W-0203. Do not expand it into storage objects repository interfaces, PostgreSQL adapters, runtime behavior, protocol routes, Protobuf sources, generated output, dependencies, automatic startup migrations, broad operations/admin behavior, authentication/session changes, hosted deployments, release binaries, packages, containers, checksums, signing/provenance artifacts, install scripts, registry publication, SDK packages, public announcements beyond the GitHub release record, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct Nakama/Pitaya API compatibility without a later bounded work item."
     },
     {
+      "rule_id": "runtime.storage_objects_repository_boundary",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects repository boundary",
+      "description": "The storage objects repository boundary must define only the future storage-neutral repository ownership, value type vocabulary, create/read/list/update/delete capabilities, version/conflict handoff, redaction posture, PostgreSQL adapter expectations, and stop conditions while preserving repository implementation, adapters, protocol, generated-output, runtime behavior, dependency, operations, authentication/session, hosted deployment, release artifact, announcement, paid promotion, object/blob storage, S3-compatible storage, and direct compatibility deferrals.",
+      "agent_guidance": "Read docs/storage-objects-repository-boundary.md and ADR-0112; the future owner candidate is runtime/internal/modules/storage and the future PostgreSQL adapter owner is runtime/internal/platform/persistence/postgres, but this gate must not create runtime/internal/modules/storage, add repository interface implementation, add SQL execution, add PostgreSQL adapters, change migrations, add protocol routes, add Protobuf sources or generated output, add dependencies, change authentication/session behavior, add hosted deployments or release artifacts, run public announcements beyond the GitHub release record, run paid promotion, add large object/blob storage, add S3-compatible object storage, or add direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

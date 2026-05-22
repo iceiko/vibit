@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 `W-0204 Define storage objects repository boundary` continuation step。
+- [x] `node tools/vibit inspect next` 能识别当前 `W-0205 Implement storage-neutral storage objects repository interface` continuation step。
 - [x] `docs/prototype-ready-local-development-path-package.md` 已打包可重复 source-first local path。
 
 ## 4. Local Prerequisites
@@ -125,7 +125,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`。下一步 work 是 `W-0204 Define storage objects repository boundary`。
+Release publishing decision gate 现在已经定义在 `docs/release-publishing-decision-gate.md`，release execution preparation gate 现在已经定义在 `docs/release-execution-preparation-gate.md`，release execution authorization gate 现在已经定义在 `docs/release-execution-authorization-gate.md`，maintainer decision 现在记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first alpha feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 记录在 `docs/storage-objects-repository-boundary.md`。下一步 work 是 `W-0205 Implement storage-neutral storage objects repository interface`。
 
 ## 11. Release Deferrals
 
@@ -158,6 +158,6 @@ authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
 prototype_ready_local_development_path_package_implemented: true
-next_direction: storage_objects_repository_boundary
+next_direction: storage_objects_repository_interface_implementation
 next_work_status: next_ready
 ```

@@ -139,6 +139,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.storage_objects_behavior_gate",
   "runtime.storage_objects_persistence_schema_gate",
   "runtime.storage_objects_migration_source",
+  "runtime.storage_objects_repository_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -26761,6 +26762,331 @@ function checkRuntimeStorageObjectsMigrationSource(root, goFiles) {
   }
 }
 
+function checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles) {
+  const ruleId = "runtime.storage_objects_repository_boundary";
+  const standardPath = "docs/storage-objects-repository-boundary.md";
+  const standardTranslationPath = "docs/storage-objects-repository-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0112-storage-objects-repository-boundary.md";
+  const changePath = "changes/2026-05-22-define-storage-objects-repository-boundary";
+  const conversationPath = "conversations/2026-05-22-storage-objects-repository-boundary.md";
+  const forbiddenRuntimeModulePath = "runtime/internal/modules/storage";
+
+  if (!workItemHasStatus(root, "W-0204", "completed")) {
+    ok("storage objects repository boundary is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects repository boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects repository boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-132"],
+    [".arch/work-items.yaml", "title: Storage Objects Repository Boundary Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0204"],
+    [".arch/work-items.yaml", "ADR-0112"],
+    [".arch/work-items.yaml", "id: M-133"],
+    [".arch/work-items.yaml", "title: Storage Objects Repository Interface Implementation"],
+    [".arch/work-items.yaml", "id: W-0205"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "storage_objects_repository_boundary: ADR-0112"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_repository_boundary:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0204"],
+    [".arch/runtime.yaml", "decision: ADR-0112"],
+    [".arch/runtime.yaml", "gate_standard: docs/storage-objects-repository-boundary.md"],
+    [".arch/runtime.yaml", "gate_standard_translation: docs/storage-objects-repository-boundary.zh-CN.md"],
+    [".arch/runtime.yaml", "storage_objects_repository_boundary_defined: true"],
+    [".arch/runtime.yaml", "storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary"],
+    [".arch/runtime.yaml", "future_repository_owner_candidate: runtime/internal/modules/storage"],
+    [".arch/runtime.yaml", "future_repository_interface_candidate: runtime/internal/modules/storage.Repository"],
+    [".arch/runtime.yaml", "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres"],
+    [".arch/runtime.yaml", "candidate_value_types_recorded: true"],
+    [".arch/runtime.yaml", "candidate_repository_capabilities_recorded: true"],
+    [".arch/runtime.yaml", "version_conflict_handoff_recorded: true"],
+    [".arch/runtime.yaml", "redaction_posture_recorded: true"],
+    [".arch/runtime.yaml", "postgresql_adapter_expectations_recorded: true"],
+    [".arch/runtime.yaml", "repository_interface_added: false"],
+    [".arch/runtime.yaml", "storage_adapter_added: false"],
+    [".arch/runtime.yaml", "storage_objects_repository_interface_implementation:"],
+    [".arch/conventions.yaml", "storage_objects_repository_boundary:"],
+    [".arch/conventions.yaml", "storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary"],
+    [".arch/conventions.yaml", "storage_objects_repository_interface_implementation:"],
+    [".arch/contracts.yaml", "storage_objects_repository_boundary:"],
+    [".arch/contracts.yaml", "storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "storage_objects_repository_interface_implementation:"],
+    [".arch/reference.yaml", "phase_2do_storage_objects_repository_boundary"],
+    [".arch/reference.yaml", "decision: ADR-0112"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_repository_boundary"],
+    [".arch/reference.yaml", "phase_2dp_storage_objects_repository_interface_implementation"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "docs/storage-objects-repository-boundary.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "docs/storage-objects-repository-boundary.md"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "docs/storage-objects-repository-boundary.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "docs/storage-objects-repository-boundary.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "docs/storage-objects-repository-boundary.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", "docs/storage-objects-repository-boundary.md"],
+    ["AGENTS.md", "runtime.storage_objects_repository_boundary"],
+    ["AGENTS.md", "W-0205"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_repository_boundary"],
+    ["AGENTS.zh-CN.md", "W-0205"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_repository_boundary"],
+    ["runtime/AGENTS.md", "W-0205"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_repository_boundary"],
+    ["runtime/AGENTS.zh-CN.md", "W-0205"],
+    ["rules/check-rules.json", "runtime.storage_objects_repository_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "storage_objects_repository_boundary: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0204",
+      "decision: ADR-0112",
+      "check_rule: runtime.storage_objects_repository_boundary",
+      "future_repository_owner_candidate: runtime/internal/modules/storage",
+      "future_repository_interface_candidate: runtime/internal/modules/storage.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "candidate_repository_capabilities:",
+      "CreateStorageObject",
+      "GetStorageObject",
+      "ListStorageObjects",
+      "UpdateStorageObject",
+      "DeleteStorageObject",
+      "candidate_conflict_classes:",
+      "version_mismatch",
+      "value_log_safe: false",
+      "PostgreSQL Adapter Expectations",
+      "future_repository_interface_work_item: W-0205",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "storage_objects_repository_boundary: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0204",
+      "decision: ADR-0112",
+      "check_rule: runtime.storage_objects_repository_boundary",
+      "future_repository_owner_candidate: runtime/internal/modules/storage",
+      "future_repository_interface_candidate: runtime/internal/modules/storage.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "candidate_repository_capabilities:",
+      "CreateStorageObject",
+      "GetStorageObject",
+      "ListStorageObjects",
+      "UpdateStorageObject",
+      "DeleteStorageObject",
+      "candidate_conflict_classes:",
+      "version_mismatch",
+      "value_log_safe: false",
+      "PostgreSQL Adapter Expectations",
+      "future_repository_interface_work_item: W-0205",
+      "Stop Conditions",
+    ],
+    [decisionPath]: [
+      "ADR-0112",
+      "docs/storage-objects-repository-boundary.md",
+      "runtime.storage_objects_repository_boundary",
+      "M-133/W-0205 Implement storage-neutral storage objects repository interface",
+      "This ADR does not add repository interface implementation",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0204",
+      "completed_milestone: M-132",
+      "previous_completed_work_item: W-0203",
+      "next_milestone: M-133",
+      "next_work_item: W-0205",
+      "next_work_item_status: next_ready",
+      "storage_objects_repository_boundary_defined: true",
+      "storage_objects_repository_boundary_decision: ADR-0112",
+      "storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary",
+      "future_repository_owner_candidate: runtime/internal/modules/storage",
+      "future_repository_interface_candidate: runtime/internal/modules/storage.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "repository_interface_added: false",
+      "storage_adapter_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /repository_interface_(?:added|changed|implemented):\s*true/, label: "repository interface implementation" },
+    { pattern: /storage_adapter_(?:added|changed|implemented):\s*true/, label: "storage adapter implementation" },
+    { pattern: /sql_execution_added:\s*true/, label: "SQL execution behavior" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /route_protection_semantics_changed:\s*true/, label: "route protection semantic change" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_(?:added|changed):\s*true/, label: "migration change" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /broad_operations_admin_behavior_added:\s*true/, label: "broad operations/admin behavior" },
+    { pattern: /product_module_expansion_added:\s*true/, label: "product module expansion" },
+    { pattern: /hosted_deployment_(?:authorized|added)(?:_by_this_(?:decision|change))?:\s*true/, label: "hosted deployment" },
+    { pattern: /additional_release_artifacts_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "additional release artifacts" },
+    { pattern: /public_announcements_beyond_github_release_authorized(?:_by_this_(?:decision|change))?:\s*true/, label: "public announcement authorization" },
+    { pattern: /public_announcement_executed:\s*true/, label: "public announcement execution" },
+    { pattern: /paid_promotion_(?:authorized|executed)(?:_by_this_(?:decision|change))?:\s*true/, label: "paid promotion" },
+    { pattern: /large_object_blob_storage_added:\s*true/, label: "large object/blob storage" },
+    { pattern: /s3_compatible_object_storage_added:\s*true/, label: "S3-compatible object storage" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+/, label: "GitHub token-like text" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses storage objects repository boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  if (exists(root, forbiddenRuntimeModulePath) && !workItemHasStatus(root, "W-0205", "completed")) {
+    fail(`${forbiddenRuntimeModulePath} must not be created by the repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  } else if (exists(root, forbiddenRuntimeModulePath) && workItemHasStatus(root, "W-0205", "completed")) {
+    ok(`${forbiddenRuntimeModulePath} exists after completed W-0205`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  } else {
+    ok(`${forbiddenRuntimeModulePath} is deferred to W-0205`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bStorageObjectRepository\b|\bNewStorageObjectRepository\b/, label: "storage object repository implementation" },
+    { pattern: /\bINSERT INTO storage_objects\b|\bFROM storage_objects\b|\bUPDATE storage_objects\b|\bDELETE FROM storage_objects\b/i, label: "storage object SQL behavior" },
+    { pattern: /\bStorageObjectRequest\b|\bStorageObjectResponse\b/, label: "storage object protocol shape" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (workItemHasStatus(root, "W-0205", "completed") && pathStartsWith(file, `${forbiddenRuntimeModulePath}/`)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} crosses storage objects repository-boundary-only scope with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const storageAdapterFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bstorage_objects\b|\bStorageObject\b/.test(text);
+    });
+  for (const file of storageAdapterFiles) {
+    fail(`${file} adds storage object PostgreSQL adapter behavior during repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (storageAdapterFiles.length === 0) {
+    ok("no storage object PostgreSQL adapter behavior is added by the repository boundary gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const storageProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bStorageObject\b|\bstorage_objects\b/i.test(text);
+  });
+  if (storageProto) {
+    fail(`${storageProto} adds storage object protocol shape during repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: storageProto,
+    });
+  } else {
+    ok("no storage object Protobuf shape is added by storage objects repository boundary", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -28436,6 +28762,7 @@ function workItemHasStatus(root, workItemId, expectedStatus) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0204", "next_ready_work_item: W-0205"],
     ["W-0203", "next_ready_work_item: W-0204"],
     ["W-0202", "next_ready_work_item: W-0203"],
     ["W-0201", "next_ready_work_item: W-0202"],
@@ -28468,6 +28795,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0204", "completed")) {
+    return "next_work_item: W-0205";
+  }
   if (workItemHasStatus(root, "W-0203", "completed")) {
     return "next_work_item: W-0204";
   }
@@ -28509,6 +28839,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0204", "storage_objects_repository_interface_implementation"],
     ["W-0203", "storage_objects_repository_boundary"],
     ["W-0202", "storage_objects_migration_source"],
     ["W-0201", "storage_objects_persistence_schema_gate"],
@@ -28541,6 +28872,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0204", "W-0205 Implement storage-neutral storage objects repository interface"],
     ["W-0203", "W-0204 Define storage objects repository boundary"],
     ["W-0202", "W-0203 Add storage objects migration source"],
     ["W-0201", "W-0202 Define storage objects persistence schema gate"],
@@ -28574,6 +28906,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0204", "current_phase: storage_objects_repository_interface_implementation"],
     ["W-0203", "current_phase: storage_objects_repository_boundary"],
     ["W-0202", "current_phase: storage_objects_migration_source"],
     ["W-0201", "current_phase: storage_objects_persistence_schema_gate"],
@@ -29141,6 +29474,7 @@ function checkRuntime(root) {
   checkRuntimeStorageObjectsBehaviorGate(root, goFiles);
   checkRuntimeStorageObjectsPersistenceSchemaGate(root, goFiles);
   checkRuntimeStorageObjectsMigrationSource(root, goFiles);
+  checkRuntimeStorageObjectsRepositoryBoundary(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

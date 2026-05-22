@@ -157,7 +157,8 @@ local_development_path_gate: docs/prototype-ready-local-development-path-gate.md
 local_development_path_package: docs/prototype-ready-local-development-path-package.md
 storage_objects_behavior_gate: docs/storage-objects-behavior-gate.md
 storage_objects_persistence_schema_gate: docs/storage-objects-persistence-schema-gate.md
-next_work_item: W-0204 Define storage objects repository boundary
+storage_objects_repository_boundary: docs/storage-objects-repository-boundary.md
+next_work_item: W-0205 Implement storage-neutral storage objects repository interface
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -169,7 +170,8 @@ Candidate work:
 - Define first general storage-object behavior beyond the inventory proof slice. Completed by `W-0201`.
 - Define first storage objects persistence schema posture. Completed by `W-0202`.
 - Add the first storage objects migration source. Completed by `W-0203`.
-- Define the storage objects repository boundary. Next.
+- Define the storage objects repository boundary. Completed by `W-0204`.
+- Implement the storage-neutral storage objects repository interface. Next.
 - Define first realtime messaging, stream, broadcast, or server-push behavior.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.

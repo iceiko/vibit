@@ -5028,19 +5028,79 @@ storage_objects_migration_source:
   check_rule: runtime.storage_objects_migration_source
 
 storage_objects_repository_boundary:
-  status: next_ready
+  status: completed
   milestone: M-132
-  next_ready_work_item: W-0204
+  completed_work_item: W-0204
+  decision: ADR-0112
+  change: changes/2026-05-22-define-storage-objects-repository-boundary
+  next_milestone: M-133
+  next_ready_work_item: W-0205
   previous_completed_work_item: W-0203
   selected_direction: storage_objects_repository_boundary
+  next_direction: storage_objects_repository_interface_implementation
   expected_change: changes/2026-05-22-define-storage-objects-repository-boundary
   tier: tier_2_data
   target_stage: prototype_ready_foundation
   source_migration_source_decision: ADR-0111
   source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+  gate_standard: docs/storage-objects-repository-boundary.md
+  gate_standard_translation: docs/storage-objects-repository-boundary.zh-CN.md
+  storage_objects_repository_boundary_defined: true
+  storage_objects_repository_boundary_decision: ADR-0112
+  storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary
+  storage_objects_logical_table: storage_objects
+  future_repository_owner_candidate: runtime/internal/modules/storage
+  future_repository_interface_candidate: runtime/internal/modules/storage.Repository
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  candidate_value_types_recorded: true
+  candidate_repository_capabilities_recorded: true
+  version_conflict_handoff_recorded: true
+  redaction_posture_recorded: true
+  postgresql_adapter_expectations_recorded: true
+  stop_conditions_recorded: true
   planned_scope: repository_boundary_gate_only
+  repository_boundary_gate_only: true
+  implementation_authorized_by_this_standard: false
+  repository_interface_added: false
   repository_interface_implemented: false
+  storage_adapter_added: false
   storage_adapter_implemented: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  hosted_deployment_added: false
+  additional_release_artifacts_authorized: false
+  public_announcements_beyond_github_release_authorized: false
+  paid_promotion_authorized: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  check_rule: runtime.storage_objects_repository_boundary
+
+storage_objects_repository_interface_implementation:
+  status: next_ready
+  milestone: M-133
+  next_ready_work_item: W-0205
+  previous_completed_work_item: W-0204
+  selected_direction: storage_objects_repository_interface_implementation
+  expected_change: changes/2026-05-22-implement-storage-objects-repository-interface
+  tier: tier_2_data
+  target_stage: prototype_ready_foundation
+  source_repository_boundary_decision: ADR-0112
+  source_repository_boundary_standard: docs/storage-objects-repository-boundary.md
+  planned_scope: repository_interface_implementation_only
+  future_repository_owner_candidate: runtime/internal/modules/storage
+  future_repository_interface_candidate: runtime/internal/modules/storage.Repository
+  source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+  storage_objects_logical_table: storage_objects
+  storage_adapter_implemented: false
+  sql_execution_added: false
   runtime_behavior_added: false
   authentication_session_behavior_changed: false
   protocol_route_added: false

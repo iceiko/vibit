@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-131
+current_milestone: M-132
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: storage_objects_persistence_schema_gate_defined
+    current_release_state: storage_objects_repository_boundary_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0203
+    next_ready_work_item: W-0205
     preferred_after_current:
-      - storage_objects_migration_source
+      - storage_objects_repository_interface_implementation
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2490,7 +2490,7 @@ milestones:
 
   - id: M-132
     title: Storage Objects Repository Boundary Gate
-    status: active
+    status: completed
     goal: Define the storage-neutral storage objects repository boundary after the migration source, without adding repository implementation, PostgreSQL adapter behavior, protocol, or runtime behavior.
     completion_criteria:
       - The storage objects repository boundary gate is recorded.
@@ -2501,6 +2501,32 @@ milestones:
       - adding protocol routes or generated output
       - adding Protobuf source files
       - adding repository interfaces or storage adapters
+      - adding dependencies
+      - changing migrations
+      - changing authentication/session behavior
+      - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the storage objects repository boundary in `docs/storage-objects-repository-boundary.md` and `docs/storage-objects-repository-boundary.zh-CN.md`, accepted `ADR-0112`, recorded future owner `runtime/internal/modules/storage`, future interface candidate `runtime/internal/modules/storage.Repository`, future PostgreSQL adapter owner `runtime/internal/platform/persistence/postgres`, candidate storage object value types, create/read/list/update/delete repository vocabulary, version and conflict handoff, redaction posture, PostgreSQL adapter expectations, `runtime.storage_objects_repository_boundary` check coverage, and selected `W-0205 Implement storage-neutral storage objects repository interface` as the next-ready work item without adding repository implementation, adapter behavior, runtime behavior, protocol routes, Protobuf sources or generated output, dependencies, migration changes, operations/admin behavior, authentication/session changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility.
+
+  - id: M-133
+    title: Storage Objects Repository Interface Implementation
+    status: active
+    goal: Implement the storage-neutral storage objects repository interface after the repository boundary, without adding PostgreSQL adapter behavior, protocol, or runtime behavior.
+    completion_criteria:
+      - The storage-neutral storage objects repository interface is implemented under the authorized storage module owner.
+      - The implementation defines module-owned value types, create/read/list/update/delete input and result vocabulary, validation helpers, version/conflict vocabulary, redacted errors, and focused unit tests.
+      - The slice preserves PostgreSQL adapter implementation, SQL execution, runtime behavior, protocol, generated output, dependency, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing storage objects runtime behavior
+      - adding protocol routes or generated output
+      - adding Protobuf source files
+      - adding PostgreSQL storage adapters
+      - adding SQL execution behavior
       - adding dependencies
       - changing migrations
       - changing authentication/session behavior
@@ -7517,8 +7543,10 @@ work_items:
   - id: W-0204
     milestone: M-132
     title: Define storage objects repository boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-define-storage-objects-repository-boundary
+    commits:
+      - pending
     depends_on:
       - W-0203
     expected_change_id: define-storage-objects-repository-boundary
@@ -7539,3 +7567,31 @@ work_items:
       - Define the storage-neutral storage objects repository boundary gate.
       - Record future repository ownership, candidate value types, create/read/update/delete/conflict vocabulary, version handoff, redaction posture, PostgreSQL adapter expectations, and stop conditions.
       - Preserve repository interface implementation, storage adapters, protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Defined `docs/storage-objects-repository-boundary.md` and `docs/storage-objects-repository-boundary.zh-CN.md` as a repository-boundary-only slice, accepted `ADR-0112`, recorded future storage module ownership, candidate repository interface and value type vocabulary, create/read/list/update/delete capabilities, version and conflict handoff, redaction posture, PostgreSQL adapter expectations, future implementation queue, and `runtime.storage_objects_repository_boundary` check coverage. No storage object repository interface implementation, storage adapters, protocol routes, generated output, runtime behavior, migration changes, dependencies, operations/admin behavior, authentication/session behavior changes, hosted deployments, release artifacts, public announcements, paid promotion, broad product modules, large object/blob storage, S3-compatible object storage, or direct compatibility were added.
+
+  - id: W-0205
+    milestone: M-133
+    title: Implement storage-neutral storage objects repository interface
+    status: next_ready
+    change: changes/2026-05-22-implement-storage-objects-repository-interface
+    depends_on:
+      - W-0204
+    expected_change_id: implement-storage-objects-repository-interface
+    tier: tier_2_data
+    selected_direction: storage_objects_repository_interface_implementation
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0112
+      - ADR-0111
+      - ADR-0110
+      - ADR-0109
+      - ADR-0108
+      - ADR-0078
+      - ADR-0086
+      - ADR-0082
+    ask_first:
+      - PostgreSQL storage adapter implementation, SQL execution behavior, runtime behavior changes, protocol route changes, Protobuf source or generated output changes, dependencies, migration changes, automatic startup migration behavior, broad operations/admin behavior, authentication/session behavior changes, hosted deployments, public announcements beyond the GitHub release record, paid promotion, release binaries, packages, containers, checksums, provenance files, signing artifacts, install scripts, registry publication, SDK packages, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product module expansion beyond the storage-objects repository interface implementation.
+    completion:
+      - Implement the storage-neutral storage objects repository interface under `runtime/internal/modules/storage`.
+      - Define module-owned value types, create/read/list/update/delete input and result vocabulary, version/conflict helpers, redacted errors, and focused tests.
+      - Preserve storage adapters, SQL execution, protocol routes, generated output, runtime behavior, dependencies, operations/admin, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, broad product module, object/blob storage, S3-compatible object storage, and direct compatibility deferrals unless explicitly authorized.

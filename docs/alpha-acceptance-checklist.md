@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0204 Define storage objects repository boundary` continuation step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0205 Implement storage-neutral storage objects repository interface` continuation step.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -126,7 +126,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, and the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`. The next work is `W-0204 Define storage objects repository boundary`.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, and the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`. The next work is `W-0205 Implement storage-neutral storage objects repository interface`.
 
 ## 11. Release Deferrals
 
@@ -159,6 +159,6 @@ authorized_release_identifier: v0.1.0-alpha.1
 release_declared: true
 release_publishing_authorized_by_this_checklist: true
 prototype_ready_local_development_path_package_implemented: true
-next_direction: storage_objects_repository_boundary
+next_direction: storage_objects_repository_interface_implementation
 next_work_status: next_ready
 ```

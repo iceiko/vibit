@@ -172,6 +172,11 @@ Storage objects migration source 是：
 - `runtime/migrations/postgres/000006_create_storage_objects.sql`
 - `decisions/ADR-0111-storage-objects-migration-source.md`
 
+Storage objects repository boundary 是：
+
+- `docs/storage-objects-repository-boundary.md`
+- `decisions/ADR-0112-storage-objects-repository-boundary.md`
+
 ## 继续开发
 
 如果你是继续推进项目的 agent 或 contributor，先运行：
@@ -184,7 +189,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0204 Define storage objects repository boundary
+W-0205 Implement storage-neutral storage objects repository interface
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。

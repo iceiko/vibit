@@ -113,23 +113,25 @@ purpose: >
   storage_objects_behavior_gate: ADR-0109
   storage_objects_persistence_schema_gate: ADR-0110
   storage_objects_migration_source: ADR-0111
+  storage_objects_repository_boundary: ADR-0112
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: storage_objects_repository_boundary
+  current_phase: storage_objects_repository_interface_implementation
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_and_authenticated_e2e_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0204
+  next_ready_work_item: W-0205
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   prototype_ready_local_development_path_package_standard: docs/prototype-ready-local-development-path-package.md
   storage_objects_behavior_gate_standard: docs/storage-objects-behavior-gate.md
   storage_objects_persistence_schema_gate_standard: docs/storage-objects-persistence-schema-gate.md
+  storage_objects_repository_boundary_standard: docs/storage-objects-repository-boundary.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -6389,19 +6391,43 @@ identity_session_boundary:
     rule: W-0203 added only the storage objects SQL migration source before repository interfaces, adapters, protocol, or runtime behavior.
 
   storage_objects_repository_boundary:
-    status: next_ready
+    status: completed
     milestone: M-132
-    next_ready_work_item: W-0204
+    completed_work_item: W-0204
+    decision: ADR-0112
+    change: changes/2026-05-22-define-storage-objects-repository-boundary
+    next_milestone: M-133
+    next_ready_work_item: W-0205
     previous_completed_work_item: W-0203
     selected_direction: storage_objects_repository_boundary
+    next_direction: storage_objects_repository_interface_implementation
     expected_change: changes/2026-05-22-define-storage-objects-repository-boundary
     tier: tier_2_data
     gate_density_strategy: ADR-0082
     target_stage: prototype_ready_foundation
     source_migration_source_decision: ADR-0111
     source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    gate_standard: docs/storage-objects-repository-boundary.md
+    gate_standard_translation: docs/storage-objects-repository-boundary.zh-CN.md
+    storage_objects_repository_boundary_defined: true
+    storage_objects_repository_boundary_decision: ADR-0112
+    storage_objects_repository_boundary_check_rule: runtime.storage_objects_repository_boundary
+    storage_objects_logical_table: storage_objects
+    future_repository_owner_candidate: runtime/internal/modules/storage
+    future_repository_interface_candidate: runtime/internal/modules/storage.Repository
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    candidate_value_types_recorded: true
+    candidate_repository_capabilities_recorded: true
+    version_conflict_handoff_recorded: true
+    redaction_posture_recorded: true
+    postgresql_adapter_expectations_recorded: true
+    stop_conditions_recorded: true
     planned_scope: repository_boundary_gate_only
+    repository_boundary_gate_only: true
+    implementation_authorized_by_this_standard: false
+    repository_interface_added: false
     repository_interface_implemented: false
+    storage_adapter_added: false
     storage_adapter_implemented: false
     runtime_behavior_added: false
     authentication_session_behavior_changed: false
@@ -6419,7 +6445,45 @@ identity_session_boundary:
     large_object_blob_storage_added: false
     s3_compatible_object_storage_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0204 should define the storage objects repository boundary only, before repository implementation, adapter, protocol, or runtime behavior.
+    check_rule: runtime.storage_objects_repository_boundary
+    rule: W-0204 defined the storage objects repository boundary only, before repository implementation, adapter, protocol, or runtime behavior.
+
+  storage_objects_repository_interface_implementation:
+    status: next_ready
+    milestone: M-133
+    next_ready_work_item: W-0205
+    previous_completed_work_item: W-0204
+    selected_direction: storage_objects_repository_interface_implementation
+    expected_change: changes/2026-05-22-implement-storage-objects-repository-interface
+    tier: tier_2_data
+    gate_density_strategy: ADR-0082
+    target_stage: prototype_ready_foundation
+    source_repository_boundary_decision: ADR-0112
+    source_repository_boundary_standard: docs/storage-objects-repository-boundary.md
+    planned_scope: repository_interface_implementation_only
+    future_repository_owner_candidate: runtime/internal/modules/storage
+    future_repository_interface_candidate: runtime/internal/modules/storage.Repository
+    source_migration_source: runtime/migrations/postgres/000006_create_storage_objects.sql
+    storage_objects_logical_table: storage_objects
+    storage_adapter_implemented: false
+    sql_execution_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    migration_added: false
+    broad_operations_admin_behavior_added: false
+    product_module_expansion_added: false
+    hosted_deployment_added: false
+    additional_release_artifacts_authorized: false
+    public_announcements_beyond_github_release_authorized: false
+    paid_promotion_authorized: false
+    large_object_blob_storage_added: false
+    s3_compatible_object_storage_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0205 should implement only the storage-neutral repository interface before adapter, protocol, or runtime behavior.
 
 persistence_model:
   decision: ADR-0011

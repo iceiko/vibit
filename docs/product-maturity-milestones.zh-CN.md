@@ -187,12 +187,12 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 Local development path package 之后的下一个产品方向是：
 
 ```text
-W-0204 Define storage objects repository boundary
+W-0205 Implement storage-neutral storage objects repository interface
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`。下一项 work 应先定义 storage objects repository boundary，再进入 repository implementation、adapter、protocol 或 runtime behavior。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`。下一项 work 应实现 storage-neutral storage objects repository interface，再进入 adapter、protocol 或 runtime behavior。
 
-上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate` 和 `W-0203 Add storage objects migration source` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
+上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source` 和 `W-0204 Define storage objects repository boundary` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability gate 的追溯记录。
 
 已记录的候选重点仍包括：
 
