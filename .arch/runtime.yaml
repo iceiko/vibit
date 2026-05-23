@@ -125,18 +125,19 @@ purpose: >
   next_alpha_direction_after_storage_objects_local_proof: ADR-0121
   first_server_push_realtime_messaging_gate: ADR-0122
   first_server_push_realtime_messaging_runtime_slice: ADR-0123
+  next_alpha_direction_after_realtime_runtime_slice: ADR-0124
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: confirm_next_alpha_direction_after_realtime_runtime_slice
+  current_phase: realtime_protocol_websocket_outbound_delivery_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_and_realtime_runtime_slice_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0216
+  next_ready_work_item: W-0217
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   prototype_ready_local_development_path_package_standard: docs/prototype-ready-local-development-path-package.md
@@ -170,7 +171,9 @@ architecture_scope:
   first_server_push_realtime_messaging_runtime_slice_check_rule: runtime.first_server_push_realtime_messaging_runtime_slice
   first_server_push_realtime_messaging_runtime_slice_source: runtime/internal/app/realtime/service.go
   first_server_push_realtime_messaging_runtime_slice_tests: runtime/internal/app/realtime/service_test.go
-  next_alpha_direction_after_realtime_runtime_slice_next_work_item: W-0216
+  next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
+  realtime_protocol_websocket_outbound_delivery_gate_selected: true
+  realtime_protocol_websocket_outbound_delivery_gate_next_work_item: W-0217
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -7040,19 +7043,31 @@ identity_session_boundary:
     direct_nakama_pitaya_api_compatibility_added: false
 
   confirm_next_alpha_direction_after_realtime_runtime_slice:
-    status: next_ready
+    status: completed
     milestone: M-144
-    next_ready_work_item: W-0216
+    completed_work_item: W-0216
+    decision: ADR-0124
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
+    next_milestone: M-145
+    next_ready_work_item: W-0217
     previous_completed_work_item: W-0215
-    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
     tier: tier_2_planning
     target_stage: prototype_ready_foundation
     source_realtime_runtime_slice_decision: ADR-0123
+    next_alpha_direction_after_realtime_runtime_slice_selected: true
+    next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
+    next_alpha_direction_after_realtime_runtime_slice_check_rule: runtime.next_alpha_direction_after_realtime_runtime_slice
+    future_gate_work_item: W-0217
+    future_gate_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     implementation_authorized_by_this_selection: false
     runtime_behavior_added: false
     transport_delivery_added: false
+    websocket_outbound_writer_added: false
+    socket_write_added: false
     protocol_route_added: false
+    protocol_bridge_added: false
     protobuf_source_added: false
     generated_output_added: false
     startup_wiring_added: false
@@ -7060,9 +7075,44 @@ identity_session_boundary:
     migration_added: false
     dependency_added: false
     authentication_session_behavior_changed: false
+    route_protection_changed: false
+    delivery_guarantees_added: false
+    broad_social_module_added: false
     matchmaking_added: false
     match_runtime_added: false
     distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+
+  realtime_protocol_websocket_outbound_delivery_gate:
+    status: next_ready
+    milestone: M-145
+    next_ready_work_item: W-0217
+    previous_completed_work_item: W-0216
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+    expected_change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
+    tier: tier_2_planning
+    target_stage: prototype_ready_foundation
+    source_next_direction_decision: ADR-0124
+    implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    transport_delivery_added: false
+    websocket_outbound_writer_added: false
+    socket_write_added: false
+    protocol_route_added: false
+    protocol_bridge_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    startup_wiring_added: false
+    persistence_added: false
+    migration_added: false
+    dependency_added: false
+    authentication_session_behavior_changed: false
+    route_protection_changed: false
+    delivery_guarantees_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    distributed_runtime_added: false
+    broad_social_module_added: false
     direct_nakama_pitaya_api_compatibility_added: false
 
 persistence_model:

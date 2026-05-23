@@ -1300,6 +1300,14 @@
       "agent_guidance": "Read ADR-0123, ADR-0122, docs/first-server-push-realtime-messaging-gate.md, docs/runtime-protocol-adapter.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing realtime runtime behavior. W-0215 may add runtime/internal/app/realtime/service.go and runtime/internal/app/realtime/service_test.go only as an application-layer delivery-intent slice. Do not add WebSocket outbound writers, socket writes, proto/vibit/realtime/v1/realtime.proto, generated output, protocol routes or bridges, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, public client publish routes, stream subscription persistence, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure, distributed fanout, broad chat/social modules, matchmaking, match runtime, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.next_alpha_direction_after_realtime_runtime_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Next alpha direction after realtime runtime slice",
+      "description": "The direction-selection slice after the first realtime runtime slice must select exactly one next bounded alpha direction, record Nakama/Pitaya reference alignment, open one follow-up work item, and preserve WebSocket outbound delivery, socket write, protocol bridge, Protobuf source, generated-output, startup wiring, persistence, migration, dependency, authentication/session, route-protection, delivery guarantee, broad social, matchmaking, match runtime, distributed runtime, hosted/release, public announcement, paid promotion, blob/S3, and direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0124, ADR-0123, docs/first-server-push-realtime-messaging-gate.md, docs/game-protocol.md, docs/runtime-protocol-adapter.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing the next direction after the realtime runtime slice. W-0216 selects define_realtime_protocol_websocket_outbound_delivery_gate and opens W-0217 only. Do not implement WebSocket outbound delivery, socket writes, proto/vibit/realtime/v1/realtime.proto, generated output, protocol routes or bridges, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, route-protection behavior changes, stream subscriptions, chat, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure, distributed fanout, matchmaking, match runtime, or direct Nakama/Pitaya API compatibility in this slice."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

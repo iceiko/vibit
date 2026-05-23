@@ -169,7 +169,8 @@ first_server_push_realtime_messaging_gate: docs/first-server-push-realtime-messa
 first_server_push_realtime_messaging_gate_decision: ADR-0122
 first_server_push_realtime_messaging_runtime_slice: runtime/internal/app/realtime/service.go
 first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
-next_work_item: W-0216 Confirm next alpha direction after realtime runtime slice
+next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
+next_work_item: W-0217 Define realtime protocol and WebSocket outbound delivery gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -190,7 +191,8 @@ Candidate work:
 - Confirm the next alpha direction after storage object local proof. Completed by `W-0213`.
 - Define the first server push and realtime messaging gate. Completed by `W-0214`.
 - Implement the first server push and realtime messaging runtime slice. Completed by `W-0215`.
-- Confirm the next alpha direction after the realtime runtime slice. Next.
+- Confirm the next alpha direction after the realtime runtime slice. Completed by `W-0216`.
+- Define the realtime protocol and WebSocket outbound delivery gate. Next.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
 

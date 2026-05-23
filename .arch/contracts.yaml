@@ -1613,21 +1613,69 @@ implemented_wire_and_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0215 should implement only the smallest first runtime slice authorized by the first server push and realtime messaging gate.
   confirm_next_alpha_direction_after_realtime_runtime_slice:
-    status: next_ready
-    next_ready_work_item: W-0216
+    status: completed
+    completed_work_item: W-0216
+    decision: ADR-0124
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
+    next_ready_work_item: W-0217
     previous_completed_work_item: W-0215
-    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
     contract_changes_expected: false
     target_stage: prototype_ready_foundation
     source_realtime_runtime_slice_decision: ADR-0123
+    next_alpha_direction_after_realtime_runtime_slice_selected: true
+    next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
+    next_alpha_direction_after_realtime_runtime_slice_check_rule: runtime.next_alpha_direction_after_realtime_runtime_slice
+    future_gate_work_item: W-0217
+    future_gate_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     implementation_authorized_by_this_selection: false
     runtime_behavior_added: false
+    transport_delivery_added: false
+    websocket_outbound_writer_added: false
+    socket_write_added: false
     protocol_route_added: false
+    protocol_bridge_added: false
     protobuf_source_added: false
     generated_output_added: false
+    startup_wiring_added: false
+    persistence_added: false
+    migration_added: false
+    dependency_added: false
+    authentication_session_behavior_changed: false
+    route_protection_changed: false
+    delivery_guarantees_added: false
+    broad_social_module_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0216 should select the next alpha direction after the realtime runtime slice without implementing a new protocol, transport, persistence, matchmaking, match runtime, distributed runtime, or direct compatibility slice.
+  realtime_protocol_websocket_outbound_delivery_gate:
+    status: next_ready
+    next_ready_work_item: W-0217
+    previous_completed_work_item: W-0216
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+    expected_change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
+    contract_changes_expected: false
+    target_stage: prototype_ready_foundation
+    source_next_direction_decision: ADR-0124
+    implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    transport_delivery_added: false
+    websocket_outbound_writer_added: false
+    socket_write_added: false
+    protocol_route_added: false
+    protocol_bridge_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    startup_wiring_added: false
+    persistence_added: false
+    migration_added: false
+    dependency_added: false
+    authentication_session_behavior_changed: false
+    route_protection_changed: false
+    delivery_guarantees_added: false
+    broad_social_module_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0217 should define the realtime protocol and WebSocket outbound delivery gate before any Protobuf, generated output, protocol bridge, socket write, startup wiring, persistence, or delivery guarantee implementation.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

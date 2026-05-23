@@ -1,0 +1,120 @@
+schema_version: 0.1
+change_id: confirm-next-alpha-direction-after-realtime-runtime-slice
+date: 2026-05-23
+type: standard
+status: verified
+
+summary: Select the realtime protocol and WebSocket outbound delivery gate as the next bounded alpha direction after implementing the first application-owned realtime runtime slice.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0124
+  referenced:
+    - ADR-0123
+    - ADR-0122
+    - ADR-0121
+    - ADR-0120
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+
+candidate_directions:
+  - define_realtime_protocol_websocket_outbound_delivery_gate
+  - strengthen_authenticated_loop_concurrency_failure_verification
+  - define_minimal_operations_inspection_surface
+  - add_clearer_example_client_or_example_app_path
+  - define_stream_subscription_ownership_gate
+  - define_chat_or_group_messaging_gate
+  - define_matchmaking_gate
+
+runtime:
+  completed_work_item: W-0216
+  completed_milestone: M-144
+  previous_completed_work_item: W-0215
+  next_milestone: M-145
+  next_work_item: W-0217
+  next_work_item_status: next_ready
+  tier: tier_2_direction_selection
+  gate_density_strategy: ADR-0082
+  source_realtime_runtime_slice_decision: ADR-0123
+  selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+  realtime_protocol_websocket_outbound_delivery_gate_selected: true
+  next_alpha_direction_after_realtime_runtime_slice_selected: true
+  next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
+  next_alpha_direction_after_realtime_runtime_slice_check_rule: runtime.next_alpha_direction_after_realtime_runtime_slice
+  future_work_item: W-0217
+  future_change_id: define-realtime-protocol-websocket-outbound-delivery-gate
+  target_stage: prototype_ready_foundation
+  nakama_reference_mapping: after_application_owned_server_authored_delivery_intents_next_define_bounded_protocol_and_outbound_transport_delivery_planning_for_notifications_streams_chat_or_presence_adjacent_capabilities_without_copying_public_apis
+  pitaya_reference_mapping: preserve_acceptor_session_handler_protocol_backend_push_group_broadcast_separation_before_socket_writes_groups_broadcast_fanout_cluster_rpc_or_service_discovery
+  implementation_authorized_by_this_change: false
+  runtime_behavior_added: false
+  websocket_outbound_delivery_added: false
+  websocket_socket_write_added: false
+  protocol_bridge_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  acknowledgement_added: false
+  ordering_guarantee_added: false
+  retry_behavior_added: false
+  backpressure_behavior_added: false
+  durable_offset_added: false
+  delivery_guarantee_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.next_alpha_direction_after_realtime_runtime_slice
+    - node tools/vibit check change confirm-next-alpha-direction-after-realtime-runtime-slice --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

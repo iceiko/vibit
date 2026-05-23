@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-144
+current_milestone: M-145
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: first_server_push_realtime_messaging_runtime_slice_completed
+    current_release_state: next_alpha_direction_after_realtime_runtime_slice_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0216
+    next_ready_work_item: W-0217
     preferred_after_current:
-      - confirm_next_alpha_direction_after_realtime_runtime_slice
+      - define_realtime_protocol_websocket_outbound_delivery_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2797,7 +2797,7 @@ milestones:
 
   - id: M-144
     title: Next Direction Confirmation After Realtime Runtime Slice
-    status: active
+    status: completed
     goal: Confirm the next bounded alpha direction after the first server push and realtime messaging runtime slice, without implementing protocol, transport delivery, persistence, broad realtime/social behavior, matchmaking, match runtime, distributed runtime, or direct compatibility.
     completion_criteria:
       - The next alpha direction after the realtime runtime slice is selected and recorded in an ADR.
@@ -2808,6 +2808,23 @@ milestones:
       - implementing WebSocket outbound delivery
       - adding Protobuf source or generated output
       - adding protocol routes or startup wiring
+      - adding stream subscriptions, chat, groups, broadcast fanout, offline inboxes, ordering, retries, durable offsets, or backpressure
+      - adding persistence, migrations, dependencies, or authentication/session behavior changes
+      - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_realtime_protocol_websocket_outbound_delivery_gate` as the next prototype-ready alpha direction after the first server push and realtime messaging runtime slice, accepted `ADR-0124`, recorded Nakama/Pitaya alignment for moving from application-owned delivery intents toward bounded protocol and transport delivery planning, registered `runtime.next_alpha_direction_after_realtime_runtime_slice`, and opened `M-145/W-0217 Define realtime protocol and WebSocket outbound delivery gate` as the next-ready item. No WebSocket outbound delivery, Protobuf source, generated output, protocol bridge, application bootstrap handler, startup wiring, persistence, migration, dependency, authentication/session behavior change, route-protection change, delivery guarantee, distributed fanout, broad social module, matchmaking, match runtime, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-145
+    title: Realtime Protocol And WebSocket Outbound Delivery Gate
+    status: active
+    goal: Define the gate for realtime protocol payloads and WebSocket outbound delivery after the application-owned realtime runtime slice, while preserving protocol/generated-output, transport, startup, persistence, delivery guarantee, broad realtime/social, matchmaking, match runtime, distributed runtime, and direct compatibility deferrals.
+    completion_criteria:
+      - The realtime protocol and WebSocket outbound delivery gate is recorded with ownership, allowed future files, verification expectations, and stop conditions.
+      - The gate maps Nakama-style realtime notifications/streams/chat/presence pressure and Pitaya-style protocol/transport/session/backend push layering without implementing protocol source, generated output, socket writes, startup wiring, persistence, or broad fanout.
+      - Existing deferrals for stream subscription persistence, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure, distributed fanout, broad social modules, matchmaking, match runtime, hosted/release surfaces, and direct compatibility remain explicit.
+    non_goals:
+      - implementing WebSocket outbound delivery
+      - adding Protobuf source or generated output
+      - adding protocol routes, protocol bridge behavior, application bootstrap handlers, or startup wiring
       - adding stream subscriptions, chat, groups, broadcast fanout, offline inboxes, ordering, retries, durable offsets, or backpressure
       - adding persistence, migrations, dependencies, or authentication/session behavior changes
       - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, or direct Nakama/Pitaya API compatibility
@@ -8173,7 +8190,7 @@ work_items:
   - id: W-0216
     milestone: M-144
     title: Confirm next alpha direction after realtime runtime slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
     depends_on:
       - W-0215
@@ -8194,3 +8211,30 @@ work_items:
       - Select exactly one next alpha direction after the realtime runtime slice.
       - Record Nakama/Pitaya reference alignment and preserve direct compatibility deferrals.
       - Open exactly one follow-up work item as next-ready.
+    completion_summary: Selected `define_realtime_protocol_websocket_outbound_delivery_gate` as the next bounded alpha direction after the first server push and realtime messaging runtime slice. `ADR-0124` records Nakama alignment for advancing toward notifications, streams, chat, and presence-adjacent outbound protocol delivery, and Pitaya alignment for preserving acceptor/session/handler/protocol/backend/push separation before any concrete socket writes or fanout. Opened `M-145/W-0217 Define realtime protocol and WebSocket outbound delivery gate` as next-ready. No WebSocket outbound delivery, Protobuf source, generated output, protocol bridge, application bootstrap handler, startup wiring, persistence, migration, dependency, authentication/session behavior change, route-protection change, delivery guarantee, distributed fanout, broad social module, matchmaking, match runtime, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0217
+    milestone: M-145
+    title: Define realtime protocol and WebSocket outbound delivery gate
+    status: next_ready
+    change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
+    depends_on:
+      - W-0216
+    expected_change_id: define-realtime-protocol-websocket-outbound-delivery-gate
+    tier: tier_2_planning
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0124
+      - ADR-0123
+      - ADR-0122
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing WebSocket outbound delivery, adding concrete socket writes, adding Protobuf source or generated output, adding protocol routes or bridge code, wiring application bootstrap handlers, wiring startup, adding stream subscriptions, chat, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure mechanisms, distributed fanout, frontend/backend split, RPC, service discovery, cluster groups, matchmaking, match runtime, persistence, migrations, dependencies, authentication/session behavior changes, route-protection changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product expansion beyond defining the gate.
+    completion:
+      - Define the realtime protocol and WebSocket outbound delivery gate.
+      - Record protocol, generated-output, application handler, transport outbound delivery, verification, and stop-condition expectations.
+      - Record Nakama/Pitaya reference alignment while preserving implementation, persistence, migration, dependency, authentication/session, route-protection, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, broad social, delivery guarantee, and direct compatibility deferrals.

@@ -189,7 +189,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0216 Confirm next alpha direction after realtime runtime slice
+W-0217 Define realtime protocol and WebSocket outbound delivery gate
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。

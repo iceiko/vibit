@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: first_server_push_realtime_messaging_runtime_slice_completed
+  current_state: next_alpha_direction_after_realtime_runtime_slice_selected
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0216
-  immediate_next_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+  immediate_next_work_item: W-0217
+  immediate_next_direction: define_realtime_protocol_websocket_outbound_delivery_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4472,17 +4472,44 @@ phase_plan:
     generated_output_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ea_next_direction_after_realtime_runtime_slice:
-    status: next_ready
+    status: completed
     milestone: M-144
-    next_ready_work_item: W-0216
+    completed_work_item: W-0216
+    decision: ADR-0124
+    next_milestone: M-145
+    next_ready_work_item: W-0217
     previous_completed_work_item: W-0215
-    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
     reference_mapping:
-      nakama: The next direction should choose the next useful game-backend capability family after the first server-authored realtime service while avoiding direct notification, channel, stream, chat, or match API compatibility.
-      pitaya: The next direction should preserve transport, session, handler, protocol, backend-service, push, group, broadcast, cluster, RPC, and service-discovery separation before implementing any broader runtime topology.
+      nakama: The selected direction advances from application-owned delivery intents toward bounded protocol and WebSocket outbound delivery planning for notification, stream, chat, and presence-adjacent capability pressure without direct API compatibility.
+      pitaya: The selected direction preserves acceptor, session, handler, protocol, backend-service, push, group, broadcast, cluster, RPC, and service-discovery separation before implementing socket writes or broader runtime topology.
     target_stage: prototype_ready_foundation
     source_realtime_runtime_slice_decision: ADR-0123
+    check_rule: runtime.next_alpha_direction_after_realtime_runtime_slice
+    implementation_authorized_by_this_selection: false
+    transport_delivery_added: false
+    websocket_outbound_writer_added: false
+    socket_write_added: false
+    protocol_route_added: false
+    protocol_bridge_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    startup_wiring_added: false
+    delivery_guarantees_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2eb_realtime_protocol_websocket_outbound_delivery_gate:
+    status: next_ready
+    milestone: M-145
+    next_ready_work_item: W-0217
+    previous_completed_work_item: W-0216
+    selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+    expected_change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
+    reference_mapping:
+      nakama: The gate should define how vibit-native outbound realtime payloads can later cover notifications, streams, chat, and presence-adjacent delivery without copying Nakama notification, channel, stream, or chat APIs.
+      pitaya: The gate should define protocol and transport ownership while keeping acceptor/session/handler/backend push separation and deferring groups, broadcast fanout, cluster, RPC, and service discovery.
+    target_stage: prototype_ready_foundation
+    source_next_direction_decision: ADR-0124
     implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
