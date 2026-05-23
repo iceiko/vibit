@@ -31,7 +31,7 @@
 
 `M-140 Storage Objects Protocol Route Local Proof` 已由 `W-0212` 完成。检查规则是 `runtime.storage_objects_protocol_route_local_proof`。该 proof 添加了 `TestStorageObjectsProtocolRouteLocalAlphaFlow`，在 local authenticated E2E fixture 中加入 test-only storage route registration 和 test-only storage repository，并更新 `examples/local-alpha-request-loop.sh`，用于通过现有 WebSocket/Protobuf route flow 演示 authenticated own-player storage object put/get/list/delete。
 
-下一项 work item 是 `W-0214 Define first server push and realtime messaging gate`。它只能定义 `ADR-0121` 已选择的第一版 outbound realtime gate；不得实现 new protocol messages or routes、storage service behavior changes、repository interface changes、PostgreSQL adapter changes、migration changes、dependencies、authentication/session changes、public ACLs、admin search、group/guild/party/room/match storage scopes、batch writes、JSON patch、merge semantics、TTL、script hooks、large object/blob storage、S3-compatible object storage、production memory storage behavior 或 direct Nakama/Pitaya API compatibility。
+Storage module 的 storage-object work 已完成到 local proof。Repository 下一项 work item 是 `W-0215 Implement first server push and realtime messaging runtime slice`，不属于本模块。不要把 storage module 当作 realtime behavior 的 owner；除非后续 bounded storage work item 明确授权，继续保留 storage service、repository interface、PostgreSQL adapter、migration、public ACL、admin search、group/guild/party/room/match storage scope、batch write、JSON patch、merge、TTL、script hook、large object/blob storage、S3-compatible object storage、production memory storage behavior 和 direct Nakama/Pitaya API compatibility 的 deferrals。
 
 ## 何时不要使用本模块
 

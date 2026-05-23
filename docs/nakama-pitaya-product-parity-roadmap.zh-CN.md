@@ -165,7 +165,9 @@ storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.pr
 storage_objects_protocol_route_implementation_decision: ADR-0119
 storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
 storage_objects_protocol_route_local_proof_decision: ADR-0120
-next_work_item: W-0214 Define first server push and realtime messaging gate
+first_server_push_realtime_messaging_gate: docs/first-server-push-realtime-messaging-gate.md
+first_server_push_realtime_messaging_gate_decision: ADR-0122
+next_work_item: W-0215 Implement first server push and realtime messaging runtime slice
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -184,7 +186,8 @@ next_work_item: W-0214 Define first server push and realtime messaging gate
 - 定义并实现 storage objects protocol route family。已由 `W-0210` 和 `W-0211` 完成。
 - 通过 local alpha request flow 证明 storage object routes。已由 `W-0212` 完成。
 - 在 storage object local proof 后确认下一项 alpha direction。已由 `W-0213` 完成。
-- 定义第一版 realtime messaging、stream、broadcast 或 server-push behavior。Next。
+- 定义第一版 server push and realtime messaging gate。已由 `W-0214` 完成。
+- 实现第一版 server push and realtime messaging runtime slice。Next。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。
 

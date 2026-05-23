@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-141
+current_milestone: M-143
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: storage_objects_protocol_route_local_proof_completed
+    current_release_state: first_server_push_realtime_messaging_gate_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0213
+    next_ready_work_item: W-0215
     preferred_after_current:
-      - confirm_next_alpha_direction_after_storage_objects_local_proof
+      - first_server_push_realtime_messaging_runtime_slice
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2748,7 +2748,7 @@ milestones:
 
   - id: M-142
     title: First Server Push And Realtime Messaging Gate
-    status: active
+    status: completed
     goal: Define the first bounded server push and realtime messaging gate for prototype-ready shared online services while preserving transport/session/protocol/application/backend separation and avoiding direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The first server push and realtime messaging gate is recorded with ownership, vocabulary, allowed future files, verification expectations, and stop conditions.
@@ -2771,6 +2771,27 @@ milestones:
       - adding large object/blob storage or S3-compatible object storage
       - adding matchmaking or match runtime behavior
       - adding distributed runtime, frontend/backend split, RPC, or service discovery
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the first server push and realtime messaging gate in `docs/first-server-push-realtime-messaging-gate.md`, accepted `ADR-0122`, registered `runtime.first_server_push_realtime_messaging_gate`, recorded Nakama alignment for notifications, streams, chat, and presence-adjacent outbound messaging, recorded Pitaya alignment for acceptor/session/handler/push/group/broadcast/backend-service separation, and opened `M-143/W-0215 Implement first server push and realtime messaging runtime slice` as next-ready. No runtime behavior, transport delivery, protocol route, Protobuf source, generated output, startup wiring, persistence, migration, dependency, authentication/session behavior, hosted deployment, release artifact, public announcement, paid promotion, matchmaking, match runtime, distributed runtime, broad social module, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-143
+    title: First Server Push And Realtime Messaging Runtime Slice
+    status: active
+    goal: Implement the smallest first server push and realtime messaging runtime slice authorized by ADR-0122 while preserving protocol/generated-output, persistence, delivery guarantees, distributed fanout, matchmaking, match runtime, broad social, and direct compatibility deferrals unless explicitly authorized.
+    completion_criteria:
+      - The first runtime slice implements only the smallest application-owned outbound realtime behavior and focused verification authorized by `docs/first-server-push-realtime-messaging-gate.md`.
+      - Recipient target validation, metadata-only identity refusal, redacted delivery outcomes, and Nakama/Pitaya layering alignment are verified.
+      - Protocol routes, Protobuf source, generated output, persistence, migrations, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, paid promotion, matchmaking, match runtime, distributed runtime, and direct compatibility remain deferred unless a later implementation ADR explicitly authorizes a narrower exception.
+    non_goals:
+      - implementing broad chat, channels, groups, parties, rooms, matches, matchmaking, or match runtime
+      - adding Protobuf source or generated output unless separately authorized
+      - adding public client publish routes
+      - adding stream subscription persistence
+      - adding offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, or backpressure mechanisms
+      - adding distributed fanout, frontend/backend split, RPC, service discovery, or cluster groups
+      - changing authentication/session semantics
+      - changing storage object behavior, repository interfaces, PostgreSQL adapters, migrations, or dependencies
+      - adding hosted deployments, release artifacts, public announcements beyond the GitHub release record, or paid promotion
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -8081,7 +8102,7 @@ work_items:
   - id: W-0214
     milestone: M-142
     title: Define first server push and realtime messaging gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
     depends_on:
       - W-0213
@@ -8102,3 +8123,30 @@ work_items:
       - Define the first server push and realtime messaging gate.
       - Record ownership, vocabulary, future allowed files, verification expectations, and stop conditions.
       - Record Nakama/Pitaya reference alignment while preserving implementation, protocol, generated output, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, and direct compatibility deferrals.
+    completion_summary: Defined the first server push and realtime messaging gate, accepted `ADR-0122`, recorded future ownership under `runtime/internal/app/realtime`, future protocol/bridge/handler/transport candidates, first message-intent vocabulary, conservative sender authority and identity rules, Nakama/Pitaya reference mapping, and stop conditions. `M-143/W-0215 Implement first server push and realtime messaging runtime slice` is now next-ready. No runtime behavior, transport delivery, protocol routes, Protobuf source, generated output, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, hosted deployment, release artifact, public announcement, paid promotion, matchmaking, match runtime, distributed runtime, broad social module, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0215
+    milestone: M-143
+    title: Implement first server push and realtime messaging runtime slice
+    status: next_ready
+    change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
+    depends_on:
+      - W-0214
+    expected_change_id: implement-first-server-push-realtime-messaging-runtime-slice
+    tier: tier_2_runtime
+    selected_direction: first_server_push_realtime_messaging_runtime_slice
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0122
+      - ADR-0121
+      - ADR-0120
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding Protobuf source or generated output, adding public client publish routes, adding stream subscription persistence, adding offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure mechanisms, distributed fanout, frontend/backend split, RPC, service discovery, cluster groups, broad chat, channels, groups, parties, rooms, matches, matchmaking, match runtime, storage object behavior changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, authentication/session behavior changes, route-protection changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product expansion beyond the first runtime slice.
+    completion:
+      - Implement the smallest first server push and realtime messaging runtime slice authorized by ADR-0122.
+      - Add focused tests for recipient validation, metadata-only identity refusal, redacted delivery outcomes, and single-process layering.
+      - Preserve protocol/generated-output, persistence, migration, dependency, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, broad social, and direct compatibility deferrals unless explicitly authorized.

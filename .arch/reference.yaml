@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: storage_objects_protocol_route_local_proof_completed
+  current_state: first_server_push_realtime_messaging_gate_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0214
-  immediate_next_direction: define_first_server_push_realtime_messaging_gate
+  immediate_next_work_item: W-0215
+  immediate_next_direction: first_server_push_realtime_messaging_runtime_slice
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4426,9 +4426,15 @@ phase_plan:
     implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2dy_first_server_push_realtime_messaging_gate:
-    status: next_ready
+    status: completed
     milestone: M-142
-    next_ready_work_item: W-0214
+    completed_work_item: W-0214
+    decision: ADR-0122
+    standard: docs/first-server-push-realtime-messaging-gate.md
+    translation: docs/first-server-push-realtime-messaging-gate.zh-CN.md
+    change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
+    next_milestone: M-143
+    next_ready_work_item: W-0215
     previous_completed_work_item: W-0213
     selected_direction: define_first_server_push_realtime_messaging_gate
     expected_change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
@@ -4437,7 +4443,22 @@ phase_plan:
       pitaya: The gate should preserve acceptor/session/handler/protocol/backend separation and avoid premature groups, broadcast fanout, cluster mode, RPC, or direct route compatibility.
     target_stage: prototype_ready_foundation
     source_next_direction_decision: ADR-0121
+    first_server_push_realtime_messaging_gate_defined: true
+    check_rule: runtime.first_server_push_realtime_messaging_gate
     implementation_authorized_by_this_selection: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2dz_first_server_push_realtime_messaging_runtime_slice:
+    status: next_ready
+    milestone: M-143
+    next_ready_work_item: W-0215
+    previous_completed_work_item: W-0214
+    selected_direction: first_server_push_realtime_messaging_runtime_slice
+    expected_change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
+    reference_mapping:
+      nakama: The runtime slice should make the first server-authored outbound realtime behavior useful without jumping to broad chat, social modules, matchmaking, or direct compatibility.
+      pitaya: The runtime slice should preserve transport/session/handler/protocol/backend separation and remain single-process before group, broadcast fanout, cluster, RPC, or service discovery work.
+    target_stage: prototype_ready_foundation
+    source_gate_decision: ADR-0122
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

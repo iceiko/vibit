@@ -5452,16 +5452,70 @@ confirm_next_alpha_direction_after_storage_objects_local_proof:
   direct_nakama_pitaya_api_compatibility_added: false
 
 first_server_push_realtime_messaging_gate:
-  status: next_ready
+  status: completed
   milestone: M-142
-  next_ready_work_item: W-0214
+  completed_work_item: W-0214
+  decision: ADR-0122
+  change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
+  next_milestone: M-143
+  next_ready_work_item: W-0215
   previous_completed_work_item: W-0213
   selected_direction: define_first_server_push_realtime_messaging_gate
   expected_change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
   tier: tier_2_planning
   target_stage: prototype_ready_foundation
   source_next_direction_decision: ADR-0121
+  first_server_push_realtime_messaging_gate_defined: true
+  first_server_push_realtime_messaging_gate_standard: docs/first-server-push-realtime-messaging-gate.md
+  first_server_push_realtime_messaging_gate_translation: docs/first-server-push-realtime-messaging-gate.zh-CN.md
+  first_server_push_realtime_messaging_gate_decision: ADR-0122
+  first_server_push_realtime_messaging_gate_check_rule: runtime.first_server_push_realtime_messaging_gate
+  future_runtime_owner_candidate: runtime/internal/app/realtime
+  future_runtime_service_source_candidate: runtime/internal/app/realtime/service.go
+  future_runtime_service_test_candidate: runtime/internal/app/realtime/service_test.go
+  future_protocol_source_candidate: proto/vibit/realtime/v1/realtime.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/realtime.go
+  future_transport_delivery_candidate: runtime/internal/platform/transport/ws/outbound.go
+  future_runtime_slice_work_item: W-0215
+  future_runtime_slice_direction: first_server_push_realtime_messaging_runtime_slice
+  first_delivery_model_candidate: single_process_bound_connection_delivery
+  first_message_intent_vocabulary_recorded: true
+  sender_authority: server_only
+  client_published_facts_allowed: false
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  connection_id_client_authority_allowed: false
+  websocket_transport_credential_neutral: true
+  protocol_adapter_payload_mapping_only: true
+  application_policy_owner_required: true
+  backend_intent_owner_required: true
   implementation_authorized_by_this_selection: false
+  runtime_behavior_added: false
+  transport_delivery_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+first_server_push_realtime_messaging_runtime_slice:
+  status: next_ready
+  milestone: M-143
+  next_ready_work_item: W-0215
+  previous_completed_work_item: W-0214
+  selected_direction: first_server_push_realtime_messaging_runtime_slice
+  expected_change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
+  tier: tier_2_runtime
+  target_stage: prototype_ready_foundation
+  source_gate_decision: ADR-0122
+  source_gate_standard: docs/first-server-push-realtime-messaging-gate.md
+  implementation_authorized_by_gate: true
   direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:

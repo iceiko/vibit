@@ -165,7 +165,9 @@ storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.pr
 storage_objects_protocol_route_implementation_decision: ADR-0119
 storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
 storage_objects_protocol_route_local_proof_decision: ADR-0120
-next_work_item: W-0214 Define first server push and realtime messaging gate
+first_server_push_realtime_messaging_gate: docs/first-server-push-realtime-messaging-gate.md
+first_server_push_realtime_messaging_gate_decision: ADR-0122
+next_work_item: W-0215 Implement first server push and realtime messaging runtime slice
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -184,7 +186,8 @@ Candidate work:
 - Define and implement the storage objects protocol route family. Completed by `W-0210` and `W-0211`.
 - Prove storage object routes through the local alpha request flow. Completed by `W-0212`.
 - Confirm the next alpha direction after storage object local proof. Completed by `W-0213`.
-- Define first realtime messaging, stream, broadcast, or server-push behavior. Next.
+- Define the first server push and realtime messaging gate. Completed by `W-0214`.
+- Implement the first server push and realtime messaging runtime slice. Next.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
 
