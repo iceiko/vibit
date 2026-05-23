@@ -148,6 +148,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.storage_objects_protocol_route_gate",
   "runtime.storage_objects_protocol_route_implementation",
   "runtime.storage_objects_protocol_route_local_proof",
+  "runtime.next_alpha_direction_after_storage_objects_local_proof",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -29631,6 +29632,183 @@ function checkRuntimeStorageObjectsProtocolRouteLocalProof(root, goFiles) {
   });
 }
 
+function checkRuntimeNextAlphaDirectionAfterStorageObjectsLocalProof(root, goFiles) {
+  const ruleId = "runtime.next_alpha_direction_after_storage_objects_local_proof";
+  const decisionPath = "decisions/ADR-0121-next-alpha-direction-first-server-push-realtime-messaging-gate.md";
+  const changePath = "changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof";
+  const conversationPath = "conversations/2026-05-23-next-alpha-direction-first-server-push-realtime-messaging-gate.md";
+
+  if (!nextAlphaDirectionAfterStorageObjectsLocalProofCompleted(root)) {
+    ok("next alpha direction after storage objects local proof is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for next alpha direction after storage objects local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for next alpha direction after storage objects local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-141"],
+    [".arch/work-items.yaml", "title: Next Direction Confirmation After Storage Objects Local Proof"],
+    [".arch/work-items.yaml", "id: W-0213"],
+    [".arch/work-items.yaml", "title: Confirm next alpha direction after storage objects local proof"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0121"],
+    [".arch/work-items.yaml", "selected_direction: define_first_server_push_realtime_messaging_gate"],
+    [".arch/work-items.yaml", "id: M-142"],
+    [".arch/work-items.yaml", "title: First Server Push And Realtime Messaging Gate"],
+    [".arch/work-items.yaml", "id: W-0214"],
+    [".arch/work-items.yaml", "title: Define first server push and realtime messaging gate"],
+    [".arch/work-items.yaml", workItemHasStatus(root, "W-0214", "completed") ? "status: completed" : "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "next_alpha_direction_after_storage_objects_local_proof: ADR-0121"],
+    [".arch/runtime.yaml", "confirm_next_alpha_direction_after_storage_objects_local_proof:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0213"],
+    [".arch/runtime.yaml", "decision: ADR-0121"],
+    [".arch/runtime.yaml", "selected_direction: define_first_server_push_realtime_messaging_gate"],
+    [".arch/runtime.yaml", "first_server_push_realtime_messaging_gate_selected: true"],
+    [".arch/runtime.yaml", "first_server_push_realtime_messaging_gate:"],
+    [".arch/runtime.yaml", "next_ready_work_item: W-0214"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "next_alpha_direction_after_storage_objects_local_proof_check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof"],
+    [".arch/contracts.yaml", "next_alpha_direction_after_storage_objects_local_proof_check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof"],
+    [".arch/reference.yaml", "phase_2dx_next_direction_after_storage_objects_local_proof"],
+    [".arch/reference.yaml", "phase_2dy_first_server_push_realtime_messaging_gate"],
+    [".arch/reference.yaml", "check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof"],
+    [".arch/modules.yaml", "protocol_route_next_work_item: W-0214"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "M-142 First Server Push And Realtime Messaging Gate"],
+    ["AGENTS.zh-CN.md", "M-142 First Server Push And Realtime Messaging Gate"],
+    ["runtime/AGENTS.md", "M-142 First Server Push And Realtime Messaging Gate"],
+    ["runtime/AGENTS.zh-CN.md", "M-142 First Server Push And Realtime Messaging Gate"],
+    ["rules/check-rules.json", "runtime.next_alpha_direction_after_storage_objects_local_proof"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0121",
+      "define_first_server_push_realtime_messaging_gate",
+      "M-142/W-0214",
+      "Nakama",
+      "Pitaya",
+      "does not implement server push or realtime messaging",
+      "no direct Nakama/Pitaya public API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0213",
+      "completed_milestone: M-141",
+      "previous_completed_work_item: W-0212",
+      "next_milestone: M-142",
+      "next_work_item: W-0214",
+      "selected_direction: define_first_server_push_realtime_messaging_gate",
+      "first_server_push_realtime_messaging_gate_selected: true",
+      "implementation_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "authentication_session_behavior_changed: false",
+      "matchmaking_added: false",
+      "match_runtime_added: false",
+      "distributed_runtime_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "define_first_server_push_realtime_messaging_gate",
+      "M-142/W-0214",
+      "Nakama",
+      "Pitaya",
+      "direct compatibility deferred",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenImplementationPatterns = [
+    { pattern: /\bSendPush\b|\bBroadcast\b|\bPublishStream\b|\bSubscribeStream\b/, label: "server push implementation vocabulary" },
+    { pattern: /\bChatMessage\b|\bNotification\b|\bRealtimeMessage\b/, label: "concrete realtime message implementation type" },
+    { pattern: /\b\/v2\/notification\b|\b\/v2\/channel\b|\b\/v2\/stream\b/, label: "Nakama-compatible HTTP path" },
+    { pattern: /\bnk\.(?:notification|channel|stream|messages?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, forbiddenImplementationPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids implementation and direct-compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds forbidden marker for this direction-selection slice: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("next alpha direction after storage objects local proof selects the first server push and realtime messaging gate without implementing runtime, protocol, generated-output, migration, dependency, session, matchmaking, match runtime, distributed runtime, or direct compatibility changes", {
+    rule_id: ruleId,
+    artifact: "runtime",
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -31344,6 +31522,10 @@ function storageObjectsProtocolRouteLocalProofCompleted(root) {
   return workItemHasStatus(root, "W-0212", "completed");
 }
 
+function nextAlphaDirectionAfterStorageObjectsLocalProofCompleted(root) {
+  return workItemHasStatus(root, "W-0213", "completed");
+}
+
 function isStorageObjectsProtocolRouteImplementationFile(root, file) {
   if (!storageObjectsProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -31366,6 +31548,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0213", "next_ready_work_item: W-0214"],
     ["W-0212", "next_ready_work_item: W-0213"],
     ["W-0211", "next_ready_work_item: W-0212"],
     ["W-0210", "next_ready_work_item: W-0211"],
@@ -31407,6 +31590,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0213", "completed")) {
+    return "next_work_item: W-0214";
+  }
   if (workItemHasStatus(root, "W-0212", "completed")) {
     return "next_work_item: W-0213";
   }
@@ -31475,6 +31661,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0213", "define_first_server_push_realtime_messaging_gate"],
     ["W-0212", "confirm_next_alpha_direction_after_storage_objects_local_proof"],
     ["W-0211", "storage_objects_protocol_route_local_proof"],
     ["W-0210", "storage_objects_protocol_route_implementation"],
@@ -31516,6 +31703,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0213", "W-0214 Define first server push and realtime messaging gate"],
     ["W-0212", "W-0213 Confirm next alpha direction after storage objects local proof"],
     ["W-0211", "W-0212 Prove storage objects protocol route in local alpha request flow"],
     ["W-0210", "W-0211 Implement storage objects protocol route"],
@@ -31558,6 +31746,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0213", "current_phase: first_server_push_realtime_messaging_gate"],
     ["W-0212", "current_phase: confirm_next_alpha_direction_after_storage_objects_local_proof"],
     ["W-0211", "current_phase: storage_objects_protocol_route_local_proof"],
     ["W-0210", "current_phase: storage_objects_protocol_route_implementation"],
@@ -32143,6 +32332,7 @@ function checkRuntime(root) {
   checkRuntimeStorageObjectsProtocolRouteGate(root, goFiles);
   checkRuntimeStorageObjectsProtocolRouteImplementation(root, goFiles);
   checkRuntimeStorageObjectsProtocolRouteLocalProof(root, goFiles);
+  checkRuntimeNextAlphaDirectionAfterStorageObjectsLocalProof(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

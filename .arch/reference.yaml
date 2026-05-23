@@ -33,8 +33,8 @@ release_target:
   current_state: storage_objects_protocol_route_local_proof_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0213
-  immediate_next_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
+  immediate_next_work_item: W-0214
+  immediate_next_direction: define_first_server_push_realtime_messaging_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4408,17 +4408,35 @@ phase_plan:
     protocol_shape_change_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2dx_next_direction_after_storage_objects_local_proof:
-    status: next_ready
+    status: completed
     milestone: M-141
-    next_ready_work_item: W-0213
+    completed_work_item: W-0213
     previous_completed_work_item: W-0212
-    selected_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
+    selected_direction: define_first_server_push_realtime_messaging_gate
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof
     reference_mapping:
-      nakama: Selection should choose the next product-useful game backend capability or alpha hardening step without copying Nakama APIs.
-      pitaya: Selection should preserve route/session/protocol-adapter/backend separation and avoid premature cluster/RPC expansion.
+      nakama: After durable storage objects are locally proven, the next product-useful shared online-service direction is outbound realtime vocabulary for notifications, streams, chat, and presence-adjacent behavior without copying Nakama APIs.
+      pitaya: The future gate should preserve push, broadcast, group, stream, session, handler, protocol-adapter, and backend-service separation before cluster/RPC expansion.
     target_stage: prototype_ready_foundation
     source_storage_objects_local_proof_decision: ADR-0120
+    decision: ADR-0121
+    check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof
+    next_milestone: M-142
+    next_ready_work_item: W-0214
+    implementation_authorized_by_this_selection: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2dy_first_server_push_realtime_messaging_gate:
+    status: next_ready
+    milestone: M-142
+    next_ready_work_item: W-0214
+    previous_completed_work_item: W-0213
+    selected_direction: define_first_server_push_realtime_messaging_gate
+    expected_change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
+    reference_mapping:
+      nakama: The gate should define the first outbound realtime vocabulary before notifications, streams, chat, or broader social services are implemented.
+      pitaya: The gate should preserve acceptor/session/handler/protocol/backend separation and avoid premature groups, broadcast fanout, cluster mode, RPC, or direct route compatibility.
+    target_stage: prototype_ready_foundation
+    source_next_direction_decision: ADR-0121
     implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:

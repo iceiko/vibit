@@ -122,18 +122,19 @@ purpose: >
   storage_objects_protocol_route_gate: ADR-0118
   storage_objects_protocol_route_implementation: ADR-0119
   storage_objects_protocol_route_local_proof: ADR-0120
+  next_alpha_direction_after_storage_objects_local_proof: ADR-0121
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: confirm_next_alpha_direction_after_storage_objects_local_proof
+  current_phase: first_server_push_realtime_messaging_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_and_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0213
+  next_ready_work_item: W-0214
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
   prototype_ready_local_development_path_package_standard: docs/prototype-ready-local-development-path-package.md
@@ -156,6 +157,8 @@ architecture_scope:
   storage_objects_protocol_route_implementation_handler: runtime/internal/app/bootstrap/storage.go
   storage_objects_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
   storage_objects_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
+  next_alpha_direction_after_storage_objects_local_proof_decision: ADR-0121
+  first_server_push_realtime_messaging_gate_selected: true
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -6885,16 +6888,50 @@ identity_session_boundary:
     direct_nakama_pitaya_api_compatibility_added: false
 
   confirm_next_alpha_direction_after_storage_objects_local_proof:
-    status: next_ready
+    status: completed
     milestone: M-141
-    next_ready_work_item: W-0213
+    completed_work_item: W-0213
+    decision: ADR-0121
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof
+    next_milestone: M-142
+    next_ready_work_item: W-0214
     previous_completed_work_item: W-0212
-    selected_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
+    selected_direction: define_first_server_push_realtime_messaging_gate
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof
     tier: tier_2_planning
     target_stage: prototype_ready_foundation
     source_storage_objects_local_proof_decision: ADR-0120
+    first_server_push_realtime_messaging_gate_selected: true
+    first_server_push_realtime_messaging_gate_next_work_item: W-0214
+    next_alpha_direction_after_storage_objects_local_proof_check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof
     implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    authentication_session_behavior_changed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+
+  first_server_push_realtime_messaging_gate:
+    status: next_ready
+    milestone: M-142
+    next_ready_work_item: W-0214
+    previous_completed_work_item: W-0213
+    selected_direction: define_first_server_push_realtime_messaging_gate
+    expected_change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
+    tier: tier_2_planning
+    target_stage: prototype_ready_foundation
+    source_next_direction_decision: ADR-0121
+    implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    authentication_session_behavior_changed: false
     direct_nakama_pitaya_api_compatibility_added: false
 
 persistence_model:

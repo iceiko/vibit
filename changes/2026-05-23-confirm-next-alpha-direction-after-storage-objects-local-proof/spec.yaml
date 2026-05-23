@@ -1,0 +1,99 @@
+schema_version: 0.1
+change_id: confirm-next-alpha-direction-after-storage-objects-local-proof
+date: 2026-05-23
+type: standard
+status: verified
+
+summary: Select the first server push and realtime messaging gate as the next bounded alpha direction after proving storage objects in the local request flow.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0121
+  referenced:
+    - ADR-0120
+    - ADR-0119
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: define_first_server_push_realtime_messaging_gate
+
+candidate_directions:
+  - define_first_server_push_realtime_messaging_gate
+  - strengthen_authenticated_loop_concurrency_failure_verification
+  - define_minimal_operations_inspection_surface
+  - add_clearer_example_client_or_example_app_path
+  - define_presence_status_expansion_gate
+  - define_matchmaking_gate
+
+runtime:
+  completed_work_item: W-0213
+  completed_milestone: M-141
+  previous_completed_work_item: W-0212
+  next_milestone: M-142
+  next_work_item: W-0214
+  next_work_item_status: next_ready
+  tier: tier_2_direction_selection
+  gate_density_strategy: ADR-0082
+  source_storage_objects_local_proof_decision: ADR-0120
+  selected_direction: define_first_server_push_realtime_messaging_gate
+  first_server_push_realtime_messaging_gate_selected: true
+  future_work_item: W-0214
+  future_change_id: define-first-server-push-realtime-messaging-gate
+  target_stage: prototype_ready_foundation
+  nakama_reference_mapping: storage_objects_are_now_proven_so_next_shared_online_service_should_define_outbound_realtime_vocabulary_for_notifications_streams_chat_or_presence_adjacent_capabilities
+  pitaya_reference_mapping: future_push_broadcast_stream_group_and_handler_vocabulary_must_preserve_transport_session_protocol_adapter_application_and_backend_service_separation_before_cluster_rpc_expansion
+  implementation_authorized_by_this_change: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  storage_service_behavior_changed: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  broad_social_module_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.next_alpha_direction_after_storage_objects_local_proof
+    - node tools/vibit check change confirm-next-alpha-direction-after-storage-objects-local-proof --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

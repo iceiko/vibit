@@ -2725,7 +2725,7 @@ milestones:
 
   - id: M-141
     title: Next Direction Confirmation After Storage Objects Local Proof
-    status: active
+    status: completed
     goal: Confirm the next bounded alpha direction after proving storage objects in the local request flow, preserving Nakama/Pitaya alignment and avoiding broad product module expansion without explicit selection.
     completion_criteria:
       - The next direction after storage objects local proof is selected and recorded with Nakama/Pitaya reference alignment.
@@ -2743,6 +2743,34 @@ milestones:
       - executing public announcements beyond the GitHub release record
       - running paid promotion
       - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_first_server_push_realtime_messaging_gate` as the next prototype-ready alpha direction after the storage objects local proof, accepted `ADR-0121`, recorded Nakama/Pitaya alignment for outbound realtime vocabulary and Pitaya-style layering, registered `runtime.next_alpha_direction_after_storage_objects_local_proof`, and opened `M-142/W-0214 Define first server push and realtime messaging gate` as the next-ready item. No runtime behavior, protocol routes, Protobuf messages, generated output, storage behavior, repository interface, PostgreSQL adapter, migration, dependency, authentication/session behavior, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, matchmaking, match runtime, distributed runtime, broad social module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-142
+    title: First Server Push And Realtime Messaging Gate
+    status: active
+    goal: Define the first bounded server push and realtime messaging gate for prototype-ready shared online services while preserving transport/session/protocol/application/backend separation and avoiding direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The first server push and realtime messaging gate is recorded with ownership, vocabulary, allowed future files, verification expectations, and stop conditions.
+      - The gate maps Nakama-style outbound realtime capability pressure and Pitaya-style push/broadcast/group/session/handler layering without implementing runtime behavior or copying public APIs.
+      - Current protocol, generated output, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, matchmaking, match runtime, distributed runtime, blob/S3, and direct compatibility deferrals remain preserved unless separately authorized.
+    non_goals:
+      - implementing server push, broadcast, streams, chat, notifications, or realtime messaging
+      - adding protocol messages or routes
+      - changing Protobuf source or generated output
+      - changing storage object service behavior
+      - changing repository interfaces or PostgreSQL adapters
+      - changing migrations
+      - adding dependencies
+      - changing authentication/session behavior
+      - changing route protection
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding matchmaking or match runtime behavior
+      - adding distributed runtime, frontend/backend split, RPC, or service discovery
       - adding direct Nakama/Pitaya API compatibility
 
 work_items:
@@ -8028,7 +8056,7 @@ work_items:
   - id: W-0213
     milestone: M-141
     title: Confirm next alpha direction after storage objects local proof
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof
     depends_on:
       - W-0212
@@ -8048,3 +8076,29 @@ work_items:
       - Select exactly one next bounded alpha direction after storage objects local proof.
       - Record Nakama/Pitaya reference alignment and why the selected direction is product-useful.
       - Preserve current implementation, protocol, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, and direct compatibility deferrals.
+    completion_summary: Selected `define_first_server_push_realtime_messaging_gate` as the next bounded alpha direction after storage objects local proof. The selection records Nakama alignment for outbound realtime vocabulary after durable storage objects and Pitaya alignment for preserving transport/session/protocol-adapter/application/backend separation before push, broadcast, groups, cluster, or RPC expansion. `M-142/W-0214 Define first server push and realtime messaging gate` is now next-ready. No implementation, protocol, generated output, storage, repository, adapter, migration, dependency, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, broad social module, or direct Nakama/Pitaya API compatibility change was added.
+
+  - id: W-0214
+    milestone: M-142
+    title: Define first server push and realtime messaging gate
+    status: next_ready
+    change: changes/2026-05-23-define-first-server-push-realtime-messaging-gate
+    depends_on:
+      - W-0213
+    expected_change_id: define-first-server-push-realtime-messaging-gate
+    tier: tier_2_planning
+    selected_direction: define_first_server_push_realtime_messaging_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0121
+      - ADR-0120
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing server push, broadcast, streams, chat, notifications, realtime messaging, adding protocol messages or routes, changing Protobuf source or generated output, changing storage object service behavior, changing repository interfaces or PostgreSQL adapters, adding migrations, adding dependencies, changing authentication/session behavior, changing route protection, adding hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, matchmaking, match runtime, distributed runtime, RPC, service discovery, or broad product expansion beyond defining the first server push and realtime messaging gate.
+    completion:
+      - Define the first server push and realtime messaging gate.
+      - Record ownership, vocabulary, future allowed files, verification expectations, and stop conditions.
+      - Record Nakama/Pitaya reference alignment while preserving implementation, protocol, generated output, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, and direct compatibility deferrals.

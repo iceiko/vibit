@@ -189,7 +189,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0213 Confirm next alpha direction after storage objects local proof
+W-0214 Define first server push and realtime messaging gate
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
