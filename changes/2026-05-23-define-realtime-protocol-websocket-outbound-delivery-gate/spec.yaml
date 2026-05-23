@@ -1,0 +1,141 @@
+schema_version: 0.1
+change_id: define-realtime-protocol-websocket-outbound-delivery-gate
+date: 2026-05-23
+type: standard
+status: verified
+
+summary: Define the realtime protocol and WebSocket outbound delivery gate after the application-owned realtime runtime slice without adding protocol source, generated output, socket writes, startup wiring, persistence, delivery guarantees, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0125
+  referenced:
+    - ADR-0124
+    - ADR-0123
+    - ADR-0122
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: realtime_protocol_websocket_outbound_delivery_gate
+next_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+
+runtime:
+  completed_work_item: W-0217
+  completed_milestone: M-145
+  previous_completed_work_item: W-0216
+  next_milestone: M-146
+  next_work_item: W-0218
+  next_work_item_status: next_ready
+  tier: tier_2_planning
+  gate_density_strategy: ADR-0082
+  source_next_direction_decision: ADR-0124
+  source_realtime_runtime_slice_decision: ADR-0123
+  source_realtime_gate_decision: ADR-0122
+  realtime_protocol_websocket_outbound_delivery_gate_defined: true
+  realtime_protocol_websocket_outbound_delivery_gate_decision: ADR-0125
+  realtime_protocol_websocket_outbound_delivery_gate_standard: docs/realtime-protocol-websocket-outbound-delivery-gate.md
+  realtime_protocol_websocket_outbound_delivery_gate_translation: docs/realtime-protocol-websocket-outbound-delivery-gate.zh-CN.md
+  realtime_protocol_websocket_outbound_delivery_gate_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_gate
+  runtime_intent_owner: runtime/internal/app/realtime
+  connection_registry_owner: runtime/internal/app/connection
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  websocket_transport_owner: runtime/internal/platform/transport/ws
+  future_protocol_source_candidate: proto/vibit/realtime/v1/realtime.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/realtime.go
+  future_transport_delivery_candidate: runtime/internal/platform/transport/ws/outbound.go
+  future_implementation_slice_work_item: W-0218
+  future_implementation_slice_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+  first_protocol_delivery_model_candidate: single_process_server_observed_connection_delivery
+  first_envelope_kind_candidates:
+    - event
+    - system
+  first_payload_family_candidates:
+    - server_notice
+    - domain_event_push
+    - stream_message
+    - presence_signal
+  application_policy_owner_required: true
+  protocol_adapter_payload_mapping_only: true
+  websocket_transport_payload_policy_neutral: true
+  server_observed_connection_id_required: true
+  server_observed_connection_epoch_required: true
+  client_connection_id_authority_allowed: false
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  implementation_authorized_by_this_change: false
+  runtime_behavior_added: false
+  websocket_outbound_delivery_added: false
+  socket_write_added: false
+  protocol_bridge_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  acknowledgement_added: false
+  ordering_guarantee_added: false
+  retry_behavior_added: false
+  backpressure_behavior_added: false
+  durable_offset_added: false
+  delivery_guarantee_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_alignment:
+  nakama_reference_mapping: define_future_client_visible_outbound_realtime_protocol_delivery_for_notifications_streams_chat_and_presence_adjacent_capabilities_without_copying_public_apis_payloads_or_routes
+  pitaya_reference_mapping: preserve_acceptor_session_handler_protocol_backend_push_group_broadcast_separation_before_socket_writes_groups_broadcast_fanout_cluster_rpc_service_discovery_or_frontend_backend_split
+  direct_compatibility: deferred
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.realtime_protocol_websocket_outbound_delivery_gate
+    - node tools/vibit check change define-realtime-protocol-websocket-outbound-delivery-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

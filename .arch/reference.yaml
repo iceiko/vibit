@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: next_alpha_direction_after_realtime_runtime_slice_selected
+  current_state: realtime_protocol_websocket_outbound_delivery_gate_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0217
-  immediate_next_direction: define_realtime_protocol_websocket_outbound_delivery_gate
+  immediate_next_work_item: W-0218
+  immediate_next_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4499,9 +4499,15 @@ phase_plan:
     delivery_guarantees_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2eb_realtime_protocol_websocket_outbound_delivery_gate:
-    status: next_ready
+    status: completed
     milestone: M-145
-    next_ready_work_item: W-0217
+    completed_work_item: W-0217
+    decision: ADR-0125
+    standard: docs/realtime-protocol-websocket-outbound-delivery-gate.md
+    translation: docs/realtime-protocol-websocket-outbound-delivery-gate.zh-CN.md
+    check_rule: runtime.realtime_protocol_websocket_outbound_delivery_gate
+    next_milestone: M-146
+    next_ready_work_item: W-0218
     previous_completed_work_item: W-0216
     selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
     expected_change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
@@ -4510,7 +4516,22 @@ phase_plan:
       pitaya: The gate should define protocol and transport ownership while keeping acceptor/session/handler/backend push separation and deferring groups, broadcast fanout, cluster, RPC, and service discovery.
     target_stage: prototype_ready_foundation
     source_next_direction_decision: ADR-0124
+    realtime_protocol_websocket_outbound_delivery_gate_defined: true
+    future_implementation_slice_work_item: W-0218
     implementation_authorized_by_this_selection: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ec_realtime_protocol_websocket_outbound_delivery_implementation_slice:
+    status: next_ready
+    milestone: M-146
+    next_ready_work_item: W-0218
+    previous_completed_work_item: W-0217
+    selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+    expected_change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+    reference_mapping:
+      nakama: The future implementation should add the smallest vibit-native client-visible outbound realtime protocol and WebSocket delivery slice that can support notification, stream, chat, and presence-adjacent capability pressure without direct API compatibility.
+      pitaya: The future implementation should preserve application policy, protocol serialization, transport write, session/connection state, and backend intent separation while deferring groups, broadcast fanout, cluster, RPC, and service discovery.
+    target_stage: prototype_ready_foundation
+    source_gate_decision: ADR-0125
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

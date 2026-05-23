@@ -5580,17 +5580,42 @@ confirm_next_alpha_direction_after_realtime_runtime_slice:
   direct_nakama_pitaya_api_compatibility_added: false
 
 realtime_protocol_websocket_outbound_delivery_gate:
-  status: next_ready
+  status: completed
   milestone: M-145
-  next_ready_work_item: W-0217
+  completed_work_item: W-0217
+  decision: ADR-0125
+  standard: docs/realtime-protocol-websocket-outbound-delivery-gate.md
+  translation: docs/realtime-protocol-websocket-outbound-delivery-gate.zh-CN.md
+  check_rule: runtime.realtime_protocol_websocket_outbound_delivery_gate
+  next_milestone: M-146
+  next_ready_work_item: W-0218
   previous_completed_work_item: W-0216
   selected_direction: define_realtime_protocol_websocket_outbound_delivery_gate
   expected_change: changes/2026-05-23-define-realtime-protocol-websocket-outbound-delivery-gate
   tier: tier_2_planning
   target_stage: prototype_ready_foundation
   source_next_direction_decision: ADR-0124
+  source_realtime_runtime_slice_decision: ADR-0123
+  source_realtime_gate_decision: ADR-0122
+  realtime_protocol_websocket_outbound_delivery_gate_defined: true
+  realtime_protocol_websocket_outbound_delivery_gate_decision: ADR-0125
+  realtime_protocol_websocket_outbound_delivery_gate_standard: docs/realtime-protocol-websocket-outbound-delivery-gate.md
+  realtime_protocol_websocket_outbound_delivery_gate_translation: docs/realtime-protocol-websocket-outbound-delivery-gate.zh-CN.md
+  realtime_protocol_websocket_outbound_delivery_gate_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_gate
+  runtime_intent_owner: runtime/internal/app/realtime
+  connection_registry_owner: runtime/internal/app/connection
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  websocket_transport_owner: runtime/internal/platform/transport/ws
+  future_protocol_source_candidate: proto/vibit/realtime/v1/realtime.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/realtime.go
+  future_transport_delivery_candidate: runtime/internal/platform/transport/ws/outbound.go
+  future_implementation_slice_work_item: W-0218
+  future_implementation_slice_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
   implementation_authorized_by_this_selection: false
   runtime_behavior_added: false
+  websocket_outbound_delivery_added: false
   transport_delivery_added: false
   websocket_outbound_writer_added: false
   socket_write_added: false
@@ -5609,6 +5634,30 @@ realtime_protocol_websocket_outbound_delivery_gate:
   match_runtime_added: false
   distributed_runtime_added: false
   broad_social_module_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+realtime_protocol_websocket_outbound_delivery_implementation_slice:
+  status: next_ready
+  milestone: M-146
+  next_ready_work_item: W-0218
+  previous_completed_work_item: W-0217
+  selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+  expected_change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+  tier: tier_2_runtime
+  target_stage: prototype_ready_foundation
+  source_gate_decision: ADR-0125
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  acknowledgement_added: false
+  retry_behavior_added: false
+  ordering_guarantee_added: false
+  durable_offset_added: false
+  backpressure_behavior_added: false
+  delivery_guarantees_added: false
+  broad_social_module_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
   direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:

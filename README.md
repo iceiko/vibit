@@ -189,7 +189,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0217 Define realtime protocol and WebSocket outbound delivery gate
+W-0218 Implement realtime protocol and WebSocket outbound delivery slice
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
