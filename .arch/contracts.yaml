@@ -1702,14 +1702,25 @@ implemented_wire_and_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0217 should define the realtime protocol and WebSocket outbound delivery gate before any Protobuf, generated output, protocol bridge, socket write, startup wiring, persistence, or delivery guarantee implementation.
   realtime_protocol_websocket_outbound_delivery_implementation_slice:
-    status: next_ready
-    next_ready_work_item: W-0218
+    status: completed
+    completed_work_item: W-0218
+    decision: ADR-0126
+    change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+    next_ready_work_item: W-0219
     previous_completed_work_item: W-0217
     selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
     expected_change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
     contract_changes_expected: true
     target_stage: prototype_ready_foundation
     source_gate_decision: ADR-0125
+    realtime_protocol_websocket_outbound_delivery_implementation_completed: true
+    realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
+    realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation
+    realtime_protocol_websocket_outbound_delivery_protocol_source_added: true
+    realtime_protocol_websocket_outbound_delivery_generated_output_added: true
+    realtime_protocol_websocket_outbound_delivery_protocol_bridge_added: true
+    realtime_protocol_websocket_outbound_delivery_transport_delivery_added: true
+    realtime_protocol_websocket_outbound_delivery_startup_wiring_added: false
     stream_subscription_persistence_added: false
     offline_inbox_added: false
     acknowledgement_added: false
@@ -1721,6 +1732,21 @@ implemented_wire_and_runtime_slices:
     broad_social_module_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0218 may implement only the smallest realtime protocol and WebSocket outbound delivery slice authorized by ADR-0125; broader delivery guarantees, stream subscriptions, chat, groups, fanout, distributed runtime, matchmaking, match runtime, and direct compatibility remain deferred.
+  confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
+    status: next_ready
+    next_ready_work_item: W-0219
+    previous_completed_work_item: W-0218
+    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+    target_stage: prototype_ready_foundation
+    source_realtime_outbound_delivery_decision: ADR-0126
+    implementation_authorized_by_this_selection: false
+    startup_wiring_added: false
+    stream_subscription_persistence_added: false
+    delivery_guarantees_added: false
+    broad_social_module_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0219 should select the next bounded alpha direction after realtime outbound delivery without adding startup wiring, stream subscriptions, chat, groups, broadcast fanout, persistence, delivery guarantees, distributed runtime, matchmaking, match runtime, or direct compatibility.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

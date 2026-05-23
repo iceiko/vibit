@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-146
+current_milestone: M-147
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: realtime_protocol_websocket_outbound_delivery_gate_defined
+    current_release_state: realtime_protocol_websocket_outbound_delivery_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0218
+    next_ready_work_item: W-0219
     preferred_after_current:
-      - realtime_protocol_websocket_outbound_delivery_implementation_slice
+      - confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2832,7 +2832,7 @@ milestones:
 
   - id: M-146
     title: Realtime Protocol And WebSocket Outbound Delivery Implementation Slice
-    status: active
+    status: completed
     goal: Implement the smallest realtime protocol payload and WebSocket outbound delivery slice authorized by ADR-0125 while preserving stream subscription, chat, group, broadcast fanout, persistence, delivery guarantee, distributed runtime, matchmaking, match runtime, and direct compatibility deferrals unless explicitly authorized.
     completion_criteria:
       - The implementation adds only the narrow protocol, generated-output, protocol-bridge, and transport outbound delivery behavior authorized by `docs/realtime-protocol-websocket-outbound-delivery-gate.md`.
@@ -2840,6 +2840,22 @@ milestones:
       - Server-observed connection id and epoch are the only connection targeting authority.
       - Stream subscription ownership, chat semantics, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure, distributed fanout, matchmaking, match runtime, hosted/release surfaces, and direct compatibility remain deferred.
     non_goals:
+      - adding stream subscriptions, chat semantics, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, or backpressure
+      - adding persistence, migrations, dependencies, authentication/session behavior changes, or route-protection changes
+      - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the smallest realtime protocol and WebSocket outbound delivery slice authorized by `ADR-0125`, accepted `ADR-0126`, added `proto/vibit/realtime/v1/realtime.proto`, generated Go Protobuf output, realtime protocol bridge mapping, payload registry coverage, and WebSocket outbound binary frame delivery by server-observed connection id and epoch. The slice preserves application policy, protocol mapping, and transport write ownership boundaries, keeps `stream_message` future-only, and avoids startup wiring, realtime bootstrap handlers, persistence, migrations, dependencies, authentication/session changes, route-protection changes, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, hosted/release surfaces, public announcements, paid promotion, blob/S3 storage, and direct Nakama/Pitaya API compatibility.
+
+  - id: M-147
+    title: Next Direction Confirmation After Realtime Outbound Delivery Slice
+    status: active
+    goal: Hold the work queue at an explicit maintainer confirmation point after realtime protocol and WebSocket outbound delivery implementation before choosing the next prototype-ready alpha direction.
+    completion_criteria:
+      - The next bounded alpha direction after the realtime outbound delivery slice is selected.
+      - The selected direction is recorded as a bounded milestone with at least one next_ready work item.
+      - Nakama/Pitaya alignment remains explicit without adding direct compatibility.
+      - Ask-first boundaries remain preserved for startup wiring, stream subscriptions, chat, groups, broadcast fanout, persistence, delivery guarantees, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, paid promotion, and direct compatibility.
+    non_goals:
+      - implementing startup wiring or realtime bootstrap handlers
       - adding stream subscriptions, chat semantics, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, or backpressure
       - adding persistence, migrations, dependencies, authentication/session behavior changes, or route-protection changes
       - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility
@@ -8259,8 +8275,9 @@ work_items:
   - id: W-0218
     milestone: M-146
     title: Implement realtime protocol and WebSocket outbound delivery slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+    commits: []
     depends_on:
       - W-0217
     expected_change_id: implement-realtime-protocol-websocket-outbound-delivery-slice
@@ -8282,3 +8299,32 @@ work_items:
       - Implement only the smallest realtime protocol and WebSocket outbound delivery slice authorized by ADR-0125.
       - Preserve application policy, protocol mapping, and transport write ownership boundaries.
       - Verify server-observed connection id and epoch targeting, redacted delivery failures, generated-output traceability, and no direct Nakama/Pitaya API compatibility.
+    completion_summary: Implemented the bounded realtime protocol and WebSocket outbound delivery slice, accepted `ADR-0126`, registered `runtime.realtime_protocol_websocket_outbound_delivery_implementation`, added vibit-native `ServerNotice`, `DomainEventPush`, and `PresenceSignal` payloads with generated output, mapped accepted realtime delivery intents into existing envelopes and encoded frames, registered realtime generated payload types, added WebSocket `DeliverBinaryFrame` with server-observed connection id and epoch targeting, serialized per-socket writes, and opened `M-147/W-0219 Confirm next alpha direction after realtime outbound delivery slice` as next-ready. No startup wiring, realtime bootstrap handler, stream subscription, chat room, group, broadcast fanout, offline inbox, acknowledgement, retry, ordering guarantee, durable offset, backpressure, persistence, migration, dependency, authentication/session behavior change, route-protection change, matchmaking, match runtime, distributed runtime, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0219
+    milestone: M-147
+    title: Confirm next alpha direction after realtime outbound delivery slice
+    status: next_ready
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+    depends_on:
+      - W-0218
+    expected_change_id: confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+    tier: tier_2_planning
+    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0126
+      - ADR-0125
+      - ADR-0124
+      - ADR-0123
+      - ADR-0122
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing startup wiring, realtime bootstrap handlers, stream subscriptions, chat semantics, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure mechanisms, distributed fanout, frontend/backend split, RPC, service discovery, cluster groups, matchmaking, match runtime, persistence, migrations, dependencies, authentication/session behavior changes, route-protection changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product expansion beyond choosing the next direction.
+    completion:
+      - Select the next bounded alpha direction after realtime outbound delivery implementation.
+      - Record the selection in ADR, change spec, conversation log, and manifests.
+      - Preserve startup wiring, stream subscription, chat, group, broadcast fanout, persistence, delivery guarantee, distributed runtime, matchmaking, match runtime, hosted/release, public announcement, paid promotion, blob/S3, and direct compatibility deferrals.

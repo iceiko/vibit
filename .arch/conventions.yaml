@@ -5637,15 +5637,55 @@ realtime_protocol_websocket_outbound_delivery_gate:
   direct_nakama_pitaya_api_compatibility_added: false
 
 realtime_protocol_websocket_outbound_delivery_implementation_slice:
-  status: next_ready
+  status: completed
   milestone: M-146
-  next_ready_work_item: W-0218
+  completed_work_item: W-0218
+  decision: ADR-0126
+  change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+  next_milestone: M-147
+  next_ready_work_item: W-0219
   previous_completed_work_item: W-0217
   selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
   expected_change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
   tier: tier_2_runtime
   target_stage: prototype_ready_foundation
   source_gate_decision: ADR-0125
+  realtime_protocol_websocket_outbound_delivery_implementation_completed: true
+  realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
+  realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation
+  protocol_source_added: proto/vibit/realtime/v1/realtime.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+  protocol_bridge_added: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+  websocket_outbound_delivery_added: runtime/internal/platform/transport/ws/outbound.go
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  protocol_route_added: false
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  acknowledgement_added: false
+  retry_behavior_added: false
+  ordering_guarantee_added: false
+  durable_offset_added: false
+  backpressure_behavior_added: false
+  delivery_guarantees_added: false
+  broad_social_module_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
+  status: next_ready
+  milestone: M-147
+  next_ready_work_item: W-0219
+  previous_completed_work_item: W-0218
+  selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+  expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+  tier: tier_2_planning
+  target_stage: prototype_ready_foundation
+  source_realtime_outbound_delivery_decision: ADR-0126
+  implementation_authorized_by_this_selection: false
+  startup_wiring_added: false
   stream_subscription_persistence_added: false
   offline_inbox_added: false
   acknowledgement_added: false

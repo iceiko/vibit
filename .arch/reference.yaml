@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: realtime_protocol_websocket_outbound_delivery_gate_defined
+  current_state: realtime_protocol_websocket_outbound_delivery_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0218
-  immediate_next_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+  immediate_next_work_item: W-0219
+  immediate_next_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4521,9 +4521,12 @@ phase_plan:
     implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ec_realtime_protocol_websocket_outbound_delivery_implementation_slice:
-    status: next_ready
+    status: completed
     milestone: M-146
-    next_ready_work_item: W-0218
+    completed_work_item: W-0218
+    decision: ADR-0126
+    change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+    next_ready_work_item: W-0219
     previous_completed_work_item: W-0217
     selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
     expected_change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
@@ -4532,6 +4535,26 @@ phase_plan:
       pitaya: The future implementation should preserve application policy, protocol serialization, transport write, session/connection state, and backend intent separation while deferring groups, broadcast fanout, cluster, RPC, and service discovery.
     target_stage: prototype_ready_foundation
     source_gate_decision: ADR-0125
+    check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation
+    protocol_source_added: proto/vibit/realtime/v1/realtime.proto
+    generated_go_output_added: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+    protocol_bridge_added: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+    websocket_outbound_delivery_added: runtime/internal/platform/transport/ws/outbound.go
+    startup_wiring_added: false
+    delivery_guarantees_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ed_next_direction_after_realtime_outbound_delivery_slice:
+    status: next_ready
+    milestone: M-147
+    next_ready_work_item: W-0219
+    previous_completed_work_item: W-0218
+    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+    reference_mapping:
+      nakama: The next selection should choose a bounded alpha direction after client-visible outbound realtime delivery, without jumping directly to broad social, matchmaking, match runtime, or direct compatibility.
+      pitaya: The next selection should preserve acceptor/session/handler/protocol/backend push separation before startup wiring, groups, broadcast fanout, cluster, RPC, or service discovery work.
+    target_stage: prototype_ready_foundation
+    source_realtime_outbound_delivery_decision: ADR-0126
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

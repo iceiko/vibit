@@ -40,6 +40,7 @@ type Server struct {
 
 	nextConnectionID uint64
 	closeHandoff     closeHandoffSocketTable
+	outbound         outboundSocketTable
 }
 
 type ConnectionLifecycleObserver interface {
@@ -88,7 +89,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}()
 	s.registerCloseHandoffSocket(meta, conn)
+	s.registerOutboundSocket(meta, conn)
 	defer s.unregisterCloseHandoffSocket(meta)
+	defer s.unregisterOutboundSocket(meta)
 	_ = s.handleConnection(r.Context(), conn, meta)
 }
 
@@ -98,7 +101,7 @@ type connectionMetadata struct {
 	remoteAddr string
 }
 
-func (s *Server) handleConnection(ctx context.Context, conn *websocket.Conn, meta connectionMetadata) error {
+func (s *Server) handleConnection(ctx context.Context, conn websocketConn, meta connectionMetadata) error {
 	for {
 		messageType, payload, err := conn.Read(ctx)
 		if err != nil {
@@ -120,11 +123,18 @@ func (s *Server) handleConnection(ctx context.Context, conn *websocket.Conn, met
 		}
 
 		for _, response := range responses {
-			if err := conn.Write(ctx, websocket.MessageBinary, response); err != nil {
+			if err := s.writeAcceptedBinaryFrame(ctx, meta, response); err != nil {
 				return err
 			}
 		}
 	}
+}
+
+type websocketConn interface {
+	Read(context.Context) (websocket.MessageType, []byte, error)
+	Write(context.Context, websocket.MessageType, []byte) error
+	Close(websocket.StatusCode, string) error
+	CloseNow() error
 }
 
 func newFrame(meta connectionMetadata, payload []byte) Frame {

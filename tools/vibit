@@ -153,6 +153,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.first_server_push_realtime_messaging_runtime_slice",
   "runtime.next_alpha_direction_after_realtime_runtime_slice",
   "runtime.realtime_protocol_websocket_outbound_delivery_gate",
+  "runtime.realtime_protocol_websocket_outbound_delivery_implementation",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -24236,7 +24237,7 @@ function checkRuntimeReleaseExecutionFinalAuthorization(root, goFiles) {
     [".arch/work-items.yaml", "id: M-124"],
     [".arch/work-items.yaml", "title: First Alpha User Discovery"],
     [".arch/work-items.yaml", "id: W-0196"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root) ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "release_execution_final_authorization: ADR-0103"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
@@ -29709,7 +29710,7 @@ function checkRuntimeNextAlphaDirectionAfterStorageObjectsLocalProof(root, goFil
     [".arch/reference.yaml", "phase_2dx_next_direction_after_storage_objects_local_proof"],
     [".arch/reference.yaml", "phase_2dy_first_server_push_realtime_messaging_gate"],
     [".arch/reference.yaml", "check_rule: runtime.next_alpha_direction_after_storage_objects_local_proof"],
-    [".arch/modules.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0217" : firstServerPushRealtimeMessagingRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0216" : firstServerPushRealtimeMessagingGateCompleted(root) ? "repository_next_work_item: W-0215" : "protocol_route_next_work_item: W-0214"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
@@ -29880,9 +29881,9 @@ function checkRuntimeFirstServerPushRealtimeMessagingGate(root, goFiles) {
     [".arch/contracts.yaml", "first_server_push_realtime_messaging_gate_check_rule: runtime.first_server_push_realtime_messaging_gate"],
     [".arch/reference.yaml", "phase_2dy_first_server_push_realtime_messaging_gate"],
     [".arch/reference.yaml", "check_rule: runtime.first_server_push_realtime_messaging_gate"],
-    [".arch/modules.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0217" : firstServerPushRealtimeMessagingRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0216" : "repository_next_work_item: W-0215"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
     [".arch/modules.yaml", "realtime_messaging_owned_by_storage: false"],
-    ["modules/storage/module.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0217" : firstServerPushRealtimeMessagingRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0216" : "repository_next_work_item: W-0215"],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
     ["modules/storage/module.yaml", "realtime_messaging_owned_by_storage: false"],
     ["modules/storage/AGENTS.md", "outside this module"],
     ["modules/storage/AGENTS.zh-CN.md", "不属于本模块"],
@@ -30003,11 +30004,14 @@ function checkRuntimeFirstServerPushRealtimeMessagingGate(root, goFiles) {
     }
   }
 
+  const implementationCompleted = realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root);
   const forbiddenFiles = [
-    "runtime/internal/platform/transport/ws/outbound.go",
-    "proto/vibit/realtime/v1/realtime.proto",
-    "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
-    "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ...(implementationCompleted ? [] : [
+      "runtime/internal/platform/transport/ws/outbound.go",
+      "proto/vibit/realtime/v1/realtime.proto",
+      "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
+      "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ]),
     "runtime/internal/app/bootstrap/realtime.go",
   ];
   if (!firstServerPushRealtimeMessagingRuntimeSliceCompleted(root)) {
@@ -30125,12 +30129,12 @@ function checkRuntimeFirstServerPushRealtimeMessagingRuntimeSlice(root, goFiles)
     [".arch/reference.yaml", "phase_2dz_first_server_push_realtime_messaging_runtime_slice"],
     [".arch/reference.yaml", "phase_2ea_next_direction_after_realtime_runtime_slice"],
     [".arch/reference.yaml", "check_rule: runtime.first_server_push_realtime_messaging_runtime_slice"],
-    [".arch/modules.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0217" : "repository_next_work_item: W-0216"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
     [".arch/modules.yaml", "realtime_messaging_owned_by_storage: false"],
-    ["modules/storage/module.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "repository_next_work_item: W-0217" : "repository_next_work_item: W-0216"],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
     ["modules/storage/module.yaml", "realtime_messaging_owned_by_storage: false"],
-    ["modules/storage/AGENTS.md", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "W-0218 Implement realtime protocol and WebSocket outbound delivery slice" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "W-0217 Define realtime protocol and WebSocket outbound delivery gate" : "W-0216 Confirm next alpha direction after realtime runtime slice"],
-    ["modules/storage/AGENTS.zh-CN.md", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "W-0218 Implement realtime protocol and WebSocket outbound delivery slice" : nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root) ? "W-0217 Define realtime protocol and WebSocket outbound delivery gate" : "W-0216 Confirm next alpha direction after realtime runtime slice"],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
@@ -30226,11 +30230,14 @@ function checkRuntimeFirstServerPushRealtimeMessagingRuntimeSlice(root, goFiles)
     }
   }
 
+  const implementationCompleted = realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root);
   const forbiddenFiles = [
-    "runtime/internal/platform/transport/ws/outbound.go",
-    "proto/vibit/realtime/v1/realtime.proto",
-    "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
-    "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ...(implementationCompleted ? [] : [
+      "runtime/internal/platform/transport/ws/outbound.go",
+      "proto/vibit/realtime/v1/realtime.proto",
+      "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
+      "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ]),
     "runtime/internal/app/bootstrap/realtime.go",
   ];
   for (const file of forbiddenFiles) {
@@ -30355,14 +30362,14 @@ function checkRuntimeNextAlphaDirectionAfterRealtimeRuntimeSlice(root, goFiles) 
     [".arch/reference.yaml", "phase_2ea_next_direction_after_realtime_runtime_slice"],
     [".arch/reference.yaml", "phase_2eb_realtime_protocol_websocket_outbound_delivery_gate"],
     [".arch/reference.yaml", "check_rule: runtime.next_alpha_direction_after_realtime_runtime_slice"],
-    [".arch/modules.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : "repository_next_work_item: W-0217"],
-    [".arch/modules.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item_scope: realtime_protocol_websocket_outbound_delivery_implementation_slice" : "repository_next_work_item_scope: define_realtime_protocol_websocket_outbound_delivery_gate"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
     [".arch/modules.yaml", "realtime_messaging_owned_by_storage: false"],
-    ["modules/storage/module.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item: W-0218" : "repository_next_work_item: W-0217"],
-    ["modules/storage/module.yaml", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "repository_next_work_item_scope: realtime_protocol_websocket_outbound_delivery_implementation_slice" : "repository_next_work_item_scope: define_realtime_protocol_websocket_outbound_delivery_gate"],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
     ["modules/storage/module.yaml", "realtime_messaging_owned_by_storage: false"],
-    ["modules/storage/AGENTS.md", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "W-0218 Implement realtime protocol and WebSocket outbound delivery slice" : "W-0217 Define realtime protocol and WebSocket outbound delivery gate"],
-    ["modules/storage/AGENTS.zh-CN.md", realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) ? "W-0218 Implement realtime protocol and WebSocket outbound delivery slice" : "W-0217 Define realtime protocol and WebSocket outbound delivery gate"],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
@@ -30438,11 +30445,14 @@ function checkRuntimeNextAlphaDirectionAfterRealtimeRuntimeSlice(root, goFiles) 
     }
   }
 
+  const implementationCompleted = realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root);
   const forbiddenFiles = [
-    "runtime/internal/platform/transport/ws/outbound.go",
-    "proto/vibit/realtime/v1/realtime.proto",
-    "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
-    "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ...(implementationCompleted ? [] : [
+      "runtime/internal/platform/transport/ws/outbound.go",
+      "proto/vibit/realtime/v1/realtime.proto",
+      "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
+      "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ]),
     "runtime/internal/app/bootstrap/realtime.go",
   ];
   for (const file of forbiddenFiles) {
@@ -30571,12 +30581,12 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles
     [".arch/reference.yaml", "phase_2eb_realtime_protocol_websocket_outbound_delivery_gate"],
     [".arch/reference.yaml", "phase_2ec_realtime_protocol_websocket_outbound_delivery_implementation_slice"],
     [".arch/reference.yaml", "check_rule: runtime.realtime_protocol_websocket_outbound_delivery_gate"],
-    [".arch/modules.yaml", "repository_next_work_item: W-0218"],
-    [".arch/modules.yaml", "repository_next_work_item_scope: realtime_protocol_websocket_outbound_delivery_implementation_slice"],
-    ["modules/storage/module.yaml", "repository_next_work_item: W-0218"],
-    ["modules/storage/module.yaml", "repository_next_work_item_scope: realtime_protocol_websocket_outbound_delivery_implementation_slice"],
-    ["modules/storage/AGENTS.md", "W-0218 Implement realtime protocol and WebSocket outbound delivery slice"],
-    ["modules/storage/AGENTS.zh-CN.md", "W-0218 Implement realtime protocol and WebSocket outbound delivery slice"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
     ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
     ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
@@ -30704,11 +30714,14 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles
     }
   }
 
+  const implementationCompleted = realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root);
   const forbiddenFiles = [
-    "runtime/internal/platform/transport/ws/outbound.go",
-    "proto/vibit/realtime/v1/realtime.proto",
-    "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
-    "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ...(implementationCompleted ? [] : [
+      "runtime/internal/platform/transport/ws/outbound.go",
+      "proto/vibit/realtime/v1/realtime.proto",
+      "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
+      "runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+    ]),
     "runtime/internal/app/bootstrap/realtime.go",
   ];
   for (const file of forbiddenFiles) {
@@ -30754,6 +30767,341 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles
   ok("realtime protocol and WebSocket outbound delivery gate defines protocol, generated-output, application policy, transport delivery, verification, W-0218 follow-up, and Nakama/Pitaya-aligned stop conditions without adding runtime behavior, protocol source, generated output, socket writes, persistence, delivery guarantees, distributed runtime, or direct compatibility", {
     rule_id: ruleId,
     artifact: standardPath,
+  });
+}
+
+function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(root, goFiles) {
+  const ruleId = "runtime.realtime_protocol_websocket_outbound_delivery_implementation";
+  const decisionPath = "decisions/ADR-0126-realtime-protocol-websocket-outbound-delivery-implementation.md";
+  const changePath = "changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice";
+  const conversationPath = "conversations/2026-05-23-realtime-protocol-websocket-outbound-delivery-implementation.md";
+  const protoPath = "proto/vibit/realtime/v1/realtime.proto";
+  const generatedPath = "runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go";
+  const bridgePath = "runtime/internal/platform/protocol/protobuf/realtime_bridge.go";
+  const bridgeTestPath = "runtime/internal/platform/protocol/protobuf/realtime_bridge_test.go";
+  const payloadRegistryPath = "runtime/internal/platform/protocol/protobuf/payload_registry.go";
+  const outboundPath = "runtime/internal/platform/transport/ws/outbound.go";
+  const outboundTestPath = "runtime/internal/platform/transport/ws/outbound_test.go";
+  const websocketServerPath = "runtime/internal/platform/transport/ws/server.go";
+  const forbiddenBootstrapPath = "runtime/internal/app/bootstrap/realtime.go";
+
+  if (!realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
+    ok("realtime protocol and WebSocket outbound delivery implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    protoPath,
+    generatedPath,
+    bridgePath,
+    bridgeTestPath,
+    outboundPath,
+    outboundTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for realtime protocol and WebSocket outbound delivery implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for realtime protocol and WebSocket outbound delivery implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-146"],
+    [".arch/work-items.yaml", "title: Realtime Protocol And WebSocket Outbound Delivery Implementation Slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0218"],
+    [".arch/work-items.yaml", "title: Implement realtime protocol and WebSocket outbound delivery slice"],
+    [".arch/work-items.yaml", "ADR-0126"],
+    [".arch/work-items.yaml", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    [".arch/work-items.yaml", "id: M-147"],
+    [".arch/work-items.yaml", "title: Next Direction Confirmation After Realtime Outbound Delivery Slice"],
+    [".arch/work-items.yaml", "id: W-0219"],
+    [".arch/work-items.yaml", "title: Confirm next alpha direction after realtime outbound delivery slice"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation: ADR-0126"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_completed: true"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_protocol_source: proto/vibit/realtime/v1/realtime.proto"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_generated_go: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_bridge: runtime/internal/platform/protocol/protobuf/realtime_bridge.go"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_transport: runtime/internal/platform/transport/ws/outbound.go"],
+    [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_next_work_item: W-0219"],
+    [".arch/conventions.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    [".arch/contracts.yaml", "realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    [".arch/reference.yaml", "phase_2ec_realtime_protocol_websocket_outbound_delivery_implementation_slice"],
+    [".arch/reference.yaml", "phase_2ed_next_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/reference.yaml", "check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    ["AGENTS.zh-CN.md", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    ["runtime/AGENTS.md", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+    ["rules/check-rules.json", "runtime.realtime_protocol_websocket_outbound_delivery_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [protoPath]: [
+      "package vibit.realtime.v1;",
+      "option go_package = \"github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/realtime/v1;realtimev1\";",
+      "message ServerNotice",
+      "message DomainEventPush",
+      "message PresenceSignal",
+      "@source docs/realtime-protocol-websocket-outbound-delivery-gate.md",
+      "@source decisions/ADR-0125-realtime-protocol-websocket-outbound-delivery-gate.md",
+      "@source decisions/ADR-0126-realtime-protocol-websocket-outbound-delivery-implementation.md",
+      "@route realtime.ServerNotice",
+      "@route realtime.DomainEventPush",
+      "@route realtime.PresenceSignal",
+    ],
+    [generatedPath]: [
+      "Code generated by protoc-gen-go. DO NOT EDIT.",
+      "source: vibit/realtime/v1/realtime.proto",
+    ],
+    [payloadRegistryPath]: [
+      "runtime/internal/generated/proto/vibit/realtime/v1",
+    ],
+    [bridgePath]: [
+      "BuildRealtimeDeliveryEnvelope",
+      "BuildRealtimeDeliveryFrame",
+      "MessageIntentServerNotice",
+      "MessageIntentDomainEventPush",
+      "MessageIntentPresenceSignal",
+      "MessageIntentStreamMessage",
+      "ServerNotice",
+      "DomainEventPush",
+      "PresenceSignal",
+      "TargetScopePlayer",
+      "TargetScopeSystem",
+      "realtime stream delivery is not supported",
+    ],
+    [bridgeTestPath]: [
+      "TestBuildRealtimeDeliveryEnvelopeMapsServerNoticeToSystemEnvelope",
+      "TestBuildRealtimeDeliveryFrameMapsDomainEventAndPresenceSignal",
+      "TestBuildRealtimeDeliveryEnvelopeRejectsUnsupportedOrMalformedIntent",
+      "TestRealtimeProtoPayloadShapeOmitsCredentialAndDeliveryGuaranteeFields",
+      "TestRealtimeDeliveryFrameShapeIsTransportNeutral",
+    ],
+    [outboundPath]: [
+      "DeliverBinaryFrame",
+      "OutboundDeliveryOutcomeDelivered",
+      "OutboundDeliveryOutcomeSocketNotFound",
+      "OutboundDeliveryOutcomeEpochMismatch",
+      "OutboundDeliveryOutcomeAlreadyClosed",
+      "OutboundDeliveryOutcomeWriteFailed",
+      "registerOutboundSocket",
+      "writeAcceptedBinaryFrame",
+      "websocket.MessageBinary",
+    ],
+    [outboundTestPath]: [
+      "TestDeliverBinaryFrameWritesToServerObservedConnectionAndEpoch",
+      "TestDeliverBinaryFrameRejectsMissingOrStaleSocketWithoutWriting",
+      "TestDeliverBinaryFrameReturnsAlreadyClosedForClosedEntry",
+      "TestDeliverBinaryFrameReturnsRedactedWriteFailedOutcome",
+      "TestDeliverBinaryFrameSerializesSocketWrites",
+      "TestServerDeliversOutboundFrameToAcceptedSocket",
+      "TestOutboundDeliveryRequestAndResultRemainCredentialNeutral",
+    ],
+    [websocketServerPath]: [
+      "outbound         outboundSocketTable",
+      "s.registerOutboundSocket(meta, conn)",
+      "s.unregisterOutboundSocket(meta)",
+      "s.writeAcceptedBinaryFrame(ctx, meta, response)",
+    ],
+    [decisionPath]: [
+      "ADR-0126",
+      "W-0218",
+      "W-0219",
+      "runtime.realtime_protocol_websocket_outbound_delivery_implementation",
+      "Nakama",
+      "Pitaya",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0218",
+      "completed_milestone: M-146",
+      "previous_completed_work_item: W-0217",
+      "next_milestone: M-147",
+      "next_work_item: W-0219",
+      "next_work_item_status: next_ready",
+      "realtime_protocol_websocket_outbound_delivery_implementation_completed: true",
+      "realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126",
+      "realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation",
+      "protocol_source_added: proto/vibit/realtime/v1/realtime.proto",
+      "generated_go_output_added: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go",
+      "protocol_bridge_added: runtime/internal/platform/protocol/protobuf/realtime_bridge.go",
+      "websocket_outbound_delivery_added: runtime/internal/platform/transport/ws/outbound.go",
+      "stream_message_future_only: true",
+      "application_bootstrap_handler_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "persistence_added: false",
+      "delivery_guarantees_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0218",
+      "W-0219",
+      "Nakama",
+      "Pitaya",
+      "Direct Nakama/Pitaya API compatibility remains deferred",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  if (isFile(root, forbiddenBootstrapPath)) {
+    fail(`${forbiddenBootstrapPath} must remain deferred after realtime outbound delivery implementation`, {
+      rule_id: ruleId,
+      artifact: forbiddenBootstrapPath,
+    });
+  } else {
+    ok(`${forbiddenBootstrapPath} remains deferred after realtime outbound delivery implementation`, {
+      rule_id: ruleId,
+      artifact: forbiddenBootstrapPath,
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/notification|\/v2\/channel|\/v2\/stream/, label: "Nakama realtime REST path" },
+    { pattern: /\bnk\.(?:notification|channel|stream|messages?)_/i, label: "Nakama realtime runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [
+    protoPath,
+    bridgePath,
+    bridgeTestPath,
+    outboundPath,
+    outboundTestPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    conversationPath,
+  ]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenExpansionPatterns = [
+    { pattern: /\bStreamSubscription(?:Repository|Store|Service)?\b|\bSubscribeStream\b|\bstream_subscribers_table\b/i, label: "stream subscription implementation" },
+    { pattern: /\bChatRoom\b|\bChatMessageRoute\b|\bGroupMessage\b|\bBroadcastFanout\b|\bBroadcastRoute\b/i, label: "chat, group, or broadcast fanout implementation" },
+    { pattern: /\bOfflineInbox\b|\bAck(?:Repository|Store|Service)\b|\bAcknowledgement(?:Repository|Store|Service)\b|\bRetryPolicy\b|\bDurableOffset\b|\bBackpressure\b/i, label: "durable delivery guarantee implementation" },
+    { pattern: /\bpostgres\b|\bpgx\b|\bgoose\b|\bmigration\b/i, label: "persistence, migration, or PostgreSQL expansion" },
+    { pattern: /\bRegisterRealtime\b|\bRealtimeRouteHandlers\b|\bbootstrap\.Realtime\b/i, label: "startup or realtime route wiring" },
+  ];
+  for (const file of [protoPath, bridgePath, outboundPath, websocketServerPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    const matches = textMatchesAny(text, forbiddenExpansionPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids deferred realtime expansion implementation markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds deferred realtime expansion marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenImportsByFile = {
+    [bridgePath]: [
+      "github.com/coder/websocket",
+      "github.com/jackc/pgx",
+      "github.com/pressly/goose",
+      "github.com/aws/",
+      "github.com/minio/",
+    ],
+    [outboundPath]: [
+      "github.com/jackc/pgx",
+      "github.com/pressly/goose",
+      "github.com/aws/",
+      "github.com/minio/",
+    ],
+  };
+  for (const [file, forbiddenImports] of Object.entries(forbiddenImportsByFile)) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const imports = parseGoImports(readText(path.join(root, file)));
+    for (const importPath of imports) {
+      if (forbiddenImports.some((prefix) => importPath.startsWith(prefix))) {
+        fail(`${file} imports forbidden realtime outbound dependency ${importPath}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("realtime protocol and WebSocket outbound delivery implementation is bounded to vibit-native realtime Protobuf payloads, generated output, protocol mapping, single-process server-observed WebSocket delivery, redacted outcomes, and Nakama/Pitaya-aligned layering without startup wiring, persistence, delivery guarantees, broad social behavior, distributed runtime, or direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
   });
 }
 
@@ -32490,6 +32838,52 @@ function realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root) {
   return workItemHasStatus(root, "W-0217", "completed");
 }
 
+function realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0218", "completed");
+}
+
+function expectedRepositoryNextWorkItem(root) {
+  if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0219";
+  }
+  if (realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root)) {
+    return "repository_next_work_item: W-0218";
+  }
+  if (nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root)) {
+    return "repository_next_work_item: W-0217";
+  }
+  if (firstServerPushRealtimeMessagingRuntimeSliceCompleted(root)) {
+    return "repository_next_work_item: W-0216";
+  }
+  if (firstServerPushRealtimeMessagingGateCompleted(root)) {
+    return "repository_next_work_item: W-0215";
+  }
+  return "protocol_route_next_work_item: W-0214";
+}
+
+function expectedRepositoryNextWorkItemScope(root) {
+  if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice";
+  }
+  if (realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root)) {
+    return "repository_next_work_item_scope: realtime_protocol_websocket_outbound_delivery_implementation_slice";
+  }
+  return "repository_next_work_item_scope: define_realtime_protocol_websocket_outbound_delivery_gate";
+}
+
+function expectedStorageGuideNextWorkItemTitle(root) {
+  if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
+    return "W-0219 Confirm next alpha direction after realtime outbound delivery slice";
+  }
+  if (realtimeProtocolWebsocketOutboundDeliveryGateCompleted(root)) {
+    return "W-0218 Implement realtime protocol and WebSocket outbound delivery slice";
+  }
+  if (nextAlphaDirectionAfterRealtimeRuntimeSliceCompleted(root)) {
+    return "W-0217 Define realtime protocol and WebSocket outbound delivery gate";
+  }
+  return "W-0216 Confirm next alpha direction after realtime runtime slice";
+}
+
 function isStorageObjectsProtocolRouteImplementationFile(root, file) {
   if (!storageObjectsProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -32512,6 +32906,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0218", "next_ready_work_item: W-0219"],
     ["W-0217", "next_ready_work_item: W-0218"],
     ["W-0216", "next_ready_work_item: W-0217"],
     ["W-0215", "next_ready_work_item: W-0216"],
@@ -32558,6 +32953,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0218", "completed")) {
+    return "next_work_item: W-0219";
+  }
   if (workItemHasStatus(root, "W-0217", "completed")) {
     return "next_work_item: W-0218";
   }
@@ -32641,6 +33039,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0218", "confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "realtime_protocol_websocket_outbound_delivery_implementation_slice"],
     ["W-0216", "define_realtime_protocol_websocket_outbound_delivery_gate"],
     ["W-0215", "confirm_next_alpha_direction_after_realtime_runtime_slice"],
@@ -32687,6 +33086,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0218", "W-0219 Confirm next alpha direction after realtime outbound delivery slice"],
     ["W-0217", "W-0218 Implement realtime protocol and WebSocket outbound delivery slice"],
     ["W-0216", "W-0217 Define realtime protocol and WebSocket outbound delivery gate"],
     ["W-0215", "W-0216 Confirm next alpha direction after realtime runtime slice"],
@@ -32734,6 +33134,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0218", "current_phase: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "current_phase: realtime_protocol_websocket_outbound_delivery_implementation_slice"],
     ["W-0216", "current_phase: realtime_protocol_websocket_outbound_delivery_gate"],
     ["W-0215", "current_phase: confirm_next_alpha_direction_after_realtime_runtime_slice"],
@@ -33329,6 +33730,7 @@ function checkRuntime(root) {
   checkRuntimeFirstServerPushRealtimeMessagingRuntimeSlice(root, goFiles);
   checkRuntimeNextAlphaDirectionAfterRealtimeRuntimeSlice(root, goFiles);
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles);
+  checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package vibit.realtime.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/realtime/v1;realtimev1";
+
+// @source docs/realtime-protocol-websocket-outbound-delivery-gate.md
+// @source decisions/ADR-0125-realtime-protocol-websocket-outbound-delivery-gate.md
+// @source decisions/ADR-0126-realtime-protocol-websocket-outbound-delivery-implementation.md
+// @source proto/vibit/realtime/v1/realtime.proto
+// @route realtime.ServerNotice
+// @route realtime.DomainEventPush
+// @route realtime.PresenceSignal
+
+message ServerNotice {
+  string message_id = 1;
+  string payload_type = 2;
+  bytes payload = 3;
+  string accepted_at = 4;
+}
+
+message DomainEventPush {
+  string message_id = 1;
+  string source_payload_type = 2;
+  bytes payload = 3;
+  string accepted_at = 4;
+}
+
+message PresenceSignal {
+  string message_id = 1;
+  string source_payload_type = 2;
+  bytes payload = 3;
+  string accepted_at = 4;
+}

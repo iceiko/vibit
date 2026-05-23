@@ -170,7 +170,7 @@ first_server_push_realtime_messaging_gate_decision: ADR-0122
 first_server_push_realtime_messaging_runtime_slice: runtime/internal/app/realtime/service.go
 first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
 next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
-next_work_item: W-0218 Implement realtime protocol and WebSocket outbound delivery slice
+next_work_item: W-0219 Confirm next alpha direction after realtime outbound delivery slice
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -192,7 +192,8 @@ next_work_item: W-0218 Implement realtime protocol and WebSocket outbound delive
 - 定义第一版 server push and realtime messaging gate。已由 `W-0214` 完成。
 - 实现第一版 server push and realtime messaging runtime slice。已由 `W-0215` 完成。
 - 确认 realtime runtime slice 后的下一项 alpha direction。已由 `W-0216` 完成。
-- 实现 realtime protocol and WebSocket outbound delivery slice。Next。
+- 实现 realtime protocol and WebSocket outbound delivery slice。已由 `W-0218` 完成。
+- 确认 realtime outbound delivery 后的下一项 alpha direction。Next。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。
 

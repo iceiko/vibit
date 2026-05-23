@@ -1,0 +1,142 @@
+schema_version: 0.1
+change_id: implement-realtime-protocol-websocket-outbound-delivery-slice
+date: 2026-05-23
+type: feature
+status: verified
+
+summary: Implement the smallest realtime protocol payload and WebSocket outbound delivery slice authorized by ADR-0125 without startup wiring, persistence, delivery guarantees, stream subscriptions, chat, groups, broadcast fanout, distributed runtime, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0126
+  referenced:
+    - ADR-0125
+    - ADR-0124
+    - ADR-0123
+    - ADR-0122
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
+next_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+
+runtime:
+  completed_work_item: W-0218
+  completed_milestone: M-146
+  previous_completed_work_item: W-0217
+  next_milestone: M-147
+  next_work_item: W-0219
+  next_work_item_status: next_ready
+  tier: tier_2_runtime
+  gate_density_strategy: ADR-0082
+  source_gate_decision: ADR-0125
+  source_gate_standard: docs/realtime-protocol-websocket-outbound-delivery-gate.md
+  implementation_authorized_by_gate: true
+  realtime_protocol_websocket_outbound_delivery_implementation_completed: true
+  realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
+  realtime_protocol_websocket_outbound_delivery_implementation_check_rule: runtime.realtime_protocol_websocket_outbound_delivery_implementation
+  runtime_intent_owner: runtime/internal/app/realtime
+  connection_registry_owner: runtime/internal/app/connection
+  protocol_adapter_owner: runtime/internal/platform/protocol/protobuf
+  websocket_transport_owner: runtime/internal/platform/transport/ws
+  protocol_source_added: proto/vibit/realtime/v1/realtime.proto
+  generated_go_output_added: runtime/internal/generated/proto/vibit/realtime/v1/realtime.pb.go
+  protocol_bridge_added: runtime/internal/platform/protocol/protobuf/realtime_bridge.go
+  protocol_bridge_tests_added: runtime/internal/platform/protocol/protobuf/realtime_bridge_test.go
+  websocket_outbound_delivery_added: runtime/internal/platform/transport/ws/outbound.go
+  websocket_outbound_delivery_tests_added: runtime/internal/platform/transport/ws/outbound_test.go
+  payload_registry_updated: runtime/internal/platform/protocol/protobuf/payload_registry.go
+  websocket_server_updated: runtime/internal/platform/transport/ws/server.go
+  first_protocol_delivery_model: single_process_server_observed_connection_delivery
+  envelope_changed: false
+  first_payloads:
+    - ServerNotice
+    - DomainEventPush
+    - PresenceSignal
+  server_notice_route: realtime.ServerNotice
+  domain_event_push_route: realtime.DomainEventPush
+  presence_signal_route: realtime.PresenceSignal
+  stream_message_future_only: true
+  application_policy_owner_required: true
+  protocol_adapter_payload_mapping_only: true
+  websocket_transport_payload_policy_neutral: true
+  websocket_transport_credential_neutral: true
+  server_observed_connection_id_required: true
+  server_observed_connection_epoch_required: true
+  client_connection_id_authority_allowed: false
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  protocol_route_added: false
+  client_publish_route_added: false
+  persistence_added: false
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  acknowledgement_added: false
+  ordering_guarantee_added: false
+  retry_behavior_added: false
+  backpressure_behavior_added: false
+  durable_offset_added: false
+  delivery_guarantees_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_alignment:
+  nakama_reference_mapping: implement_small_vibit_native_client_visible_outbound_realtime_protocol_and_socket_delivery_foundation_for_notification_stream_chat_and_presence_adjacent_capability_pressure_without_direct_api_compatibility
+  pitaya_reference_mapping: preserve_application_policy_protocol_serialization_transport_write_connection_state_and_backend_intent_separation_while_deferring_groups_broadcast_cluster_rpc_and_service_discovery
+  direct_compatibility: deferred
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: true
+  generated_outputs_changed: true
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - buf generate
+    - cd runtime && go test ./internal/platform/protocol/protobuf ./internal/platform/transport/ws ./internal/app/realtime
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.realtime_protocol_websocket_outbound_delivery_implementation
+    - node tools/vibit check generated --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check change implement-realtime-protocol-websocket-outbound-delivery-slice --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
