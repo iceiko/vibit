@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-140
+current_milestone: M-141
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: storage_objects_protocol_route_implementation_completed
+    current_release_state: storage_objects_protocol_route_local_proof_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0212
+    next_ready_work_item: W-0213
     preferred_after_current:
-      - storage_objects_protocol_route_local_proof
+      - confirm_next_alpha_direction_after_storage_objects_local_proof
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2695,7 +2695,7 @@ milestones:
 
   - id: M-140
     title: Storage Objects Protocol Route Local Proof
-    status: active
+    status: completed
     goal: Prove the completed storage objects protocol route in the local alpha request flow without broadening route semantics, changing protocol shape, changing authentication/session behavior, or adding direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The local alpha request flow can demonstrate authenticated own-player storage object put/get/list/delete behavior through the existing WebSocket/Protobuf path.
@@ -2715,6 +2715,29 @@ milestones:
       - adding JSON patch or merge semantics
       - adding TTL or script hooks
       - adding broad operations/admin behavior
+      - adding hosted deployments or demos
+      - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
+      - executing public announcements beyond the GitHub release record
+      - running paid promotion
+      - adding large object/blob storage or S3-compatible object storage
+      - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Proved the completed own-player storage object protocol route family in the local alpha WebSocket/Protobuf request flow. Added `TestStorageObjectsProtocolRouteLocalAlphaFlow`, extended the authenticated gameplay E2E fixture with test-only storage route registration and a test-only in-memory storage repository, updated `examples/local-alpha-request-loop.sh` to run both the existing authenticated gameplay proof and the storage objects proof, documented the request/response proof path and redaction expectations in `examples/README.md` and `examples/README.zh-CN.md`, accepted `ADR-0120`, and registered `runtime.storage_objects_protocol_route_local_proof`. The proof demonstrates authenticated `storage.PutOwnStorageObject`, `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, and `storage.DeleteOwnStorageObject` over the existing request-token protected WebSocket/Protobuf flow while preserving protocol shape, storage service behavior, repository interface, PostgreSQL adapter, migrations, dependencies, authentication/session behavior, hosted deployment, release artifact, public announcement, paid promotion, public ACL, cross-owner access, admin search, group/guild/party/room/match scopes, batch write, JSON patch, merge, TTL, script hook, large object/blob storage, S3-compatible storage, production memory storage, and direct Nakama/Pitaya API compatibility deferrals.
+
+  - id: M-141
+    title: Next Direction Confirmation After Storage Objects Local Proof
+    status: active
+    goal: Confirm the next bounded alpha direction after proving storage objects in the local request flow, preserving Nakama/Pitaya alignment and avoiding broad product module expansion without explicit selection.
+    completion_criteria:
+      - The next direction after storage objects local proof is selected and recorded with Nakama/Pitaya reference alignment.
+      - The selection identifies one bounded follow-up work item and preserves current protocol, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, and direct compatibility deferrals unless separately authorized.
+    non_goals:
+      - implementing the selected direction
+      - adding protocol messages or routes
+      - changing storage object service behavior
+      - changing repository interfaces or PostgreSQL adapters
+      - changing migrations
+      - adding dependencies
+      - changing authentication/session behavior
       - adding hosted deployments or demos
       - creating release binaries, packages, containers, checksums, provenance, signing artifacts, install scripts, registry publications, or SDK packages
       - executing public announcements beyond the GitHub release record
@@ -7971,7 +7994,7 @@ work_items:
   - id: W-0212
     milestone: M-140
     title: Prove storage objects protocol route in local alpha request flow
-    status: next_ready
+    status: completed
     change: changes/2026-05-22-prove-storage-objects-protocol-route-local-flow
     depends_on:
       - W-0211
@@ -8000,3 +8023,28 @@ work_items:
       - Add a narrow local proof for the completed storage objects protocol route family using the existing WebSocket/Protobuf request flow.
       - Record exact prerequisites, commands, expected request/response shape, redaction expectations, and Nakama/Pitaya alignment notes for own-player storage object put/get/list/delete.
       - Preserve protocol shape, storage service behavior, repository/adapter/migration/dependency/authentication/session/direct-compatibility deferrals, and avoid broad product module expansion.
+    completion_summary: Added a local alpha proof for own-player storage object put/get/list/delete using the existing WebSocket/Protobuf `FrameHandler` path. `TestStorageObjectsProtocolRouteLocalAlphaFlow` performs local onboarding, device credential login, first-message connection binding, authenticated `storage.PutOwnStorageObject`, `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.DeleteOwnStorageObject`, and post-delete not-found verification through the existing authenticated request wrapper. The proof uses a test-only storage repository inside `_test.go`, updates `examples/local-alpha-request-loop.sh` to run both focused E2E proofs, documents prerequisites/request-flow/redaction/Nakama/Pitaya alignment in examples docs, accepts `ADR-0120`, and registers `runtime.storage_objects_protocol_route_local_proof`. No protocol messages, routes, generated output, storage service behavior, repository interface, PostgreSQL adapter, migration, dependency, authentication/session behavior, hosted deployment, release artifact, public announcement, paid promotion, broad product module, blob/S3 storage, production memory storage, public ACL, cross-owner access, admin search, group/guild/party/room/match scope, batch write, JSON patch, merge, TTL, script hook, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0213
+    milestone: M-141
+    title: Confirm next alpha direction after storage objects local proof
+    status: next_ready
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-storage-objects-local-proof
+    depends_on:
+      - W-0212
+    expected_change_id: confirm-next-alpha-direction-after-storage-objects-local-proof
+    tier: tier_2_planning
+    selected_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0120
+      - ADR-0119
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing a new module or runtime subsystem, adding protocol messages or routes, changing storage object service behavior, changing repository interfaces or PostgreSQL adapters, adding migrations, adding dependencies, changing authentication/session behavior, adding hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product expansion beyond confirming the next alpha direction.
+    completion:
+      - Select exactly one next bounded alpha direction after storage objects local proof.
+      - Record Nakama/Pitaya reference alignment and why the selected direction is product-useful.
+      - Preserve current implementation, protocol, storage, authentication/session, dependency, migration, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, and direct compatibility deferrals.

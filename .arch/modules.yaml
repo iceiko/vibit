@@ -82,7 +82,7 @@ modules:
       runtime_behavior_gate_decision: ADR-0116
       runtime_behavior_implementation_decision: ADR-0117
       protocol_route_gate_decision: ADR-0118
-      status: repository_interface_postgresql_adapter_runtime_behavior_and_protocol_route_gate_completed_route_implementation_deferred
+      status: repository_interface_postgresql_adapter_runtime_behavior_protocol_route_implementation_and_local_proof_completed
       runtime_repository_interface: runtime/internal/modules/storage/repository.go
       runtime_repository_tests: runtime/internal/modules/storage/repository_test.go
       postgres_adapter_owner: runtime/internal/platform/persistence/postgres
@@ -95,11 +95,17 @@ modules:
       protocol_route_gate_translation: docs/storage-objects-protocol-route-gate.zh-CN.md
       protocol_route_implementation_decision: ADR-0119
       protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
+      protocol_route_local_proof_decision: ADR-0120
+      protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof
+      storage_objects_protocol_route_local_proof_completed: true
+      storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof
       protocol_source: proto/vibit/storage/v1/storage.proto
       generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
       protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
       application_handler: runtime/internal/app/bootstrap/storage.go
-      protocol_route_next_work_item: W-0212
+      protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+      protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
+      protocol_route_next_work_item: W-0213
     owns:
       - player_owned_small_json_storage_objects
       - storage_object_repository_interface_vocabulary

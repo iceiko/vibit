@@ -1268,6 +1268,14 @@
       "agent_guidance": "Read ADR-0118, ADR-0119, docs/storage-objects-protocol-route-gate.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing storage object protocol routes. W-0211 may add proto/vibit/storage/v1/storage.proto, generated Go protobuf output from buf, runtime/internal/platform/protocol/protobuf/storage_bridge.go, runtime/internal/app/bootstrap/storage.go, runtime/internal/app/storage/routes.go, startup registration, and focused tests for storage.GetOwnStorageObject, storage.ListOwnStorageObjects, storage.PutOwnStorageObject, and storage.DeleteOwnStorageObject. Do not add public ACLs, cross-owner access, admin search, group/guild/party/room/match scopes, batch writes, JSON patch, merge semantics, TTL, script hooks, large object/blob storage, S3-compatible storage, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, authentication/session behavior changes, hosted deployments, release artifacts, paid promotion, public announcements beyond the GitHub release record, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.storage_objects_protocol_route_local_proof",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Storage objects protocol route local proof",
+      "description": "The storage objects protocol route local proof must prove the completed own-player storage object put/get/list/delete route family through the local alpha WebSocket/Protobuf request flow using test-only storage support, script/readme updates, and metadata while preserving protocol shape, generated output, application service behavior, repository/adapter/migration/dependency/authentication/session behavior, production memory storage behavior, hosted/release surfaces, and direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0120, ADR-0119, docs/storage-objects-protocol-route-gate.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing the local storage route proof. W-0212 may add only focused local proof tests, local-alpha script/readme updates, and metadata. Do not add protocol messages/routes, generated output, storage service behavior, repository/adapter/migration/dependency/auth/session changes, production memory storage behavior, broad storage features, release/deployment artifacts, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

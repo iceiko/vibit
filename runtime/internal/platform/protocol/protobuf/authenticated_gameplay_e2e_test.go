@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"sort"
 	"strings"
 	"sync"
 	"testing"
@@ -16,13 +17,16 @@ import (
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	sessionmodule "github.com/iceiko/vibit/runtime/internal/app/session"
+	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
 	presencev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
+	storagev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1"
 	authenticationmodule "github.com/iceiko/vibit/runtime/internal/modules/authentication"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	playermodule "github.com/iceiko/vibit/runtime/internal/modules/player"
+	storagemodule "github.com/iceiko/vibit/runtime/internal/modules/storage"
 	"github.com/iceiko/vibit/runtime/internal/platform/tx"
 	"google.golang.org/protobuf/proto"
 )
@@ -224,6 +228,127 @@ func TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPres
 	assertNoFrameErrorSecretLeak(t, afterLogout, accessToken, onboarding.DeviceCredential)
 }
 
+func TestStorageObjectsProtocolRouteLocalAlphaFlow(t *testing.T) {
+	ctx := context.Background()
+	fixture := newAuthenticatedGameplayE2EFixture(t)
+	player := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-storage-e2e-1", "client-storage-e2e-1")
+	session := app.Session{
+		ConnectionID:    player.connectionID,
+		SessionID:       player.sessionID,
+		PlayerID:        player.playerID,
+		ConnectionEpoch: 1,
+	}
+	target := app.Target{Scope: app.TargetScopePlayer, ID: player.playerID}
+	valueJSON := `{"checkpoint":"gate","level":4}`
+
+	putEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appstorage.PutOwnStorageObjectRoute(),
+		requestID:       "storage-put-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &storagev1.PutOwnStorageObjectRequest{
+			Collection: "progress",
+			Key:        "tutorial",
+			ValueJson:  valueJSON,
+		},
+	})
+	put := mustDecodePayloadAs[*storagev1.PutOwnStorageObjectResponse](t, putEnvelope)
+	if put.GetVersion() != int64(storagemodule.InitialStorageObjectVersion) ||
+		put.GetObject().GetCollection() != "progress" ||
+		put.GetObject().GetKey() != "tutorial" ||
+		put.GetObject().GetValueJson() != valueJSON ||
+		put.GetObject().GetVersion() != int64(storagemodule.InitialStorageObjectVersion) {
+		t.Fatalf("PutOwnStorageObject response = %#v, want stored progress/tutorial object", put)
+	}
+
+	getEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appstorage.GetOwnStorageObjectRoute(),
+		requestID:       "storage-get-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &storagev1.GetOwnStorageObjectRequest{
+			Collection: "progress",
+			Key:        "tutorial",
+		},
+	})
+	get := mustDecodePayloadAs[*storagev1.GetOwnStorageObjectResponse](t, getEnvelope)
+	if get.GetObject().GetCollection() != "progress" ||
+		get.GetObject().GetKey() != "tutorial" ||
+		get.GetObject().GetValueJson() != valueJSON ||
+		get.GetObject().GetVersion() != put.GetVersion() {
+		t.Fatalf("GetOwnStorageObject response = %#v, want stored object", get)
+	}
+
+	listEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appstorage.ListOwnStorageObjectsRoute(),
+		requestID:       "storage-list-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &storagev1.ListOwnStorageObjectsRequest{
+			Collection: "progress",
+			Limit:      10,
+		},
+	})
+	list := mustDecodePayloadAs[*storagev1.ListOwnStorageObjectsResponse](t, listEnvelope)
+	if len(list.GetObjects()) != 1 ||
+		list.GetObjects()[0].GetCollection() != "progress" ||
+		list.GetObjects()[0].GetKey() != "tutorial" ||
+		list.GetObjects()[0].GetValueJson() != valueJSON ||
+		list.GetNextKey() != "" {
+		t.Fatalf("ListOwnStorageObjects response = %#v, want one progress object and no next key", list)
+	}
+
+	expectedVersion := put.GetVersion()
+	deleteEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appstorage.DeleteOwnStorageObjectRoute(),
+		requestID:       "storage-delete-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &storagev1.DeleteOwnStorageObjectRequest{
+			Collection:      "progress",
+			Key:             "tutorial",
+			ExpectedVersion: &expectedVersion,
+		},
+	})
+	deleted := mustDecodePayloadAs[*storagev1.DeleteOwnStorageObjectResponse](t, deleteEnvelope)
+	if !deleted.GetDeleted() || deleted.GetVersion() != expectedVersion+1 {
+		t.Fatalf("DeleteOwnStorageObject response = %#v, want deleted version %d", deleted, expectedVersion+1)
+	}
+
+	afterDelete := fixture.handleFrame(t, &frameStep{
+		route:           appstorage.GetOwnStorageObjectRoute(),
+		requestID:       "storage-get-after-delete-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &storagev1.GetOwnStorageObjectRequest{
+			Collection: "progress",
+			Key:        "tutorial",
+		},
+	})
+	assertErrorEnvelope(t, afterDelete, app.ErrorCode(appstorage.PublicErrorStorageObjectNotFound))
+	assertNoFrameErrorSecretLeak(t, afterDelete, player.accessToken, player.deviceCredential, valueJSON)
+}
+
 type authenticatedGameplayE2EFixture struct {
 	clock                    e2eClock
 	service                  appauth.Service
@@ -240,10 +365,12 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	authenticationRepository := newE2EAuthenticationRepository()
 	playerRepository := newE2EPlayerRepository()
 	sessionRepository := newE2ESessionRepository()
+	storageRepository := newE2EStorageRepository(clock)
 	runner := e2eUnitOfWorkRunner{unit: &e2eUnitOfWork{
 		authenticationRepository: authenticationRepository,
 		playerRepository:         playerRepository,
 		sessionRepository:        sessionRepository,
+		storageRepository:        storageRepository,
 	}}
 	service, err := appauth.NewService(appauth.ServiceDependencies{
 		UnitOfWorkRunner:              runner,
@@ -281,6 +408,17 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	connectionRegistry := appconnection.NewInMemoryRegistry(clock)
 	if err := (apppresence.Handlers{Registry: connectionRegistry}).RegisterRoutes(dispatcher); err != nil {
 		t.Fatalf("Register presence routes error = %v, want nil", err)
+	}
+
+	storageService, err := appstorage.NewService(appstorage.ServiceDependencies{
+		UnitOfWorkRunner:  runner,
+		ObjectIDGenerator: e2eStorageObjectIDGenerator{},
+	})
+	if err != nil {
+		t.Fatalf("storage NewService() error = %v, want nil", err)
+	}
+	if err := (bootstrap.StorageRouteHandlers{Service: storageService}).RegisterRoutes(dispatcher); err != nil {
+		t.Fatalf("Register storage routes error = %v, want nil", err)
 	}
 
 	routeValidator := appauth.NewRouteAccessTokenValidator(service)
@@ -369,6 +507,82 @@ func mustDecodePayloadAs[T proto.Message](t *testing.T, envelope *protocolv1.Env
 	return typed
 }
 
+type e2eAuthenticatedPlayer struct {
+	playerID         string
+	sessionID        string
+	connectionID     string
+	accessToken      string
+	deviceCredential string
+}
+
+func (f authenticatedGameplayE2EFixture) authenticateAndBindLocalPlayer(t *testing.T, ctx context.Context, connectionID string, clientInstanceID string) e2eAuthenticatedPlayer {
+	t.Helper()
+
+	onboarding, err := f.service.OnboardLocalPlayerWithDeviceCredential(ctx, appauth.LocalOnboardingDeviceCredentialIssuanceRequest{
+		DisplayName: "Storage Alpha Player",
+		RequestedBy: "local-storage-e2e-test",
+	})
+	if err != nil {
+		t.Fatalf("OnboardLocalPlayerWithDeviceCredential() error = %v, want nil", err)
+	}
+
+	loginEnvelope := f.handleFrame(t, &frameStep{
+		route:           app.AuthenticateWithDeviceCredentialRoute(),
+		requestID:       "storage-login-1",
+		target:          app.Target{Scope: app.TargetScopePlayer, ID: onboarding.PlayerID},
+		session:         app.Session{ConnectionID: connectionID, ConnectionEpoch: 1},
+		connectionID:    connectionID,
+		connectionEpoch: 1,
+		payload: &authenticationv1.AuthenticateWithDeviceCredentialRequest{
+			CredentialProof:       onboarding.DeviceCredential,
+			RequestedPlayerId:     onboarding.PlayerID,
+			ClientInstanceId:      clientInstanceID,
+			AccountCreationIntent: authenticationv1.AccountCreationIntent_ACCOUNT_CREATION_INTENT_AUTHENTICATE_EXISTING_ONLY,
+		},
+	})
+	login := mustDecodePayloadAs[*authenticationv1.AuthenticateWithDeviceCredentialResponse](t, loginEnvelope)
+	if login.GetAuthenticationStatus() != string(appauth.AuthenticationStatusAuthenticated) ||
+		login.GetPlayerId() != onboarding.PlayerID ||
+		login.GetAccessToken() == "" {
+		t.Fatalf("storage login response = %#v, want authenticated player", login)
+	}
+
+	if _, err := f.connectionRegistry.RegisterOpenConnection(ctx, appconnection.OpenConnection{
+		ConnectionID:    appconnection.ConnectionID(connectionID),
+		ConnectionEpoch: 1,
+		OpenedAt:        f.clock.Now().Add(time.Second),
+	}); err != nil {
+		t.Fatalf("RegisterOpenConnection() error = %v, want nil", err)
+	}
+	bindEnvelope := f.handleFrame(t, &frameStep{
+		route:           app.BindConnectionRoute(),
+		requestID:       "storage-bind-1",
+		target:          app.Target{Scope: app.TargetScopeSystem, ID: "runtime"},
+		session:         app.Session{ConnectionID: connectionID, SessionID: loginEnvelope.GetSession().GetSessionId(), PlayerID: onboarding.PlayerID, ConnectionEpoch: 1},
+		connectionID:    connectionID,
+		connectionEpoch: 1,
+		payload: &authenticationv1.BindConnectionRequest{
+			AccessToken:      login.GetAccessToken(),
+			ClientInstanceId: clientInstanceID,
+		},
+	})
+	binding := mustDecodePayloadAs[*authenticationv1.BindConnectionResponse](t, bindEnvelope)
+	if binding.GetBindingStatus() != authenticationv1.ConnectionBindingStatus_CONNECTION_BINDING_STATUS_BOUND ||
+		binding.GetPlayerId() != onboarding.PlayerID ||
+		binding.GetConnectionId() != connectionID ||
+		binding.GetConnectionEpoch() != 1 {
+		t.Fatalf("storage BindConnection response = %#v, want bound storage proof connection", binding)
+	}
+
+	return e2eAuthenticatedPlayer{
+		playerID:         onboarding.PlayerID,
+		sessionID:        loginEnvelope.GetSession().GetSessionId(),
+		connectionID:     connectionID,
+		accessToken:      login.GetAccessToken(),
+		deviceCredential: onboarding.DeviceCredential,
+	}
+}
+
 func mustE2EVerifierKeySet(t *testing.T) appauth.VerifierKeySet {
 	t.Helper()
 	keySet, err := appauth.NewVerifierKeySet(appauth.VerifierKeySetConfig{
@@ -451,6 +665,7 @@ type e2eUnitOfWork struct {
 	authenticationRepository authenticationmodule.Repository
 	playerRepository         playermodule.Repository
 	sessionRepository        sessionmodule.Repository
+	storageRepository        storagemodule.Repository
 }
 
 func (u *e2eUnitOfWork) Context() context.Context {
@@ -476,6 +691,13 @@ func (u *e2eUnitOfWork) NewSessionRepository() (sessionmodule.Repository, error)
 		return nil, errors.New("e2e: session repository unavailable")
 	}
 	return u.sessionRepository, nil
+}
+
+func (u *e2eUnitOfWork) NewStorageObjectRepository() (storagemodule.Repository, error) {
+	if u == nil || u.storageRepository == nil {
+		return nil, errors.New("e2e: storage repository unavailable")
+	}
+	return u.storageRepository, nil
 }
 
 type e2eAuthenticationRepository struct {
@@ -739,6 +961,202 @@ func (r *e2eSessionRepository) ListActiveSessionsForPlayer(context.Context, sess
 	return nil, errors.New("e2e: unexpected active session list")
 }
 
+type e2eStorageObjectIDGenerator struct{}
+
+func (e2eStorageObjectIDGenerator) GenerateStorageObjectID(context.Context) (string, error) {
+	return "storage-object-e2e-1", nil
+}
+
+type e2eStorageRepository struct {
+	mu      sync.Mutex
+	clock   e2eClock
+	objects map[e2eStorageObjectKey]storagemodule.StorageObject
+}
+
+type e2eStorageObjectKey struct {
+	ownerKind  storagemodule.OwnerKind
+	ownerID    string
+	collection string
+	key        string
+}
+
+func newE2EStorageRepository(clock e2eClock) *e2eStorageRepository {
+	return &e2eStorageRepository{
+		clock:   clock,
+		objects: make(map[e2eStorageObjectKey]storagemodule.StorageObject),
+	}
+}
+
+func (r *e2eStorageRepository) CreateStorageObject(_ context.Context, input storagemodule.CreateStorageObjectInput) (storagemodule.StorageObject, error) {
+	normalized, err := storagemodule.NormalizeCreateStorageObjectInput(input)
+	if err != nil {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("create", storagemodule.StorageObjectConflictInvalidExpectedVersion, 0, 0)
+	}
+	key := e2eStorageKey(normalized.Owner, normalized.Identity)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.objects[key]; ok {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("create", storagemodule.StorageObjectConflictAlreadyExists, 0, 0)
+	}
+	record := storagemodule.StorageObject{
+		ObjectID:  normalized.ObjectID,
+		Owner:     normalized.Owner,
+		Identity:  normalized.Identity,
+		Value:     normalized.Value,
+		Version:   normalized.InitialVersion,
+		Status:    storagemodule.StorageObjectStatusActive,
+		CreatedAt: r.clock.Now(),
+		UpdatedAt: r.clock.Now(),
+	}
+	record, err = storagemodule.NormalizeStorageObjectRecord(record)
+	if err != nil {
+		return storagemodule.StorageObject{}, err
+	}
+	r.objects[key] = cloneStorageObjectForE2E(record)
+	return cloneStorageObjectForE2E(record), nil
+}
+
+func (r *e2eStorageRepository) GetStorageObject(_ context.Context, input storagemodule.GetStorageObjectInput) (storagemodule.StorageObject, error) {
+	normalized, err := storagemodule.NormalizeGetStorageObjectInput(input)
+	if err != nil {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("get", storagemodule.StorageObjectConflictOwnerScopeMismatch, 0, 0)
+	}
+	key := e2eStorageKey(normalized.Owner, normalized.Identity)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	record, ok := r.objects[key]
+	if !ok {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("get", storagemodule.StorageObjectConflictNotFound, 0, 0)
+	}
+	if record.Status != storagemodule.StorageObjectStatusActive {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("get", storagemodule.StorageObjectConflictDeletedObject, 0, 0)
+	}
+	return cloneStorageObjectForE2E(record), nil
+}
+
+func (r *e2eStorageRepository) ListStorageObjects(_ context.Context, input storagemodule.ListStorageObjectsInput) (storagemodule.ListStorageObjectsResult, error) {
+	normalized, err := storagemodule.NormalizeListStorageObjectsInput(input)
+	if err != nil {
+		return storagemodule.ListStorageObjectsResult{}, e2eStorageRepositoryError("list", storagemodule.StorageObjectConflictOwnerScopeMismatch, 0, 0)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	objects := make([]storagemodule.StorageObject, 0, len(r.objects))
+	for _, record := range r.objects {
+		if record.Status != storagemodule.StorageObjectStatusActive ||
+			record.Owner != normalized.Owner ||
+			record.Identity.Collection != normalized.Collection ||
+			record.Identity.Key <= normalized.AfterObjectKey {
+			continue
+		}
+		objects = append(objects, cloneStorageObjectForE2E(record))
+	}
+	sort.Slice(objects, func(i, j int) bool {
+		return objects[i].Identity.Key < objects[j].Identity.Key
+	})
+
+	var nextKey string
+	if len(objects) > normalized.Limit {
+		nextKey = objects[normalized.Limit].Identity.Key
+		objects = objects[:normalized.Limit]
+	}
+	return storagemodule.ListStorageObjectsResult{
+		Objects:       objects,
+		NextObjectKey: nextKey,
+	}, nil
+}
+
+func (r *e2eStorageRepository) UpdateStorageObject(_ context.Context, input storagemodule.UpdateStorageObjectInput) (storagemodule.StorageObject, error) {
+	normalized, err := storagemodule.NormalizeUpdateStorageObjectInput(input)
+	if err != nil {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("update", storagemodule.StorageObjectConflictInvalidExpectedVersion, 0, 0)
+	}
+	key := e2eStorageKey(normalized.Owner, normalized.Identity)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	record, ok := r.objects[key]
+	if !ok {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("update", storagemodule.StorageObjectConflictNotFound, 0, 0)
+	}
+	if record.Status != storagemodule.StorageObjectStatusActive {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("update", storagemodule.StorageObjectConflictDeletedObject, 0, 0)
+	}
+	if normalized.ExpectedVersion != nil && record.Version != *normalized.ExpectedVersion {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("update", storagemodule.StorageObjectConflictVersionMismatch, *normalized.ExpectedVersion, record.Version)
+	}
+
+	record.Value = normalized.Value
+	record.Version++
+	record.UpdatedAt = r.clock.Now()
+	record, err = storagemodule.NormalizeStorageObjectRecord(record)
+	if err != nil {
+		return storagemodule.StorageObject{}, err
+	}
+	r.objects[key] = cloneStorageObjectForE2E(record)
+	return cloneStorageObjectForE2E(record), nil
+}
+
+func (r *e2eStorageRepository) DeleteStorageObject(_ context.Context, input storagemodule.DeleteStorageObjectInput) (storagemodule.StorageObject, error) {
+	normalized, err := storagemodule.NormalizeDeleteStorageObjectInput(input)
+	if err != nil {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("delete", storagemodule.StorageObjectConflictInvalidExpectedVersion, 0, 0)
+	}
+	key := e2eStorageKey(normalized.Owner, normalized.Identity)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	record, ok := r.objects[key]
+	if !ok {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("delete", storagemodule.StorageObjectConflictNotFound, 0, 0)
+	}
+	if record.Status != storagemodule.StorageObjectStatusActive {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("delete", storagemodule.StorageObjectConflictDeletedObject, 0, 0)
+	}
+	if normalized.ExpectedVersion != nil && record.Version != *normalized.ExpectedVersion {
+		return storagemodule.StorageObject{}, e2eStorageRepositoryError("delete", storagemodule.StorageObjectConflictVersionMismatch, *normalized.ExpectedVersion, record.Version)
+	}
+
+	deletedAt := r.clock.Now()
+	record.Version++
+	record.Status = storagemodule.StorageObjectStatusDeleted
+	record.UpdatedAt = deletedAt
+	record.DeletedAt = &deletedAt
+	record, err = storagemodule.NormalizeStorageObjectRecord(record)
+	if err != nil {
+		return storagemodule.StorageObject{}, err
+	}
+	r.objects[key] = cloneStorageObjectForE2E(record)
+	return cloneStorageObjectForE2E(record), nil
+}
+
+func e2eStorageKey(owner storagemodule.StorageObjectOwner, identity storagemodule.StorageObjectIdentity) e2eStorageObjectKey {
+	return e2eStorageObjectKey{
+		ownerKind:  owner.Kind,
+		ownerID:    owner.ID,
+		collection: identity.Collection,
+		key:        identity.Key,
+	}
+}
+
+func e2eStorageRepositoryError(operation string, class storagemodule.StorageObjectConflictClass, expected storagemodule.StorageObjectVersion, actual storagemodule.StorageObjectVersion) error {
+	return &storagemodule.StorageObjectRepositoryError{
+		Kind: storagemodule.ErrStorageObjectConflict,
+		Conflict: storagemodule.StorageObjectConflict{
+			Class:          class,
+			Expected:       expected,
+			Actual:         actual,
+			Retryable:      class == storagemodule.StorageObjectConflictVersionMismatch,
+			RedactedReason: string(class),
+		},
+		Operation:      operation,
+		RedactedReason: string(class),
+	}
+}
+
 type e2eRegistryConnectionBinder struct {
 	binder   app.ConnectionBinder
 	registry *appconnection.InMemoryRegistry
@@ -805,5 +1223,14 @@ func cloneCredentialRecordForE2E(record authenticationmodule.CredentialRecord) a
 func cloneTokenRecordForE2E(record authenticationmodule.TokenRecord) authenticationmodule.TokenRecord {
 	record.TokenLookupDigest = cloneBytesForE2E(record.TokenLookupDigest)
 	record.TokenVerifierDigest = cloneBytesForE2E(record.TokenVerifierDigest)
+	return record
+}
+
+func cloneStorageObjectForE2E(record storagemodule.StorageObject) storagemodule.StorageObject {
+	record.Value.JSON = cloneBytesForE2E(record.Value.JSON)
+	if record.DeletedAt != nil {
+		deletedAt := *record.DeletedAt
+		record.DeletedAt = &deletedAt
+	}
 	return record
 }

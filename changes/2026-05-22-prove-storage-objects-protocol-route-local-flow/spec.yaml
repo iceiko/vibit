@@ -1,0 +1,207 @@
+schema_version: 0.1
+change_id: prove-storage-objects-protocol-route-local-flow
+date: 2026-05-22
+type: feature
+status: verified
+
+summary: Prove the completed own-player storage objects protocol route family in the local alpha WebSocket/Protobuf request flow while preserving protocol shape, service behavior, storage persistence boundaries, authentication/session behavior, and direct compatibility deferrals.
+
+affected_modules:
+  - runtime
+  - storage
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0120
+  referenced:
+    - ADR-0119
+    - ADR-0118
+    - ADR-0117
+    - ADR-0116
+    - ADR-0115
+    - ADR-0114
+    - ADR-0113
+    - ADR-0112
+    - ADR-0111
+    - ADR-0110
+    - ADR-0109
+    - ADR-0108
+    - ADR-0086
+    - ADR-0082
+
+runtime:
+  go_code_added: true
+  production_go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0212
+  completed_milestone: M-140
+  previous_completed_work_item: W-0211
+  next_milestone: M-141
+  next_work_item: W-0213
+  next_work_item_status: next_ready
+  tier: tier_2_protocol
+  selected_direction: storage_objects_protocol_route_local_proof
+  next_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
+  storage_objects_protocol_route_local_proof_completed: true
+  storage_objects_protocol_route_local_proof_decision: ADR-0120
+  storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof
+  source_protocol_route_implementation_decision: ADR-0119
+  source_protocol_route_implementation: runtime/internal/app/bootstrap/storage.go
+  source_protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
+  source_protocol_proto: proto/vibit/storage/v1/storage.proto
+  local_alpha_request_loop_script: examples/local-alpha-request-loop.sh
+  local_alpha_examples_readme: examples/README.md
+  local_alpha_examples_readme_translation: examples/README.zh-CN.md
+  proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  proof_test_name: TestStorageObjectsProtocolRouteLocalAlphaFlow
+  focused_existing_gameplay_test: TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout
+  proof_flow:
+    - local onboarding
+    - device credential login
+    - first-message connection binding
+    - authenticated storage.PutOwnStorageObject
+    - authenticated storage.GetOwnStorageObject
+    - authenticated storage.ListOwnStorageObjects
+    - authenticated storage.DeleteOwnStorageObject
+    - post-delete storage.GetOwnStorageObject not-found error
+  candidate_routes:
+    - storage.GetOwnStorageObject
+    - storage.ListOwnStorageObjects
+    - storage.PutOwnStorageObject
+    - storage.DeleteOwnStorageObject
+  first_payload_package: vibit.storage.v1
+  route_policy_requirement: request_token_required
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  client_supplied_owner_id_allowed: false
+  protobuf_envelope_change_status: unchanged
+  websocket_transport_credential_neutral: true
+  local_test_storage_repository_added: true
+  production_storage_repository_changed: false
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  protocol_bridge_changed: false
+  application_handler_changed: false
+  storage_service_behavior_changed: false
+  postgres_startup_route_registration_changed: false
+  transaction_bypass_changed: false
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  broad_operations_admin_behavior_added: false
+  product_module_expansion_added: false
+  public_acl_added: false
+  admin_search_added: false
+  group_guild_party_room_match_scope_added: false
+  batch_writes_added: false
+  json_patch_added: false
+  merge_semantics_added: false
+  ttl_added: false
+  script_hooks_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.storage_objects_protocol_route_local_proof
+    - node tools/vibit check change prove-storage-objects-protocol-route-local-flow --json
+    - node tools/vibit check module storage --json
+    - node tools/vibit check work --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+    - git diff --check
+    - cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow' -v
+    - cd runtime && go test ./...
+    - examples/local-alpha-request-loop.sh
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - protocol_shape_change_requires_separate_work_item
+    - storage_service_behavior_change_requires_authorization
+    - repository_interface_change_requires_authorization
+    - postgresql_adapter_change_requires_authorization
+    - migration_change_requires_authorization
+    - dependency_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - public_acl_requires_authorization
+    - admin_search_requires_authorization
+    - broad_product_module_requires_authorization
+    - object_blob_storage_requires_authorization
+    - s3_compatible_object_storage_requires_authorization
+    - direct_compatibility_requires_authorization
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_table_referenced:
+    - storage_objects
+  ownership_changes:
+    - runtime/internal/platform/protocol/protobuf authenticated E2E tests now include a test-only in-memory storage repository for local proof only.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow' -v

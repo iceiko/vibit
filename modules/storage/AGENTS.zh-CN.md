@@ -29,7 +29,9 @@
 
 `M-139 Storage Objects Protocol Route Implementation` 已由 `W-0211` 完成。检查规则是 `runtime.storage_objects_protocol_route_implementation`。该实现添加了 `vibit.storage.v1` Protobuf source 和 generated output、route keys、protocol bridge mapping、bootstrap handlers、startup registration，以及针对 `storage.GetOwnStorageObject`、`storage.ListOwnStorageObjects`、`storage.PutOwnStorageObject` 和 `storage.DeleteOwnStorageObject` 的聚焦测试。
 
-下一项 work item 是 `W-0212 Prove storage objects protocol route in local alpha request flow`。它只能证明已实现的 own-player route family；不得添加 new protocol messages or routes、storage service behavior changes、repository interface changes、PostgreSQL adapter changes、migration changes、dependencies、authentication/session changes、public ACLs、admin search、group/guild/party/room/match storage scopes、batch writes、JSON patch、merge semantics、TTL、script hooks、large object/blob storage、S3-compatible object storage 或 direct Nakama/Pitaya API compatibility。
+`M-140 Storage Objects Protocol Route Local Proof` 已由 `W-0212` 完成。检查规则是 `runtime.storage_objects_protocol_route_local_proof`。该 proof 添加了 `TestStorageObjectsProtocolRouteLocalAlphaFlow`，在 local authenticated E2E fixture 中加入 test-only storage route registration 和 test-only storage repository，并更新 `examples/local-alpha-request-loop.sh`，用于通过现有 WebSocket/Protobuf route flow 演示 authenticated own-player storage object put/get/list/delete。
+
+下一项 work item 是 `W-0213 Confirm next alpha direction after storage objects local proof`。它只能选择一个 next bounded direction；不得实现 new protocol messages or routes、storage service behavior changes、repository interface changes、PostgreSQL adapter changes、migration changes、dependencies、authentication/session changes、public ACLs、admin search、group/guild/party/room/match storage scopes、batch writes、JSON patch、merge semantics、TTL、script hooks、large object/blob storage、S3-compatible object storage、production memory storage behavior 或 direct Nakama/Pitaya API compatibility。
 
 ## 何时不要使用本模块
 

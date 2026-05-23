@@ -42,7 +42,9 @@ storage_objects_protocol_route_gate: docs/storage-objects-protocol-route-gate.md
 storage_objects_protocol_route_gate_decision: ADR-0118
 storage_objects_protocol_route_implementation_completed: true
 storage_objects_protocol_route_implementation_decision: ADR-0119
-next_direction: storage_objects_protocol_route_local_proof
+storage_objects_protocol_route_local_proof_completed: true
+storage_objects_protocol_route_local_proof_decision: ADR-0120
+next_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
 next_work_status: next_ready
 ```
 
@@ -107,6 +109,7 @@ local onboarding
 -> connection binding
 -> protected inventory grant/read
 -> protected presence query
+-> protected own-player storage object put/get/list/delete
 -> logout
 -> post-logout protected request rejection
 ```
@@ -120,7 +123,7 @@ examples/local-alpha-request-loop.sh
 该 script 包装 focused Go E2E proof：
 
 ```bash
-cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow' -v
 ```
 
 该 proof 使用现有 runtime protocol handlers。它不需要 live PostgreSQL、committed verifier keys、raw credentials、raw access tokens、DSNs、digests 或手写 WebSocket client。
@@ -162,7 +165,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `decisions/ADR-0111-storage-objects-migration-source.md`，storage objects repository boundary 记录在 `docs/storage-objects-repository-boundary.md` 和 `decisions/ADR-0112-storage-objects-repository-boundary.md`，storage objects repository interface 记录在 `runtime/internal/modules/storage/repository.go` 和 `decisions/ADR-0113-storage-objects-repository-interface-implementation.md`，storage objects PostgreSQL adapter gate 记录在 `docs/storage-objects-postgresql-adapter-gate.md` 和 `decisions/ADR-0114-storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go` 和 `decisions/ADR-0115-storage-objects-postgresql-adapter-implementation.md`，storage objects runtime behavior gate 记录在 `docs/storage-objects-runtime-behavior-gate.md` 和 `decisions/ADR-0116-storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 记录在 `runtime/internal/app/storage/service.go` 和 `decisions/ADR-0117-storage-objects-runtime-behavior-implementation.md`，storage objects protocol route gate 记录在 `docs/storage-objects-protocol-route-gate.md` 和 `decisions/ADR-0118-storage-objects-protocol-route-gate.md`，storage objects protocol route implementation 记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `decisions/ADR-0119-storage-objects-protocol-route-implementation.md`。下一步 work 是 `W-0212 Prove storage objects protocol route in local alpha request flow`；它应通过现有 local alpha request flow 证明 own-player storage object put/get/list/delete，保留 Nakama 启发的 storage object 能力覆盖和 Pitaya 启发的 route/session/handler 分离，但不添加 direct API compatibility。
+Release execution maintainer decision 记录在 `docs/release-execution-maintainer-decision.md`，release identifier plan 记录在 `docs/release-identifier-artifact-plan.md`，final authorization 记录在 `docs/release-execution-final-authorization.md`，first alpha user discovery loop 记录在 `docs/first-alpha-user-discovery-loop.md`，first feedback intake surface 记录在 `docs/first-alpha-feedback-intake-surfaces.md`，product maturity milestones 记录在 `docs/product-maturity-milestones.md`，prototype-ready execution plan 记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `decisions/ADR-0111-storage-objects-migration-source.md`，storage objects repository boundary 记录在 `docs/storage-objects-repository-boundary.md` 和 `decisions/ADR-0112-storage-objects-repository-boundary.md`，storage objects repository interface 记录在 `runtime/internal/modules/storage/repository.go` 和 `decisions/ADR-0113-storage-objects-repository-interface-implementation.md`，storage objects PostgreSQL adapter gate 记录在 `docs/storage-objects-postgresql-adapter-gate.md` 和 `decisions/ADR-0114-storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go` 和 `decisions/ADR-0115-storage-objects-postgresql-adapter-implementation.md`，storage objects runtime behavior gate 记录在 `docs/storage-objects-runtime-behavior-gate.md` 和 `decisions/ADR-0116-storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 记录在 `runtime/internal/app/storage/service.go` 和 `decisions/ADR-0117-storage-objects-runtime-behavior-implementation.md`，storage objects protocol route gate 记录在 `docs/storage-objects-protocol-route-gate.md` 和 `decisions/ADR-0118-storage-objects-protocol-route-gate.md`，storage objects protocol route implementation 记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `decisions/ADR-0119-storage-objects-protocol-route-implementation.md`，storage objects protocol route local proof 记录在 `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`、`examples/local-alpha-request-loop.sh` 和 `decisions/ADR-0120-storage-objects-protocol-route-local-proof.md`。下一步 work 是 `W-0213 Confirm next alpha direction after storage objects local proof`；它应选择 exactly one bounded next direction，保留 Nakama/Pitaya alignment，但不实现 new runtime behavior，也不添加 direct API compatibility。
 
 ## 9. Deferred Work
 

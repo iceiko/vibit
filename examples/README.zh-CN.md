@@ -18,7 +18,7 @@ examples/local-alpha-request-loop.sh
 该 script 包装 focused authenticated gameplay E2E proof：
 
 ```bash
-cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow' -v
 ```
 
 它证明：
@@ -29,9 +29,12 @@ local onboarding
 -> first-message connection binding
 -> protected inventory grant/read
 -> protected presence query
+-> protected own-player storage object put/get/list/delete
 -> logout
 -> post-logout protected request rejection
 ```
+
+storage object proof 使用现有 `storage.GetOwnStorageObject`、`storage.ListOwnStorageObjects`、`storage.PutOwnStorageObject` 和 `storage.DeleteOwnStorageObject` routes，以及 `vibit.storage.v1` Protobuf payloads。它在 local request-flow 层面证明 Nakama-class durable player storage object capability coverage，同时保留 vibit 自己的 route names，并且不添加 direct Nakama/Pitaya API compatibility。它也通过保持 transport、protocol adaptation、session metadata、route protection、application handlers、service behavior 和 repository handoff 分离，证明 Pitaya-aligned layering。
 
 该 script 有意保持 redacted。它不得打印 raw credentials、raw access tokens、verifier keys、DSNs、digests、headers、cookies、query strings、WebSocket subprotocol values、remote addresses 或 concrete transport metadata。
 

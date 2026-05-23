@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0212 Prove storage objects protocol route in local alpha request flow` continuation step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0213 Confirm next alpha direction after storage objects local proof` continuation step.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -88,6 +88,7 @@ Use these states when reviewing the alpha flow:
 - [x] First-message connection binding is exposed through the `runtime.authentication.BindConnection` protocol route.
 - [x] Protected inventory grant/read requests use `AuthenticatedRequest`.
 - [x] Protected presence query is available through `runtime.presence.GetPlayerPresence`.
+- [x] Protected own-player storage object put/get/list/delete is proven through `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject`.
 - [x] Logout is exposed through the `runtime.authentication.LogoutAccessToken` protocol route.
 - [x] A post-logout protected request using the same token is rejected.
 - [x] The focused authenticated gameplay E2E test proves onboarding -> login -> connection binding -> protected inventory -> presence query -> logout -> post-logout rejection.
@@ -110,6 +111,7 @@ Optional focused checks:
 ```bash
 cd runtime && go test ./cmd/vibit-server
 cd runtime && go test ./internal/platform/protocol/protobuf -run TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run TestStorageObjectsProtocolRouteLocalAlphaFlow -v
 ```
 
 Optional live PostgreSQL verification remains opt-in and requires a disposable database:
@@ -126,7 +128,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`, the storage objects repository interface is recorded in `runtime/internal/modules/storage/repository.go`, the storage objects PostgreSQL adapter gate is recorded in `docs/storage-objects-postgresql-adapter-gate.md`, the storage objects PostgreSQL adapter is recorded in `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, the storage objects runtime behavior gate is recorded in `docs/storage-objects-runtime-behavior-gate.md`, the storage objects runtime behavior implementation is recorded in `runtime/internal/app/storage/service.go`, the storage objects protocol route gate is recorded in `docs/storage-objects-protocol-route-gate.md`, and the storage objects protocol route implementation is recorded in `proto/vibit/storage/v1/storage.proto`, `runtime/internal/app/bootstrap/storage.go`, `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, and `decisions/ADR-0119-storage-objects-protocol-route-implementation.md`. The next work is `W-0212 Prove storage objects protocol route in local alpha request flow`.
+The release publishing decision gate is now defined in `docs/release-publishing-decision-gate.md`, the release execution preparation gate is now defined in `docs/release-execution-preparation-gate.md`, the release execution authorization gate is now defined in `docs/release-execution-authorization-gate.md`, the maintainer decision is recorded in `docs/release-execution-maintainer-decision.md`, the release identifier plan is recorded in `docs/release-identifier-artifact-plan.md`, final authorization is recorded in `docs/release-execution-final-authorization.md`, the first alpha user discovery loop is recorded in `docs/first-alpha-user-discovery-loop.md`, the first alpha feedback intake surface is recorded in `docs/first-alpha-feedback-intake-surfaces.md`, product maturity milestones are recorded in `docs/product-maturity-milestones.md`, the prototype-ready execution plan is recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`, the storage objects repository interface is recorded in `runtime/internal/modules/storage/repository.go`, the storage objects PostgreSQL adapter gate is recorded in `docs/storage-objects-postgresql-adapter-gate.md`, the storage objects PostgreSQL adapter is recorded in `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, the storage objects runtime behavior gate is recorded in `docs/storage-objects-runtime-behavior-gate.md`, the storage objects runtime behavior implementation is recorded in `runtime/internal/app/storage/service.go`, the storage objects protocol route gate is recorded in `docs/storage-objects-protocol-route-gate.md`, the storage objects protocol route implementation is recorded in `proto/vibit/storage/v1/storage.proto`, `runtime/internal/app/bootstrap/storage.go`, `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, and `decisions/ADR-0119-storage-objects-protocol-route-implementation.md`, and the storage objects protocol route local proof is recorded in `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`, `examples/local-alpha-request-loop.sh`, and `decisions/ADR-0120-storage-objects-protocol-route-local-proof.md`. The next work is `W-0213 Confirm next alpha direction after storage objects local proof`.
 
 ## 11. Release Deferrals
 
@@ -161,6 +163,7 @@ release_publishing_authorized_by_this_checklist: true
 prototype_ready_local_development_path_package_implemented: true
 storage_objects_protocol_route_gate_defined: true
 storage_objects_protocol_route_implementation_completed: true
-next_direction: storage_objects_protocol_route_local_proof
+storage_objects_protocol_route_local_proof_completed: true
+next_direction: confirm_next_alpha_direction_after_storage_objects_local_proof
 next_work_status: next_ready
 ```

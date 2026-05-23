@@ -163,7 +163,9 @@ storage_objects_protocol_route_gate: docs/storage-objects-protocol-route-gate.md
 storage_objects_protocol_route_gate_decision: ADR-0118
 storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.proto
 storage_objects_protocol_route_implementation_decision: ADR-0119
-next_work_item: W-0212 Prove storage objects protocol route in local alpha request flow
+storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+storage_objects_protocol_route_local_proof_decision: ADR-0120
+next_work_item: W-0213 Confirm next alpha direction after storage objects local proof
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -180,7 +182,8 @@ next_work_item: W-0212 Prove storage objects protocol route in local alpha reque
 - 定义并实现 storage objects PostgreSQL adapter。已由 `W-0206` 和 `W-0207` 完成。
 - 定义并实现 storage objects runtime behavior。已由 `W-0208` 和 `W-0209` 完成。
 - 定义并实现 storage objects protocol route family。已由 `W-0210` 和 `W-0211` 完成。
-- 通过 local alpha request flow 证明 storage object routes。Next。
+- 通过 local alpha request flow 证明 storage object routes。已由 `W-0212` 完成。
+- 在 storage object local proof 后确认下一项 alpha direction。Next。
 - 定义第一版 realtime messaging、stream、broadcast 或 server-push behavior。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。

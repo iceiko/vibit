@@ -147,6 +147,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.storage_objects_runtime_behavior_implementation",
   "runtime.storage_objects_protocol_route_gate",
   "runtime.storage_objects_protocol_route_implementation",
+  "runtime.storage_objects_protocol_route_local_proof",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -29377,6 +29378,259 @@ function checkRuntimeStorageObjectsProtocolRouteImplementation(root, goFiles) {
   });
 }
 
+function checkRuntimeStorageObjectsProtocolRouteLocalProof(root, goFiles) {
+  const ruleId = "runtime.storage_objects_protocol_route_local_proof";
+  const decisionPath = "decisions/ADR-0120-storage-objects-protocol-route-local-proof.md";
+  const changePath = "changes/2026-05-22-prove-storage-objects-protocol-route-local-flow";
+  const conversationPath = "conversations/2026-05-23-storage-objects-protocol-route-local-proof.md";
+  const e2ePath = "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go";
+  const scriptPath = "examples/local-alpha-request-loop.sh";
+  const examplesReadmePath = "examples/README.md";
+  const examplesReadmeTranslationPath = "examples/README.zh-CN.md";
+  const moduleManifestPath = "modules/storage/module.yaml";
+  const moduleGuidePath = "modules/storage/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/storage/AGENTS.zh-CN.md";
+
+  if (!storageObjectsProtocolRouteLocalProofCompleted(root)) {
+    ok("storage objects protocol route local proof is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    e2ePath,
+    scriptPath,
+    examplesReadmePath,
+    examplesReadmeTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for storage objects protocol route local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for storage objects protocol route local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-140"],
+    [".arch/work-items.yaml", "title: Storage Objects Protocol Route Local Proof"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0212"],
+    [".arch/work-items.yaml", "title: Prove storage objects protocol route in local alpha request flow"],
+    [".arch/work-items.yaml", "ADR-0120"],
+    [".arch/work-items.yaml", "id: M-141"],
+    [".arch/work-items.yaml", "id: W-0213"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_local_proof: ADR-0120"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh"],
+    [".arch/runtime.yaml", "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_local_proof_completed: true"],
+    [".arch/conventions.yaml", "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_local_proof_completed: true"],
+    [".arch/contracts.yaml", "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [".arch/reference.yaml", "phase_2dw_storage_objects_protocol_route_local_proof"],
+    [".arch/reference.yaml", "phase_2dx_next_direction_after_storage_objects_local_proof"],
+    [".arch/reference.yaml", "check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [".arch/modules.yaml", "storage_objects_protocol_route_local_proof_completed: true"],
+    [".arch/modules.yaml", "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [moduleManifestPath, "storage_objects_protocol_route_local_proof_completed: true"],
+    [moduleManifestPath, "storage_objects_protocol_route_local_proof_decision: ADR-0120"],
+    [moduleManifestPath, "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof"],
+    [moduleManifestPath, "storage_objects_protocol_route_local_proof_work_item: W-0212"],
+    [moduleGuidePath, "runtime.storage_objects_protocol_route_local_proof"],
+    [moduleGuideTranslationPath, "runtime.storage_objects_protocol_route_local_proof"],
+    ["AGENTS.md", "runtime.storage_objects_protocol_route_local_proof"],
+    ["AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_local_proof"],
+    ["runtime/AGENTS.md", "runtime.storage_objects_protocol_route_local_proof"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.storage_objects_protocol_route_local_proof"],
+    ["rules/check-rules.json", "runtime.storage_objects_protocol_route_local_proof"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "storage.GetOwnStorageObject",
+    "storage.ListOwnStorageObjects",
+    "storage.PutOwnStorageObject",
+    "storage.DeleteOwnStorageObject",
+  ];
+  for (const file of [e2ePath, scriptPath, examplesReadmePath, examplesReadmeTranslationPath, decisionPath, `${changePath}/spec.yaml`]) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const markersByFile = {
+    [e2ePath]: [
+      "TestStorageObjectsProtocolRouteLocalAlphaFlow",
+      "AuthenticatedRequest",
+      "PutOwnStorageObjectRequest",
+      "GetOwnStorageObjectRequest",
+      "ListOwnStorageObjectsRequest",
+      "DeleteOwnStorageObjectRequest",
+      "PublicErrorStorageObjectNotFound",
+      "assertNoFrameErrorSecretLeak",
+      "newE2EStorageRepository",
+      "e2eStorageRepository",
+      "authenticateAndBindLocalPlayer",
+      "bootstrap.StorageRouteHandlers",
+      "appstorage.NewService",
+      "storageRepository",
+    ],
+    [scriptPath]: [
+      "TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout",
+      "TestStorageObjectsProtocolRouteLocalAlphaFlow",
+      "storage",
+      "put/get/list/delete",
+    ],
+    [examplesReadmePath]: [
+      "storage.GetOwnStorageObject",
+      "storage.ListOwnStorageObjects",
+      "storage.PutOwnStorageObject",
+      "storage.DeleteOwnStorageObject",
+      "Nakama-class",
+      "Pitaya-aligned",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [examplesReadmeTranslationPath]: [
+      "storage.GetOwnStorageObject",
+      "storage.ListOwnStorageObjects",
+      "storage.PutOwnStorageObject",
+      "storage.DeleteOwnStorageObject",
+      "Nakama-class",
+      "Pitaya-aligned",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0212",
+      "completed_milestone: M-140",
+      "previous_completed_work_item: W-0211",
+      "next_milestone: M-141",
+      "next_work_item: W-0213",
+      "next_direction: confirm_next_alpha_direction_after_storage_objects_local_proof",
+      "storage_objects_protocol_route_local_proof_completed: true",
+      "storage_objects_protocol_route_local_proof_decision: ADR-0120",
+      "storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof",
+      "proof_test_name: TestStorageObjectsProtocolRouteLocalAlphaFlow",
+      "local_test_storage_repository_added: true",
+      "production_storage_repository_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "protocol_bridge_changed: false",
+      "application_handler_changed: false",
+      "storage_service_behavior_changed: false",
+      "postgres_startup_route_registration_changed: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "large_object_blob_storage_added: false",
+      "s3_compatible_object_storage_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0120",
+      "W-0212",
+      "TestStorageObjectsProtocolRouteLocalAlphaFlow",
+      "Nakama",
+      "Pitaya",
+      "No direct Nakama or Pitaya API compatibility",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const testOnlyRepositoryFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bnewE2EStorageRepository\b|\be2eStorageRepository\b/.test(text);
+    });
+  for (const file of testOnlyRepositoryFiles) {
+    fail(`${file} references local proof storage repository outside tests`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (testOnlyRepositoryFiles.length === 0) {
+    ok("storage route local proof repository remains test-only", {
+      rule_id: ruleId,
+      artifact: e2ePath,
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/storage\b/, label: "Nakama storage REST path" },
+    { pattern: /\bnk\.storage_(read|write|delete|list)\b/, label: "Nakama runtime storage API name" },
+    { pattern: /\bStorageRead\b|\bStorageWrite\b|\bStorageDelete\b/, label: "Nakama storage API type name" },
+    { pattern: /\bpermission_read\b|\bpermission_write\b/, label: "Nakama permission field name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, e2ePath, scriptPath, examplesReadmePath, examplesReadmeTranslationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("storage objects protocol route local proof is bounded to the existing local alpha WebSocket/Protobuf route flow, test-only storage repository support, redaction checks, and Nakama/Pitaya-aligned capability/layering without direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -31086,6 +31340,10 @@ function storageObjectsProtocolRouteImplementationCompleted(root) {
   return workItemHasStatus(root, "W-0211", "completed");
 }
 
+function storageObjectsProtocolRouteLocalProofCompleted(root) {
+  return workItemHasStatus(root, "W-0212", "completed");
+}
+
 function isStorageObjectsProtocolRouteImplementationFile(root, file) {
   if (!storageObjectsProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -31108,6 +31366,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0212", "next_ready_work_item: W-0213"],
     ["W-0211", "next_ready_work_item: W-0212"],
     ["W-0210", "next_ready_work_item: W-0211"],
     ["W-0209", "next_ready_work_item: W-0210"],
@@ -31148,6 +31407,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0212", "completed")) {
+    return "next_work_item: W-0213";
+  }
   if (workItemHasStatus(root, "W-0211", "completed")) {
     return "next_work_item: W-0212";
   }
@@ -31213,6 +31475,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0212", "confirm_next_alpha_direction_after_storage_objects_local_proof"],
     ["W-0211", "storage_objects_protocol_route_local_proof"],
     ["W-0210", "storage_objects_protocol_route_implementation"],
     ["W-0209", "storage_objects_protocol_route_gate"],
@@ -31253,6 +31516,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0212", "W-0213 Confirm next alpha direction after storage objects local proof"],
     ["W-0211", "W-0212 Prove storage objects protocol route in local alpha request flow"],
     ["W-0210", "W-0211 Implement storage objects protocol route"],
     ["W-0209", "W-0210 Define storage objects protocol route gate"],
@@ -31294,6 +31558,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0212", "current_phase: confirm_next_alpha_direction_after_storage_objects_local_proof"],
     ["W-0211", "current_phase: storage_objects_protocol_route_local_proof"],
     ["W-0210", "current_phase: storage_objects_protocol_route_implementation"],
     ["W-0209", "current_phase: storage_objects_protocol_route_gate"],
@@ -31877,6 +32142,7 @@ function checkRuntime(root) {
   checkRuntimeStorageObjectsRuntimeBehaviorImplementation(root, goFiles);
   checkRuntimeStorageObjectsProtocolRouteGate(root, goFiles);
   checkRuntimeStorageObjectsProtocolRouteImplementation(root, goFiles);
+  checkRuntimeStorageObjectsProtocolRouteLocalProof(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

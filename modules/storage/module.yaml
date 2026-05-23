@@ -2,7 +2,7 @@ schema_version: 0.1
 module: storage
 category: domain
 status: draft
-summary: Owns player-owned small JSON storage object repository vocabulary, storage-neutral value types, completed PostgreSQL adapter handoff, application-owned runtime behavior, and own-player storage object protocol routes while large object/blob storage, S3-compatible storage, and direct Nakama/Pitaya API compatibility remain deferred.
+summary: Owns player-owned small JSON storage object repository vocabulary, storage-neutral value types, completed PostgreSQL adapter handoff, application-owned runtime behavior, own-player storage object protocol routes, and the local alpha route proof while large object/blob storage, S3-compatible storage, production memory storage behavior, and direct Nakama/Pitaya API compatibility remain deferred.
 
 decisions:
   - ADR-0109
@@ -16,6 +16,7 @@ decisions:
   - ADR-0117
   - ADR-0118
   - ADR-0119
+  - ADR-0120
 
 owns:
   entities:
@@ -43,7 +44,7 @@ owns:
       - s3_compatible_object_storage
 
 public_api:
-  status: storage_repository_interface_postgresql_adapter_runtime_behavior_and_protocol_route_implementation_completed
+  status: storage_repository_interface_postgresql_adapter_runtime_behavior_protocol_route_implementation_and_local_proof_completed
   commands:
     - PutOwnStorageObject
     - DeleteOwnStorageObject
@@ -168,6 +169,12 @@ contracts:
   storage_objects_protocol_route_implementation_decision: ADR-0119
   storage_objects_protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
   storage_objects_protocol_route_implementation_work_item: W-0211
+  storage_objects_protocol_route_local_proof_completed: true
+  storage_objects_protocol_route_local_proof_decision: ADR-0120
+  storage_objects_protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof
+  storage_objects_protocol_route_local_proof_work_item: W-0212
+  storage_objects_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  storage_objects_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
   protocol_source: proto/vibit/storage/v1/storage.proto
   generated_go_output: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
   protocol_bridge: runtime/internal/platform/protocol/protobuf/storage_bridge.go
@@ -176,12 +183,12 @@ contracts:
   application_handler_test: runtime/internal/app/bootstrap/storage_test.go
   route_keys_source: runtime/internal/app/storage/routes.go
   postgres_startup_route_registration: runtime/cmd/vibit-server/main.go
-  protocol_route_next_work_item: W-0211
-  current_protocol_route_next_work_item: W-0212
+  protocol_route_next_work_item: W-0213
+  current_protocol_route_next_work_item: W-0213
   future_protocol_route_implementation_work_item: W-0211
   future_protocol_route_implementation_direction: storage_objects_protocol_route_implementation
-  future_protocol_route_local_proof_work_item: W-0212
-  future_protocol_route_local_proof_direction: storage_objects_protocol_route_local_proof
+  completed_protocol_route_local_proof_work_item: W-0212
+  completed_protocol_route_local_proof_direction: storage_objects_protocol_route_local_proof
   future_protocol_source_candidate: proto/vibit/storage/v1/storage.proto
   future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/storage/v1/storage.pb.go
   future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/storage_bridge.go
@@ -233,10 +240,12 @@ contracts:
       protobuf_source_added: true
       generated_output_added: true
   current_stage_status:
-    work_item: W-0211
-    protocol_route_next_work_item: W-0211
-    current_protocol_route_next_work_item: W-0212
+    work_item: W-0212
+    historical_protocol_route_next_work_item: W-0211
+    protocol_route_next_work_item: W-0213
+    current_protocol_route_next_work_item: W-0213
     protocol_route_implementation_completed: true
+    protocol_route_local_proof_completed: true
   runtime_behavior_added: true
   runtime_handlers_added: true
   protocol_route_added: true
@@ -282,8 +291,11 @@ persistence:
     protocol_route_implementation_work_item: W-0211
     protocol_route_implementation_decision: ADR-0119
     protocol_route_implementation_check_rule: runtime.storage_objects_protocol_route_implementation
-    protocol_route_next_work_item: W-0211
-    current_protocol_route_next_work_item: W-0212
+    protocol_route_local_proof_work_item: W-0212
+    protocol_route_local_proof_decision: ADR-0120
+    protocol_route_local_proof_check_rule: runtime.storage_objects_protocol_route_local_proof
+    protocol_route_next_work_item: W-0213
+    current_protocol_route_next_work_item: W-0213
 
 handwritten:
   extension_points:
@@ -319,3 +331,4 @@ check_rules:
   - runtime.storage_objects_runtime_behavior_implementation
   - runtime.storage_objects_protocol_route_gate
   - runtime.storage_objects_protocol_route_implementation
+  - runtime.storage_objects_protocol_route_local_proof

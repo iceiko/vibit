@@ -163,7 +163,9 @@ storage_objects_protocol_route_gate: docs/storage-objects-protocol-route-gate.md
 storage_objects_protocol_route_gate_decision: ADR-0118
 storage_objects_protocol_route_implementation: proto/vibit/storage/v1/storage.proto
 storage_objects_protocol_route_implementation_decision: ADR-0119
-next_work_item: W-0212 Prove storage objects protocol route in local alpha request flow
+storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+storage_objects_protocol_route_local_proof_decision: ADR-0120
+next_work_item: W-0213 Confirm next alpha direction after storage objects local proof
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -180,7 +182,8 @@ Candidate work:
 - Define and implement the storage objects PostgreSQL adapter. Completed by `W-0206` and `W-0207`.
 - Define and implement storage objects runtime behavior. Completed by `W-0208` and `W-0209`.
 - Define and implement the storage objects protocol route family. Completed by `W-0210` and `W-0211`.
-- Prove storage object routes through the local alpha request flow. Next.
+- Prove storage object routes through the local alpha request flow. Completed by `W-0212`.
+- Confirm the next alpha direction after storage object local proof. Next.
 - Define first realtime messaging, stream, broadcast, or server-push behavior.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
