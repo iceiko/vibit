@@ -1,0 +1,122 @@
+schema_version: 0.1
+change_id: implement-first-server-push-realtime-messaging-runtime-slice
+date: 2026-05-23
+type: feature
+status: verified
+
+summary: Implement the first application-owned server push and realtime messaging runtime slice without transport delivery or protocol expansion.
+
+affected_modules:
+  - runtime
+  - reference
+
+decisions:
+  added:
+    - ADR-0123
+  referenced:
+    - ADR-0122
+    - ADR-0121
+    - ADR-0120
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: first_server_push_realtime_messaging_runtime_slice
+next_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+
+runtime:
+  completed_work_item: W-0215
+  completed_milestone: M-143
+  previous_completed_work_item: W-0214
+  next_milestone: M-144
+  next_work_item: W-0216
+  next_work_item_status: next_ready
+  tier: tier_2_runtime
+  gate_density_strategy: ADR-0082
+  source_gate_decision: ADR-0122
+  source_gate_standard: docs/first-server-push-realtime-messaging-gate.md
+  implementation_authorized_by_gate: true
+  first_server_push_realtime_messaging_runtime_slice_completed: true
+  first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
+  first_server_push_realtime_messaging_runtime_slice_check_rule: runtime.first_server_push_realtime_messaging_runtime_slice
+  runtime_owner: runtime/internal/app/realtime
+  runtime_service_source: runtime/internal/app/realtime/service.go
+  runtime_service_tests: runtime/internal/app/realtime/service_test.go
+  first_delivery_model: single_process_bound_connection_delivery_intent_only
+  sender_authority: server_or_admin_validated_identity_only
+  client_published_facts_allowed: false
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  connection_id_client_authority_allowed: false
+  message_intent_kinds:
+    - server_notice
+    - domain_event_push
+    - stream_message
+    - presence_signal
+  recipient_targets:
+    - connection_id_and_epoch
+    - player_current_connections
+    - stream_subscribers
+  delivery_outcomes:
+    - accepted
+    - no_active_recipient
+    - recipient_not_authorized
+    - payload_invalid
+    - delivery_unavailable
+  stream_subscribers_future_only: true
+  transport_delivery_added: false
+  websocket_outbound_writer_added: false
+  socket_write_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  public_client_publish_route_added: false
+  stream_subscription_persistence_added: false
+  offline_inbox_added: false
+  delivery_guarantees_added: false
+  distributed_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  broad_social_module_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_alignment:
+  nakama_reference_mapping: first_server_authored_outbound_realtime_capability_family_for_notifications_streams_chat_and_presence_adjacent_messages_without_direct_api_compatibility
+  pitaya_reference_mapping: preserve_acceptor_session_handler_protocol_backend_push_group_broadcast_and_cluster_rpc_separation_with_single_process_application_policy_first
+  direct_compatibility: deferred
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - gofmt -w runtime/internal/app/realtime/service.go runtime/internal/app/realtime/service_test.go
+    - cd runtime && go test ./internal/app/realtime -v
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.first_server_push_realtime_messaging_runtime_slice
+    - node tools/vibit check change implement-first-server-push-realtime-messaging-runtime-slice --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

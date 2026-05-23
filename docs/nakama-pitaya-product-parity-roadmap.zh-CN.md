@@ -167,7 +167,9 @@ storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/p
 storage_objects_protocol_route_local_proof_decision: ADR-0120
 first_server_push_realtime_messaging_gate: docs/first-server-push-realtime-messaging-gate.md
 first_server_push_realtime_messaging_gate_decision: ADR-0122
-next_work_item: W-0215 Implement first server push and realtime messaging runtime slice
+first_server_push_realtime_messaging_runtime_slice: runtime/internal/app/realtime/service.go
+first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
+next_work_item: W-0216 Confirm next alpha direction after realtime runtime slice
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -187,7 +189,8 @@ next_work_item: W-0215 Implement first server push and realtime messaging runtim
 - 通过 local alpha request flow 证明 storage object routes。已由 `W-0212` 完成。
 - 在 storage object local proof 后确认下一项 alpha direction。已由 `W-0213` 完成。
 - 定义第一版 server push and realtime messaging gate。已由 `W-0214` 完成。
-- 实现第一版 server push and realtime messaging runtime slice。Next。
+- 实现第一版 server push and realtime messaging runtime slice。已由 `W-0215` 完成。
+- 确认 realtime runtime slice 后的下一项 alpha direction。Next。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。
 

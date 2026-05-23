@@ -1589,8 +1589,11 @@ implemented_wire_and_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0214 should define the first server push and realtime messaging gate before protocol or runtime implementation.
   first_server_push_realtime_messaging_runtime_slice:
-    status: next_ready
-    next_ready_work_item: W-0215
+    status: completed
+    completed_work_item: W-0215
+    decision: ADR-0123
+    change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
+    next_ready_work_item: W-0216
     previous_completed_work_item: W-0214
     selected_direction: first_server_push_realtime_messaging_runtime_slice
     expected_change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
@@ -1598,8 +1601,33 @@ implemented_wire_and_runtime_slices:
     target_stage: prototype_ready_foundation
     source_gate_decision: ADR-0122
     source_gate_standard: docs/first-server-push-realtime-messaging-gate.md
+    first_server_push_realtime_messaging_runtime_slice_completed: true
+    first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
+    first_server_push_realtime_messaging_runtime_slice_check_rule: runtime.first_server_push_realtime_messaging_runtime_slice
+    runtime_service_source: runtime/internal/app/realtime/service.go
+    runtime_service_tests: runtime/internal/app/realtime/service_test.go
+    runtime_behavior_added: true
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0215 should implement only the smallest first runtime slice authorized by the first server push and realtime messaging gate.
+  confirm_next_alpha_direction_after_realtime_runtime_slice:
+    status: next_ready
+    next_ready_work_item: W-0216
+    previous_completed_work_item: W-0215
+    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
+    contract_changes_expected: false
+    target_stage: prototype_ready_foundation
+    source_realtime_runtime_slice_decision: ADR-0123
+    implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0216 should select the next alpha direction after the realtime runtime slice without implementing a new protocol, transport, persistence, matchmaking, match runtime, distributed runtime, or direct compatibility slice.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

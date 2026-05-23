@@ -167,7 +167,9 @@ storage_objects_protocol_route_local_proof: runtime/internal/platform/protocol/p
 storage_objects_protocol_route_local_proof_decision: ADR-0120
 first_server_push_realtime_messaging_gate: docs/first-server-push-realtime-messaging-gate.md
 first_server_push_realtime_messaging_gate_decision: ADR-0122
-next_work_item: W-0215 Implement first server push and realtime messaging runtime slice
+first_server_push_realtime_messaging_runtime_slice: runtime/internal/app/realtime/service.go
+first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
+next_work_item: W-0216 Confirm next alpha direction after realtime runtime slice
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -187,7 +189,8 @@ Candidate work:
 - Prove storage object routes through the local alpha request flow. Completed by `W-0212`.
 - Confirm the next alpha direction after storage object local proof. Completed by `W-0213`.
 - Define the first server push and realtime messaging gate. Completed by `W-0214`.
-- Implement the first server push and realtime messaging runtime slice. Next.
+- Implement the first server push and realtime messaging runtime slice. Completed by `W-0215`.
+- Confirm the next alpha direction after the realtime runtime slice. Next.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
 

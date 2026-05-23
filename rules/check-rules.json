@@ -1292,6 +1292,14 @@
       "agent_guidance": "Read docs/first-server-push-realtime-messaging-gate.md, ADR-0122, ADR-0121, docs/game-protocol.md, docs/runtime-protocol-adapter.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing server push or realtime messaging. W-0214 may define only the gate and opens W-0215. Do not add runtime/internal/app/realtime service code, WebSocket outbound delivery, proto/vibit/realtime/v1/realtime.proto, generated output, protocol routes, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, matchmaking, match runtime, distributed runtime, broad chat/social behavior, or direct Nakama/Pitaya API compatibility in this slice."
     },
     {
+      "rule_id": "runtime.first_server_push_realtime_messaging_runtime_slice",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "First server push and realtime messaging runtime slice",
+      "description": "The first server push and realtime messaging runtime slice must add only an application-owned realtime service under runtime/internal/app/realtime that validates server-authored outbound intents, resolves active bound recipients through the connection registry, returns redacted delivery intents, and preserves WebSocket outbound delivery, Protobuf source, generated output, protocol bridge, startup wiring, persistence, migrations, dependencies, authentication/session changes, delivery guarantees, broad social behavior, matchmaking, match runtime, distributed runtime, and direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0123, ADR-0122, docs/first-server-push-realtime-messaging-gate.md, docs/runtime-protocol-adapter.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing realtime runtime behavior. W-0215 may add runtime/internal/app/realtime/service.go and runtime/internal/app/realtime/service_test.go only as an application-layer delivery-intent slice. Do not add WebSocket outbound writers, socket writes, proto/vibit/realtime/v1/realtime.proto, generated output, protocol routes or bridges, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, public client publish routes, stream subscription persistence, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure, distributed fanout, broad chat/social modules, matchmaking, match runtime, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

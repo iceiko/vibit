@@ -30,11 +30,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: first_server_push_realtime_messaging_gate_completed
+  current_state: first_server_push_realtime_messaging_runtime_slice_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0215
-  immediate_next_direction: first_server_push_realtime_messaging_runtime_slice
+  immediate_next_work_item: W-0216
+  immediate_next_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4448,9 +4448,13 @@ phase_plan:
     implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2dz_first_server_push_realtime_messaging_runtime_slice:
-    status: next_ready
+    status: completed
     milestone: M-143
-    next_ready_work_item: W-0215
+    completed_work_item: W-0215
+    decision: ADR-0123
+    change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
+    next_milestone: M-144
+    next_ready_work_item: W-0216
     previous_completed_work_item: W-0214
     selected_direction: first_server_push_realtime_messaging_runtime_slice
     expected_change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
@@ -4459,6 +4463,27 @@ phase_plan:
       pitaya: The runtime slice should preserve transport/session/handler/protocol/backend separation and remain single-process before group, broadcast fanout, cluster, RPC, or service discovery work.
     target_stage: prototype_ready_foundation
     source_gate_decision: ADR-0122
+    runtime_service_source: runtime/internal/app/realtime/service.go
+    runtime_service_tests: runtime/internal/app/realtime/service_test.go
+    check_rule: runtime.first_server_push_realtime_messaging_runtime_slice
+    transport_delivery_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ea_next_direction_after_realtime_runtime_slice:
+    status: next_ready
+    milestone: M-144
+    next_ready_work_item: W-0216
+    previous_completed_work_item: W-0215
+    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
+    reference_mapping:
+      nakama: The next direction should choose the next useful game-backend capability family after the first server-authored realtime service while avoiding direct notification, channel, stream, chat, or match API compatibility.
+      pitaya: The next direction should preserve transport, session, handler, protocol, backend-service, push, group, broadcast, cluster, RPC, and service-discovery separation before implementing any broader runtime topology.
+    target_stage: prototype_ready_foundation
+    source_realtime_runtime_slice_decision: ADR-0123
+    implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

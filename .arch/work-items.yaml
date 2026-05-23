@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-143
+current_milestone: M-144
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: first_server_push_realtime_messaging_gate_completed
+    current_release_state: first_server_push_realtime_messaging_runtime_slice_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0215
+    next_ready_work_item: W-0216
     preferred_after_current:
-      - first_server_push_realtime_messaging_runtime_slice
+      - confirm_next_alpha_direction_after_realtime_runtime_slice
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2776,7 +2776,7 @@ milestones:
 
   - id: M-143
     title: First Server Push And Realtime Messaging Runtime Slice
-    status: active
+    status: completed
     goal: Implement the smallest first server push and realtime messaging runtime slice authorized by ADR-0122 while preserving protocol/generated-output, persistence, delivery guarantees, distributed fanout, matchmaking, match runtime, broad social, and direct compatibility deferrals unless explicitly authorized.
     completion_criteria:
       - The first runtime slice implements only the smallest application-owned outbound realtime behavior and focused verification authorized by `docs/first-server-push-realtime-messaging-gate.md`.
@@ -2793,6 +2793,24 @@ milestones:
       - changing storage object behavior, repository interfaces, PostgreSQL adapters, migrations, or dependencies
       - adding hosted deployments, release artifacts, public announcements beyond the GitHub release record, or paid promotion
       - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the first application-owned realtime runtime service under `runtime/internal/app/realtime`, accepted `ADR-0123`, registered `runtime.first_server_push_realtime_messaging_runtime_slice`, and added focused tests for server-authored intent validation, metadata-only and player sender refusal, bound-connection and player-current-connection recipient resolution, future-only stream subscribers, redacted errors, and copied delivery intents. The slice preserves Nakama-aligned outbound realtime capability pressure and Pitaya-aligned transport/session/handler/protocol/backend separation without WebSocket writes, Protobuf source, generated output, protocol routes, startup wiring, persistence, migrations, dependencies, authentication/session behavior changes, route-protection changes, delivery guarantees, distributed fanout, broad chat/social behavior, matchmaking, match runtime, hosted deployments, release artifacts, public announcements, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-144
+    title: Next Direction Confirmation After Realtime Runtime Slice
+    status: active
+    goal: Confirm the next bounded alpha direction after the first server push and realtime messaging runtime slice, without implementing protocol, transport delivery, persistence, broad realtime/social behavior, matchmaking, match runtime, distributed runtime, or direct compatibility.
+    completion_criteria:
+      - The next alpha direction after the realtime runtime slice is selected and recorded in an ADR.
+      - One follow-up work item is opened as `next_ready`.
+      - Nakama/Pitaya reference alignment is recorded for the selected direction.
+      - Existing deferrals for protocol expansion, WebSocket outbound delivery, generated output, persistence, delivery guarantees, broad chat/social modules, matchmaking, match runtime, distributed runtime, hosted/release surfaces, and direct compatibility remain explicit.
+    non_goals:
+      - implementing WebSocket outbound delivery
+      - adding Protobuf source or generated output
+      - adding protocol routes or startup wiring
+      - adding stream subscriptions, chat, groups, broadcast fanout, offline inboxes, ordering, retries, durable offsets, or backpressure
+      - adding persistence, migrations, dependencies, or authentication/session behavior changes
+      - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8128,7 +8146,7 @@ work_items:
   - id: W-0215
     milestone: M-143
     title: Implement first server push and realtime messaging runtime slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-implement-first-server-push-realtime-messaging-runtime-slice
     depends_on:
       - W-0214
@@ -8150,3 +8168,29 @@ work_items:
       - Implement the smallest first server push and realtime messaging runtime slice authorized by ADR-0122.
       - Add focused tests for recipient validation, metadata-only identity refusal, redacted delivery outcomes, and single-process layering.
       - Preserve protocol/generated-output, persistence, migration, dependency, authentication/session, hosted deployment, release artifact, public announcement, paid promotion, blob/S3, matchmaking, match runtime, distributed runtime, broad social, and direct compatibility deferrals unless explicitly authorized.
+    completion_summary: Implemented `runtime/internal/app/realtime/service.go` and `runtime/internal/app/realtime/service_test.go` as the first server-authored outbound realtime application service. The service accepts validated service/admin intent only, rejects metadata-only or player-authored publish attempts before registry access, resolves active bound connection and player-current-connection targets through the single-process connection registry, keeps stream subscriber delivery future-only, returns redacted copied delivery intents, and avoids socket writes. `ADR-0123` records the Nakama/Pitaya mapping: Nakama informs the notifications/streams/chat/presence-adjacent capability family, while Pitaya informs acceptor/session/handler/protocol/backend/push/group/broadcast separation. No WebSocket outbound delivery, Protobuf source, generated output, protocol bridge, application bootstrap handler, startup wiring, persistence, migration, dependency, authentication/session change, route-protection change, delivery guarantee, distributed fanout, broad social module, matchmaking, match runtime, hosted deployment, release artifact, public announcement, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0216
+    milestone: M-144
+    title: Confirm next alpha direction after realtime runtime slice
+    status: next_ready
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-runtime-slice
+    depends_on:
+      - W-0215
+    expected_change_id: confirm-next-alpha-direction-after-realtime-runtime-slice
+    tier: tier_2_planning
+    selected_direction: confirm_next_alpha_direction_after_realtime_runtime_slice
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0123
+      - ADR-0122
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing WebSocket outbound delivery, adding Protobuf source or generated output, adding protocol routes, wiring startup, adding stream subscriptions, chat, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, backpressure mechanisms, distributed fanout, frontend/backend split, RPC, service discovery, cluster groups, matchmaking, match runtime, persistence, migrations, dependencies, authentication/session behavior changes, route-protection changes, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, direct Nakama/Pitaya API compatibility, large object/blob storage, S3-compatible object storage, or broad product expansion beyond choosing the next direction.
+    completion:
+      - Select exactly one next alpha direction after the realtime runtime slice.
+      - Record Nakama/Pitaya reference alignment and preserve direct compatibility deferrals.
+      - Open exactly one follow-up work item as next-ready.
