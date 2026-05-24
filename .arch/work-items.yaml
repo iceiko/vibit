@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-158
+current_milestone: M-159
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: agent_native_feature_request_scaffolding_implemented
+    current_release_state: scaffolded_nakama_feature_request_intake_pilot_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0230
+    next_ready_work_item: W-0231
     preferred_after_current:
-      - pilot_scaffolded_nakama_feature_request_intake
+      - define_friends_relationship_lifecycle_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3016,7 +3016,7 @@ milestones:
 
   - id: M-158
     title: Scaffolded Nakama Feature Request Pilot
-    status: active
+    status: completed
     goal: Use the new source-first feature request scaffold on one bounded Nakama-style request intake before broad product module expansion.
     completion_criteria:
       - A scaffolded change directory is created with `tools/vibit scaffold feature`.
@@ -3025,6 +3025,20 @@ milestones:
       - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added unless the scaffolded request explicitly opens a later bounded work item.
     non_goals:
       - adding runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Used `tools/vibit scaffold feature` to create and fill `changes/2026-05-24-pilot-scaffolded-nakama-feature-request-intake/`, accepted `ADR-0138`, registered `runtime.scaffolded_nakama_feature_request_intake_pilot`, selected the Nakama `friends_groups_and_parties` capability family through a concrete player friendship relationship lifecycle request, kept Pitaya deferred, and opened `M-159/W-0231 Define friends relationship lifecycle gate` as the next-ready bounded follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted deployment, SDK, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-159
+    title: Friends Relationship Lifecycle Gate
+    status: active
+    goal: Define a contract-first gate for a future player friendship relationship lifecycle before adding runtime behavior, protocol routes, persistence, generated output, or broader social features.
+    completion_criteria:
+      - The future friendship lifecycle semantic scope is defined: request, accept, reject, remove, block, unblock, list, and read relationship status.
+      - The gate records ownership, identity, permissions, invariants, errors, events, persistence posture, protocol posture, generated output posture, redaction, test expectations, and stop conditions.
+      - Nakama remains the primary product capability reference and Pitaya remains deferred.
+      - A bounded follow-up is opened only if implementation can preserve current ask-first boundaries.
+      - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added in the gate itself.
+    non_goals:
+      - implementing friendship runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8823,7 +8837,7 @@ work_items:
   - id: W-0230
     milestone: M-158
     title: Pilot scaffolded Nakama feature request intake
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-pilot-scaffolded-nakama-feature-request-intake
     depends_on:
       - W-0229
@@ -8832,6 +8846,7 @@ work_items:
     selected_direction: pilot_scaffolded_nakama_feature_request_intake
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0138
       - ADR-0137
       - ADR-0136
       - ADR-0135
@@ -8846,3 +8861,36 @@ work_items:
       - Fill the scaffolded request with Nakama capability mapping, Pitaya deferral, acceptance criteria, test plan, implementation boundaries, verification, and durable memory expectations.
       - Select a bounded next implementation or gate follow-up only if it preserves current ask-first boundaries.
       - Preserve runtime, protocol, generated output, migration, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals unless the pilot explicitly opens a later authorized work item.
+    decision: ADR-0138
+    check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot
+    next_milestone: M-159
+    next_ready_work_item: W-0231
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: define_friends_relationship_lifecycle_gate
+    completion_summary: Used `tools/vibit scaffold feature` to create and fill the pilot change directory, selected a concrete player friendship relationship lifecycle request under the Nakama `friends_groups_and_parties` capability family, recorded acceptance criteria, future test plan, implementation boundaries, verification, and durable memory, accepted `ADR-0138`, registered `runtime.scaffolded_nakama_feature_request_intake_pilot`, and opened `M-159/W-0231 Define friends relationship lifecycle gate` as the next-ready bounded follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted deployment, SDK, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0231
+    milestone: M-159
+    title: Define friends relationship lifecycle gate
+    status: next_ready
+    change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
+    depends_on:
+      - W-0230
+    expected_change_id: define-friends-relationship-lifecycle-gate
+    tier: tier_2_standard
+    selected_direction: define_friends_relationship_lifecycle_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0138
+      - ADR-0137
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime behavior, new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of defining the friends relationship lifecycle gate.
+    completion:
+      - Define the friendship relationship lifecycle semantic boundary before implementation.
+      - Record Nakama friends/social mapping, Pitaya deferral, acceptance criteria, tests, ownership, identity, permissions, errors, events, invariants, data posture, protocol posture, generated output posture, redaction, verification, and durable memory expectations.
+      - Open a bounded follow-up only if it preserves current ask-first boundaries.
+      - Preserve runtime, protocol, generated output, migration, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals unless the gate explicitly opens a later authorized work item.

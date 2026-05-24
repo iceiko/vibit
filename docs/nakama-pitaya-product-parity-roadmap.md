@@ -237,7 +237,8 @@ agent_native_feature_request_test_workflow_decision: ADR-0128
 next_nakama_prototype_ready_capability_selection_decision: ADR-0132
 agent_native_feature_request_scaffolding_gate: docs/agent-native-feature-request-scaffolding-gate.md
 agent_native_feature_request_scaffolding_gate_decision: ADR-0136
-next_work_item: W-0230 Pilot scaffolded Nakama feature request intake
+scaffolded_nakama_feature_request_intake_pilot_decision: ADR-0138
+next_work_item: W-0231 Define friends relationship lifecycle gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -351,11 +352,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, and the feature request scaffolding gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should implement the source-first feature request scaffolding that the gate defined:
+After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, and the scaffolded Nakama intake pilot, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should define the selected friends relationship lifecycle gate:
 
 ```text
-next_work_item: W-0230 Pilot scaffolded Nakama feature request intake
-recommended_next_direction: pilot_scaffolded_nakama_feature_request_intake
+next_work_item: W-0231 Define friends relationship lifecycle gate
+recommended_next_direction: define_friends_relationship_lifecycle_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -364,8 +365,9 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 Rationale:
 
 - The project now has an explicit user-facing AI-native development workflow and has piloted it through presence/status and authenticated failure-path proof.
-- The existing source-first alpha capabilities now have a readable local example path; the next gap is to make new user requirements scaffold into specs, acceptance criteria, tests, implementation boundaries, verification, and durable memory before broad module expansion.
-- `ADR-0136` defined the scaffolding gate and `ADR-0137` implemented `tools/vibit scaffold feature`, so `W-0230 Pilot scaffolded Nakama feature request intake` should use that scaffold on one bounded Nakama request intake before any later implementation work.
+- The existing source-first alpha capabilities now have a readable local example path and source-first feature request scaffold.
+- `ADR-0138` used that scaffold on a bounded Nakama request intake, selected `friends_groups_and_parties`, and opened `W-0231 Define friends relationship lifecycle gate` before any friendship implementation work.
+- Friend relationship lifecycle is a core Nakama-class social graph primitive and should be gated before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on it.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
 - Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the source-first example path are clearer.
 

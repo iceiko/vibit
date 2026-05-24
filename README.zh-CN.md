@@ -192,10 +192,10 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0230 Pilot scaffolded Nakama feature request intake
+W-0231 Define friends relationship lifecycle gate
 ```
 
-使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
+使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0230` 已完成 scaffolded Nakama feature request intake pilot，选择 `friends_groups_and_parties`，并打开 friends relationship lifecycle gate。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
 
 ## Agent-Native 的含义
 

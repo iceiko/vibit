@@ -1,0 +1,245 @@
+schema_version: 0.1
+change_id: pilot-scaffolded-nakama-feature-request-intake
+date: 2026-05-24
+type: standard
+status: verified
+
+summary: Pilot the source-first feature request scaffold on a bounded Nakama-style friendship relationship lifecycle request and open a gate follow-up.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - social
+
+decisions:
+  added:
+    - ADR-0138
+  referenced:
+    - ADR-0137
+    - ADR-0136
+    - ADR-0135
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: define_friends_relationship_lifecycle_gate
+
+candidate_directions:
+  - define_friends_relationship_lifecycle_gate
+  - define_chat_or_group_messaging_gate
+  - define_leaderboards_or_tournaments_gate
+  - define_matchmaking_gate
+  - define_authoritative_match_runtime_gate
+  - define_minimal_operations_inspection_surface
+  - reactivate_pitaya_distributed_architecture_review
+
+runtime:
+  scaffolded_nakama_feature_request_intake_pilot: completed
+  completed_work_item: W-0230
+  completed_milestone: M-158
+  previous_completed_work_item: W-0229
+  next_milestone: M-159
+  next_work_item: W-0231
+  next_work_item_status: next_ready
+  tier: tier_2_standard
+  selected_direction: define_friends_relationship_lifecycle_gate
+  selected_nakama_capability_family: friends_groups_and_parties
+  selected_user_requirement: player_friendship_relationship_lifecycle
+  source_scaffold_decision: ADR-0137
+  source_gate_decision: ADR-0136
+  source_workflow_decision: ADR-0128
+  decision: ADR-0138
+  check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_work_item: W-0231
+  future_change_id: define-friends-relationship-lifecycle-gate
+  target_stage: prototype_ready_foundation
+  implementation_authorized_by_this_pilot: false
+  gate_defined_by_this_pilot: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protocol_bridge_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "As a game developer building on vibit, I want a future player friendship relationship lifecycle so players can request, accept, reject, remove, and block social relationships through server-authoritative rules before broader groups, parties, chat, matchmaking, or match runtime features depend on social graph state."
+user_visible_outcome: A completed scaffolded intake records the friendship lifecycle requirement, acceptance criteria, test plan, boundaries, verification, and durable memory, and opens W-0231 as a gate before implementation.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Friend relationship lifecycle is a core social graph primitive in Nakama-class backends and should precede richer social surfaces such as groups, parties, chat targeting, invites, matchmaking filters, and match social context.
+  adopted:
+    - Friend relationship lifecycle is treated as a first-class social graph capability.
+    - Player identity, permissions, state transitions, events, errors, and redaction must be defined before behavior is implemented.
+  adapted:
+    - The next step is a vibit-native semantic gate, not a direct Nakama API surface.
+    - Protocol routes, Protobuf messages, generated output, repository persistence, and startup wiring remain behind later gated work.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - broad groups, parties, chat, matchmaking, match runtime, or SDK work in this pilot
+  pitaya_status: deferred_future_architecture_reference
+
+acceptance_criteria:
+  - The scaffolded pilot records a concrete Nakama-style friendship lifecycle request.
+  - The pilot maps the request to `friends_groups_and_parties`.
+  - The pilot records acceptance criteria and a future test plan before any implementation.
+  - The pilot records implementation boundaries and all runtime/protocol/generated/migration/dependency deferrals.
+  - The pilot opens W-0231 as `Define friends relationship lifecycle gate`.
+  - The pilot adds no runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, SDK, hosted, distributed runtime, or direct compatibility scope.
+
+test_plan:
+  pilot_slice:
+    - Repository check for W-0230 completion and W-0231 next-ready state.
+    - Runtime check for ADR-0138, scaffolded change artifacts, Nakama capability mapping, selected follow-up direction, deferral markers, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  follow_up_w_0231:
+    positive_behavior:
+      - Define tests for create friend request, accept request, reject request, remove friend, block player, unblock player, list relationships, and read relationship status.
+    negative_behavior:
+      - Define tests for self-targeting, duplicate requests, invalid state transitions, blocked-player interactions, missing target player, unknown player, and redacted internal failures.
+    permission_and_authentication:
+      - Define tests that actor ownership comes from validated player identity and metadata-only identity is rejected.
+    persistence_and_transactions:
+      - Define repository and migration test expectations before any table or adapter work.
+    protocol_mapping:
+      - Defer routes and Protobuf payloads until semantic contracts are stable.
+    failure_paths_and_redaction:
+      - Define public error classes that do not leak private relationship, token, credential, transport, or database details.
+    concurrency_or_ordering:
+      - Define state transition and idempotency expectations before implementation.
+    integration_or_e2e:
+      - Defer local alpha E2E proof until route and runtime implementation slices are authorized.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-24-pilot-scaffolded-nakama-feature-request-intake/
+    - decisions/ADR-0138-scaffolded-nakama-feature-request-intake-pilot.md
+    - conversations/2026-05-24-scaffolded-nakama-feature-request-intake-pilot.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - friendship runtime behavior in this pilot
+    - friend protocol routes
+    - Protobuf source
+    - generated output
+    - repository interfaces or PostgreSQL adapters
+    - migrations or indexes
+    - dependency changes
+    - persistence changes
+    - startup wiring
+    - authentication/session behavior changes
+    - groups, parties, chat, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, distributed runtime, or direct compatibility
+
+generated_output:
+  required: false
+  source_of_truth: not_applicable
+
+migrations:
+  required: false
+  source: not_applicable
+
+dependencies:
+  added: []
+  posture: no_new_dependency_expected
+
+redaction:
+  raw_device_credentials_allowed: false
+  raw_access_tokens_allowed: false
+  verifier_keys_allowed: false
+  credential_or_token_digests_allowed: false
+  dsn_with_credentials_allowed: false
+  github_tokens_allowed: false
+  private_user_data_policy: record_only_explicit_request_text_or_redacted_placeholders
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.scaffolded_nakama_feature_request_intake_pilot
+    - node tools/vibit check change pilot-scaffolded-nakama-feature-request-intake --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

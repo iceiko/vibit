@@ -165,6 +165,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.agent_native_feature_request_scaffolding_selection",
   "runtime.agent_native_feature_request_scaffolding_gate",
   "runtime.agent_native_feature_request_scaffolding_implementation",
+  "runtime.scaffolded_nakama_feature_request_intake_pilot",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -33578,6 +33579,194 @@ function checkRuntimeAgentNativeFeatureRequestScaffoldingImplementation(root, go
   });
 }
 
+function checkRuntimeScaffoldedNakamaFeatureRequestIntakePilot(root, goFiles) {
+  const ruleId = "runtime.scaffolded_nakama_feature_request_intake_pilot";
+  const decisionPath = "decisions/ADR-0138-scaffolded-nakama-feature-request-intake-pilot.md";
+  const changePath = "changes/2026-05-24-pilot-scaffolded-nakama-feature-request-intake";
+  const conversationPath = "conversations/2026-05-24-scaffolded-nakama-feature-request-intake-pilot.md";
+
+  if (!scaffoldedNakamaFeatureRequestIntakePilotCompleted(root)) {
+    ok("scaffolded Nakama feature request intake pilot is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for scaffolded Nakama feature request intake pilot`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for scaffolded Nakama feature request intake pilot`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-158"],
+    [".arch/work-items.yaml", "title: Scaffolded Nakama Feature Request Pilot"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0230"],
+    [".arch/work-items.yaml", "title: Pilot scaffolded Nakama feature request intake"],
+    [".arch/work-items.yaml", "decision: ADR-0138"],
+    [".arch/work-items.yaml", "check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    [".arch/work-items.yaml", "selected_nakama_capability_family: friends_groups_and_parties"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: define_friends_relationship_lifecycle_gate"],
+    [".arch/work-items.yaml", "id: M-159"],
+    [".arch/work-items.yaml", "title: Friends Relationship Lifecycle Gate"],
+    [".arch/work-items.yaml", "id: W-0231"],
+    [".arch/work-items.yaml", "title: Define friends relationship lifecycle gate"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot: ADR-0138"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_completed: true"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_next_work_item: W-0231"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_next_direction: define_friends_relationship_lifecycle_gate"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_selected_nakama_capability_family: friends_groups_and_parties"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_selected_user_requirement: player_friendship_relationship_lifecycle"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_protocol_route_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_protobuf_source_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_generated_output_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_migration_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_dependency_added: false"],
+    [".arch/runtime.yaml", "scaffolded_nakama_feature_request_intake_pilot_direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    [".arch/contracts.yaml", "check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    [".arch/contracts.yaml", "selected_nakama_capability_family: friends_groups_and_parties"],
+    [".arch/reference.yaml", "phase_2eo_scaffolded_nakama_feature_request_pilot"],
+    [".arch/reference.yaml", "phase_2ep_friends_relationship_lifecycle_gate"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.scaffolded_nakama_feature_request_intake_pilot"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.scaffolded_nakama_feature_request_intake_pilot"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0138",
+      "friends_groups_and_parties",
+      "define_friends_relationship_lifecycle_gate",
+      "M-159/W-0231",
+      "Nakama",
+      "Pitaya remains deferred",
+      "does not define the gate itself",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "scaffolded_nakama_feature_request_intake_pilot: completed",
+      "completed_work_item: W-0230",
+      "completed_milestone: M-158",
+      "next_milestone: M-159",
+      "next_work_item: W-0231",
+      "selected_direction: define_friends_relationship_lifecycle_gate",
+      "selected_nakama_capability_family: friends_groups_and_parties",
+      "selected_user_requirement: player_friendship_relationship_lifecycle",
+      "check_rule: runtime.scaffolded_nakama_feature_request_intake_pilot",
+      "implementation_authorized_by_this_pilot: false",
+      "gate_defined_by_this_pilot: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0230",
+      "W-0231",
+      "ADR-0138",
+      "friends_groups_and_parties",
+      "player_friendship_relationship_lifecycle",
+      "runtime.scaffolded_nakama_feature_request_intake_pilot",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Scaffolded Nakama feature request intake pilot completes W-0230, opens W-0231, selects friends relationship lifecycle, and adds no runtime/protocol/generated/migration/dependency/SDK/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -35359,7 +35548,14 @@ function agentNativeFeatureRequestScaffoldingImplementationCompleted(root) {
   return workItemHasStatus(root, "W-0229", "completed");
 }
 
+function scaffoldedNakamaFeatureRequestIntakePilotCompleted(root) {
+  return workItemHasStatus(root, "W-0230", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (scaffoldedNakamaFeatureRequestIntakePilotCompleted(root)) {
+    return "repository_next_work_item: W-0231";
+  }
   if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
     return "repository_next_work_item: W-0230";
   }
@@ -35412,6 +35608,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (scaffoldedNakamaFeatureRequestIntakePilotCompleted(root)) {
+    return "repository_next_work_item_scope: define_friends_relationship_lifecycle_gate";
+  }
   if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
     return "repository_next_work_item_scope: pilot_scaffolded_nakama_feature_request_intake";
   }
@@ -35455,6 +35654,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (scaffoldedNakamaFeatureRequestIntakePilotCompleted(root)) {
+    return "W-0231 Define friends relationship lifecycle gate";
+  }
   if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
     return "W-0230 Pilot scaffolded Nakama feature request intake";
   }
@@ -35522,6 +35724,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0230", "next_ready_work_item: W-0231"],
     ["W-0229", "next_ready_work_item: W-0230"],
     ["W-0228", "next_ready_work_item: W-0229"],
     ["W-0227", "next_ready_work_item: W-0228"],
@@ -35580,6 +35783,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0230", "completed")) {
+    return "next_work_item: W-0231";
+  }
   if (workItemHasStatus(root, "W-0229", "completed")) {
     return "next_work_item: W-0230";
   }
@@ -35699,6 +35905,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0230", "define_friends_relationship_lifecycle_gate"],
     ["W-0229", "pilot_scaffolded_nakama_feature_request_intake"],
     ["W-0228", "implement_agent_native_feature_request_scaffolding"],
     ["W-0227", "define_agent_native_feature_request_scaffolding_gate"],
@@ -35757,6 +35964,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0230", "W-0231 Define friends relationship lifecycle gate"],
     ["W-0229", "W-0230 Pilot scaffolded Nakama feature request intake"],
     ["W-0228", "W-0229 Implement agent-native feature request scaffolding"],
     ["W-0227", "W-0228 Define agent-native feature request scaffolding gate"],
@@ -35816,6 +36024,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0230", "current_phase: define_friends_relationship_lifecycle_gate"],
     ["W-0229", "current_phase: pilot_scaffolded_nakama_feature_request_intake"],
     ["W-0228", "current_phase: implement_agent_native_feature_request_scaffolding"],
     ["W-0227", "current_phase: define_agent_native_feature_request_scaffolding_gate"],
@@ -36435,6 +36644,7 @@ function checkRuntime(root) {
   checkRuntimeAgentNativeFeatureRequestScaffoldingSelection(root, goFiles);
   checkRuntimeAgentNativeFeatureRequestScaffoldingGate(root, goFiles);
   checkRuntimeAgentNativeFeatureRequestScaffoldingImplementation(root, goFiles);
+  checkRuntimeScaffoldedNakamaFeatureRequestIntakePilot(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
