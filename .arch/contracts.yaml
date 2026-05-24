@@ -53,7 +53,7 @@ implemented_wire_and_runtime_slices:
     protocol_route_added: false
     generated_output_added: false
     dependencies_added: false
-    recommended_next_direction: implement_local_alpha_example_client_path
+    recommended_next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
     rule: W-0168 ratified product parity as common capability coverage, and ADR-0127 refines that posture to Nakama-first product planning with Pitaya deferred to future distributed architecture review. It adds no runtime behavior, protocol route, generated output, dependency, migration, or direct external API compatibility.
   protocol_logout_route_gate:
     protocol_logout_route_gate_defined: true
@@ -1963,6 +1963,52 @@ implemented_wire_and_runtime_slices:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0225 defined the source-first local alpha example client path gate and opened W-0226 as the bounded implementation follow-up without adding example implementation, SDK, generated client library, runtime behavior, protocol, generated output, migration, dependency, hosted, release, distributed runtime, or direct compatibility scope.
+  local_alpha_example_client_path_implementation:
+    status: completed
+    milestone: M-154
+    completed_work_item: W-0226
+    decision: ADR-0134
+    change: changes/2026-05-24-implement-local-alpha-example-client-path
+    source_gate_decision: ADR-0133
+    check_rule: runtime.local_alpha_example_client_path_implementation
+    selected_direction: implement_local_alpha_example_client_path
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+    next_ready_work_item: W-0227
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    example_docs: examples/local-alpha-client/README.md
+    example_docs_translation: examples/local-alpha-client/README.zh-CN.md
+    example_script: examples/local-alpha-example-client.sh
+    compatibility_script: examples/local-alpha-request-loop.sh
+    runtime_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    accepted_existing_routes:
+      - runtime.authentication.AuthenticateWithDeviceCredential
+      - runtime.connection.BindConnection
+      - inventory.GrantItem
+      - inventory.GetInventory
+      - presence.GetPlayerPresence
+      - storage.GetOwnStorageObject
+      - storage.ListOwnStorageObjects
+      - storage.PutOwnStorageObject
+      - storage.DeleteOwnStorageObject
+      - runtime.authentication.LogoutAccessToken
+    path_posture: source_first_local_alpha_example_client_path
+    public_sdk_posture: not_a_public_sdk
+    sdk_added: false
+    generated_client_library_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    hosted_deployment_added: false
+    release_artifact_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0226 implements the source-first local alpha example client path under examples using existing runtime proof tests and opens W-0227 as the next Nakama-first selection without adding SDK, generated client library, runtime behavior, protocol, generated output, migration, dependency, hosted, release, distributed runtime, or direct compatibility scope.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

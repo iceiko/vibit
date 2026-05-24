@@ -1,0 +1,233 @@
+schema_version: 0.1
+change_id: implement-local-alpha-example-client-path
+date: 2026-05-24
+type: feature
+status: verified
+
+summary: Implement the source-first repository-local local alpha example client path using existing runtime and protocol proofs without adding SDKs, generated clients, runtime behavior, protocol routes, generated output, migrations, dependencies, hosted surfaces, or direct compatibility.
+
+affected_modules:
+  - examples
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0134
+  referenced:
+    - ADR-0133
+    - ADR-0132
+    - ADR-0131
+    - ADR-0128
+    - ADR-0127
+    - ADR-0108
+    - ADR-0097
+    - ADR-0094
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  local_alpha_example_client_path_implementation: completed
+  completed_work_item: W-0226
+  completed_milestone: M-154
+  previous_completed_work_item: W-0225
+  next_milestone: M-155
+  next_work_item: W-0227
+  next_work_item_status: next_ready
+  selected_direction: implement_local_alpha_example_client_path
+  selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+  selected_nakama_capability_family: client_sdks_examples_and_developer_experience
+  decision: ADR-0134
+  source_gate_decision: ADR-0133
+  source_selection_decision: ADR-0132
+  source_workflow_decision: ADR-0128
+  check_rule: runtime.local_alpha_example_client_path_implementation
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  path_posture: source_first_local_alpha_example_client_path
+  public_sdk_posture: not_a_public_sdk
+  live_network_client_posture: deferred_until_public_onboarding_and_client_package_boundary
+  example_docs_added: examples/local-alpha-client/README.md
+  example_docs_translation_added: examples/local-alpha-client/README.zh-CN.md
+  example_script_added: examples/local-alpha-example-client.sh
+  compatibility_script_updated: examples/local-alpha-request-loop.sh
+  future_selection_work_item: W-0227
+  future_selection_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+  demonstrated_existing_routes:
+    - runtime.authentication.AuthenticateWithDeviceCredential
+    - runtime.connection.BindConnection
+    - inventory.GrantItem
+    - inventory.GetInventory
+    - presence.GetPlayerPresence
+    - storage.GetOwnStorageObject
+    - storage.ListOwnStorageObjects
+    - storage.PutOwnStorageObject
+    - storage.DeleteOwnStorageObject
+    - runtime.authentication.LogoutAccessToken
+  tests_reused:
+    - TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout
+    - TestStorageObjectsProtocolRouteLocalAlphaFlow
+    - TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation
+    - TestAuthenticatedGameplayFailurePathsLocalAlphaFlow
+  sdk_added: false
+  generated_client_library_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  delivery_guarantees_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Implement a clearer source-first local alpha example client path for the existing local alpha gameplay flow.
+nakama_capability_family: client_sdks_examples_and_developer_experience
+
+nakama_capability_mapping:
+  family: client_sdks_examples_and_developer_experience
+  product_intent: Make the existing local alpha backend loop easier for developers and AI agents to understand before broader product expansion.
+  adopted:
+    - clear example/evaluation path pressure
+    - developer experience priority before broader product modules
+  adapted:
+    - source-first repository-local example instead of public SDK
+    - internal runtime proof reuse until public client package boundaries exist
+    - redacted shell entrypoint over existing Go E2E proof
+  rejected:
+    - direct Nakama API compatibility
+    - Nakama public route names or client SDK shapes
+    - public SDK or generated client package in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+acceptance_criteria:
+  - `examples/local-alpha-client/README.md` and `examples/local-alpha-client/README.zh-CN.md` describe the source-first local alpha example client path.
+  - `examples/local-alpha-example-client.sh` runs the focused local alpha flow proof using existing runtime and protocol tests.
+  - `examples/local-alpha-request-loop.sh` remains available as a compatibility wrapper.
+  - The example path demonstrates local onboarding, device credential login, connection binding, protected inventory, protected presence, own-player storage object put/get/list/delete, logout, rejected post-logout protected request, and selected failure-path redaction checks.
+  - The example path output remains redacted and must not print raw credentials, raw access tokens, digests, verifier keys, DSNs, or transport metadata.
+  - The slice opens W-0227 as a next Nakama-first capability selection follow-up.
+  - The slice does not add SDKs, generated clients, runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, hosted surfaces, release artifacts, Pitaya-style distributed architecture, or direct compatibility.
+
+test_plan:
+  focused_go_tests:
+    - examples/local-alpha-example-client.sh
+    - examples/local-alpha-request-loop.sh
+    - cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
+  repository_checks:
+    - Repository check for W-0226 completion and W-0227 next-ready state.
+    - Runtime check for ADR-0134, example docs, example script, reused tests, redaction markers, accepted existing routes, deferrals, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - `cd runtime && go test ./...` is optional because this slice does not change Go source, but focused Go E2E proof is required through the example script.
+
+implementation_boundaries:
+  allowed:
+    - examples/local-alpha-client/README.md
+    - examples/local-alpha-client/README.zh-CN.md
+    - examples/local-alpha-example-client.sh
+    - examples/local-alpha-request-loop.sh
+    - examples/README.md
+    - examples/README.zh-CN.md
+    - changes/2026-05-24-implement-local-alpha-example-client-path/
+    - decisions/ADR-0134-local-alpha-example-client-path-implementation.md
+    - conversations/2026-05-24-local-alpha-example-client-path-implementation.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - SDK publication or generated client libraries
+    - public onboarding protocol routes
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - persistence changes
+    - authentication/session behavior changes
+    - delivery guarantees, stream subscriptions, chat, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, hosted demos, release artifacts, or direct compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  - examples/README.md
+  - examples/README.zh-CN.md
+  - examples/local-alpha-client/README.md
+  - examples/local-alpha-client/README.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - examples/local-alpha-example-client.sh
+    - examples/local-alpha-request-loop.sh
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.local_alpha_example_client_path_implementation
+    - node tools/vibit check change implement-local-alpha-example-client-path --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

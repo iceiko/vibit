@@ -235,7 +235,7 @@ realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
 next_nakama_prototype_ready_capability_selection_decision: ADR-0132
-next_work_item: W-0226 Implement local alpha example client path
+next_work_item: W-0227 Select next Nakama prototype-ready capability after local alpha example client path
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -243,7 +243,7 @@ Goal: move from a source-first alpha that developers can inspect to a foundation
 Candidate work:
 
 - Reduce local setup, migration, and configuration friction. Completed by `W-0200`.
-- Define and then add a clearer example client or example app path. Gate completed by `W-0225`; implementation next-ready as `W-0226`.
+- Define and then add a clearer example client or example app path. Completed by `W-0225` and `W-0226`.
 - Define first general storage-object behavior beyond the inventory proof slice. Completed by `W-0201`.
 - Define first storage objects persistence schema posture. Completed by `W-0202`.
 - Add the first storage objects migration source. Completed by `W-0203`.
@@ -349,10 +349,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, and the example client path gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should implement the source-first local alpha example client path:
+After authenticated failure-path proof, next capability selection, the example client path gate, and the example client path implementation, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should select the next bounded Nakama prototype-ready capability:
 
 ```text
-recommended_next_direction: implement_local_alpha_example_client_path
+recommended_next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

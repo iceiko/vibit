@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-154
+current_milestone: M-155
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: local_alpha_example_client_path_gate_defined
+    current_release_state: local_alpha_example_client_path_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0226
+    next_ready_work_item: W-0227
     preferred_after_current:
-      - implement_local_alpha_example_client_path
+      - select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2959,7 +2959,7 @@ milestones:
 
   - id: M-154
     title: Local Alpha Example Client Path Implementation
-    status: active
+    status: completed
     goal: Implement the first source-first local alpha example client path using existing runtime and protocol behavior while preserving redaction, internal package boundaries, no-SDK-publication, no-hosted-demo, no-new-protocol, and direct compatibility deferrals.
     completion_criteria:
       - A clear repository-local example path exists under `examples/` for developers and AI agents to follow.
@@ -2967,6 +2967,21 @@ milestones:
       - The example path keeps raw credentials, raw access tokens, digests, verifier keys, DSNs, and transport metadata redacted.
       - Verification covers the example path and the repository continuation state.
     non_goals:
+      - publishing SDKs, generated client libraries, packages, binaries, containers, hosted demos, install scripts, or release artifacts
+      - adding public onboarding routes, live external client guarantees, new protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the first source-first local alpha example client path under `examples/local-alpha-client/` and `examples/local-alpha-example-client.sh`, preserved `examples/local-alpha-request-loop.sh` as a compatibility wrapper, accepted `ADR-0134`, registered `runtime.local_alpha_example_client_path_implementation`, and opened `M-155/W-0227 Select next Nakama prototype-ready capability after local alpha example client path` as the next-ready follow-up. The path reuses existing local alpha E2E proofs for onboarding, login, connection binding, protected inventory, presence, storage objects, logout, post-logout rejection, and failure-path redaction without adding SDKs, generated clients, runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, hosted deployment, release artifacts, distributed runtime, or direct Nakama/Pitaya API compatibility.
+
+  - id: M-155
+    title: Next Nakama Prototype-Ready Capability Selection After Example Path
+    status: active
+    goal: Select the next bounded Nakama-first prototype-ready capability after the source-first local alpha example client path is implemented, while preserving AI-native development/testing workflow and keeping Pitaya deferred.
+    completion_criteria:
+      - The next capability family is selected from the Nakama-first roadmap.
+      - The selection records why the next step should precede broad chat, groups, matchmaking, match runtime, operations/admin, SDK publication, hosted surfaces, or distributed runtime.
+      - A bounded follow-up work item is opened.
+      - Ask-first boundaries remain in place for runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, SDK publication, hosted deployments, release artifacts, Pitaya-style distributed architecture, and direct compatibility.
+    non_goals:
+      - implementing the selected capability in the selection slice
       - publishing SDKs, generated client libraries, packages, binaries, containers, hosted demos, install scripts, or release artifacts
       - adding public onboarding routes, live external client guarantees, new protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, or direct Nakama/Pitaya API compatibility
 
@@ -8634,7 +8649,7 @@ work_items:
   - id: W-0226
     milestone: M-154
     title: Implement local alpha example client path
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-implement-local-alpha-example-client-path
     depends_on:
       - W-0225
@@ -8660,3 +8675,37 @@ work_items:
       - Keep raw credentials, raw access tokens, digests, verifier keys, DSNs, and transport metadata redacted.
       - Reuse existing runtime and protocol behavior without adding routes, Protobuf source, generated output, dependencies, migrations, persistence, startup wiring, SDK publication, hosted surfaces, release artifacts, distributed runtime, or direct compatibility.
       - Verify the example path and update durable memory.
+    decision: ADR-0134
+    check_rule: runtime.local_alpha_example_client_path_implementation
+    next_milestone: M-155
+    next_ready_work_item: W-0227
+    completion_summary: Implemented the source-first local alpha example client path with `examples/local-alpha-client/README.md`, `examples/local-alpha-client/README.zh-CN.md`, and `examples/local-alpha-example-client.sh`; kept `examples/local-alpha-request-loop.sh` as a compatibility wrapper; reused existing focused local alpha Protobuf E2E proofs for onboarding, login, connection binding, protected inventory, presence, storage objects, logout, rejected post-logout requests, failure-path handling, and redaction checks; and opened `M-155/W-0227 Select next Nakama prototype-ready capability after local alpha example client path` as the next-ready follow-up. No SDK, generated client library, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, hosted deployment, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0227
+    milestone: M-155
+    title: Select next Nakama prototype-ready capability after local alpha example client path
+    status: next_ready
+    change: changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path
+    depends_on:
+      - W-0226
+    expected_change_id: select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path
+    tier: tier_1_planning
+    selected_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0134
+      - ADR-0133
+      - ADR-0132
+      - ADR-0128
+      - ADR-0127
+      - ADR-0108
+      - ADR-0097
+      - ADR-0094
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime behavior, new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of selecting the next bounded Nakama prototype-ready capability.
+    completion:
+      - Review the Nakama-first roadmap and current alpha foundation after the source-first example client path implementation.
+      - Select one next bounded prototype-ready capability or foundation gap with explicit rationale and deferrals.
+      - Open a follow-up work item that can apply the agent-native requirement/test workflow without broadening scope prematurely.

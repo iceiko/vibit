@@ -7,18 +7,24 @@ The paired Simplified Chinese translation is `examples/README.zh-CN.md`. The Eng
 
 This directory contains source-first local examples and templates. These files are not product SDKs, release artifacts, hosted demos, install scripts, package registry publications, or direct Nakama/Pitaya compatibility surfaces.
 
-## Local Alpha Request Loop
+## Local Alpha Example Client Path
 
 Run from the repository root:
 
 ```bash
-examples/local-alpha-request-loop.sh
+examples/local-alpha-example-client.sh
+```
+
+The source-first guide is:
+
+```text
+examples/local-alpha-client/README.md
 ```
 
 The script wraps the focused authenticated gameplay E2E proof:
 
 ```bash
-cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow' -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
 ```
 
 It proves:
@@ -30,13 +36,17 @@ local onboarding
 -> protected inventory grant/read
 -> protected presence query
 -> protected own-player storage object put/get/list/delete
+-> presence online/offline proof after close and invalidation
 -> logout
 -> post-logout protected request rejection
+-> protected request failure-path and redaction checks
 ```
 
 The storage object proof uses the existing `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject` routes with `vibit.storage.v1` Protobuf payloads. It demonstrates Nakama-class durable player storage object capability coverage at the local request-flow level while preserving vibit's own route names and no direct Nakama/Pitaya API compatibility. It also demonstrates Pitaya-aligned layering by keeping transport, protocol adaptation, session metadata, route protection, application handlers, service behavior, and repository handoff separate.
 
 The script is intentionally redacted. It must not print raw credentials, raw access tokens, verifier keys, DSNs, digests, headers, cookies, query strings, WebSocket subprotocol values, remote addresses, or concrete transport metadata.
+
+The older `examples/local-alpha-request-loop.sh` entrypoint remains as a compatibility wrapper around `examples/local-alpha-example-client.sh`.
 
 ## Local Environment Template
 

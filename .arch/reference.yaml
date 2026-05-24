@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_local_alpha_example_client_path
-  recommended_next_direction: implement_local_alpha_example_client_path
+  current_near_term_priority: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+  recommended_next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: local_alpha_example_client_path_gate_defined
+  current_state: local_alpha_example_client_path_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0226
-  immediate_next_direction: implement_local_alpha_example_client_path
+  immediate_next_work_item: W-0227
+  immediate_next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4756,12 +4756,17 @@ phase_plan:
     future_example_script_candidate: examples/local-alpha-example-client.sh
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ek_local_alpha_example_client_path_implementation:
-    status: next_ready
+    status: completed
     milestone: M-154
-    next_ready_work_item: W-0226
+    completed_work_item: W-0226
     previous_completed_work_item: W-0225
     selected_direction: implement_local_alpha_example_client_path
     expected_change: changes/2026-05-24-implement-local-alpha-example-client-path
+    decision: ADR-0134
+    check_rule: runtime.local_alpha_example_client_path_implementation
+    next_milestone: M-155
+    next_ready_work_item: W-0227
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
     reference_mapping:
       nakama: Implement the source-first local alpha example path so developers can understand the current login, binding, protected gameplay, storage, presence, logout, and failure behavior without SDK publication.
       pitaya: Pitaya remains deferred; do not use the example implementation to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
@@ -4770,6 +4775,31 @@ phase_plan:
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     selected_nakama_capability_family: client_sdks_examples_and_developer_experience
+    example_docs: examples/local-alpha-client/README.md
+    example_script: examples/local-alpha-example-client.sh
+    compatibility_script: examples/local-alpha-request-loop.sh
+    runtime_proof: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    sdk_added: false
+    generated_client_library_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2el_select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path:
+    status: next_ready
+    milestone: M-155
+    next_ready_work_item: W-0227
+    previous_completed_work_item: W-0226
+    selected_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+    expected_change: changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path
+    reference_mapping:
+      nakama: Select the next bounded prototype-ready capability after the local alpha example client path makes the existing capability loop readable.
+      pitaya: Pitaya remains deferred; do not use the selection to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
+    target_stage: prototype_ready_foundation
+    source_example_client_path_decision: ADR-0134
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned
