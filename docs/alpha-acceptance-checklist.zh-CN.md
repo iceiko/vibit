@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 `W-0221 Pilot Nakama-aligned feature request workflow` continuation step。
+- [x] `node tools/vibit inspect next` 能识别当前 `W-0222 Harden presence status local proof through close and offline cases` continuation step。
 - [x] `docs/prototype-ready-local-development-path-package.md` 已打包可重复 source-first local path。
 
 ## 4. Local Prerequisites
@@ -127,7 +127,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release、discovery、prototype-ready、storage objects、realtime outbound delivery 和 Nakama-first direction artifacts 继续记录在既有文档中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。下一步 work 是 `W-0221 Pilot Nakama-aligned feature request workflow`。
+Release、discovery、prototype-ready、storage objects、realtime outbound delivery、Nakama-first direction、agent-native feature request/test workflow 和 Nakama-aligned presence/status pilot artifacts 继续记录在既有文档中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`。下一步 work 是 `W-0222 Harden presence status local proof through close and offline cases`。
 
 Alpha acceptance 的追溯引用包括 `docs/first-alpha-user-discovery-loop.md`、`docs/first-alpha-feedback-intake-surfaces.md`、`docs/product-maturity-milestones.md`、`docs/prototype-ready-foundation-execution-plan.md`、`docs/prototype-ready-local-development-path-gate.md`、`docs/storage-objects-behavior-gate.md` 和 `docs/storage-objects-persistence-schema-gate.md`。
 
@@ -170,6 +170,6 @@ first_server_push_realtime_messaging_runtime_slice_completed: true
 realtime_protocol_websocket_outbound_delivery_gate_defined: true
 realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
-next_direction: pilot_nakama_aligned_feature_request_workflow
+next_direction: presence_status_local_proof_hardening
 next_work_status: next_ready
 ```

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-149
+current_milestone: M-150
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: agent_native_feature_request_test_workflow_defined
+    current_release_state: nakama_presence_status_workflow_pilot_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0221
+    next_ready_work_item: W-0222
     preferred_after_current:
-      - pilot_nakama_aligned_feature_request_workflow
+      - presence_status_local_proof_hardening
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2884,7 +2884,7 @@ milestones:
 
   - id: M-149
     title: Nakama-Aligned Feature Request Workflow Pilot
-    status: active
+    status: completed
     goal: Apply the agent-native feature request and test workflow to choose and shape the next bounded Nakama-aligned prototype-ready feature slice.
     completion_criteria:
       - A concrete user-facing Nakama-style capability request is captured.
@@ -2896,6 +2896,21 @@ milestones:
       - adding protocol routes, Protobuf source, generated output, migrations, or dependencies without a bounded follow-up work item
       - adding chat, groups, matchmaking, match runtime, leaderboards, economy, operations, SDKs, or distributed runtime as an unbounded module expansion
       - adding direct Nakama/Pitaya API compatibility
+    completion_summary: Applied the agent-native feature request and test workflow to a concrete Nakama-style presence/status capability request, accepted ADR-0129, recorded requirement/spec/acceptance criteria/test plan/implementation boundaries/verification/memory expectations, selected `presence_status_and_notifications` as the Nakama capability family, and opened `M-150/W-0222 Harden presence status local proof through close and offline cases` as the next-ready bounded follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, broad product module, Pitaya-style distributed architecture, hosted deployment, release artifact, public announcement, paid promotion, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-150
+    title: Presence Status Local Proof Hardening
+    status: active
+    goal: Harden the existing Nakama-style self-presence/status local alpha proof around close, invalidation, offline, and redaction behavior without broadening into subscriptions, chat, groups, matchmaking, match runtime, persistence, or direct compatibility.
+    completion_criteria:
+      - Existing presence/status behavior is proven through focused tests for online active bound connections and offline after close or invalidation.
+      - The local alpha request-flow proof covers the selected presence/status behavior or records why a lower-level proof is the right boundary.
+      - The proof uses existing runtime, protocol, and generated surfaces unless the bounded work item explicitly records otherwise.
+      - Pitaya remains deferred and direct Nakama/Pitaya API compatibility remains out of scope.
+    non_goals:
+      - adding new presence protocol routes or Protobuf messages
+      - adding presence subscriptions, status broadcast fanout, chat, groups, parties, matchmaking, match runtime, leaderboards, economy, SDKs, operations, or distributed runtime
+      - adding persistence, migrations, dependencies, startup wiring, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8404,7 +8419,7 @@ work_items:
   - id: W-0221
     milestone: M-149
     title: Pilot Nakama-aligned feature request workflow
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow
     depends_on:
       - W-0220
@@ -8413,6 +8428,7 @@ work_items:
     selected_direction: pilot_nakama_aligned_feature_request_workflow
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0129
       - ADR-0128
       - ADR-0127
       - ADR-0106
@@ -8425,3 +8441,32 @@ work_items:
       - Apply the agent-native feature request and test workflow to a concrete Nakama-aligned product capability request.
       - Record the request, Nakama capability family, acceptance criteria, test plan, implementation boundaries, verification plan, and durable memory expectations.
       - Select or open one bounded follow-up work item without adding unbounded runtime/product scope.
+    selected_nakama_capability_family: presence_status_and_notifications
+    next_milestone: M-150
+    next_ready_work_item: W-0222
+    completion_summary: Piloted the agent-native feature request workflow on a concrete Nakama-style self-presence/status local alpha requirement, accepted `ADR-0129`, selected `presence_status_and_notifications` as the capability family, recorded acceptance criteria, test plan, implementation boundaries, verification, and durable memory expectations, and opened `W-0222 Harden presence status local proof through close and offline cases` as the next-ready bounded follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, broad product module, Pitaya-style distributed architecture, hosted deployment, release artifact, public announcement, paid promotion, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0222
+    milestone: M-150
+    title: Harden presence status local proof through close and offline cases
+    status: next_ready
+    change: changes/2026-05-24-harden-presence-status-local-proof
+    depends_on:
+      - W-0221
+    expected_change_id: harden-presence-status-local-proof
+    tier: tier_2_runtime
+    selected_direction: presence_status_local_proof_hardening
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0129
+      - ADR-0128
+      - ADR-0087
+      - ADR-0085
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding new protocol routes or Protobuf messages, generated output, migrations, dependencies, persistence, presence subscriptions, status broadcast fanout, chat, groups, parties, matchmaking, match runtime, operations/admin behavior, SDKs, distributed runtime, startup wiring, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of hardening the bounded local presence/status proof.
+    completion:
+      - Add or strengthen focused tests that prove existing self-presence reports online from active bound connections and offline after close or invalidation.
+      - Add or strengthen local alpha request-flow proof only where it uses existing protocol and runtime surfaces.
+      - Record verification and memory updates without broadening presence/status into subscriptions, broadcasts, chat, social, persistence, distributed runtime, or direct compatibility.

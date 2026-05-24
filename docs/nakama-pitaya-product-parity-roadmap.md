@@ -35,6 +35,12 @@ fourth_direction: define_protocol_session_carrier_gate
 first_module_expansion_after_lifecycle: define_presence_lifecycle_gate
 ```
 
+Historical `W-0220` workflow markers are retained for repository check traceability. They record the direction that opened the now-completed workflow pilot, not the current next-ready item:
+
+```text
+recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
+```
+
 vibit should become a Nakama-class open-source game backend framework with AI-native development and AI-native testing as the product purpose. This means vibit must cover the common product capability families that game teams expect from Nakama-style systems while preserving vibit's core differentiator: users state backend requirements in ordinary product language, and AI agents turn those requirements into bounded specs, acceptance criteria, tests, implementation, verification records, ADRs, manifests, and repository checks.
 
 Product parity means comparable capability coverage and operational usefulness. It does not mean direct API compatibility, copied public routes, copied data models, copied clustering internals, or a commitment to follow every implementation detail from Nakama. Pitaya-style frontend/backend, RPC, service discovery, cluster groups, and distributed topology remain future concerns until a later ADR reintroduces Pitaya as an active architecture reference.
@@ -222,7 +228,7 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0221 Pilot Nakama-aligned feature request workflow
+next_work_item: W-0222 Harden presence status local proof through close and offline cases
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -247,7 +253,8 @@ Candidate work:
 - Implement the realtime protocol and WebSocket outbound delivery slice. Completed by `W-0218`.
 - Confirm the next alpha direction after realtime outbound delivery. Completed by `W-0219`.
 - Define the agent-native feature request and test workflow. Completed by `W-0220`.
-- Pilot the Nakama-aligned feature request workflow. Next.
+- Pilot the Nakama-aligned feature request workflow. Completed by `W-0221`.
+- Harden presence/status local proof through close and offline cases. Next.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
 
@@ -338,7 +345,7 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 After defining the agent-native feature request and test workflow, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, or distributed runtime. The next concrete work should pilot that workflow on one Nakama-aligned capability request:
 
 ```text
-recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
+recommended_next_direction: presence_status_local_proof_hardening
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

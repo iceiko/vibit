@@ -33,6 +33,12 @@ first_module_expansion_after_lifecycle: define_presence_lifecycle_gate
 Nakama/Pitaya-class game backend product
 ```
 
+保留历史 `W-0220` workflow markers 供 repository checks 追踪。它们记录的是当时打开、现在已经完成的 workflow pilot 方向，不是当前 next-ready item：
+
+```text
+recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
+```
+
 vibit 应成为 Nakama-class 的开源游戏后端框架，并把 AI-native development 与 AI-native testing 作为产品目的。这意味着 vibit 必须覆盖游戏团队通常期待 Nakama-style 系统提供的常用能力族，同时保留 vibit 的核心差异化：用户用普通产品语言描述 backend requirement，AI agents 把需求转成 bounded specs、acceptance criteria、tests、implementation、verification records、ADRs、manifests 和 repository checks。
 
 产品同级意味着能力覆盖和运维实用性接近。它不意味着直接 API 兼容，不意味着复制公开 routes、data models、clustering internals，也不意味着照搬 Nakama 的实现细节。Pitaya-style frontend/backend、RPC、service discovery、cluster groups 和 distributed topology 仍是未来事项，直到后续 ADR 重新把 Pitaya 激活为 active architecture reference。
@@ -220,7 +226,7 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0221 Pilot Nakama-aligned feature request workflow
+next_work_item: W-0222 Harden presence status local proof through close and offline cases
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -244,7 +250,9 @@ next_work_item: W-0221 Pilot Nakama-aligned feature request workflow
 - 确认 realtime runtime slice 后的下一项 alpha direction。已由 `W-0216` 完成。
 - 实现 realtime protocol and WebSocket outbound delivery slice。已由 `W-0218` 完成。
 - 确认 realtime outbound delivery 后的下一项 alpha direction。已由 `W-0219` 完成。
-- 定义 agent-native feature request and test workflow。Next。
+- 定义 agent-native feature request and test workflow。已由 `W-0220` 完成。
+- 试点 Nakama-aligned feature request workflow。已由 `W-0221` 完成。
+- Harden presence/status local proof through close and offline cases。Next。
 - 加强 authenticated gameplay loop 周围的 concurrency 和 failure-path verification。
 - 定义 serious prototype 使用前需要的最小 operations inspection surface。
 
@@ -335,7 +343,7 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 Realtime outbound delivery 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime 或 distributed runtime。下一个具体工作应定义 agent-native feature request and test workflow：
 
 ```text
-recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
+recommended_next_direction: presence_status_local_proof_hardening
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

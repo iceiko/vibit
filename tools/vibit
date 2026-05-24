@@ -156,6 +156,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.realtime_protocol_websocket_outbound_delivery_implementation",
   "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice",
   "runtime.agent_native_feature_request_test_workflow",
+  "runtime.nakama_aligned_feature_request_workflow_pilot",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -31602,6 +31603,195 @@ function checkRuntimeAgentNativeFeatureRequestTestWorkflow(root, goFiles) {
   });
 }
 
+function checkRuntimeNakamaAlignedFeatureRequestWorkflowPilot(root, goFiles) {
+  const ruleId = "runtime.nakama_aligned_feature_request_workflow_pilot";
+  const decisionPath = "decisions/ADR-0129-nakama-aligned-presence-status-workflow-pilot.md";
+  const changePath = "changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow";
+  const conversationPath = "conversations/2026-05-24-nakama-presence-status-workflow-pilot.md";
+
+  if (!nakamaAlignedFeatureRequestWorkflowPilotCompleted(root)) {
+    ok("Nakama-aligned feature request workflow pilot is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Nakama-aligned feature request workflow pilot`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Nakama-aligned feature request workflow pilot`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-149"],
+    [".arch/work-items.yaml", "title: Nakama-Aligned Feature Request Workflow Pilot"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0221"],
+    [".arch/work-items.yaml", "title: Pilot Nakama-aligned feature request workflow"],
+    [".arch/work-items.yaml", "ADR-0129"],
+    [".arch/work-items.yaml", "selected_direction: pilot_nakama_aligned_feature_request_workflow"],
+    [".arch/work-items.yaml", "selected_nakama_capability_family: presence_status_and_notifications"],
+    [".arch/work-items.yaml", "id: M-150"],
+    [".arch/work-items.yaml", "title: Presence Status Local Proof Hardening"],
+    [".arch/work-items.yaml", "id: W-0222"],
+    [".arch/work-items.yaml", "title: Harden presence status local proof through close and offline cases"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "selected_direction: presence_status_local_proof_hardening"],
+    [".arch/runtime.yaml", "nakama_aligned_feature_request_workflow_pilot: ADR-0129"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "nakama_aligned_feature_request_workflow_pilot_completed: true"],
+    [".arch/runtime.yaml", "nakama_aligned_feature_request_workflow_pilot_check_rule: runtime.nakama_aligned_feature_request_workflow_pilot"],
+    [".arch/runtime.yaml", "selected_nakama_capability_family: presence_status_and_notifications"],
+    [".arch/runtime.yaml", "selected_user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow"],
+    [".arch/runtime.yaml", "future_presence_status_local_proof_work_item: W-0222"],
+    [".arch/runtime.yaml", "future_presence_status_local_proof_direction: presence_status_local_proof_hardening"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.nakama_aligned_feature_request_workflow_pilot"],
+    [".arch/contracts.yaml", "check_rule: runtime.nakama_aligned_feature_request_workflow_pilot"],
+    [".arch/reference.yaml", "phase_2ef_nakama_aligned_feature_request_workflow_pilot"],
+    [".arch/reference.yaml", "phase_2eg_presence_status_local_proof_hardening"],
+    [".arch/reference.yaml", "selected_nakama_capability_family: presence_status_and_notifications"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.md", "presence_status_local_proof_hardening"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "recommended_next_direction: presence_status_local_proof_hardening"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.nakama_aligned_feature_request_workflow_pilot"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.nakama_aligned_feature_request_workflow_pilot"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.nakama_aligned_feature_request_workflow_pilot"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.nakama_aligned_feature_request_workflow_pilot"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.nakama_aligned_feature_request_workflow_pilot"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0129",
+      "presence_status_and_notifications",
+      "presence_status_local_proof_hardening",
+      "M-150/W-0222",
+      "Nakama",
+      "Pitaya remains deferred",
+      "does not add runtime behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0221",
+      "completed_milestone: M-149",
+      "next_milestone: M-150",
+      "next_work_item: W-0222",
+      "selected_nakama_capability_family: presence_status_and_notifications",
+      "selected_follow_up_direction: presence_status_local_proof_hardening",
+      "user_requirement:",
+      "nakama_capability_mapping:",
+      "acceptance_criteria:",
+      "test_plan:",
+      "implementation_boundaries:",
+      "verification:",
+      "memory_updates:",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "Nakama",
+      "presence_status_and_notifications",
+      "W-0221",
+      "W-0222",
+      "ADR-0129",
+      "No runtime behavior",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Nakama-aligned feature request workflow pilot selects presence/status, records requirement/spec/acceptance/test/boundary/verification/memory expectations, opens W-0222, and adds no runtime/protocol/generated/migration/dependency/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -33347,7 +33537,14 @@ function agentNativeFeatureRequestTestWorkflowCompleted(root) {
   return workItemHasStatus(root, "W-0220", "completed");
 }
 
+function nakamaAlignedFeatureRequestWorkflowPilotCompleted(root) {
+  return workItemHasStatus(root, "W-0221", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (nakamaAlignedFeatureRequestWorkflowPilotCompleted(root)) {
+    return "repository_next_work_item: W-0222";
+  }
   if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
     return "repository_next_work_item: W-0221";
   }
@@ -33373,6 +33570,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (nakamaAlignedFeatureRequestWorkflowPilotCompleted(root)) {
+    return "repository_next_work_item_scope: presence_status_local_proof_hardening";
+  }
   if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
     return "repository_next_work_item_scope: pilot_nakama_aligned_feature_request_workflow";
   }
@@ -33389,6 +33589,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (nakamaAlignedFeatureRequestWorkflowPilotCompleted(root)) {
+    return "W-0222 Harden presence status local proof through close and offline cases";
+  }
   if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
     return "W-0221 Pilot Nakama-aligned feature request workflow";
   }
@@ -33429,6 +33632,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0221", "next_ready_work_item: W-0222"],
     ["W-0220", "next_ready_work_item: W-0221"],
     ["W-0219", "next_ready_work_item: W-0220"],
     ["W-0218", "next_ready_work_item: W-0219"],
@@ -33478,6 +33682,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0221", "completed")) {
+    return "next_work_item: W-0222";
+  }
   if (workItemHasStatus(root, "W-0220", "completed")) {
     return "next_work_item: W-0221";
   }
@@ -33570,6 +33777,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0221", "presence_status_local_proof_hardening"],
     ["W-0220", "pilot_nakama_aligned_feature_request_workflow"],
     ["W-0219", "define_agent_native_feature_request_test_workflow"],
     ["W-0218", "confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
@@ -33619,6 +33827,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0221", "W-0222 Harden presence status local proof through close and offline cases"],
     ["W-0220", "W-0221 Pilot Nakama-aligned feature request workflow"],
     ["W-0219", "W-0220 Define agent-native feature request and test workflow"],
     ["W-0218", "W-0219 Confirm next alpha direction after realtime outbound delivery slice"],
@@ -33669,6 +33878,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0221", "current_phase: presence_status_local_proof_hardening"],
     ["W-0220", "current_phase: nakama_aligned_feature_request_workflow_pilot"],
     ["W-0219", "current_phase: agent_native_feature_request_test_workflow"],
     ["W-0218", "current_phase: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
@@ -34270,6 +34480,7 @@ function checkRuntime(root) {
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(root, goFiles);
   checkRuntimeNextAlphaDirectionAfterRealtimeOutboundDeliverySlice(root, goFiles);
   checkRuntimeAgentNativeFeatureRequestTestWorkflow(root, goFiles);
+  checkRuntimeNakamaAlignedFeatureRequestWorkflowPilot(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

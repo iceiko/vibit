@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: agent_native_feature_request_test_workflow
-  recommended_next_direction: define_agent_native_feature_request_test_workflow
+  current_near_term_priority: presence_status_local_proof_hardening
+  recommended_next_direction: presence_status_local_proof_hardening
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: nakama_first_ai_native_feature_workflow_direction_selected
+  current_state: nakama_presence_status_workflow_pilot_selected
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0220
-  immediate_next_direction: define_agent_native_feature_request_test_workflow
+  immediate_next_work_item: W-0222
+  immediate_next_direction: presence_status_local_proof_hardening
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4624,21 +4624,51 @@ phase_plan:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ef_nakama_aligned_feature_request_workflow_pilot:
-    status: next_ready
+    status: completed
     milestone: M-149
-    next_ready_work_item: W-0221
+    completed_work_item: W-0221
+    decision: ADR-0129
+    change: changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow
+    check_rule: runtime.nakama_aligned_feature_request_workflow_pilot
+    next_milestone: M-150
+    next_ready_work_item: W-0222
     previous_completed_work_item: W-0220
     selected_direction: pilot_nakama_aligned_feature_request_workflow
+    selected_follow_up_direction: presence_status_local_proof_hardening
     expected_change: changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow
     reference_mapping:
-      nakama: The pilot should apply the new workflow to a concrete Nakama-style capability request and produce bounded spec, acceptance criteria, test plan, implementation boundary, verification plan, and durable memory expectations.
+      nakama: The pilot applied the new workflow to a concrete self-presence/status local alpha capability request and produced bounded spec, acceptance criteria, test plan, implementation boundary, verification plan, durable memory expectations, and a follow-up hardening slice.
       pitaya: Pitaya remains deferred and must not pull distributed runtime, RPC, frontend/backend, service discovery, groups, or broadcast fanout into the pilot.
     target_stage: prototype_ready_foundation
     source_workflow_decision: ADR-0128
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: presence_status_and_notifications
+    selected_user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow
     ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
     implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2eg_presence_status_local_proof_hardening:
+    status: next_ready
+    milestone: M-150
+    next_ready_work_item: W-0222
+    previous_completed_work_item: W-0221
+    selected_direction: presence_status_local_proof_hardening
+    expected_change: changes/2026-05-24-harden-presence-status-local-proof
+    reference_mapping:
+      nakama: Presence and status are core Nakama-style online-service capabilities. The next slice should harden vibit's existing self-presence proof around online, close, invalidation, and offline behavior before broader subscriptions or social features.
+      pitaya: Pitaya remains deferred; no distributed session routing, frontend/backend split, groups, RPC, or service discovery is part of this slice.
+    target_stage: prototype_ready_foundation
+    source_pilot_decision: ADR-0129
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: presence_status_and_notifications
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

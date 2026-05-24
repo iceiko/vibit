@@ -1,0 +1,219 @@
+schema_version: 0.1
+change_id: pilot-nakama-aligned-feature-request-workflow
+date: 2026-05-24
+type: standard
+status: verified
+
+summary: Apply the agent-native feature request and test workflow to a concrete Nakama-style presence/status capability request and open a bounded follow-up proof-hardening slice.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0129
+  referenced:
+    - ADR-0128
+    - ADR-0127
+    - ADR-0087
+    - ADR-0085
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  nakama_aligned_feature_request_workflow_pilot: completed
+  completed_work_item: W-0221
+  completed_milestone: M-149
+  previous_completed_work_item: W-0220
+  next_milestone: M-150
+  next_work_item: W-0222
+  next_work_item_status: next_ready
+  selected_direction: pilot_nakama_aligned_feature_request_workflow
+  selected_follow_up_direction: presence_status_local_proof_hardening
+  selected_nakama_capability_family: presence_status_and_notifications
+  selected_user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow
+  decision: ADR-0129
+  source_workflow_decision: ADR-0128
+  check_rule: runtime.nakama_aligned_feature_request_workflow_pilot
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_work_item: W-0222
+  future_change_id: harden-presence-status-local-proof
+  target_stage: prototype_ready_foundation
+  implementation_authorized_by_this_selection: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protocol_bridge_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  presence_subscription_added: false
+  status_broadcast_fanout_added: false
+  chat_added: false
+  group_messaging_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Prove self-presence/status through the authenticated local alpha flow, including online after connection binding and offline after close or invalidation.
+nakama_capability_family: presence_status_and_notifications
+
+nakama_capability_mapping:
+  family: presence_status_and_notifications
+  product_intent: Presence/status lets developers observe whether a player is online through server-owned connection state before broader realtime, social, or multiplayer features depend on it.
+  existing_foundation:
+    - runtime/internal/app/presence/presence.go
+    - runtime/internal/app/connection/registry.go
+    - proto/vibit/presence/v1/presence.proto
+    - runtime/internal/platform/protocol/protobuf/presence_bridge.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  deferred:
+    - presence subscriptions
+    - status broadcast fanout
+    - friends/groups/parties
+    - chat
+    - matchmaking
+    - match runtime
+    - durable or distributed presence
+    - direct Nakama/Pitaya API compatibility
+
+workflow_phases:
+  user_requirement:
+    recorded: true
+    artifact: request.md
+  requirement_spec:
+    recorded: true
+    artifact: spec.yaml
+  nakama_capability_mapping:
+    recorded: true
+    family: presence_status_and_notifications
+  acceptance_criteria:
+    recorded: true
+  test_plan:
+    recorded: true
+  tests:
+    pilot_slice_tests_applicable: false
+    rationale: This pilot selects and scopes the follow-up slice; W-0222 will add or strengthen runtime tests.
+  implementation_boundaries:
+    recorded: true
+  verification_phase:
+    recorded: true
+  durable_memory:
+    recorded: true
+
+acceptance_criteria:
+  - The pilot applies the workflow from docs/agent-native-feature-request-test-workflow.md to one concrete user-facing capability request.
+  - The selected request maps to Nakama-style presence/status, not to direct API compatibility.
+  - The pilot identifies existing implementation surfaces and test surfaces relevant to the follow-up slice.
+  - The pilot opens W-0222 as a bounded runtime proof-hardening slice.
+  - The pilot does not add runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, subscriptions, broadcasts, broad social/multiplayer modules, distributed runtime, or direct compatibility.
+
+test_plan:
+  pilot_slice:
+    - Repository check for W-0221 completion and W-0222 next-ready state.
+    - Runtime check for ADR-0129, change artifacts, Nakama mapping, deferral markers, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  follow_up_w_0222:
+    - Go tests for online presence from active bound connections.
+    - Go tests for offline presence after transport close and policy invalidation.
+    - Local alpha request-flow proof using existing authenticated presence query where feasible.
+    - Redaction and compatibility checks to ensure raw tokens, credentials, and direct Nakama/Pitaya API shapes are not exposed.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow/
+    - decisions/ADR-0129-nakama-aligned-presence-status-workflow-pilot.md
+    - conversations/2026-05-24-nakama-presence-status-workflow-pilot.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes in this pilot slice
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - presence subscriptions or broadcast fanout
+    - chat, groups, matchmaking, match runtime, leaderboards, economy, SDKs, operations, or distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.nakama_aligned_feature_request_workflow_pilot
+    - node tools/vibit check change pilot-nakama-aligned-feature-request-workflow --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -62,7 +62,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: pilot_nakama_aligned_feature_request_workflow
+next_direction: presence_status_local_proof_hardening
 next_work_status: next_ready
 ```
 
@@ -185,7 +185,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, and Nakama-first direction remain recorded in their existing artifacts. The agent-native feature request and test workflow is now recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. The next work is `W-0221 Pilot Nakama-aligned feature request workflow`; it should apply the workflow to one bounded Nakama-aligned capability request while keeping Pitaya deferred and leaving broad product/runtime scope behind explicit future work items.
+The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, Nakama-first direction, agent-native feature request/test workflow, and Nakama-aligned presence/status workflow pilot remain recorded in their existing artifacts. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`. The next work is `W-0222 Harden presence status local proof through close and offline cases`; it should harden existing self-presence/status proof while keeping Pitaya deferred and leaving broad product/runtime scope behind explicit future work items.
 
 ## 9. Deferred Work
 
