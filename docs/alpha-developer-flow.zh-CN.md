@@ -61,7 +61,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+next_direction: define_local_alpha_example_client_path_gate
 next_work_status: next_ready
 ```
 
@@ -184,7 +184,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening 和 authenticated gameplay failure-path verification 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`，failure-path verification decision 已记录在 `ADR-0131`。下一步 work 是 `W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof`；它应选择下一个 bounded Nakama prototype-ready capability，同时继续延后 Pitaya 和 broad product/runtime scope，直到后续明确 work item 授权。
+Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening、authenticated gameplay failure-path verification 和 next Nakama prototype-ready capability selection 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`，failure-path verification decision 已记录在 `ADR-0131`，next capability selection decision 已记录在 `ADR-0132`。下一步 work 是 `W-0225 Define local alpha example client path gate`；它应定义一个 bounded source-first example client 或 example app path，同时继续延后 Pitaya、implementation、SDK publication、hosted surfaces、broad product/runtime scope 和 direct compatibility，直到后续明确 work item 授权。
 
 ## 9. Deferred Work
 

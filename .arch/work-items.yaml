@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-152
+current_milestone: M-153
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: authenticated_gameplay_failure_paths_verified
+    current_release_state: next_nakama_prototype_ready_capability_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0224
+    next_ready_work_item: W-0225
     preferred_after_current:
-      - select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+      - define_local_alpha_example_client_path_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2930,7 +2930,7 @@ milestones:
 
   - id: M-152
     title: Next Nakama Prototype-Ready Capability Selection After Authenticated Failure Path Proof
-    status: active
+    status: completed
     goal: Select the next bounded Nakama prototype-ready capability after authenticated gameplay failure-path verification without adding runtime behavior, protocol routes, persistence, broad product modules, distributed runtime, or direct compatibility.
     completion_criteria:
       - The next Nakama prototype-ready capability family is selected and recorded with rationale.
@@ -2940,6 +2940,21 @@ milestones:
     non_goals:
       - implementing chat, friends, groups, parties, leaderboards, matchmaking, match runtime, operations/admin behavior, SDKs, or distributed runtime in the selection slice
       - adding protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, release artifacts, hosted deployments, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `client_sdks_examples_and_developer_experience` as the next bounded Nakama prototype-ready capability family, with `define_local_alpha_example_client_path_gate` as the follow-up direction. Accepted ADR-0132, registered `runtime.next_nakama_prototype_ready_capability_selection`, and opened `M-153/W-0225 Define local alpha example client path gate` as the next-ready bounded follow-up. No example client implementation, SDK publication, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, operations/admin behavior, hosted deployment, release artifact, broad product module, distributed runtime, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-153
+    title: Local Alpha Example Client Path Gate
+    status: active
+    goal: Define the source-first local alpha example client or example app path before implementation, using existing runtime and protocol behavior while preserving redaction, no-SDK-publication, no-hosted-demo, no-new-protocol, and direct compatibility deferrals.
+    completion_criteria:
+      - The allowed example client or example app shape is defined with explicit ownership, file candidates, and redaction rules.
+      - The example path maps to existing local alpha capabilities without adding runtime behavior, protocol routes, Protobuf messages, generated output, dependencies, migrations, persistence, startup wiring, hosted deployment, release artifacts, SDK publication, or direct compatibility.
+      - The future implementation work item is narrow and testable.
+      - Pitaya remains deferred as a future distributed architecture reference unless a later ADR explicitly reactivates it.
+    non_goals:
+      - implementing the example client or example app in the gate slice
+      - publishing SDKs, generated client libraries, packages, binaries, containers, hosted demos, install scripts, or release artifacts
+      - adding new protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8540,7 +8555,7 @@ work_items:
   - id: W-0224
     milestone: M-152
     title: Select next Nakama prototype-ready capability after authenticated failure-path proof
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-authenticated-failure-path-proof
     depends_on:
       - W-0223
@@ -8549,6 +8564,7 @@ work_items:
     selected_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0132
       - ADR-0131
       - ADR-0130
       - ADR-0129
@@ -8562,3 +8578,36 @@ work_items:
       - Review the Nakama-first roadmap and current alpha foundation after authenticated failure-path proof.
       - Select one next bounded prototype-ready capability or foundation gap with explicit rationale and deferrals.
       - Open a follow-up work item that can apply the agent-native requirement/test workflow without broadening scope prematurely.
+    decision: ADR-0132
+    check_rule: runtime.next_nakama_prototype_ready_capability_selection
+    next_milestone: M-153
+    next_ready_work_item: W-0225
+    completion_summary: Selected `client_sdks_examples_and_developer_experience` as the next bounded Nakama prototype-ready capability family and `define_local_alpha_example_client_path_gate` as the follow-up direction. The selection records that the current source-first alpha needs a clearer client-like or example-app path before broadening into chat, social, matchmaking, match runtime, operations, SDK publication, hosted surfaces, or distributed runtime. No implementation, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, release artifact, hosted deployment, or direct compatibility scope was added.
+
+  - id: W-0225
+    milestone: M-153
+    title: Define local alpha example client path gate
+    status: next_ready
+    change: changes/2026-05-24-define-local-alpha-example-client-path-gate
+    depends_on:
+      - W-0224
+    expected_change_id: define-local-alpha-example-client-path-gate
+    tier: tier_2_developer_experience
+    selected_direction: define_local_alpha_example_client_path_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0132
+      - ADR-0131
+      - ADR-0128
+      - ADR-0127
+      - ADR-0108
+      - ADR-0097
+      - ADR-0094
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing an example client or example app, publishing SDKs, generating client libraries, adding dependencies, adding runtime behavior, new protocol routes, Protobuf messages, generated output, migrations, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of defining the local alpha example client path gate.
+    completion:
+      - Define the allowed source-first example client or example app shape for the local alpha path.
+      - Record file ownership, redaction requirements, accepted runtime/protocol surfaces, test plan, verification commands, and stop conditions for the future implementation slice.
+      - Open a follow-up implementation work item only if the gate can keep scope bounded to existing behavior and existing protocol surfaces.

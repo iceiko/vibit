@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+next_direction: define_local_alpha_example_client_path_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,13 +204,13 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after presence/status local proof hardening is:
+The next product direction after authenticated gameplay failure-path proof and next capability selection is:
 
 ```text
-W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
+W-0225 Define local alpha example client path gate
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, and `ADR-0131` strengthened authenticated gameplay failure-path verification. The next work should select the next bounded Nakama prototype-ready capability using existing roadmap and runtime evidence, keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, `ADR-0131` strengthened authenticated gameplay failure-path verification, and `ADR-0132` selected `client_sdks_examples_and_developer_experience` as the next prototype-ready capability family. The next work should define the local alpha example client path gate, keeping implementation, protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 
@@ -220,7 +220,7 @@ The recorded candidate focus areas are now:
 
 - harden presence/status local proof through close and offline cases;
 - strengthen concurrency and failure-path verification for the existing authenticated loop;
-- add a clearer example client or example app path;
+- define the local alpha example client or example app path gate;
 - define the minimum operations inspection surface needed before serious prototype use.
 
 Future work must preserve ask-first boundaries for runtime behavior, protocol, generated output, dependencies, repository interfaces, storage adapters, operations/admin breadth, release artifacts, hosted deployments, public announcements, authentication/session behavior changes, broad product modules, large object/blob storage, S3-compatible object storage, Pitaya-style distributed architecture, and direct Nakama/Pitaya compatibility.

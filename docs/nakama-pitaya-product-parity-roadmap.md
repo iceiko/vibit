@@ -234,7 +234,8 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
+next_nakama_prototype_ready_capability_selection_decision: ADR-0132
+next_work_item: W-0225 Define local alpha example client path gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -242,7 +243,7 @@ Goal: move from a source-first alpha that developers can inspect to a foundation
 Candidate work:
 
 - Reduce local setup, migration, and configuration friction. Completed by `W-0200`.
-- Add a clearer example client or example app path.
+- Define and then add a clearer example client or example app path. Gate selected by `W-0224`; gate next-ready as `W-0225`.
 - Define first general storage-object behavior beyond the inventory proof slice. Completed by `W-0201`.
 - Define first storage objects persistence schema posture. Completed by `W-0202`.
 - Add the first storage objects migration source. Completed by `W-0203`.
@@ -348,10 +349,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After defining the agent-native feature request and test workflow, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, or distributed runtime. The next concrete work should pilot that workflow on one Nakama-aligned capability request:
+After authenticated failure-path proof and next capability selection, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should define the source-first local alpha example client path gate:
 
 ```text
-recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+recommended_next_direction: define_local_alpha_example_client_path_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -359,10 +360,10 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 
 Rationale:
 
-- The project now has an explicit user-facing AI-native development workflow in `docs/agent-native-feature-request-test-workflow.md`.
-- A pilot is needed to prove the workflow can turn a Nakama-style capability request into spec, acceptance criteria, test plan, implementation boundary, verification plan, and durable memory.
+- The project now has an explicit user-facing AI-native development workflow and has piloted it through presence/status and authenticated failure-path proof.
+- The existing source-first alpha capabilities need a clearer client-like or example-app path so developers can understand the current loop without reverse-engineering internal E2E tests.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
-- Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the AI-native feature workflow are proven.
+- Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the source-first example path are clearer.
 
 ## 8. Non-Goals
 

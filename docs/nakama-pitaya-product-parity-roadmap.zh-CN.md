@@ -226,7 +226,8 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
+next_nakama_prototype_ready_capability_selection_decision: ADR-0132
+next_work_item: W-0225 Define local alpha example client path gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -234,7 +235,7 @@ next_work_item: W-0224 Select next Nakama prototype-ready capability after authe
 候选工作：
 
 - 降低 local setup、migration 和 configuration friction。已由 `W-0200` 完成。
-- 添加更清晰的 example client 或 example app path。
+- 定义并添加更清晰的 example client 或 example app path。Gate 已由 `W-0224` 选择；`W-0225` 是 next-ready gate。
 - 定义超出 inventory proof slice 的 first general storage-object behavior。已由 `W-0201` 完成。
 - 定义第一版 storage objects persistence schema posture。已由 `W-0202` 完成。
 - 添加第一版 storage objects migration source。已由 `W-0203` 完成。
@@ -340,10 +341,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Realtime outbound delivery 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime 或 distributed runtime。下一个具体工作应定义 agent-native feature request and test workflow：
+Authenticated failure-path proof 和 next capability selection 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应定义 source-first local alpha example client path gate：
 
 ```text
-recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+recommended_next_direction: define_local_alpha_example_client_path_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -351,7 +352,8 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 
 理由：
 
-- 项目已有足够 runtime foundation，可以开始明确用户可见的 AI-native development workflow。
+- 项目已经有明确的用户可见 AI-native development workflow，并已通过 presence/status 和 authenticated failure-path proof 试点。
+- 现有 source-first alpha capabilities 需要更清晰的 client-like 或 example-app path，让开发者不用反向理解内部 E2E tests 也能看清当前 loop。
 - 如果没有 requirement 和 test workflow，后续 feature work 可以技术上正确，但无法兑现“AI 帮用户完成 specification、tests、implementation、verification”的产品承诺。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续延后，直到 single-process behavior 和 AI-native feature workflow 被证明。

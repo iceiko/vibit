@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+next_direction: define_local_alpha_example_client_path_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-presence/status local proof hardening 之后，下一个产品方向是：
+authenticated gameplay failure-path proof 和 next capability selection 之后，下一个产品方向是：
 
 ```text
-W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
+W-0225 Define local alpha example client path gate
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0129` 已把该 workflow 试点应用到 Nakama-style presence/status request，`ADR-0130` 已 harden 选定的 self-presence/status proof through close and offline cases，`ADR-0131` 已 strengthen authenticated gameplay failure-path verification。下一项 work 应使用现有 roadmap 和 runtime evidence 选择下一个 bounded Nakama prototype-ready capability，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0129` 已把该 workflow 试点应用到 Nakama-style presence/status request，`ADR-0130` 已 harden 选定的 self-presence/status proof through close and offline cases，`ADR-0131` 已 strengthen authenticated gameplay failure-path verification，`ADR-0132` 已选择 `client_sdks_examples_and_developer_experience` 作为下一项 prototype-ready capability family。下一项 work 应定义 local alpha example client path gate，同时继续延后 implementation、protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
 
@@ -219,7 +219,7 @@ Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-packa
 
 - harden presence/status local proof through close and offline cases；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
-- 添加更清晰的 example client 或 example app path；
+- 定义 local alpha example client 或 example app path gate；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。
 
 后续 work 必须保留 runtime behavior、protocol、generated output、dependencies、repository interfaces、storage adapters、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules、large object/blob storage、S3-compatible object storage、Pitaya-style distributed architecture 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
