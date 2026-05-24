@@ -129,18 +129,19 @@ purpose: >
   realtime_protocol_websocket_outbound_delivery_gate: ADR-0125
   realtime_protocol_websocket_outbound_delivery_implementation: ADR-0126
   nakama_first_ai_native_requirement_test_workflow_direction: ADR-0127
+  agent_native_feature_request_test_workflow: ADR-0128
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: agent_native_feature_request_test_workflow
+  current_phase: nakama_aligned_feature_request_workflow_pilot
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_and_realtime_protocol_websocket_outbound_delivery_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0220
+  next_ready_work_item: W-0221
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -195,7 +196,12 @@ architecture_scope:
   realtime_protocol_websocket_outbound_delivery_implementation_next_work_item: W-0219
   next_alpha_direction_after_realtime_outbound_delivery_slice_decision: ADR-0127
   next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice
-  agent_native_feature_request_test_workflow_next_work_item: W-0220
+  agent_native_feature_request_test_workflow_completed: true
+  agent_native_feature_request_test_workflow_decision: ADR-0128
+  agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-request-test-workflow.md
+  agent_native_feature_request_test_workflow_translation: docs/agent-native-feature-request-test-workflow.zh-CN.md
+  agent_native_feature_request_test_workflow_check_rule: runtime.agent_native_feature_request_test_workflow
+  agent_native_feature_request_test_workflow_next_work_item: W-0221
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -7278,9 +7284,15 @@ identity_session_boundary:
     direct_nakama_pitaya_api_compatibility_added: false
 
   agent_native_feature_request_test_workflow:
-    status: next_ready
+    status: defined
     milestone: M-148
-    next_ready_work_item: W-0220
+    completed_work_item: W-0220
+    decision: ADR-0128
+    standard: docs/agent-native-feature-request-test-workflow.md
+    translation: docs/agent-native-feature-request-test-workflow.zh-CN.md
+    check_rule: runtime.agent_native_feature_request_test_workflow
+    next_milestone: M-149
+    next_ready_work_item: W-0221
     previous_completed_work_item: W-0219
     selected_direction: define_agent_native_feature_request_test_workflow
     expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
@@ -7291,7 +7303,26 @@ identity_session_boundary:
     pitaya_reference_status: deferred_future_architecture_reference
     ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
     workflow_goal: user_requirement_to_spec_acceptance_criteria_test_plan_tests_implementation_verification_and_memory
-    implementation_authorized_by_this_selection: false
+    workflow_phases:
+      - user_requirement
+      - requirement_spec
+      - nakama_capability_mapping
+      - acceptance_criteria
+      - test_plan
+      - tests
+      - implementation_boundaries
+      - verification
+      - durable_memory
+    required_artifacts:
+      - request.md
+      - spec.yaml
+      - impact.md
+      - plan.md
+      - checklist.md
+      - verification.md
+    future_pilot_work_item: W-0221
+    future_pilot_direction: pilot_nakama_aligned_feature_request_workflow
+    implementation_authorized_by_this_standard: false
     runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false

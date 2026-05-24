@@ -218,7 +218,9 @@ first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
 next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
 realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realtime/v1/realtime.proto
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
-next_work_item: W-0220 Define agent-native feature request and test workflow
+agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
+agent_native_feature_request_test_workflow_decision: ADR-0128
+next_work_item: W-0221 Pilot Nakama-aligned feature request workflow
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -333,7 +335,7 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 Realtime outbound delivery 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime 或 distributed runtime。下一个具体工作应定义 agent-native feature request and test workflow：
 
 ```text
-recommended_next_direction: define_agent_native_feature_request_test_workflow
+recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

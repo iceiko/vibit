@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_agent_native_feature_request_test_workflow
+next_direction: pilot_nakama_aligned_feature_request_workflow
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,19 +203,21 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-Realtime protocol and WebSocket outbound delivery slice 之后，下一个产品方向是：
+定义 agent-native feature request and test workflow 之后，下一个产品方向是：
 
 ```text
-W-0220 Define agent-native feature request and test workflow
+W-0221 Pilot Nakama-aligned feature request workflow
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`，storage objects repository interface 已记录在 `runtime/internal/modules/storage/repository.go`，storage objects PostgreSQL adapter gate 已记录在 `docs/storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 已记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go`，storage objects runtime behavior gate 已记录在 `docs/storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 已记录在 `runtime/internal/app/storage/service.go`，storage objects protocol route gate 已记录在 `docs/storage-objects-protocol-route-gate.md` 和 `ADR-0118`，storage objects protocol route implementation 已记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `ADR-0119`，storage objects protocol route local proof 已记录在 `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`、`examples/local-alpha-request-loop.sh` 和 `ADR-0120`，first server push and realtime messaging gate 已记录在 `docs/first-server-push-realtime-messaging-gate.md` 和 `ADR-0122`，first server push and realtime messaging runtime slice 已记录在 `runtime/internal/app/realtime/service.go`、`runtime/internal/app/realtime/service_test.go` 和 `ADR-0123`，realtime runtime slice 后的 next-direction selection 已记录在 `ADR-0124`，realtime protocol and WebSocket outbound delivery gate 已记录在 `docs/realtime-protocol-websocket-outbound-delivery-gate.md` 和 `ADR-0125`，realtime protocol and WebSocket outbound delivery implementation 已记录在 `proto/vibit/realtime/v1/realtime.proto`、`runtime/internal/platform/protocol/protobuf/realtime_bridge.go`、`runtime/internal/platform/transport/ws/outbound.go` 和 `ADR-0126`，Nakama-first AI-native feature workflow direction 已记录在 `ADR-0127`。下一项 work 应定义 agent-native feature request and test workflow，并继续延后 runtime behavior、protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。下一项 work 应把该 workflow 试点应用到一个 bounded Nakama-aligned capability request，同时继续延后 runtime behavior、protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility，除非 pilot 打开后续明确 work item。
+
+Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
 
 上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source`、`W-0204 Define storage objects repository boundary`、`W-0205 Implement storage-neutral storage objects repository interface`、`W-0206 Define storage objects PostgreSQL adapter gate`、`W-0207 Implement storage objects PostgreSQL adapter`、`W-0208 Define storage objects runtime behavior gate`、`W-0209 Implement storage objects runtime behavior`、`W-0210 Define storage objects protocol route gate`、`W-0211 Implement storage objects protocol route`、`W-0212 Prove storage objects protocol route in local alpha request flow`、`W-0213 Confirm next alpha direction after storage objects local proof`、`W-0214 Define first server push and realtime messaging gate` 和 `W-0215 Implement first server push and realtime messaging runtime slice` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability path 的追溯记录。
 
 已记录的候选重点现在是：
 
-- 定义 agent-native feature request and test workflow；
+- 试点 Nakama-aligned feature request workflow；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
 - 添加更清晰的 example client 或 example app path；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。

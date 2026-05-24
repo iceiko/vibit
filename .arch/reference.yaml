@@ -4584,9 +4584,16 @@ phase_plan:
     distributed_runtime_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ee_agent_native_feature_request_test_workflow:
-    status: next_ready
+    status: completed
     milestone: M-148
-    next_ready_work_item: W-0220
+    completed_work_item: W-0220
+    decision: ADR-0128
+    standard: docs/agent-native-feature-request-test-workflow.md
+    translation: docs/agent-native-feature-request-test-workflow.zh-CN.md
+    change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+    check_rule: runtime.agent_native_feature_request_test_workflow
+    next_milestone: M-149
+    next_ready_work_item: W-0221
     previous_completed_work_item: W-0219
     selected_direction: define_agent_native_feature_request_test_workflow
     expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
@@ -4595,6 +4602,39 @@ phase_plan:
       pitaya: Pitaya remains deferred and may only be used later for distributed architecture vocabulary after a new ADR reactivates it.
     target_stage: prototype_ready_foundation
     source_direction_decision: ADR-0127
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    workflow_phases:
+      - user_requirement
+      - requirement_spec
+      - nakama_capability_mapping
+      - acceptance_criteria
+      - test_plan
+      - tests
+      - implementation_boundaries
+      - verification
+      - durable_memory
+    implementation_authorized_by_this_standard: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ef_nakama_aligned_feature_request_workflow_pilot:
+    status: next_ready
+    milestone: M-149
+    next_ready_work_item: W-0221
+    previous_completed_work_item: W-0220
+    selected_direction: pilot_nakama_aligned_feature_request_workflow
+    expected_change: changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow
+    reference_mapping:
+      nakama: The pilot should apply the new workflow to a concrete Nakama-style capability request and produce bounded spec, acceptance criteria, test plan, implementation boundary, verification plan, and durable memory expectations.
+      pitaya: Pitaya remains deferred and must not pull distributed runtime, RPC, frontend/backend, service discovery, groups, or broadcast fanout into the pilot.
+    target_stage: prototype_ready_foundation
+    source_workflow_decision: ADR-0128
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

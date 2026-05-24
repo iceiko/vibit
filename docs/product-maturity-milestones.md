@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_agent_native_feature_request_test_workflow
+next_direction: pilot_nakama_aligned_feature_request_workflow
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,19 +204,21 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the realtime protocol and WebSocket outbound delivery slice is:
+The next product direction after defining the agent-native feature request and test workflow is:
 
 ```text
-W-0220 Define agent-native feature request and test workflow
+W-0221 Pilot Nakama-aligned feature request workflow
 ```
 
-The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`, the storage objects repository interface is recorded in `runtime/internal/modules/storage/repository.go`, the storage objects PostgreSQL adapter gate is recorded in `docs/storage-objects-postgresql-adapter-gate.md`, the storage objects PostgreSQL adapter is recorded in `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, the storage objects runtime behavior gate is recorded in `docs/storage-objects-runtime-behavior-gate.md`, the storage objects runtime behavior implementation is recorded in `runtime/internal/app/storage/service.go`, the storage objects protocol route gate is recorded in `docs/storage-objects-protocol-route-gate.md` and `ADR-0118`, the storage objects protocol route implementation is recorded in `proto/vibit/storage/v1/storage.proto`, `runtime/internal/app/bootstrap/storage.go`, `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, and `ADR-0119`, the storage objects protocol route local proof is recorded in `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`, `examples/local-alpha-request-loop.sh`, and `ADR-0120`, the first server push and realtime messaging gate is recorded in `docs/first-server-push-realtime-messaging-gate.md` and `ADR-0122`, the first server push and realtime messaging runtime slice is recorded in `runtime/internal/app/realtime/service.go`, `runtime/internal/app/realtime/service_test.go`, and `ADR-0123`, the next-direction selection after realtime runtime slice is recorded in `ADR-0124`, the realtime protocol and WebSocket outbound delivery gate is recorded in `docs/realtime-protocol-websocket-outbound-delivery-gate.md` and `ADR-0125`, the realtime protocol and WebSocket outbound delivery implementation is recorded in `proto/vibit/realtime/v1/realtime.proto`, `runtime/internal/platform/protocol/protobuf/realtime_bridge.go`, `runtime/internal/platform/transport/ws/outbound.go`, and `ADR-0126`, and the Nakama-first AI-native feature workflow direction is recorded in `ADR-0127`. The next work should define the agent-native feature request and test workflow, keeping runtime behavior, protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. The next work should pilot that workflow on one bounded Nakama-aligned capability request, keeping runtime behavior, protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless the pilot opens a later explicit work item.
+
+Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 
 The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, `W-0200 Implement prototype-ready local development path package`, `W-0201 Define storage objects behavior gate`, `W-0202 Define storage objects persistence schema gate`, `W-0203 Add storage objects migration source`, `W-0204 Define storage objects repository boundary`, `W-0205 Implement storage-neutral storage objects repository interface`, `W-0206 Define storage objects PostgreSQL adapter gate`, `W-0207 Implement storage objects PostgreSQL adapter`, `W-0208 Define storage objects runtime behavior gate`, `W-0209 Implement storage objects runtime behavior`, `W-0210 Define storage objects protocol route gate`, `W-0211 Implement storage objects protocol route`, `W-0212 Prove storage objects protocol route in local alpha request flow`, `W-0213 Confirm next alpha direction after storage objects local proof`, `W-0214 Define first server push and realtime messaging gate`, and `W-0215 Implement first server push and realtime messaging runtime slice` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first product capability path.
 
 The recorded candidate focus areas are now:
 
-- define the agent-native feature request and test workflow;
+- pilot the Nakama-aligned feature request workflow;
 - strengthen concurrency and failure-path verification for the existing authenticated loop;
 - add a clearer example client or example app path;
 - define the minimum operations inspection surface needed before serious prototype use.

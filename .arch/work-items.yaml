@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-148
+current_milestone: M-149
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: nakama_first_ai_native_feature_workflow_direction_selected
+    current_release_state: agent_native_feature_request_test_workflow_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0220
+    next_ready_work_item: W-0221
     preferred_after_current:
-      - define_agent_native_feature_request_test_workflow
+      - pilot_nakama_aligned_feature_request_workflow
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2867,7 +2867,7 @@ milestones:
 
   - id: M-148
     title: Agent-Native Feature Request And Test Workflow
-    status: active
+    status: completed
     goal: Define the workflow that turns user backend requirements into specs, acceptance criteria, test plans, tests, implementation boundaries, verification records, and durable project memory before broadening product modules.
     completion_criteria:
       - The workflow is documented as the default for non-trivial user-facing feature work.
@@ -2880,6 +2880,22 @@ milestones:
       - adding generated output
       - changing migrations or dependencies
       - adding chat, groups, matchmaking, match runtime, or distributed runtime
+    completion_summary: Defined the agent-native feature request and test workflow standard, accepted ADR-0128, and recorded how user backend requirements become bounded specs, Nakama capability mapping, acceptance criteria, test plans, tests or explicit test rationale, implementation boundaries, verification records, and durable project memory. Opened M-149/W-0221 as the next-ready workflow pilot for a Nakama-aligned feature slice. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, broad module, Pitaya-style distributed architecture, hosted deployment, release artifact, public announcement, paid promotion, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-149
+    title: Nakama-Aligned Feature Request Workflow Pilot
+    status: active
+    goal: Apply the agent-native feature request and test workflow to choose and shape the next bounded Nakama-aligned prototype-ready feature slice.
+    completion_criteria:
+      - A concrete user-facing Nakama-style capability request is captured.
+      - The request is mapped through the agent-native workflow into spec, acceptance criteria, test plan, implementation boundaries, verification plan, and durable memory expectations.
+      - The pilot selects or opens one bounded follow-up slice without adding broad runtime behavior prematurely.
+      - Pitaya remains deferred unless a later ADR explicitly reactivates it for distributed architecture planning.
+    non_goals:
+      - implementing broad runtime behavior directly in the pilot
+      - adding protocol routes, Protobuf source, generated output, migrations, or dependencies without a bounded follow-up work item
+      - adding chat, groups, matchmaking, match runtime, leaderboards, economy, operations, SDKs, or distributed runtime as an unbounded module expansion
+      - adding direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8359,7 +8375,7 @@ work_items:
   - id: W-0220
     milestone: M-148
     title: Define agent-native feature request and test workflow
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
     depends_on:
       - W-0219
@@ -8368,6 +8384,7 @@ work_items:
     selected_direction: define_agent_native_feature_request_test_workflow
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0128
       - ADR-0127
       - ADR-0126
       - ADR-0106
@@ -8380,3 +8397,31 @@ work_items:
       - Define the AI-native feature request and test workflow standard.
       - Define required change artifacts such as bounded requirement specs, acceptance criteria, test plans, tests, implementation notes, verification records, and durable memory updates.
       - Register repository checks or a future check posture for the workflow standard.
+    next_milestone: M-149
+    next_ready_work_item: W-0221
+    completion_summary: Defined the agent-native feature request and test workflow standard in `docs/agent-native-feature-request-test-workflow.md`, accepted `ADR-0128`, registered `runtime.agent_native_feature_request_test_workflow`, required user requirement capture, bounded specs, Nakama capability mapping, acceptance criteria, test plans, tests or explicit not-applicable rationale, implementation boundaries, verification, and durable memory updates for non-trivial user-facing feature work, and opened `M-149/W-0221 Pilot Nakama-aligned feature request workflow` as next-ready. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, broad product module, Pitaya-style distributed architecture, hosted deployment, release artifact, public announcement, paid promotion, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0221
+    milestone: M-149
+    title: Pilot Nakama-aligned feature request workflow
+    status: next_ready
+    change: changes/2026-05-24-pilot-nakama-aligned-feature-request-workflow
+    depends_on:
+      - W-0220
+    expected_change_id: pilot-nakama-aligned-feature-request-workflow
+    tier: tier_2_planning
+    selected_direction: pilot_nakama_aligned_feature_request_workflow
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0128
+      - ADR-0127
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing broad runtime behavior, protocol changes, generated output, migrations, dependencies, broad product modules, Pitaya-style distributed architecture, hosted deployment, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of piloting the workflow and selecting a bounded follow-up slice.
+    completion:
+      - Apply the agent-native feature request and test workflow to a concrete Nakama-aligned product capability request.
+      - Record the request, Nakama capability family, acceptance criteria, test plan, implementation boundaries, verification plan, and durable memory expectations.
+      - Select or open one bounded follow-up work item without adding unbounded runtime/product scope.

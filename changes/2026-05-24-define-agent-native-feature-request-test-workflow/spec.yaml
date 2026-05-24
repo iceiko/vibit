@@ -1,0 +1,203 @@
+schema_version: 0.1
+change_id: define-agent-native-feature-request-test-workflow
+date: 2026-05-24
+type: standard
+status: verified
+
+summary: Define the agent-native feature request and test workflow for turning user backend requirements into Nakama-mapped specs, acceptance criteria, test plans, tests, implementation boundaries, verification, and durable memory.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0128
+  referenced:
+    - ADR-0127
+    - ADR-0126
+    - ADR-0106
+    - ADR-0086
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  agent_native_feature_request_test_workflow: defined
+  completed_work_item: W-0220
+  completed_milestone: M-148
+  previous_completed_work_item: W-0219
+  next_milestone: M-149
+  next_work_item: W-0221
+  next_work_item_status: next_ready
+  selected_direction: define_agent_native_feature_request_test_workflow
+  future_selected_direction: pilot_nakama_aligned_feature_request_workflow
+  decision: ADR-0128
+  source_direction_decision: ADR-0127
+  check_rule: runtime.agent_native_feature_request_test_workflow
+  standard: docs/agent-native-feature-request-test-workflow.md
+  translation: docs/agent-native-feature-request-test-workflow.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  workflow_goal: user_requirement_to_spec_acceptance_criteria_test_plan_tests_implementation_verification_and_memory
+  implementation_authorized_by_this_standard: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protocol_bridge_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  large_object_blob_storage_added: false
+  s3_compatible_object_storage_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward the Nakama target by defining the AI-native feature request and test workflow.
+nakama_capability_family: agent_native_requirement_test_implementation_workflow
+
+workflow_phases:
+  - user_requirement
+  - requirement_spec
+  - nakama_capability_mapping
+  - acceptance_criteria
+  - test_plan
+  - tests
+  - implementation_boundaries
+  - verification
+  - durable_memory
+
+required_artifacts:
+  - request.md
+  - spec.yaml
+  - impact.md
+  - plan.md
+  - checklist.md
+  - verification.md
+
+required_spec_fields:
+  - user_requirement
+  - nakama_capability_family
+  - acceptance_criteria
+  - test_plan
+  - implementation_boundaries
+  - verification
+  - memory_updates
+
+acceptance_criteria:
+  - The workflow standard is created in English and Simplified Chinese.
+  - ADR-0128 records the decision.
+  - Change records capture the request, impact, plan, checklist, and verification.
+  - Manifests and guides record W-0220 completion and W-0221 next-ready state.
+  - Repository checks register and enforce runtime.agent_native_feature_request_test_workflow.
+  - The standard requires Nakama capability mapping for major features and keeps Pitaya deferred.
+  - The standard requires tests for non-trivial behavior or explicit not-applicable rationale.
+
+test_plan:
+  - Repository check for the workflow standard and required markers.
+  - Change check for this change spec directory.
+  - Work queue check for W-0220 completed and W-0221 next-ready.
+  - Runtime check for manifest, docs, ADR, rule catalog, and deferral markers.
+  - Memory/schema/all checks for repository-wide consistency.
+
+implementation_boundaries:
+  allowed:
+    - docs/agent-native-feature-request-test-workflow.md
+    - docs/agent-native-feature-request-test-workflow.zh-CN.md
+    - decisions/ADR-0128-agent-native-feature-request-test-workflow.md
+    - conversations/2026-05-24-agent-native-feature-request-test-workflow.md
+    - changes/2026-05-24-define-agent-native-feature-request-test-workflow/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - broad product module implementation
+    - Pitaya-style distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.agent_native_feature_request_test_workflow
+    - node tools/vibit check change define-agent-native-feature-request-test-workflow --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+

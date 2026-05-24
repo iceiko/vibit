@@ -155,6 +155,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.realtime_protocol_websocket_outbound_delivery_gate",
   "runtime.realtime_protocol_websocket_outbound_delivery_implementation",
   "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice",
+  "runtime.agent_native_feature_request_test_workflow",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -31329,6 +31330,278 @@ function checkRuntimeNextAlphaDirectionAfterRealtimeOutboundDeliverySlice(root, 
   });
 }
 
+function checkRuntimeAgentNativeFeatureRequestTestWorkflow(root, goFiles) {
+  const ruleId = "runtime.agent_native_feature_request_test_workflow";
+  const standardPath = "docs/agent-native-feature-request-test-workflow.md";
+  const standardTranslationPath = "docs/agent-native-feature-request-test-workflow.zh-CN.md";
+  const decisionPath = "decisions/ADR-0128-agent-native-feature-request-test-workflow.md";
+  const changePath = "changes/2026-05-24-define-agent-native-feature-request-test-workflow";
+  const conversationPath = "conversations/2026-05-24-agent-native-feature-request-test-workflow.md";
+
+  if (!agentNativeFeatureRequestTestWorkflowCompleted(root)) {
+    ok("agent-native feature request and test workflow is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for agent-native feature request and test workflow`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for agent-native feature request and test workflow`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-148"],
+    [".arch/work-items.yaml", "title: Agent-Native Feature Request And Test Workflow"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0220"],
+    [".arch/work-items.yaml", "title: Define agent-native feature request and test workflow"],
+    [".arch/work-items.yaml", "ADR-0128"],
+    [".arch/work-items.yaml", "id: M-149"],
+    [".arch/work-items.yaml", "title: Nakama-Aligned Feature Request Workflow Pilot"],
+    [".arch/work-items.yaml", "id: W-0221"],
+    [".arch/work-items.yaml", "title: Pilot Nakama-aligned feature request workflow"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "selected_direction: pilot_nakama_aligned_feature_request_workflow"],
+    [".arch/runtime.yaml", "agent_native_feature_request_test_workflow: ADR-0128"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-request-test-workflow.md"],
+    [".arch/runtime.yaml", "agent_native_feature_request_test_workflow_check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [".arch/runtime.yaml", "future_pilot_work_item: W-0221"],
+    [".arch/runtime.yaml", "future_pilot_direction: pilot_nakama_aligned_feature_request_workflow"],
+    [".arch/runtime.yaml", "primary_product_reference: Nakama"],
+    [".arch/runtime.yaml", "pitaya_reference_status: deferred_future_architecture_reference"],
+    [".arch/runtime.yaml", "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [".arch/conventions.yaml", "future_pilot_work_item: W-0221"],
+    [".arch/contracts.yaml", "check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [".arch/contracts.yaml", "required_artifacts:"],
+    [".arch/reference.yaml", "phase_2ee_agent_native_feature_request_test_workflow"],
+    [".arch/reference.yaml", "phase_2ef_nakama_aligned_feature_request_workflow_pilot"],
+    [".arch/reference.yaml", "check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.md", "docs/agent-native-feature-request-test-workflow.md"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.md", "agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-request-test-workflow.md"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "docs/agent-native-feature-request-test-workflow.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "recommended_next_direction: pilot_nakama_aligned_feature_request_workflow"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.agent_native_feature_request_test_workflow"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.agent_native_feature_request_test_workflow"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.agent_native_feature_request_test_workflow"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.agent_native_feature_request_test_workflow"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.agent_native_feature_request_test_workflow"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredStandardText = [
+    [standardPath, "agent_native_feature_request_test_workflow: defined"],
+    [standardPath, "completed_work_item: W-0220"],
+    [standardPath, "decision: ADR-0128"],
+    [standardPath, "check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [standardPath, "primary_product_reference: Nakama"],
+    [standardPath, "pitaya_reference_status: deferred_future_architecture_reference"],
+    [standardPath, "required_artifacts:"],
+    [standardPath, "request.md"],
+    [standardPath, "spec.yaml"],
+    [standardPath, "acceptance_criteria"],
+    [standardPath, "test_plan"],
+    [standardPath, "verification.md"],
+    [standardPath, "durable_memory"],
+    [standardPath, "Nakama capability mapping"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "agent_native_feature_request_test_workflow: defined"],
+    [standardTranslationPath, "completed_work_item: W-0220"],
+    [standardTranslationPath, "decision: ADR-0128"],
+    [standardTranslationPath, "check_rule: runtime.agent_native_feature_request_test_workflow"],
+    [standardTranslationPath, "primary_product_reference: Nakama"],
+    [standardTranslationPath, "pitaya_reference_status: deferred_future_architecture_reference"],
+    [standardTranslationPath, "required_artifacts:"],
+    [standardTranslationPath, "request.md"],
+    [standardTranslationPath, "spec.yaml"],
+    [standardTranslationPath, "acceptance_criteria"],
+    [standardTranslationPath, "test_plan"],
+    [standardTranslationPath, "verification.md"],
+    [standardTranslationPath, "durable_memory"],
+    [standardTranslationPath, "Nakama Capability Mapping"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+  ];
+  for (const [relativePath, requiredText] of requiredStandardText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0128",
+      "M-149/W-0221",
+      "Nakama is the primary product capability reference",
+      "Pitaya remains deferred",
+      "does not add runtime behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "agent_native_feature_request_test_workflow: defined",
+      "completed_work_item: W-0220",
+      "next_work_item: W-0221",
+      "future_selected_direction: pilot_nakama_aligned_feature_request_workflow",
+      "check_rule: runtime.agent_native_feature_request_test_workflow",
+      "primary_product_reference: Nakama",
+      "pitaya_reference_status: deferred_future_architecture_reference",
+      "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification",
+      "user_requirement:",
+      "nakama_capability_family:",
+      "acceptance_criteria:",
+      "test_plan:",
+      "implementation_boundaries:",
+      "verification:",
+      "memory_updates:",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "distributed_runtime_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "Nakama",
+      "Pitaya",
+      "W-0220",
+      "W-0221",
+      "ADR-0128",
+      "No runtime behavior",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenMarkers = [
+    "runtime_behavior_added: true",
+    "protocol_route_added: true",
+    "protobuf_source_added: true",
+    "generated_output_added: true",
+    "migration_added: true",
+    "dependency_added: true",
+    "distributed_runtime_added: true",
+    "direct_nakama_pitaya_api_compatibility_added: true",
+  ];
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    decisionPath,
+    conversationPath,
+  ]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const marker of forbiddenMarkers) {
+      if (text.includes(marker)) {
+        fail(`${file} contains forbidden workflow-slice marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      } else {
+        ok(`${file} does not contain forbidden workflow-slice marker ${marker}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("agent-native feature request and test workflow is defined with Nakama mapping, acceptance criteria, test planning, tests or explicit rationale, implementation boundaries, verification, durable memory, W-0221 pilot follow-up, and no runtime/protocol/generated/migration/dependency/distributed/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -33070,7 +33343,14 @@ function nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root) {
   return workItemHasStatus(root, "W-0219", "completed");
 }
 
+function agentNativeFeatureRequestTestWorkflowCompleted(root) {
+  return workItemHasStatus(root, "W-0220", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
+    return "repository_next_work_item: W-0221";
+  }
   if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
     return "repository_next_work_item: W-0220";
   }
@@ -33093,6 +33373,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
+    return "repository_next_work_item_scope: pilot_nakama_aligned_feature_request_workflow";
+  }
   if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
     return "repository_next_work_item_scope: define_agent_native_feature_request_test_workflow";
   }
@@ -33106,6 +33389,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (agentNativeFeatureRequestTestWorkflowCompleted(root)) {
+    return "W-0221 Pilot Nakama-aligned feature request workflow";
+  }
   if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
     return "W-0220 Define agent-native feature request and test workflow";
   }
@@ -33143,6 +33429,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0220", "next_ready_work_item: W-0221"],
     ["W-0219", "next_ready_work_item: W-0220"],
     ["W-0218", "next_ready_work_item: W-0219"],
     ["W-0217", "next_ready_work_item: W-0218"],
@@ -33191,6 +33478,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0220", "completed")) {
+    return "next_work_item: W-0221";
+  }
   if (workItemHasStatus(root, "W-0219", "completed")) {
     return "next_work_item: W-0220";
   }
@@ -33280,6 +33570,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0220", "pilot_nakama_aligned_feature_request_workflow"],
     ["W-0219", "define_agent_native_feature_request_test_workflow"],
     ["W-0218", "confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "realtime_protocol_websocket_outbound_delivery_implementation_slice"],
@@ -33328,6 +33619,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0220", "W-0221 Pilot Nakama-aligned feature request workflow"],
     ["W-0219", "W-0220 Define agent-native feature request and test workflow"],
     ["W-0218", "W-0219 Confirm next alpha direction after realtime outbound delivery slice"],
     ["W-0217", "W-0218 Implement realtime protocol and WebSocket outbound delivery slice"],
@@ -33377,6 +33669,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0220", "current_phase: nakama_aligned_feature_request_workflow_pilot"],
     ["W-0219", "current_phase: agent_native_feature_request_test_workflow"],
     ["W-0218", "current_phase: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "current_phase: realtime_protocol_websocket_outbound_delivery_implementation_slice"],
@@ -33976,6 +34269,7 @@ function checkRuntime(root) {
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles);
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(root, goFiles);
   checkRuntimeNextAlphaDirectionAfterRealtimeOutboundDeliverySlice(root, goFiles);
+  checkRuntimeAgentNativeFeatureRequestTestWorkflow(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

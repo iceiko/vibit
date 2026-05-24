@@ -5721,20 +5721,45 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
   distributed_runtime_added: false
   direct_nakama_pitaya_api_compatibility_added: false
 
-agent_native_feature_request_test_workflow:
-  status: next_ready
-  milestone: M-148
-  next_ready_work_item: W-0220
-  previous_completed_work_item: W-0219
-  selected_direction: define_agent_native_feature_request_test_workflow
-  expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+  agent_native_feature_request_test_workflow:
+    status: defined
+    milestone: M-148
+    completed_work_item: W-0220
+    decision: ADR-0128
+    standard: docs/agent-native-feature-request-test-workflow.md
+    translation: docs/agent-native-feature-request-test-workflow.zh-CN.md
+    check_rule: runtime.agent_native_feature_request_test_workflow
+    next_milestone: M-149
+    next_ready_work_item: W-0221
+    previous_completed_work_item: W-0219
+    selected_direction: define_agent_native_feature_request_test_workflow
+    expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
   target_stage: prototype_ready_foundation
-  source_direction_decision: ADR-0127
-  primary_product_reference: Nakama
-  pitaya_reference_status: deferred_future_architecture_reference
-  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-  implementation_authorized_by_this_selection: false
-  direct_nakama_pitaya_api_compatibility_added: false
+    source_direction_decision: ADR-0127
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    workflow_phases:
+      - user_requirement
+      - requirement_spec
+      - nakama_capability_mapping
+      - acceptance_criteria
+      - test_plan
+      - tests
+      - implementation_boundaries
+      - verification
+      - durable_memory
+    required_artifacts:
+      - request.md
+      - spec.yaml
+      - impact.md
+      - plan.md
+      - checklist.md
+      - verification.md
+    future_pilot_work_item: W-0221
+    future_pilot_direction: pilot_nakama_aligned_feature_request_workflow
+    implementation_authorized_by_this_standard: false
+    direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:
   first_reference_language: Go

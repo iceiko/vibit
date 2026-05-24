@@ -220,7 +220,9 @@ first_server_push_realtime_messaging_runtime_slice_decision: ADR-0123
 next_alpha_direction_after_realtime_runtime_slice_decision: ADR-0124
 realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realtime/v1/realtime.proto
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
-next_work_item: W-0220 Define agent-native feature request and test workflow
+agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
+agent_native_feature_request_test_workflow_decision: ADR-0128
+next_work_item: W-0221 Pilot Nakama-aligned feature request workflow
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -244,7 +246,8 @@ Candidate work:
 - Confirm the next alpha direction after the realtime runtime slice. Completed by `W-0216`.
 - Implement the realtime protocol and WebSocket outbound delivery slice. Completed by `W-0218`.
 - Confirm the next alpha direction after realtime outbound delivery. Completed by `W-0219`.
-- Define the agent-native feature request and test workflow. Next.
+- Define the agent-native feature request and test workflow. Completed by `W-0220`.
+- Pilot the Nakama-aligned feature request workflow. Next.
 - Strengthen concurrency and failure-path verification around the authenticated gameplay loop.
 - Define the minimal operations inspection surface needed before serious prototype use.
 
@@ -332,10 +335,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After realtime outbound delivery, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, or distributed runtime. The next concrete work should define the agent-native feature request and test workflow:
+After defining the agent-native feature request and test workflow, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, or distributed runtime. The next concrete work should pilot that workflow on one Nakama-aligned capability request:
 
 ```text
-recommended_next_direction: define_agent_native_feature_request_test_workflow
+recommended_next_direction: pilot_nakama_aligned_feature_request_workflow
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -343,8 +346,8 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 
 Rationale:
 
-- The project has enough runtime foundation to start making the user-facing AI-native development workflow explicit.
-- Without a requirement and test workflow, future feature work can be technically correct but fail to deliver the product promise that AI handles specification, tests, implementation, and verification.
+- The project now has an explicit user-facing AI-native development workflow in `docs/agent-native-feature-request-test-workflow.md`.
+- A pilot is needed to prove the workflow can turn a Nakama-style capability request into spec, acceptance criteria, test plan, implementation boundary, verification plan, and durable memory.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
 - Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the AI-native feature workflow are proven.
 

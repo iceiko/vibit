@@ -192,7 +192,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0220 Define agent-native feature request and test workflow
+W-0221 Pilot Nakama-aligned feature request workflow
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
