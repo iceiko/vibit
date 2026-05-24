@@ -227,7 +227,7 @@ realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
 next_nakama_prototype_ready_capability_selection_decision: ADR-0132
-next_work_item: W-0227 Select next Nakama prototype-ready capability after local alpha example client path
+next_work_item: W-0228 Define agent-native feature request scaffolding gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -341,10 +341,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Authenticated failure-path proof、next capability selection、example client path gate 和 example client path implementation 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应选择下一项 bounded Nakama prototype-ready capability：
+Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation 和 follow-up scaffolding selection 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应定义 feature request scaffolding gate：
 
 ```text
-recommended_next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+recommended_next_direction: define_agent_native_feature_request_scaffolding_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -353,7 +353,7 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 理由：
 
 - 项目已经有明确的用户可见 AI-native development workflow，并已通过 presence/status 和 authenticated failure-path proof 试点。
-- 现有 source-first alpha capabilities 需要更清晰的 client-like 或 example-app path，让开发者不用反向理解内部 E2E tests 也能看清当前 loop。
+- 现有 source-first alpha capabilities 已有可读的 local example path；下一项 gap 是让新的 user requirements 能 scaffold 成 specs、acceptance criteria、tests、implementation boundaries、verification 和 durable memory，再扩展 broad modules。
 - 如果没有 requirement 和 test workflow，后续 feature work 可以技术上正确，但无法兑现“AI 帮用户完成 specification、tests、implementation、verification”的产品承诺。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续延后，直到 single-process behavior 和 AI-native feature workflow 被证明。

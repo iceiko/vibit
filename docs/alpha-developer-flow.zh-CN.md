@@ -61,7 +61,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+next_direction: define_agent_native_feature_request_scaffolding_gate
 next_work_status: next_ready
 ```
 
@@ -184,7 +184,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate 和 local alpha example client path implementation 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`，failure-path verification decision 已记录在 `ADR-0131`，next capability selection decision 已记录在 `ADR-0132`，example client path gate decision 已记录在 `ADR-0133`，example client path implementation decision 已记录在 `ADR-0134`。下一步 work 是 `W-0227 Select next Nakama prototype-ready capability after local alpha example client path`；它应选择一个 bounded Nakama-first follow-up，同时继续延后 Pitaya、SDK publication、hosted surfaces、broad product/runtime scope 和 direct compatibility，直到后续明确 work item 授权。
+Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate 和 local alpha example client path implementation 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`，failure-path verification decision 已记录在 `ADR-0131`，next capability selection decision 已记录在 `ADR-0132`，example client path gate decision 已记录在 `ADR-0133`，example client path implementation decision 已记录在 `ADR-0134`。下一步 work 是 `W-0228 Define agent-native feature request scaffolding gate`；它应选择一个 bounded Nakama-first follow-up，同时继续延后 Pitaya、SDK publication、hosted surfaces、broad product/runtime scope 和 direct compatibility，直到后续明确 work item 授权。
 
 ## 9. Deferred Work
 

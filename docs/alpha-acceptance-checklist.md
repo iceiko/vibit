@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0227 Select next Nakama prototype-ready capability after local alpha example client path` continuation step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0228 Define agent-native feature request scaffolding gate` continuation step.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -128,7 +128,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, and local alpha example client path implementation artifacts remain recorded in their existing documents. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`; the failure-path verification decision is recorded in `ADR-0131`; the next capability selection decision is recorded in `ADR-0132`; the example client path gate decision is recorded in `ADR-0133`; the example client path implementation decision is recorded in `ADR-0134`. The next work is `W-0227 Select next Nakama prototype-ready capability after local alpha example client path`.
+The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, and local alpha example client path implementation artifacts remain recorded in their existing documents. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`; the failure-path verification decision is recorded in `ADR-0131`; the next capability selection decision is recorded in `ADR-0132`; the example client path gate decision is recorded in `ADR-0133`; the example client path implementation decision is recorded in `ADR-0134`. The next work is `W-0228 Define agent-native feature request scaffolding gate`.
 
 Trace references for alpha acceptance include `docs/first-alpha-user-discovery-loop.md`, `docs/first-alpha-feedback-intake-surfaces.md`, `docs/product-maturity-milestones.md`, `docs/prototype-ready-foundation-execution-plan.md`, `docs/prototype-ready-local-development-path-gate.md`, `docs/storage-objects-behavior-gate.md`, and `docs/storage-objects-persistence-schema-gate.md`.
 
@@ -171,6 +171,6 @@ first_server_push_realtime_messaging_runtime_slice_completed: true
 realtime_protocol_websocket_outbound_delivery_gate_defined: true
 realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
-next_direction: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path
+next_direction: define_agent_native_feature_request_scaffolding_gate
 next_work_status: next_ready
 ```

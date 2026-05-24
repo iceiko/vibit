@@ -1,0 +1,250 @@
+schema_version: 0.1
+change_id: select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path
+date: 2026-05-24
+type: standard
+status: verified
+
+summary: Select the agent-native feature request scaffolding gate as the next Nakama-first prototype-ready capability after the local alpha example client path.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - developer_experience
+
+decisions:
+  added:
+    - ADR-0135
+  referenced:
+    - ADR-0134
+    - ADR-0133
+    - ADR-0132
+    - ADR-0128
+    - ADR-0127
+    - ADR-0108
+    - ADR-0097
+    - ADR-0094
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: define_agent_native_feature_request_scaffolding_gate
+
+candidate_directions:
+  - define_agent_native_feature_request_scaffolding_gate
+  - define_minimal_operations_inspection_surface
+  - define_notifications_or_realtime_delivery_flow_proof
+  - define_chat_or_group_messaging_gate
+  - define_friends_groups_or_parties_gate
+  - define_leaderboards_or_tournaments_gate
+  - define_matchmaking_gate
+  - define_authoritative_match_runtime_gate
+  - define_public_client_package_boundary
+  - reactivate_pitaya_distributed_architecture_review
+
+runtime:
+  agent_native_feature_request_scaffolding_selection: completed
+  completed_work_item: W-0227
+  completed_milestone: M-155
+  previous_completed_work_item: W-0226
+  next_milestone: M-156
+  next_work_item: W-0228
+  next_work_item_status: next_ready
+  tier: tier_1_planning
+  selected_direction: define_agent_native_feature_request_scaffolding_gate
+  selected_nakama_capability_family: agent_native_requirement_test_implementation_workflow
+  selected_user_requirement: make_ai_native_requirement_to_tests_to_implementation_scaffolding_explicit
+  source_example_client_path_decision: ADR-0134
+  source_workflow_decision: ADR-0128
+  decision: ADR-0135
+  check_rule: runtime.agent_native_feature_request_scaffolding_selection
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_work_item: W-0228
+  future_change_id: define-agent-native-feature-request-scaffolding-gate
+  future_gate_direction: define_agent_native_feature_request_scaffolding_gate
+  target_stage: prototype_ready_foundation
+  implementation_authorized_by_this_selection: false
+  scaffolding_gate_defined_by_this_selection: false
+  scaffolding_implementation_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  delivery_guarantees_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Make the AI-native path from user requirement to spec, acceptance criteria, tests, implementation boundaries, verification, and durable memory more executable before broadening Nakama-style modules.
+nakama_capability_family: agent_native_requirement_test_implementation_workflow
+
+nakama_capability_mapping:
+  family: agent_native_requirement_test_implementation_workflow
+  product_intent: Nakama-class frameworks are useful because they cover common game backend services. vibit's differentiator is that these services should be added through an AI-native requirement-to-test-to-implementation workflow that users and agents can run repeatably.
+  adopted:
+    - Nakama-first product capability coverage remains the reference for future feature families.
+    - Developer-facing feature intake and verification must be explicit before broad module expansion.
+  adapted:
+    - The next slice is a vibit-native scaffolding gate, not a Nakama API or SDK surface.
+    - The future gate should define templates, command posture, check coverage, and stop conditions before implementation.
+  rejected:
+    - direct Nakama API compatibility
+    - public SDK publication
+    - broad chat, groups, matchmaking, match runtime, operations/admin, or hosted-demo work in this selection
+  pitaya_status: deferred_future_architecture_reference
+
+decision_rationale:
+  selected:
+    direction: define_agent_native_feature_request_scaffolding_gate
+    reason: The local alpha example path now makes existing backend capability readable. The next highest-leverage prototype-ready gap is making the product promise operational: a user opens a new backend requirement and AI can reliably scaffold the spec, acceptance criteria, test plan, implementation boundary, verification record, and durable memory before coding.
+  deferred_candidates:
+    define_minimal_operations_inspection_surface: Important before production-candidate work, but less central than the requirement-to-test product loop for the current user direction.
+    define_notifications_or_realtime_delivery_flow_proof: Useful, but should follow a stronger feature intake and test scaffolding path.
+    define_chat_or_group_messaging_gate: Product-useful but broadens social scope before the AI-native feature workflow is executable enough.
+    define_matchmaking_gate: Product-class capability, but depends on a stronger feature request and test workflow.
+    define_public_client_package_boundary: Useful later, but the current example path is enough for source-first alpha evaluation and SDK publication remains deferred.
+    reactivate_pitaya_distributed_architecture_review: Explicitly deferred by the Nakama-first direction.
+
+workflow_phases:
+  user_requirement:
+    recorded: true
+    artifact: request.md
+  requirement_spec:
+    recorded: true
+    artifact: spec.yaml
+  nakama_capability_mapping:
+    recorded: true
+    family: agent_native_requirement_test_implementation_workflow
+  acceptance_criteria:
+    recorded: true
+  test_plan:
+    recorded: true
+  tests:
+    selection_slice_tests_applicable: false
+    rationale: This slice selects the follow-up gate only. W-0228 will define the test plan for any future scaffolding implementation.
+  implementation_boundaries:
+    recorded: true
+  verification_phase:
+    recorded: true
+  durable_memory:
+    recorded: true
+
+acceptance_criteria:
+  - The selected next capability family is `agent_native_requirement_test_implementation_workflow`.
+  - The selected next direction is `define_agent_native_feature_request_scaffolding_gate`.
+  - The selection records why the feature request scaffolding gate should precede chat, groups, matchmaking, match runtime, operations/admin behavior, SDK publication, hosted surfaces, distributed runtime, or direct compatibility.
+  - The selection opens W-0228 as a bounded gate before implementation.
+  - The selection does not add runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, SDKs, hosted deployments, release artifacts, broad product modules, Pitaya-style distributed architecture, or direct compatibility.
+
+test_plan:
+  selection_slice:
+    - Repository check for W-0227 completion and W-0228 next-ready state.
+    - Runtime check for ADR-0135, change artifacts, Nakama capability mapping, selected follow-up direction, deferral markers, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  follow_up_w_0228:
+    - Define accepted scaffolding artifacts and ownership.
+    - Define whether future implementation should add `tools/vibit` commands, templates, docs, or checks.
+    - Define required redaction behavior for user requests, secrets, DSNs, tokens, credentials, transport metadata, and local env values.
+    - Preserve no runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted demo, SDK publication, or direct compatibility scope.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path/
+    - decisions/ADR-0135-agent-native-feature-request-scaffolding-selection.md
+    - conversations/2026-05-24-agent-native-feature-request-scaffolding-selection.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - scaffolding gate definition in this selection slice
+    - scaffolding implementation in this selection slice
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - persistence changes
+    - authentication/session behavior changes
+    - delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, distributed runtime, or direct compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.agent_native_feature_request_scaffolding_selection
+    - node tools/vibit check change select-next-nakama-prototype-ready-capability-after-local-alpha-example-client-path --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
