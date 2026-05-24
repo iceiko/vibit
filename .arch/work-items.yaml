@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-150
+current_milestone: M-151
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: nakama_presence_status_workflow_pilot_selected
+    current_release_state: presence_status_local_proof_hardened
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0222
+    next_ready_work_item: W-0223
     preferred_after_current:
-      - presence_status_local_proof_hardening
+      - authenticated_gameplay_failure_path_verification
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2900,7 +2900,7 @@ milestones:
 
   - id: M-150
     title: Presence Status Local Proof Hardening
-    status: active
+    status: completed
     goal: Harden the existing Nakama-style self-presence/status local alpha proof around close, invalidation, offline, and redaction behavior without broadening into subscriptions, chat, groups, matchmaking, match runtime, persistence, or direct compatibility.
     completion_criteria:
       - Existing presence/status behavior is proven through focused tests for online active bound connections and offline after close or invalidation.
@@ -2911,6 +2911,21 @@ milestones:
       - adding new presence protocol routes or Protobuf messages
       - adding presence subscriptions, status broadcast fanout, chat, groups, parties, matchmaking, match runtime, leaderboards, economy, SDKs, operations, or distributed runtime
       - adding persistence, migrations, dependencies, startup wiring, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility
+    completion_summary: Hardened the existing Nakama-style self-presence/status local alpha proof with focused application and authenticated Protobuf request-flow tests for online active bound connections, offline after transport close, offline after close-policy invalidation, and response redaction. Accepted ADR-0130, registered `runtime.presence_status_local_proof_hardening`, and opened `M-151/W-0223 Strengthen authenticated gameplay failure-path verification` as the next-ready bounded follow-up. No production runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, subscription, broadcast fanout, broad product module, distributed runtime, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-151
+    title: Authenticated Gameplay Failure Path Verification
+    status: active
+    goal: Strengthen the authenticated local alpha gameplay loop failure-path proof around missing, malformed, invalid, expired, revoked, route-protection, and redaction behavior without adding new protocol routes, persistence, or broad product modules.
+    completion_criteria:
+      - Existing authenticated gameplay request-flow failure behavior is covered by focused tests for missing or malformed proof where current surfaces support it.
+      - Invalid, expired, revoked, or otherwise unusable access-token paths remain fail-closed and redacted.
+      - Protected gameplay routes continue to require authenticated identity handoff before application behavior executes.
+      - The proof uses existing runtime, protocol, and generated surfaces unless a later bounded work item explicitly records otherwise.
+    non_goals:
+      - adding new authentication, session, or gameplay protocol routes
+      - adding Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, logout behavior changes, token refresh, cleanup jobs, SDKs, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+      - adding chat, groups, parties, matchmaking, match runtime, leaderboards, economy, operations/admin behavior, distributed runtime, or Pitaya-style cluster architecture
 
 work_items:
   - id: W-0001
@@ -8449,7 +8464,7 @@ work_items:
   - id: W-0222
     milestone: M-150
     title: Harden presence status local proof through close and offline cases
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-harden-presence-status-local-proof
     depends_on:
       - W-0221
@@ -8470,3 +8485,35 @@ work_items:
       - Add or strengthen focused tests that prove existing self-presence reports online from active bound connections and offline after close or invalidation.
       - Add or strengthen local alpha request-flow proof only where it uses existing protocol and runtime surfaces.
       - Record verification and memory updates without broadening presence/status into subscriptions, broadcasts, chat, social, persistence, distributed runtime, or direct compatibility.
+    decision: ADR-0130
+    check_rule: runtime.presence_status_local_proof_hardening
+    next_milestone: M-151
+    next_ready_work_item: W-0223
+    completion_summary: Hardened the existing self-presence/status proof with `TestGetPlayerPresenceReportsOfflineAfterCloseAndInvalidation` at the application boundary and `TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation` through the authenticated local alpha Protobuf request flow. The slice proves online active bound connection behavior, offline after transport close, offline after close-policy invalidation, and response redaction while preserving protocol/generated/migration/dependency/persistence/startup/direct compatibility deferrals.
+
+  - id: W-0223
+    milestone: M-151
+    title: Strengthen authenticated gameplay failure-path verification
+    status: next_ready
+    change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
+    depends_on:
+      - W-0222
+    expected_change_id: strengthen-authenticated-gameplay-failure-path-verification
+    tier: tier_2_runtime
+    selected_direction: authenticated_gameplay_failure_path_verification
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0130
+      - ADR-0129
+      - ADR-0128
+      - ADR-0127
+      - ADR-0087
+      - ADR-0085
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, logout behavior changes, token refresh, cleanup jobs, broad product modules, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of strengthening existing authenticated gameplay failure-path verification.
+    completion:
+      - Add or strengthen focused tests for authenticated local alpha gameplay failure paths using existing runtime and protocol surfaces.
+      - Prove missing, malformed, invalid, expired, revoked, route-protection, or redaction behavior at the lowest existing boundary that accurately exercises the current implementation.
+      - Record verification and memory updates without broadening authentication, session, protocol, persistence, social, multiplayer, distributed runtime, or direct compatibility scope.

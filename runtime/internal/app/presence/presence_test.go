@@ -68,6 +68,88 @@ func TestGetPlayerPresenceAllowsExplicitSelfPlayerID(t *testing.T) {
 	}
 }
 
+func TestGetPlayerPresenceReportsOfflineAfterCloseAndInvalidation(t *testing.T) {
+	tests := []struct {
+		name     string
+		terminal func(*testing.T, *connection.InMemoryRegistry)
+	}{
+		{
+			name: "transport close",
+			terminal: func(t *testing.T, registry *connection.InMemoryRegistry) {
+				t.Helper()
+				if _, err := registry.MarkConnectionClosed(context.Background(), connection.MarkClosed{
+					ConnectionID:     "connection-1",
+					ConnectionEpoch:  7,
+					ClosedAt:         fixedTime().Add(time.Minute),
+					CloseReasonClass: "transport_closed",
+				}); err != nil {
+					t.Fatalf("MarkConnectionClosed() error = %v, want nil", err)
+				}
+			},
+		},
+		{
+			name: "policy invalidation",
+			terminal: func(t *testing.T, registry *connection.InMemoryRegistry) {
+				t.Helper()
+				if _, err := registry.MarkConnectionInvalidated(context.Background(), connection.Invalidation{
+					ConnectionID:      "connection-1",
+					ConnectionEpoch:   7,
+					InvalidatedAt:     fixedTime().Add(time.Minute),
+					InvalidationClass: "token_revoked",
+				}); err != nil {
+					t.Fatalf("MarkConnectionInvalidated() error = %v, want nil", err)
+				}
+			},
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			registry := connection.NewInMemoryRegistry(fixedClock{now: fixedTime()})
+			if _, err := registry.RegisterOpenConnection(context.Background(), connection.OpenConnection{
+				ConnectionID:    "connection-1",
+				ConnectionEpoch: 7,
+				OpenedAt:        fixedTime().Add(-time.Minute),
+			}); err != nil {
+				t.Fatalf("RegisterOpenConnection() error = %v, want nil", err)
+			}
+			if _, err := registry.BindConnectionIdentity(context.Background(), connection.BindIdentity{
+				ConnectionID:     "connection-1",
+				ConnectionEpoch:  7,
+				ActorKind:        connection.ActorKindPlayer,
+				PlayerID:         "player-1",
+				RuntimeSessionID: "session-1",
+				ValidatedAt:      fixedTime(),
+			}); err != nil {
+				t.Fatalf("BindConnectionIdentity() error = %v, want nil", err)
+			}
+			handlers := Handlers{Registry: registry}
+
+			online, err := handlers.GetPlayerPresence(context.Background(), GetPlayerPresenceRequest{}, validatedIdentity("player-1"))
+			if err != nil {
+				t.Fatalf("GetPlayerPresence(online) error = %v, want nil", err)
+			}
+			if online.Status != PresenceStatusOnline || online.ConnectionCount != 1 {
+				t.Fatalf("GetPlayerPresence(online) = %#v, want online with one active connection", online)
+			}
+
+			tt.terminal(t, registry)
+
+			offline, err := handlers.GetPlayerPresence(context.Background(), GetPlayerPresenceRequest{}, validatedIdentity("player-1"))
+			if err != nil {
+				t.Fatalf("GetPlayerPresence(offline) error = %v, want nil", err)
+			}
+			if offline.Status != PresenceStatusOffline ||
+				offline.ConnectionCount != 0 ||
+				len(offline.ActiveConnections) != 0 ||
+				len(offline.RuntimeSessionIDs) != 0 ||
+				offline.LastSeenAt != nil {
+				t.Fatalf("GetPlayerPresence(offline) = %#v, want offline without active connection metadata", offline)
+			}
+		})
+	}
+}
+
 func TestGetPlayerPresenceRejectsCrossPlayerQuery(t *testing.T) {
 	_, err := (Handlers{Registry: connection.NewInMemoryRegistry(nil)}).GetPlayerPresence(context.Background(), GetPlayerPresenceRequest{
 		PlayerID: "player-2",

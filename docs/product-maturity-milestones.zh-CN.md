@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: presence_status_local_proof_hardening
+next_direction: authenticated_gameplay_failure_path_verification
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-Nakama-aligned presence/status workflow pilot 之后，下一个产品方向是：
+presence/status local proof hardening 之后，下一个产品方向是：
 
 ```text
-W-0222 Harden presence status local proof through close and offline cases
+W-0223 Strengthen authenticated gameplay failure-path verification
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0129` 已把该 workflow 试点应用到 Nakama-style presence/status request，并打开下一项 bounded slice。下一项 work 应 harden 现有 self-presence/status local proof through close and offline cases，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0129` 已把该 workflow 试点应用到 Nakama-style presence/status request，`ADR-0130` 已 harden 选定的 self-presence/status proof through close and offline cases。下一项 work 应使用现有 protocol 和 runtime surfaces strengthen authenticated gameplay failure-path verification，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
 

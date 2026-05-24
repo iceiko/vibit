@@ -1,0 +1,200 @@
+schema_version: 0.1
+change_id: harden-presence-status-local-proof
+date: 2026-05-24
+type: feature
+status: verified
+
+summary: Harden the existing Nakama-style self-presence/status local alpha proof around online, close, invalidation, and offline behavior using existing runtime and protocol surfaces.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0130
+  referenced:
+    - ADR-0129
+    - ADR-0128
+    - ADR-0087
+    - ADR-0085
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  presence_status_local_proof_hardening: completed
+  completed_work_item: W-0222
+  completed_milestone: M-150
+  previous_completed_work_item: W-0221
+  next_milestone: M-151
+  next_work_item: W-0223
+  next_work_item_status: next_ready
+  selected_direction: presence_status_local_proof_hardening
+  selected_follow_up_direction: authenticated_gameplay_failure_path_verification
+  selected_nakama_capability_family: presence_status_and_notifications
+  user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow
+  decision: ADR-0130
+  source_pilot_decision: ADR-0129
+  source_workflow_decision: ADR-0128
+  check_rule: runtime.presence_status_local_proof_hardening
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_work_item: W-0223
+  future_change_id: strengthen-authenticated-gameplay-failure-path-verification
+  target_stage: prototype_ready_foundation
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protocol_bridge_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  presence_subscription_added: false
+  status_broadcast_fanout_added: false
+  chat_added: false
+  group_messaging_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Prove self-presence/status through the authenticated local alpha flow, including online after connection binding and offline after close or invalidation.
+nakama_capability_family: presence_status_and_notifications
+
+nakama_capability_mapping:
+  family: presence_status_and_notifications
+  product_intent: Presence/status lets developers observe whether a player is online through server-owned connection state before broader realtime, social, or multiplayer features depend on it.
+  hardened_foundation:
+    - runtime/internal/app/presence/presence_test.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  reused_surfaces:
+    - runtime/internal/app/presence/presence.go
+    - runtime/internal/app/connection/registry.go
+    - runtime/internal/app/connection/close_policy.go
+    - proto/vibit/presence/v1/presence.proto
+    - runtime/internal/platform/protocol/protobuf/presence_bridge.go
+  deferred:
+    - presence subscriptions
+    - status broadcast fanout
+    - friends/groups/parties
+    - chat
+    - matchmaking
+    - match runtime
+    - durable or distributed presence
+    - direct Nakama/Pitaya API compatibility
+
+acceptance_criteria:
+  - The application presence service proves online self-presence from an active bound connection.
+  - The application presence service proves offline self-presence after transport close.
+  - The application presence service proves offline self-presence after policy invalidation.
+  - The authenticated local alpha Protobuf request flow proves online, close/offline, and invalidation/offline behavior through existing route and wire surfaces.
+  - The slice does not add new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, subscriptions, broadcast fanout, broad social/multiplayer modules, distributed runtime, or direct compatibility.
+
+test_plan:
+  focused_go_tests:
+    - go test ./internal/app/presence ./internal/platform/protocol/protobuf
+    - go test ./...
+  repository_checks:
+    - Repository check for W-0222 completion and W-0223 next-ready state.
+    - Runtime check for ADR-0130, change artifacts, hardened test names, deferral markers, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+
+implementation_boundaries:
+  allowed:
+    - runtime/internal/app/presence/presence_test.go
+    - runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    - changes/2026-05-24-harden-presence-status-local-proof/
+    - decisions/ADR-0130-presence-status-local-proof-hardening.md
+    - conversations/2026-05-24-presence-status-local-proof-hardening.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes beyond tests
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - persistence changes
+    - presence subscriptions or broadcast fanout
+    - chat, groups, matchmaking, match runtime, leaderboards, economy, SDKs, operations, or distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - go test ./internal/app/presence ./internal/platform/protocol/protobuf
+    - go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.presence_status_local_proof_hardening
+    - node tools/vibit check change harden-presence-status-local-proof --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

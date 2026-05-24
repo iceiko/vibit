@@ -131,18 +131,19 @@ purpose: >
   nakama_first_ai_native_requirement_test_workflow_direction: ADR-0127
   agent_native_feature_request_test_workflow: ADR-0128
   nakama_aligned_feature_request_workflow_pilot: ADR-0129
+  presence_status_local_proof_hardening: ADR-0130
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: presence_status_local_proof_hardening
+  current_phase: authenticated_gameplay_failure_path_verification
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_and_realtime_protocol_websocket_outbound_delivery_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0222
+  next_ready_work_item: W-0223
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -209,8 +210,14 @@ architecture_scope:
   nakama_aligned_feature_request_workflow_pilot_check_rule: runtime.nakama_aligned_feature_request_workflow_pilot
   selected_nakama_capability_family: presence_status_and_notifications
   selected_user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow
-  future_presence_status_local_proof_work_item: W-0222
-  future_presence_status_local_proof_direction: presence_status_local_proof_hardening
+  presence_status_local_proof_hardening_completed: true
+  presence_status_local_proof_hardening_decision: ADR-0130
+  presence_status_local_proof_hardening_change: changes/2026-05-24-harden-presence-status-local-proof
+  presence_status_local_proof_hardening_check_rule: runtime.presence_status_local_proof_hardening
+  presence_status_local_proof_hardening_application_test: runtime/internal/app/presence/presence_test.go
+  presence_status_local_proof_hardening_e2e_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  future_authenticated_gameplay_failure_path_work_item: W-0223
+  future_authenticated_gameplay_failure_path_direction: authenticated_gameplay_failure_path_verification
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   previous_experimental_runtime_slice: removed_from_mainline
 
@@ -7379,6 +7386,48 @@ identity_session_boundary:
     generated_output_added: false
     migration_added: false
     dependency_added: false
+    distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  presence_status_local_proof_hardening:
+    status: completed
+    milestone: M-150
+    completed_work_item: W-0222
+    decision: ADR-0130
+    change: changes/2026-05-24-harden-presence-status-local-proof
+    check_rule: runtime.presence_status_local_proof_hardening
+    next_milestone: M-151
+    next_ready_work_item: W-0223
+    previous_completed_work_item: W-0221
+    selected_direction: presence_status_local_proof_hardening
+    selected_follow_up_direction: authenticated_gameplay_failure_path_verification
+    expected_follow_up_change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
+    tier: tier_2_runtime
+    target_stage: prototype_ready_foundation
+    source_pilot_decision: ADR-0129
+    source_workflow_decision: ADR-0128
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: presence_status_and_notifications
+    selected_user_requirement: prove_self_presence_status_through_authenticated_local_alpha_flow
+    application_presence_test: runtime/internal/app/presence/presence_test.go
+    authenticated_local_alpha_flow_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    proves_online_active_bound_connection: true
+    proves_offline_after_transport_close: true
+    proves_offline_after_close_policy_invalidation: true
+    proves_response_redaction: true
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    presence_subscription_added: false
+    status_broadcast_fanout_added: false
+    chat_added: false
+    matchmaking_added: false
+    match_runtime_added: false
     distributed_runtime_added: false
     direct_nakama_pitaya_api_compatibility_added: false
 

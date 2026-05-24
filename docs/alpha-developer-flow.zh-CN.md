@@ -61,7 +61,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: presence_status_local_proof_hardening
+next_direction: authenticated_gameplay_failure_path_verification
 next_work_status: next_ready
 ```
 
@@ -184,7 +184,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow 和 Nakama-aligned presence/status workflow pilot 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`。下一步 work 是 `W-0222 Harden presence status local proof through close and offline cases`；它应 harden 现有 self-presence/status proof，同时继续延后 Pitaya 和 broad product/runtime scope，直到后续明确 work item 授权。
+Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot 和 presence/status local proof hardening 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`。下一步 work 是 `W-0223 Strengthen authenticated gameplay failure-path verification`；它应 strengthen existing authenticated local alpha failure-path proof，同时继续延后 Pitaya 和 broad product/runtime scope，直到后续明确 work item 授权。
 
 ## 9. Deferred Work
 

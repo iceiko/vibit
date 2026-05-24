@@ -349,6 +349,73 @@ func TestStorageObjectsProtocolRouteLocalAlphaFlow(t *testing.T) {
 	assertNoFrameErrorSecretLeak(t, afterDelete, player.accessToken, player.deviceCredential, valueJSON)
 }
 
+func TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation(t *testing.T) {
+	ctx := context.Background()
+
+	t.Run("transport close", func(t *testing.T) {
+		fixture := newAuthenticatedGameplayE2EFixture(t)
+		player := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-presence-close-e2e-1", "client-presence-close-e2e-1")
+		session := app.Session{
+			ConnectionID:    player.connectionID,
+			SessionID:       player.sessionID,
+			PlayerID:        player.playerID,
+			ConnectionEpoch: 1,
+		}
+		target := app.Target{Scope: app.TargetScopePlayer, ID: player.playerID}
+
+		online := fixture.queryPlayerPresence(t, "presence-close-online-1", target, session, player, 1)
+		assertPresenceOnline(t, online, player.playerID, player.connectionID, 1)
+
+		if _, err := fixture.connectionRegistry.MarkConnectionClosed(ctx, appconnection.MarkClosed{
+			ConnectionID:     appconnection.ConnectionID(player.connectionID),
+			ConnectionEpoch:  1,
+			ClosedAt:         fixture.clock.Now().Add(2 * time.Second),
+			CloseReasonClass: "transport_closed",
+		}); err != nil {
+			t.Fatalf("MarkConnectionClosed() error = %v, want nil", err)
+		}
+
+		offline := fixture.queryPlayerPresence(t, "presence-close-offline-1", target, session, player, 1)
+		assertPresenceOffline(t, offline, player.playerID)
+		assertNoPresenceSecretLeak(t, offline, player.accessToken, player.deviceCredential)
+	})
+
+	t.Run("policy invalidation", func(t *testing.T) {
+		fixture := newAuthenticatedGameplayE2EFixture(t)
+		player := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-presence-invalidated-e2e-1", "client-presence-invalidated-e2e-1")
+		session := app.Session{
+			ConnectionID:    player.connectionID,
+			SessionID:       player.sessionID,
+			PlayerID:        player.playerID,
+			ConnectionEpoch: 1,
+		}
+		target := app.Target{Scope: app.TargetScopePlayer, ID: player.playerID}
+
+		online := fixture.queryPlayerPresence(t, "presence-invalidated-online-1", target, session, player, 1)
+		assertPresenceOnline(t, online, player.playerID, player.connectionID, 1)
+
+		closeResult, err := appconnection.NewClosePolicy(
+			fixture.connectionRegistry,
+			appconnection.WithClosePolicyClock(fixture.clock),
+		).RequestClose(ctx, appconnection.CloseConnectionsCommand{
+			Target:           appconnection.TargetConnection(appconnection.ConnectionID(player.connectionID), 1),
+			ReasonClass:      appconnection.CloseReasonTokenRevoked,
+			PublicVisibility: appconnection.ClosePublicVisibilityGenericReauthRequired,
+			Retryability:     appconnection.CloseRetryabilityNotRetryable,
+		})
+		if err != nil {
+			t.Fatalf("RequestClose() error = %v, want nil", err)
+		}
+		if len(closeResult.Intents) != 1 || closeResult.Intents[0].Outcome != appconnection.CloseOutcomeInvalidated {
+			t.Fatalf("closeResult = %#v, want one invalidated close intent", closeResult)
+		}
+
+		offline := fixture.queryPlayerPresence(t, "presence-invalidated-offline-1", target, session, player, 1)
+		assertPresenceOffline(t, offline, player.playerID)
+		assertNoPresenceSecretLeak(t, offline, player.accessToken, player.deviceCredential)
+	})
+}
+
 type authenticatedGameplayE2EFixture struct {
 	clock                    e2eClock
 	service                  appauth.Service
@@ -479,6 +546,25 @@ func (f authenticatedGameplayE2EFixture) handleFrame(t *testing.T, step *frameSt
 	return mustUnmarshalSingleResponse(t, responses)
 }
 
+func (f authenticatedGameplayE2EFixture) queryPlayerPresence(t *testing.T, requestID string, target app.Target, session app.Session, player e2eAuthenticatedPlayer, epoch uint64) *presencev1.GetPlayerPresenceResponse {
+	t.Helper()
+
+	envelope := f.handleFrame(t, &frameStep{
+		route:           apppresence.GetPlayerPresenceRoute(),
+		requestID:       requestID,
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: epoch,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &presencev1.GetPlayerPresenceRequest{
+			PlayerId: player.playerID,
+		},
+	})
+	return mustDecodePayloadAs[*presencev1.GetPlayerPresenceResponse](t, envelope)
+}
+
 type frameStep struct {
 	route           app.RouteKey
 	requestID       string
@@ -580,6 +666,50 @@ func (f authenticatedGameplayE2EFixture) authenticateAndBindLocalPlayer(t *testi
 		connectionID:     connectionID,
 		accessToken:      login.GetAccessToken(),
 		deviceCredential: onboarding.DeviceCredential,
+	}
+}
+
+func assertPresenceOnline(t *testing.T, response *presencev1.GetPlayerPresenceResponse, playerID string, connectionID string, epoch uint64) {
+	t.Helper()
+
+	if response.GetPlayerId() != playerID ||
+		response.GetPresenceStatus() != presencev1.PresenceStatus_PRESENCE_STATUS_ONLINE ||
+		response.GetConnectionCount() != 1 ||
+		len(response.GetActiveConnections()) != 1 ||
+		response.GetLastSeenAt() == "" {
+		t.Fatalf("presence response = %#v, want online self-presence", response)
+	}
+	active := response.GetActiveConnections()[0]
+	if active.GetConnectionId() != connectionID ||
+		active.GetConnectionEpoch() != epoch ||
+		active.GetLastSeenAt() == "" ||
+		active.GetBoundAt() == "" {
+		t.Fatalf("active presence connection = %#v, want bound connection metadata", active)
+	}
+}
+
+func assertPresenceOffline(t *testing.T, response *presencev1.GetPlayerPresenceResponse, playerID string) {
+	t.Helper()
+
+	if response.GetPlayerId() != playerID ||
+		response.GetPresenceStatus() != presencev1.PresenceStatus_PRESENCE_STATUS_OFFLINE ||
+		response.GetConnectionCount() != 0 ||
+		len(response.GetActiveConnections()) != 0 ||
+		len(response.GetRuntimeSessionIds()) != 0 ||
+		response.GetLastSeenAt() != "" ||
+		response.GetObservedAt() == "" {
+		t.Fatalf("presence response = %#v, want offline without active connection metadata", response)
+	}
+}
+
+func assertNoPresenceSecretLeak(t *testing.T, response *presencev1.GetPlayerPresenceResponse, secrets ...string) {
+	t.Helper()
+
+	text := response.String()
+	for _, secret := range secrets {
+		if secret != "" && strings.Contains(text, secret) {
+			t.Fatalf("presence response leaks secret %q: %v", secret, response)
+		}
 	}
 }
 
