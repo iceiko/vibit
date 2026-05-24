@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-157
+current_milestone: M-158
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: agent_native_feature_request_scaffolding_gate_defined
+    current_release_state: agent_native_feature_request_scaffolding_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0229
+    next_ready_work_item: W-0230
     preferred_after_current:
-      - implement_agent_native_feature_request_scaffolding
+      - pilot_scaffolded_nakama_feature_request_intake
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3002,7 +3002,7 @@ milestones:
 
   - id: M-157
     title: Agent-Native Feature Request Scaffolding Implementation
-    status: active
+    status: completed
     goal: Implement source-first feature request scaffolding so user backend requirements can be turned into bounded change artifacts before coding, while staying inside docs, templates, tooling, and repository checks.
     completion_criteria:
       - A source-first feature request template exists or an equivalent scaffold output is implemented.
@@ -3010,6 +3010,19 @@ milestones:
       - The scaffold includes Nakama capability mapping, Pitaya deferral, acceptance criteria, test planning, implementation boundaries, redaction reminders, verification commands, and durable memory expectations.
       - The implementation remains bounded to docs, templates, tooling, and checks.
       - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added.
+    non_goals:
+      - adding runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented source-first feature request scaffolding with `changes/_template/feature-request/`, the six required template artifacts, `docs/agent-native-feature-request-scaffolding.md` and its Simplified Chinese translation, a narrow `tools/vibit scaffold feature` command, `ADR-0137`, and `runtime.agent_native_feature_request_scaffolding_implementation` check coverage. The scaffold creates or guides `request.md`, `spec.yaml`, `impact.md`, `plan.md`, `checklist.md`, and `verification.md` with Nakama capability mapping, Pitaya deferral, acceptance criteria, test planning, implementation boundaries, redaction, verification, and durable memory prompts. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted deployment, SDK, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-158
+    title: Scaffolded Nakama Feature Request Pilot
+    status: active
+    goal: Use the new source-first feature request scaffold on one bounded Nakama-style request intake before broad product module expansion.
+    completion_criteria:
+      - A scaffolded change directory is created with `tools/vibit scaffold feature`.
+      - The scaffolded request records Nakama capability mapping, Pitaya deferral, acceptance criteria, test plan, implementation boundaries, verification, and durable memory expectations.
+      - The pilot chooses a bounded follow-up that remains aligned with the Nakama-first prototype-ready roadmap.
+      - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added unless the scaffolded request explicitly opens a later bounded work item.
     non_goals:
       - adding runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
@@ -8778,7 +8791,7 @@ work_items:
   - id: W-0229
     milestone: M-157
     title: Implement agent-native feature request scaffolding
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-implement-agent-native-feature-request-scaffolding
     depends_on:
       - W-0228
@@ -8801,3 +8814,35 @@ work_items:
       - Include Nakama capability mapping, Pitaya deferral, acceptance criteria, test planning, implementation boundaries, redaction reminders, verification commands, and durable memory expectations.
       - Add focused checks or tests for the scaffold/template shape.
       - Preserve runtime, protocol, generated output, migration, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals.
+    decision: ADR-0137
+    check_rule: runtime.agent_native_feature_request_scaffolding_implementation
+    next_milestone: M-158
+    next_ready_work_item: W-0230
+    completion_summary: Implemented source-first feature request scaffolding with `changes/_template/feature-request/`, the six required template artifacts, `docs/agent-native-feature-request-scaffolding.md` and its Simplified Chinese translation, a narrow `tools/vibit scaffold feature` command, `ADR-0137`, and `runtime.agent_native_feature_request_scaffolding_implementation` check coverage. The command supports `--request`, `--summary`, `--date`, and `--dry-run`, refuses to overwrite existing change directories, and creates deterministic text change artifacts. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted deployment, SDK, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0230
+    milestone: M-158
+    title: Pilot scaffolded Nakama feature request intake
+    status: next_ready
+    change: changes/2026-05-24-pilot-scaffolded-nakama-feature-request-intake
+    depends_on:
+      - W-0229
+    expected_change_id: pilot-scaffolded-nakama-feature-request-intake
+    tier: tier_2_standard
+    selected_direction: pilot_scaffolded_nakama_feature_request_intake
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0137
+      - ADR-0136
+      - ADR-0135
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime behavior, new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of piloting scaffolded feature request intake.
+    completion:
+      - Use `tools/vibit scaffold feature` to create the pilot change directory.
+      - Fill the scaffolded request with Nakama capability mapping, Pitaya deferral, acceptance criteria, test plan, implementation boundaries, verification, and durable memory expectations.
+      - Select a bounded next implementation or gate follow-up only if it preserves current ask-first boundaries.
+      - Preserve runtime, protocol, generated output, migration, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals unless the pilot explicitly opens a later authorized work item.

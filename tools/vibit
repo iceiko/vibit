@@ -164,6 +164,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.local_alpha_example_client_path_implementation",
   "runtime.agent_native_feature_request_scaffolding_selection",
   "runtime.agent_native_feature_request_scaffolding_gate",
+  "runtime.agent_native_feature_request_scaffolding_implementation",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -250,6 +251,7 @@ Usage:
   vibit inspect rule <rule-id>
   vibit inspect rules
   vibit inspect rules --category <category>
+  vibit scaffold feature <change-id> --request <text> [--summary <text>] [--date YYYY-MM-DD] [--dry-run]
   vibit generate module <module>
   vibit generate contract-shapes <module|all>
 
@@ -280,6 +282,7 @@ Commands:
   inspect memory           Print project memory indexes as JSON.
   inspect rule <rule-id>   Print check rule metadata as JSON.
   inspect rules            Print check rule catalog metadata as JSON.
+  scaffold feature         Create source-first feature request change artifacts.
   generate module <module> Generate a minimal module skeleton.
   generate contract-shapes Generate Go contract shape files from semantic contracts.
 `;
@@ -357,6 +360,18 @@ function writeFileIfMissing(filePath, content) {
   fs.mkdirSync(path.dirname(filePath), { recursive: true });
   fs.writeFileSync(filePath, content, "utf8");
   return true;
+}
+
+function escapeYamlScalar(value) {
+  return JSON.stringify(String(value));
+}
+
+function formatToday() {
+  const now = new Date();
+  const year = now.getFullYear();
+  const month = String(now.getMonth() + 1).padStart(2, "0");
+  const day = String(now.getDate()).padStart(2, "0");
+  return `${year}-${month}-${day}`;
 }
 
 function checkName(value, label, pattern, example) {
@@ -33292,6 +33307,277 @@ function checkRuntimeAgentNativeFeatureRequestScaffoldingGate(root, goFiles) {
   });
 }
 
+function checkRuntimeAgentNativeFeatureRequestScaffoldingImplementation(root, goFiles) {
+  const ruleId = "runtime.agent_native_feature_request_scaffolding_implementation";
+  const standardPath = "docs/agent-native-feature-request-scaffolding.md";
+  const standardTranslationPath = "docs/agent-native-feature-request-scaffolding.zh-CN.md";
+  const decisionPath = "decisions/ADR-0137-agent-native-feature-request-scaffolding-implementation.md";
+  const changePath = "changes/2026-05-24-implement-agent-native-feature-request-scaffolding";
+  const conversationPath = "conversations/2026-05-24-agent-native-feature-request-scaffolding-implementation.md";
+  const templateDir = "changes/_template/feature-request";
+
+  if (!agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
+    ok("agent-native feature request scaffolding implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for agent-native feature request scaffolding implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for agent-native feature request scaffolding implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  if (isDirectory(root, templateDir)) {
+    ok(`${templateDir}/ exists for feature request scaffolding`, {
+      rule_id: ruleId,
+      artifact: templateDir,
+    });
+  } else {
+    fail(`${templateDir}/ is missing for feature request scaffolding`, {
+      rule_id: ruleId,
+      artifact: templateDir,
+    });
+  }
+
+  const requiredScaffoldArtifacts = [
+    "request.md",
+    "spec.yaml",
+    "impact.md",
+    "plan.md",
+    "checklist.md",
+    "verification.md",
+  ];
+  for (const artifact of requiredScaffoldArtifacts) {
+    const templatePath = `${templateDir}/${artifact}`;
+    if (isFile(root, templatePath)) {
+      ok(`${templatePath} exists`, {
+        rule_id: ruleId,
+        artifact: templatePath,
+      });
+    } else {
+      fail(`${templatePath} is missing`, {
+        rule_id: ruleId,
+        artifact: templatePath,
+      });
+    }
+    checkRequiredText(root, standardPath, artifact, ruleId, artifact);
+    checkRequiredText(root, standardTranslationPath, artifact, ruleId, artifact);
+    checkRequiredText(root, `${changePath}/spec.yaml`, artifact, ruleId, artifact);
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-157"],
+    [".arch/work-items.yaml", "title: Agent-Native Feature Request Scaffolding Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0229"],
+    [".arch/work-items.yaml", "title: Implement agent-native feature request scaffolding"],
+    [".arch/work-items.yaml", "decision: ADR-0137"],
+    [".arch/work-items.yaml", "check_rule: runtime.agent_native_feature_request_scaffolding_implementation"],
+    [".arch/work-items.yaml", "id: M-158"],
+    [".arch/work-items.yaml", "title: Scaffolded Nakama Feature Request Pilot"],
+    [".arch/work-items.yaml", "id: W-0230"],
+    [".arch/work-items.yaml", "title: Pilot scaffolded Nakama feature request intake"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation: ADR-0137"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implemented: true"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_check_rule: runtime.agent_native_feature_request_scaffolding_implementation"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_scaffold_command: tools/vibit scaffold feature"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_template_directory: changes/_template/feature-request/"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_next_work_item: W-0230"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_next_direction: pilot_scaffolded_nakama_feature_request_intake"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_protocol_route_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_protobuf_source_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_generated_output_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_migration_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_dependency_added: false"],
+    [".arch/runtime.yaml", "agent_native_feature_request_scaffolding_implementation_direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.agent_native_feature_request_scaffolding_implementation"],
+    [".arch/contracts.yaml", "check_rule: runtime.agent_native_feature_request_scaffolding_implementation"],
+    [".arch/reference.yaml", "phase_2en_agent_native_feature_request_scaffolding_implementation"],
+    [".arch/reference.yaml", "phase_2eo_scaffolded_nakama_feature_request_pilot"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.agent_native_feature_request_scaffolding_implementation"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.agent_native_feature_request_scaffolding_implementation"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.agent_native_feature_request_scaffolding_implementation"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.agent_native_feature_request_scaffolding_implementation"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.agent_native_feature_request_scaffolding_implementation"],
+    ["tools/vibit", "scaffold feature"],
+    ["tools/vibit", "function scaffoldFeature"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredMarkersByFile = {
+    [standardPath]: [
+      "agent_native_feature_request_scaffolding: implemented",
+      "completed_work_item: W-0229",
+      "decision: ADR-0137",
+      "check_rule: runtime.agent_native_feature_request_scaffolding_implementation",
+      "tools/vibit scaffold feature",
+      "changes/_template/feature-request/",
+      "Pitaya remains deferred",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [standardTranslationPath]: [
+      "agent_native_feature_request_scaffolding: implemented",
+      "completed_work_item: W-0229",
+      "decision: ADR-0137",
+      "runtime.agent_native_feature_request_scaffolding_implementation",
+      "tools/vibit scaffold feature",
+      "changes/_template/feature-request/",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0137",
+      "tools/vibit scaffold feature",
+      "changes/_template/feature-request/",
+      "M-158/W-0230",
+      "runtime.agent_native_feature_request_scaffolding_implementation",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "agent_native_feature_request_scaffolding: implemented",
+      "completed_work_item: W-0229",
+      "completed_milestone: M-157",
+      "next_milestone: M-158",
+      "next_work_item: W-0230",
+      "selected_direction: implement_agent_native_feature_request_scaffolding",
+      "next_direction: pilot_scaffolded_nakama_feature_request_intake",
+      "check_rule: runtime.agent_native_feature_request_scaffolding_implementation",
+      "scaffold_command: tools/vibit scaffold feature",
+      "template_directory: changes/_template/feature-request/",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0229",
+      "W-0230",
+      "ADR-0137",
+      "tools/vibit scaffold feature",
+      "changes/_template/feature-request/",
+    ],
+    [`${templateDir}/request.md`]: [
+      "Nakama Capability Mapping",
+      "Pitaya Status",
+      "Acceptance Criteria",
+      "Test Expectations",
+      "Redaction Notes",
+      "direct Nakama API compatibility",
+    ],
+    [`${templateDir}/spec.yaml`]: [
+      "user_requirement:",
+      "user_visible_outcome:",
+      "nakama_capability_family:",
+      "nakama_capability_mapping:",
+      "pitaya_status: deferred_future_architecture_reference",
+      "acceptance_criteria:",
+      "test_plan:",
+      "implementation_boundaries:",
+      "generated_output:",
+      "migrations:",
+      "dependencies:",
+      "redaction:",
+      "verification:",
+      "memory_updates:",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [`${templateDir}/impact.md`]: [
+      "Nakama Product Capability Impact",
+      "Pitaya Impact",
+      "Public Contract Impact",
+      "Data And Migration Impact",
+      "Test Impact",
+      "Documentation And Memory Impact",
+      "Compatibility Risks",
+    ],
+    [`${templateDir}/plan.md`]: [
+      "Nakama capability family",
+      "Pitaya remains deferred",
+      "Implementation Boundary",
+      "Verification Commands",
+      "node tools/vibit check change {{CHANGE_ID}} --json",
+    ],
+    [`${templateDir}/checklist.md`]: [
+      "Nakama/Pitaya Alignment",
+      "Acceptance criteria recorded before implementation",
+      "Generated output posture recorded",
+      "Migration posture recorded",
+      "Dependency posture recorded",
+      "Redaction posture recorded",
+    ],
+    [`${templateDir}/verification.md`]: [
+      "Verified:",
+      "Not verified:",
+      "Not applicable:",
+      "Do not claim a command was run unless it actually ran.",
+      "Preserve redaction",
+    ],
+  };
+  for (const [file, markers] of Object.entries(requiredMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  ok("Agent-native feature request scaffolding implementation completes W-0229 with source-first templates, a narrow scaffold command, focused checks, and no runtime/protocol/generated/migration/dependency/SDK/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -35069,7 +35355,14 @@ function agentNativeFeatureRequestScaffoldingGateCompleted(root) {
   return workItemHasStatus(root, "W-0228", "completed");
 }
 
+function agentNativeFeatureRequestScaffoldingImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0229", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0230";
+  }
   if (agentNativeFeatureRequestScaffoldingGateCompleted(root)) {
     return "repository_next_work_item: W-0229";
   }
@@ -35119,6 +35412,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: pilot_scaffolded_nakama_feature_request_intake";
+  }
   if (agentNativeFeatureRequestScaffoldingGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_agent_native_feature_request_scaffolding";
   }
@@ -35159,6 +35455,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (agentNativeFeatureRequestScaffoldingImplementationCompleted(root)) {
+    return "W-0230 Pilot scaffolded Nakama feature request intake";
+  }
   if (agentNativeFeatureRequestScaffoldingGateCompleted(root)) {
     return "W-0229 Implement agent-native feature request scaffolding";
   }
@@ -35223,6 +35522,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0229", "next_ready_work_item: W-0230"],
     ["W-0228", "next_ready_work_item: W-0229"],
     ["W-0227", "next_ready_work_item: W-0228"],
     ["W-0226", "next_ready_work_item: W-0227"],
@@ -35280,6 +35580,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0229", "completed")) {
+    return "next_work_item: W-0230";
+  }
   if (workItemHasStatus(root, "W-0228", "completed")) {
     return "next_work_item: W-0229";
   }
@@ -35396,6 +35699,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0229", "pilot_scaffolded_nakama_feature_request_intake"],
     ["W-0228", "implement_agent_native_feature_request_scaffolding"],
     ["W-0227", "define_agent_native_feature_request_scaffolding_gate"],
     ["W-0226", "select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path"],
@@ -35453,6 +35757,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0229", "W-0230 Pilot scaffolded Nakama feature request intake"],
     ["W-0228", "W-0229 Implement agent-native feature request scaffolding"],
     ["W-0227", "W-0228 Define agent-native feature request scaffolding gate"],
     ["W-0226", "W-0227 Select next Nakama prototype-ready capability after local alpha example client path"],
@@ -35511,6 +35816,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0229", "current_phase: pilot_scaffolded_nakama_feature_request_intake"],
     ["W-0228", "current_phase: implement_agent_native_feature_request_scaffolding"],
     ["W-0227", "current_phase: define_agent_native_feature_request_scaffolding_gate"],
     ["W-0226", "current_phase: select_next_nakama_prototype_ready_capability_after_local_alpha_example_client_path"],
@@ -36128,6 +36434,7 @@ function checkRuntime(root) {
   checkRuntimeLocalAlphaExampleClientPathImplementation(root, goFiles);
   checkRuntimeAgentNativeFeatureRequestScaffoldingSelection(root, goFiles);
   checkRuntimeAgentNativeFeatureRequestScaffoldingGate(root, goFiles);
+  checkRuntimeAgentNativeFeatureRequestScaffoldingImplementation(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -36522,6 +36829,143 @@ function generateModule(root, moduleName) {
   finish();
 }
 
+function parseScaffoldFeatureArgs(args) {
+  const parsed = {
+    changeId: null,
+    request: null,
+    summary: null,
+    date: formatToday(),
+    dryRun: false,
+  };
+  if (args.length === 0) {
+    return null;
+  }
+  parsed.changeId = args[0];
+  for (let index = 1; index < args.length; index += 1) {
+    const arg = args[index];
+    if (arg === "--dry-run") {
+      parsed.dryRun = true;
+      continue;
+    }
+    if (arg === "--request") {
+      index += 1;
+      if (index >= args.length) {
+        return null;
+      }
+      parsed.request = args[index];
+      continue;
+    }
+    if (arg === "--summary") {
+      index += 1;
+      if (index >= args.length) {
+        return null;
+      }
+      parsed.summary = args[index];
+      continue;
+    }
+    if (arg === "--date") {
+      index += 1;
+      if (index >= args.length) {
+        return null;
+      }
+      parsed.date = args[index];
+      continue;
+    }
+    return null;
+  }
+  if (!parsed.summary) {
+    parsed.summary = parsed.request || "Replace with one-sentence summary.";
+  }
+  return parsed;
+}
+
+function renderFeatureRequestTemplate(content, values) {
+  return content
+    .replaceAll("{{CHANGE_ID}}", values.changeId)
+    .replaceAll("{{DATE}}", values.date)
+    .replaceAll("{{SUMMARY}}", values.summary)
+    .replaceAll("{{ORIGINAL_REQUEST}}", values.request)
+    .replaceAll("{{ORIGINAL_REQUEST_YAML}}", escapeYamlScalar(values.request));
+}
+
+function scaffoldFeature(root, options) {
+  resetResults("scaffold feature");
+  ensureName(options.changeId, "change-id", /^[a-z0-9][a-z0-9-]*[a-z0-9]$/, "kebab-case");
+  ensureName(options.date, "date", /^\d{4}-\d{2}-\d{2}$/, "YYYY-MM-DD");
+  if (!options.request || !String(options.request).trim()) {
+    console.error("--request is required.");
+    process.exit(2);
+  }
+
+  const templateDir = path.join(root, "changes", "_template", "feature-request");
+  if (!fs.existsSync(templateDir) || !fs.statSync(templateDir).isDirectory()) {
+    fail("feature request template directory is missing", {
+      rule_id: "artifact.directory_exists",
+      artifact: rel(root, templateDir),
+    });
+    finish({
+      target: options.changeId,
+      dry_run: options.dryRun,
+    });
+    return;
+  }
+
+  const changeDirName = `${options.date}-${options.changeId}`;
+  const changeDir = path.join(root, "changes", changeDirName);
+  if (fs.existsSync(changeDir)) {
+    fail(`change directory already exists: ${rel(root, changeDir)}`, {
+      rule_id: "generator.artifact_already_exists",
+      artifact: rel(root, changeDir),
+    });
+    finish({
+      target: options.changeId,
+      dry_run: options.dryRun,
+      path: rel(root, changeDir),
+    });
+    return;
+  }
+
+  const created = [];
+  for (const file of CHANGE_SPEC_REQUIRED_FILES) {
+    const templatePath = path.join(templateDir, file);
+    if (!fs.existsSync(templatePath) || !fs.statSync(templatePath).isFile()) {
+      fail(`feature request template is missing ${file}`, {
+        rule_id: "artifact.file_exists",
+        artifact: rel(root, templatePath),
+      });
+      continue;
+    }
+    const rendered = renderFeatureRequestTemplate(readText(templatePath), {
+      changeId: options.changeId,
+      date: options.date,
+      request: String(options.request),
+      summary: String(options.summary),
+    });
+    const target = path.join(changeDir, file);
+    if (options.dryRun) {
+      ok(`would create ${rel(root, target)}`, {
+        rule_id: "generator.created_artifact",
+        artifact: rel(root, target),
+      });
+      continue;
+    }
+    fs.mkdirSync(path.dirname(target), { recursive: true });
+    fs.writeFileSync(target, rendered, "utf8");
+    created.push(rel(root, target));
+    ok(`created ${rel(root, target)}`, {
+      rule_id: "generator.created_artifact",
+      artifact: rel(root, target),
+    });
+  }
+
+  finish({
+    target: options.changeId,
+    dry_run: options.dryRun,
+    path: rel(root, changeDir),
+    created,
+  });
+}
+
 function generateContractShapes(root, targetModule) {
   resetResults("generate contract-shapes");
   if (!/^(all|[a-z][a-z0-9_]*)$/.test(targetModule)) {
@@ -36683,6 +37127,16 @@ function main() {
       process.exit(2);
     }
     generateContractShapes(root, value);
+    return;
+  }
+
+  if (group === "scaffold" && command === "feature") {
+    const parsed = parseScaffoldFeatureArgs(args.slice(2));
+    if (!parsed) {
+      console.error("Usage: vibit scaffold feature <change-id> --request <text> [--summary <text>] [--date YYYY-MM-DD] [--dry-run]");
+      process.exit(2);
+    }
+    scaffoldFeature(root, parsed);
     return;
   }
 

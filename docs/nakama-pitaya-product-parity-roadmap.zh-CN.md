@@ -229,7 +229,7 @@ agent_native_feature_request_test_workflow_decision: ADR-0128
 next_nakama_prototype_ready_capability_selection_decision: ADR-0132
 agent_native_feature_request_scaffolding_gate: docs/agent-native-feature-request-scaffolding-gate.md
 agent_native_feature_request_scaffolding_gate_decision: ADR-0136
-next_work_item: W-0229 Implement agent-native feature request scaffolding
+next_work_item: W-0230 Pilot scaffolded Nakama feature request intake
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -346,8 +346,8 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection 和 feature request scaffolding gate 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应实现该 gate 已定义的 source-first feature request scaffolding：
 
 ```text
-next_work_item: W-0229 Implement agent-native feature request scaffolding
-recommended_next_direction: implement_agent_native_feature_request_scaffolding
+next_work_item: W-0230 Pilot scaffolded Nakama feature request intake
+recommended_next_direction: pilot_scaffolded_nakama_feature_request_intake
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -358,7 +358,7 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 - 项目已经有明确的用户可见 AI-native development workflow，并已通过 presence/status 和 authenticated failure-path proof 试点。
 - 现有 source-first alpha capabilities 已有可读的 local example path；下一项 gap 是让新的 user requirements 能 scaffold 成 specs、acceptance criteria、tests、implementation boundaries、verification 和 durable memory，再扩展 broad modules。
 - 如果没有 requirement 和 test workflow，后续 feature work 可以技术上正确，但无法兑现“AI 帮用户完成 specification、tests、implementation、verification”的产品承诺。
-- `ADR-0136` 已定义 scaffolding gate，因此 `W-0229 Implement agent-native feature request scaffolding` 应限定在 docs、templates、tooling 和 checks 内。
+- `ADR-0136` 已定义 scaffolding gate，`ADR-0137` 已实现 `tools/vibit scaffold feature`，因此 `W-0230 Pilot scaffolded Nakama feature request intake` 应先用该 scaffold 做一个 bounded Nakama request intake，再进入任何后续 implementation work。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续延后，直到 single-process behavior 和 AI-native feature workflow 被证明。
 

@@ -1,0 +1,114 @@
+schema_version: 0.1
+change_id: {{CHANGE_ID}}
+date: {{DATE}}
+type: feature
+status: draft
+
+summary: {{SUMMARY}}
+
+affected_modules: []
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: {{ORIGINAL_REQUEST_YAML}}
+user_visible_outcome: Replace with observable outcome.
+nakama_capability_family: agent_native_requirement_test_implementation_workflow
+
+nakama_capability_mapping:
+  family: agent_native_requirement_test_implementation_workflow
+  product_intent: Replace with the Nakama-style product capability this request supports, or no_mapping_applies with rationale.
+  adopted: []
+  adapted: []
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+  pitaya_status: deferred_future_architecture_reference
+
+acceptance_criteria:
+  - Replace with user-visible success condition.
+  - Replace with user-visible failure or negative condition.
+
+test_plan:
+  positive_behavior: []
+  negative_behavior: []
+  permission_and_authentication: []
+  persistence_and_transactions: []
+  protocol_mapping: []
+  failure_paths_and_redaction: []
+  concurrency_or_ordering: []
+  integration_or_e2e: []
+  repository_checks:
+    - node tools/vibit check change {{CHANGE_ID}} --json
+
+implementation_boundaries:
+  allowed: []
+  forbidden:
+    - runtime behavior outside this change boundary
+    - protocol routes unless explicitly authorized
+    - Protobuf source unless explicitly authorized
+    - generated output unless explicitly authorized
+    - migrations unless explicitly authorized
+    - dependencies unless explicitly authorized
+    - SDK publication, hosted deployments, release artifacts, distributed runtime, or direct compatibility unless explicitly authorized
+
+generated_output:
+  required: false
+  source_of_truth: not_applicable
+
+migrations:
+  required: false
+  source: not_applicable
+
+dependencies:
+  added: []
+  posture: no_new_dependency_expected
+
+redaction:
+  raw_device_credentials_allowed: false
+  raw_access_tokens_allowed: false
+  verifier_keys_allowed: false
+  credential_or_token_digests_allowed: false
+  dsn_with_credentials_allowed: false
+  github_tokens_allowed: false
+  private_user_data_policy: record_only_explicit_request_text_or_redacted_placeholders
+
+verification:
+  required:
+    - node tools/vibit check change {{CHANGE_ID}} --json
+    - node tools/vibit check work --json
+  status: Not verified
+
+memory_updates:
+  - changes/{{DATE}}-{{CHANGE_ID}}/
+  - decisions/ADR-TBD.md when architecture, direction, boundary, dependency, contract, protocol, generated output, or public behavior changes
+  - conversations/{{DATE}}-{{CHANGE_ID}}.md when maintainer intent or product direction matters

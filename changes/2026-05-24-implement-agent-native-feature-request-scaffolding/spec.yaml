@@ -1,0 +1,264 @@
+schema_version: 0.1
+change_id: implement-agent-native-feature-request-scaffolding
+date: 2026-05-24
+type: tooling
+status: verified
+
+summary: Implement source-first feature request scaffolding.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - developer_experience
+
+contracts:
+  commands:
+    added:
+      - tools/vibit scaffold feature
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0137
+  referenced:
+    - ADR-0136
+    - ADR-0135
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: implement_agent_native_feature_request_scaffolding
+next_direction: pilot_scaffolded_nakama_feature_request_intake
+
+runtime:
+  agent_native_feature_request_scaffolding: implemented
+  completed_work_item: W-0229
+  completed_milestone: M-157
+  previous_completed_work_item: W-0228
+  next_milestone: M-158
+  next_work_item: W-0230
+  next_work_item_status: next_ready
+  tier: tier_2_tooling
+  selected_direction: implement_agent_native_feature_request_scaffolding
+  next_direction: pilot_scaffolded_nakama_feature_request_intake
+  selected_nakama_capability_family: agent_native_requirement_test_implementation_workflow
+  user_requirement: make_ai_native_requirement_to_tests_to_implementation_scaffolding_executable
+  source_gate_decision: ADR-0136
+  source_selection_decision: ADR-0135
+  source_workflow_decision: ADR-0128
+  decision: ADR-0137
+  check_rule: runtime.agent_native_feature_request_scaffolding_implementation
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  scaffold_command: tools/vibit scaffold feature
+  template_directory: changes/_template/feature-request/
+  target_stage: prototype_ready_foundation
+  required_scaffold_artifacts:
+    - request.md
+    - spec.yaml
+    - impact.md
+    - plan.md
+    - checklist.md
+    - verification.md
+  scaffolding_implementation_added: true
+  template_files_added: true
+  scaffold_command_added: true
+  repository_check_added: true
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  delivery_guarantees_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Implement source-first feature request scaffolding so AI agents can turn user backend requirements into bounded specs, acceptance criteria, test plans, implementation boundaries, verification records, and durable memory before coding.
+user_visible_outcome: Agents can scaffold a feature-request change directory from a user requirement before coding.
+nakama_capability_family: agent_native_requirement_test_implementation_workflow
+
+nakama_capability_mapping:
+  family: agent_native_requirement_test_implementation_workflow
+  product_intent: Nakama-class capability growth should begin from bounded user requirements, acceptance criteria, tests, implementation boundaries, verification, and durable memory rather than ad hoc coding.
+  adopted:
+    - Nakama remains the primary product capability reference.
+    - Future major features should begin with source-first scaffolded change artifacts.
+    - Acceptance criteria and test planning are required before implementation.
+  adapted:
+    - The scaffold is vibit-native repository tooling, not a Nakama API, SDK, route, or hosted surface.
+    - The first command only creates text change artifacts and refuses to overwrite existing directories.
+  rejected:
+    - direct Nakama API compatibility
+    - direct Pitaya API compatibility
+    - runtime, protocol, generated, migration, dependency, SDK, hosted, or distributed architecture scope in this implementation
+  pitaya_status: deferred_future_architecture_reference
+
+acceptance_criteria:
+  - `changes/_template/feature-request/` contains `request.md`, `spec.yaml`, `impact.md`, `plan.md`, `checklist.md`, and `verification.md`.
+  - `tools/vibit scaffold feature <change-id> --request <text>` creates the six required artifacts under `changes/YYYY-MM-DD-<change-id>/`.
+  - The command supports `--summary`, `--date`, and `--dry-run`.
+  - The command refuses to overwrite an existing change directory.
+  - Template and scaffold content include Nakama mapping, Pitaya deferral, acceptance criteria, test plan, implementation boundaries, redaction, verification, and durable memory prompts.
+  - The repository check rule validates the implementation shape.
+  - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, SDK, hosted, distributed runtime, or direct compatibility scope is added.
+
+test_plan:
+  tooling:
+    - `node -c tools/vibit`
+    - `node tools/vibit scaffold feature scaffold-smoke --date 2026-05-24 --request "Smoke test feature request scaffold." --summary "Smoke test feature request scaffold." --dry-run`
+    - `node tools/vibit scaffold feature implement-agent-native-feature-request-scaffolding --date 2026-05-24 --request "<request>" --summary "Implement source-first feature request scaffolding."`
+  repository_checks:
+    - `node tools/vibit inspect rule runtime.agent_native_feature_request_scaffolding_implementation`
+    - `node tools/vibit check change implement-agent-native-feature-request-scaffolding --json`
+    - `node tools/vibit check work --json`
+    - `node tools/vibit check runtime --json`
+    - `node tools/vibit check memory --json`
+    - `node tools/vibit check schemas --json`
+    - `node tools/vibit check all --json`
+    - `git diff --check`
+  not_applicable:
+    - Go runtime behavior tests are not required because this slice changes no Go runtime source.
+    - Protocol/generated/migration checks remain covered by repository checks; this slice adds no protocol source, generated output, or migrations.
+
+implementation_boundaries:
+  allowed:
+    - changes/_template/feature-request/
+    - docs/agent-native-feature-request-scaffolding.md
+    - docs/agent-native-feature-request-scaffolding.zh-CN.md
+    - changes/2026-05-24-implement-agent-native-feature-request-scaffolding/
+    - decisions/ADR-0137-agent-native-feature-request-scaffolding-implementation.md
+    - conversations/2026-05-24-agent-native-feature-request-scaffolding-implementation.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - docs/agent-native-feature-request-test-workflow*.md
+    - docs/agent-native-feature-request-scaffolding-gate*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - persistence changes
+    - authentication/session behavior changes
+    - delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, distributed runtime, or direct compatibility
+
+generated_output:
+  required: false
+  source_of_truth: not_applicable
+
+migrations:
+  required: false
+  source: not_applicable
+
+dependencies:
+  added: []
+  posture: no_new_dependency_expected
+
+redaction:
+  raw_device_credentials_allowed: false
+  raw_access_tokens_allowed: false
+  verifier_keys_allowed: false
+  credential_or_token_digests_allowed: false
+  dsn_with_credentials_allowed: false
+  github_tokens_allowed: false
+  private_user_data_policy: record_only_explicit_request_text_or_redacted_placeholders
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit scaffold feature scaffold-smoke --date 2026-05-24 --request "Smoke test feature request scaffold." --summary "Smoke test feature request scaffold." --dry-run
+    - node tools/vibit inspect rule runtime.agent_native_feature_request_scaffolding_implementation
+    - node tools/vibit check change implement-agent-native-feature-request-scaffolding --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+
+memory_updates:
+  - changes/2026-05-24-implement-agent-native-feature-request-scaffolding/
+  - decisions/ADR-0137-agent-native-feature-request-scaffolding-implementation.md
+  - conversations/2026-05-24-agent-native-feature-request-scaffolding-implementation.md
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
