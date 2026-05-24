@@ -159,6 +159,8 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.nakama_aligned_feature_request_workflow_pilot",
   "runtime.presence_status_local_proof_hardening",
   "runtime.authenticated_gameplay_failure_path_verification",
+  "runtime.next_nakama_prototype_ready_capability_selection",
+  "runtime.local_alpha_example_client_path_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -32367,6 +32369,244 @@ function checkRuntimeNextNakamaPrototypeReadyCapabilitySelection(root, goFiles) 
   });
 }
 
+function checkRuntimeLocalAlphaExampleClientPathGate(root, goFiles) {
+  const ruleId = "runtime.local_alpha_example_client_path_gate";
+  const standardPath = "docs/local-alpha-example-client-path-gate.md";
+  const standardTranslationPath = "docs/local-alpha-example-client-path-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0133-local-alpha-example-client-path-gate.md";
+  const changePath = "changes/2026-05-24-define-local-alpha-example-client-path-gate";
+  const conversationPath = "conversations/2026-05-24-local-alpha-example-client-path-gate.md";
+
+  if (!localAlphaExampleClientPathGateCompleted(root)) {
+    ok("local alpha example client path gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for local alpha example client path gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for local alpha example client path gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-153"],
+    [".arch/work-items.yaml", "title: Local Alpha Example Client Path Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0225"],
+    [".arch/work-items.yaml", "title: Define local alpha example client path gate"],
+    [".arch/work-items.yaml", "decision: ADR-0133"],
+    [".arch/work-items.yaml", "check_rule: runtime.local_alpha_example_client_path_gate"],
+    [".arch/work-items.yaml", "id: M-154"],
+    [".arch/work-items.yaml", "title: Local Alpha Example Client Path Implementation"],
+    [".arch/work-items.yaml", "id: W-0226"],
+    [".arch/work-items.yaml", "title: Implement local alpha example client path"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate: ADR-0133"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_defined: true"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_check_rule: runtime.local_alpha_example_client_path_gate"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_next_work_item: W-0226"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_next_direction: implement_local_alpha_example_client_path"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_path_posture: source_first_local_alpha_example_client_path"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_public_sdk_posture: not_a_public_sdk"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_future_example_docs_candidate: examples/local-alpha-client/README.md"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_future_example_script_candidate: examples/local-alpha-example-client.sh"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_future_runtime_proof_candidate: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_implementation_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_example_client_implementation_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_sdk_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_generated_client_library_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_protocol_route_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_protobuf_source_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_generated_output_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_migration_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_dependency_added: false"],
+    [".arch/runtime.yaml", "local_alpha_example_client_path_gate_direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.local_alpha_example_client_path_gate"],
+    [".arch/contracts.yaml", "check_rule: runtime.local_alpha_example_client_path_gate"],
+    [".arch/contracts.yaml", "accepted_existing_routes:"],
+    [".arch/reference.yaml", "phase_2ej_local_alpha_example_client_path_gate"],
+    [".arch/reference.yaml", "phase_2ek_local_alpha_example_client_path_implementation"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.local_alpha_example_client_path_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.local_alpha_example_client_path_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.local_alpha_example_client_path_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.local_alpha_example_client_path_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.local_alpha_example_client_path_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredMarkersByFile = {
+    [standardPath]: [
+      "local_alpha_example_client_path_gate: defined",
+      "completed_work_item: W-0225",
+      "decision: ADR-0133",
+      "check_rule: runtime.local_alpha_example_client_path_gate",
+      "future_implementation_work_item: W-0226",
+      "path_posture: source_first_local_alpha_example_client_path",
+      "public_sdk_posture: not_a_public_sdk",
+      "future_example_docs_candidate: examples/local-alpha-client/README.md",
+      "future_example_script_candidate: examples/local-alpha-example-client.sh",
+      "future_runtime_proof_candidate: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go",
+      "implementation_added_by_this_gate: false",
+      "example_client_implementation_added: false",
+      "sdk_added: false",
+      "generated_client_library_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+      "runtime.authentication.AuthenticateWithDeviceCredential",
+      "runtime.connection.BindConnection",
+      "storage.PutOwnStorageObject",
+      "runtime.authentication.LogoutAccessToken",
+      "raw device credential",
+      "raw access tokens",
+      "PostgreSQL DSNs",
+      "Pitaya remains deferred",
+    ],
+    [standardTranslationPath]: [
+      "local_alpha_example_client_path_gate: defined",
+      "completed_work_item: W-0225",
+      "decision: ADR-0133",
+      "check_rule: runtime.local_alpha_example_client_path_gate",
+      "future_implementation_work_item: W-0226",
+      "path_posture: source_first_local_alpha_example_client_path",
+      "public_sdk_posture: not_a_public_sdk",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0133",
+      "source_first_local_alpha_example_client_path",
+      "M-154/W-0226",
+      "runtime.local_alpha_example_client_path_gate",
+      "does not implement an example client",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "local_alpha_example_client_path_gate: defined",
+      "completed_work_item: W-0225",
+      "completed_milestone: M-153",
+      "next_milestone: M-154",
+      "next_work_item: W-0226",
+      "selected_direction: define_local_alpha_example_client_path_gate",
+      "next_direction: implement_local_alpha_example_client_path",
+      "check_rule: runtime.local_alpha_example_client_path_gate",
+      "future_example_docs_candidate: examples/local-alpha-client/README.md",
+      "future_example_script_candidate: examples/local-alpha-example-client.sh",
+      "implementation_added_by_this_gate: false",
+      "example_client_implementation_added: false",
+      "sdk_added: false",
+      "generated_client_library_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0225",
+      "W-0226",
+      "ADR-0133",
+      "source-first",
+      "runtime.local_alpha_example_client_path_gate",
+    ],
+  };
+  for (const [file, markers] of Object.entries(requiredMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Local alpha example client path gate completes W-0225, defines source-first example path posture, opens W-0226, and adds no implementation/runtime/protocol/generated/migration/dependency/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -34128,7 +34368,14 @@ function nextNakamaPrototypeReadyCapabilitySelectionCompleted(root) {
   return workItemHasStatus(root, "W-0224", "completed");
 }
 
+function localAlphaExampleClientPathGateCompleted(root) {
+  return workItemHasStatus(root, "W-0225", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (localAlphaExampleClientPathGateCompleted(root)) {
+    return "repository_next_work_item: W-0226";
+  }
   if (nextNakamaPrototypeReadyCapabilitySelectionCompleted(root)) {
     return "repository_next_work_item: W-0225";
   }
@@ -34166,6 +34413,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (localAlphaExampleClientPathGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_local_alpha_example_client_path";
+  }
   if (nextNakamaPrototypeReadyCapabilitySelectionCompleted(root)) {
     return "repository_next_work_item_scope: define_local_alpha_example_client_path_gate";
   }
@@ -34194,6 +34444,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (localAlphaExampleClientPathGateCompleted(root)) {
+    return "W-0226 Implement local alpha example client path";
+  }
   if (nextNakamaPrototypeReadyCapabilitySelectionCompleted(root)) {
     return "W-0225 Define local alpha example client path gate";
   }
@@ -34246,6 +34499,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0225", "next_ready_work_item: W-0226"],
     ["W-0224", "next_ready_work_item: W-0225"],
     ["W-0223", "next_ready_work_item: W-0224"],
     ["W-0222", "next_ready_work_item: W-0223"],
@@ -34299,6 +34553,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0225", "completed")) {
+    return "next_work_item: W-0226";
+  }
   if (workItemHasStatus(root, "W-0224", "completed")) {
     return "next_work_item: W-0225";
   }
@@ -34403,6 +34660,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0225", "implement_local_alpha_example_client_path"],
     ["W-0224", "define_local_alpha_example_client_path_gate"],
     ["W-0223", "select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
     ["W-0222", "authenticated_gameplay_failure_path_verification"],
@@ -34456,6 +34714,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0225", "W-0226 Implement local alpha example client path"],
     ["W-0224", "W-0225 Define local alpha example client path gate"],
     ["W-0223", "W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof"],
     ["W-0222", "W-0223 Strengthen authenticated gameplay failure-path verification"],
@@ -34510,6 +34769,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0225", "current_phase: implement_local_alpha_example_client_path"],
     ["W-0224", "current_phase: define_local_alpha_example_client_path_gate"],
     ["W-0223", "current_phase: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
     ["W-0222", "current_phase: authenticated_gameplay_failure_path_verification"],
@@ -35119,6 +35379,7 @@ function checkRuntime(root) {
   checkRuntimePresenceStatusLocalProofHardening(root, goFiles);
   checkRuntimeAuthenticatedGameplayFailurePathVerification(root, goFiles);
   checkRuntimeNextNakamaPrototypeReadyCapabilitySelection(root, goFiles);
+  checkRuntimeLocalAlphaExampleClientPathGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

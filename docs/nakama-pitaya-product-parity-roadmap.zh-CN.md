@@ -227,7 +227,7 @@ realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
 next_nakama_prototype_ready_capability_selection_decision: ADR-0132
-next_work_item: W-0225 Define local alpha example client path gate
+next_work_item: W-0226 Implement local alpha example client path
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -235,7 +235,7 @@ next_work_item: W-0225 Define local alpha example client path gate
 候选工作：
 
 - 降低 local setup、migration 和 configuration friction。已由 `W-0200` 完成。
-- 定义并添加更清晰的 example client 或 example app path。Gate 已由 `W-0224` 选择；`W-0225` 是 next-ready gate。
+- 定义并添加更清晰的 example client 或 example app path。Gate 已由 `W-0225` 完成；`W-0226` 是 next-ready implementation。
 - 定义超出 inventory proof slice 的 first general storage-object behavior。已由 `W-0201` 完成。
 - 定义第一版 storage objects persistence schema posture。已由 `W-0202` 完成。
 - 添加第一版 storage objects migration source。已由 `W-0203` 完成。
@@ -341,10 +341,10 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Authenticated failure-path proof 和 next capability selection 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应定义 source-first local alpha example client path gate：
+Authenticated failure-path proof、next capability selection 和 example client path gate 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作应实现 source-first local alpha example client path：
 
 ```text
-recommended_next_direction: define_local_alpha_example_client_path_gate
+recommended_next_direction: implement_local_alpha_example_client_path
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

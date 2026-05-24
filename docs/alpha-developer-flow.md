@@ -62,7 +62,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: define_local_alpha_example_client_path_gate
+next_direction: implement_local_alpha_example_client_path
 next_work_status: next_ready
 ```
 
@@ -185,7 +185,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status workflow pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, and next Nakama prototype-ready capability selection remain recorded in their existing artifacts. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`; the failure-path verification decision is recorded in `ADR-0131`; the next capability selection decision is recorded in `ADR-0132`. The next work is `W-0225 Define local alpha example client path gate`; it should define a bounded source-first example client or example app path while keeping Pitaya deferred and leaving implementation, SDK publication, hosted surfaces, broad product/runtime scope, and direct compatibility behind explicit future work items.
+The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status workflow pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, and local alpha example client path gate remain recorded in their existing artifacts. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`; the failure-path verification decision is recorded in `ADR-0131`; the next capability selection decision is recorded in `ADR-0132`; the example client path gate decision is recorded in `ADR-0133`. The next work is `W-0226 Implement local alpha example client path`; it should implement a bounded source-first example client or example app path while keeping Pitaya deferred and leaving SDK publication, hosted surfaces, broad product/runtime scope, and direct compatibility behind explicit future work items.
 
 ## 9. Deferred Work
 

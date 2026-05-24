@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-153
+current_milestone: M-154
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: next_nakama_prototype_ready_capability_selected
+    current_release_state: local_alpha_example_client_path_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0225
+    next_ready_work_item: W-0226
     preferred_after_current:
-      - define_local_alpha_example_client_path_gate
+      - implement_local_alpha_example_client_path
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2944,7 +2944,7 @@ milestones:
 
   - id: M-153
     title: Local Alpha Example Client Path Gate
-    status: active
+    status: completed
     goal: Define the source-first local alpha example client or example app path before implementation, using existing runtime and protocol behavior while preserving redaction, no-SDK-publication, no-hosted-demo, no-new-protocol, and direct compatibility deferrals.
     completion_criteria:
       - The allowed example client or example app shape is defined with explicit ownership, file candidates, and redaction rules.
@@ -2955,6 +2955,20 @@ milestones:
       - implementing the example client or example app in the gate slice
       - publishing SDKs, generated client libraries, packages, binaries, containers, hosted demos, install scripts, or release artifacts
       - adding new protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the source-first local alpha example client path gate in `docs/local-alpha-example-client-path-gate.md` and `ADR-0133`, registered `runtime.local_alpha_example_client_path_gate`, selected a repository-local example path posture, and opened `M-154/W-0226 Implement local alpha example client path` as the next-ready bounded follow-up. No example implementation, SDK publication, generated client library, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, hosted deployment, release artifact, distributed runtime, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-154
+    title: Local Alpha Example Client Path Implementation
+    status: active
+    goal: Implement the first source-first local alpha example client path using existing runtime and protocol behavior while preserving redaction, internal package boundaries, no-SDK-publication, no-hosted-demo, no-new-protocol, and direct compatibility deferrals.
+    completion_criteria:
+      - A clear repository-local example path exists under `examples/` for developers and AI agents to follow.
+      - The example path demonstrates the existing local alpha loop without adding runtime behavior, protocol routes, Protobuf messages, generated output, dependencies, migrations, persistence, startup wiring, hosted deployment, release artifacts, SDK publication, or direct compatibility.
+      - The example path keeps raw credentials, raw access tokens, digests, verifier keys, DSNs, and transport metadata redacted.
+      - Verification covers the example path and the repository continuation state.
+    non_goals:
+      - publishing SDKs, generated client libraries, packages, binaries, containers, hosted demos, install scripts, or release artifacts
+      - adding public onboarding routes, live external client guarantees, new protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, distributed runtime, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8587,7 +8601,7 @@ work_items:
   - id: W-0225
     milestone: M-153
     title: Define local alpha example client path gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-define-local-alpha-example-client-path-gate
     depends_on:
       - W-0224
@@ -8611,3 +8625,38 @@ work_items:
       - Define the allowed source-first example client or example app shape for the local alpha path.
       - Record file ownership, redaction requirements, accepted runtime/protocol surfaces, test plan, verification commands, and stop conditions for the future implementation slice.
       - Open a follow-up implementation work item only if the gate can keep scope bounded to existing behavior and existing protocol surfaces.
+    decision: ADR-0133
+    check_rule: runtime.local_alpha_example_client_path_gate
+    next_milestone: M-154
+    next_ready_work_item: W-0226
+    completion_summary: Defined the local alpha example client path gate as a source-first repository-local path. Accepted `ADR-0133`, added `docs/local-alpha-example-client-path-gate.md` and its Simplified Chinese translation, registered `runtime.local_alpha_example_client_path_gate`, and opened `M-154/W-0226 Implement local alpha example client path` as the next-ready bounded follow-up. No example implementation, SDK publication, generated client library, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, hosted deployment, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0226
+    milestone: M-154
+    title: Implement local alpha example client path
+    status: next_ready
+    change: changes/2026-05-24-implement-local-alpha-example-client-path
+    depends_on:
+      - W-0225
+    expected_change_id: implement-local-alpha-example-client-path
+    tier: tier_2_developer_experience
+    selected_direction: implement_local_alpha_example_client_path
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0133
+      - ADR-0132
+      - ADR-0131
+      - ADR-0128
+      - ADR-0127
+      - ADR-0108
+      - ADR-0097
+      - ADR-0094
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Publishing SDKs, generating client libraries, adding dependencies, adding runtime behavior, adding public onboarding routes, adding new protocol routes, Protobuf messages, generated output, migrations, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, broadcast fanout, matchmaking, match runtime, operations/admin behavior, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of implementing the source-first local alpha example client path.
+    completion:
+      - Add a clear repository-local example path under `examples/` for the existing local alpha loop.
+      - Keep raw credentials, raw access tokens, digests, verifier keys, DSNs, and transport metadata redacted.
+      - Reuse existing runtime and protocol behavior without adding routes, Protobuf source, generated output, dependencies, migrations, persistence, startup wiring, SDK publication, hosted surfaces, release artifacts, distributed runtime, or direct compatibility.
+      - Verify the example path and update durable memory.
