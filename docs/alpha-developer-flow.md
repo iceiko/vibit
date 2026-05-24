@@ -62,7 +62,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: authenticated_gameplay_failure_path_verification
+next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
 next_work_status: next_ready
 ```
 
@@ -185,7 +185,7 @@ The next contribution path is always machine-readable:
 node tools/vibit inspect next
 ```
 
-The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status workflow pilot, and presence/status local proof hardening remain recorded in their existing artifacts. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`. The next work is `W-0223 Strengthen authenticated gameplay failure-path verification`; it should strengthen existing authenticated local alpha failure-path proof while keeping Pitaya deferred and leaving broad product/runtime scope behind explicit future work items.
+The release execution maintainer decision, release identifier plan, final authorization, first alpha discovery and feedback surfaces, prototype-ready execution plan, storage objects path, realtime outbound delivery path, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status workflow pilot, presence/status local proof hardening, and authenticated gameplay failure-path verification remain recorded in their existing artifacts. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the pilot decision is recorded in `ADR-0129`; the proof-hardening decision is recorded in `ADR-0130`; the failure-path verification decision is recorded in `ADR-0131`. The next work is `W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof`; it should select the next bounded Nakama prototype-ready capability while keeping Pitaya deferred and leaving broad product/runtime scope behind explicit future work items.
 
 ## 9. Deferred Work
 

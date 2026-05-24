@@ -53,7 +53,7 @@ implemented_wire_and_runtime_slices:
     protocol_route_added: false
     generated_output_added: false
     dependencies_added: false
-    recommended_next_direction: authenticated_gameplay_failure_path_verification
+    recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
     rule: W-0168 ratified product parity as common capability coverage, and ADR-0127 refines that posture to Nakama-first product planning with Pitaya deferred to future distributed architecture review. It adds no runtime behavior, protocol route, generated output, dependency, migration, or direct external API compatibility.
   protocol_logout_route_gate:
     protocol_logout_route_gate_defined: true
@@ -1860,6 +1860,41 @@ implemented_wire_and_runtime_slices:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0222 hardened the existing Nakama-style self-presence/status local alpha proof through focused tests and opened W-0223 as the bounded authenticated gameplay failure-path verification follow-up without adding runtime behavior, protocol, generated, migration, dependency, persistence, startup wiring, or direct compatibility scope.
+  authenticated_gameplay_failure_path_verification:
+    status: completed
+    milestone: M-151
+    completed_work_item: W-0223
+    decision: ADR-0131
+    change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
+    check_rule: runtime.authenticated_gameplay_failure_path_verification
+    next_milestone: M-152
+    next_ready_work_item: W-0224
+    previous_completed_work_item: W-0222
+    selected_direction: authenticated_gameplay_failure_path_verification
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+    selected_nakama_capability_family: identity_authentication_sessions
+    selected_user_requirement: prove_authenticated_gameplay_failure_paths_through_local_alpha_flow
+    source_presence_hardening_decision: ADR-0130
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    authenticated_local_alpha_failure_path_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    test_name: TestAuthenticatedGameplayFailurePathsLocalAlphaFlow
+    proves_missing_authenticated_wrapper: true
+    proves_malformed_authenticated_wrapper: true
+    proves_malformed_access_token_text: true
+    proves_unknown_well_formed_access_token: true
+    proves_expired_access_token: true
+    proves_revoked_access_token_after_logout: true
+    proves_protected_presence_missing_wrapper: true
+    proves_response_redaction: true
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0223 strengthened the authenticated local alpha gameplay failure-path proof through focused E2E tests and opened W-0224 as the bounded next Nakama prototype-ready capability selection follow-up without adding runtime behavior, protocol, generated, migration, dependency, persistence, startup wiring, authentication/session behavior, token refresh, cleanup jobs, or direct compatibility scope.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: authenticated_gameplay_failure_path_verification
+next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -207,10 +207,10 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 The next product direction after presence/status local proof hardening is:
 
 ```text
-W-0223 Strengthen authenticated gameplay failure-path verification
+W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, and `ADR-0130` hardened the selected self-presence/status proof through close and offline cases. The next work should strengthen authenticated gameplay failure-path verification using existing protocol and runtime surfaces, keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, and `ADR-0131` strengthened authenticated gameplay failure-path verification. The next work should select the next bounded Nakama prototype-ready capability using existing roadmap and runtime evidence, keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 

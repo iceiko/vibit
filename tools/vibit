@@ -158,6 +158,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.agent_native_feature_request_test_workflow",
   "runtime.nakama_aligned_feature_request_workflow_pilot",
   "runtime.presence_status_local_proof_hardening",
+  "runtime.authenticated_gameplay_failure_path_verification",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -31849,8 +31850,8 @@ function checkRuntimePresenceStatusLocalProofHardening(root, goFiles) {
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
     [".arch/runtime.yaml", "presence_status_local_proof_hardening_completed: true"],
     [".arch/runtime.yaml", "presence_status_local_proof_hardening_check_rule: runtime.presence_status_local_proof_hardening"],
-    [".arch/runtime.yaml", "future_authenticated_gameplay_failure_path_work_item: W-0223"],
-    [".arch/runtime.yaml", "future_authenticated_gameplay_failure_path_direction: authenticated_gameplay_failure_path_verification"],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification_completed: true"],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification_check_rule: runtime.authenticated_gameplay_failure_path_verification"],
     [".arch/runtime.yaml", "proves_online_active_bound_connection: true"],
     [".arch/runtime.yaml", "proves_offline_after_transport_close: true"],
     [".arch/runtime.yaml", "proves_offline_after_close_policy_invalidation: true"],
@@ -31865,7 +31866,7 @@ function checkRuntimePresenceStatusLocalProofHardening(root, goFiles) {
     [".arch/contracts.yaml", "check_rule: runtime.presence_status_local_proof_hardening"],
     [".arch/reference.yaml", "phase_2eg_presence_status_local_proof_hardening"],
     [".arch/reference.yaml", "phase_2eh_authenticated_gameplay_failure_path_verification"],
-    [".arch/reference.yaml", "recommended_next_direction: authenticated_gameplay_failure_path_verification"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
     [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
     ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
@@ -31885,9 +31886,9 @@ function checkRuntimePresenceStatusLocalProofHardening(root, goFiles) {
     ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
     ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
     ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
-    ["docs/nakama-pitaya-product-parity-roadmap.md", "recommended_next_direction: authenticated_gameplay_failure_path_verification"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
-    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", "recommended_next_direction: authenticated_gameplay_failure_path_verification"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
     ["AGENTS.md", "runtime.presence_status_local_proof_hardening"],
     ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
     ["AGENTS.zh-CN.md", "runtime.presence_status_local_proof_hardening"],
@@ -31973,6 +31974,205 @@ function checkRuntimePresenceStatusLocalProofHardening(root, goFiles) {
   }
 
   ok("Presence status local proof hardening completes W-0222, proves close/offline and invalidation/offline behavior with existing surfaces, opens W-0223, and adds no protocol/generated/migration/dependency/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
+function checkRuntimeAuthenticatedGameplayFailurePathVerification(root, goFiles) {
+  const ruleId = "runtime.authenticated_gameplay_failure_path_verification";
+  const decisionPath = "decisions/ADR-0131-authenticated-gameplay-failure-path-verification.md";
+  const changePath = "changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification";
+  const conversationPath = "conversations/2026-05-24-authenticated-gameplay-failure-path-verification.md";
+
+  if (!authenticatedGameplayFailurePathVerificationCompleted(root)) {
+    ok("authenticated gameplay failure-path verification is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for authenticated gameplay failure-path verification`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for authenticated gameplay failure-path verification`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-151"],
+    [".arch/work-items.yaml", "title: Authenticated Gameplay Failure Path Verification"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0223"],
+    [".arch/work-items.yaml", "title: Strengthen authenticated gameplay failure-path verification"],
+    [".arch/work-items.yaml", "ADR-0131"],
+    [".arch/work-items.yaml", "check_rule: runtime.authenticated_gameplay_failure_path_verification"],
+    [".arch/work-items.yaml", "id: M-152"],
+    [".arch/work-items.yaml", "title: Next Nakama Prototype-Ready Capability Selection After Authenticated Failure Path Proof"],
+    [".arch/work-items.yaml", "id: W-0224"],
+    [".arch/work-items.yaml", "title: Select next Nakama prototype-ready capability after authenticated failure-path proof"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "selected_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification: ADR-0131"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification_completed: true"],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification_check_rule: runtime.authenticated_gameplay_failure_path_verification"],
+    [".arch/runtime.yaml", "authenticated_gameplay_failure_path_verification_test_name: TestAuthenticatedGameplayFailurePathsLocalAlphaFlow"],
+    [".arch/runtime.yaml", "future_next_nakama_prototype_ready_capability_selection_work_item: W-0224"],
+    [".arch/runtime.yaml", "future_next_nakama_prototype_ready_capability_selection_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
+    [".arch/runtime.yaml", "proves_missing_authenticated_wrapper: true"],
+    [".arch/runtime.yaml", "proves_malformed_authenticated_wrapper: true"],
+    [".arch/runtime.yaml", "proves_malformed_access_token_text: true"],
+    [".arch/runtime.yaml", "proves_unknown_well_formed_access_token: true"],
+    [".arch/runtime.yaml", "proves_expired_access_token: true"],
+    [".arch/runtime.yaml", "proves_revoked_access_token_after_logout: true"],
+    [".arch/runtime.yaml", "proves_protected_presence_missing_wrapper: true"],
+    [".arch/runtime.yaml", "proves_response_redaction: true"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.authenticated_gameplay_failure_path_verification"],
+    [".arch/contracts.yaml", "check_rule: runtime.authenticated_gameplay_failure_path_verification"],
+    [".arch/reference.yaml", "phase_2eh_authenticated_gameplay_failure_path_verification"],
+    [".arch/reference.yaml", "phase_2ei_select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.authenticated_gameplay_failure_path_verification"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.authenticated_gameplay_failure_path_verification"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.authenticated_gameplay_failure_path_verification"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.authenticated_gameplay_failure_path_verification"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.authenticated_gameplay_failure_path_verification"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "TestAuthenticatedGameplayFailurePathsLocalAlphaFlow"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory without authenticated wrapper"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory with malformed authenticated wrapper"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory with malformed access token text"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory with unknown well-formed access token"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory with expired access token"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected inventory with revoked access token after logout"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "protected presence with missing authenticated wrapper"],
+    ["runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go", "assertNoFrameErrorSecretLeak"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0131",
+      "identity_authentication_sessions",
+      "M-152/W-0224",
+      "Nakama",
+      "Pitaya remains deferred",
+      "tests only",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0223",
+      "completed_milestone: M-151",
+      "next_milestone: M-152",
+      "next_work_item: W-0224",
+      "selected_direction: authenticated_gameplay_failure_path_verification",
+      "selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof",
+      "check_rule: runtime.authenticated_gameplay_failure_path_verification",
+      "authenticated_gameplay_failure_path_verification: completed",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "authentication_session_behavior_changed: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "Nakama",
+      "identity_authentication_sessions",
+      "W-0223",
+      "W-0224",
+      "ADR-0131",
+      "No production runtime behavior",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Authenticated gameplay failure-path verification completes W-0223, proves missing/malformed/invalid/expired/revoked/redacted behavior with existing surfaces, opens W-0224, and adds no protocol/generated/migration/dependency/direct compatibility scope", {
     rule_id: ruleId,
     artifact: `${changePath}/spec.yaml`,
   });
@@ -33731,7 +33931,14 @@ function presenceStatusLocalProofHardeningCompleted(root) {
   return workItemHasStatus(root, "W-0222", "completed");
 }
 
+function authenticatedGameplayFailurePathVerificationCompleted(root) {
+  return workItemHasStatus(root, "W-0223", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (authenticatedGameplayFailurePathVerificationCompleted(root)) {
+    return "repository_next_work_item: W-0224";
+  }
   if (presenceStatusLocalProofHardeningCompleted(root)) {
     return "repository_next_work_item: W-0223";
   }
@@ -33763,6 +33970,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (authenticatedGameplayFailurePathVerificationCompleted(root)) {
+    return "repository_next_work_item_scope: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof";
+  }
   if (presenceStatusLocalProofHardeningCompleted(root)) {
     return "repository_next_work_item_scope: authenticated_gameplay_failure_path_verification";
   }
@@ -33785,6 +33995,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (authenticatedGameplayFailurePathVerificationCompleted(root)) {
+    return "W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof";
+  }
   if (presenceStatusLocalProofHardeningCompleted(root)) {
     return "W-0223 Strengthen authenticated gameplay failure-path verification";
   }
@@ -33831,6 +34044,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0223", "next_ready_work_item: W-0224"],
     ["W-0222", "next_ready_work_item: W-0223"],
     ["W-0221", "next_ready_work_item: W-0222"],
     ["W-0220", "next_ready_work_item: W-0221"],
@@ -33882,6 +34096,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0223", "completed")) {
+    return "next_work_item: W-0224";
+  }
   if (workItemHasStatus(root, "W-0222", "completed")) {
     return "next_work_item: W-0223";
   }
@@ -33980,6 +34197,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0223", "select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
     ["W-0222", "authenticated_gameplay_failure_path_verification"],
     ["W-0221", "presence_status_local_proof_hardening"],
     ["W-0220", "pilot_nakama_aligned_feature_request_workflow"],
@@ -34031,6 +34249,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0223", "W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof"],
     ["W-0222", "W-0223 Strengthen authenticated gameplay failure-path verification"],
     ["W-0221", "W-0222 Harden presence status local proof through close and offline cases"],
     ["W-0220", "W-0221 Pilot Nakama-aligned feature request workflow"],
@@ -34083,6 +34302,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0223", "current_phase: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof"],
     ["W-0222", "current_phase: authenticated_gameplay_failure_path_verification"],
     ["W-0221", "current_phase: presence_status_local_proof_hardening"],
     ["W-0220", "current_phase: nakama_aligned_feature_request_workflow_pilot"],
@@ -34688,6 +34908,7 @@ function checkRuntime(root) {
   checkRuntimeAgentNativeFeatureRequestTestWorkflow(root, goFiles);
   checkRuntimeNakamaAlignedFeatureRequestWorkflowPilot(root, goFiles);
   checkRuntimePresenceStatusLocalProofHardening(root, goFiles);
+  checkRuntimeAuthenticatedGameplayFailurePathVerification(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

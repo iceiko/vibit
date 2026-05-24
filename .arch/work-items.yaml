@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-151
+current_milestone: M-152
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: presence_status_local_proof_hardened
+    current_release_state: authenticated_gameplay_failure_paths_verified
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0223
+    next_ready_work_item: W-0224
     preferred_after_current:
-      - authenticated_gameplay_failure_path_verification
+      - select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -2915,7 +2915,7 @@ milestones:
 
   - id: M-151
     title: Authenticated Gameplay Failure Path Verification
-    status: active
+    status: completed
     goal: Strengthen the authenticated local alpha gameplay loop failure-path proof around missing, malformed, invalid, expired, revoked, route-protection, and redaction behavior without adding new protocol routes, persistence, or broad product modules.
     completion_criteria:
       - Existing authenticated gameplay request-flow failure behavior is covered by focused tests for missing or malformed proof where current surfaces support it.
@@ -2926,6 +2926,20 @@ milestones:
       - adding new authentication, session, or gameplay protocol routes
       - adding Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, logout behavior changes, token refresh, cleanup jobs, SDKs, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
       - adding chat, groups, parties, matchmaking, match runtime, leaderboards, economy, operations/admin behavior, distributed runtime, or Pitaya-style cluster architecture
+    completion_summary: Strengthened the authenticated local alpha gameplay failure-path proof with `TestAuthenticatedGameplayFailurePathsLocalAlphaFlow`, covering missing wrapper, malformed wrapper, malformed token, unknown well-formed token, expired token, revoked token after logout, protected presence missing wrapper, and redaction. Accepted ADR-0131, registered `runtime.authenticated_gameplay_failure_path_verification`, and opened `M-152/W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof` as the next-ready bounded follow-up. No production runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, persistence, startup wiring, authentication/session behavior change, token refresh, cleanup job, broad product module, distributed runtime, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-152
+    title: Next Nakama Prototype-Ready Capability Selection After Authenticated Failure Path Proof
+    status: active
+    goal: Select the next bounded Nakama prototype-ready capability after authenticated gameplay failure-path verification without adding runtime behavior, protocol routes, persistence, broad product modules, distributed runtime, or direct compatibility.
+    completion_criteria:
+      - The next Nakama prototype-ready capability family is selected and recorded with rationale.
+      - The selected follow-up work item is narrow, testable, and aligned with the agent-native requirement/test workflow.
+      - Pitaya remains deferred as a future distributed architecture reference unless a later ADR explicitly reactivates it.
+      - No runtime behavior, protocol, generated output, migration, dependency, release artifact, hosted deployment, or direct compatibility scope is added by the selection slice.
+    non_goals:
+      - implementing chat, friends, groups, parties, leaderboards, matchmaking, match runtime, operations/admin behavior, SDKs, or distributed runtime in the selection slice
+      - adding protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, release artifacts, hosted deployments, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8494,7 +8508,7 @@ work_items:
   - id: W-0223
     milestone: M-151
     title: Strengthen authenticated gameplay failure-path verification
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
     depends_on:
       - W-0222
@@ -8517,3 +8531,34 @@ work_items:
       - Add or strengthen focused tests for authenticated local alpha gameplay failure paths using existing runtime and protocol surfaces.
       - Prove missing, malformed, invalid, expired, revoked, route-protection, or redaction behavior at the lowest existing boundary that accurately exercises the current implementation.
       - Record verification and memory updates without broadening authentication, session, protocol, persistence, social, multiplayer, distributed runtime, or direct compatibility scope.
+    decision: ADR-0131
+    check_rule: runtime.authenticated_gameplay_failure_path_verification
+    next_milestone: M-152
+    next_ready_work_item: W-0224
+    completion_summary: Added `TestAuthenticatedGameplayFailurePathsLocalAlphaFlow` to the authenticated local alpha Protobuf E2E proof. The slice covers protected inventory missing wrapper, malformed wrapper, malformed token, unknown well-formed token, expired token, revoked token after logout, protected presence missing wrapper, and response redaction while preserving protocol/generated/migration/dependency/persistence/startup/authentication-session/direct compatibility deferrals.
+
+  - id: W-0224
+    milestone: M-152
+    title: Select next Nakama prototype-ready capability after authenticated failure-path proof
+    status: next_ready
+    change: changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-authenticated-failure-path-proof
+    depends_on:
+      - W-0223
+    expected_change_id: select-next-nakama-prototype-ready-capability-after-authenticated-failure-path-proof
+    tier: tier_1_planning
+    selected_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0131
+      - ADR-0130
+      - ADR-0129
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime behavior, new protocol routes, Protobuf messages, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, token refresh, cleanup jobs, broad product modules, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of selecting the next bounded Nakama prototype-ready capability.
+    completion:
+      - Review the Nakama-first roadmap and current alpha foundation after authenticated failure-path proof.
+      - Select one next bounded prototype-ready capability or foundation gap with explicit rationale and deferrals.
+      - Open a follow-up work item that can apply the agent-native requirement/test workflow without broadening scope prematurely.

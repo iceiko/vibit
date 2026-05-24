@@ -416,6 +416,196 @@ func TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation(t *
 	})
 }
 
+func TestAuthenticatedGameplayFailurePathsLocalAlphaFlow(t *testing.T) {
+	ctx := context.Background()
+
+	tests := []struct {
+		name         string
+		handle       func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope
+		wantError    app.ErrorCode
+		extraNoLeaks []string
+		expireToken  bool
+		logoutBefore bool
+	}{
+		{
+			name:      "protected inventory without authenticated wrapper",
+			wantError: app.ErrorCodeAuthenticationTokenMissing,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleFrame(t, &frameStep{
+					route:           inventory.GetInventoryRoute(),
+					requestID:       "failure-missing-wrapper-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					payload: &inventoryv1.GetInventoryRequest{
+						PlayerId:    player.playerID,
+						RequestedBy: player.playerID,
+					},
+				})
+			},
+		},
+		{
+			name:      "protected inventory with malformed authenticated wrapper",
+			wantError: app.ErrorCodeAuthenticationTokenMalformed,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleMalformedAuthenticatedInventoryFrame(t, "failure-malformed-wrapper-1", target, session, player)
+			},
+		},
+		{
+			name:      "protected inventory with malformed access token text",
+			wantError: app.ErrorCodeAuthenticationTokenMalformed,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleFrame(t, &frameStep{
+					route:           inventory.GetInventoryRoute(),
+					requestID:       "failure-malformed-token-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					authenticated:   true,
+					accessToken:     "not-a-valid-access-token",
+					payload: &inventoryv1.GetInventoryRequest{
+						PlayerId:    player.playerID,
+						RequestedBy: player.playerID,
+					},
+				})
+			},
+			extraNoLeaks: []string{"not-a-valid-access-token"},
+		},
+		{
+			name:      "protected inventory with unknown well-formed access token",
+			wantError: app.ErrorCodeAuthenticationTokenInvalid,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				unknownAccessToken := base64.RawURLEncoding.EncodeToString(bytesWithIncrementingSeed(120, appauth.RawSecretMaterialBytes))
+				return fixture.handleFrame(t, &frameStep{
+					route:           inventory.GetInventoryRoute(),
+					requestID:       "failure-unknown-token-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					authenticated:   true,
+					accessToken:     unknownAccessToken,
+					payload: &inventoryv1.GetInventoryRequest{
+						PlayerId:    player.playerID,
+						RequestedBy: player.playerID,
+					},
+				})
+			},
+			extraNoLeaks: []string{base64.RawURLEncoding.EncodeToString(bytesWithIncrementingSeed(120, appauth.RawSecretMaterialBytes))},
+		},
+		{
+			name:        "protected inventory with expired access token",
+			wantError:   app.ErrorCodeAuthenticationTokenInvalid,
+			expireToken: true,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleFrame(t, &frameStep{
+					route:           inventory.GetInventoryRoute(),
+					requestID:       "failure-expired-token-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					authenticated:   true,
+					accessToken:     player.accessToken,
+					payload: &inventoryv1.GetInventoryRequest{
+						PlayerId:    player.playerID,
+						RequestedBy: player.playerID,
+					},
+				})
+			},
+		},
+		{
+			name:         "protected inventory with revoked access token after logout",
+			wantError:    app.ErrorCodeAuthenticationTokenInvalid,
+			logoutBefore: true,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleFrame(t, &frameStep{
+					route:           inventory.GetInventoryRoute(),
+					requestID:       "failure-revoked-token-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					authenticated:   true,
+					accessToken:     player.accessToken,
+					payload: &inventoryv1.GetInventoryRequest{
+						PlayerId:    player.playerID,
+						RequestedBy: player.playerID,
+					},
+				})
+			},
+		},
+		{
+			name:      "protected presence with missing authenticated wrapper",
+			wantError: app.ErrorCodeAuthenticationTokenMissing,
+			handle: func(t *testing.T, fixture authenticatedGameplayE2EFixture, player e2eAuthenticatedPlayer, session app.Session, target app.Target) *protocolv1.Envelope {
+				t.Helper()
+				return fixture.handleFrame(t, &frameStep{
+					route:           apppresence.GetPlayerPresenceRoute(),
+					requestID:       "failure-presence-missing-wrapper-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					payload: &presencev1.GetPlayerPresenceRequest{
+						PlayerId: player.playerID,
+					},
+				})
+			},
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			fixture := newAuthenticatedGameplayE2EFixture(t)
+			player := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-failure-e2e-1", "client-failure-e2e-1")
+			session := app.Session{
+				ConnectionID:    player.connectionID,
+				SessionID:       player.sessionID,
+				PlayerID:        player.playerID,
+				ConnectionEpoch: 1,
+			}
+			target := app.Target{Scope: app.TargetScopePlayer, ID: player.playerID}
+
+			if tc.expireToken {
+				fixture.authenticationRepository.expireTokenForE2E(t, "token-e2e-1", fixture.clock.Now().Add(-time.Second))
+			}
+			if tc.logoutBefore {
+				logoutEnvelope := fixture.handleFrame(t, &frameStep{
+					route:           app.LogoutAccessTokenRoute(),
+					requestID:       "failure-logout-before-protected-request-1",
+					target:          target,
+					session:         session,
+					connectionID:    player.connectionID,
+					connectionEpoch: 1,
+					payload: &authenticationv1.LogoutAccessTokenRequest{
+						AccessToken:  player.accessToken,
+						LogoutReason: "failure_path_e2e_logout",
+					},
+				})
+				logout := mustDecodePayloadAs[*authenticationv1.LogoutAccessTokenResponse](t, logoutEnvelope)
+				if logout.GetLogoutStatus() != string(appauth.LogoutStatusRevoked) || !logout.GetRevoked() {
+					t.Fatalf("logout response = %#v, want revoked before protected failure request", logout)
+				}
+				assertNoFrameErrorSecretLeak(t, logoutEnvelope, player.accessToken, player.deviceCredential)
+			}
+
+			response := tc.handle(t, fixture, player, session, target)
+			assertErrorEnvelope(t, response, tc.wantError)
+			noLeaks := append([]string{player.accessToken, player.deviceCredential}, tc.extraNoLeaks...)
+			assertNoFrameErrorSecretLeak(t, response, noLeaks...)
+		})
+	}
+}
+
 type authenticatedGameplayE2EFixture struct {
 	clock                    e2eClock
 	service                  appauth.Service
@@ -542,6 +732,35 @@ func (f authenticatedGameplayE2EFixture) handleFrame(t *testing.T, step *frameSt
 	})
 	if err != nil {
 		t.Fatalf("HandleFrame(%s) error = %v, want nil", step.requestID, err)
+	}
+	return mustUnmarshalSingleResponse(t, responses)
+}
+
+func (f authenticatedGameplayE2EFixture) handleMalformedAuthenticatedInventoryFrame(t *testing.T, requestID string, target app.Target, session app.Session, player e2eAuthenticatedPlayer) *protocolv1.Envelope {
+	t.Helper()
+
+	envelope := mustBuildEnvelope(
+		t,
+		inventory.GetInventoryRoute(),
+		requestID,
+		target,
+		session,
+		&authenticationv1.AuthenticatedRequest{
+			AccessToken:      player.accessToken,
+			InnerPayloadType: PayloadType(&inventoryv1.GetInventoryRequest{}),
+		},
+	)
+	encoded, err := proto.Marshal(envelope)
+	if err != nil {
+		t.Fatalf("proto.Marshal(malformed authenticated envelope) error = %v, want nil", err)
+	}
+	responses, err := f.handler.HandleFrame(context.Background(), FrameRequest{
+		ConnectionID:    player.connectionID,
+		ConnectionEpoch: session.ConnectionEpoch,
+		Payload:         encoded,
+	})
+	if err != nil {
+		t.Fatalf("HandleFrame(%s) error = %v, want nil", requestID, err)
 	}
 	return mustUnmarshalSingleResponse(t, responses)
 }
@@ -953,6 +1172,21 @@ func (r *e2eAuthenticationRepository) RevokeToken(_ context.Context, mutation au
 	record.UpdatedAt = mutation.RevokedAt
 	r.tokensByLookup[lookupKey] = record
 	return nil
+}
+
+func (r *e2eAuthenticationRepository) expireTokenForE2E(t *testing.T, tokenRecordID string, expiresAt time.Time) {
+	t.Helper()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	lookupKey, ok := r.tokenLookupByRecordID[strings.TrimSpace(tokenRecordID)]
+	if !ok {
+		t.Fatalf("token record %q not found for e2e expiration", tokenRecordID)
+	}
+	record := r.tokensByLookup[lookupKey]
+	record.ExpiresAt = expiresAt.UTC()
+	record.UpdatedAt = expiresAt.UTC()
+	r.tokensByLookup[lookupKey] = record
 }
 
 func (r *e2eAuthenticationRepository) ListTokensEligibleForCleanup(context.Context, authenticationmodule.TokenCleanupQuery) ([]authenticationmodule.TokenRecord, error) {

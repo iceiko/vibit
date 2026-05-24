@@ -234,7 +234,7 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0223 Strengthen authenticated gameplay failure-path verification
+next_work_item: W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -351,7 +351,7 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 After defining the agent-native feature request and test workflow, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, or distributed runtime. The next concrete work should pilot that workflow on one Nakama-aligned capability request:
 
 ```text
-recommended_next_direction: authenticated_gameplay_failure_path_verification
+recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: authenticated_gameplay_failure_path_verification
-  recommended_next_direction: authenticated_gameplay_failure_path_verification
+  current_near_term_priority: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+  recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: presence_status_local_proof_hardened
+  current_state: authenticated_gameplay_failure_paths_verified
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0223
-  immediate_next_direction: authenticated_gameplay_failure_path_verification
+  immediate_next_work_item: W-0224
+  immediate_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4685,20 +4685,41 @@ phase_plan:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2eh_authenticated_gameplay_failure_path_verification:
-    status: next_ready
+    status: completed
     milestone: M-151
-    next_ready_work_item: W-0223
+    completed_work_item: W-0223
+    decision: ADR-0131
+    change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
+    check_rule: runtime.authenticated_gameplay_failure_path_verification
+    next_milestone: M-152
+    next_ready_work_item: W-0224
     previous_completed_work_item: W-0222
     selected_direction: authenticated_gameplay_failure_path_verification
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
     expected_change: changes/2026-05-24-strengthen-authenticated-gameplay-failure-path-verification
     reference_mapping:
-      nakama: Protected game-backend request loops must fail closed and avoid leaking credentials before broader Nakama-style services depend on them. The next slice should strengthen authenticated gameplay failure-path verification using existing protocol and runtime surfaces.
+      nakama: Protected game-backend request loops now have local alpha failure-path proof for missing, malformed, invalid, expired, revoked, route-protection, and redaction behavior before broader Nakama-style services depend on them.
       pitaya: Pitaya remains deferred; no distributed session routing, frontend/backend split, groups, RPC, or service discovery is part of this slice.
     target_stage: prototype_ready_foundation
     source_presence_hardening_decision: ADR-0130
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     selected_nakama_capability_family: identity_authentication_sessions
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ei_select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof:
+    status: next_ready
+    milestone: M-152
+    next_ready_work_item: W-0224
+    previous_completed_work_item: W-0223
+    selected_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
+    expected_change: changes/2026-05-24-select-next-nakama-prototype-ready-capability-after-authenticated-failure-path-proof
+    reference_mapping:
+      nakama: The next slice should select one bounded prototype-ready Nakama capability or foundation gap now that authenticated request failure-path proof is stronger.
+      pitaya: Pitaya remains deferred; do not select distributed session routing, frontend/backend split, groups, RPC, or service discovery as near-term work without a later ADR.
+    target_stage: prototype_ready_foundation
+    source_authenticated_failure_path_decision: ADR-0131
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

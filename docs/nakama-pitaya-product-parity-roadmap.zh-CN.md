@@ -226,7 +226,7 @@ realtime_protocol_websocket_outbound_delivery_implementation: proto/vibit/realti
 realtime_protocol_websocket_outbound_delivery_implementation_decision: ADR-0126
 agent_native_feature_request_test_workflow: docs/agent-native-feature-request-test-workflow.md
 agent_native_feature_request_test_workflow_decision: ADR-0128
-next_work_item: W-0223 Strengthen authenticated gameplay failure-path verification
+next_work_item: W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -343,7 +343,7 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 Realtime outbound delivery 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime 或 distributed runtime。下一个具体工作应定义 agent-native feature request and test workflow：
 
 ```text
-recommended_next_direction: authenticated_gameplay_failure_path_verification
+recommended_next_direction: select_next_nakama_prototype_ready_capability_after_authenticated_failure_path_proof
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

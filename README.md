@@ -192,7 +192,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0223 Strengthen authenticated gameplay failure-path verification
+W-0224 Select next Nakama prototype-ready capability after authenticated failure-path proof
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
