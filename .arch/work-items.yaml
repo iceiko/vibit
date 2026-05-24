@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-159
+current_milestone: M-160
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: scaffolded_nakama_feature_request_intake_pilot_completed
+    current_release_state: friends_relationship_lifecycle_gate_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0231
+    next_ready_work_item: W-0232
     preferred_after_current:
-      - define_friends_relationship_lifecycle_gate
+      - define_friends_relationship_persistence_schema_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3029,7 +3029,7 @@ milestones:
 
   - id: M-159
     title: Friends Relationship Lifecycle Gate
-    status: active
+    status: completed
     goal: Define a contract-first gate for a future player friendship relationship lifecycle before adding runtime behavior, protocol routes, persistence, generated output, or broader social features.
     completion_criteria:
       - The future friendship lifecycle semantic scope is defined: request, accept, reject, remove, block, unblock, list, and read relationship status.
@@ -3039,6 +3039,20 @@ milestones:
       - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added in the gate itself.
     non_goals:
       - implementing friendship runtime behavior, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the friends relationship lifecycle gate in `docs/friends-relationship-lifecycle-gate.md` and its Simplified Chinese translation, accepted `ADR-0139`, registered `runtime.friends_relationship_lifecycle_gate`, recorded future request, accept, reject, remove, block, unblock, list, and status-read semantics, future command/query/event/error/permission vocabulary, actor-relative relationship states, validated identity requirements, invariants, redaction, and test expectations, and opened `M-160/W-0232 Define friends relationship persistence schema gate` as the next-ready bounded follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, repository interface, PostgreSQL adapter, dependency, startup wiring, broader social feature, distributed runtime, hosted deployment, SDK, release artifact, or direct compatibility scope was added.
+
+  - id: M-160
+    title: Friends Relationship Persistence Schema Gate
+    status: active
+    goal: Define the first persistence schema gate for future friends relationship lifecycle state before adding migration source, repositories, adapters, runtime behavior, protocol routes, generated output, or broader social features.
+    completion_criteria:
+      - Future table candidates, pair identity posture, relationship state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, and redaction expectations are defined before SQL.
+      - Repository and PostgreSQL adapter boundaries are recorded without implementation.
+      - Nakama remains the primary product capability reference and Pitaya remains deferred.
+      - A bounded follow-up is opened only if implementation can preserve current ask-first boundaries.
+      - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added in the gate itself.
+    non_goals:
+      - adding a migration source, relationship table, repository interface, PostgreSQL adapter, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, persistence execution, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8872,7 +8886,7 @@ work_items:
   - id: W-0231
     milestone: M-159
     title: Define friends relationship lifecycle gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
     depends_on:
       - W-0230
@@ -8881,6 +8895,7 @@ work_items:
     selected_direction: define_friends_relationship_lifecycle_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0139
       - ADR-0138
       - ADR-0137
       - ADR-0128
@@ -8894,3 +8909,36 @@ work_items:
       - Record Nakama friends/social mapping, Pitaya deferral, acceptance criteria, tests, ownership, identity, permissions, errors, events, invariants, data posture, protocol posture, generated output posture, redaction, verification, and durable memory expectations.
       - Open a bounded follow-up only if it preserves current ask-first boundaries.
       - Preserve runtime, protocol, generated output, migration, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals unless the gate explicitly opens a later authorized work item.
+    decision: ADR-0139
+    check_rule: runtime.friends_relationship_lifecycle_gate
+    next_milestone: M-160
+    next_ready_work_item: W-0232
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: define_friends_relationship_persistence_schema_gate
+    completion_summary: Defined the friends relationship lifecycle semantic gate, added the English standard and Simplified Chinese translation, accepted `ADR-0139`, registered `runtime.friends_relationship_lifecycle_gate`, recorded future friend request, accept, reject, remove, block, unblock, list, and status-read scope, future command/query/event/error/permission vocabulary, actor-relative relationship states, validated-player-identity requirement, metadata-only identity rejection, lifecycle invariants, redaction, and future tests, and opened `M-160/W-0232 Define friends relationship persistence schema gate` as the next-ready follow-up. No runtime behavior, protocol route, Protobuf source, generated output, migration, repository interface, PostgreSQL adapter, dependency, startup wiring, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0232
+    milestone: M-160
+    title: Define friends relationship persistence schema gate
+    status: next_ready
+    change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
+    depends_on:
+      - W-0231
+    expected_change_id: define-friends-relationship-persistence-schema-gate
+    tier: tier_2_data
+    selected_direction: define_friends_relationship_persistence_schema_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0139
+      - ADR-0138
+      - ADR-0137
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding migration source, relationship tables, repository interface implementation, PostgreSQL adapter implementation, runtime behavior, protocol routes, Protobuf messages, generated output, dependencies, persistence execution, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility instead of defining the friends relationship persistence schema gate.
+    completion:
+      - Define future friends relationship table candidates, pair identity, state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, and redaction expectations before SQL.
+      - Record future migration source candidate, repository owner, PostgreSQL adapter owner, transaction posture, test expectations, and stop conditions.
+      - Preserve migration source, repository interface, adapter implementation, runtime behavior, protocol routes, generated output, dependencies, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.

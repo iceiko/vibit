@@ -61,7 +61,7 @@ agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-r
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
-next_direction: define_friends_relationship_lifecycle_gate
+next_direction: define_friends_relationship_persistence_schema_gate
 next_work_status: next_ready
 ```
 
@@ -184,7 +184,7 @@ Request-loop script 和 `/configz` surface 都属于该 redaction posture。
 node tools/vibit inspect next
 ```
 
-Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate、local alpha example client path implementation、feature request scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation 和 scaffolded Nakama feature request intake pilot 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，pilot decision 已记录在 `ADR-0129`，proof-hardening decision 已记录在 `ADR-0130`，failure-path verification decision 已记录在 `ADR-0131`，next capability selection decision 已记录在 `ADR-0132`，example client path gate decision 已记录在 `ADR-0133`，example client path implementation decision 已记录在 `ADR-0134`，feature request scaffolding selection decision 已记录在 `ADR-0135`，feature request scaffolding gate decision 已记录在 `ADR-0136`，feature request scaffolding implementation decision 已记录在 `ADR-0137`，scaffolded intake pilot decision 已记录在 `ADR-0138`。下一步 work 是 `W-0231 Define friends relationship lifecycle gate`；它应定义选定的 `friends_groups_and_parties` lifecycle gate，同时继续延后 Pitaya、SDK publication、hosted surfaces、broad product/runtime scope、runtime behavior、protocol routes、Protobuf source、generated output、migrations、persistence 和 direct compatibility，直到后续明确 work item 授权。
+Release execution、first alpha discovery/feedback、prototype-ready execution plan、storage objects path、realtime outbound delivery path、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status workflow pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate、local alpha example client path implementation、feature request scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama feature request intake pilot 和 friends relationship lifecycle gate 继续记录在既有 artifacts 中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，scaffolded intake pilot decision 已记录在 `ADR-0138`，friends lifecycle gate decision 已记录在 `ADR-0139`。下一步 work 是 `W-0232 Define friends relationship persistence schema gate`；它应定义选定的 `friends_groups_and_parties` persistence schema gate，同时继续延后 Pitaya、SDK publication、hosted surfaces、broad product/runtime scope、runtime behavior、protocol routes、Protobuf source、generated output、migrations、repository implementation、PostgreSQL adapter implementation 和 direct compatibility，直到后续明确 work item 授权。
 
 ## 9. Deferred Work
 

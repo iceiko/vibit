@@ -1,0 +1,359 @@
+schema_version: 0.1
+change_id: define-friends-relationship-lifecycle-gate
+date: 2026-05-24
+type: feature
+status: verified
+
+summary: Define the Nakama-first friends relationship lifecycle gate and open the persistence schema gate follow-up.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - social
+
+contracts:
+  commands:
+    added:
+      - SendFriendRequest
+      - AcceptFriendRequest
+      - RejectFriendRequest
+      - RemoveFriend
+      - BlockPlayer
+      - UnblockPlayer
+    changed: []
+    removed: []
+  queries:
+    added:
+      - ListFriendRelationships
+      - GetFriendRelationshipStatus
+    changed: []
+    removed: []
+  events:
+    added:
+      - FriendRequestCreated
+      - FriendRequestAccepted
+      - FriendRequestRejected
+      - FriendRemoved
+      - PlayerBlocked
+      - PlayerUnblocked
+    changed: []
+    removed: []
+  errors:
+    added:
+      - FRIENDSHIP_INVALID_TARGET
+      - FRIENDSHIP_SELF_TARGET_FORBIDDEN
+      - FRIENDSHIP_DUPLICATE_REQUEST
+      - FRIENDSHIP_BLOCKED_RELATIONSHIP
+      - FRIENDSHIP_INVALID_TRANSITION
+      - FRIENDSHIP_RELATIONSHIP_NOT_FOUND
+      - FRIENDSHIP_TARGET_NOT_FOUND
+      - FRIENDSHIP_METADATA_IDENTITY_NOT_AUTHENTICATED
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - validated_player_identity
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Define a Nakama-first friends relationship lifecycle gate for vibit so a future player social graph can support sending friend requests, accepting, rejecting, removing, blocking, unblocking, listing relationships, and reading relationship status through server-authoritative rules before runtime behavior, protocol routes, persistence, generated output, or broader social features are implemented."
+user_visible_outcome: A completed gate standard records future friends relationship lifecycle semantics, acceptance criteria, tests, identity rules, invariants, redaction, deferrals, and opens the persistence schema gate before implementation.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Friend relationship lifecycle is a core social graph primitive in Nakama-class backends and should precede richer social surfaces such as groups, parties, chat targeting, invites, matchmaking filters, and match social context.
+  adopted:
+    - Friend request, accept, reject, remove, block, unblock, list, and relationship status are treated as first-class future social graph semantics.
+    - Server-authoritative state transitions, validated player identity, explicit errors, events, permissions, redaction, and tests must be defined before behavior is implemented.
+  adapted:
+    - vibit uses its own contract-first lifecycle vocabulary rather than direct external API compatibility.
+    - Public relationship status is actor-relative even if a future persisted canonical state is pair-oriented.
+    - The next step is a persistence schema gate, not runtime behavior.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - groups, parties, chat, matchmaking, match runtime, SDKs, hosted surfaces, distributed runtime, and broad social module expansion in this gate
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  friends_relationship_lifecycle_gate: defined
+  completed_work_item: W-0231
+  completed_milestone: M-159
+  previous_completed_work_item: W-0230
+  next_milestone: M-160
+  next_work_item: W-0232
+  next_work_item_status: next_ready
+  tier: tier_2_standard
+  selected_direction: define_friends_relationship_lifecycle_gate
+  next_direction: define_friends_relationship_persistence_schema_gate
+  decision: ADR-0139
+  check_rule: runtime.friends_relationship_lifecycle_gate
+  gate_standard: docs/friends-relationship-lifecycle-gate.md
+  gate_standard_translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+  source_intake_decision: ADR-0138
+  source_scaffolding_decision: ADR-0137
+  source_workflow_decision: ADR-0128
+  selected_nakama_capability_family: friends_groups_and_parties
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_persistence_schema_gate_work_item: W-0232
+  future_persistence_schema_gate_direction: define_friends_relationship_persistence_schema_gate
+  semantic_gate_only_scope: true
+  command_vocabulary_recorded: true
+  query_vocabulary_recorded: true
+  event_vocabulary_recorded: true
+  error_vocabulary_recorded: true
+  permission_vocabulary_recorded: true
+  actor_relative_state_model_recorded: true
+  lifecycle_invariants_recorded: true
+  test_plan_recorded: true
+  redaction_posture_recorded: true
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+semantic_scope:
+  - request
+  - accept
+  - reject
+  - remove
+  - block
+  - unblock
+  - list
+  - read_relationship_status
+
+actor_relative_public_states:
+  - none
+  - outgoing_request_pending
+  - incoming_request_pending
+  - friends
+  - blocked_by_actor
+  - blocked_actor
+  - mutual_blocked
+  - removed
+  - rejected
+
+permissions:
+  required:
+    - validated_player_identity
+  actor_identity_source: validated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+
+lifecycle_invariants:
+  - self_targeting_forbidden
+  - duplicate_request_forbidden_or_explicit_idempotency_required_before_implementation
+  - accept_only_incoming_pending_request
+  - reject_only_incoming_pending_request
+  - remove_only_existing_friendship_not_block
+  - block_overrides_pending_or_friend_relationship
+  - unblock_does_not_restore_prior_friendship
+  - public_status_actor_relative
+  - private_social_graph_not_log_safe_by_default
+  - public_failures_do_not_leak_hidden_relationship_details_where_privacy_requires_collapse
+
+acceptance_criteria:
+  - The gate defines future friend request, accept, reject, remove, block, unblock, list, and relationship-status semantics.
+  - The gate records future command, query, event, error, permission, actor-relative state, invariant, redaction, and test vocabulary.
+  - The gate requires validated player identity and rejects metadata-only `player_id` or `session_id` as proof.
+  - The gate maps the capability to Nakama `friends_groups_and_parties` while keeping Pitaya deferred.
+  - The gate opens W-0232 as `Define friends relationship persistence schema gate`.
+  - The gate adds no runtime behavior, protocol route, Protobuf source, generated output, migration, repository interface, PostgreSQL adapter, dependency, startup wiring, broader social feature, hosted surface, distributed runtime, or direct compatibility scope.
+
+test_plan:
+  positive_behavior:
+    - Future tests must cover sending a friend request.
+    - Future tests must cover accepting an incoming friend request.
+    - Future tests must cover rejecting an incoming friend request.
+    - Future tests must cover removing an existing friend relationship.
+    - Future tests must cover blocking a target player.
+    - Future tests must cover unblocking a previously blocked player.
+    - Future tests must cover listing actor-relative relationships.
+    - Future tests must cover reading actor-relative relationship status.
+  negative_behavior:
+    - Future tests must cover self-targeting.
+    - Future tests must cover duplicate request or explicitly selected idempotency behavior.
+    - Future tests must cover invalid transition.
+    - Future tests must cover blocked relationship interaction.
+    - Future tests must cover missing or unknown target.
+    - Future tests must cover missing relationship.
+    - Future tests must cover metadata-only identity.
+  permission_and_authentication:
+    - Future tests must require validated player identity for every command/query.
+    - Future tests must reject or ignore client-supplied actor id.
+    - Future tests must reject metadata-only `player_id` and `session_id` as proof.
+  persistence_and_transactions:
+    - Future schema and repository tests must be defined after W-0232 and before migration, adapter, or runtime implementation.
+    - Future command transitions must be transactional.
+    - Future emitted events and state changes must remain consistent within the unit-of-work boundary.
+  protocol_mapping:
+    - Protocol routes and Protobuf payloads are deferred until semantic and persistence gates are stable.
+  failure_paths_and_redaction:
+    - Future public errors must avoid leaking private relationship graph details where privacy requires collapse.
+    - Future logs must not expose raw credentials, tokens, verifier keys, digests, transport metadata, or private social graph internals.
+  concurrency_or_ordering:
+    - Future tests must define simultaneous request, accept, reject, remove, block, and unblock conflict behavior before runtime implementation.
+  integration_or_e2e:
+    - Local alpha E2E proof is deferred until route and runtime implementation slices are authorized.
+  repository_checks:
+    - node tools/vibit check change define-friends-relationship-lifecycle-gate --json
+
+implementation_boundaries:
+  allowed:
+    - docs/friends-relationship-lifecycle-gate.md
+    - docs/friends-relationship-lifecycle-gate.zh-CN.md
+    - decisions/ADR-0139-friends-relationship-lifecycle-gate.md
+    - conversations/2026-05-24-friends-relationship-lifecycle-gate.md
+    - changes/2026-05-24-define-friends-relationship-lifecycle-gate/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime friendship behavior
+    - friend protocol routes
+    - Protobuf source
+    - generated output
+    - migrations
+    - repository interfaces
+    - PostgreSQL adapters
+    - dependencies
+    - startup wiring
+    - authentication/session behavior changes
+    - delivery guarantees
+    - stream subscriptions
+    - chat rooms
+    - groups
+    - parties
+    - broadcast fanout
+    - matchmaking
+    - match runtime
+    - operations/admin behavior
+    - SDK publication
+    - generated client libraries
+    - hosted deployments
+    - release artifacts
+    - Pitaya-style distributed architecture
+    - direct Nakama/Pitaya API compatibility
+
+generated_output:
+  required: false
+  source_of_truth: not_applicable
+
+migrations:
+  required: false
+  source: not_applicable
+
+dependencies:
+  added: []
+  posture: no_new_dependency_expected
+
+redaction:
+  raw_device_credentials_allowed: false
+  raw_access_tokens_allowed: false
+  verifier_keys_allowed: false
+  credential_or_token_digests_allowed: false
+  dsn_with_credentials_allowed: false
+  github_tokens_allowed: false
+  private_user_data_policy: record_only_explicit_request_text_or_redacted_placeholders
+  private_social_graph_details_log_safe_by_default: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_lifecycle_gate
+    - node tools/vibit check change define-friends-relationship-lifecycle-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
+
+memory_updates:
+  - changes/2026-05-24-define-friends-relationship-lifecycle-gate/
+  - docs/friends-relationship-lifecycle-gate.md
+  - docs/friends-relationship-lifecycle-gate.zh-CN.md
+  - decisions/ADR-0139-friends-relationship-lifecycle-gate.md
+  - conversations/2026-05-24-friends-relationship-lifecycle-gate.md
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  - tools/vibit
+  - rules/check-rules.json

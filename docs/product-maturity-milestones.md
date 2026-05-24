@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_friends_relationship_lifecycle_gate
+next_direction: define_friends_relationship_persistence_schema_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,13 +204,13 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the scaffolded Nakama feature request intake pilot is:
+The next product direction after the friends relationship lifecycle gate is:
 
 ```text
-W-0231 Define friends relationship lifecycle gate
+W-0232 Define friends relationship persistence schema gate
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, `ADR-0131` strengthened authenticated gameplay failure-path verification, `ADR-0132` selected `client_sdks_examples_and_developer_experience` as a prototype-ready capability family, `ADR-0133` defined the source-first local alpha example client path gate, `ADR-0134` implemented the source-first local alpha example client path, `ADR-0135` selected `agent_native_requirement_test_implementation_workflow` after the example path, `ADR-0136` defined the feature request scaffolding gate, `ADR-0137` implemented source-first feature request scaffolding with `tools/vibit scaffold feature`, and `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`. The next work is `W-0231 Define friends relationship lifecycle gate`; it should define the future friend request, accept, reject, remove, block, unblock, list, and status-read semantic boundary while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, migrations, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, and `ADR-0139` defined the friends relationship lifecycle gate. The next work is `W-0232 Define friends relationship persistence schema gate`; it should define table candidates, pair identity posture, relationship state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, redaction, and repository/adapter boundaries while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, migration source, repository implementation, PostgreSQL adapter implementation, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 

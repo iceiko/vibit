@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_friends_relationship_lifecycle_gate
-  recommended_next_direction: define_friends_relationship_lifecycle_gate
+  current_near_term_priority: define_friends_relationship_persistence_schema_gate
+  recommended_next_direction: define_friends_relationship_persistence_schema_gate
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: scaffolded_nakama_feature_request_intake_pilot_completed
+  current_state: friends_relationship_lifecycle_gate_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0231
-  immediate_next_direction: define_friends_relationship_lifecycle_gate
+  immediate_next_work_item: W-0232
+  immediate_next_direction: define_friends_relationship_persistence_schema_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4902,12 +4902,19 @@ phase_plan:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ep_friends_relationship_lifecycle_gate:
-    status: next_ready
+    status: completed
     milestone: M-159
-    next_ready_work_item: W-0231
+    completed_work_item: W-0231
     previous_completed_work_item: W-0230
     selected_direction: define_friends_relationship_lifecycle_gate
+    selected_follow_up_direction: define_friends_relationship_persistence_schema_gate
     expected_change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
+    decision: ADR-0139
+    standard: docs/friends-relationship-lifecycle-gate.md
+    translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+    check_rule: runtime.friends_relationship_lifecycle_gate
+    next_milestone: M-160
+    next_ready_work_item: W-0232
     reference_mapping:
       nakama: Define a vibit-native friends relationship lifecycle gate before implementing social graph behavior, groups, parties, chat targeting, matchmaking filters, or match social context.
       pitaya: Pitaya remains deferred; do not use the friendship gate to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
@@ -4915,6 +4922,39 @@ phase_plan:
     source_pilot_decision: ADR-0138
     source_scaffold_decision: ADR-0137
     source_workflow_decision: ADR-0128
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: friends_groups_and_parties
+    semantic_scope:
+      - request
+      - accept
+      - reject
+      - remove
+      - block
+      - unblock
+      - list
+      - read_relationship_status
+    future_persistence_schema_gate_work_item: W-0232
+    future_persistence_schema_gate_direction: define_friends_relationship_persistence_schema_gate
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2eq_friends_relationship_persistence_schema_gate:
+    status: next_ready
+    milestone: M-160
+    next_ready_work_item: W-0232
+    previous_completed_work_item: W-0231
+    selected_direction: define_friends_relationship_persistence_schema_gate
+    expected_change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
+    reference_mapping:
+      nakama: Define the future durable social graph schema posture for friends relationship lifecycle state before migration, repository, runtime, protocol, groups, parties, chat targeting, matchmaking filters, or match social context.
+      pitaya: Pitaya remains deferred; do not use the friendship persistence schema gate to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
+    target_stage: prototype_ready_foundation
+    source_lifecycle_gate_decision: ADR-0139
+    source_pilot_decision: ADR-0138
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     selected_nakama_capability_family: friends_groups_and_parties

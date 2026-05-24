@@ -140,18 +140,19 @@ purpose: >
   agent_native_feature_request_scaffolding_gate: ADR-0136
   agent_native_feature_request_scaffolding_implementation: ADR-0137
   scaffolded_nakama_feature_request_intake_pilot: ADR-0138
+  friends_relationship_lifecycle_gate: ADR-0139
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: define_friends_relationship_lifecycle_gate
+  current_phase: define_friends_relationship_persistence_schema_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0231
+  next_ready_work_item: W-0232
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -412,6 +413,30 @@ architecture_scope:
   scaffolded_nakama_feature_request_intake_pilot_hosted_deployment_added: false
   scaffolded_nakama_feature_request_intake_pilot_distributed_runtime_added: false
   scaffolded_nakama_feature_request_intake_pilot_direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_lifecycle_gate_defined: true
+  friends_relationship_lifecycle_gate_decision: ADR-0139
+  friends_relationship_lifecycle_gate_standard: docs/friends-relationship-lifecycle-gate.md
+  friends_relationship_lifecycle_gate_translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+  friends_relationship_lifecycle_gate_change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
+  friends_relationship_lifecycle_gate_check_rule: runtime.friends_relationship_lifecycle_gate
+  friends_relationship_lifecycle_gate_completed_work_item: W-0231
+  friends_relationship_lifecycle_gate_next_work_item: W-0232
+  friends_relationship_lifecycle_gate_next_direction: define_friends_relationship_persistence_schema_gate
+  friends_relationship_lifecycle_gate_selected_nakama_capability_family: friends_groups_and_parties
+  friends_relationship_lifecycle_gate_permission_required: validated_player_identity
+  friends_relationship_lifecycle_gate_metadata_only_player_id_allowed_as_proof: false
+  friends_relationship_lifecycle_gate_metadata_only_session_id_allowed_as_proof: false
+  friends_relationship_lifecycle_gate_future_persistence_schema_gate_work_item: W-0232
+  friends_relationship_lifecycle_gate_future_change_id: define-friends-relationship-persistence-schema-gate
+  friends_relationship_lifecycle_gate_runtime_behavior_added: false
+  friends_relationship_lifecycle_gate_protocol_route_added: false
+  friends_relationship_lifecycle_gate_protobuf_source_added: false
+  friends_relationship_lifecycle_gate_generated_output_added: false
+  friends_relationship_lifecycle_gate_migration_added: false
+  friends_relationship_lifecycle_gate_repository_interface_changed: false
+  friends_relationship_lifecycle_gate_postgresql_adapter_changed: false
+  friends_relationship_lifecycle_gate_dependency_added: false
+  friends_relationship_lifecycle_gate_direct_nakama_pitaya_api_compatibility_added: false
   scaffolding_implementation_added: true
   runtime_behavior_added: false
   protocol_route_added: false
@@ -8025,6 +8050,99 @@ identity_session_boundary:
     chat_added: false
     group_messaging_added: false
     broadcast_fanout_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    operations_admin_behavior_added: false
+    sdk_added: false
+    generated_client_library_added: false
+    hosted_deployment_added: false
+    release_artifact_added: false
+    distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_lifecycle_gate:
+    status: completed
+    milestone: M-159
+    completed_work_item: W-0231
+    decision: ADR-0139
+    standard: docs/friends-relationship-lifecycle-gate.md
+    translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+    change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
+    source_intake_decision: ADR-0138
+    source_scaffold_decision: ADR-0137
+    source_workflow_decision: ADR-0128
+    check_rule: runtime.friends_relationship_lifecycle_gate
+    next_milestone: M-160
+    next_ready_work_item: W-0232
+    selected_direction: define_friends_relationship_lifecycle_gate
+    selected_follow_up_direction: define_friends_relationship_persistence_schema_gate
+    selected_nakama_capability_family: friends_groups_and_parties
+    semantic_scope:
+      - request
+      - accept
+      - reject
+      - remove
+      - block
+      - unblock
+      - list
+      - read_relationship_status
+    future_commands:
+      - SendFriendRequest
+      - AcceptFriendRequest
+      - RejectFriendRequest
+      - RemoveFriend
+      - BlockPlayer
+      - UnblockPlayer
+    future_queries:
+      - ListFriendRelationships
+      - GetFriendRelationshipStatus
+    future_events:
+      - FriendRequestCreated
+      - FriendRequestAccepted
+      - FriendRequestRejected
+      - FriendRemoved
+      - PlayerBlocked
+      - PlayerUnblocked
+    future_errors:
+      - FRIENDSHIP_INVALID_TARGET
+      - FRIENDSHIP_SELF_TARGET_FORBIDDEN
+      - FRIENDSHIP_DUPLICATE_REQUEST
+      - FRIENDSHIP_BLOCKED_RELATIONSHIP
+      - FRIENDSHIP_INVALID_TRANSITION
+      - FRIENDSHIP_RELATIONSHIP_NOT_FOUND
+      - FRIENDSHIP_TARGET_NOT_FOUND
+      - FRIENDSHIP_METADATA_IDENTITY_NOT_AUTHENTICATED
+    required_permission: validated_player_identity
+    actor_identity_source: validated_request_identity
+    metadata_only_player_id_allowed_as_proof: false
+    metadata_only_session_id_allowed_as_proof: false
+    actor_relative_public_states:
+      - none
+      - outgoing_request_pending
+      - incoming_request_pending
+      - friends
+      - blocked_by_actor
+      - blocked_actor
+      - mutual_blocked
+      - removed
+      - rejected
+    future_persistence_schema_gate_work_item: W-0232
+    future_persistence_schema_gate_direction: define_friends_relationship_persistence_schema_gate
+    semantic_gate_only: true
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    delivery_guarantee_added: false
+    stream_subscription_added: false
+    chat_added: false
+    group_messaging_added: false
+    parties_added: false
     matchmaking_added: false
     match_runtime_added: false
     operations_admin_behavior_added: false

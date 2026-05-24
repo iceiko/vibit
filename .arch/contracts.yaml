@@ -2161,6 +2161,61 @@ implemented_wire_and_runtime_slices:
     release_artifact_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0230 used the source-first scaffold on a concrete Nakama friends relationship lifecycle request and opened W-0231 as a gate without adding runtime behavior, protocol, generated output, migration, dependency, SDK, hosted, release, distributed runtime, or direct compatibility scope.
+  friends_relationship_lifecycle_gate:
+    status: completed
+    milestone: M-159
+    completed_work_item: W-0231
+    decision: ADR-0139
+    standard: docs/friends-relationship-lifecycle-gate.md
+    translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+    change: changes/2026-05-24-define-friends-relationship-lifecycle-gate
+    check_rule: runtime.friends_relationship_lifecycle_gate
+    selected_direction: define_friends_relationship_lifecycle_gate
+    selected_follow_up_direction: define_friends_relationship_persistence_schema_gate
+    selected_nakama_capability_family: friends_groups_and_parties
+    next_ready_work_item: W-0232
+    next_direction: define_friends_relationship_persistence_schema_gate
+    future_commands:
+      - SendFriendRequest
+      - AcceptFriendRequest
+      - RejectFriendRequest
+      - RemoveFriend
+      - BlockPlayer
+      - UnblockPlayer
+    future_queries:
+      - ListFriendRelationships
+      - GetFriendRelationshipStatus
+    future_events:
+      - FriendRequestCreated
+      - FriendRequestAccepted
+      - FriendRequestRejected
+      - FriendRemoved
+      - PlayerBlocked
+      - PlayerUnblocked
+    future_errors:
+      - FRIENDSHIP_INVALID_TARGET
+      - FRIENDSHIP_SELF_TARGET_FORBIDDEN
+      - FRIENDSHIP_DUPLICATE_REQUEST
+      - FRIENDSHIP_BLOCKED_RELATIONSHIP
+      - FRIENDSHIP_INVALID_TRANSITION
+      - FRIENDSHIP_RELATIONSHIP_NOT_FOUND
+      - FRIENDSHIP_TARGET_NOT_FOUND
+      - FRIENDSHIP_METADATA_IDENTITY_NOT_AUTHENTICATED
+    required_permission: validated_player_identity
+    metadata_only_player_id_allowed_as_proof: false
+    metadata_only_session_id_allowed_as_proof: false
+    actor_relative_state_model_recorded: true
+    future_schema_gate_work_item: W-0232
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0231 defines future friends relationship lifecycle semantics, command/query/event/error/permission vocabulary, actor-relative states, validated identity requirements, invariants, redaction, and tests without adding contract source files, runtime behavior, protocol, generated output, migration, repository interface, adapter, dependency, distributed runtime, or direct compatibility scope.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

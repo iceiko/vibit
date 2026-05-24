@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_friends_relationship_lifecycle_gate
+next_direction: define_friends_relationship_persistence_schema_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-scaffolded Nakama feature request intake pilot 之后，下一个产品方向是：
+friends relationship lifecycle gate 之后，下一个产品方向是：
 
 ```text
-W-0231 Define friends relationship lifecycle gate
+W-0232 Define friends relationship persistence schema gate
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0129` 已把该 workflow 试点应用到 Nakama-style presence/status request，`ADR-0130` 已 harden 选定的 self-presence/status proof through close and offline cases，`ADR-0131` 已 strengthen authenticated gameplay failure-path verification，`ADR-0132` 已选择 `client_sdks_examples_and_developer_experience` 作为一项 prototype-ready capability family，`ADR-0133` 已定义 source-first local alpha example client path gate，`ADR-0134` 已实现 source-first local alpha example client path，`ADR-0135` 已在 example path 之后选择 `agent_native_requirement_test_implementation_workflow`，`ADR-0136` 已定义 feature request scaffolding gate，`ADR-0137` 已用 `tools/vibit scaffold feature` 实现 source-first feature request scaffolding，`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`。下一项 work 是 `W-0231 Define friends relationship lifecycle gate`；它应定义未来 friend request、accept、reject、remove、block、unblock、list 和 status-read semantic boundary，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、migrations 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`，`ADR-0139` 已定义 friends relationship lifecycle gate。下一项 work 是 `W-0232 Define friends relationship persistence schema gate`；它应定义 table candidates、pair identity posture、relationship state representation、block representation、indexes、uniqueness、timestamps、event/audit posture、redaction 和 repository/adapter boundaries，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、migration source、repository implementation、PostgreSQL adapter implementation 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
 
