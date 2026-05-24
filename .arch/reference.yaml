@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_agent_native_feature_request_scaffolding_gate
-  recommended_next_direction: define_agent_native_feature_request_scaffolding_gate
+  current_near_term_priority: implement_agent_native_feature_request_scaffolding
+  recommended_next_direction: implement_agent_native_feature_request_scaffolding
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: agent_native_feature_request_scaffolding_selected
+  current_state: agent_native_feature_request_scaffolding_gate_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0228
-  immediate_next_direction: define_agent_native_feature_request_scaffolding_gate
+  immediate_next_work_item: W-0229
+  immediate_next_direction: implement_agent_native_feature_request_scaffolding
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -4809,16 +4809,53 @@ phase_plan:
     selected_follow_up_direction: define_agent_native_feature_request_scaffolding_gate
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2em_agent_native_feature_request_scaffolding_gate:
-    status: next_ready
+    status: completed
     milestone: M-156
-    next_ready_work_item: W-0228
+    completed_work_item: W-0228
     previous_completed_work_item: W-0227
     selected_direction: define_agent_native_feature_request_scaffolding_gate
     expected_change: changes/2026-05-24-define-agent-native-feature-request-scaffolding-gate
+    decision: ADR-0136
+    check_rule: runtime.agent_native_feature_request_scaffolding_gate
+    next_milestone: M-157
+    next_ready_work_item: W-0229
     reference_mapping:
       nakama: Define a gate for the vibit-native feature request scaffolding path so future Nakama-style capabilities begin with bounded requirement specs, acceptance criteria, test plans, implementation boundaries, verification records, and durable memory.
       pitaya: Pitaya remains deferred; do not use the scaffolding gate to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
     target_stage: prototype_ready_foundation
+    source_selection_decision: ADR-0135
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: agent_native_requirement_test_implementation_workflow
+    selected_follow_up_direction: implement_agent_native_feature_request_scaffolding
+    future_scaffold_command_candidate: tools/vibit scaffold feature
+    future_template_directory_candidate: changes/_template/feature-request/
+    required_scaffold_artifacts:
+      - request.md
+      - spec.yaml
+      - impact.md
+      - plan.md
+      - checklist.md
+      - verification.md
+    scaffolding_implementation_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2en_agent_native_feature_request_scaffolding_implementation:
+    status: next_ready
+    milestone: M-157
+    next_ready_work_item: W-0229
+    previous_completed_work_item: W-0228
+    selected_direction: implement_agent_native_feature_request_scaffolding
+    expected_change: changes/2026-05-24-implement-agent-native-feature-request-scaffolding
+    reference_mapping:
+      nakama: Implement source-first feature request scaffolding so future Nakama-style capabilities start from bounded requirements, acceptance criteria, test plans, implementation boundaries, verification records, and durable memory before coding.
+      pitaya: Pitaya remains deferred; do not use the scaffolding implementation to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
+    target_stage: prototype_ready_foundation
+    source_gate_decision: ADR-0136
     source_selection_decision: ADR-0135
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference

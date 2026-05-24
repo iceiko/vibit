@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_agent_native_feature_request_scaffolding_gate
+next_direction: implement_agent_native_feature_request_scaffolding
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -207,10 +207,10 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 The next product direction after authenticated gameplay failure-path proof and next capability selection is:
 
 ```text
-W-0228 Define agent-native feature request scaffolding gate
+W-0229 Implement agent-native feature request scaffolding
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, `ADR-0131` strengthened authenticated gameplay failure-path verification, `ADR-0132` selected `client_sdks_examples_and_developer_experience` as a prototype-ready capability family, `ADR-0133` defined the source-first local alpha example client path gate, `ADR-0134` implemented the source-first local alpha example client path, and `ADR-0135` selected `agent_native_requirement_test_implementation_workflow` after the example path. The next work should define the agent-native feature request scaffolding gate, keeping scaffolding implementation, protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0129` piloted that workflow on a Nakama-style presence/status request, `ADR-0130` hardened the selected self-presence/status proof through close and offline cases, `ADR-0131` strengthened authenticated gameplay failure-path verification, `ADR-0132` selected `client_sdks_examples_and_developer_experience` as a prototype-ready capability family, `ADR-0133` defined the source-first local alpha example client path gate, `ADR-0134` implemented the source-first local alpha example client path, `ADR-0135` selected `agent_native_requirement_test_implementation_workflow` after the example path, and `ADR-0136` defined the feature request scaffolding gate. The next work is `W-0229 Implement agent-native feature request scaffolding`; it should implement only source-first docs, templates, tooling, and checks while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 
