@@ -141,18 +141,19 @@ purpose: >
   agent_native_feature_request_scaffolding_implementation: ADR-0137
   scaffolded_nakama_feature_request_intake_pilot: ADR-0138
   friends_relationship_lifecycle_gate: ADR-0139
+  friends_relationship_persistence_schema_gate: ADR-0140
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: define_friends_relationship_persistence_schema_gate
+  current_phase: add_friends_relationship_migration_source
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0232
+  next_ready_work_item: W-0233
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -178,6 +179,15 @@ architecture_scope:
   storage_objects_protocol_route_implementation_handler: runtime/internal/app/bootstrap/storage.go
   storage_objects_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
   storage_objects_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
+  friends_relationship_lifecycle_gate_standard: docs/friends-relationship-lifecycle-gate.md
+  friends_relationship_lifecycle_gate_translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+  friends_relationship_lifecycle_gate_decision: ADR-0139
+  friends_relationship_lifecycle_gate_check_rule: runtime.friends_relationship_lifecycle_gate
+  friends_relationship_persistence_schema_gate_standard: docs/friends-relationship-persistence-schema-gate.md
+  friends_relationship_persistence_schema_gate_translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
+  friends_relationship_persistence_schema_gate_decision: ADR-0140
+  friends_relationship_persistence_schema_gate_check_rule: runtime.friends_relationship_persistence_schema_gate
+  friends_relationship_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
   next_alpha_direction_after_storage_objects_local_proof_decision: ADR-0121
   first_server_push_realtime_messaging_gate_selected: true
   first_server_push_realtime_messaging_gate_standard: docs/first-server-push-realtime-messaging-gate.md
@@ -8151,6 +8161,110 @@ identity_session_boundary:
     hosted_deployment_added: false
     release_artifact_added: false
     distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_persistence_schema_gate:
+    status: completed
+    milestone: M-160
+    completed_work_item: W-0232
+    decision: ADR-0140
+    standard: docs/friends-relationship-persistence-schema-gate.md
+    translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
+    change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
+    source_lifecycle_gate_decision: ADR-0139
+    source_lifecycle_gate_standard: docs/friends-relationship-lifecycle-gate.md
+    source_intake_decision: ADR-0138
+    source_scaffold_decision: ADR-0137
+    source_workflow_decision: ADR-0128
+    check_rule: runtime.friends_relationship_persistence_schema_gate
+    next_milestone: M-161
+    next_ready_work_item: W-0233
+    previous_completed_work_item: W-0231
+    selected_direction: define_friends_relationship_persistence_schema_gate
+    next_direction: add_friends_relationship_migration_source
+    selected_nakama_capability_family: friends_groups_and_parties
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    selected_first_friends_relationship_store: postgres
+    future_friends_relationships_logical_table: friend_relationships
+    future_friend_relationship_events_logical_table: deferred
+    future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    future_repository_owner_candidate: runtime/internal/modules/friends
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    future_contract_owner_candidate: contracts/friends
+    future_proto_source_candidate: proto/vibit/friends/v1
+    pair_identity: canonical_unordered_player_pair
+    logical_pair_identity:
+      - player_low_id
+      - player_high_id
+    lifecycle_state_column: lifecycle_state
+    allowed_lifecycle_states:
+      - pending
+      - friends
+      - rejected
+      - removed
+    block_representation: per_pair_member_timestamp
+    relationship_version_type_candidate: BIGINT
+    timestamp_type_candidate: TIMESTAMPTZ
+    pair_identity_posture_recorded: true
+    relationship_state_representation_recorded: true
+    block_representation_recorded: true
+    index_uniqueness_posture_recorded: true
+    timestamp_posture_recorded: true
+    event_audit_posture_recorded: true
+    redaction_posture_recorded: true
+    future_repository_adapter_boundaries_recorded: true
+    future_migration_source_candidate_recorded: true
+    schema_gate_only: true
+    migration_source_added: false
+    friend_relationships_table_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    delivery_guarantee_added: false
+    stream_subscription_added: false
+    chat_added: false
+    group_messaging_added: false
+    parties_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    operations_admin_behavior_added: false
+    sdk_added: false
+    generated_client_library_added: false
+    hosted_deployment_added: false
+    release_artifact_added: false
+    event_audit_table_added: false
+    distributed_runtime_added: false
+    pitaya_distributed_architecture_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0232 defined the friends relationship persistence schema gate before adding migration source, repository interfaces, adapters, protocol, generated output, or runtime behavior.
+  friends_relationship_migration_source:
+    status: next_ready
+    milestone: M-161
+    next_ready_work_item: W-0233
+    previous_completed_work_item: W-0232
+    selected_direction: add_friends_relationship_migration_source
+    expected_change: changes/2026-05-24-add-friends-relationship-migration-source
+    source_schema_gate_decision: ADR-0140
+    source_schema_gate_standard: docs/friends-relationship-persistence-schema-gate.md
+    migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    future_logical_table: friend_relationships
+    migration_source_only_scope: true
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
 
 persistence_model:

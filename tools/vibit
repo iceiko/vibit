@@ -167,6 +167,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.agent_native_feature_request_scaffolding_implementation",
   "runtime.scaffolded_nakama_feature_request_intake_pilot",
   "runtime.friends_relationship_lifecycle_gate",
+  "runtime.friends_relationship_persistence_schema_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -33995,6 +33996,339 @@ function checkRuntimeFriendsRelationshipLifecycleGate(root, goFiles) {
   });
 }
 
+function checkRuntimeFriendsRelationshipPersistenceSchemaGate(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_persistence_schema_gate";
+  const standardPath = "docs/friends-relationship-persistence-schema-gate.md";
+  const standardTranslationPath = "docs/friends-relationship-persistence-schema-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0140-friends-relationship-persistence-schema-gate.md";
+  const changePath = "changes/2026-05-24-define-friends-relationship-persistence-schema-gate";
+  const conversationPath = "conversations/2026-05-24-friends-relationship-persistence-schema-gate.md";
+  const forbiddenMigrationPath = "runtime/migrations/postgres/000007_create_friend_relationships.sql";
+
+  if (!friendsRelationshipPersistenceSchemaGateCompleted(root)) {
+    ok("friends relationship persistence schema gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship persistence schema gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship persistence schema gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-160"],
+    [".arch/work-items.yaml", "title: Friends Relationship Persistence Schema Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0232"],
+    [".arch/work-items.yaml", "title: Define friends relationship persistence schema gate"],
+    [".arch/work-items.yaml", "decision: ADR-0140"],
+    [".arch/work-items.yaml", "check_rule: runtime.friends_relationship_persistence_schema_gate"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: add_friends_relationship_migration_source"],
+    [".arch/work-items.yaml", "id: M-161"],
+    [".arch/work-items.yaml", "title: Friends Relationship Migration Source"],
+    [".arch/work-items.yaml", "id: W-0233"],
+    [".arch/work-items.yaml", "title: Add friends relationship migration source"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "friends_relationship_persistence_schema_gate: ADR-0140"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_persistence_schema_gate:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0232"],
+    [".arch/runtime.yaml", "decision: ADR-0140"],
+    [".arch/runtime.yaml", "standard: docs/friends-relationship-persistence-schema-gate.md"],
+    [".arch/runtime.yaml", "translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md"],
+    [".arch/runtime.yaml", "check_rule: runtime.friends_relationship_persistence_schema_gate"],
+    [".arch/runtime.yaml", "selected_first_friends_relationship_store: postgres"],
+    [".arch/runtime.yaml", "future_friends_relationships_logical_table: friend_relationships"],
+    [".arch/runtime.yaml", "future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql"],
+    [".arch/runtime.yaml", "future_repository_owner_candidate: runtime/internal/modules/friends"],
+    [".arch/runtime.yaml", "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres"],
+    [".arch/runtime.yaml", "pair_identity_posture_recorded: true"],
+    [".arch/runtime.yaml", "relationship_state_representation_recorded: true"],
+    [".arch/runtime.yaml", "block_representation_recorded: true"],
+    [".arch/runtime.yaml", "index_uniqueness_posture_recorded: true"],
+    [".arch/runtime.yaml", "timestamp_posture_recorded: true"],
+    [".arch/runtime.yaml", "event_audit_posture_recorded: true"],
+    [".arch/runtime.yaml", "redaction_posture_recorded: true"],
+    [".arch/runtime.yaml", "future_repository_adapter_boundaries_recorded: true"],
+    [".arch/runtime.yaml", "future_migration_source_candidate_recorded: true"],
+    [".arch/runtime.yaml", "schema_gate_only: true"],
+    [".arch/runtime.yaml", "migration_source_added: false"],
+    [".arch/runtime.yaml", "friend_relationships_table_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "event_audit_table_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/runtime.yaml", "friends_relationship_migration_source:"],
+    [".arch/conventions.yaml", "friends_relationship_persistence_schema_gate:"],
+    [".arch/conventions.yaml", "check_rule: runtime.friends_relationship_persistence_schema_gate"],
+    [".arch/conventions.yaml", "friends_relationship_migration_source:"],
+    [".arch/contracts.yaml", "friends_relationship_persistence_schema_gate:"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.friends_relationship_persistence_schema_gate"],
+    [".arch/contracts.yaml", "friends_relationship_migration_source:"],
+    [".arch/reference.yaml", "phase_2eq_friends_relationship_persistence_schema_gate"],
+    [".arch/reference.yaml", "decision: ADR-0140"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_persistence_schema_gate"],
+    [".arch/reference.yaml", "phase_2er_friends_relationship_migration_source"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_persistence_schema_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_persistence_schema_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_persistence_schema_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_persistence_schema_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_persistence_schema_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "friends_relationship_persistence_schema_gate: defined",
+      "completed_work_item: W-0232",
+      "decision: ADR-0140",
+      "check_rule: runtime.friends_relationship_persistence_schema_gate",
+      "selected_first_friends_relationship_store: postgres",
+      "future_friends_relationships_logical_table: friend_relationships",
+      "future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_repository_owner_candidate: runtime/internal/modules/friends",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "player_low_id + player_high_id",
+      "lifecycle_state_column: lifecycle_state",
+      "block_representation: per_pair_member_timestamp",
+      "relationship_version_type_candidate: BIGINT",
+      "schema_gate_only: true",
+      "migration_source_added: false",
+      "W-0233 Add friends relationship migration source",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "friends_relationship_persistence_schema_gate: defined",
+      "completed_work_item: W-0232",
+      "decision: ADR-0140",
+      "check_rule: runtime.friends_relationship_persistence_schema_gate",
+      "selected_first_friends_relationship_store: postgres",
+      "future_friends_relationships_logical_table: friend_relationships",
+      "future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_repository_owner_candidate: runtime/internal/modules/friends",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "player_low_id + player_high_id",
+      "lifecycle_state_column: lifecycle_state",
+      "block_representation: per_pair_member_timestamp",
+      "relationship_version_type_candidate: BIGINT",
+      "schema_gate_only: true",
+      "migration_source_added: false",
+      "W-0233 Add friends relationship migration source",
+      "Stop Conditions",
+    ],
+    [decisionPath]: [
+      "ADR-0140",
+      "runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "friend_relationships",
+      "runtime.friends_relationship_persistence_schema_gate",
+      "M-161/W-0233",
+      "This ADR",
+      "direct compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "friends_relationship_persistence_schema_gate: defined",
+      "completed_work_item: W-0232",
+      "completed_milestone: M-160",
+      "previous_completed_work_item: W-0231",
+      "next_milestone: M-161",
+      "next_work_item: W-0233",
+      "next_work_item_status: next_ready",
+      "selected_direction: define_friends_relationship_persistence_schema_gate",
+      "next_direction: add_friends_relationship_migration_source",
+      "check_rule: runtime.friends_relationship_persistence_schema_gate",
+      "future_friends_relationships_logical_table: friend_relationships",
+      "future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "pair_identity_posture_recorded: true",
+      "block_representation_recorded: true",
+      "schema_gate_only_scope: true",
+      "migration_source_added: false",
+      "friend_relationships_table_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0232",
+      "W-0233",
+      "ADR-0140",
+      "friend_relationships",
+      "runtime.friends_relationship_persistence_schema_gate",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  if (exists(root, forbiddenMigrationPath) && !workItemHasStatus(root, "W-0233", "completed")) {
+    fail(`${forbiddenMigrationPath} must not be created by the friends relationship persistence schema gate`, {
+      rule_id: ruleId,
+      artifact: forbiddenMigrationPath,
+    });
+  } else if (exists(root, forbiddenMigrationPath) && workItemHasStatus(root, "W-0233", "completed")) {
+    ok(`${forbiddenMigrationPath} exists after completed W-0233`, {
+      rule_id: ruleId,
+      artifact: forbiddenMigrationPath,
+    });
+  } else {
+    ok(`${forbiddenMigrationPath} is deferred to W-0233`, {
+      rule_id: ruleId,
+      artifact: forbiddenMigrationPath,
+    });
+  }
+
+  const forbiddenFiles = [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    conversationPath,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /migration_source_added:\s*true/, label: "migration source addition" },
+    { pattern: /friend_relationships_table_added:\s*true/, label: "friend relationships table addition" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /repository_interface_changed:\s*true/, label: "repository interface change" },
+    { pattern: /postgresql_adapter_changed:\s*true/, label: "PostgreSQL adapter change" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /event_audit_table_added:\s*true/, label: "event/audit table addition" },
+    { pattern: /chat_added:\s*true|group_messaging_added:\s*true|parties_added:\s*true|matchmaking_added:\s*true|match_runtime_added:\s*true/, label: "broader social/game feature" },
+    { pattern: /hosted_deployment_added:\s*true|release_artifact_added:\s*true|sdk_added:\s*true|generated_client_library_added:\s*true/, label: "hosted/release/SDK scope" },
+    { pattern: /distributed_runtime_added:\s*true|pitaya_distributed_architecture_added:\s*true/, label: "distributed runtime scope" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+/, label: "GitHub token-like text" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses friends relationship persistence schema gate boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bFriendRelationship\b|\bFriendRelationships\b|\bFriendRelationshipRepository\b|\bfriend_relationships\b|\bfriends_relationship_persistence_schema_gate\b/, label: "friends relationship persistence schema gate runtime code" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} appears to add runtime code for friends relationship persistence schema gate: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  ok("Friends relationship persistence schema gate completes W-0232, opens W-0233, records PostgreSQL pair-oriented social graph persistence posture, and adds no migration/runtime/protocol/generated/repository/adapter/dependency/direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -35784,7 +36118,14 @@ function friendsRelationshipLifecycleGateCompleted(root) {
   return workItemHasStatus(root, "W-0231", "completed");
 }
 
+function friendsRelationshipPersistenceSchemaGateCompleted(root) {
+  return workItemHasStatus(root, "W-0232", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (friendsRelationshipPersistenceSchemaGateCompleted(root)) {
+    return "repository_next_work_item: W-0233";
+  }
   if (friendsRelationshipLifecycleGateCompleted(root)) {
     return "repository_next_work_item: W-0232";
   }
@@ -35843,6 +36184,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (friendsRelationshipPersistenceSchemaGateCompleted(root)) {
+    return "repository_next_work_item_scope: add_friends_relationship_migration_source";
+  }
   if (friendsRelationshipLifecycleGateCompleted(root)) {
     return "repository_next_work_item_scope: define_friends_relationship_persistence_schema_gate";
   }
@@ -35892,6 +36236,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (friendsRelationshipPersistenceSchemaGateCompleted(root)) {
+    return "W-0233 Add friends relationship migration source";
+  }
   if (friendsRelationshipLifecycleGateCompleted(root)) {
     return "W-0232 Define friends relationship persistence schema gate";
   }
@@ -35965,6 +36312,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0232", "next_ready_work_item: W-0233"],
     ["W-0231", "next_ready_work_item: W-0232"],
     ["W-0230", "next_ready_work_item: W-0231"],
     ["W-0229", "next_ready_work_item: W-0230"],
@@ -36025,6 +36373,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0232", "completed")) {
+    return "next_work_item: W-0233";
+  }
   if (workItemHasStatus(root, "W-0231", "completed")) {
     return "next_work_item: W-0232";
   }
@@ -36150,6 +36501,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0232", "add_friends_relationship_migration_source"],
     ["W-0231", "define_friends_relationship_persistence_schema_gate"],
     ["W-0230", "define_friends_relationship_lifecycle_gate"],
     ["W-0229", "pilot_scaffolded_nakama_feature_request_intake"],
@@ -36210,6 +36562,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0232", "W-0233 Add friends relationship migration source"],
     ["W-0231", "W-0232 Define friends relationship persistence schema gate"],
     ["W-0230", "W-0231 Define friends relationship lifecycle gate"],
     ["W-0229", "W-0230 Pilot scaffolded Nakama feature request intake"],
@@ -36271,6 +36624,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0232", "current_phase: add_friends_relationship_migration_source"],
     ["W-0231", "current_phase: define_friends_relationship_persistence_schema_gate"],
     ["W-0230", "current_phase: define_friends_relationship_lifecycle_gate"],
     ["W-0229", "current_phase: pilot_scaffolded_nakama_feature_request_intake"],
@@ -36894,6 +37248,7 @@ function checkRuntime(root) {
   checkRuntimeAgentNativeFeatureRequestScaffoldingImplementation(root, goFiles);
   checkRuntimeScaffoldedNakamaFeatureRequestIntakePilot(root, goFiles);
   checkRuntimeFriendsRelationshipLifecycleGate(root, goFiles);
+  checkRuntimeFriendsRelationshipPersistenceSchemaGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

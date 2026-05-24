@@ -2216,6 +2216,50 @@ implemented_wire_and_runtime_slices:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0231 defines future friends relationship lifecycle semantics, command/query/event/error/permission vocabulary, actor-relative states, validated identity requirements, invariants, redaction, and tests without adding contract source files, runtime behavior, protocol, generated output, migration, repository interface, adapter, dependency, distributed runtime, or direct compatibility scope.
+  friends_relationship_persistence_schema_gate:
+    status: completed
+    milestone: M-160
+    completed_work_item: W-0232
+    decision: ADR-0140
+    standard: docs/friends-relationship-persistence-schema-gate.md
+    translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
+    change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
+    check_rule: runtime.friends_relationship_persistence_schema_gate
+    selected_direction: define_friends_relationship_persistence_schema_gate
+    selected_follow_up_direction: add_friends_relationship_migration_source
+    selected_nakama_capability_family: friends_groups_and_parties
+    next_ready_work_item: W-0233
+    next_direction: add_friends_relationship_migration_source
+    contract_changes_expected: false
+    future_contract_owner_candidate: contracts/friends
+    future_proto_source_candidate: proto/vibit/friends/v1
+    future_friends_relationships_logical_table: friend_relationships
+    future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    pair_identity_posture_recorded: true
+    relationship_state_representation_recorded: true
+    block_representation_recorded: true
+    event_audit_posture_recorded: true
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_source_added: false
+    friend_relationships_table_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0232 defined future friends relationship persistence schema posture without adding contract source files, runtime behavior, protocol, generated output, migration source, repository interface, adapter, dependency, distributed runtime, or direct compatibility scope.
+  friends_relationship_migration_source:
+    status: next_ready
+    milestone: M-161
+    next_ready_work_item: W-0233
+    selected_direction: add_friends_relationship_migration_source
+    source_schema_gate_decision: ADR-0140
+    migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    future_logical_table: friend_relationships
+    contract_changes_expected: false
+
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128

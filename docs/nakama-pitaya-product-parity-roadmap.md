@@ -239,7 +239,7 @@ agent_native_feature_request_scaffolding_gate: docs/agent-native-feature-request
 agent_native_feature_request_scaffolding_gate_decision: ADR-0136
 scaffolded_nakama_feature_request_intake_pilot_decision: ADR-0138
 friends_relationship_lifecycle_gate_decision: ADR-0139
-next_work_item: W-0232 Define friends relationship persistence schema gate
+next_work_item: W-0233 Add friends relationship migration source
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -353,11 +353,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, and the friends relationship lifecycle gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should define the selected friends relationship persistence schema gate:
+After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, and the friends relationship persistence schema gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, or distributed runtime. The next concrete work should add only the friends relationship migration source:
 
 ```text
-next_work_item: W-0232 Define friends relationship persistence schema gate
-recommended_next_direction: define_friends_relationship_persistence_schema_gate
+next_work_item: W-0233 Add friends relationship migration source
+recommended_next_direction: add_friends_relationship_migration_source
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -369,6 +369,7 @@ Rationale:
 - The existing source-first alpha capabilities now have a readable local example path and source-first feature request scaffold.
 - `ADR-0138` used that scaffold on a bounded Nakama request intake, selected `friends_groups_and_parties`, and opened `W-0231 Define friends relationship lifecycle gate` before any friendship implementation work.
 - `ADR-0139` defined the friend relationship lifecycle semantic gate and opened `W-0232 Define friends relationship persistence schema gate`.
+- `ADR-0140` defined the friends relationship persistence schema gate and opened `W-0233 Add friends relationship migration source`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its durable state posture should be gated before migration, repository, runtime, protocol, groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on it.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
 - Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the source-first example path are clearer.

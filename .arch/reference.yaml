@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_friends_relationship_persistence_schema_gate
-  recommended_next_direction: define_friends_relationship_persistence_schema_gate
+  current_near_term_priority: add_friends_relationship_migration_source
+  recommended_next_direction: add_friends_relationship_migration_source
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: friends_relationship_lifecycle_gate_completed
+  current_state: friends_relationship_persistence_schema_gate_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0232
-  immediate_next_direction: define_friends_relationship_persistence_schema_gate
+  immediate_next_work_item: W-0233
+  immediate_next_direction: add_friends_relationship_migration_source
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -59,6 +59,10 @@ release_target:
   storage_objects_runtime_behavior_gate_translation: docs/storage-objects-runtime-behavior-gate.zh-CN.md
   storage_objects_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md
   storage_objects_protocol_route_gate_translation: docs/storage-objects-protocol-route-gate.zh-CN.md
+  friends_relationship_lifecycle_gate_standard: docs/friends-relationship-lifecycle-gate.md
+  friends_relationship_lifecycle_gate_translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
+  friends_relationship_persistence_schema_gate_standard: docs/friends-relationship-persistence-schema-gate.md
+  friends_relationship_persistence_schema_gate_translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
@@ -4943,12 +4947,19 @@ phase_plan:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2eq_friends_relationship_persistence_schema_gate:
-    status: next_ready
+    status: completed
     milestone: M-160
-    next_ready_work_item: W-0232
+    completed_work_item: W-0232
     previous_completed_work_item: W-0231
     selected_direction: define_friends_relationship_persistence_schema_gate
+    selected_follow_up_direction: add_friends_relationship_migration_source
     expected_change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
+    decision: ADR-0140
+    standard: docs/friends-relationship-persistence-schema-gate.md
+    translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
+    check_rule: runtime.friends_relationship_persistence_schema_gate
+    next_milestone: M-161
+    next_ready_work_item: W-0233
     reference_mapping:
       nakama: Define the future durable social graph schema posture for friends relationship lifecycle state before migration, repository, runtime, protocol, groups, parties, chat targeting, matchmaking filters, or match social context.
       pitaya: Pitaya remains deferred; do not use the friendship persistence schema gate to introduce distributed topology, frontend/backend split, RPC, groups, or service discovery.
@@ -4958,6 +4969,34 @@ phase_plan:
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     selected_nakama_capability_family: friends_groups_and_parties
+    future_friends_relationships_logical_table: friend_relationships
+    future_migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    future_repository_owner_candidate: runtime/internal/modules/friends
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    migration_source_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2er_friends_relationship_migration_source:
+    status: next_ready
+    milestone: M-161
+    next_ready_work_item: W-0233
+    previous_completed_work_item: W-0232
+    selected_direction: add_friends_relationship_migration_source
+    expected_change: changes/2026-05-24-add-friends-relationship-migration-source
+    reference_mapping:
+      nakama: Add the first local PostgreSQL migration source for durable friends relationship current-state persistence before repository, runtime, protocol, groups, parties, chat targeting, matchmaking filters, or match social context.
+      pitaya: Pitaya remains deferred; do not use the migration source to introduce distributed topology, frontend/backend split, RPC, groups, service discovery, or distributed social graph routing.
+    target_stage: prototype_ready_foundation
+    source_schema_gate_decision: ADR-0140
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: friends_groups_and_parties
+    migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    future_logical_table: friend_relationships
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

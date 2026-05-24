@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_friends_relationship_persistence_schema_gate
+next_direction: add_friends_relationship_migration_source
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,13 +204,13 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the friends relationship lifecycle gate is:
+The next product direction after the friends relationship persistence schema gate is:
 
 ```text
-W-0232 Define friends relationship persistence schema gate
+W-0233 Add friends relationship migration source
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, and `ADR-0139` defined the friends relationship lifecycle gate. The next work is `W-0232 Define friends relationship persistence schema gate`; it should define table candidates, pair identity posture, relationship state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, redaction, and repository/adapter boundaries while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, migration source, repository implementation, PostgreSQL adapter implementation, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, `ADR-0139` defined the friends relationship lifecycle gate, and `ADR-0140` defined the friends relationship persistence schema gate. The next work is `W-0233 Add friends relationship migration source`; it should add only the friends relationship SQL migration source and matching static checks while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, persistence execution, repository implementation, PostgreSQL adapter implementation, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
 

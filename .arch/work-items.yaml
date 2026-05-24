@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-160
+current_milestone: M-161
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: friends_relationship_lifecycle_gate_completed
+    current_release_state: friends_relationship_persistence_schema_gate_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0232
+    next_ready_work_item: W-0233
     preferred_after_current:
-      - define_friends_relationship_persistence_schema_gate
+      - add_friends_relationship_migration_source
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3043,7 +3043,7 @@ milestones:
 
   - id: M-160
     title: Friends Relationship Persistence Schema Gate
-    status: active
+    status: completed
     goal: Define the first persistence schema gate for future friends relationship lifecycle state before adding migration source, repositories, adapters, runtime behavior, protocol routes, generated output, or broader social features.
     completion_criteria:
       - Future table candidates, pair identity posture, relationship state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, and redaction expectations are defined before SQL.
@@ -3053,6 +3053,19 @@ milestones:
       - No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility scope is added in the gate itself.
     non_goals:
       - adding a migration source, relationship table, repository interface, PostgreSQL adapter, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, persistence execution, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the friends relationship persistence schema gate in `docs/friends-relationship-persistence-schema-gate.md` and its Simplified Chinese translation, accepted `ADR-0140`, registered `runtime.friends_relationship_persistence_schema_gate`, recorded PostgreSQL as the first store, `friend_relationships` as the future current-state logical table, `runtime/migrations/postgres/000007_create_friend_relationships.sql` as the future migration source candidate, canonical unordered player pair identity, lifecycle state representation, actor-specific block timestamps, relationship version and timestamp posture, uniqueness/index expectations, event/audit deferral, redaction, and future repository/adapter ownership candidates, and opened `M-161/W-0233 Add friends relationship migration source` as the next-ready bounded follow-up. No migration source, relationship table, repository interface, PostgreSQL adapter, runtime behavior, protocol route, Protobuf source, generated output, dependency, startup wiring, broader social feature, distributed runtime, hosted deployment, SDK, release artifact, event/audit table, or direct compatibility scope was added.
+
+  - id: M-161
+    title: Friends Relationship Migration Source
+    status: active
+    goal: Add the first SQL migration source for future friends relationship current-state persistence before repository interfaces, PostgreSQL adapters, runtime behavior, protocol routes, generated output, or broader social features.
+    completion_criteria:
+      - The migration source `runtime/migrations/postgres/000007_create_friend_relationships.sql` exists with goose up/down markers.
+      - The migration creates only the `friend_relationships` current-state table and required indexes/checks from the schema gate.
+      - Forbidden secret, digest, transport, chat, group, party, match, Pitaya, or Nakama compatibility columns are absent.
+      - Repository interfaces, PostgreSQL adapter behavior, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, hosted, SDK, distributed runtime, event/audit tables, and direct compatibility remain deferred.
+    non_goals:
+      - adding repository interfaces, PostgreSQL adapter behavior, runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -8920,7 +8933,7 @@ work_items:
   - id: W-0232
     milestone: M-160
     title: Define friends relationship persistence schema gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-24-define-friends-relationship-persistence-schema-gate
     depends_on:
       - W-0231
@@ -8929,6 +8942,7 @@ work_items:
     selected_direction: define_friends_relationship_persistence_schema_gate
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0140
       - ADR-0139
       - ADR-0138
       - ADR-0137
@@ -8942,3 +8956,37 @@ work_items:
       - Define future friends relationship table candidates, pair identity, state representation, block representation, indexes, uniqueness, timestamps, event/audit posture, and redaction expectations before SQL.
       - Record future migration source candidate, repository owner, PostgreSQL adapter owner, transaction posture, test expectations, and stop conditions.
       - Preserve migration source, repository interface, adapter implementation, runtime behavior, protocol routes, generated output, dependencies, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0140
+    check_rule: runtime.friends_relationship_persistence_schema_gate
+    next_milestone: M-161
+    next_ready_work_item: W-0233
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: add_friends_relationship_migration_source
+    completion_summary: Defined the friends relationship persistence schema gate, added the English standard and Simplified Chinese translation, accepted `ADR-0140`, registered `runtime.friends_relationship_persistence_schema_gate`, recorded PostgreSQL as the selected first store, `friend_relationships` as the future current-state table, `runtime/migrations/postgres/000007_create_friend_relationships.sql` as the migration source candidate, canonical unordered player pair identity, lifecycle state, actor-specific block timestamps, relationship versioning, timestamp checks, uniqueness/index posture, event/audit deferral, redaction, and future repository/adapter owners, and opened `M-161/W-0233 Add friends relationship migration source` as the next-ready follow-up. No migration source, relationship table, repository interface, PostgreSQL adapter, runtime behavior, protocol route, Protobuf source, generated output, dependency, startup wiring, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, event/audit table, or direct compatibility scope was added.
+
+  - id: W-0233
+    milestone: M-161
+    title: Add friends relationship migration source
+    status: next_ready
+    change: changes/2026-05-24-add-friends-relationship-migration-source
+    depends_on:
+      - W-0232
+    expected_change_id: add-friends-relationship-migration-source
+    tier: tier_2_data
+    selected_direction: add_friends_relationship_migration_source
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding repository interfaces, PostgreSQL adapter implementation, runtime behavior, protocol routes, Protobuf messages, generated output, dependencies, persistence execution beyond SQL source, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of adding only the friends relationship migration source.
+    completion:
+      - Add `runtime/migrations/postgres/000007_create_friend_relationships.sql` with goose up/down markers.
+      - Create only the `friend_relationships` current-state table with pair identity, lifecycle state, block timestamps, relationship version, timestamps, uniqueness, indexes, and checks from ADR-0140.
+      - Add or update static checks for the migration shape and forbidden columns.
+      - Preserve repository interfaces, PostgreSQL adapter behavior, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals.
