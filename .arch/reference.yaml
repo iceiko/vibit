@@ -14,15 +14,19 @@ product_parity_roadmap:
   standard: docs/nakama-pitaya-product-parity-roadmap.md
   translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
   decision: ADR-0078
+  reference_posture_update: ADR-0127
   check_rule: runtime.reference_product_parity_roadmap
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
-  parity_goal: nakama_pitaya_same_class_common_capability_coverage
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: protocol_logout_and_connection_lifecycle
-  recommended_next_direction: define_protocol_logout_route_gate
+  current_near_term_priority: agent_native_feature_request_test_workflow
+  recommended_next_direction: define_agent_native_feature_request_test_workflow
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -30,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: realtime_protocol_websocket_outbound_delivery_implemented
+  current_state: nakama_first_ai_native_feature_workflow_direction_selected
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0219
-  immediate_next_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+  immediate_next_work_item: W-0220
+  immediate_next_direction: define_agent_native_feature_request_test_workflow
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -56,10 +60,14 @@ release_target:
   storage_objects_protocol_route_gate_standard: docs/storage-objects-protocol-route-gate.md
   storage_objects_protocol_route_gate_translation: docs/storage-objects-protocol-route-gate.zh-CN.md
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   direct_nakama_pitaya_api_compatibility_goal: false
   implementation_authorized_by_this_standard: roadmap_only
 
 parity_capability_families:
+  - agent_native_requirement_test_implementation_workflow
   - identity_authentication_sessions
   - connection_lifecycle_reconnect_logout
   - storage_objects_and_durable_game_state
@@ -77,7 +85,8 @@ parity_capability_families:
 
 reference_projects:
   - name: Nakama
-    role: broad_game_backend_capability_surface
+    role: primary_product_capability_surface
+    status: primary_product_reference
     homepage: https://heroiclabs.com/nakama
     documentation: https://heroiclabs.com/docs/
     repository: https://github.com/heroiclabs/nakama
@@ -95,7 +104,8 @@ reference_projects:
       - generated_file_conventions
       - agent_workflow
   - name: Pitaya
-    role: go_game_server_framework_architecture_vocabulary
+    role: deferred_future_architecture_vocabulary
+    status: deferred_future_reference
     documentation: https://pitaya.readthedocs.io/
     repository: https://github.com/topfreegames/pitaya
     use_for:
@@ -4526,6 +4536,7 @@ phase_plan:
     completed_work_item: W-0218
     decision: ADR-0126
     change: changes/2026-05-23-implement-realtime-protocol-websocket-outbound-delivery-slice
+    next_milestone: M-147
     next_ready_work_item: W-0219
     previous_completed_work_item: W-0217
     selected_direction: realtime_protocol_websocket_outbound_delivery_implementation_slice
@@ -4544,17 +4555,50 @@ phase_plan:
     delivery_guarantees_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2ed_next_direction_after_realtime_outbound_delivery_slice:
-    status: next_ready
+    status: completed
     milestone: M-147
-    next_ready_work_item: W-0219
+    completed_work_item: W-0219
+    decision: ADR-0127
+    change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
+    next_milestone: M-148
+    next_ready_work_item: W-0220
     previous_completed_work_item: W-0218
-    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    selected_direction: define_agent_native_feature_request_test_workflow
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
     reference_mapping:
-      nakama: The next selection should choose a bounded alpha direction after client-visible outbound realtime delivery, without jumping directly to broad social, matchmaking, match runtime, or direct compatibility.
-      pitaya: The next selection should preserve acceptor/session/handler/protocol/backend push separation before startup wiring, groups, broadcast fanout, cluster, RPC, or service discovery work.
+      nakama: Nakama is now the primary product capability reference for deciding which backend capability families matter, while vibit keeps its own agent-native workflow, contracts, tests, and route shapes.
+      pitaya: Pitaya is deferred to future distributed architecture review and must not drive near-term cluster, RPC, frontend/backend, groups, broadcast fanout, or service-discovery work.
     target_stage: prototype_ready_foundation
     source_realtime_outbound_delivery_decision: ADR-0126
+    check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ee_agent_native_feature_request_test_workflow:
+    status: next_ready
+    milestone: M-148
+    next_ready_work_item: W-0220
+    previous_completed_work_item: W-0219
+    selected_direction: define_agent_native_feature_request_test_workflow
+    expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+    reference_mapping:
+      nakama: The workflow should make Nakama-class product feature requests actionable by requiring AI-written specs, acceptance criteria, test plans, tests, implementation boundaries, verification, and durable records before broad modules expand.
+      pitaya: Pitaya remains deferred and may only be used later for distributed architecture vocabulary after a new ADR reactivates it.
+    target_stage: prototype_ready_foundation
+    source_direction_decision: ADR-0127
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    implementation_authorized_by_this_selection: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

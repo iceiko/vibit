@@ -8,7 +8,7 @@ Canonical decision: `ADR-0105`
 
 The paired Simplified Chinese translation is `docs/product-maturity-milestones.zh-CN.md`. The English file is authoritative.
 
-This document turns the maintainer's product-stage intent into durable milestones. The current source-first alpha proves that vibit has a real backend loop, but the product goal is larger: move from first alpha to prototype-ready foundation, then to a single-node production-candidate foundation, and finally to a Nakama/Pitaya-class open-source server framework. This document is roadmap and feedback-triage guidance only. It does not authorize runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, hosted deployments, additional release artifacts, public announcements beyond the GitHub release record, paid promotion, broad operations/admin behavior, authentication/session behavior changes, broad product module expansion, or direct Nakama/Pitaya API compatibility.
+This document turns the maintainer's product-stage intent into durable milestones. The current source-first alpha proves that vibit has a real backend loop, but the product goal is larger: move from first alpha to prototype-ready foundation, then to a single-node production-candidate foundation, and finally to a Nakama-first open-source server framework where AI-native development and AI-native testing are the default user experience. This document is roadmap and feedback-triage guidance only. It does not authorize runtime behavior changes, protocol route changes, Protobuf source or generated output changes, migrations, dependencies, hosted deployments, additional release artifacts, public announcements beyond the GitHub release record, paid promotion, broad operations/admin behavior, authentication/session behavior changes, broad product module expansion, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility.
 
 ## 1. Core Rule
 
@@ -24,10 +24,15 @@ current_release_identifier: v0.1.0-alpha.1
 stage_1_source_first_alpha: reached
 stage_2_prototype_ready_foundation: next_product_stage
 stage_3_single_node_production_candidate_foundation: planned
+stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
+reference_posture_update: ADR-0127
+primary_product_reference: Nakama
+pitaya_reference_status: deferred_future_architecture_reference
+ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: prototype_ready_foundation_execution_plan
+next_direction: define_agent_native_feature_request_test_workflow
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -42,6 +47,7 @@ broad_operations_admin_behavior_added: false
 authentication_session_behavior_changed: false
 product_module_expansion_added: false
 direct_nakama_pitaya_api_compatibility_added: false
+pitaya_distributed_architecture_added: false
 ```
 
 ## 2. Stage 1: Source-First Alpha
@@ -76,6 +82,7 @@ Stage 1 is not:
 - SDK readiness;
 - hosted platform readiness;
 - feature parity with Nakama, Pitaya, Colyseus, Pomelo, Agones, or custom production backends.
+- a complete user-facing AI-native feature request, test, implementation, and verification workflow.
 
 ## 3. Stage 2: Prototype-Ready Foundation
 
@@ -99,6 +106,7 @@ Required capability groups:
 - Better local startup ergonomics, including explicit setup, migration, and configuration flow.
 - A realistic example client or example app path that demonstrates more than one request in isolation.
 - Issue and feedback loops that convert external friction into bounded work items.
+- AI-native requirement intake that converts user requests into specs, acceptance criteria, test plans, tests, implementation boundaries, verification records, and durable project memory.
 - Basic concurrency and failure-path verification for login, protected requests, logout, reconnect, and database failure behavior.
 
 Exit criteria:
@@ -107,6 +115,7 @@ Exit criteria:
 - The main setup friction is documented and intentionally accepted or reduced.
 - The next missing capability is a product decision, not an accidental unknown.
 - At least one non-maintainer feedback item has been triaged into a bounded work item or explicitly deferred.
+- A non-trivial future feature can follow the documented AI-native requirement and test workflow without inventing the process ad hoc.
 
 Stage 2 is still not production-ready. It may remain single-node, local-first, and source-first, but it should feel useful rather than merely inspectable.
 
@@ -133,6 +142,7 @@ Required capability groups:
 - Stable client ergonomics: SDK, client helper, or documented protocol client example.
 - Security review for authentication, sessions, token redaction, configuration leakage, and route permissions.
 - Concurrency, soak, and failure-mode verification appropriate to single-node usage.
+- AI-generated or AI-maintained feature tests that are traceable to requirement and acceptance artifacts.
 
 Exit criteria:
 
@@ -141,16 +151,24 @@ Exit criteria:
 - Upgrade and operations expectations are explicit.
 - The remaining gap to product-class parity is mostly breadth, not core reliability posture.
 
-## 5. Stage 4: Nakama/Pitaya-Class Product
+## 5. Stage 4: Nakama-First AI-Native Product
 
 Status:
 
 ```text
+stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
 target: ai_era_nakama_pitaya_class_server_framework
+primary_product_reference: Nakama
+pitaya_reference_status: deferred_future_architecture_reference
 ```
 
-Purpose: become a serious open-source server framework in the same broad product class as Nakama and Pitaya, adapted around vibit's agent-native maintainability model.
+Purpose: become a serious open-source server framework in the same broad product class as Nakama, adapted around vibit's agent-native maintainability model. Pitaya-style distributed architecture remains future-only until a later ADR explicitly reactivates it.
+
+The product-class target has two inseparable parts:
+
+- Nakama-style backend capability coverage.
+- AI-native development and testing, where user requirements produce specs, acceptance criteria, tests, implementation, verification, and durable records through agent assistance.
 
 This stage requires common capability coverage across the roadmap families already recorded in `docs/nakama-pitaya-product-parity-roadmap.md`:
 
@@ -167,7 +185,8 @@ This stage requires common capability coverage across the roadmap families alrea
 - server runtime hooks, RPC, and custom logic;
 - admin console, metrics, observability, and operations;
 - client SDKs, examples, and developer experience;
-- distributed runtime, frontend/backend roles, RPC, and service discovery.
+- distributed runtime, frontend/backend roles, RPC, and service discovery, only after a later architecture ADR selects that path;
+- agent-native requirement, acceptance, test, implementation, and verification workflow.
 
 Stage 4 does not imply direct Nakama/Pitaya API compatibility unless a later ADR explicitly adopts a compatibility surface.
 
@@ -178,7 +197,7 @@ Early user feedback should be mapped to one of these maturity buckets:
 - `source_alpha_friction`: README, setup, checks, request-loop, runbook, or concept clarity blocks.
 - `prototype_ready_gap`: missing shared online service, example flow, client ergonomics, or local development path blocks a prototype.
 - `production_candidate_gap`: security, operations, packaging, migration, observability, performance, or failure behavior blocks real project evaluation.
-- `product_class_gap`: social, competitive, matchmaking, match runtime, SDK, admin console, distributed runtime, or extensibility breadth blocks Nakama/Pitaya-class usefulness.
+- `product_class_gap`: social, competitive, matchmaking, match runtime, SDK, admin console, distributed runtime, extensibility breadth, or AI-native feature workflow gaps block Nakama-first product-class usefulness.
 - `out_of_scope_for_now`: request is valid but must wait for explicit authorization or a later stage.
 
 Feedback that asks for production claims, broad feature parity, hosted deployment, direct compatibility, binary/package/container publication, paid promotion, or public announcement should not be silently accepted. It should be routed through maintainer authorization.
@@ -188,23 +207,21 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 The next product direction after the realtime protocol and WebSocket outbound delivery slice is:
 
 ```text
-W-0219 Confirm next alpha direction after realtime outbound delivery slice
+W-0220 Define agent-native feature request and test workflow
 ```
 
-The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`, the storage objects repository interface is recorded in `runtime/internal/modules/storage/repository.go`, the storage objects PostgreSQL adapter gate is recorded in `docs/storage-objects-postgresql-adapter-gate.md`, the storage objects PostgreSQL adapter is recorded in `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, the storage objects runtime behavior gate is recorded in `docs/storage-objects-runtime-behavior-gate.md`, the storage objects runtime behavior implementation is recorded in `runtime/internal/app/storage/service.go`, the storage objects protocol route gate is recorded in `docs/storage-objects-protocol-route-gate.md` and `ADR-0118`, the storage objects protocol route implementation is recorded in `proto/vibit/storage/v1/storage.proto`, `runtime/internal/app/bootstrap/storage.go`, `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, and `ADR-0119`, the storage objects protocol route local proof is recorded in `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`, `examples/local-alpha-request-loop.sh`, and `ADR-0120`, the first server push and realtime messaging gate is recorded in `docs/first-server-push-realtime-messaging-gate.md` and `ADR-0122`, the first server push and realtime messaging runtime slice is recorded in `runtime/internal/app/realtime/service.go`, `runtime/internal/app/realtime/service_test.go`, and `ADR-0123`, the next-direction selection after realtime runtime slice is recorded in `ADR-0124`, the realtime protocol and WebSocket outbound delivery gate is recorded in `docs/realtime-protocol-websocket-outbound-delivery-gate.md` and `ADR-0125`, and the realtime protocol and WebSocket outbound delivery implementation is recorded in `proto/vibit/realtime/v1/realtime.proto`, `runtime/internal/platform/protocol/protobuf/realtime_bridge.go`, `runtime/internal/platform/transport/ws/outbound.go`, and `ADR-0126`. The next work should choose one bounded follow-up direction after the outbound delivery proof, keeping Nakama-style capability planning and Pitaya-style layering alignment while keeping startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred.
+The prototype-ready execution plan is now recorded in `docs/prototype-ready-foundation-execution-plan.md`, the local development path gate is recorded in `docs/prototype-ready-local-development-path-gate.md`, the local development path package is recorded in `docs/prototype-ready-local-development-path-package.md`, the storage objects behavior gate is recorded in `docs/storage-objects-behavior-gate.md`, the storage objects persistence schema gate is recorded in `docs/storage-objects-persistence-schema-gate.md`, the storage objects migration source is recorded in `runtime/migrations/postgres/000006_create_storage_objects.sql`, the storage objects repository boundary is recorded in `docs/storage-objects-repository-boundary.md`, the storage objects repository interface is recorded in `runtime/internal/modules/storage/repository.go`, the storage objects PostgreSQL adapter gate is recorded in `docs/storage-objects-postgresql-adapter-gate.md`, the storage objects PostgreSQL adapter is recorded in `runtime/internal/platform/persistence/postgres/storage_object_repository.go`, the storage objects runtime behavior gate is recorded in `docs/storage-objects-runtime-behavior-gate.md`, the storage objects runtime behavior implementation is recorded in `runtime/internal/app/storage/service.go`, the storage objects protocol route gate is recorded in `docs/storage-objects-protocol-route-gate.md` and `ADR-0118`, the storage objects protocol route implementation is recorded in `proto/vibit/storage/v1/storage.proto`, `runtime/internal/app/bootstrap/storage.go`, `runtime/internal/platform/protocol/protobuf/storage_bridge.go`, and `ADR-0119`, the storage objects protocol route local proof is recorded in `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`, `examples/local-alpha-request-loop.sh`, and `ADR-0120`, the first server push and realtime messaging gate is recorded in `docs/first-server-push-realtime-messaging-gate.md` and `ADR-0122`, the first server push and realtime messaging runtime slice is recorded in `runtime/internal/app/realtime/service.go`, `runtime/internal/app/realtime/service_test.go`, and `ADR-0123`, the next-direction selection after realtime runtime slice is recorded in `ADR-0124`, the realtime protocol and WebSocket outbound delivery gate is recorded in `docs/realtime-protocol-websocket-outbound-delivery-gate.md` and `ADR-0125`, the realtime protocol and WebSocket outbound delivery implementation is recorded in `proto/vibit/realtime/v1/realtime.proto`, `runtime/internal/platform/protocol/protobuf/realtime_bridge.go`, `runtime/internal/platform/transport/ws/outbound.go`, and `ADR-0126`, and the Nakama-first AI-native feature workflow direction is recorded in `ADR-0127`. The next work should define the agent-native feature request and test workflow, keeping runtime behavior, protocol changes, startup wiring, stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, persistence expansion, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, and direct compatibility deferred.
 
 The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, `W-0200 Implement prototype-ready local development path package`, `W-0201 Define storage objects behavior gate`, `W-0202 Define storage objects persistence schema gate`, `W-0203 Add storage objects migration source`, `W-0204 Define storage objects repository boundary`, `W-0205 Implement storage-neutral storage objects repository interface`, `W-0206 Define storage objects PostgreSQL adapter gate`, `W-0207 Implement storage objects PostgreSQL adapter`, `W-0208 Define storage objects runtime behavior gate`, `W-0209 Implement storage objects runtime behavior`, `W-0210 Define storage objects protocol route gate`, `W-0211 Implement storage objects protocol route`, `W-0212 Prove storage objects protocol route in local alpha request flow`, `W-0213 Confirm next alpha direction after storage objects local proof`, `W-0214 Define first server push and realtime messaging gate`, and `W-0215 Implement first server push and realtime messaging runtime slice` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first product capability path.
 
-The recorded candidate focus areas remain:
+The recorded candidate focus areas are now:
 
-- reduce local setup friction;
-- add a clearer example client or example app path;
-- prove the storage objects protocol route in the local alpha request flow;
-- confirm the next alpha direction after realtime outbound delivery;
+- define the agent-native feature request and test workflow;
 - strengthen concurrency and failure-path verification for the existing authenticated loop;
+- add a clearer example client or example app path;
 - define the minimum operations inspection surface needed before serious prototype use.
 
-Future work must preserve ask-first boundaries for runtime behavior, protocol, generated output, dependencies, repository interfaces, storage adapters, operations/admin breadth, release artifacts, hosted deployments, public announcements, authentication/session behavior changes, broad product modules, large object/blob storage, S3-compatible object storage, and direct Nakama/Pitaya compatibility.
+Future work must preserve ask-first boundaries for runtime behavior, protocol, generated output, dependencies, repository interfaces, storage adapters, operations/admin breadth, release artifacts, hosted deployments, public announcements, authentication/session behavior changes, broad product modules, large object/blob storage, S3-compatible object storage, Pitaya-style distributed architecture, and direct Nakama/Pitaya compatibility.
 
 ## 8. Non-Authorization
 
@@ -220,5 +237,6 @@ This document records product maturity goals. It does not itself:
 - add operations/admin behavior;
 - change authentication/session behavior;
 - add broad product modules;
+- add Pitaya-style distributed architecture before a later ADR reactivates it;
 - add direct Nakama/Pitaya API compatibility;
 - declare the current alpha production-ready.

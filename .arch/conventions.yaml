@@ -257,12 +257,16 @@ documentation_pairs:
     check_rule: runtime.websocket_close_policy_single_process_implementation
   nakama_pitaya_product_parity_roadmap:
     decision: ADR-0078
+    reference_posture_update: ADR-0127
     standard: docs/nakama-pitaya-product-parity-roadmap.md
     translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
     check_rule: runtime.reference_product_parity_roadmap
-    parity_goal: nakama_pitaya_same_class_common_capability_coverage
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    parity_goal: nakama_first_same_class_common_capability_coverage
     api_compatibility_goal: false
-    recommended_next_direction: define_protocol_logout_route_gate
+    recommended_next_direction: define_agent_native_feature_request_test_workflow
 
 standard_directories:
   architecture: .arch
@@ -3760,15 +3764,19 @@ nakama_pitaya_product_parity_roadmap:
   milestone: M-096
   completed_work_item: W-0168
   decision: ADR-0078
+  reference_posture_update: ADR-0127
   standard: docs/nakama-pitaya-product-parity-roadmap.md
   translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
   check_rule: runtime.reference_product_parity_roadmap
-  parity_goal: nakama_pitaya_same_class_common_capability_coverage
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: protocol_logout_and_connection_lifecycle
-  recommended_next_direction: define_protocol_logout_route_gate
+  current_near_term_priority: agent_native_feature_request_test_workflow
+  recommended_next_direction: define_agent_native_feature_request_test_workflow
 
 protocol_logout_route_gate:
   status: completed
@@ -5675,16 +5683,29 @@ realtime_protocol_websocket_outbound_delivery_implementation_slice:
   direct_nakama_pitaya_api_compatibility_added: false
 
 confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
-  status: next_ready
+  status: completed
   milestone: M-147
-  next_ready_work_item: W-0219
+  completed_work_item: W-0219
+  decision: ADR-0127
+  next_milestone: M-148
+  next_ready_work_item: W-0220
   previous_completed_work_item: W-0218
-  selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+  selected_direction: define_agent_native_feature_request_test_workflow
   expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
   tier: tier_2_planning
   target_stage: prototype_ready_foundation
   source_realtime_outbound_delivery_decision: ADR-0126
+  next_alpha_direction_after_realtime_outbound_delivery_slice_decision: ADR-0127
+  next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   implementation_authorized_by_this_selection: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
   startup_wiring_added: false
   stream_subscription_persistence_added: false
   offline_inbox_added: false
@@ -5698,6 +5719,21 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
   matchmaking_added: false
   match_runtime_added: false
   distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+agent_native_feature_request_test_workflow:
+  status: next_ready
+  milestone: M-148
+  next_ready_work_item: W-0220
+  previous_completed_work_item: W-0219
+  selected_direction: define_agent_native_feature_request_test_workflow
+  expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+  target_stage: prototype_ready_foundation
+  source_direction_decision: ADR-0127
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  implementation_authorized_by_this_selection: false
   direct_nakama_pitaya_api_compatibility_added: false
 
 server_runtime:

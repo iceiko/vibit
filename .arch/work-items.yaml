@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-147
+current_milestone: M-148
 
 release_targets:
   short_term:
@@ -13,18 +13,21 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: realtime_protocol_websocket_outbound_delivery_implemented
+    current_release_state: nakama_first_ai_native_feature_workflow_direction_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0219
+    next_ready_work_item: W-0220
     preferred_after_current:
-      - confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+      - define_agent_native_feature_request_test_workflow
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
     maturity_standard: docs/product-maturity-milestones.md
     near_term_standard: docs/v0.1-alpha-goal.md
-    goal: Become an AI-era Nakama/Pitaya-class open-source game/backend server framework without accidental direct API compatibility.
+    goal: Become a Nakama-class open-source game/backend server framework optimized for AI-native development and AI-native testing, while deferring Pitaya as a future distributed architecture reference.
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
     direct_api_compatibility_goal: false
 
 continuation_semantics:
@@ -2847,18 +2850,36 @@ milestones:
 
   - id: M-147
     title: Next Direction Confirmation After Realtime Outbound Delivery Slice
-    status: active
+    status: completed
     goal: Hold the work queue at an explicit maintainer confirmation point after realtime protocol and WebSocket outbound delivery implementation before choosing the next prototype-ready alpha direction.
     completion_criteria:
       - The next bounded alpha direction after the realtime outbound delivery slice is selected.
       - The selected direction is recorded as a bounded milestone with at least one next_ready work item.
-      - Nakama/Pitaya alignment remains explicit without adding direct compatibility.
+      - Nakama is recorded as the primary product capability reference, while Pitaya is deferred as a future distributed architecture reference.
+      - AI-native development and AI-native testing are recorded as the product purpose before broadening feature work.
       - Ask-first boundaries remain preserved for startup wiring, stream subscriptions, chat, groups, broadcast fanout, persistence, delivery guarantees, distributed runtime, matchmaking, match runtime, SDKs, hosted deployments, release artifacts, public announcements, paid promotion, and direct compatibility.
     non_goals:
       - implementing startup wiring or realtime bootstrap handlers
       - adding stream subscriptions, chat semantics, groups, broadcast fanout, offline inboxes, acknowledgements, retries, ordering guarantees, durable offsets, or backpressure
       - adding persistence, migrations, dependencies, authentication/session behavior changes, or route-protection changes
       - adding matchmaking, match runtime, distributed runtime, hosted deployments, release artifacts, public announcements beyond the GitHub release record, paid promotion, blob/S3 storage, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_agent_native_feature_request_test_workflow` as the next prototype-ready alpha direction after the realtime protocol and WebSocket outbound delivery slice, accepted `ADR-0127`, made Nakama the primary product capability reference, deferred Pitaya as a future distributed architecture reference, recorded AI-native development and AI-native testing as the product purpose, and opened `M-148/W-0220 Define agent-native feature request and test workflow` as the next-ready item. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, distributed runtime, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: M-148
+    title: Agent-Native Feature Request And Test Workflow
+    status: active
+    goal: Define the workflow that turns user backend requirements into specs, acceptance criteria, test plans, tests, implementation boundaries, verification records, and durable project memory before broadening product modules.
+    completion_criteria:
+      - The workflow is documented as the default for non-trivial user-facing feature work.
+      - Required artifacts for request, acceptance, test plan, implementation, verification, and durable memory are declared.
+      - The workflow keeps Nakama-first product mapping and Pitaya-deferred architecture posture.
+      - Repository checks can detect the workflow standard and next-ready state.
+    non_goals:
+      - implementing runtime behavior
+      - adding protocol routes or messages
+      - adding generated output
+      - changing migrations or dependencies
+      - adding chat, groups, matchmaking, match runtime, or distributed runtime
 
 work_items:
   - id: W-0001
@@ -8304,15 +8325,16 @@ work_items:
   - id: W-0219
     milestone: M-147
     title: Confirm next alpha direction after realtime outbound delivery slice
-    status: next_ready
+    status: completed
     change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
     depends_on:
       - W-0218
     expected_change_id: confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
     tier: tier_2_planning
-    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    selected_direction: define_agent_native_feature_request_test_workflow
     gate_density_strategy: ADR-0082
     related_decisions:
+      - ADR-0127
       - ADR-0126
       - ADR-0125
       - ADR-0124
@@ -8327,4 +8349,34 @@ work_items:
     completion:
       - Select the next bounded alpha direction after realtime outbound delivery implementation.
       - Record the selection in ADR, change spec, conversation log, and manifests.
+      - Make Nakama the primary product capability reference while deferring Pitaya as a future distributed architecture reference.
+      - Record AI-native development and AI-native testing as the product purpose.
       - Preserve startup wiring, stream subscription, chat, group, broadcast fanout, persistence, delivery guarantee, distributed runtime, matchmaking, match runtime, hosted/release, public announcement, paid promotion, blob/S3, and direct compatibility deferrals.
+    next_milestone: M-148
+    next_ready_work_item: W-0220
+    completion_summary: Selected `define_agent_native_feature_request_test_workflow` as the next alpha direction, accepted `ADR-0127`, recorded Nakama-first product capability planning, deferred Pitaya to future distributed architecture review, centered AI-native development and AI-native testing around user requirement to spec, acceptance criteria, test plan, tests, implementation, verification, and durable memory, and opened `M-148/W-0220` as next-ready. No runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, distributed runtime, broad product module, or direct Nakama/Pitaya API compatibility was added.
+
+  - id: W-0220
+    milestone: M-148
+    title: Define agent-native feature request and test workflow
+    status: next_ready
+    change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+    depends_on:
+      - W-0219
+    expected_change_id: define-agent-native-feature-request-test-workflow
+    tier: tier_2_standard
+    selected_direction: define_agent_native_feature_request_test_workflow
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0127
+      - ADR-0126
+      - ADR-0106
+      - ADR-0086
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Implementing runtime behavior, protocol changes, generated output, migrations, dependencies, broad product modules, Pitaya-style distributed architecture, hosted deployment, release artifacts, public announcements, paid promotion, or direct Nakama/Pitaya API compatibility.
+    completion:
+      - Define the AI-native feature request and test workflow standard.
+      - Define required change artifacts such as bounded requirement specs, acceptance criteria, test plans, tests, implementation notes, verification records, and durable memory updates.
+      - Register repository checks or a future check posture for the workflow standard.

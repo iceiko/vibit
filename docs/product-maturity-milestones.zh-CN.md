@@ -7,7 +7,7 @@
 权威决策：`ADR-0105`
 说明：本文件是 `docs/product-maturity-milestones.md` 的简体中文译本。英文版本是权威版本，本译本用于人类阅读、讨论和维护共识。
 
-本文把维护者关于“必须推进到真正产品阶段、真正成为生产力”的意图沉淀成持久 milestones。当前 source-first alpha 已经证明 vibit 有真实后端闭环，但产品目标更大：从 first alpha 走到 prototype-ready foundation，再走到 single-node production-candidate foundation，最后走到 Nakama/Pitaya-class open-source server framework。本文只提供 roadmap 和 feedback triage 指导。它不授权 runtime behavior changes、protocol route changes、Protobuf source 或 generated output changes、migrations、dependencies、hosted deployments、additional release artifacts、GitHub release record 之外的 public announcements、paid promotion、broad operations/admin behavior、authentication/session behavior changes、broad product module expansion 或 direct Nakama/Pitaya API compatibility。
+本文把维护者关于“必须推进到真正产品阶段、真正成为生产力”的意图沉淀成持久 milestones。当前 source-first alpha 已经证明 vibit 有真实后端闭环，但产品目标更大：从 first alpha 走到 prototype-ready foundation，再走到 single-node production-candidate foundation，最后走到 Nakama-first open-source server framework，并让 AI-native development 和 AI-native testing 成为默认用户体验。本文只提供 roadmap 和 feedback triage 指导。它不授权 runtime behavior changes、protocol route changes、Protobuf source 或 generated output changes、migrations、dependencies、hosted deployments、additional release artifacts、GitHub release record 之外的 public announcements、paid promotion、broad operations/admin behavior、authentication/session behavior changes、broad product module expansion、Pitaya-style distributed architecture 或 direct Nakama/Pitaya API compatibility。
 
 ## 1. Core Rule
 
@@ -23,10 +23,15 @@ current_release_identifier: v0.1.0-alpha.1
 stage_1_source_first_alpha: reached
 stage_2_prototype_ready_foundation: next_product_stage
 stage_3_single_node_production_candidate_foundation: planned
+stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
+reference_posture_update: ADR-0127
+primary_product_reference: Nakama
+pitaya_reference_status: deferred_future_architecture_reference
+ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: prototype_ready_foundation_execution_plan
+next_direction: define_agent_native_feature_request_test_workflow
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -41,6 +46,7 @@ broad_operations_admin_behavior_added: false
 authentication_session_behavior_changed: false
 product_module_expansion_added: false
 direct_nakama_pitaya_api_compatibility_added: false
+pitaya_distributed_architecture_added: false
 ```
 
 ## 2. Stage 1：Source-First Alpha
@@ -75,6 +81,7 @@ Stage 1 不是：
 - SDK readiness；
 - hosted platform readiness；
 - 与 Nakama、Pitaya、Colyseus、Pomelo、Agones 或 custom production backends 的 feature parity。
+- 完整的用户可见 AI-native feature request、test、implementation 和 verification workflow。
 
 ## 3. Stage 2：Prototype-Ready Foundation
 
@@ -98,6 +105,7 @@ Required capability groups：
 - 更好的 local startup ergonomics，包括明确的 setup、migration 和 configuration flow。
 - 一个 realistic example client 或 example app path，展示的不只是孤立请求。
 - 能把 external friction 转换成 bounded work items 的 issue 和 feedback loops。
+- AI-native requirement intake：把用户请求转换成 specs、acceptance criteria、test plans、tests、implementation boundaries、verification records 和 durable project memory。
 - 针对 login、protected requests、logout、reconnect 和 database failure behavior 的基础 concurrency 和 failure-path verification。
 
 Exit criteria：
@@ -106,6 +114,7 @@ Exit criteria：
 - 主要 setup friction 被记录为已接受或已降低。
 - 下一个缺失能力是 product decision，而不是意外未知。
 - 至少一个 non-maintainer feedback item 被 triaged 成 bounded work item，或被明确 deferred。
+- 一个非平凡未来 feature 可以按已记录的 AI-native requirement 和 test workflow 推进，而不需要临时发明流程。
 
 Stage 2 仍然不是 production-ready。它可以继续 single-node、local-first、source-first，但应该感觉有用，而不只是可检查。
 
@@ -132,6 +141,7 @@ Required capability groups：
 - Stable client ergonomics：SDK、client helper 或 documented protocol client example。
 - Authentication、sessions、token redaction、configuration leakage 和 route permissions 的 security review。
 - 适合 single-node usage 的 concurrency、soak 和 failure-mode verification。
+- 可追溯到 requirement 和 acceptance artifacts 的 AI-generated 或 AI-maintained feature tests。
 
 Exit criteria：
 
@@ -140,16 +150,24 @@ Exit criteria：
 - Upgrade 和 operations expectations 是显式的。
 - 距 product-class parity 的剩余差距主要是 breadth，而不是 core reliability posture。
 
-## 5. Stage 4：Nakama/Pitaya-Class Product
+## 5. Stage 4：Nakama-First AI-Native Product
 
 状态：
 
 ```text
+stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
 target: ai_era_nakama_pitaya_class_server_framework
+primary_product_reference: Nakama
+pitaya_reference_status: deferred_future_architecture_reference
 ```
 
-目的：成为与 Nakama 和 Pitaya 同一广义产品级别的严肃开源 server framework，并围绕 vibit 的 agent-native maintainability model 重新适配。
+目的：成为与 Nakama 同一广义产品级别的严肃开源 server framework，并围绕 vibit 的 agent-native maintainability model 重新适配。Pitaya-style distributed architecture 保持 future-only，直到后续 ADR 明确重新激活。
+
+Product-class target 有两个不可分割的部分：
+
+- Nakama-style backend capability coverage。
+- AI-native development 和 testing，即用户需求通过 agent assistance 产出 specs、acceptance criteria、tests、implementation、verification 和 durable records。
 
 这个阶段需要覆盖 `docs/nakama-pitaya-product-parity-roadmap.md` 中已经记录的 common capability families：
 
@@ -166,7 +184,8 @@ target: ai_era_nakama_pitaya_class_server_framework
 - server runtime hooks、RPC、custom logic；
 - admin console、metrics、observability、operations；
 - client SDKs、examples、developer experience；
-- distributed runtime、frontend/backend roles、RPC、service discovery。
+- distributed runtime、frontend/backend roles、RPC、service discovery，仅在后续 architecture ADR 选择该路径之后；
+- agent-native requirement、acceptance、test、implementation 和 verification workflow。
 
 Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR 明确采纳 compatibility surface。
 
@@ -177,7 +196,7 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 - `source_alpha_friction`：README、setup、checks、request-loop、runbook 或 concept clarity 阻塞。
 - `prototype_ready_gap`：缺少 shared online service、example flow、client ergonomics 或 local development path，导致无法做 prototype。
 - `production_candidate_gap`：security、operations、packaging、migration、observability、performance 或 failure behavior 阻塞真实项目评估。
-- `product_class_gap`：social、competitive、matchmaking、match runtime、SDK、admin console、distributed runtime 或 extensibility breadth 阻塞 Nakama/Pitaya-class usefulness。
+- `product_class_gap`：social、competitive、matchmaking、match runtime、SDK、admin console、distributed runtime、extensibility breadth 或 AI-native feature workflow gaps 阻塞 Nakama-first product-class usefulness。
 - `out_of_scope_for_now`：请求有效，但必须等待明确授权或后续阶段。
 
 如果反馈要求 production claims、broad feature parity、hosted deployment、direct compatibility、binary/package/container publication、paid promotion 或 public announcement，不应默默接受，应转入 maintainer authorization。
@@ -187,23 +206,21 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 Realtime protocol and WebSocket outbound delivery slice 之后，下一个产品方向是：
 
 ```text
-W-0219 Confirm next alpha direction after realtime outbound delivery slice
+W-0220 Define agent-native feature request and test workflow
 ```
 
-Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`，storage objects repository interface 已记录在 `runtime/internal/modules/storage/repository.go`，storage objects PostgreSQL adapter gate 已记录在 `docs/storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 已记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go`，storage objects runtime behavior gate 已记录在 `docs/storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 已记录在 `runtime/internal/app/storage/service.go`，storage objects protocol route gate 已记录在 `docs/storage-objects-protocol-route-gate.md` 和 `ADR-0118`，storage objects protocol route implementation 已记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `ADR-0119`，storage objects protocol route local proof 已记录在 `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`、`examples/local-alpha-request-loop.sh` 和 `ADR-0120`，first server push and realtime messaging gate 已记录在 `docs/first-server-push-realtime-messaging-gate.md` 和 `ADR-0122`，first server push and realtime messaging runtime slice 已记录在 `runtime/internal/app/realtime/service.go`、`runtime/internal/app/realtime/service_test.go` 和 `ADR-0123`，realtime runtime slice 后的 next-direction selection 已记录在 `ADR-0124`，realtime protocol and WebSocket outbound delivery gate 已记录在 `docs/realtime-protocol-websocket-outbound-delivery-gate.md` 和 `ADR-0125`，realtime protocol and WebSocket outbound delivery implementation 已记录在 `proto/vibit/realtime/v1/realtime.proto`、`runtime/internal/platform/protocol/protobuf/realtime_bridge.go`、`runtime/internal/platform/transport/ws/outbound.go` 和 `ADR-0126`。下一项 work 应在 outbound delivery proof 之后选择一个 bounded follow-up direction，保留 Nakama-style capability planning 和 Pitaya-style layering alignment，并继续延后 startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility。
+Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-execution-plan.md`，local development path gate 已记录在 `docs/prototype-ready-local-development-path-gate.md`，local development path package 已记录在 `docs/prototype-ready-local-development-path-package.md`，storage objects behavior gate 已记录在 `docs/storage-objects-behavior-gate.md`，storage objects persistence schema gate 已记录在 `docs/storage-objects-persistence-schema-gate.md`，storage objects migration source 已记录在 `runtime/migrations/postgres/000006_create_storage_objects.sql`，storage objects repository boundary 已记录在 `docs/storage-objects-repository-boundary.md`，storage objects repository interface 已记录在 `runtime/internal/modules/storage/repository.go`，storage objects PostgreSQL adapter gate 已记录在 `docs/storage-objects-postgresql-adapter-gate.md`，storage objects PostgreSQL adapter 已记录在 `runtime/internal/platform/persistence/postgres/storage_object_repository.go`，storage objects runtime behavior gate 已记录在 `docs/storage-objects-runtime-behavior-gate.md`，storage objects runtime behavior implementation 已记录在 `runtime/internal/app/storage/service.go`，storage objects protocol route gate 已记录在 `docs/storage-objects-protocol-route-gate.md` 和 `ADR-0118`，storage objects protocol route implementation 已记录在 `proto/vibit/storage/v1/storage.proto`、`runtime/internal/app/bootstrap/storage.go`、`runtime/internal/platform/protocol/protobuf/storage_bridge.go` 和 `ADR-0119`，storage objects protocol route local proof 已记录在 `runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go`、`examples/local-alpha-request-loop.sh` 和 `ADR-0120`，first server push and realtime messaging gate 已记录在 `docs/first-server-push-realtime-messaging-gate.md` 和 `ADR-0122`，first server push and realtime messaging runtime slice 已记录在 `runtime/internal/app/realtime/service.go`、`runtime/internal/app/realtime/service_test.go` 和 `ADR-0123`，realtime runtime slice 后的 next-direction selection 已记录在 `ADR-0124`，realtime protocol and WebSocket outbound delivery gate 已记录在 `docs/realtime-protocol-websocket-outbound-delivery-gate.md` 和 `ADR-0125`，realtime protocol and WebSocket outbound delivery implementation 已记录在 `proto/vibit/realtime/v1/realtime.proto`、`runtime/internal/platform/protocol/protobuf/realtime_bridge.go`、`runtime/internal/platform/transport/ws/outbound.go` 和 `ADR-0126`，Nakama-first AI-native feature workflow direction 已记录在 `ADR-0127`。下一项 work 应定义 agent-native feature request and test workflow，并继续延后 runtime behavior、protocol changes、startup wiring、stream subscriptions、chat rooms、groups、broadcast fanout、delivery guarantees、persistence expansion、distributed runtime、matchmaking、match runtime、SDKs、hosted deployments、release artifacts、public announcements 和 direct compatibility。
 
 上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source`、`W-0204 Define storage objects repository boundary`、`W-0205 Implement storage-neutral storage objects repository interface`、`W-0206 Define storage objects PostgreSQL adapter gate`、`W-0207 Implement storage objects PostgreSQL adapter`、`W-0208 Define storage objects runtime behavior gate`、`W-0209 Implement storage objects runtime behavior`、`W-0210 Define storage objects protocol route gate`、`W-0211 Implement storage objects protocol route`、`W-0212 Prove storage objects protocol route in local alpha request flow`、`W-0213 Confirm next alpha direction after storage objects local proof`、`W-0214 Define first server push and realtime messaging gate` 和 `W-0215 Implement first server push and realtime messaging runtime slice` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability path 的追溯记录。
 
-已记录的候选重点仍包括：
+已记录的候选重点现在是：
 
-- 降低 local setup friction；
-- 添加更清晰的 example client 或 example app path；
-- 通过 local alpha request flow 证明 storage objects protocol route；
-- 确认 realtime outbound delivery 后的下一项 alpha direction；
+- 定义 agent-native feature request and test workflow；
 - 加强现有 authenticated loop 的 concurrency 和 failure-path verification；
+- 添加更清晰的 example client 或 example app path；
 - 定义严肃 prototype 使用前需要的最小 operations inspection surface。
 
-后续 work 必须保留 runtime behavior、protocol、generated output、dependencies、repository interfaces、storage adapters、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules、large object/blob storage、S3-compatible object storage 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
+后续 work 必须保留 runtime behavior、protocol、generated output、dependencies、repository interfaces、storage adapters、operations/admin breadth、release artifacts、hosted deployments、public announcements、authentication/session behavior changes、broad product modules、large object/blob storage、S3-compatible object storage、Pitaya-style distributed architecture 和 direct Nakama/Pitaya compatibility 的 ask-first boundaries。
 
 ## 8. 非授权声明
 
@@ -219,5 +236,6 @@ Prototype-ready execution plan 已记录在 `docs/prototype-ready-foundation-exe
 - 添加 operations/admin behavior；
 - 改变 authentication/session behavior；
 - 添加 broad product modules；
+- 在后续 ADR 重新激活前添加 Pitaya-style distributed architecture；
 - 添加 direct Nakama/Pitaya API compatibility；
 - 声明当前 alpha production-ready。

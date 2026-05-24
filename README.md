@@ -20,7 +20,9 @@ vibit is testing a stricter model:
 - agents can inspect the next safe task with `tools/vibit`;
 - humans can audit why a change exists without reading old chats.
 
-The first domain focus is game/backend servers. The long-term target is an AI-era Nakama/Pitaya-class open-source backend framework, adapted around agent-native maintainability rather than direct API compatibility.
+The first domain focus is game/backend servers. The long-term target is an AI-era Nakama-class open-source backend framework, adapted around agent-native maintainability rather than direct API compatibility. Pitaya is deferred as a future architecture reference for distributed runtime concerns.
+
+The product purpose is AI-native development and AI-native testing: a user states a backend requirement, and AI helps produce the bounded spec, acceptance criteria, tests, implementation, verification, and durable project records.
 
 ## Try The Alpha
 
@@ -94,7 +96,7 @@ The runtime listens on `:8080` by default and mounts:
 Try vibit now if you:
 
 - build or operate game/backend servers;
-- have used or evaluated Nakama, Pitaya, Colyseus, Pomelo, Agones, or custom Go backends;
+- have used or evaluated Nakama, Colyseus, Pomelo, Agones, Pitaya, or custom Go backends;
 - want AI coding agents to make safer changes in a serious backend codebase;
 - care about explicit architecture, contracts, generated structure, tests, and durable decision records;
 - want to help define the first useful agent-native server framework shape before it hardens.
@@ -113,7 +115,8 @@ This alpha is not yet for production deployment, plug-and-play SDK use, hosted o
 - no hosted deployment;
 - no install script;
 - no SDK package;
-- no direct Nakama/Pitaya API compatibility promise.
+- no direct Nakama/Pitaya API compatibility promise;
+- no Pitaya-style cluster/RPC/frontend-backend work before a later ADR reactivates it.
 
 The PostgreSQL runtime path is the most complete local path, but it still expects development setup: migrations, `VIBIT_POSTGRES_DSN`, and authentication verifier key environment variables. See `docs/runtime-runbook.md`.
 For the current packaged local path, see `docs/prototype-ready-local-development-path-package.md`.
@@ -189,7 +192,7 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0219 Confirm next alpha direction after realtime outbound delivery slice
+W-0220 Define agent-native feature request and test workflow
 ```
 
 Use `.arch/work-items.yaml` as the source of truth for continuation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
@@ -198,12 +201,14 @@ Use `.arch/work-items.yaml` as the source of truth for continuation. A request s
 
 Agent-native does not primarily mean that the server has AI features.
 
-It means the codebase is designed so AI coding agents can work inside it reliably:
+It means the codebase is designed so AI coding agents can work inside it reliably and can turn user requirements into tested backend changes:
 
 - architecture rules are explicit;
 - module ownership is declared;
 - public behavior is contract-first;
 - generated structure is traceable;
+- user requirements become bounded specs;
+- acceptance criteria and test plans are written before non-trivial implementation;
 - business rules are tested;
 - change workflow is bounded;
 - repository state is checkable;
@@ -211,14 +216,14 @@ It means the codebase is designed so AI coding agents can work inside it reliabl
 
 AI gameplay features such as NPC agents, memory, model routing, tool calling, and simulations may become extensions later. They are not the foundation.
 
-## Nakama And Pitaya Target
+## Nakama-First Target
 
-Nakama and Pitaya are active reference baselines for capability planning.
+Nakama is the active primary product reference for capability planning.
 
 - Nakama guides the broad game backend surface: accounts, sessions, storage, social systems, chat, groups, parties, leaderboards, tournaments, matchmaking, realtime multiplayer, authoritative matches, operations, SDKs, and examples.
-- Pitaya guides Go game server architecture vocabulary: acceptors, sessions, routes, handlers, remotes/RPC, frontend/backend roles, groups, broadcast, serializers, and cluster service discovery.
+- Pitaya is deferred as a future architecture reference for acceptors, sessions, routes, handlers, remotes/RPC, frontend/backend roles, groups, broadcast, serializers, and cluster service discovery.
 
-vibit should cover the same class of common capability over time while preserving its own architecture: explicit manifests, contracts, generation, tests, ADRs, repository checks, and bounded agent workflow.
+vibit should cover the same class of common Nakama-style capability over time while preserving its own architecture: explicit manifests, contracts, generation, tests, ADRs, repository checks, bounded agent workflow, and AI-native requirement-to-test-to-implementation flow.
 
 See:
 
@@ -235,7 +240,7 @@ Important entry points:
 - `.arch/README.md`: architecture manifest entry point.
 - `.arch/work-items.yaml`: continuation queue.
 - `.arch/runtime.yaml`: runtime readiness and implementation state.
-- `.arch/reference.yaml`: Nakama/Pitaya reference and product parity planning.
+- `.arch/reference.yaml`: Nakama-first reference and product parity planning.
 - `docs/v0.1-alpha-goal.md`: short-term alpha and long-term product target.
 - `docs/alpha-developer-flow.md`: packaged local alpha developer journey.
 - `docs/alpha-acceptance-checklist.md`: local v0.1 alpha acceptance checklist.
@@ -250,7 +255,7 @@ Important entry points:
 - `docs/prototype-ready-local-development-path-package.md`: repeatable source-first local development path.
 - `docs/storage-objects-behavior-gate.md`: first player-owned small storage objects behavior gate.
 - `docs/releases/v0.1.0-alpha.1.md`: alpha release notes.
-- `docs/nakama-pitaya-product-parity-roadmap.md`: long-term capability roadmap.
+- `docs/nakama-pitaya-product-parity-roadmap.md`: long-term Nakama-first capability roadmap.
 - `examples/README.md`: local examples and redacted configuration template guidance.
 - `changes/`: concrete change specs and verification records.
 - `conversations/`: durable maintainer-agent project memory.

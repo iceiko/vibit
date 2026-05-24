@@ -8,13 +8,13 @@ This document records how vibit should use mature game server projects as refere
 
 The paired Simplified Chinese translation is `docs/reference-game-server-alignment.zh-CN.md`. The English file is authoritative.
 
-`ADR-0078` and `docs/nakama-pitaya-product-parity-roadmap.md` refine this reference baseline into an explicit product target: vibit should become a Nakama/Pitaya-class game backend framework by covering common capability families while preserving vibit's agent-native constraints. This document still defines reference roles; the product parity roadmap defines phased execution.
+`ADR-0078` and `docs/nakama-pitaya-product-parity-roadmap.md` refined this reference baseline into an explicit product target. `ADR-0127` updates the posture: Nakama is the primary product capability reference, and Pitaya is deferred as a future architecture reference for distributed runtime concerns. This document still defines reference roles; the product roadmap defines phased execution.
 
 ## 1. Purpose
 
 vibit is not only an inventory proof slice.
 
-vibit should eventually cover the same broad problem class as mature game backend and game server frameworks such as Nakama and Pitaya:
+vibit should eventually cover the same broad product problem class as mature game backend frameworks such as Nakama:
 
 - Player identity and sessions.
 - Social and realtime communication.
@@ -23,7 +23,8 @@ vibit should eventually cover the same broad problem class as mature game backen
 - Realtime multiplayer and authoritative server behavior.
 - Leaderboards, rewards, currencies, and other metagame systems.
 - Operational visibility and production maintainability.
-- Scalable routing and, later, distributed server topology.
+- Scalable routing and, later, distributed server topology if a future architecture ADR selects it.
+- AI-native requirement intake, test planning, implementation, verification, and project memory.
 
 The difference is not the existence of those game server capabilities. The difference is that vibit must make those capabilities Agent-Native:
 
@@ -35,7 +36,7 @@ The difference is not the existence of those game server capabilities. The diffe
 - Durable decision records.
 - Verification commands that agents can run before and after changes.
 
-Nakama documents a broad game server product surface that includes user accounts, authentication, storage, friends, groups, chat, leaderboards, tournaments, matchmaking, realtime multiplayer, and authoritative match runtime concepts. Pitaya documents a Go game server framework shape around client acceptors, sessions, route handlers, remote calls, groups, serializers, and cluster vocabulary. vibit should learn from both surfaces while making every adopted capability explicit, generated where appropriate, and machine-checkable.
+Nakama documents a broad game server product surface that includes user accounts, authentication, storage, friends, groups, chat, leaderboards, tournaments, matchmaking, realtime multiplayer, and authoritative match runtime concepts. vibit should use Nakama to decide product capability priorities while making every adopted capability explicit, generated where appropriate, tested, and machine-checkable. Pitaya remains useful background for future distributed architecture vocabulary, but it should not drive current product planning.
 
 Current product target markers:
 
@@ -44,8 +45,11 @@ nakama_pitaya_product_parity_roadmap: ratified
 decision: ADR-0078
 check_rule: runtime.reference_product_parity_roadmap
 parity_goal: nakama_pitaya_same_class_common_capability_coverage
+reference_posture_update: ADR-0127
+primary_product_reference: Nakama
+pitaya_reference_status: deferred_future_architecture_reference
 api_compatibility_goal: false
-recommended_next_direction: define_protocol_logout_route_gate
+recommended_next_direction: define_agent_native_feature_request_test_workflow
 ```
 
 ## 2. Reference Roles
@@ -69,7 +73,7 @@ Nakama must not become a governing API shape for vibit unless a future ADR expli
 
 ### Pitaya
 
-Use Pitaya as the primary reference for Go game server framework architecture vocabulary.
+Pitaya is deferred as a future reference for Go game server architecture vocabulary. Do not use Pitaya as a current product planning driver.
 
 Reference areas:
 
@@ -81,9 +85,9 @@ Reference areas:
 - Groups for broadcast and multicast use cases such as rooms.
 - Message forwarding, serializers, RPC services, and cluster service discovery.
 
-Pitaya should guide how Go game server frameworks separate transport, session, route, server role, RPC, and group concerns.
+Pitaya may later guide how Go game server frameworks separate transport, session, route, server role, RPC, and group concerns.
 
-Pitaya must not force vibit into distributed clustering before the modular monolith proof slice is healthy.
+Pitaya must not force vibit into distributed clustering before a later ADR reactivates it and the modular monolith proof slice is healthy.
 
 ## 3. Capability Matrix
 
@@ -92,23 +96,24 @@ The following matrix is a planning tool. It is not a promise that every capabili
 | Capability | Reference | Vibit Direction |
 | --- | --- | --- |
 | Accounts and authentication | Nakama | `player` or `identity` module with explicit auth/session contracts. |
-| Sessions and connection identity | Nakama, Pitaya | Platform session adapter plus app-owned session context; no transport shortcut identity. |
+| Sessions and connection identity | Nakama | Platform session adapter plus app-owned session context; no transport shortcut identity. |
 | Storage objects | Nakama | PostgreSQL-backed module state first; object storage only for large artifacts. |
 | Inventory | Common game backend need | First proof module; must prove contract -> generated shape -> handler -> tests. |
 | Currency and wallets | Nakama/Hiro capability family | Future `currency` module with transactional invariants. |
 | Rewards and claims | Nakama/Hiro capability family | Future `reward` module with eligibility, idempotency, and event tests. |
 | Friends, groups, parties | Nakama | Future social modules with explicit membership ownership and events. |
 | Chat and realtime messaging | Nakama | Future realtime module; not hidden in WebSocket transport. |
-| Presence and status | Nakama, Pitaya | Future platform/application capability with explicit lifecycle semantics. |
+| Presence and status | Nakama | Future platform/application capability with explicit lifecycle semantics. |
 | Matchmaking | Nakama | Future `matchmaking` module; query and criteria contracts before implementation. |
-| Match/session lifecycle | Nakama, Pitaya | Future `match` module; authoritative match behavior separate from transport. |
-| Rooms and broadcast groups | Pitaya | Future group/room abstraction; target scopes already reserve `room` and `match`. |
+| Match/session lifecycle | Nakama | Future `match` module; authoritative match behavior separate from transport. |
+| Rooms and broadcast groups | Nakama first, Pitaya deferred | Future group/room abstraction; target scopes already reserve `room` and `match`. |
 | Leaderboards and tournaments | Nakama | Future competitive modules; ranking and reset rules must be contract-first. |
 | Authoritative realtime simulation | Nakama | Future match runtime; server remains authoritative. |
 | Cluster frontend/backend split | Pitaya | Deferred until single-process boundaries are proven. |
 | Server-to-server RPC | Pitaya | Deferred; must not bypass module contracts when introduced. |
 | Dashboard and operations | Nakama | Future admin/inspection surface; do not mix with gameplay protocol. |
-| Metrics and observability | Nakama, Pitaya | Deferred dependency decision; must be platform-owned. |
+| Metrics and observability | Nakama | Deferred dependency decision; must be platform-owned. |
+| AI-native feature workflow | Vibit core thesis | User request -> spec -> acceptance criteria -> test plan -> tests -> implementation -> verification -> durable memory. |
 
 ## 4. Phased Roadmap
 
@@ -141,7 +146,7 @@ Goals:
 Reference pull:
 
 - Nakama storage and custom server logic concepts.
-- Pitaya handler routing separation.
+- Vibit-owned handler routing separation.
 
 ### Phase 2: Player, Session, And Transport
 
@@ -156,7 +161,7 @@ Goals:
 Reference pull:
 
 - Nakama authentication and session model.
-- Pitaya session binding and WebSocket acceptor separation.
+- Vibit-owned session binding and WebSocket acceptor separation.
 
 ### Phase 3: Core Game Backend Modules
 
@@ -186,7 +191,7 @@ Goals:
 Reference pull:
 
 - Nakama matchmaker and authoritative/relayed multiplayer distinction.
-- Pitaya groups and route/handler model.
+- Vibit-owned groups, rooms, and route/handler model unless a later ADR reactivates Pitaya.
 
 ### Phase 5: Distributed Runtime
 
@@ -200,7 +205,7 @@ Goals:
 
 Reference pull:
 
-- Pitaya cluster architecture.
+- Future architecture ADR required before selecting Pitaya or another distributed reference.
 
 This phase must not begin until single-process module, transaction, protocol, and verification boundaries are stable.
 
@@ -210,6 +215,7 @@ Agents must:
 
 - Consult this document before proposing new game server modules or runtime subsystems.
 - Check whether a proposed capability maps to a known Nakama/Pitaya capability family.
+- Treat Nakama as the product priority reference and Pitaya as deferred unless a later ADR says otherwise.
 - Preserve vibit's Agent-Native constraints even when matching reference functionality.
 - Record whether a reference pattern is adopted, adapted, deferred, or rejected, and why.
 - Prefer adding a small enforceable manifest/check over adding broad aspirational text.
@@ -219,6 +225,7 @@ Agents must not:
 - Copy external APIs without an explicit compatibility ADR.
 - Add a Nakama-like or Pitaya-like feature directly in transport handlers.
 - Add cluster/RPC/service-discovery work before the modular monolith proof slice is stable.
+- Use Pitaya to justify near-term cluster/RPC/frontend-backend work before a later ADR reactivates it.
 - Treat feature parity as more important than explicit contracts, module ownership, or verification.
 - Use references as an excuse to bypass vibit's generated-file and boundary rules.
 

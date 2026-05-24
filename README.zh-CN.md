@@ -20,7 +20,9 @@ vibit 正在验证一种更严格的模型：
 - agents 可以用 `tools/vibit` 检查下一步安全任务；
 - humans 不需要翻旧聊天记录也能审计一个变更为什么存在。
 
-第一个领域重点是 game/backend servers。长期目标是成为 AI 时代的 Nakama/Pitaya-class open-source backend framework，但围绕 agent-native maintainability 重新组织，而不是追求 direct API compatibility。
+第一个领域重点是 game/backend servers。长期目标是成为 AI 时代的 Nakama-class open-source backend framework，但围绕 agent-native maintainability 重新组织，而不是追求 direct API compatibility。Pitaya 暂缓为未来 distributed runtime concerns 的 architecture reference。
+
+产品目的包括 AI-native development 和 AI-native testing：用户说出 backend requirement，AI 帮助产出 bounded spec、acceptance criteria、tests、implementation、verification 和持久项目记录。
 
 ## 试用 Alpha
 
@@ -94,7 +96,7 @@ Runtime 默认监听 `:8080`，并挂载：
 如果你符合下面任意一项，现在就值得试 vibit：
 
 - 你构建或运营 game/backend servers；
-- 你用过或评估过 Nakama、Pitaya、Colyseus、Pomelo、Agones 或 custom Go backends；
+- 你用过或评估过 Nakama、Colyseus、Pomelo、Agones、Pitaya 或 custom Go backends；
 - 你希望 AI coding agents 在严肃 backend codebase 中更安全地改代码；
 - 你关心 explicit architecture、contracts、generated structure、tests 和 durable decision records；
 - 你想在形态固化前参与定义第一个有用的 agent-native server framework。
@@ -113,7 +115,8 @@ Runtime 默认监听 `:8080`，并挂载：
 - 没有 hosted deployment；
 - 没有 install script；
 - 没有 SDK package；
-- 没有 direct Nakama/Pitaya API compatibility 承诺。
+- 没有 direct Nakama/Pitaya API compatibility 承诺；
+- 在后续 ADR 重新激活前，没有 Pitaya-style cluster/RPC/frontend-backend work。
 
 PostgreSQL runtime path 是目前最完整的本地路径，但仍然需要 development setup：migrations、`VIBIT_POSTGRES_DSN` 和 authentication verifier key environment variables。见 `docs/runtime-runbook.md`。
 当前已打包的 local path 见 `docs/prototype-ready-local-development-path-package.md`。
@@ -189,7 +192,7 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0219 Confirm next alpha direction after realtime outbound delivery slice
+W-0220 Define agent-native feature request and test workflow
 ```
 
 使用 `.arch/work-items.yaml` 作为 continuation source of truth。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
@@ -198,12 +201,14 @@ W-0219 Confirm next alpha direction after realtime outbound delivery slice
 
 Agent-native 主要不是指服务器带有 AI 功能。
 
-它指的是代码库被设计成让 AI coding agents 能可靠工作：
+它指的是代码库被设计成让 AI coding agents 能可靠工作，并能把用户需求转成已测试的后端变更：
 
 - architecture rules 是显式的；
 - module ownership 是声明的；
 - public behavior 是 contract-first；
 - generated structure 可追溯；
+- 用户需求会被转成 bounded specs；
+- 非平凡实现前会先写 acceptance criteria 和 test plans；
 - business rules 有测试；
 - change workflow 有边界；
 - repository state 可检查；
@@ -211,14 +216,14 @@ Agent-native 主要不是指服务器带有 AI 功能。
 
 NPC agents、memory、model routing、tool calling 和 simulations 等 AI gameplay features 未来可以成为扩展，但它们不是项目基础。
 
-## Nakama 与 Pitaya 目标
+## Nakama 优先目标
 
-Nakama 和 Pitaya 是 capability planning 的主动参考基线。
+Nakama 是 capability planning 的 active primary product reference。
 
 - Nakama 指导 broad game backend surface：accounts、sessions、storage、social systems、chat、groups、parties、leaderboards、tournaments、matchmaking、realtime multiplayer、authoritative matches、operations、SDKs 和 examples。
-- Pitaya 指导 Go game server architecture vocabulary：acceptors、sessions、routes、handlers、remotes/RPC、frontend/backend roles、groups、broadcast、serializers 和 cluster service discovery。
+- Pitaya 暂缓为未来 architecture reference，用于 acceptors、sessions、routes、handlers、remotes/RPC、frontend/backend roles、groups、broadcast、serializers 和 cluster service discovery。
 
-vibit 应随时间覆盖同级常用能力，同时保留自己的架构：explicit manifests、contracts、generation、tests、ADRs、repository checks 和 bounded agent workflow。
+vibit 应随时间覆盖同级 Nakama-style 常用能力，同时保留自己的架构：explicit manifests、contracts、generation、tests、ADRs、repository checks、bounded agent workflow，以及 AI-native requirement-to-test-to-implementation flow。
 
 参见：
 
@@ -235,7 +240,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `.arch/README.md`：architecture manifest 入口。
 - `.arch/work-items.yaml`：continuation queue。
 - `.arch/runtime.yaml`：runtime readiness 和 implementation state。
-- `.arch/reference.yaml`：Nakama/Pitaya reference 和 product parity planning。
+- `.arch/reference.yaml`：Nakama-first reference 和 product parity planning。
 - `docs/v0.1-alpha-goal.md`：短期 alpha 和长期产品目标。
 - `docs/alpha-developer-flow.md`：packaged local alpha developer journey。
 - `docs/alpha-acceptance-checklist.md`：本地 v0.1 alpha acceptance checklist。
@@ -250,7 +255,7 @@ vibit 应随时间覆盖同级常用能力，同时保留自己的架构：expli
 - `docs/prototype-ready-local-development-path-package.md`：可重复 source-first local development path。
 - `docs/storage-objects-behavior-gate.md`：第一版 player-owned small storage objects behavior gate。
 - `docs/releases/v0.1.0-alpha.1.md`：alpha release notes。
-- `docs/nakama-pitaya-product-parity-roadmap.md`：长期 capability roadmap。
+- `docs/nakama-pitaya-product-parity-roadmap.md`：长期 Nakama-first capability roadmap。
 - `examples/README.md`：local examples 和 redacted configuration template guidance。
 - `changes/`：具体 change specs 和 verification records。
 - `conversations/`：持久 maintainer-agent project memory。

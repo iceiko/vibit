@@ -154,6 +154,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.next_alpha_direction_after_realtime_runtime_slice",
   "runtime.realtime_protocol_websocket_outbound_delivery_gate",
   "runtime.realtime_protocol_websocket_outbound_delivery_implementation",
+  "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -24534,7 +24535,7 @@ function checkRuntimeFirstAlphaUserDiscoveryLoop(root, goFiles) {
     [".arch/work-items.yaml", "id: M-125"],
     [".arch/work-items.yaml", "title: First Alpha Feedback Intake Surfaces"],
     [".arch/work-items.yaml", "id: W-0197"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root) ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "first_alpha_user_discovery_loop: ADR-0104"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
@@ -24816,7 +24817,7 @@ function checkRuntimeFirstAlphaFeedbackIntakeSurfaces(root, goFiles) {
     [".arch/work-items.yaml", "id: M-126"],
     [".arch/work-items.yaml", "title: Prototype Ready Foundation Execution Plan"],
     [".arch/work-items.yaml", "id: W-0198"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root) ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "first_alpha_feedback_intake_surfaces: ADR-0105"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
@@ -30554,7 +30555,7 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles
     [".arch/work-items.yaml", "title: Realtime Protocol And WebSocket Outbound Delivery Implementation Slice"],
     [".arch/work-items.yaml", "id: W-0218"],
     [".arch/work-items.yaml", "title: Implement realtime protocol and WebSocket outbound delivery slice"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root) ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
     [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_gate: ADR-0125"],
@@ -30834,7 +30835,7 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(roo
     [".arch/work-items.yaml", "title: Next Direction Confirmation After Realtime Outbound Delivery Slice"],
     [".arch/work-items.yaml", "id: W-0219"],
     [".arch/work-items.yaml", "title: Confirm next alpha direction after realtime outbound delivery slice"],
-    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root) ? "status: completed" : "status: next_ready"],
     [".arch/runtime.yaml", "realtime_protocol_websocket_outbound_delivery_implementation: ADR-0126"],
     [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
     [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
@@ -31100,6 +31101,229 @@ function checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(roo
   }
 
   ok("realtime protocol and WebSocket outbound delivery implementation is bounded to vibit-native realtime Protobuf payloads, generated output, protocol mapping, single-process server-observed WebSocket delivery, redacted outcomes, and Nakama/Pitaya-aligned layering without startup wiring, persistence, delivery guarantees, broad social behavior, distributed runtime, or direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
+  });
+}
+
+function checkRuntimeNextAlphaDirectionAfterRealtimeOutboundDeliverySlice(root, goFiles) {
+  const ruleId = "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice";
+  const decisionPath = "decisions/ADR-0127-nakama-first-ai-native-requirement-test-workflow-direction.md";
+  const changePath = "changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice";
+  const conversationPath = "conversations/2026-05-24-nakama-first-ai-native-feature-workflow-direction.md";
+
+  if (!nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
+    ok("next alpha direction after realtime outbound delivery slice is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for next alpha direction after realtime outbound delivery slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for next alpha direction after realtime outbound delivery slice`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-147"],
+    [".arch/work-items.yaml", "title: Next Direction Confirmation After Realtime Outbound Delivery Slice"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0219"],
+    [".arch/work-items.yaml", "title: Confirm next alpha direction after realtime outbound delivery slice"],
+    [".arch/work-items.yaml", "ADR-0127"],
+    [".arch/work-items.yaml", "selected_direction: define_agent_native_feature_request_test_workflow"],
+    [".arch/work-items.yaml", "id: M-148"],
+    [".arch/work-items.yaml", "title: Agent-Native Feature Request And Test Workflow"],
+    [".arch/work-items.yaml", "id: W-0220"],
+    [".arch/work-items.yaml", "title: Define agent-native feature request and test workflow"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "nakama_first_ai_native_requirement_test_workflow_direction: ADR-0127"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "next_alpha_direction_after_realtime_outbound_delivery_slice_decision: ADR-0127"],
+    [".arch/runtime.yaml", "next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/runtime.yaml", "agent_native_feature_request_test_workflow:"],
+    [".arch/runtime.yaml", "primary_product_reference: Nakama"],
+    [".arch/runtime.yaml", "pitaya_reference_status: deferred_future_architecture_reference"],
+    [".arch/runtime.yaml", "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification"],
+    [".arch/runtime.yaml", "selected_direction: define_agent_native_feature_request_test_workflow"],
+    [".arch/runtime.yaml", "implementation_authorized_by_this_selection: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "distributed_runtime_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/conventions.yaml", "primary_product_reference: Nakama"],
+    [".arch/contracts.yaml", "next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/contracts.yaml", "agent_native_feature_request_test_workflow:"],
+    [".arch/reference.yaml", "reference_posture_update: ADR-0127"],
+    [".arch/reference.yaml", "phase_2ed_next_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/reference.yaml", "phase_2ee_agent_native_feature_request_test_workflow"],
+    [".arch/reference.yaml", "check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    [".arch/reference.yaml", "primary_product_reference: Nakama"],
+    [".arch/reference.yaml", "pitaya_reference_status: deferred_future_architecture_reference"],
+    [".arch/reference.yaml", "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.md", "ADR-0127"],
+    ["docs/v0.1-alpha-goal.md", "AI-native development and AI-native testing"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "AI-native development and AI-native testing"],
+    ["README.md", "Nakama-First Target"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "stage_4_nakama_first_ai_native_product"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "Nakama-First Product Capability Roadmap"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "primary_product_reference: Nakama"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "pitaya_reference_status: deferred_future_architecture_reference"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", "Nakama 优先产品能力路线图"],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/reference-game-server-alignment.md", "Nakama is the primary product capability reference"],
+    ["docs/reference-game-server-alignment.md", "Pitaya is deferred"],
+    ["AGENTS.md", "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    ["AGENTS.md", "user requirement -> spec -> acceptance criteria -> test plan -> tests -> contract -> generated shape -> handwritten logic -> verification -> docs"],
+    ["AGENTS.zh-CN.md", "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    ["runtime/AGENTS.md", "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    ["runtime/AGENTS.zh-CN.md", "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+    ["rules/check-rules.json", "runtime.next_alpha_direction_after_realtime_outbound_delivery_slice"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0127",
+      "define_agent_native_feature_request_test_workflow",
+      "M-148/W-0220",
+      "Nakama is the primary product capability reference",
+      "Pitaya is deferred",
+      "AI-native development and AI-native testing",
+      "user requirement -> AI-written bounded requirement spec",
+      "does not add runtime behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0219",
+      "completed_milestone: M-147",
+      "previous_completed_work_item: W-0218",
+      "next_milestone: M-148",
+      "next_work_item: W-0220",
+      "selected_direction: define_agent_native_feature_request_test_workflow",
+      "next_alpha_direction_after_realtime_outbound_delivery_slice_decision: ADR-0127",
+      "next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice",
+      "primary_product_reference: Nakama",
+      "pitaya_reference_status: deferred_future_architecture_reference",
+      "ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification",
+      "workflow_goal: user_requirement_to_spec_acceptance_criteria_test_plan_tests_implementation_verification_and_memory",
+      "implementation_authorized_by_this_change: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "distributed_runtime_added: false",
+      "pitaya_distributed_architecture_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "Nakama",
+      "Pitaya",
+      "define_agent_native_feature_request_test_workflow",
+      "W-0220",
+      "AI-native development",
+      "AI-native testing",
+      "Direct Nakama/Pitaya API compatibility remains deferred",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    "runtime/internal/app/bootstrap/realtime.go",
+  ];
+  for (const file of forbiddenFiles) {
+    if (isFile(root, file)) {
+      fail(`${file} must remain deferred after next alpha direction selection`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      ok(`${file} remains deferred after next alpha direction selection`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("next alpha direction after realtime outbound delivery selects the agent-native feature request and test workflow, makes Nakama the primary product reference, defers Pitaya as future architecture reference, and adds no runtime behavior, protocol, generated output, migration, dependency, distributed runtime, broad module, or direct compatibility", {
     rule_id: ruleId,
     artifact: changePath,
   });
@@ -32842,7 +33066,14 @@ function realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root) 
   return workItemHasStatus(root, "W-0218", "completed");
 }
 
+function nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root) {
+  return workItemHasStatus(root, "W-0219", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
+    return "repository_next_work_item: W-0220";
+  }
   if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
     return "repository_next_work_item: W-0219";
   }
@@ -32862,6 +33093,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
+    return "repository_next_work_item_scope: define_agent_native_feature_request_test_workflow";
+  }
   if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
     return "repository_next_work_item_scope: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice";
   }
@@ -32872,6 +33106,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (nextAlphaDirectionAfterRealtimeOutboundDeliverySliceCompleted(root)) {
+    return "W-0220 Define agent-native feature request and test workflow";
+  }
   if (realtimeProtocolWebsocketOutboundDeliveryImplementationCompleted(root)) {
     return "W-0219 Confirm next alpha direction after realtime outbound delivery slice";
   }
@@ -32906,6 +33143,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0219", "next_ready_work_item: W-0220"],
     ["W-0218", "next_ready_work_item: W-0219"],
     ["W-0217", "next_ready_work_item: W-0218"],
     ["W-0216", "next_ready_work_item: W-0217"],
@@ -32953,6 +33191,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0219", "completed")) {
+    return "next_work_item: W-0220";
+  }
   if (workItemHasStatus(root, "W-0218", "completed")) {
     return "next_work_item: W-0219";
   }
@@ -33039,6 +33280,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0219", "define_agent_native_feature_request_test_workflow"],
     ["W-0218", "confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "realtime_protocol_websocket_outbound_delivery_implementation_slice"],
     ["W-0216", "define_realtime_protocol_websocket_outbound_delivery_gate"],
@@ -33086,6 +33328,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0219", "W-0220 Define agent-native feature request and test workflow"],
     ["W-0218", "W-0219 Confirm next alpha direction after realtime outbound delivery slice"],
     ["W-0217", "W-0218 Implement realtime protocol and WebSocket outbound delivery slice"],
     ["W-0216", "W-0217 Define realtime protocol and WebSocket outbound delivery gate"],
@@ -33134,6 +33377,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0219", "current_phase: agent_native_feature_request_test_workflow"],
     ["W-0218", "current_phase: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice"],
     ["W-0217", "current_phase: realtime_protocol_websocket_outbound_delivery_implementation_slice"],
     ["W-0216", "current_phase: realtime_protocol_websocket_outbound_delivery_gate"],
@@ -33731,6 +33975,7 @@ function checkRuntime(root) {
   checkRuntimeNextAlphaDirectionAfterRealtimeRuntimeSlice(root, goFiles);
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryGate(root, goFiles);
   checkRuntimeRealtimeProtocolWebsocketOutboundDeliveryImplementation(root, goFiles);
+  checkRuntimeNextAlphaDirectionAfterRealtimeOutboundDeliverySlice(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

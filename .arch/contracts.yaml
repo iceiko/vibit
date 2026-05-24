@@ -36,12 +36,16 @@ implemented_wire_and_runtime_slices:
   nakama_pitaya_product_parity_roadmap:
     nakama_pitaya_product_parity_roadmap_ratified: true
     nakama_pitaya_product_parity_roadmap_decision: ADR-0078
+    reference_posture_update: ADR-0127
     nakama_pitaya_product_parity_roadmap_standard: docs/nakama-pitaya-product-parity-roadmap.md
     nakama_pitaya_product_parity_roadmap_translation: docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
     nakama_pitaya_product_parity_roadmap_check_rule: runtime.reference_product_parity_roadmap
     completed_work_item: W-0168
     selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
-    parity_goal: nakama_pitaya_same_class_common_capability_coverage
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    parity_goal: nakama_first_same_class_common_capability_coverage
     api_compatibility_goal: false
     direct_nakama_pitaya_api_compatibility_added: false
     implementation_authorized_by_this_standard: roadmap_only
@@ -49,8 +53,8 @@ implemented_wire_and_runtime_slices:
     protocol_route_added: false
     generated_output_added: false
     dependencies_added: false
-    recommended_next_direction: define_protocol_logout_route_gate
-    rule: W-0168 ratifies product parity as common Nakama/Pitaya capability coverage, but it adds no runtime behavior, protocol route, generated output, dependency, migration, or direct external API compatibility.
+    recommended_next_direction: define_agent_native_feature_request_test_workflow
+    rule: W-0168 ratified product parity as common capability coverage, and ADR-0127 refines that posture to Nakama-first product planning with Pitaya deferred to future distributed architecture review. It adds no runtime behavior, protocol route, generated output, dependency, migration, or direct external API compatibility.
   protocol_logout_route_gate:
     protocol_logout_route_gate_defined: true
     protocol_logout_route_gate_decision: ADR-0079
@@ -1733,20 +1737,48 @@ implemented_wire_and_runtime_slices:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0218 may implement only the smallest realtime protocol and WebSocket outbound delivery slice authorized by ADR-0125; broader delivery guarantees, stream subscriptions, chat, groups, fanout, distributed runtime, matchmaking, match runtime, and direct compatibility remain deferred.
   confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
-    status: next_ready
-    next_ready_work_item: W-0219
+    status: completed
+    completed_work_item: W-0219
+    decision: ADR-0127
+    next_milestone: M-148
+    next_ready_work_item: W-0220
     previous_completed_work_item: W-0218
-    selected_direction: confirm_next_alpha_direction_after_realtime_outbound_delivery_slice
+    selected_direction: define_agent_native_feature_request_test_workflow
     expected_change: changes/2026-05-23-confirm-next-alpha-direction-after-realtime-outbound-delivery-slice
     target_stage: prototype_ready_foundation
     source_realtime_outbound_delivery_decision: ADR-0126
+    next_alpha_direction_after_realtime_outbound_delivery_slice_decision: ADR-0127
+    next_alpha_direction_after_realtime_outbound_delivery_slice_check_rule: runtime.next_alpha_direction_after_realtime_outbound_delivery_slice
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
     implementation_authorized_by_this_selection: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
     startup_wiring_added: false
     stream_subscription_persistence_added: false
     delivery_guarantees_added: false
     broad_social_module_added: false
     direct_nakama_pitaya_api_compatibility_added: false
-    rule: W-0219 should select the next bounded alpha direction after realtime outbound delivery without adding startup wiring, stream subscriptions, chat, groups, broadcast fanout, persistence, delivery guarantees, distributed runtime, matchmaking, match runtime, or direct compatibility.
+    rule: W-0219 selected the agent-native feature request and test workflow as the next bounded alpha direction, made Nakama the primary product reference, deferred Pitaya as a future distributed architecture reference, and added no runtime behavior, protocol, generated output, dependency, migration, distributed runtime, broad product module, or direct compatibility.
+  agent_native_feature_request_test_workflow:
+    status: next_ready
+    milestone: M-148
+    next_ready_work_item: W-0220
+    previous_completed_work_item: W-0219
+    selected_direction: define_agent_native_feature_request_test_workflow
+    expected_change: changes/2026-05-24-define-agent-native-feature-request-test-workflow
+    target_stage: prototype_ready_foundation
+    source_direction_decision: ADR-0127
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+    implementation_authorized_by_this_selection: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0220 should define the AI-native workflow that converts user requirements into specs, acceptance criteria, test plans, tests, implementation boundaries, verification records, and durable project memory before broad product expansion.
   first_message_connection_binding_implementation:
     first_message_connection_binding_implementation_completed: true
     first_message_connection_binding_implementation_work_item: W-0128
