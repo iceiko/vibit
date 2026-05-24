@@ -6137,14 +6137,41 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   friends_relationship_migration_source:
-    status: next_ready
+    status: completed
     milestone: M-161
-    next_ready_work_item: W-0233
+    completed_work_item: W-0233
+    decision: ADR-0141
+    check_rule: runtime.friends_relationship_migration_source
+    next_milestone: M-162
+    next_ready_work_item: W-0234
     selected_direction: add_friends_relationship_migration_source
+    selected_follow_up_direction: define_friends_relationship_repository_boundary
     source_schema_gate_decision: ADR-0140
-    migration_source_candidate: runtime/migrations/postgres/000007_create_friend_relationships.sql
-    future_logical_table: friend_relationships
+    migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    friend_relationships_logical_table: friend_relationships
+    friend_relationships_table_added: true
+    pair_identity: canonical_unordered_player_pair
+    block_representation: per_pair_member_timestamp
     migration_source_only_scope: true
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_repository_boundary:
+    status: next_ready
+    milestone: M-162
+    next_ready_work_item: W-0234
+    selected_direction: define_friends_relationship_repository_boundary
+    source_migration_decision: ADR-0141
+    future_repository_owner_candidate: runtime/internal/modules/friends
+    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    boundary_only_scope: true
 
 server_runtime:
   first_reference_language: Go

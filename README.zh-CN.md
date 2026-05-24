@@ -192,10 +192,10 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0233 Add friends relationship migration source
+W-0234 Define friends relationship repository boundary
 ```
 
-使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 已完成 Nakama-first friends relationship lifecycle gate。`W-0232` 已完成 friends relationship persistence schema gate，并打开 friends relationship migration source。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
+使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 已完成 Nakama-first friends relationship lifecycle gate。`W-0232` 已完成 friends relationship persistence schema gate。`W-0233` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql` 中的 friends relationship migration source，并接受 `decisions/ADR-0141-friends-relationship-migration-source.md`，然后打开 repository boundary gate。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
 
 ## Agent-Native 的含义
 

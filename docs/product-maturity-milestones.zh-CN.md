@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: add_friends_relationship_migration_source
+next_direction: define_friends_relationship_repository_boundary
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-friends relationship persistence schema gate 之后，下一个产品方向是：
+friends relationship migration source 之后，下一个产品方向是：
 
 ```text
-W-0233 Add friends relationship migration source
+W-0234 Define friends relationship repository boundary
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`，`ADR-0139` 已定义 friends relationship lifecycle gate，`ADR-0140` 已定义 friends relationship persistence schema gate。下一项 work 是 `W-0233 Add friends relationship migration source`；它只应添加 friends relationship SQL migration source 和对应 static checks，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、persistence execution、repository implementation、PostgreSQL adapter implementation 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`，`ADR-0139` 已定义 friends relationship lifecycle gate，`ADR-0140` 已定义 friends relationship persistence schema gate，`ADR-0141` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql`。下一项 work 是 `W-0234 Define friends relationship repository boundary`；它只应定义 storage-neutral friends relationship repository boundary，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、persistence execution、repository implementation、PostgreSQL adapter implementation、event/audit tables 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
 

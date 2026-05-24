@@ -1,0 +1,294 @@
+schema_version: 0.1
+change_id: add-friends-relationship-migration-source
+date: 2026-05-25
+type: migration
+status: verified
+
+summary: Add the PostgreSQL friend_relationships migration source without repository, adapter, protocol, generated output, or runtime behavior.
+
+affected_modules:
+  - runtime
+  - friends
+  - workflow
+  - reference
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: true
+  migrations_added:
+    - runtime/migrations/postgres/000007_create_friend_relationships.sql
+  ownership_changes:
+    - future friends relationship persistence source is recorded as migration-source-only before repository ownership is implemented
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: true
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Continue the Nakama-first friends relationship path by adding the migration source only, preserving AI-native spec, test, verification, and durable memory discipline."
+user_visible_outcome: A concrete SQL migration source exists for future friends relationship current-state persistence, with static checks and project memory proving the slice stays migration-source-only.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Durable friends relationship current-state persistence is a prerequisite for Nakama-class social graph behavior before runtime request, accept, reject, remove, block, unblock, list, or status behavior can be implemented safely.
+  adopted:
+    - Friend relationship state is persisted as durable social graph current state.
+    - Canonical player-pair identity, relationship lifecycle state, block posture, uniqueness, indexes, and timestamp checks are explicit in SQL source.
+  adapted:
+    - vibit uses its own pair-oriented PostgreSQL table and future actor-relative public status computation.
+    - The migration source does not copy any external public API, route, runtime API, or schema compatibility surface.
+    - Event/audit history remains deferred to a later bounded work item.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - repository, adapter, protocol, runtime, group, party, chat, matchmaking, match runtime, SDK, hosted, or distributed runtime scope in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  completed_work_item: W-0233
+  completed_milestone: M-161
+  previous_completed_work_item: W-0232
+  next_milestone: M-162
+  next_work_item: W-0234
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: add_friends_relationship_migration_source
+  next_direction: define_friends_relationship_repository_boundary
+  decision: ADR-0141
+  check_rule: runtime.friends_relationship_migration_source
+  friends_relationship_migration_source_added: true
+  friends_relationship_migration_source_decision: ADR-0141
+  friends_relationship_migration_source_check_rule: runtime.friends_relationship_migration_source
+  source_schema_gate_decision: ADR-0140
+  source_schema_gate_standard: docs/friends-relationship-persistence-schema-gate.md
+  source_lifecycle_gate_decision: ADR-0139
+  migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  friend_relationships_table_added: true
+  friend_relationships_logical_table: friend_relationships
+  selected_first_friends_relationship_store: postgres
+  pair_identity: canonical_unordered_player_pair
+  logical_pair_identity:
+    - player_low_id
+    - player_high_id
+  canonical_pair_ordering: player_low_id < player_high_id
+  self_relationship_allowed: false
+  lifecycle_state_column: lifecycle_state
+  allowed_lifecycle_states:
+    - pending
+    - friends
+    - rejected
+    - removed
+  block_representation: per_pair_member_timestamp
+  relationship_version_representation: BIGINT
+  timestamp_representation: TIMESTAMPTZ
+  pair_unique_index_added: true
+  pair_member_state_indexes_added: true
+  updated_at_index_added: true
+  migration_source_only_scope: true
+  event_audit_table_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  chat_added: false
+  group_messaging_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  startup_wiring_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_migration_source
+    - node tools/vibit check migrations --json
+    - node tools/vibit check change add-friends-relationship-migration-source --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+
+schema:
+  table: friend_relationships
+  primary_key:
+    - relationship_id
+  required_columns:
+    - relationship_id
+    - player_low_id
+    - player_high_id
+    - lifecycle_state
+    - relationship_version
+    - created_at
+    - updated_at
+    - state_changed_at
+  nullable_columns:
+    - requested_by_player_id
+    - responded_by_player_id
+    - removed_by_player_id
+    - rejected_at
+    - removed_at
+    - blocked_by_low_at
+    - blocked_by_high_at
+  foreign_keys:
+    - player_low_id references player_accounts(player_id)
+    - player_high_id references player_accounts(player_id)
+    - requested_by_player_id references player_accounts(player_id)
+    - responded_by_player_id references player_accounts(player_id)
+    - removed_by_player_id references player_accounts(player_id)
+  checks:
+    - relationship_id is not blank
+    - player_low_id is not blank
+    - player_high_id is not blank
+    - player_low_id < player_high_id
+    - lifecycle_state in pending, friends, rejected, removed
+    - requested_by_player_id is a pair member when present
+    - responded_by_player_id is a pair member when present
+    - removed_by_player_id is a pair member when present
+    - relationship_version is positive
+    - updated_at is not before created_at
+    - state_changed_at is not before created_at
+    - rejected_at is not before created_at
+    - removed_at is not before created_at
+    - blocked_by_low_at is not before created_at
+    - blocked_by_high_at is not before created_at
+  indexes:
+    - friend_relationships_pair_uq
+    - friend_relationships_player_low_state_idx
+    - friend_relationships_player_high_state_idx
+    - friend_relationships_updated_at_idx
+
+implementation_boundaries:
+  allowed:
+    - runtime/migrations/postgres/000007_create_friend_relationships.sql
+    - tools/vibit static checks
+    - rules/check-rules.json rule registration
+    - ADR, conversation, change artifacts, manifests, README, alpha, product maturity, roadmap, and agent guide updates
+  forbidden:
+    - repository interfaces
+    - PostgreSQL adapter implementation
+    - runtime behavior
+    - protocol routes
+    - Protobuf source
+    - generated output
+    - dependencies
+    - automatic startup migration execution
+    - authentication/session behavior changes
+    - event/audit tables
+    - chat rooms
+    - groups
+    - parties
+    - broadcast fanout
+    - matchmaking
+    - match runtime
+    - operations/admin behavior
+    - SDK publication
+    - generated client libraries
+    - hosted deployments
+    - release artifacts
+    - Pitaya-style distributed architecture
+    - direct Nakama/Pitaya API compatibility
+
+acceptance_criteria:
+  - runtime/migrations/postgres/000007_create_friend_relationships.sql exists.
+  - The migration declares goose Up and Down markers.
+  - The migration creates only friend_relationships.
+  - The migration includes canonical pair identity, lifecycle state, block timestamps, relationship version, timestamps, uniqueness, indexes, and checks from ADR-0140.
+  - The migration lacks forbidden secret, digest, transport, chat, group, party, match, Pitaya, and Nakama compatibility columns.
+  - Static checks enforce the migration shape and deferrals.
+  - W-0234 is opened as the next repository-boundary gate.
+
+test_plan:
+  - Repository check validates migration existence, required SQL fragments, forbidden columns, forbidden runtime/protocol/generated scopes, and next work item progression.
+  - `node tools/vibit check migrations --json` validates SQL migration source hygiene.
+  - `node tools/vibit check runtime --json` validates runtime boundaries and Go tests.
+  - `node tools/vibit check all --json` validates the full repository rule set.
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_migration_source
+    - node tools/vibit check migrations --json
+    - node tools/vibit check change add-friends-relationship-migration-source --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  status: Verified
+
+memory_updates:
+  - decisions/ADR-0141-friends-relationship-migration-source.md
+  - conversations/2026-05-25-friends-relationship-migration-source.md
+  - changes/2026-05-24-add-friends-relationship-migration-source/
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - README.md
+  - README.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - rules/check-rules.json
+  - tools/vibit

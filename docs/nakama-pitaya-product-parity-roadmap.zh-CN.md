@@ -231,7 +231,8 @@ agent_native_feature_request_scaffolding_gate: docs/agent-native-feature-request
 agent_native_feature_request_scaffolding_gate_decision: ADR-0136
 scaffolded_nakama_feature_request_intake_pilot_decision: ADR-0138
 friends_relationship_lifecycle_gate_decision: ADR-0139
-next_work_item: W-0233 Add friends relationship migration source
+friends_relationship_migration_source_decision: ADR-0141
+next_work_item: W-0234 Define friends relationship repository boundary
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -345,11 +346,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate 和 friends relationship persistence schema gate 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos 或 distributed runtime。下一个具体工作只应添加 friends relationship migration source：
+Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate 和 friends relationship migration source 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime、runtime friendship behavior、protocol routes 或 adapter implementation。下一个具体工作只应定义 friends relationship repository boundary：
 
 ```text
-next_work_item: W-0233 Add friends relationship migration source
-recommended_next_direction: add_friends_relationship_migration_source
+next_work_item: W-0234 Define friends relationship repository boundary
+recommended_next_direction: define_friends_relationship_repository_boundary
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -362,7 +363,8 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 - `ADR-0138` 已用该 scaffold 做一个 bounded Nakama request intake，选择 `friends_groups_and_parties`，并在任何 friendship implementation work 之前打开 `W-0231 Define friends relationship lifecycle gate`。
 - `ADR-0139` 已定义 friend relationship lifecycle semantic gate，并打开 `W-0232 Define friends relationship persistence schema gate`。
 - `ADR-0140` 已定义 friends relationship persistence schema gate，并打开 `W-0233 Add friends relationship migration source`。
-- Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，其 durable state posture 应先被 gate，再让 migration、repository、runtime、protocol、groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖它。
+- `ADR-0141` 只添加了 friends relationship migration source，并打开 `W-0234 Define friends relationship repository boundary`。
+- Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，其 storage-neutral repository semantics 应先被 gate，再让 repository implementation、adapters、runtime、protocol、groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖它。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续延后，直到 single-process behavior 和 AI-native feature workflow 被证明。
 

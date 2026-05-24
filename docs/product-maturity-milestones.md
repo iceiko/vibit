@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: add_friends_relationship_migration_source
+next_direction: define_friends_relationship_repository_boundary
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,15 +204,15 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the friends relationship persistence schema gate is:
+The next product direction after the friends relationship migration source is:
 
 ```text
-W-0233 Add friends relationship migration source
+W-0234 Define friends relationship repository boundary
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, `ADR-0139` defined the friends relationship lifecycle gate, and `ADR-0140` defined the friends relationship persistence schema gate. The next work is `W-0233 Add friends relationship migration source`; it should add only the friends relationship SQL migration source and matching static checks while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, persistence execution, repository implementation, PostgreSQL adapter implementation, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, `ADR-0139` defined the friends relationship lifecycle gate, `ADR-0140` defined the friends relationship persistence schema gate, and `ADR-0141` added `runtime/migrations/postgres/000007_create_friend_relationships.sql`. The next work is `W-0234 Define friends relationship repository boundary`; it should define only the storage-neutral friends relationship repository boundary while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, persistence execution, repository implementation, PostgreSQL adapter implementation, event/audit tables, and direct compatibility deferred unless a later explicit work item authorizes them.
 
-Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, and `docs/storage-objects-repository-boundary.md`.
+Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, `docs/storage-objects-repository-boundary.md`, and `runtime/migrations/postgres/000007_create_friend_relationships.sql`.
 
 The prior directions `W-0198 Define prototype-ready foundation execution plan`, `W-0199 Define prototype-ready local development path gate`, `W-0200 Implement prototype-ready local development path package`, `W-0201 Define storage objects behavior gate`, `W-0202 Define storage objects persistence schema gate`, `W-0203 Add storage objects migration source`, `W-0204 Define storage objects repository boundary`, `W-0205 Implement storage-neutral storage objects repository interface`, `W-0206 Define storage objects PostgreSQL adapter gate`, `W-0207 Implement storage objects PostgreSQL adapter`, `W-0208 Define storage objects runtime behavior gate`, `W-0209 Implement storage objects runtime behavior`, `W-0210 Define storage objects protocol route gate`, `W-0211 Implement storage objects protocol route`, `W-0212 Prove storage objects protocol route in local alpha request flow`, `W-0213 Confirm next alpha direction after storage objects local proof`, `W-0214 Define first server push and realtime messaging gate`, and `W-0215 Implement first server push and realtime messaging runtime slice` are completed and remain the trace from feedback intake into the Stage 2 execution plan and its first product capability path.
 

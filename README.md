@@ -192,10 +192,10 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0233 Add friends relationship migration source
+W-0234 Define friends relationship repository boundary
 ```
 
-Use `.arch/work-items.yaml` as the source of truth for continuation. `W-0231` completed the Nakama-first friends relationship lifecycle gate. `W-0232` completed the friends relationship persistence schema gate and opened the friends relationship migration source. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
+Use `.arch/work-items.yaml` as the source of truth for continuation. `W-0231` completed the Nakama-first friends relationship lifecycle gate. `W-0232` completed the friends relationship persistence schema gate. `W-0233` added the friends relationship migration source in `runtime/migrations/postgres/000007_create_friend_relationships.sql` and accepted `decisions/ADR-0141-friends-relationship-migration-source.md`, then opened the repository boundary gate. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
 
 ## Agent-Native Means
 

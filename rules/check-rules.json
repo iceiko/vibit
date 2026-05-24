@@ -1436,6 +1436,14 @@
       "agent_guidance": "Read ADR-0140, ADR-0139, docs/friends-relationship-persistence-schema-gate.md, docs/friends-relationship-lifecycle-gate.md, docs/postgresql-persistence-boundary.md, and docs/nakama-pitaya-product-parity-roadmap.md before continuing from W-0232. W-0233 should add only the friends relationship SQL migration source. Do not add repository interfaces, PostgreSQL adapters, runtime behavior, protocol routes, Protobuf sources, generated output, dependencies, startup wiring, event/audit tables, SDKs, hosted demos, broad social modules, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.friends_relationship_migration_source",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship migration source",
+      "description": "The friends relationship migration source must add only the PostgreSQL friend_relationships current-state table with canonical pair identity, lifecycle state, block timestamps, relationship version, timestamps, uniqueness, indexes, and static boundary checks; open W-0234 as the repository-boundary follow-up; and preserve repository/adapter/runtime/protocol/generated/dependency/event/SDK/hosted/direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0141, ADR-0140, docs/friends-relationship-persistence-schema-gate.md, docs/friends-relationship-lifecycle-gate.md, docs/postgresql-persistence-boundary.md, and docs/nakama-pitaya-product-parity-roadmap.md before continuing from W-0233. W-0234 should define only the friends relationship repository boundary. Do not add repository interface implementation, PostgreSQL adapter behavior, runtime behavior, protocol routes, Protobuf sources, generated output, dependencies, startup wiring, event/audit tables, SDKs, hosted demos, broad social modules, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",
