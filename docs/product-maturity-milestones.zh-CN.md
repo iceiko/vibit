@@ -31,7 +31,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: define_friends_relationship_repository_boundary
+next_direction: implement_friends_relationship_repository_interface
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,15 +203,15 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-friends relationship migration source 之后，下一个产品方向是：
+friends relationship repository boundary 之后，下一个产品方向是：
 
 ```text
-W-0234 Define friends relationship repository boundary
+W-0235 Implement storage-neutral friends relationship repository interface
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`，`ADR-0139` 已定义 friends relationship lifecycle gate，`ADR-0140` 已定义 friends relationship persistence schema gate，`ADR-0141` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql`。下一项 work 是 `W-0234 Define friends relationship repository boundary`；它只应定义 storage-neutral friends relationship repository boundary，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、persistence execution、repository implementation、PostgreSQL adapter implementation、event/audit tables 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0138` 已完成 scaffolded Nakama intake 并选择 `friends_groups_and_parties`，`ADR-0139` 已定义 friends relationship lifecycle gate，`ADR-0140` 已定义 friends relationship persistence schema gate，`ADR-0141` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql`，`decisions/ADR-0142-friends-relationship-repository-boundary.md` 已定义 friends relationship repository boundary。下一项 work 是 `W-0235 Implement storage-neutral friends relationship repository interface`；它只应实现 storage-neutral friends relationship repository interface，同时继续延后 protocol changes、startup wiring、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、runtime behavior、Protobuf source、generated output、persistence execution、PostgreSQL adapter implementation、event/audit tables 和 direct compatibility，除非后续明确 work item 授权。
 
-Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql` 和 `docs/storage-objects-repository-boundary.md`。
+Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql`、`docs/storage-objects-repository-boundary.md`、`runtime/migrations/postgres/000007_create_friend_relationships.sql` 和 `docs/friends-relationship-repository-boundary.md`。
 
 上一项方向 `W-0198 Define prototype-ready foundation execution plan`、`W-0199 Define prototype-ready local development path gate`、`W-0200 Implement prototype-ready local development path package`、`W-0201 Define storage objects behavior gate`、`W-0202 Define storage objects persistence schema gate`、`W-0203 Add storage objects migration source`、`W-0204 Define storage objects repository boundary`、`W-0205 Implement storage-neutral storage objects repository interface`、`W-0206 Define storage objects PostgreSQL adapter gate`、`W-0207 Implement storage objects PostgreSQL adapter`、`W-0208 Define storage objects runtime behavior gate`、`W-0209 Implement storage objects runtime behavior`、`W-0210 Define storage objects protocol route gate`、`W-0211 Implement storage objects protocol route`、`W-0212 Prove storage objects protocol route in local alpha request flow`、`W-0213 Confirm next alpha direction after storage objects local proof`、`W-0214 Define first server push and realtime messaging gate` 和 `W-0215 Implement first server push and realtime messaging runtime slice` 已完成，并继续作为从 feedback intake 进入 Stage 2 execution plan 及其第一项 product capability path 的追溯记录。
 

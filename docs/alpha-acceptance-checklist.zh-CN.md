@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 `W-0234 Define friends relationship repository boundary` continuation step。
+- [x] `node tools/vibit inspect next` 能识别当前 `W-0235 Implement storage-neutral friends relationship repository interface` continuation step。
 - [x] `docs/prototype-ready-local-development-path-package.md` 已打包可重复 source-first local path。
 
 ## 4. Local Prerequisites
@@ -127,7 +127,7 @@ Alpha developer flow 现在已经 packaged 在：
 docs/alpha-developer-flow.md
 ```
 
-Release、discovery、prototype-ready、storage objects、realtime outbound delivery、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate、local alpha example client path implementation、feature request scaffolding、scaffolded Nakama feature request intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate 和 friends relationship migration source artifacts 继续记录在既有文档中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，scaffolded intake pilot 已记录在 `ADR-0138`，friends lifecycle gate 已记录在 `ADR-0139`，friends persistence schema gate 已记录在 `ADR-0140`，friends migration source 已记录在 `ADR-0141`。下一步 work 是 `W-0234 Define friends relationship repository boundary`。
+Release、discovery、prototype-ready、storage objects、realtime outbound delivery、Nakama-first direction、agent-native feature request/test workflow、Nakama-aligned presence/status pilot、presence/status local proof hardening、authenticated gameplay failure-path verification、next Nakama prototype-ready capability selection、local alpha example client path gate、local alpha example client path implementation、feature request scaffolding、scaffolded Nakama feature request intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source 和 friends relationship repository boundary artifacts 继续记录在既有文档中。Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`，scaffolded intake pilot 已记录在 `ADR-0138`，friends lifecycle gate 已记录在 `ADR-0139`，friends persistence schema gate 已记录在 `ADR-0140`，friends migration source 已记录在 `ADR-0141`，friends repository boundary 已记录在 `ADR-0142`。下一步 work 是 `W-0235 Implement storage-neutral friends relationship repository interface`。
 
 Alpha acceptance 的追溯引用包括 `docs/first-alpha-user-discovery-loop.md`、`docs/first-alpha-feedback-intake-surfaces.md`、`docs/product-maturity-milestones.md`、`docs/prototype-ready-foundation-execution-plan.md`、`docs/prototype-ready-local-development-path-gate.md`、`docs/storage-objects-behavior-gate.md` 和 `docs/storage-objects-persistence-schema-gate.md`。
 
@@ -170,6 +170,6 @@ first_server_push_realtime_messaging_runtime_slice_completed: true
 realtime_protocol_websocket_outbound_delivery_gate_defined: true
 realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
-next_direction: define_friends_relationship_repository_boundary
+next_direction: implement_friends_relationship_repository_interface
 next_work_status: next_ready
 ```

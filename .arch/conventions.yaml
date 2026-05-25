@@ -6163,15 +6163,54 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   friends_relationship_repository_boundary:
-    status: next_ready
+    status: completed
     milestone: M-162
-    next_ready_work_item: W-0234
+    completed_work_item: W-0234
+    decision: ADR-0142
+    standard: docs/friends-relationship-repository-boundary.md
+    translation: docs/friends-relationship-repository-boundary.zh-CN.md
+    change: changes/2026-05-25-define-friends-relationship-repository-boundary
+    check_rule: runtime.friends_relationship_repository_boundary
+    next_milestone: M-163
+    next_ready_work_item: W-0235
     selected_direction: define_friends_relationship_repository_boundary
+    selected_follow_up_direction: implement_friends_relationship_repository_interface
     source_migration_decision: ADR-0141
     future_repository_owner_candidate: runtime/internal/modules/friends
     future_repository_interface_candidate: runtime/internal/modules/friends.Repository
     future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    candidate_value_types_recorded: true
+    candidate_repository_capabilities_recorded: true
+    version_conflict_handoff_recorded: true
+    redaction_posture_recorded: true
+    postgresql_adapter_expectations_recorded: true
     boundary_only_scope: true
+    repository_interface_added: false
+    postgresql_adapter_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_repository_interface_implementation:
+    status: next_ready
+    milestone: M-163
+    next_ready_work_item: W-0235
+    selected_direction: implement_friends_relationship_repository_interface
+    source_repository_boundary_decision: ADR-0142
+    future_repository_owner_candidate: runtime/internal/modules/friends
+    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
+    future_repository_source_candidate: runtime/internal/modules/friends/repository.go
+    future_repository_tests_candidate: runtime/internal/modules/friends/repository_test.go
+    implementation_scope: storage_neutral_repository_interface_only
+    postgresql_adapter_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
 
 server_runtime:
   first_reference_language: Go

@@ -1,0 +1,351 @@
+schema_version: 0.1
+change_id: define-friends-relationship-repository-boundary
+date: 2026-05-25
+type: docs
+status: verified
+
+summary: Define the friends relationship repository boundary without repository interface implementation, PostgreSQL adapter behavior, runtime behavior, protocol routes, or generated output.
+
+affected_modules:
+  - docs
+  - runtime
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0142
+  referenced:
+    - ADR-0141
+    - ADR-0140
+    - ADR-0139
+    - ADR-0138
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources_changed: []
+  logical_tables_added: []
+  repository_interfaces_added: false
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - docs/friends-relationship-repository-boundary.md records the future friends repository boundary.
+    - docs/friends-relationship-repository-boundary.zh-CN.md provides the paired Simplified Chinese translation.
+    - ADR-0142 records the repository boundary decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Define the storage-neutral friends relationship repository boundary after the friend_relationships migration source, preserving Nakama-first planning and deferring implementation."
+user_visible_outcome: A future implementation agent can inspect a precise friends relationship repository boundary and then continue to W-0235 without guessing ownership, value types, conflict classes, identity handoff, redaction, or adapter expectations.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Friends relationship repository vocabulary is a prerequisite for Nakama-class social graph behavior before runtime request, accept, reject, remove, block, unblock, list, or status behavior can be implemented safely.
+  adopted:
+    - Friends relationships are durable social graph state.
+    - Friend request, accept, reject, remove, block, unblock, list, and status behavior require repository-ready boundaries.
+    - Private social graph data must have explicit redaction posture.
+  adapted:
+    - vibit uses a storage-neutral module repository boundary before PostgreSQL adapter behavior.
+    - Public actor-relative status is computed later rather than stored as canonical database state.
+    - The protocol and schema remain vibit-native and do not copy external APIs.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - adapter, protocol, runtime, group, party, chat, matchmaking, match runtime, SDK, hosted, or distributed runtime scope in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  completed_work_item: W-0234
+  completed_milestone: M-162
+  previous_completed_work_item: W-0233
+  next_milestone: M-163
+  next_work_item: W-0235
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: define_friends_relationship_repository_boundary
+  next_direction: implement_friends_relationship_repository_interface
+  decision: ADR-0142
+  check_rule: runtime.friends_relationship_repository_boundary
+  friends_relationship_repository_boundary_defined: true
+  friends_relationship_repository_boundary_decision: ADR-0142
+  friends_relationship_repository_boundary_standard: docs/friends-relationship-repository-boundary.md
+  friends_relationship_repository_boundary_check_rule: runtime.friends_relationship_repository_boundary
+  source_migration_source_decision: ADR-0141
+  source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  source_schema_gate_decision: ADR-0140
+  source_lifecycle_gate_decision: ADR-0139
+  friend_relationships_logical_table: friend_relationships
+  future_repository_owner_candidate: runtime/internal/modules/friends
+  future_repository_interface_candidate: runtime/internal/modules/friends.Repository
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  candidate_value_types_recorded: true
+  candidate_repository_capabilities_recorded: true
+  pair_identity_handoff_recorded: true
+  version_conflict_handoff_recorded: true
+  redaction_posture_recorded: true
+  postgresql_adapter_expectations_recorded: true
+  stop_conditions_recorded: true
+  repository_boundary_gate_only_scope: true
+  future_repository_interface_work_item: W-0235
+  future_repository_interface_direction: implement_friends_relationship_repository_interface
+  repository_interface_added: false
+  repository_interface_changed: false
+  postgresql_adapter_added: false
+  postgresql_adapter_changed: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  request_identity_validation_added: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  event_audit_table_added: false
+  startup_wiring_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_repository_boundary
+    - node tools/vibit check change define-friends-relationship-repository-boundary --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - repository_interface_implementation_requires_separate_work_item
+    - postgresql_adapter_requires_separate_work_item
+    - runtime_or_protocol_scope_requires_authorization
+    - protobuf_or_generated_output_requires_authorization
+    - migration_change_requires_authorization
+    - event_audit_table_requires_authorization
+    - dependency_requires_authorization
+    - hosted_deployment_requires_authorization
+    - release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - broad_social_or_game_module_requires_authorization
+    - distributed_runtime_requires_authorization
+    - direct_compatibility_requires_authorization
+
+repository_boundary:
+  candidate_value_types:
+    - FriendRelationship
+    - FriendRelationshipPair
+    - FriendRelationshipID
+    - FriendRelationshipStatus
+    - FriendRelationshipLifecycleState
+    - FriendRelationshipActor
+    - FriendRelationshipVersion
+    - FriendRelationshipBlockState
+    - SendFriendRequestInput
+    - AcceptFriendRequestInput
+    - RejectFriendRequestInput
+    - RemoveFriendInput
+    - BlockPlayerInput
+    - UnblockPlayerInput
+    - GetFriendRelationshipInput
+    - ListFriendRelationshipsInput
+    - FriendRelationshipConflict
+    - FriendRelationshipRepositoryError
+  candidate_repository_capabilities:
+    - CreateOrUpdateFriendRequest
+    - GetRelationshipByPair
+    - ListRelationshipsForPlayer
+    - AcceptFriendRequest
+    - RejectFriendRequest
+    - RemoveFriend
+    - SetPlayerBlock
+    - ClearPlayerBlock
+  candidate_conflict_classes:
+    - relationship_not_found
+    - target_player_not_found
+    - self_relationship_forbidden
+    - duplicate_pending_request
+    - already_friends
+    - blocked_relationship
+    - invalid_transition
+    - version_mismatch
+    - stale_relationship_version
+    - pair_identity_conflict
+    - storage_unavailable
+  postgresql_adapter_expectations:
+    logical_table: friend_relationships
+    pair_unique_index: friend_relationships_pair_uq
+    player_low_state_index: friend_relationships_player_low_state_idx
+    player_high_state_index: friend_relationships_player_high_state_idx
+    updated_at_index: friend_relationships_updated_at_idx
+    version_column: relationship_version
+
+acceptance_criteria:
+  - docs/friends-relationship-repository-boundary.md exists and defines the boundary-only repository plan.
+  - docs/friends-relationship-repository-boundary.zh-CN.md exists as the paired Simplified Chinese translation.
+  - decisions/ADR-0142-friends-relationship-repository-boundary.md records the accepted decision.
+  - runtime.friends_relationship_repository_boundary is registered and passes.
+  - W-0234 is completed and W-0235 is next_ready.
+  - No friends repository interface implementation, PostgreSQL adapter behavior, runtime behavior, protocol route, Protobuf source, generated output, migration, dependency, event/audit table, distributed runtime, or direct compatibility is added.
+
+test_plan:
+  positive_behavior:
+    - Not applicable; this change adds no runtime behavior.
+  negative_behavior:
+    - Static checks reject forbidden repository implementation, adapter, runtime, protocol, generated output, migration, dependency, event/audit, distributed runtime, and direct compatibility scope.
+  permission_and_authentication:
+    - Not applicable; this boundary records that actor identity must be derived from validated request identity later.
+  persistence_and_transactions:
+    - Static checks confirm the existing W-0233 migration source remains the source and no new migration is added.
+  protocol_mapping:
+    - Static checks confirm no friends Protobuf or protocol route is added.
+  failure_paths_and_redaction:
+    - Boundary records private social graph redaction and typed conflict expectations.
+  concurrency_or_ordering:
+    - Boundary records server-owned relationship_version and typed version conflict posture.
+  integration_or_e2e:
+    - Not applicable; no runtime or protocol behavior is added.
+  repository_checks:
+    - node tools/vibit check change define-friends-relationship-repository-boundary --json
+    - node tools/vibit check runtime --json
+
+implementation_boundaries:
+  allowed:
+    - docs/friends-relationship-repository-boundary.md
+    - docs/friends-relationship-repository-boundary.zh-CN.md
+    - decisions/ADR-0142-friends-relationship-repository-boundary.md
+    - conversations/2026-05-25-friends-relationship-repository-boundary.md
+    - changes/2026-05-25-define-friends-relationship-repository-boundary/
+    - architecture manifests, README, alpha docs, product maturity docs, roadmap, AGENTS guides, tools/vibit, and rules/check-rules.json updates
+  forbidden:
+    - runtime/internal/modules/friends repository implementation
+    - PostgreSQL adapter implementation
+    - runtime behavior
+    - protocol routes
+    - Protobuf source
+    - generated output
+    - migrations
+    - dependencies
+    - event/audit tables
+    - startup wiring
+    - authentication/session behavior changes
+    - delivery guarantees
+    - stream subscriptions
+    - chat rooms
+    - groups
+    - parties
+    - broadcast fanout
+    - matchmaking
+    - match runtime
+    - operations/admin behavior
+    - SDK publication
+    - generated client libraries
+    - hosted deployments
+    - release artifacts
+    - Pitaya-style distributed architecture
+    - direct Nakama/Pitaya API compatibility
+
+generated_output:
+  required: false
+  source_of_truth: not_applicable
+
+migrations:
+  required: false
+  source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  new_migration_added_by_this_change: false
+
+dependencies:
+  added: []
+  posture: no_new_dependency_expected
+
+redaction:
+  private_social_graph_log_safe: false
+  raw_device_credentials_allowed: false
+  raw_access_tokens_allowed: false
+  verifier_keys_allowed: false
+  credential_or_token_digests_allowed: false
+  dsn_with_credentials_allowed: false
+  github_tokens_allowed: false
+  private_user_data_policy: record_only_explicit_request_text_or_redacted_placeholders
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_repository_boundary
+    - node tools/vibit check change define-friends-relationship-repository-boundary --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  status: Verified
+
+memory_updates:
+  - docs/friends-relationship-repository-boundary.md
+  - docs/friends-relationship-repository-boundary.zh-CN.md
+  - decisions/ADR-0142-friends-relationship-repository-boundary.md
+  - conversations/2026-05-25-friends-relationship-repository-boundary.md
+  - changes/2026-05-25-define-friends-relationship-repository-boundary/

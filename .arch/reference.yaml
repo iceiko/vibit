@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_friends_relationship_repository_boundary
-  recommended_next_direction: define_friends_relationship_repository_boundary
+  current_near_term_priority: implement_friends_relationship_repository_interface
+  recommended_next_direction: implement_friends_relationship_repository_interface
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: friends_relationship_migration_source_completed
+  current_state: friends_relationship_repository_boundary_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0234
-  immediate_next_direction: define_friends_relationship_repository_boundary
+  immediate_next_work_item: W-0235
+  immediate_next_direction: implement_friends_relationship_repository_interface
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -5011,11 +5011,18 @@ phase_plan:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2es_friends_relationship_repository_boundary:
-    status: next_ready
+    status: completed
     milestone: M-162
-    next_ready_work_item: W-0234
+    completed_work_item: W-0234
+    decision: ADR-0142
+    standard: docs/friends-relationship-repository-boundary.md
+    translation: docs/friends-relationship-repository-boundary.zh-CN.md
+    check_rule: runtime.friends_relationship_repository_boundary
+    next_milestone: M-163
+    next_ready_work_item: W-0235
     previous_completed_work_item: W-0233
     selected_direction: define_friends_relationship_repository_boundary
+    selected_follow_up_direction: implement_friends_relationship_repository_interface
     expected_change: changes/2026-05-25-define-friends-relationship-repository-boundary
     reference_mapping:
       nakama: Define storage-neutral repository semantics for future friends relationship lifecycle behavior before repository implementation, PostgreSQL adapter behavior, runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
@@ -5029,8 +5036,38 @@ phase_plan:
     future_repository_owner_candidate: runtime/internal/modules/friends
     future_repository_interface_candidate: runtime/internal/modules/friends.Repository
     future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    candidate_value_types_recorded: true
+    candidate_repository_capabilities_recorded: true
+    version_conflict_handoff_recorded: true
+    redaction_posture_recorded: true
+    postgresql_adapter_expectations_recorded: true
     repository_interface_added: false
     postgresql_adapter_changed: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2et_friends_relationship_repository_interface_implementation:
+    status: next_ready
+    milestone: M-163
+    next_ready_work_item: W-0235
+    previous_completed_work_item: W-0234
+    selected_direction: implement_friends_relationship_repository_interface
+    expected_change: changes/2026-05-25-implement-friends-relationship-repository-interface
+    reference_mapping:
+      nakama: Implement the storage-neutral repository interface for future friends relationship lifecycle behavior before PostgreSQL adapter behavior, runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
+      pitaya: Pitaya remains deferred; do not use the repository interface implementation to introduce distributed topology, frontend/backend split, RPC, groups, service discovery, or distributed social graph routing.
+    target_stage: prototype_ready_foundation
+    source_repository_boundary_decision: ADR-0142
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: friends_groups_and_parties
+    future_repository_owner_candidate: runtime/internal/modules/friends
+    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
+    future_repository_source_candidate: runtime/internal/modules/friends/repository.go
+    future_repository_tests_candidate: runtime/internal/modules/friends/repository_test.go
+    postgresql_adapter_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     generated_output_added: false

@@ -169,6 +169,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.friends_relationship_lifecycle_gate",
   "runtime.friends_relationship_persistence_schema_gate",
   "runtime.friends_relationship_migration_source",
+  "runtime.friends_relationship_repository_boundary",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -34638,6 +34639,9 @@ function checkRuntimeFriendsRelationshipMigrationSource(root, goFiles) {
     { pattern: /\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bRejectFriendRequest\b|\bRemoveFriend\b|\bBlockPlayer\b|\bUnblockPlayer\b|\bListFriendRelationships\b|\bGetFriendRelationshipStatus\b/, label: "friends relationship runtime behavior" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root) && pathStartsWith(file, "runtime/internal/modules/friends/")) {
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} crosses friends relationship migration-source-only boundary with ${match.label}`, {
@@ -34672,6 +34676,479 @@ function checkRuntimeFriendsRelationshipMigrationSource(root, goFiles) {
   ok("Friends relationship migration source completes W-0233, opens W-0234, adds only the friend_relationships SQL source, and preserves repository/adapter/runtime/protocol/generated/dependency/event/direct compatibility deferrals", {
     rule_id: ruleId,
     artifact: migrationPath,
+  });
+}
+
+function checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_repository_boundary";
+  const standardPath = "docs/friends-relationship-repository-boundary.md";
+  const standardTranslationPath = "docs/friends-relationship-repository-boundary.zh-CN.md";
+  const decisionPath = "decisions/ADR-0142-friends-relationship-repository-boundary.md";
+  const changePath = "changes/2026-05-25-define-friends-relationship-repository-boundary";
+  const conversationPath = "conversations/2026-05-25-friends-relationship-repository-boundary.md";
+  const forbiddenRuntimeModulePath = "runtime/internal/modules/friends";
+
+  if (!friendsRelationshipRepositoryBoundaryCompleted(root)) {
+    ok("friends relationship repository boundary is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship repository boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship repository boundary`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-162"],
+    [".arch/work-items.yaml", "title: Friends Relationship Repository Boundary"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0234"],
+    [".arch/work-items.yaml", "title: Define friends relationship repository boundary"],
+    [".arch/work-items.yaml", "decision: ADR-0142"],
+    [".arch/work-items.yaml", "check_rule: runtime.friends_relationship_repository_boundary"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: implement_friends_relationship_repository_interface"],
+    [".arch/work-items.yaml", "id: M-163"],
+    [".arch/work-items.yaml", "title: Friends Relationship Repository Interface Implementation"],
+    [".arch/work-items.yaml", "id: W-0235"],
+    [".arch/work-items.yaml", "title: Implement storage-neutral friends relationship repository interface"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_repository_boundary:"],
+    [".arch/runtime.yaml", "completed_work_item: W-0234"],
+    [".arch/runtime.yaml", "decision: ADR-0142"],
+    [".arch/runtime.yaml", "standard: docs/friends-relationship-repository-boundary.md"],
+    [".arch/runtime.yaml", "translation: docs/friends-relationship-repository-boundary.zh-CN.md"],
+    [".arch/runtime.yaml", "check_rule: runtime.friends_relationship_repository_boundary"],
+    [".arch/runtime.yaml", "source_migration_decision: ADR-0141"],
+    [".arch/runtime.yaml", "friend_relationships_logical_table: friend_relationships"],
+    [".arch/runtime.yaml", "future_repository_owner_candidate: runtime/internal/modules/friends"],
+    [".arch/runtime.yaml", "future_repository_interface_candidate: runtime/internal/modules/friends.Repository"],
+    [".arch/runtime.yaml", "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres"],
+    [".arch/runtime.yaml", "candidate_value_types_recorded: true"],
+    [".arch/runtime.yaml", "candidate_repository_capabilities_recorded: true"],
+    [".arch/runtime.yaml", "pair_identity_handoff_recorded: true"],
+    [".arch/runtime.yaml", "version_conflict_handoff_recorded: true"],
+    [".arch/runtime.yaml", "redaction_posture_recorded: true"],
+    [".arch/runtime.yaml", "postgresql_adapter_expectations_recorded: true"],
+    [".arch/runtime.yaml", "future_repository_interface_work_item: W-0235"],
+    [".arch/runtime.yaml", "future_repository_interface_direction: implement_friends_relationship_repository_interface"],
+    [".arch/runtime.yaml", "repository_interface_added: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "event_audit_table_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "friends_relationship_repository_boundary:"],
+    [".arch/conventions.yaml", "check_rule: runtime.friends_relationship_repository_boundary"],
+    [".arch/conventions.yaml", "friends_relationship_repository_interface_implementation:"],
+    [".arch/contracts.yaml", "friends_relationship_repository_boundary:"],
+    [".arch/contracts.yaml", "check_rule: runtime.friends_relationship_repository_boundary"],
+    [".arch/contracts.yaml", "contract_changes_expected: false"],
+    [".arch/contracts.yaml", "friends_relationship_repository_interface_implementation:"],
+    [".arch/reference.yaml", "phase_2es_friends_relationship_repository_boundary"],
+    [".arch/reference.yaml", "decision: ADR-0142"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_repository_boundary"],
+    [".arch/reference.yaml", "phase_2et_friends_relationship_repository_interface_implementation"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", "next_work_status: next_ready"],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0142-friends-relationship-repository-boundary.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0142-friends-relationship-repository-boundary.md"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0142-friends-relationship-repository-boundary.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0142-friends-relationship-repository-boundary.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_repository_boundary"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_repository_boundary"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_repository_boundary"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_repository_boundary"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_repository_boundary"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "friends_relationship_repository_boundary: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0234",
+      "decision: ADR-0142",
+      "check_rule: runtime.friends_relationship_repository_boundary",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_repository_owner_candidate: runtime/internal/modules/friends",
+      "future_repository_interface_candidate: runtime/internal/modules/friends.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "friend_relationships_logical_table: friend_relationships",
+      "candidate_value_types:",
+      "FriendRelationship",
+      "FriendRelationshipPair",
+      "FriendRelationshipVersion",
+      "SendFriendRequestInput",
+      "ListFriendRelationshipsInput",
+      "candidate_repository_capabilities:",
+      "CreateOrUpdateFriendRequest",
+      "GetRelationshipByPair",
+      "ListRelationshipsForPlayer",
+      "AcceptFriendRequest",
+      "RejectFriendRequest",
+      "RemoveFriend",
+      "SetPlayerBlock",
+      "ClearPlayerBlock",
+      "pair_identity: canonical_unordered_player_pair",
+      "actor_identity_source: validated_request_identity_before_repository_call",
+      "candidate_conflict_classes:",
+      "relationship_not_found",
+      "target_player_not_found",
+      "self_relationship_forbidden",
+      "duplicate_pending_request",
+      "already_friends",
+      "blocked_relationship",
+      "invalid_transition",
+      "version_mismatch",
+      "stale_relationship_version",
+      "pair_identity_conflict",
+      "storage_unavailable",
+      "private_social_graph_log_safe: false",
+      "PostgreSQL Adapter Expectations",
+      "friend_relationships_pair_uq",
+      "friend_relationships_player_low_state_idx",
+      "friend_relationships_player_high_state_idx",
+      "friend_relationships_updated_at_idx",
+      "relationship_version",
+      "future_repository_interface_work_item: W-0235",
+      "future_repository_interface_direction: implement_friends_relationship_repository_interface",
+      "Stop Conditions",
+    ],
+    [standardTranslationPath]: [
+      "friends_relationship_repository_boundary: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0234",
+      "decision: ADR-0142",
+      "check_rule: runtime.friends_relationship_repository_boundary",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_repository_owner_candidate: runtime/internal/modules/friends",
+      "future_repository_interface_candidate: runtime/internal/modules/friends.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "friend_relationships_logical_table: friend_relationships",
+      "candidate_value_types:",
+      "FriendRelationship",
+      "FriendRelationshipPair",
+      "FriendRelationshipVersion",
+      "SendFriendRequestInput",
+      "ListFriendRelationshipsInput",
+      "candidate_repository_capabilities:",
+      "CreateOrUpdateFriendRequest",
+      "GetRelationshipByPair",
+      "ListRelationshipsForPlayer",
+      "AcceptFriendRequest",
+      "RejectFriendRequest",
+      "RemoveFriend",
+      "SetPlayerBlock",
+      "ClearPlayerBlock",
+      "pair_identity: canonical_unordered_player_pair",
+      "actor_identity_source: validated_request_identity_before_repository_call",
+      "candidate_conflict_classes:",
+      "relationship_not_found",
+      "target_player_not_found",
+      "self_relationship_forbidden",
+      "duplicate_pending_request",
+      "already_friends",
+      "blocked_relationship",
+      "invalid_transition",
+      "version_mismatch",
+      "stale_relationship_version",
+      "pair_identity_conflict",
+      "storage_unavailable",
+      "private_social_graph_log_safe: false",
+      "PostgreSQL Adapter Expectations",
+      "friend_relationships_pair_uq",
+      "friend_relationships_player_low_state_idx",
+      "friend_relationships_player_high_state_idx",
+      "friend_relationships_updated_at_idx",
+      "relationship_version",
+      "future_repository_interface_work_item: W-0235",
+      "future_repository_interface_direction: implement_friends_relationship_repository_interface",
+      "Stop Conditions",
+    ],
+    [decisionPath]: [
+      "ADR-0142",
+      "docs/friends-relationship-repository-boundary.md",
+      "runtime.friends_relationship_repository_boundary",
+      "M-163/W-0235 Implement storage-neutral friends relationship repository interface",
+      "This ADR does not add repository interface implementation",
+    ],
+    [conversationPath]: [
+      "W-0234",
+      "W-0235",
+      "ADR-0142",
+      "runtime.friends_relationship_repository_boundary",
+      "runtime/internal/modules/friends.Repository",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0234",
+      "completed_milestone: M-162",
+      "previous_completed_work_item: W-0233",
+      "next_milestone: M-163",
+      "next_work_item: W-0235",
+      "next_work_item_status: next_ready",
+      "selected_direction: define_friends_relationship_repository_boundary",
+      "next_direction: implement_friends_relationship_repository_interface",
+      "friends_relationship_repository_boundary_defined: true",
+      "friends_relationship_repository_boundary_decision: ADR-0142",
+      "friends_relationship_repository_boundary_check_rule: runtime.friends_relationship_repository_boundary",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "friend_relationships_logical_table: friend_relationships",
+      "future_repository_owner_candidate: runtime/internal/modules/friends",
+      "future_repository_interface_candidate: runtime/internal/modules/friends.Repository",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "candidate_value_types_recorded: true",
+      "candidate_repository_capabilities_recorded: true",
+      "pair_identity_handoff_recorded: true",
+      "version_conflict_handoff_recorded: true",
+      "redaction_posture_recorded: true",
+      "postgresql_adapter_expectations_recorded: true",
+      "future_repository_interface_work_item: W-0235",
+      "future_repository_interface_direction: implement_friends_relationship_repository_interface",
+      "repository_interface_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_added: false",
+      "postgresql_adapter_changed: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    conversationPath,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /repository_interface_(?:added|changed|implemented):\s*true/, label: "repository interface implementation" },
+    { pattern: /postgresql_adapter_(?:added|changed|implemented):\s*true/, label: "PostgreSQL adapter implementation" },
+    { pattern: /storage_adapter_(?:added|changed|implemented):\s*true/, label: "storage adapter implementation" },
+    { pattern: /sql_execution_added:\s*true/, label: "SQL execution behavior" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /request_identity_validation_added:\s*true/, label: "request identity validation behavior" },
+    { pattern: /delivery_guarantee_added:\s*true|stream_subscription_added:\s*true/, label: "realtime delivery or subscription behavior" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_(?:added|changed):\s*true/, label: "migration change" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /event_audit_table_added:\s*true/, label: "event/audit table addition" },
+    { pattern: /chat_added:\s*true|groups_added:\s*true|parties_added:\s*true|group_messaging_added:\s*true|broadcast_fanout_added:\s*true|matchmaking_added:\s*true|match_runtime_added:\s*true/, label: "broader social/game feature" },
+    { pattern: /hosted_deployment_added:\s*true|release_artifact_added:\s*true|sdk_added:\s*true|generated_client_library_added:\s*true/, label: "hosted/release/SDK scope" },
+    { pattern: /distributed_runtime_added:\s*true|pitaya_distributed_architecture_added:\s*true/, label: "distributed runtime scope" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+/, label: "GitHub token-like text" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses friends relationship repository boundary with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  if (exists(root, forbiddenRuntimeModulePath) && !friendsRelationshipRepositoryInterfaceImplementationCompleted(root)) {
+    fail(`${forbiddenRuntimeModulePath} must not be created by the repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  } else if (exists(root, forbiddenRuntimeModulePath) && friendsRelationshipRepositoryInterfaceImplementationCompleted(root)) {
+    ok(`${forbiddenRuntimeModulePath} exists after completed W-0235`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  } else {
+    ok(`${forbiddenRuntimeModulePath} is deferred to W-0235`, {
+      rule_id: ruleId,
+      artifact: forbiddenRuntimeModulePath,
+    });
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bFriendRelationshipRepository\b|\bNewFriendRelationshipRepository\b/, label: "friends relationship repository implementation" },
+    { pattern: /\bINSERT INTO friend_relationships\b|\bFROM friend_relationships\b|\bUPDATE friend_relationships\b|\bDELETE FROM friend_relationships\b/i, label: "friends relationship SQL behavior" },
+    { pattern: /\bFriendRelationshipRequest\b|\bFriendRelationshipResponse\b/, label: "friends relationship protocol shape" },
+    { pattern: /\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bRejectFriendRequest\b|\bRemoveFriend\b|\bBlockPlayer\b|\bUnblockPlayer\b|\bListFriendRelationships\b|\bGetFriendRelationshipStatus\b/, label: "friends relationship runtime behavior" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root) && pathStartsWith(file, `${forbiddenRuntimeModulePath}/`)) {
+      continue;
+    }
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} crosses friends relationship repository-boundary-only scope with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const friendsAdapterFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bfriend_relationships\b|\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/.test(text);
+    });
+  if (friendsAdapterFiles.length === 0) {
+    ok("no friends relationship PostgreSQL adapter behavior is added by the repository boundary gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else {
+    for (const file of friendsAdapterFiles) {
+      fail(`${file} adds friends relationship PostgreSQL adapter behavior during repository boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
+  });
+  if (friendsProto) {
+    fail(`${friendsProto} adds friends relationship protocol shape during repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: friendsProto,
+    });
+  } else {
+    ok("no friends relationship Protobuf shape is added by friends relationship repository boundary", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const generatedFiles = discoverFilesUnder(root, "runtime/internal/generated")
+    .filter((file) => file.endsWith(".go"));
+  const friendsGenerated = generatedFiles.find((file) => {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsGenerated) {
+    fail(`${friendsGenerated} adds friends relationship generated output during repository boundary gate`, {
+      rule_id: ruleId,
+      artifact: friendsGenerated,
+    });
+  } else {
+    ok("no friends relationship generated output is added by friends relationship repository boundary", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated",
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Friends relationship repository boundary completes W-0234, opens W-0235, records storage-neutral Nakama-first repository vocabulary, and preserves adapter/runtime/protocol/generated/dependency/event/direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: standardPath,
   });
 }
 
@@ -36472,7 +36949,18 @@ function friendsRelationshipMigrationSourceCompleted(root) {
   return workItemHasStatus(root, "W-0233", "completed");
 }
 
+function friendsRelationshipRepositoryBoundaryCompleted(root) {
+  return workItemHasStatus(root, "W-0234", "completed");
+}
+
+function friendsRelationshipRepositoryInterfaceImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0235", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (friendsRelationshipRepositoryBoundaryCompleted(root)) {
+    return "repository_next_work_item: W-0235";
+  }
   if (friendsRelationshipMigrationSourceCompleted(root)) {
     return "repository_next_work_item: W-0234";
   }
@@ -36537,6 +37025,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (friendsRelationshipRepositoryBoundaryCompleted(root)) {
+    return "repository_next_work_item_scope: implement_friends_relationship_repository_interface";
+  }
   if (friendsRelationshipMigrationSourceCompleted(root)) {
     return "repository_next_work_item_scope: define_friends_relationship_repository_boundary";
   }
@@ -36592,6 +37083,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (friendsRelationshipRepositoryBoundaryCompleted(root)) {
+    return "W-0235 Implement storage-neutral friends relationship repository interface";
+  }
   if (friendsRelationshipMigrationSourceCompleted(root)) {
     return "W-0234 Define friends relationship repository boundary";
   }
@@ -36671,6 +37165,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0234", "next_ready_work_item: W-0235"],
     ["W-0233", "next_ready_work_item: W-0234"],
     ["W-0232", "next_ready_work_item: W-0233"],
     ["W-0231", "next_ready_work_item: W-0232"],
@@ -36733,6 +37228,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0234", "completed")) {
+    return "next_work_item: W-0235";
+  }
   if (workItemHasStatus(root, "W-0233", "completed")) {
     return "next_work_item: W-0234";
   }
@@ -36864,6 +37362,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0234", "implement_friends_relationship_repository_interface"],
     ["W-0233", "define_friends_relationship_repository_boundary"],
     ["W-0232", "add_friends_relationship_migration_source"],
     ["W-0231", "define_friends_relationship_persistence_schema_gate"],
@@ -36926,6 +37425,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0234", "W-0235 Implement storage-neutral friends relationship repository interface"],
     ["W-0233", "W-0234 Define friends relationship repository boundary"],
     ["W-0232", "W-0233 Add friends relationship migration source"],
     ["W-0231", "W-0232 Define friends relationship persistence schema gate"],
@@ -36989,6 +37489,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0234", "current_phase: implement_friends_relationship_repository_interface"],
     ["W-0233", "current_phase: define_friends_relationship_repository_boundary"],
     ["W-0232", "current_phase: add_friends_relationship_migration_source"],
     ["W-0231", "current_phase: define_friends_relationship_persistence_schema_gate"],
@@ -37616,6 +38117,7 @@ function checkRuntime(root) {
   checkRuntimeFriendsRelationshipLifecycleGate(root, goFiles);
   checkRuntimeFriendsRelationshipPersistenceSchemaGate(root, goFiles);
   checkRuntimeFriendsRelationshipMigrationSource(root, goFiles);
+  checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

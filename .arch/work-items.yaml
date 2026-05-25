@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-162
+current_milestone: M-163
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: friends_relationship_migration_source_completed
+    current_release_state: friends_relationship_repository_boundary_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0234
+    next_ready_work_item: W-0235
     preferred_after_current:
-      - define_friends_relationship_repository_boundary
+      - implement_friends_relationship_repository_interface
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3070,7 +3070,7 @@ milestones:
 
   - id: M-162
     title: Friends Relationship Repository Boundary
-    status: active
+    status: completed
     goal: Define the storage-neutral repository boundary for future friends relationship lifecycle behavior before repository implementation, PostgreSQL adapter behavior, runtime behavior, protocol routes, generated output, or broader social features.
     completion_criteria:
       - Future repository owner, interface candidate, value types, command/query vocabulary, conflict classes, transaction handoff, redaction posture, PostgreSQL adapter expectations, test expectations, and stop conditions are defined before implementation.
@@ -3079,6 +3079,19 @@ milestones:
       - No repository implementation, PostgreSQL adapter behavior, runtime behavior, protocol route, Protobuf source, generated output, dependency, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the boundary itself.
     non_goals:
       - adding repository interface implementation, PostgreSQL adapter behavior, runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the friends relationship repository boundary in `docs/friends-relationship-repository-boundary.md` and its Simplified Chinese translation, accepted `ADR-0142`, registered `runtime.friends_relationship_repository_boundary`, recorded future owner `runtime/internal/modules/friends`, future interface candidate `runtime/internal/modules/friends.Repository`, candidate value types, lifecycle repository capabilities, canonical pair identity and request identity handoff, typed conflict classes, private social graph redaction, PostgreSQL adapter expectations, and opened `M-163/W-0235 Implement storage-neutral friends relationship repository interface` as the next-ready bounded follow-up. No repository interface implementation, PostgreSQL adapter behavior, runtime friendship behavior, protocol route, Protobuf source, generated output, migration, dependency, startup wiring, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-163
+    title: Friends Relationship Repository Interface Implementation
+    status: active
+    goal: Implement the storage-neutral friends relationship repository interface and value vocabulary under `runtime/internal/modules/friends` before PostgreSQL adapter behavior, runtime behavior, protocol routes, generated output, or broader social features.
+    completion_criteria:
+      - The module-owned repository interface and value types exist under `runtime/internal/modules/friends`.
+      - The implementation preserves canonical pair identity, lifecycle state vocabulary, actor handoff, version posture, conflict classes, redaction, and storage neutrality from ADR-0142.
+      - Focused Go tests cover normalization, conflict vocabulary, redacted errors, copying, and forbidden dependency posture.
+      - No PostgreSQL adapter behavior, runtime friendship behavior, protocol route, Protobuf source, generated output, dependency, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the interface implementation itself.
+    non_goals:
+      - adding PostgreSQL adapter behavior, SQL execution, runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9014,7 +9027,7 @@ work_items:
   - id: W-0234
     milestone: M-162
     title: Define friends relationship repository boundary
-    status: next_ready
+    status: completed
     change: changes/2026-05-25-define-friends-relationship-repository-boundary
     depends_on:
       - W-0233
@@ -9037,3 +9050,39 @@ work_items:
       - Define the future friends relationship repository owner and interface candidate before implementation.
       - Record future value types, create/read/list/update/delete or lifecycle method vocabulary, conflict classes, transaction handoff, redaction, PostgreSQL adapter expectations, tests, and stop conditions.
       - Preserve repository implementation, PostgreSQL adapter behavior, runtime behavior, protocol routes, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0142
+    check_rule: runtime.friends_relationship_repository_boundary
+    next_milestone: M-163
+    next_ready_work_item: W-0235
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: implement_friends_relationship_repository_interface
+    completion_summary: Defined the friends relationship repository boundary, added the English standard and Simplified Chinese translation, accepted `ADR-0142`, registered `runtime.friends_relationship_repository_boundary`, recorded future repository owner `runtime/internal/modules/friends`, future interface candidate `runtime/internal/modules/friends.Repository`, candidate value types, lifecycle repository capabilities, canonical unordered pair identity, validated request identity handoff, version and conflict posture, redaction posture, PostgreSQL adapter expectations, and opened `M-163/W-0235 Implement storage-neutral friends relationship repository interface` as the next-ready follow-up. No repository interface implementation, PostgreSQL adapter behavior, runtime friendship behavior, protocol route, Protobuf source, generated output, migration, dependency, startup wiring, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0235
+    milestone: M-163
+    title: Implement storage-neutral friends relationship repository interface
+    status: next_ready
+    change: changes/2026-05-25-implement-friends-relationship-repository-interface
+    depends_on:
+      - W-0234
+    expected_change_id: implement-friends-relationship-repository-interface
+    tier: tier_2_data
+    selected_direction: implement_friends_relationship_repository_interface
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding PostgreSQL adapter implementation, SQL execution, runtime behavior, protocol routes, Protobuf messages, generated output, dependencies, persistence execution beyond existing SQL source, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of implementing only the storage-neutral friends relationship repository interface.
+    completion:
+      - Add `runtime/internal/modules/friends` with storage-neutral repository interface and value types.
+      - Preserve canonical pair identity, lifecycle state, actor handoff, version conflict, redaction, and repository error semantics from ADR-0142.
+      - Add focused Go tests for normalization, conflict vocabulary, redacted errors, copying, and forbidden dependency posture.
+      - Preserve PostgreSQL adapter behavior, runtime behavior, protocol routes, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
