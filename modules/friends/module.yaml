@@ -13,6 +13,7 @@ decisions:
   - ADR-0141
   - ADR-0142
   - ADR-0143
+  - ADR-0144
 
 owns:
   entities:
@@ -140,7 +141,7 @@ invariants:
   - repository_errors_must_be_redacted
   - repository_interface_must_remain_storage_neutral
   - repository_interface_must_not_authenticate_or_validate_sessions
-  - postgresql_adapter_behavior_must_remain_deferred_until_W_0236_or_later
+  - postgresql_adapter_behavior_must_follow_ADR_0144_until_W_0237_or_later
   - protocol_routes_and_generated_output_must_remain_deferred
   - direct_nakama_pitaya_api_compatibility_must_remain_false
 
@@ -169,10 +170,17 @@ contracts:
   friends_relationship_repository_interface_implementation_decision: ADR-0143
   friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
   friends_relationship_repository_interface_implementation_work_item: W-0235
+  friends_relationship_postgresql_adapter_gate_defined: true
+  friends_relationship_postgresql_adapter_gate_decision: ADR-0144
+  friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
+  friends_relationship_postgresql_adapter_gate_work_item: W-0236
   repository_owner: runtime/internal/modules/friends
   repository_interface: runtime/internal/modules/friends.Repository
   repository_source: runtime/internal/modules/friends/repository.go
   repository_tests: runtime/internal/modules/friends/repository_test.go
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+  future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+  future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork
   source_repository_boundary_decision: ADR-0142
   source_repository_boundary_standard: docs/friends-relationship-repository-boundary.md
   source_migration_source_decision: ADR-0141
@@ -208,8 +216,8 @@ contracts:
   distributed_runtime_added: false
   pitaya_distributed_architecture_added: false
   direct_nakama_pitaya_api_compatibility_added: false
-  next_repository_work_item: W-0236
-  next_repository_work_item_scope: define_friends_relationship_postgresql_adapter_gate
+  repository_next_work_item: W-0237
+  repository_next_work_item_scope: implement_friends_relationship_postgresql_adapter
 
 tests:
   required:
@@ -227,7 +235,7 @@ tests:
 
 runtime:
   implementation_status: repository_interface_only
-  postgresql_adapter_status: deferred_to_W_0236_and_later
+  postgresql_adapter_status: gated_by_ADR_0144_next_ready_W_0237
   runtime_behavior_status: deferred
   protocol_route_status: deferred
   generated_output_status: deferred

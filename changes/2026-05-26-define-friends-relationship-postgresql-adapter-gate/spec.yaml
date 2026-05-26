@@ -1,0 +1,200 @@
+schema_version: 0.1
+change_id: define-friends-relationship-postgresql-adapter-gate
+date: 2026-05-26
+type: feature
+status: verified
+
+summary: Define the future friends relationship PostgreSQL adapter gate without adding adapter implementation, SQL execution behavior, runtime friendship behavior, protocol routes, generated output, migration changes, event/audit tables, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0144
+  referenced:
+    - ADR-0143
+    - ADR-0142
+    - ADR-0141
+    - ADR-0140
+    - ADR-0139
+    - ADR-0138
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources_changed: []
+  logical_tables_added: []
+  repository_interfaces_added: false
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - runtime/internal/platform/persistence/postgres remains the future owner for the friends relationship PostgreSQL adapter.
+    - runtime/internal/modules/friends remains the owner of the storage-neutral repository vocabulary.
+    - ADR-0144 records the future adapter gate before implementation.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Define the friends relationship PostgreSQL adapter gate after the storage-neutral friends repository interface, preserving Nakama-first planning and deferring adapter implementation, runtime, protocol, generated, event/audit, and direct compatibility scope."
+user_visible_outcome: Future agents can inspect a PostgreSQL adapter gate, ADR, change spec, and checks before implementing the friends relationship adapter.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Friends relationship PostgreSQL adapter behavior is a prerequisite for durable Nakama-class social graph behavior before runtime request, accept, reject, remove, block, unblock, list, or status behavior can be implemented safely.
+  adopted:
+    - Friends relationships are durable social graph state.
+    - Friend request, accept, reject, remove, block, unblock, and list behavior require a platform persistence adapter below module-owned repository vocabulary.
+    - Private social graph data requires explicit redaction posture.
+  adapted:
+    - vibit defines the PostgreSQL adapter gate before implementation.
+    - SQL mapping stays in the platform persistence package and returns friends module value types and errors.
+    - The protocol and schema remain vibit-native and do not copy external APIs.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - adapter implementation, protocol, runtime, group, party, chat, matchmaking, match runtime, SDK, hosted, distributed runtime, or event/audit table scope in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+verification:
+  status: Verified
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_postgresql_adapter_gate
+    - node tools/vibit check change define-friends-relationship-postgresql-adapter-gate --json
+    - node tools/vibit check module friends --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  live_postgresql_required: false
+  notes:
+    - No live PostgreSQL verification is required because this gate adds no adapter or SQL execution behavior.
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0236
+  completed_milestone: M-164
+  previous_completed_work_item: W-0235
+  next_milestone: M-165
+  next_work_item: W-0237
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: define_friends_relationship_postgresql_adapter_gate
+  next_direction: implement_friends_relationship_postgresql_adapter
+  decision: ADR-0144
+  check_rule: runtime.friends_relationship_postgresql_adapter_gate
+  friends_relationship_postgresql_adapter_gate_defined: true
+  friends_relationship_postgresql_adapter_gate_decision: ADR-0144
+  friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
+  source_repository_interface_decision: ADR-0143
+  source_repository_interface: runtime/internal/modules/friends.Repository
+  source_repository_interface_source: runtime/internal/modules/friends/repository.go
+  source_repository_tests: runtime/internal/modules/friends/repository_test.go
+  source_migration_source_decision: ADR-0141
+  source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  friend_relationships_logical_table: friend_relationships
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+  future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+  future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork
+  transaction_owner: caller_supplied_unit_of_work
+  sql_mapping_owner: postgresql_adapter
+  adapter_gate_only: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  storage_adapter_added: false
+  postgresql_adapter_added: false
+  postgresql_adapter_changed: false
+  sql_execution_added: false
+  unit_of_work_factory_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  request_identity_validation_added: false
+  route_protection_semantics_changed: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  event_audit_table_added: false
+  startup_wiring_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false

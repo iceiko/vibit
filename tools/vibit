@@ -171,6 +171,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.friends_relationship_migration_source",
   "runtime.friends_relationship_repository_boundary",
   "runtime.friends_relationship_repository_interface_implementation",
+  "runtime.friends_relationship_postgresql_adapter_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -35243,7 +35244,7 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
     [".arch/runtime.yaml", "friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation"],
     [".arch/runtime.yaml", "repository_source: runtime/internal/modules/friends/repository.go"],
     [".arch/runtime.yaml", "repository_tests: runtime/internal/modules/friends/repository_test.go"],
-    [".arch/runtime.yaml", "next_ready_work_item: W-0236"],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
     [".arch/conventions.yaml", "friends_relationship_repository_interface_implementation:"],
     [".arch/conventions.yaml", "friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation"],
     [".arch/contracts.yaml", "friends_relationship_repository_interface_implementation_completed: true"],
@@ -35547,6 +35548,490 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
       artifact: "runtime/internal/generated",
     });
   }
+}
+
+function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_postgresql_adapter_gate";
+  const standardPath = "docs/friends-relationship-postgresql-adapter-gate.md";
+  const standardTranslationPath = "docs/friends-relationship-postgresql-adapter-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md";
+  const changePath = "changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-postgresql-adapter-gate.md";
+  const sourcePath = "runtime/internal/modules/friends/repository.go";
+  const testPath = "runtime/internal/modules/friends/repository_test.go";
+  const migrationPath = "runtime/migrations/postgres/000007_create_friend_relationships.sql";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+  const futureAdapterSourcePath = "runtime/internal/platform/persistence/postgres/friend_relationship_repository.go";
+
+  if (!friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
+    ok("friends relationship PostgreSQL adapter gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_gate: ADR-0144"],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate"],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_gate_standard: docs/friends-relationship-postgresql-adapter-gate.md"],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_gate_translation: docs/friends-relationship-postgresql-adapter-gate.zh-CN.md"],
+    [".arch/runtime.yaml", "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go"],
+    [".arch/runtime.yaml", "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go"],
+    [".arch/runtime.yaml", "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/conventions.yaml", "friends_relationship_postgresql_adapter_gate:"],
+    [".arch/conventions.yaml", "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate"],
+    [".arch/contracts.yaml", "friends_relationship_postgresql_adapter_gate_defined: true"],
+    [".arch/contracts.yaml", "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate"],
+    [".arch/reference.yaml", "phase_2eu_friends_relationship_postgresql_adapter_gate"],
+    [".arch/reference.yaml", "phase_2ev_friends_relationship_postgresql_adapter_implementation"],
+    [".arch/work-items.yaml", "id: M-164"],
+    [".arch/work-items.yaml", "title: Friends Relationship PostgreSQL Adapter Gate"],
+    [".arch/work-items.yaml", "id: W-0236"],
+    [".arch/work-items.yaml", "title: Define friends relationship PostgreSQL adapter gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "decision: ADR-0144"],
+    [".arch/work-items.yaml", "check_rule: runtime.friends_relationship_postgresql_adapter_gate"],
+    [".arch/work-items.yaml", "id: M-165"],
+    [".arch/work-items.yaml", "title: Friends Relationship PostgreSQL Adapter Implementation"],
+    [".arch/work-items.yaml", "id: W-0237"],
+    [".arch/work-items.yaml", "title: Implement friends relationship PostgreSQL adapter"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_postgresql_adapter_gate_defined: true"],
+    [moduleManifestPath, "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_postgresql_adapter_gate"],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_postgresql_adapter_gate"],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_postgresql_adapter_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_postgresql_adapter_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_postgresql_adapter_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_postgresql_adapter_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_postgresql_adapter_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "friends_relationship_postgresql_adapter_gate: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0236",
+      "decision: ADR-0144",
+      "check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "source_repository_interface_decision: ADR-0143",
+      "repository_interface: runtime/internal/modules/friends.Repository",
+      "repository_interface_source: runtime/internal/modules/friends/repository.go",
+      "repository_tests: runtime/internal/modules/friends/repository_test.go",
+      "source_migration_source_decision: ADR-0141",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "friend_relationships_logical_table: friend_relationships",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+      "unit_of_work_handoff_required: true",
+      "transaction_owner: caller_supplied_unit_of_work",
+      "sql_mapping_owner: postgresql_adapter",
+      "adapter_gate_only: true",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "unit_of_work_factory_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+      "future_adapter_implementation_work_item: W-0237",
+      "future_adapter_implementation_direction: implement_friends_relationship_postgresql_adapter",
+      "relationship_id",
+      "player_low_id",
+      "player_high_id",
+      "lifecycle_state",
+      "requested_by_player_id",
+      "responded_by_player_id",
+      "removed_by_player_id",
+      "blocked_by_low_at",
+      "blocked_by_high_at",
+      "relationship_version",
+      "constructor_requires_executor",
+      "transaction_control_sql_is_absent",
+      "default_tests_do_not_require_live_postgresql",
+    ],
+    [standardTranslationPath]: [
+      "friends_relationship_postgresql_adapter_gate: defined",
+      "implementation_authorized_by_this_standard: false",
+      "completed_work_item: W-0236",
+      "decision: ADR-0144",
+      "check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "future_adapter_implementation_work_item: W-0237",
+      "future_adapter_implementation_direction: implement_friends_relationship_postgresql_adapter",
+      "NewFriendRelationshipRepositoryForUnitOfWork",
+    ],
+    [decisionPath]: [
+      "ADR-0144",
+      "Friends Relationship PostgreSQL Adapter Gate",
+      "M-165/W-0237 Implement friends relationship PostgreSQL adapter",
+      "runtime.friends_relationship_postgresql_adapter_gate",
+      "This ADR does not add PostgreSQL friends adapters",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0236",
+      "completed_milestone: M-164",
+      "previous_completed_work_item: W-0235",
+      "next_milestone: M-165",
+      "next_work_item: W-0237",
+      "next_work_item_status: next_ready",
+      "selected_direction: define_friends_relationship_postgresql_adapter_gate",
+      "next_direction: implement_friends_relationship_postgresql_adapter",
+      "friends_relationship_postgresql_adapter_gate_defined: true",
+      "friends_relationship_postgresql_adapter_gate_decision: ADR-0144",
+      "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "source_repository_interface: runtime/internal/modules/friends.Repository",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+      "adapter_gate_only: true",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "unit_of_work_factory_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0236",
+      "W-0237",
+      "ADR-0144",
+      "friend_relationships",
+      "runtime.friends_relationship_postgresql_adapter_gate",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "status: completed",
+      "completed_work_item: W-0236",
+      "decision: ADR-0144",
+      "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "source_repository_interface_decision: ADR-0143",
+      "repository_interface: runtime/internal/modules/friends.Repository",
+      "repository_interface_source: runtime/internal/modules/friends/repository.go",
+      "source_migration_source_decision: ADR-0141",
+      "source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+      "next_milestone: M-165",
+      "next_ready_work_item: W-0237",
+      "selected_follow_up_direction: implement_friends_relationship_postgresql_adapter",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "status: completed",
+      "completed_work_item: W-0236",
+      "decision: ADR-0144",
+      "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "repository_interface: runtime/internal/modules/friends.Repository",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+      "next_milestone: M-165",
+      "next_ready_work_item: W-0237",
+      "selected_follow_up_direction: implement_friends_relationship_postgresql_adapter",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "friends_relationship_postgresql_adapter_gate_defined: true",
+      "friends_relationship_postgresql_adapter_gate_decision: ADR-0144",
+      "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "friends_relationship_postgresql_adapter_gate_work_item: W-0236",
+      "friends_relationship_postgresql_adapter_future_work_item: W-0237",
+      "friends_relationship_postgresql_adapter_future_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "friends_relationship_postgresql_adapter_future_tests: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "friends_relationship_postgresql_adapter_future_constructor: NewFriendRelationshipRepositoryForUnitOfWork",
+      "friends_relationship_postgresql_adapter_added: false",
+      "friends_relationship_postgresql_adapter_sql_execution_added: false",
+      "friends_relationship_postgresql_adapter_runtime_behavior_added: false",
+      "friends_relationship_postgresql_adapter_protocol_route_added: false",
+      "friends_relationship_postgresql_adapter_protobuf_source_added: false",
+      "friends_relationship_postgresql_adapter_generated_output_added: false",
+      "friends_relationship_postgresql_adapter_dependency_added: false",
+      "friends_relationship_postgresql_adapter_migration_changed: false",
+      "friends_relationship_postgresql_adapter_event_audit_table_added: false",
+      "friends_relationship_postgresql_adapter_direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "friends_relationship_postgresql_adapter_gate_defined: true",
+      "friends_relationship_postgresql_adapter_gate_decision: ADR-0144",
+      "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
+      "friends_relationship_postgresql_adapter_gate_work_item: W-0236",
+      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+      "postgresql_adapter_added: false",
+      "sql_execution_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  for (const file of [sourcePath, testPath, migrationPath]) {
+    if (isFile(root, file)) {
+      ok(`${file} remains available as a source artifact for friends relationship PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing as a source artifact for friends relationship PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  if (exists(root, futureAdapterSourcePath) && !workItemHasStatus(root, "W-0237", "completed")) {
+    fail(`${futureAdapterSourcePath} must not exist before W-0237 implements the friends relationship PostgreSQL adapter`, {
+      rule_id: ruleId,
+      artifact: futureAdapterSourcePath,
+    });
+  } else if (exists(root, futureAdapterSourcePath)) {
+    ok(`${futureAdapterSourcePath} exists after completed W-0237`, {
+      rule_id: ruleId,
+      artifact: futureAdapterSourcePath,
+    });
+  } else {
+    ok(`${futureAdapterSourcePath} is deferred to W-0237`, {
+      rule_id: ruleId,
+      artifact: futureAdapterSourcePath,
+    });
+  }
+
+  const forbiddenFiles = [
+    decisionPath,
+    standardPath,
+    standardTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    conversationPath,
+  ];
+  const forbiddenPatterns = [
+    { pattern: /postgresql_adapter_(?:added|changed|implemented):\s*true/, label: "PostgreSQL adapter implementation" },
+    { pattern: /storage_adapter_(?:added|changed|implemented):\s*true/, label: "storage adapter implementation" },
+    { pattern: /sql_execution_added:\s*true/, label: "SQL execution behavior" },
+    { pattern: /unit_of_work_factory_added:\s*true/, label: "unit-of-work factory implementation" },
+    { pattern: /runtime_behavior_added:\s*true/, label: "runtime behavior addition" },
+    { pattern: /authentication_session_behavior_changed:\s*true/, label: "authentication/session behavior change" },
+    { pattern: /request_identity_validation_added:\s*true/, label: "request identity validation behavior" },
+    { pattern: /delivery_guarantee_added:\s*true|stream_subscription_added:\s*true/, label: "realtime delivery or subscription behavior" },
+    { pattern: /protocol_route_added:\s*true/, label: "protocol route addition" },
+    { pattern: /protobuf_source_added:\s*true/, label: "Protobuf source addition" },
+    { pattern: /generated_output_added:\s*true/, label: "generated output addition" },
+    { pattern: /migration_(?:added|changed):\s*true/, label: "migration change" },
+    { pattern: /dependency_added:\s*true/, label: "dependency addition" },
+    { pattern: /event_audit_table_added:\s*true/, label: "event/audit table addition" },
+    { pattern: /chat_added:\s*true|groups_added:\s*true|parties_added:\s*true|group_messaging_added:\s*true|broadcast_fanout_added:\s*true|matchmaking_added:\s*true|match_runtime_added:\s*true/, label: "broader social/game feature" },
+    { pattern: /hosted_deployment_added:\s*true|release_artifact_added:\s*true|sdk_added:\s*true|generated_client_library_added:\s*true/, label: "hosted/release/SDK scope" },
+    { pattern: /distributed_runtime_added:\s*true|pitaya_distributed_architecture_added:\s*true/, label: "distributed runtime scope" },
+    { pattern: /direct_nakama_pitaya_api_compatibility_added:\s*true/, label: "direct Nakama/Pitaya compatibility" },
+    { pattern: /ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+/, label: "GitHub token-like text" },
+  ];
+  for (const file of forbiddenFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    for (const match of textMatchesAny(text, forbiddenPatterns, root)) {
+      fail(`${file} crosses friends relationship PostgreSQL adapter gate with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const friendsAdapterFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bfriend_relationships\b|\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/.test(text);
+    });
+  if (workItemHasStatus(root, "W-0237", "completed")) {
+    ok("friends relationship PostgreSQL adapter behavior is allowed after W-0237", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (friendsAdapterFiles.length === 0) {
+    ok("no friends relationship PostgreSQL adapter behavior is added by friends relationship PostgreSQL adapter gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else {
+    for (const file of friendsAdapterFiles) {
+      fail(`${file} adds friends relationship PostgreSQL adapter behavior during adapter gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const forbiddenRuntimePatterns = [
+    { pattern: /\bFriendRelationshipHandler\b|\bFriendRelationshipRoute\b/, label: "friends relationship runtime handler or route" },
+    { pattern: /\bRegisterFriendRelationship\b|\bHandleFriendRelationship\b/, label: "friends relationship runtime registration" },
+  ];
+  for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
+      fail(`${file} crosses friends relationship PostgreSQL adapter gate with ${match.label}`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
+  });
+  if (friendsProto) {
+    fail(`${friendsProto} adds friends relationship protocol shape during PostgreSQL adapter gate`, {
+      rule_id: ruleId,
+      artifact: friendsProto,
+    });
+  } else {
+    ok("no friends relationship Protobuf shape is added by friends relationship PostgreSQL adapter gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const generatedFiles = discoverFilesUnder(root, "runtime/internal/generated")
+    .filter((file) => file.endsWith(".go"));
+  const friendsGenerated = generatedFiles.find((file) => {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsGenerated) {
+    fail(`${friendsGenerated} adds friends relationship generated output during PostgreSQL adapter gate`, {
+      rule_id: ruleId,
+      artifact: friendsGenerated,
+    });
+  } else {
+    ok("no friends relationship generated output is added by friends relationship PostgreSQL adapter gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated",
+    });
+  }
+
+  ok("Friends relationship PostgreSQL adapter gate completes W-0236, opens W-0237, records platform adapter ownership and SQL mapping posture, and preserves implementation/runtime/protocol/generated/dependency/event/direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
 }
 
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
@@ -37354,7 +37839,14 @@ function friendsRelationshipRepositoryInterfaceImplementationCompleted(root) {
   return workItemHasStatus(root, "W-0235", "completed");
 }
 
+function friendsRelationshipPostgresqlAdapterGateCompleted(root) {
+  return workItemHasStatus(root, "W-0236", "completed");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
+    return "repository_next_work_item: W-0237";
+  }
   if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root)) {
     return "repository_next_work_item: W-0236";
   }
@@ -37425,6 +37917,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_friends_relationship_postgresql_adapter";
+  }
   if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root)) {
     return "repository_next_work_item_scope: define_friends_relationship_postgresql_adapter_gate";
   }
@@ -37486,6 +37981,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
+    return "W-0237 Implement friends relationship PostgreSQL adapter";
+  }
   if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root)) {
     return "W-0236 Define friends relationship PostgreSQL adapter gate";
   }
@@ -37571,6 +38069,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0236", "next_ready_work_item: W-0237"],
     ["W-0235", "next_ready_work_item: W-0236"],
     ["W-0234", "next_ready_work_item: W-0235"],
     ["W-0233", "next_ready_work_item: W-0234"],
@@ -37635,6 +38134,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0236", "completed")) {
+    return "next_work_item: W-0237";
+  }
   if (workItemHasStatus(root, "W-0235", "completed")) {
     return "next_work_item: W-0236";
   }
@@ -37772,6 +38274,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0236", "implement_friends_relationship_postgresql_adapter"],
     ["W-0235", "define_friends_relationship_postgresql_adapter_gate"],
     ["W-0234", "implement_friends_relationship_repository_interface"],
     ["W-0233", "define_friends_relationship_repository_boundary"],
@@ -37836,6 +38339,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0236", "W-0237 Implement friends relationship PostgreSQL adapter"],
     ["W-0235", "W-0236 Define friends relationship PostgreSQL adapter gate"],
     ["W-0234", "W-0235 Implement storage-neutral friends relationship repository interface"],
     ["W-0233", "W-0234 Define friends relationship repository boundary"],
@@ -37901,6 +38405,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0236", "current_phase: implement_friends_relationship_postgresql_adapter"],
     ["W-0235", "current_phase: define_friends_relationship_postgresql_adapter_gate"],
     ["W-0234", "current_phase: implement_friends_relationship_repository_interface"],
     ["W-0233", "current_phase: define_friends_relationship_repository_boundary"],
@@ -38532,6 +39037,7 @@ function checkRuntime(root) {
   checkRuntimeFriendsRelationshipMigrationSource(root, goFiles);
   checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles);
   checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, goFiles);
+  checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

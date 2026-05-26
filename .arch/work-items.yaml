@@ -3096,7 +3096,7 @@ milestones:
 
   - id: M-164
     title: Friends Relationship PostgreSQL Adapter Gate
-    status: active
+    status: completed
     goal: Define the PostgreSQL adapter gate for the friends relationship repository interface before adding adapter implementation, SQL execution behavior, runtime friendship behavior, protocol routes, generated output, or broader social features.
     completion_criteria:
       - The future PostgreSQL adapter owner, source/test candidates, transaction handoff, SQL mapping posture, conflict mapping, redaction posture, test expectations, and stop conditions are defined before implementation.
@@ -3105,6 +3105,20 @@ milestones:
       - No PostgreSQL adapter implementation, SQL execution behavior, runtime behavior, protocol route, Protobuf source, generated output, dependency, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the gate itself.
     non_goals:
       - adding PostgreSQL adapter implementation, SQL execution behavior, runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the friends relationship PostgreSQL adapter gate in `docs/friends-relationship-postgresql-adapter-gate.md` and its Simplified Chinese translation, accepted `ADR-0144`, registered `runtime.friends_relationship_postgresql_adapter_gate`, recorded future owner `runtime/internal/platform/persistence/postgres`, future source/test candidates, constructor posture, caller-supplied unit-of-work handoff, SQL mapping posture for `friend_relationships`, conflict and redaction mapping, focused implementation test expectations, and opened `M-165/W-0237 Implement friends relationship PostgreSQL adapter` as the next-ready follow-up. No PostgreSQL adapter implementation, SQL execution behavior, runtime friendship behavior, protocol route, Protobuf source, generated output, migration, dependency, startup wiring, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-165
+    title: Friends Relationship PostgreSQL Adapter Implementation
+    status: active
+    goal: Implement the friends relationship PostgreSQL adapter under `runtime/internal/platform/persistence/postgres` using the storage-neutral friends repository interface and the existing `friend_relationships` migration source.
+    completion_criteria:
+      - The adapter implements `runtime/internal/modules/friends.Repository` under the PostgreSQL platform package.
+      - The implementation uses caller-supplied unit-of-work executor handoff and does not own transaction control.
+      - SQL mapping, row scanning, lifecycle transitions, actor-specific block columns, affected-row handling, conflict mapping, and redacted errors follow `ADR-0144`.
+      - Focused adapter tests cover constructor validation, SQL capture or fake executor behavior, row scanning, conflicts, redaction, and transaction-control SQL absence.
+      - No runtime friendship behavior, protocol route, Protobuf source, generated output, dependency, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the adapter implementation itself.
+    non_goals:
+      - adding runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring beyond any already-authorized unit-of-work handoff, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9111,7 +9125,7 @@ work_items:
   - id: W-0236
     milestone: M-164
     title: Define friends relationship PostgreSQL adapter gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate
     depends_on:
       - W-0235
@@ -9135,3 +9149,41 @@ work_items:
     completion:
       - Define the future friends relationship PostgreSQL adapter owner, source and test candidates, transaction handoff, SQL mapping posture, conflict mapping, redaction posture, and stop conditions.
       - Preserve adapter implementation, SQL execution behavior, runtime behavior, protocol routes, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0144
+    check_rule: runtime.friends_relationship_postgresql_adapter_gate
+    next_milestone: M-165
+    next_ready_work_item: W-0237
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: implement_friends_relationship_postgresql_adapter
+    completion_summary: Defined the friends relationship PostgreSQL adapter gate, added the English standard and Simplified Chinese translation, accepted `ADR-0144`, registered `runtime.friends_relationship_postgresql_adapter_gate`, recorded the future adapter owner, source/test candidates, constructor posture, unit-of-work handoff, SQL mapping posture, conflict mapping, redaction posture, test expectations, and opened `M-165/W-0237 Implement friends relationship PostgreSQL adapter` as the next-ready follow-up. No PostgreSQL adapter implementation, SQL execution behavior, runtime friendship behavior, protocol route, Protobuf source, generated output, migration, dependency, startup wiring, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0237
+    milestone: M-165
+    title: Implement friends relationship PostgreSQL adapter
+    status: next_ready
+    change: changes/2026-05-26-implement-friends-relationship-postgresql-adapter
+    depends_on:
+      - W-0236
+    expected_change_id: implement-friends-relationship-postgresql-adapter
+    tier: tier_2_data
+    selected_direction: implement_friends_relationship_postgresql_adapter
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0144
+      - ADR-0143
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime friendship behavior, protocol routes, Protobuf messages, generated output, dependencies, migration changes, startup wiring beyond the bounded adapter handoff, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of implementing only the friends relationship PostgreSQL adapter.
+    completion:
+      - Implement the PostgreSQL adapter under `runtime/internal/platform/persistence/postgres` for `runtime/internal/modules/friends.Repository`.
+      - Use the existing `friend_relationships` migration source and caller-supplied unit-of-work executor handoff.
+      - Preserve SQL mapping, conflict mapping, redaction, transaction-control, and test expectations from `ADR-0144`.
+      - Preserve runtime behavior, protocol routes, Protobuf source, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.

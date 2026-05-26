@@ -6225,19 +6225,36 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
     generated_output_added: false
     dependency_added: false
   friends_relationship_postgresql_adapter_gate:
-    status: next_ready
+    status: completed
     milestone: M-164
-    next_ready_work_item: W-0236
+    completed_work_item: W-0236
+    decision: ADR-0144
+    change: changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate
+    friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
+    standard: docs/friends-relationship-postgresql-adapter-gate.md
+    translation: docs/friends-relationship-postgresql-adapter-gate.zh-CN.md
+    next_milestone: M-165
+    next_ready_work_item: W-0237
     selected_direction: define_friends_relationship_postgresql_adapter_gate
+    selected_follow_up_direction: implement_friends_relationship_postgresql_adapter
     source_repository_interface_decision: ADR-0143
+    repository_interface_source: runtime/internal/modules/friends/repository.go
+    source_migration_source_decision: ADR-0141
+    source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    friend_relationships_logical_table: friend_relationships
     repository_owner: runtime/internal/modules/friends
     repository_interface: runtime/internal/modules/friends.Repository
     future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
-    future_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
-    future_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork
+    transaction_owner: caller_supplied_unit_of_work
+    sql_mapping_owner: postgresql_adapter
     implementation_scope: gate_only
+    adapter_gate_only: true
     postgresql_adapter_added: false
     sql_execution_added: false
+    unit_of_work_factory_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false

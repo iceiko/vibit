@@ -16,7 +16,9 @@
 
 `M-163 Friends Relationship Repository Interface Implementation` 已由 `W-0235` 完成。检查规则是 `runtime.friends_relationship_repository_interface_implementation`。
 
-repository 下一项 work item 是 `W-0236 Define friends relationship PostgreSQL adapter gate`。在后续 bounded work item 明确授权前，不要在本模块实现 PostgreSQL adapter、SQL execution、runtime friendship behavior、protocol routes、Protobuf source、generated output、event/audit tables、startup wiring、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime 或 direct Nakama/Pitaya API compatibility。
+`M-164 Friends Relationship PostgreSQL Adapter Gate` 已由 `W-0236` 完成。检查规则是 `runtime.friends_relationship_postgresql_adapter_gate`。
+
+repository 下一项 work item 是 `W-0237 Implement friends relationship PostgreSQL adapter`。在后续 bounded work item 明确授权前，不要在本模块实现 runtime friendship behavior、protocol routes、Protobuf source、generated output、event/audit tables、超出 bounded adapter handoff 的 startup wiring、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime 或 direct Nakama/Pitaya API compatibility。
 
 ## 什么时候不要使用本模块
 
@@ -42,7 +44,8 @@ repository 下一项 work item 是 `W-0236 Define friends relationship PostgreSQ
 - Normalizers：relationship records、list results、pair identity、actors、block state 和 repository inputs
 - Tests：`runtime/internal/modules/friends/repository_test.go`
 - PostgreSQL adapter owner candidate：`runtime/internal/platform/persistence/postgres`
-- PostgreSQL adapter gate follow-up：`W-0236 Define friends relationship PostgreSQL adapter gate`
+- PostgreSQL adapter gate：`docs/friends-relationship-postgresql-adapter-gate.md`
+- PostgreSQL adapter implementation follow-up：`W-0237 Implement friends relationship PostgreSQL adapter`
 
 第一批 public runtime commands 和 queries 仍然 deferred。未来 runtime behavior 必须先从 validated request identity 派生 actor identity，再调用 repository interface；client-supplied player ids 不是 authentication proof。
 

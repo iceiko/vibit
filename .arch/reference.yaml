@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_friends_relationship_postgresql_adapter_gate
-  recommended_next_direction: define_friends_relationship_postgresql_adapter_gate
+  current_near_term_priority: implement_friends_relationship_postgresql_adapter
+  recommended_next_direction: implement_friends_relationship_postgresql_adapter
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: friends_relationship_repository_interface_implemented
+  current_state: friends_relationship_postgresql_adapter_gate_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0236
-  immediate_next_direction: define_friends_relationship_postgresql_adapter_gate
+  immediate_next_work_item: W-0237
+  immediate_next_direction: implement_friends_relationship_postgresql_adapter
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -65,6 +65,8 @@ release_target:
   friends_relationship_persistence_schema_gate_translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
   friends_relationship_repository_interface_implementation_decision: ADR-0143
   friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
+  friends_relationship_postgresql_adapter_gate_decision: ADR-0144
+  friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
@@ -5085,11 +5087,16 @@ phase_plan:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2eu_friends_relationship_postgresql_adapter_gate:
-    status: next_ready
+    status: completed
     milestone: M-164
-    next_ready_work_item: W-0236
+    completed_work_item: W-0236
+    decision: ADR-0144
+    check_rule: runtime.friends_relationship_postgresql_adapter_gate
+    next_milestone: M-165
+    next_ready_work_item: W-0237
     previous_completed_work_item: W-0235
     selected_direction: define_friends_relationship_postgresql_adapter_gate
+    selected_follow_up_direction: implement_friends_relationship_postgresql_adapter
     expected_change: changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate
     reference_mapping:
       nakama: Define PostgreSQL adapter expectations for future friends relationship lifecycle behavior before adapter implementation, runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
@@ -5102,10 +5109,36 @@ phase_plan:
     repository_owner: runtime/internal/modules/friends
     repository_interface: runtime/internal/modules/friends.Repository
     future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
-    future_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
-    future_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork
     postgresql_adapter_added: false
     sql_execution_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2ev_friends_relationship_postgresql_adapter_implementation:
+    status: next_ready
+    milestone: M-165
+    next_ready_work_item: W-0237
+    previous_completed_work_item: W-0236
+    selected_direction: implement_friends_relationship_postgresql_adapter
+    expected_change: changes/2026-05-26-implement-friends-relationship-postgresql-adapter
+    reference_mapping:
+      nakama: Implement the PostgreSQL adapter for future friends relationship lifecycle behavior before runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
+      pitaya: Pitaya remains deferred; do not use the adapter implementation to introduce distributed topology, frontend/backend split, RPC, groups, service discovery, or distributed social graph routing.
+    target_stage: prototype_ready_foundation
+    source_postgresql_adapter_gate_decision: ADR-0144
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: friends_groups_and_parties
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
     runtime_behavior_added: false
     protocol_route_added: false
     generated_output_added: false

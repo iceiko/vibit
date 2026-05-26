@@ -16,7 +16,9 @@ The current implemented slice is intentionally narrow:
 
 `M-163 Friends Relationship Repository Interface Implementation` is completed by `W-0235`. The check rule is `runtime.friends_relationship_repository_interface_implementation`.
 
-The repository next work item is `W-0236 Define friends relationship PostgreSQL adapter gate`. Do not implement the PostgreSQL adapter, SQL execution, runtime friendship behavior, protocol routes, Protobuf source, generated output, event/audit tables, startup wiring, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
+`M-164 Friends Relationship PostgreSQL Adapter Gate` is completed by `W-0236`. The check rule is `runtime.friends_relationship_postgresql_adapter_gate`.
+
+The repository next work item is `W-0237 Implement friends relationship PostgreSQL adapter`. Do not implement runtime friendship behavior, protocol routes, Protobuf source, generated output, event/audit tables, startup wiring beyond the bounded adapter handoff, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
 
 ## When Not To Use This Module
 
@@ -42,7 +44,8 @@ If a requirement needs one of those concepts, create or update the owning bounda
 - Normalizers: relationship records, list results, pair identity, actors, block state, and repository inputs
 - Tests: `runtime/internal/modules/friends/repository_test.go`
 - PostgreSQL adapter owner candidate: `runtime/internal/platform/persistence/postgres`
-- PostgreSQL adapter gate follow-up: `W-0236 Define friends relationship PostgreSQL adapter gate`
+- PostgreSQL adapter gate: `docs/friends-relationship-postgresql-adapter-gate.md`
+- PostgreSQL adapter implementation follow-up: `W-0237 Implement friends relationship PostgreSQL adapter`
 
 The first public runtime commands and queries are still deferred. Future runtime behavior must derive actor identity from validated request identity before calling this repository interface; client-supplied player ids are not authentication proof.
 
