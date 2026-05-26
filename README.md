@@ -192,10 +192,10 @@ node tools/vibit check work --json
 The current next work item is:
 
 ```text
-W-0235 Implement storage-neutral friends relationship repository interface
+W-0236 Define friends relationship PostgreSQL adapter gate
 ```
 
-Use `.arch/work-items.yaml` as the source of truth for continuation. `W-0231` completed the Nakama-first friends relationship lifecycle gate. `W-0232` completed the friends relationship persistence schema gate. `W-0233` added the friends relationship migration source in `runtime/migrations/postgres/000007_create_friend_relationships.sql` and accepted `decisions/ADR-0141-friends-relationship-migration-source.md`. `W-0234` defined `docs/friends-relationship-repository-boundary.md`, accepted `decisions/ADR-0142-friends-relationship-repository-boundary.md`, and opened the storage-neutral repository interface implementation. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
+Use `.arch/work-items.yaml` as the source of truth for continuation. `W-0231` completed the Nakama-first friends relationship lifecycle gate. `W-0232` completed the friends relationship persistence schema gate. `W-0233` added the friends relationship migration source in `runtime/migrations/postgres/000007_create_friend_relationships.sql` and accepted `decisions/ADR-0141-friends-relationship-migration-source.md`. `W-0234` defined `docs/friends-relationship-repository-boundary.md` and accepted `decisions/ADR-0142-friends-relationship-repository-boundary.md`. `W-0235` implemented the storage-neutral friends relationship repository interface, accepted `decisions/ADR-0143-friends-relationship-repository-interface-implementation.md`, and registered `runtime.friends_relationship_repository_interface_implementation`. The next direction is `define_friends_relationship_postgresql_adapter_gate`. A request such as `continue` or `继续推进` means: advance one `next_ready` work item unless blocked by an ask-first boundary, verification failure, or required maintainer confirmation.
 
 ## Agent-Native Means
 

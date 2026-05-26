@@ -1,0 +1,236 @@
+schema_version: 0.1
+module: friends
+category: domain
+status: draft
+summary: Owns the storage-neutral friends relationship repository vocabulary, canonical player-pair social graph value types, lifecycle transition inputs, redacted conflict classes, and focused repository tests for the Nakama-first friends/groups/parties capability while PostgreSQL adapter behavior, runtime friendship behavior, protocol routes, Protobuf source, generated output, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDKs, hosted deployment, distributed runtime, and direct Nakama/Pitaya API compatibility remain deferred.
+
+decisions:
+  - ADR-0127
+  - ADR-0128
+  - ADR-0138
+  - ADR-0139
+  - ADR-0140
+  - ADR-0141
+  - ADR-0142
+  - ADR-0143
+
+owns:
+  entities:
+    - friend_relationship
+    - friend_relationship_pair
+  data:
+    - friend_relationships_logical_table
+    - friends_relationship_repository_interface_vocabulary
+  permissions: []
+  does_not_own:
+    entities:
+      - player_account
+      - authentication_credential
+      - runtime_session
+      - websocket_connection
+      - storage_object
+      - chat_channel
+      - group
+      - party
+      - match_session
+    data:
+      - player_accounts
+      - authentication_credentials
+      - runtime_sessions
+      - websocket_connection_state
+      - storage_objects
+      - chat_messages
+      - group_memberships
+      - party_memberships
+      - match_runtime_state
+      - friend_relationship_events
+
+public_api:
+  status: repository_interface_implemented_adapter_behavior_deferred
+  commands: []
+  queries: []
+  repository_interface:
+    owner: runtime/internal/modules/friends
+    interface: runtime/internal/modules/friends.Repository
+    source: runtime/internal/modules/friends/repository.go
+    tests: runtime/internal/modules/friends/repository_test.go
+    capabilities:
+      - CreateOrUpdateFriendRequest
+      - GetRelationshipByPair
+      - ListRelationshipsForPlayer
+      - AcceptFriendRequest
+      - RejectFriendRequest
+      - RemoveFriend
+      - SetPlayerBlock
+      - ClearPlayerBlock
+  vocabulary:
+    lifecycle_state:
+      - pending
+      - friends
+      - rejected
+      - removed
+    public_status:
+      - pending
+      - friends
+      - blocked
+      - ended
+    conflict_classes:
+      - relationship_not_found
+      - target_player_not_found
+      - self_relationship_forbidden
+      - duplicate_pending_request
+      - already_friends
+      - blocked_relationship
+      - invalid_transition
+      - version_mismatch
+      - stale_relationship_version
+      - pair_identity_conflict
+      - storage_unavailable
+
+events:
+  publishes: []
+  subscribes: []
+
+errors:
+  owns:
+    - friend_relationship_repository_errors
+  schemas:
+    status: not_ratified
+    rule: Repository errors are storage-neutral Go vocabulary only until public friends relationship runtime contracts are ratified.
+
+permission_schemas:
+  status: not_ratified
+  rule: Route-scoped friends permissions remain deferred until runtime behavior and protocol routes are separately authorized.
+
+dependencies:
+  allowed: []
+  forbidden:
+    - direct_websocket_library
+    - direct_protobuf_runtime
+    - direct_postgresql_driver
+    - authentication
+    - session
+    - storage
+    - realtime
+    - chat
+    - groups
+    - parties
+    - matchmaking
+    - match_runtime
+  external_reference_boundaries:
+    player_id:
+      owner: player
+      standard: docs/friends-relationship-repository-boundary.md
+      decision: ADR-0142
+      rule: Friend relationship pair members identify players, but this module does not authenticate, validate, create, or own player accounts or runtime sessions.
+    request_identity:
+      owner: runtime/internal/app
+      standard: docs/friends-relationship-repository-boundary.md
+      decision: ADR-0142
+      rule: Future runtime behavior must derive actor identity from validated request identity before calling this repository interface.
+
+invariants:
+  - friend_relationship_pair_must_be_canonical_unordered_player_pair
+  - self_relationship_must_be_forbidden
+  - actor_inputs_must_be_pair_member_when_mutating_existing_pair
+  - lifecycle_state_vocabulary_must_remain_closed
+  - public_status_vocabulary_must_remain_closed
+  - relationship_version_must_be_positive_and_server_managed
+  - private_social_graph_data_must_not_be_log_safe_by_default
+  - repository_errors_must_be_redacted
+  - repository_interface_must_remain_storage_neutral
+  - repository_interface_must_not_authenticate_or_validate_sessions
+  - postgresql_adapter_behavior_must_remain_deferred_until_W_0236_or_later
+  - protocol_routes_and_generated_output_must_remain_deferred
+  - direct_nakama_pitaya_api_compatibility_must_remain_false
+
+generated:
+  files: []
+  directories: []
+  planned_outputs:
+    go_typed_contracts: []
+    protobuf_message_shapes: []
+    websocket_dispatch_shapes: []
+    test_fixtures: []
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  status: repository_interface_implemented_contract_source_deferred
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  wire_schema_status: not_ratified
+  runtime_friends_handlers_added: false
+  protocol_routes_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  friends_relationship_repository_interface_implementation_completed: true
+  friends_relationship_repository_interface_implementation_decision: ADR-0143
+  friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
+  friends_relationship_repository_interface_implementation_work_item: W-0235
+  repository_owner: runtime/internal/modules/friends
+  repository_interface: runtime/internal/modules/friends.Repository
+  repository_source: runtime/internal/modules/friends/repository.go
+  repository_tests: runtime/internal/modules/friends/repository_test.go
+  source_repository_boundary_decision: ADR-0142
+  source_repository_boundary_standard: docs/friends-relationship-repository-boundary.md
+  source_migration_source_decision: ADR-0141
+  source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  friend_relationships_logical_table: friend_relationships
+  interface_added: true
+  value_types_added: true
+  normalizers_added: true
+  redacted_errors_added: true
+  focused_tests_added: true
+  module_manifest_added: true
+  storage_adapter_added: false
+  postgresql_adapter_added: false
+  sql_execution_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  request_identity_validation_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  event_audit_table_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  next_repository_work_item: W-0236
+  next_repository_work_item_scope: define_friends_relationship_postgresql_adapter_gate
+
+tests:
+  required:
+    - runtime/internal/modules/friends/repository_test.go
+    - repository_interface_storage_neutrality
+    - lifecycle_status_and_conflict_closed_sets
+    - canonical_pair_normalization_and_self_rejection
+    - returned_record_normalization
+    - returned_list_result_copying
+    - actor_pair_member_validation
+    - expected_version_validation_and_copying
+    - list_pagination_bounds
+    - redacted_conflict_and_repository_errors
+    - forbidden_secret_transport_protocol_distributed_fields
+
+runtime:
+  implementation_status: repository_interface_only
+  postgresql_adapter_status: deferred_to_W_0236_and_later
+  runtime_behavior_status: deferred
+  protocol_route_status: deferred
+  generated_output_status: deferred
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification

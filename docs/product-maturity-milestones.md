@@ -32,7 +32,7 @@ pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: implement_friends_relationship_repository_interface
+next_direction: define_friends_relationship_postgresql_adapter_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,13 +204,13 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the friends relationship repository boundary is:
+The next product direction after the friends relationship repository interface implementation is:
 
 ```text
-W-0235 Implement storage-neutral friends relationship repository interface
+W-0236 Define friends relationship PostgreSQL adapter gate
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, `ADR-0139` defined the friends relationship lifecycle gate, `ADR-0140` defined the friends relationship persistence schema gate, `ADR-0141` added `runtime/migrations/postgres/000007_create_friend_relationships.sql`, and `decisions/ADR-0142-friends-relationship-repository-boundary.md` defined the friends relationship repository boundary. The next work is `W-0235 Implement storage-neutral friends relationship repository interface`; it should implement only the storage-neutral friends relationship repository interface while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, persistence execution, PostgreSQL adapter implementation, event/audit tables, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0138` completed a scaffolded Nakama intake selecting `friends_groups_and_parties`, `ADR-0139` defined the friends relationship lifecycle gate, `ADR-0140` defined the friends relationship persistence schema gate, `ADR-0141` added `runtime/migrations/postgres/000007_create_friend_relationships.sql`, `decisions/ADR-0142-friends-relationship-repository-boundary.md` defined the friends relationship repository boundary, and `ADR-0143` implemented the storage-neutral friends relationship repository interface with check rule `runtime.friends_relationship_repository_interface_implementation`. The next work is `W-0236 Define friends relationship PostgreSQL adapter gate`; it should define only the PostgreSQL adapter gate while keeping protocol changes, startup wiring, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, runtime behavior, Protobuf source, generated output, persistence execution, PostgreSQL adapter implementation, event/audit tables, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, `docs/storage-objects-repository-boundary.md`, `runtime/migrations/postgres/000007_create_friend_relationships.sql`, and `docs/friends-relationship-repository-boundary.md`.
 

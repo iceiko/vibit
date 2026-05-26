@@ -233,7 +233,7 @@ scaffolded_nakama_feature_request_intake_pilot_decision: ADR-0138
 friends_relationship_lifecycle_gate_decision: ADR-0139
 friends_relationship_migration_source_decision: ADR-0141
 friends_relationship_repository_boundary_decision: ADR-0142
-next_work_item: W-0235 Implement storage-neutral friends relationship repository interface
+next_work_item: W-0236 Define friends relationship PostgreSQL adapter gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -347,11 +347,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source 和 friends relationship repository boundary 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime、runtime friendship behavior、protocol routes 或 adapter implementation。下一个具体工作只应实现 storage-neutral friends relationship repository interface：
+Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source、friends relationship repository boundary 和 storage-neutral friends relationship repository interface implementation 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime、runtime friendship behavior、protocol routes 或 adapter implementation。下一个具体工作只应定义 friends relationship PostgreSQL adapter gate：
 
 ```text
-next_work_item: W-0235 Implement storage-neutral friends relationship repository interface
-recommended_next_direction: implement_friends_relationship_repository_interface
+next_work_item: W-0236 Define friends relationship PostgreSQL adapter gate
+recommended_next_direction: define_friends_relationship_postgresql_adapter_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -366,7 +366,8 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 - `ADR-0140` 已定义 friends relationship persistence schema gate，并打开 `W-0233 Add friends relationship migration source`。
 - `ADR-0141` 只添加了 friends relationship migration source，并打开 `W-0234 Define friends relationship repository boundary`。
 - `ADR-0142` 已定义 friends relationship repository boundary，并打开 `W-0235 Implement storage-neutral friends relationship repository interface`。
-- Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，其 storage-neutral repository interface 应先被实现，再让 adapters、runtime、protocol、groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖它。
+- `ADR-0143` 已实现 storage-neutral friends relationship repository interface，注册 `runtime.friends_relationship_repository_interface_implementation`，并打开 `W-0236 Define friends relationship PostgreSQL adapter gate`。
+- Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，其 PostgreSQL adapter 应先经过 gate，再让 runtime、protocol、groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖 persistence behavior。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续延后，直到 single-process behavior 和 AI-native feature workflow 被证明。
 

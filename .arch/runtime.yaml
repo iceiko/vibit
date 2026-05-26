@@ -144,18 +144,19 @@ purpose: >
   friends_relationship_persistence_schema_gate: ADR-0140
   friends_relationship_migration_source: ADR-0141
   friends_relationship_repository_boundary: ADR-0142
+  friends_relationship_repository_interface_implementation: ADR-0143
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: implement_friends_relationship_repository_interface
+  current_phase: define_friends_relationship_postgresql_adapter_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0235
+  next_ready_work_item: W-0236
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -196,6 +197,10 @@ architecture_scope:
   friends_relationship_repository_boundary_translation: docs/friends-relationship-repository-boundary.zh-CN.md
   friends_relationship_repository_boundary_decision: ADR-0142
   friends_relationship_repository_boundary_check_rule: runtime.friends_relationship_repository_boundary
+  friends_relationship_repository_interface_source: runtime/internal/modules/friends/repository.go
+  friends_relationship_repository_interface_tests: runtime/internal/modules/friends/repository_test.go
+  friends_relationship_repository_interface_implementation_decision: ADR-0143
+  friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
   next_alpha_direction_after_storage_objects_local_proof_decision: ADR-0121
   first_server_push_realtime_messaging_gate_selected: true
   first_server_push_realtime_messaging_gate_standard: docs/first-server-push-realtime-messaging-gate.md
@@ -8357,19 +8362,70 @@ identity_session_boundary:
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0234 defined the friends relationship repository boundary before repository interface implementation, PostgreSQL adapter behavior, runtime behavior, protocol, generated output, event/audit tables, or direct compatibility.
   friends_relationship_repository_interface_implementation:
-    status: next_ready
+    status: completed
     milestone: M-163
-    next_ready_work_item: W-0235
+    completed_work_item: W-0235
+    decision: ADR-0143
+    change: changes/2026-05-25-implement-friends-relationship-repository-interface
+    check_rule: runtime.friends_relationship_repository_interface_implementation
+    next_milestone: M-164
+    next_ready_work_item: W-0236
     previous_completed_work_item: W-0234
     selected_direction: implement_friends_relationship_repository_interface
+    selected_follow_up_direction: define_friends_relationship_postgresql_adapter_gate
     expected_change: changes/2026-05-25-implement-friends-relationship-repository-interface
     source_repository_boundary_decision: ADR-0142
-    future_repository_owner_candidate: runtime/internal/modules/friends
-    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
-    future_repository_source_candidate: runtime/internal/modules/friends/repository.go
-    future_repository_tests_candidate: runtime/internal/modules/friends/repository_test.go
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
     implementation_scope: storage_neutral_repository_interface_only
+    interface_added: true
+    value_types_added: true
+    normalizers_added: true
+    redacted_errors_added: true
+    focused_tests_added: true
+    module_manifest_added: true
+    storage_adapter_added: false
     postgresql_adapter_added: false
+    sql_execution_added: false
+    runtime_behavior_added: false
+    authentication_session_behavior_changed: false
+    request_identity_validation_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    event_audit_table_added: false
+    chat_added: false
+    groups_added: false
+    parties_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    sdk_added: false
+    hosted_deployment_added: false
+    distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0235 implemented only the storage-neutral friends relationship repository interface before PostgreSQL adapter behavior, SQL execution, runtime behavior, protocol, generated output, event/audit tables, or direct compatibility.
+  friends_relationship_postgresql_adapter_gate:
+    status: next_ready
+    milestone: M-164
+    next_ready_work_item: W-0236
+    previous_completed_work_item: W-0235
+    selected_direction: define_friends_relationship_postgresql_adapter_gate
+    expected_change: changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate
+    source_repository_interface_decision: ADR-0143
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    future_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    future_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    implementation_scope: gate_only
+    postgresql_adapter_added: false
+    sql_execution_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false

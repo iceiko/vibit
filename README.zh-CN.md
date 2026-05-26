@@ -192,10 +192,10 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0235 Implement storage-neutral friends relationship repository interface
+W-0236 Define friends relationship PostgreSQL adapter gate
 ```
 
-使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 已完成 Nakama-first friends relationship lifecycle gate。`W-0232` 已完成 friends relationship persistence schema gate。`W-0233` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql` 中的 friends relationship migration source，并接受 `decisions/ADR-0141-friends-relationship-migration-source.md`。`W-0234` 已定义 `docs/friends-relationship-repository-boundary.md`，接受 `decisions/ADR-0142-friends-relationship-repository-boundary.md`，并打开 storage-neutral repository interface implementation。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
+使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 已完成 Nakama-first friends relationship lifecycle gate。`W-0232` 已完成 friends relationship persistence schema gate。`W-0233` 已添加 `runtime/migrations/postgres/000007_create_friend_relationships.sql` 中的 friends relationship migration source，并接受 `decisions/ADR-0141-friends-relationship-migration-source.md`。`W-0234` 已定义 `docs/friends-relationship-repository-boundary.md`，接受 `decisions/ADR-0142-friends-relationship-repository-boundary.md`。`W-0235` 已实现 storage-neutral friends relationship repository interface，接受 `decisions/ADR-0143-friends-relationship-repository-interface-implementation.md`，并注册 `runtime.friends_relationship_repository_interface_implementation`。下一方向是 `define_friends_relationship_postgresql_adapter_gate`。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
 
 ## Agent-Native 的含义
 

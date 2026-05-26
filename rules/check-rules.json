@@ -1452,6 +1452,14 @@
       "agent_guidance": "Read ADR-0142, ADR-0141, docs/friends-relationship-repository-boundary.md, docs/friends-relationship-persistence-schema-gate.md, docs/friends-relationship-lifecycle-gate.md, and docs/nakama-pitaya-product-parity-roadmap.md before continuing from W-0234. W-0235 should implement only the storage-neutral friends relationship repository interface. Do not add PostgreSQL adapter behavior, runtime behavior, protocol routes, Protobuf sources, generated output, dependencies, startup wiring, event/audit tables, SDKs, hosted demos, broad social modules, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.friends_relationship_repository_interface_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship repository interface implementation",
+      "description": "The friends relationship repository interface implementation must add only storage-neutral friends relationship Go repository vocabulary, value types, normalizers, typed redacted errors, module manifest guidance, and focused tests under runtime/internal/modules/friends while preserving PostgreSQL adapters, SQL execution, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, migration changes, authentication/session behavior, event/audit tables, SDK/hosted/distributed scope, and direct Nakama/Pitaya API compatibility deferrals.",
+      "agent_guidance": "Treat runtime/internal/modules/friends.Repository as storage-neutral module-owned vocabulary only. Do not expand W-0235 into PostgreSQL adapter behavior, SQL execution, runtime friendship behavior, protocol routes, Protobuf sources or generated output, migration changes, dependency additions, authentication/session behavior, event/audit tables, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "generator.created_artifact",
       "category": "generator",
       "default_severity": "info",

@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0235 Implement storage-neutral friends relationship repository interface` continuation step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0236 Define friends relationship PostgreSQL adapter gate` continuation step.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -128,7 +128,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, local alpha example client path implementation, feature request scaffolding, scaffolded Nakama feature request intake pilot, friends relationship lifecycle gate, friends relationship persistence schema gate, friends relationship migration source, and friends relationship repository boundary artifacts remain recorded in their existing documents. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the scaffolded intake pilot is recorded in `ADR-0138`; the friends lifecycle gate is recorded in `ADR-0139`; the friends persistence schema gate is recorded in `ADR-0140`; the friends migration source is recorded in `ADR-0141`; the friends repository boundary is recorded in `ADR-0142`. The next work is `W-0235 Implement storage-neutral friends relationship repository interface`.
+The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, local alpha example client path implementation, feature request scaffolding, scaffolded Nakama feature request intake pilot, friends relationship lifecycle gate, friends relationship persistence schema gate, friends relationship migration source, friends relationship repository boundary, and friends relationship repository interface implementation artifacts remain recorded in their existing documents. The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`; the scaffolded intake pilot is recorded in `ADR-0138`; the friends lifecycle gate is recorded in `ADR-0139`; the friends persistence schema gate is recorded in `ADR-0140`; the friends migration source is recorded in `ADR-0141`; the friends repository boundary is recorded in `ADR-0142`; the friends repository interface implementation is recorded in `ADR-0143` with check rule `runtime.friends_relationship_repository_interface_implementation`. The next work is `W-0236 Define friends relationship PostgreSQL adapter gate`; next_direction: define_friends_relationship_postgresql_adapter_gate.
 
 Trace references for alpha acceptance include `docs/first-alpha-user-discovery-loop.md`, `docs/first-alpha-feedback-intake-surfaces.md`, `docs/product-maturity-milestones.md`, `docs/prototype-ready-foundation-execution-plan.md`, `docs/prototype-ready-local-development-path-gate.md`, `docs/storage-objects-behavior-gate.md`, and `docs/storage-objects-persistence-schema-gate.md`.
 
@@ -171,6 +171,6 @@ first_server_push_realtime_messaging_runtime_slice_completed: true
 realtime_protocol_websocket_outbound_delivery_gate_defined: true
 realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
-next_direction: implement_friends_relationship_repository_interface
+next_direction: define_friends_relationship_postgresql_adapter_gate
 next_work_status: next_ready
 ```

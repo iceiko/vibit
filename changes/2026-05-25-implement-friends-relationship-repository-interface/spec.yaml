@@ -1,0 +1,233 @@
+schema_version: 0.1
+change_id: implement-friends-relationship-repository-interface
+date: 2026-05-25
+type: feature
+status: verified
+
+summary: Implement the storage-neutral friends relationship repository interface without PostgreSQL adapter behavior, SQL execution, runtime friendship behavior, protocol routes, generated output, migration changes, event/audit tables, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0143
+  referenced:
+    - ADR-0142
+    - ADR-0141
+    - ADR-0140
+    - ADR-0139
+    - ADR-0138
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources_changed: []
+  logical_tables_added: []
+  repository_interfaces_added: true
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - runtime/internal/modules/friends owns storage-neutral friends relationship repository vocabulary.
+    - modules/friends/module.yaml records module ownership and forbidden scope.
+    - ADR-0143 records the repository interface implementation decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: true
+  postgresql_adapters_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Implement the storage-neutral friends relationship repository interface after the friends relationship repository boundary, preserving Nakama-first planning and deferring PostgreSQL adapter, runtime, protocol, generated, event/audit, and direct compatibility scope."
+user_visible_outcome: Future agents can inspect a typed friends relationship repository interface, module manifest, and tests before implementing the PostgreSQL adapter gate or runtime friendship behavior.
+nakama_capability_family: friends_groups_and_parties
+
+nakama_capability_mapping:
+  family: friends_groups_and_parties
+  product_intent: Friends relationship repository vocabulary is a prerequisite for Nakama-class social graph behavior before runtime request, accept, reject, remove, block, unblock, list, or status behavior can be implemented safely.
+  adopted:
+    - Friends relationships are durable social graph state.
+    - Friend request, accept, reject, remove, block, unblock, list, and status behavior require typed repository vocabulary.
+    - Private social graph data requires explicit redaction posture.
+  adapted:
+    - vibit implements a storage-neutral module repository interface before PostgreSQL adapter behavior.
+    - Canonical pair and actor rules are normalized in repository value helpers.
+    - The protocol and schema remain vibit-native and do not copy external APIs.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - adapter, protocol, runtime, group, party, chat, matchmaking, match runtime, SDK, hosted, distributed runtime, or event/audit table scope in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0235
+  completed_milestone: M-163
+  previous_completed_work_item: W-0234
+  next_milestone: M-164
+  next_work_item: W-0236
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: implement_friends_relationship_repository_interface
+  next_direction: define_friends_relationship_postgresql_adapter_gate
+  decision: ADR-0143
+  check_rule: runtime.friends_relationship_repository_interface_implementation
+  friends_relationship_repository_interface_implementation_completed: true
+  friends_relationship_repository_interface_implementation_decision: ADR-0143
+  friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
+  source_repository_boundary_decision: ADR-0142
+  source_repository_boundary_standard: docs/friends-relationship-repository-boundary.md
+  source_migration_source_decision: ADR-0141
+  source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+  source_schema_gate_decision: ADR-0140
+  source_lifecycle_gate_decision: ADR-0139
+  friend_relationships_logical_table: friend_relationships
+  repository_owner: runtime/internal/modules/friends
+  repository_interface: runtime/internal/modules/friends.Repository
+  repository_source: runtime/internal/modules/friends/repository.go
+  repository_tests: runtime/internal/modules/friends/repository_test.go
+  module_manifest: modules/friends/module.yaml
+  interface_added: true
+  value_types_added: true
+  normalizers_added: true
+  redacted_errors_added: true
+  focused_tests_added: true
+  module_manifest_added: true
+  storage_adapter_added: false
+  postgresql_adapter_added: false
+  postgresql_adapter_changed: false
+  sql_execution_added: false
+  unit_of_work_factory_added: false
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  request_identity_validation_added: false
+  route_protection_semantics_changed: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  event_audit_table_added: false
+  startup_wiring_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  group_messaging_added: false
+  broadcast_fanout_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - go test ./internal/modules/friends
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_repository_interface_implementation
+    - node tools/vibit check change implement-friends-relationship-repository-interface --json
+    - node tools/vibit check module friends --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - postgresql_adapter_requires_separate_work_item
+    - sql_execution_requires_separate_work_item
+    - runtime_or_protocol_scope_requires_authorization
+    - protobuf_or_generated_output_requires_authorization
+    - migration_change_requires_authorization
+    - dependency_requires_authorization
+    - event_audit_table_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - broader_social_scope_requires_authorization
+    - sdk_or_hosted_scope_requires_authorization
+    - distributed_runtime_requires_authorization
+    - direct_compatibility_requires_authorization
+
+tests:
+  added:
+    - runtime/internal/modules/friends/repository_test.go
+  focused_coverage:
+    - repository_interface_storage_neutrality
+    - closed_lifecycle_status_conflict_vocabularies
+    - canonical_pair_normalization
+    - self_relationship_rejection
+    - returned_record_normalization
+    - returned_list_result_copying
+    - actor_in_pair_validation
+    - expected_version_validation_and_copying
+    - list_pagination_bounds
+    - redacted_conflict_and_repository_errors
+    - forbidden_secret_transport_protocol_distributed_fields
+
+verification:
+  status: Verified
+  focused_passed:
+    - cd runtime && go test ./internal/modules/friends
+  full_verification_record: changes/2026-05-25-implement-friends-relationship-repository-interface/verification.md

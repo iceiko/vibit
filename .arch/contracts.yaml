@@ -2304,15 +2304,56 @@ implemented_wire_and_runtime_slices:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   friends_relationship_repository_interface_implementation:
-    status: next_ready
+    status: completed
     milestone: M-163
-    next_ready_work_item: W-0235
+    completed_work_item: W-0235
+    friends_relationship_repository_interface_implementation_completed: true
+    friends_relationship_repository_interface_implementation_decision: ADR-0143
+    friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
+    friends_relationship_repository_interface_implementation_work_item: W-0235
+    next_milestone: M-164
+    next_ready_work_item: W-0236
     selected_direction: implement_friends_relationship_repository_interface
+    selected_follow_up_direction: define_friends_relationship_postgresql_adapter_gate
     source_repository_boundary_decision: ADR-0142
-    future_repository_owner_candidate: runtime/internal/modules/friends
-    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
-    future_repository_source_candidate: runtime/internal/modules/friends/repository.go
+    friends_relationship_repository_owner: runtime/internal/modules/friends
+    friends_relationship_repository_interface: runtime/internal/modules/friends.Repository
+    friends_relationship_repository_interface_source: runtime/internal/modules/friends/repository.go
+    friends_relationship_repository_interface_tests: runtime/internal/modules/friends/repository_test.go
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
     contract_changes_expected: false
+    friends_relationship_repository_interface_added: true
+    friends_relationship_repository_value_types_added: true
+    friends_relationship_repository_normalizers_added: true
+    friends_relationship_repository_postgresql_adapter_added: false
+    friends_relationship_repository_sql_execution_added: false
+    friends_relationship_repository_runtime_behavior_added: false
+    friends_relationship_repository_protocol_route_added: false
+    friends_relationship_repository_protobuf_source_added: false
+    friends_relationship_repository_generated_output_added: false
+    friends_relationship_repository_dependencies_added: false
+    friends_relationship_repository_migration_changed: false
+    friends_relationship_repository_event_audit_table_added: false
+    friends_relationship_repository_direct_nakama_pitaya_api_compatibility_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+  friends_relationship_postgresql_adapter_gate:
+    status: next_ready
+    milestone: M-164
+    next_ready_work_item: W-0236
+    selected_direction: define_friends_relationship_postgresql_adapter_gate
+    source_repository_interface_decision: ADR-0143
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    contract_changes_expected: false
+    postgresql_adapter_added: false
+    sql_execution_added: false
+    runtime_behavior_added: false
     protocol_route_added: false
     protobuf_source_added: false
     generated_output_added: false
@@ -4158,3 +4199,38 @@ modules:
     errors: []
     permissions: []
     rule: Storage has own-player get/list/put/delete Protobuf routes and application handlers. Semantic contract source files, events, permissions, ACLs, cross-owner access, large object/blob storage, S3-compatible storage, and direct compatibility remain deferred.
+  friends:
+    status: repository_interface_implemented_contract_source_deferred
+    module_manifest: modules/friends/module.yaml
+    decisions:
+      - ADR-0138
+      - ADR-0139
+      - ADR-0140
+      - ADR-0141
+      - ADR-0142
+      - ADR-0143
+    repository_interface:
+      owner: runtime/internal/modules/friends
+      interface: runtime/internal/modules/friends.Repository
+      source: runtime/internal/modules/friends/repository.go
+      tests: runtime/internal/modules/friends/repository_test.go
+      implementation_completed: true
+      implementation_work_item: W-0235
+      implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
+    persistence_schema:
+      logical_table: friend_relationships
+      migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+      postgresql_adapter_added: false
+      sql_execution_added: false
+    protocol_routes:
+      status: deferred
+      protocol_source_added: false
+      generated_go_output_added: false
+      runtime_friends_handlers_added: false
+      direct_nakama_pitaya_api_compatibility_added: false
+    commands: []
+    queries: []
+    events: []
+    errors: []
+    permissions: []
+    rule: Friends currently owns only the storage-neutral repository vocabulary for friend request, accept, reject, remove, block, unblock, read, and list behavior. Semantic contract source files, Protobuf routes, generated output, runtime friendship handlers, PostgreSQL adapter implementation, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDKs, hosted deployment, distributed runtime, and direct compatibility remain deferred.

@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_friends_relationship_repository_interface
-  recommended_next_direction: implement_friends_relationship_repository_interface
+  current_near_term_priority: define_friends_relationship_postgresql_adapter_gate
+  recommended_next_direction: define_friends_relationship_postgresql_adapter_gate
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: friends_relationship_repository_boundary_defined
+  current_state: friends_relationship_repository_interface_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0235
-  immediate_next_direction: implement_friends_relationship_repository_interface
+  immediate_next_work_item: W-0236
+  immediate_next_direction: define_friends_relationship_postgresql_adapter_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -63,6 +63,8 @@ release_target:
   friends_relationship_lifecycle_gate_translation: docs/friends-relationship-lifecycle-gate.zh-CN.md
   friends_relationship_persistence_schema_gate_standard: docs/friends-relationship-persistence-schema-gate.md
   friends_relationship_persistence_schema_gate_translation: docs/friends-relationship-persistence-schema-gate.zh-CN.md
+  friends_relationship_repository_interface_implementation_decision: ADR-0143
+  friends_relationship_repository_interface_implementation_check_rule: runtime.friends_relationship_repository_interface_implementation
   long_term_product_target: ai_era_nakama_pitaya_class_server_framework
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
@@ -5049,11 +5051,16 @@ phase_plan:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2et_friends_relationship_repository_interface_implementation:
-    status: next_ready
+    status: completed
     milestone: M-163
-    next_ready_work_item: W-0235
+    completed_work_item: W-0235
+    decision: ADR-0143
+    check_rule: runtime.friends_relationship_repository_interface_implementation
+    next_milestone: M-164
+    next_ready_work_item: W-0236
     previous_completed_work_item: W-0234
     selected_direction: implement_friends_relationship_repository_interface
+    selected_follow_up_direction: define_friends_relationship_postgresql_adapter_gate
     expected_change: changes/2026-05-25-implement-friends-relationship-repository-interface
     reference_mapping:
       nakama: Implement the storage-neutral repository interface for future friends relationship lifecycle behavior before PostgreSQL adapter behavior, runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
@@ -5063,11 +5070,42 @@ phase_plan:
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     selected_nakama_capability_family: friends_groups_and_parties
-    future_repository_owner_candidate: runtime/internal/modules/friends
-    future_repository_interface_candidate: runtime/internal/modules/friends.Repository
-    future_repository_source_candidate: runtime/internal/modules/friends/repository.go
-    future_repository_tests_candidate: runtime/internal/modules/friends/repository_test.go
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
+    interface_added: true
+    value_types_added: true
+    normalizers_added: true
     postgresql_adapter_added: false
+    sql_execution_added: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    generated_output_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2eu_friends_relationship_postgresql_adapter_gate:
+    status: next_ready
+    milestone: M-164
+    next_ready_work_item: W-0236
+    previous_completed_work_item: W-0235
+    selected_direction: define_friends_relationship_postgresql_adapter_gate
+    expected_change: changes/2026-05-26-define-friends-relationship-postgresql-adapter-gate
+    reference_mapping:
+      nakama: Define PostgreSQL adapter expectations for future friends relationship lifecycle behavior before adapter implementation, runtime handlers, protocol routes, groups, parties, chat targeting, matchmaking filters, or match social context.
+      pitaya: Pitaya remains deferred; do not use the adapter gate to introduce distributed topology, frontend/backend split, RPC, groups, service discovery, or distributed social graph routing.
+    target_stage: prototype_ready_foundation
+    source_repository_interface_decision: ADR-0143
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    selected_nakama_capability_family: friends_groups_and_parties
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    future_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    future_postgresql_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    postgresql_adapter_added: false
+    sql_execution_added: false
     runtime_behavior_added: false
     protocol_route_added: false
     generated_output_added: false
