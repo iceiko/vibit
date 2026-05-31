@@ -27,11 +27,11 @@ stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
 reference_posture_update: ADR-0127
 primary_product_reference: Nakama
-pitaya_reference_status: deferred_future_architecture_reference
+pitaya_reference_status: frontend_backend_role_source_first_map_implemented
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: implement_pitaya_aligned_frontend_backend_role_source_first_map
+next_direction: define_pitaya_aligned_server_to_server_rpc_boundary_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-Pitaya-aligned distributed runtime vocabulary reactivation gate 之后，下一个产品方向是：
+Pitaya-aligned frontend/backend role source-first map 之后，下一个产品方向是：
 
 ```text
-W-0249 Implement Pitaya-aligned frontend/backend role source-first map
+W-0250 Define Pitaya-aligned server-to-server RPC boundary gate
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0152` 已定义 minimum operations inspection gate，检查规则是 `runtime.minimum_operations_inspection_surface_gate`；`ADR-0153` 已实现 source-first operations inspection，检查规则是 `runtime.minimum_operations_inspection_source_first_surface_implementation`；`ADR-0154` 已定义 Pitaya-aligned distributed runtime vocabulary reactivation gate，检查规则是 `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`；`ADR-0155` 已实现 Pitaya-aligned distributed runtime vocabulary source-first map，检查规则是 `runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map`；`ADR-0156` 已定义 Pitaya-aligned frontend/backend role boundary gate，检查规则是 `runtime.pitaya_aligned_frontend_backend_role_boundary_gate`。下一项 work 是 `W-0249 Implement Pitaya-aligned frontend/backend role source-first map`；它只应实现 source-first role map，同时继续延后 protocol shape changes、service behavior changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime implementation、frontend/backend server role implementation、server-to-server RPC、remote calls、service discovery、cluster-safe session routing、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、event/audit tables、admin endpoints、metrics endpoints、observability pipelines、dashboards 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0152` 已定义 minimum operations inspection gate，检查规则是 `runtime.minimum_operations_inspection_surface_gate`；`ADR-0153` 已实现 source-first operations inspection，检查规则是 `runtime.minimum_operations_inspection_source_first_surface_implementation`；`ADR-0154` 已定义 Pitaya-aligned distributed runtime vocabulary reactivation gate，检查规则是 `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`；`ADR-0155` 已实现 Pitaya-aligned distributed runtime vocabulary source-first map，检查规则是 `runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map`；`ADR-0156` 已定义 Pitaya-aligned frontend/backend role boundary gate，检查规则是 `runtime.pitaya_aligned_frontend_backend_role_boundary_gate`；`ADR-0157` 已实现 `node tools/vibit inspect pitaya-roles --json`，检查规则是 `runtime.pitaya_aligned_frontend_backend_role_source_first_map`。下一项 work 是 `W-0250 Define Pitaya-aligned server-to-server RPC boundary gate`；它只应定义 server-to-server RPC boundary gate，同时继续延后 protocol shape changes、service behavior changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、stream subscriptions、chat rooms、groups、parties、broadcast fanout、delivery guarantees、distributed runtime implementation、frontend/backend server role implementation、server-to-server RPC implementation、remote calls、service discovery、cluster-safe session routing、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、event/audit tables、admin endpoints、metrics endpoints、observability pipelines、dashboards 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql`、`docs/storage-objects-repository-boundary.md`、`runtime/migrations/postgres/000007_create_friend_relationships.sql` 和 `docs/friends-relationship-repository-boundary.md`。
 
