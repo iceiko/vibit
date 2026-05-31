@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-179
+current_milestone: M-180
 
 release_targets:
   short_term:
@@ -16,9 +16,9 @@ release_targets:
     current_release_state: pitaya_aligned_server_to_server_rpc_boundary_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0251
+    next_ready_work_item: W-0252
     preferred_after_current:
-      - implement_pitaya_aligned_server_to_server_rpc_source_first_map
+      - define_pitaya_aligned_service_discovery_boundary_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3284,7 +3284,7 @@ milestones:
 
   - id: M-179
     title: Pitaya-Aligned Server To Server RPC Source-First Map
-    status: active
+    status: completed
     goal: Implement a source-first repository map for the Pitaya-aligned server-to-server RPC vocabulary defined by ADR-0158, without implementing RPC, remote calls, service discovery, frontend/backend roles, distributed runtime behavior, distributed groups, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first repository inspection surface summarizes the server-to-server RPC and remote-call vocabulary and current single-process mapping.
@@ -3292,6 +3292,18 @@ milestones:
       - Repository checks verify the map and deferrals.
     non_goals:
       - adding server-to-server RPC implementation, remote call behavior, service discovery, frontend/backend server role implementation, distributed runtime implementation, distributed groups, room broadcast fanout, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-rpc --json` as a source-first repository inspection map for Pitaya-aligned server-to-server RPC and remote-call vocabulary, current single-process RPC mapping, source surfaces, deferrals, and redaction flags. Accepted `ADR-0159`, registered `runtime.pitaya_aligned_server_to_server_rpc_source_first_map`, completed `W-0251`, and opened `M-180/W-0252 Define Pitaya-aligned service discovery boundary gate` as next-ready. Preserved server-to-server RPC implementation, remote calls, service discovery, frontend/backend role implementation, distributed runtime implementation, distributed groups, room broadcast fanout, cluster-safe session routing, runtime endpoint behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-180
+    title: Pitaya-Aligned Service Discovery Boundary Gate
+    status: active
+    goal: Define a narrow Pitaya-aligned service discovery boundary gate after the server-to-server RPC source-first map, without implementing service discovery, RPC, remote calls, frontend/backend roles, distributed runtime behavior, distributed groups, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A gate records service discovery vocabulary for future planning.
+      - The gate maps current static single-process composition to deferred service discovery vocabulary.
+      - The gate preserves implementation deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding service discovery implementation, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, distributed runtime implementation, distributed groups, room broadcast fanout, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9807,7 +9819,7 @@ work_items:
   - id: W-0251
     milestone: M-179
     title: Implement Pitaya-aligned server-to-server RPC source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-server-to-server-rpc-source-first-map
     depends_on:
       - W-0250
@@ -9830,4 +9842,39 @@ work_items:
     completion:
       - Implement a source-first repository inspection map for server-to-server RPC and remote-call vocabulary.
       - Summarize current single-process dispatch, route handler, module handler, and service discovery deferrals.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0159
+    check_rule: runtime.pitaya_aligned_server_to_server_rpc_source_first_map
+    next_milestone: M-180
+    next_ready_work_item: W-0252
+    selected_follow_up_direction: define_pitaya_aligned_service_discovery_boundary_gate
+    completion_summary: Implemented `node tools/vibit inspect pitaya-rpc --json` as a source-first repository inspection map for Pitaya-aligned server-to-server RPC vocabulary, current single-process RPC mapping, source surfaces, deferrals, and redaction flags. Preserved RPC implementation, remote calls, service discovery, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0252
+    milestone: M-180
+    title: Define Pitaya-aligned service discovery boundary gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-service-discovery-boundary-gate
+    depends_on:
+      - W-0251
+    expected_change_id: define-pitaya-aligned-service-discovery-boundary-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_pitaya_aligned_service_discovery_boundary_gate
+    gate_decision: ADR-0159
+    related_decisions:
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing service discovery, server-to-server RPC, remote call behavior, frontend/backend server roles, distributed runtime behavior, distributed groups, room broadcast fanout, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of defining only a service discovery boundary gate.
+    completion:
+      - Define a Pitaya-aligned service discovery boundary gate.
+      - Map current static single-process composition to deferred service discovery vocabulary.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

@@ -28,11 +28,11 @@ stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
 reference_posture_update: ADR-0127
 primary_product_reference: Nakama
-pitaya_reference_status: server_to_server_rpc_vocabulary_boundary_defined_for_future_architecture_planning
+pitaya_reference_status: server_to_server_rpc_source_first_map_implemented
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: implement_pitaya_aligned_server_to_server_rpc_source_first_map
+next_direction: define_pitaya_aligned_service_discovery_boundary_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -204,13 +204,13 @@ Feedback that asks for production claims, broad feature parity, hosted deploymen
 
 ## 7. Next Product Direction
 
-The next product direction after the Pitaya-aligned server-to-server RPC boundary gate is:
+The next product direction after the Pitaya-aligned server-to-server RPC source-first map is:
 
 ```text
-W-0251 Implement Pitaya-aligned server-to-server RPC source-first map
+W-0252 Define Pitaya-aligned service discovery boundary gate
 ```
 
-The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0152` defined the minimum operations inspection gate with check rule `runtime.minimum_operations_inspection_surface_gate`, `ADR-0153` implemented source-first operations inspection with check rule `runtime.minimum_operations_inspection_source_first_surface_implementation`, `ADR-0154` defined the Pitaya-aligned distributed runtime vocabulary reactivation gate with check rule `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`, `ADR-0155` implemented the Pitaya-aligned distributed runtime vocabulary source-first map with check rule `runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map`, `ADR-0156` defined the Pitaya-aligned frontend/backend role boundary gate with check rule `runtime.pitaya_aligned_frontend_backend_role_boundary_gate`, `ADR-0157` implemented `node tools/vibit inspect pitaya-roles --json` with check rule `runtime.pitaya_aligned_frontend_backend_role_source_first_map`, and `ADR-0158` defined the Pitaya-aligned server-to-server RPC boundary gate with check rule `runtime.pitaya_aligned_server_to_server_rpc_boundary_gate`. The next work is `W-0251 Implement Pitaya-aligned server-to-server RPC source-first map`; it should add only a source-first repository inspection map for server-to-server RPC and remote-call vocabulary while keeping protocol shape changes, service behavior changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime implementation, frontend/backend server role implementation, server-to-server RPC implementation, remote calls, service discovery, cluster-safe session routing, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, event/audit tables, admin endpoints, metrics endpoints, observability pipelines, dashboards, and direct compatibility deferred unless a later explicit work item authorizes them.
+The agent-native feature request and test workflow is recorded in `docs/agent-native-feature-request-test-workflow.md` and `ADR-0128`. `ADR-0152` defined the minimum operations inspection gate with check rule `runtime.minimum_operations_inspection_surface_gate`, `ADR-0153` implemented source-first operations inspection with check rule `runtime.minimum_operations_inspection_source_first_surface_implementation`, `ADR-0154` defined the Pitaya-aligned distributed runtime vocabulary reactivation gate with check rule `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`, `ADR-0155` implemented the Pitaya-aligned distributed runtime vocabulary source-first map with check rule `runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map`, `ADR-0156` defined the Pitaya-aligned frontend/backend role boundary gate with check rule `runtime.pitaya_aligned_frontend_backend_role_boundary_gate`, `ADR-0157` implemented `node tools/vibit inspect pitaya-roles --json` with check rule `runtime.pitaya_aligned_frontend_backend_role_source_first_map`, `ADR-0158` defined the Pitaya-aligned server-to-server RPC boundary gate with check rule `runtime.pitaya_aligned_server_to_server_rpc_boundary_gate`, and `ADR-0159` implemented `node tools/vibit inspect pitaya-rpc --json` with check rule `runtime.pitaya_aligned_server_to_server_rpc_source_first_map`. The next work is `W-0252 Define Pitaya-aligned service discovery boundary gate`; it should define only a service-discovery vocabulary gate while keeping protocol shape changes, service behavior changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, distributed runtime implementation, frontend/backend server role implementation, server-to-server RPC implementation, remote calls, service discovery implementation, cluster-safe session routing, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, event/audit tables, admin endpoints, metrics endpoints, observability pipelines, dashboards, and direct compatibility deferred unless a later explicit work item authorizes them.
 
 Stage 2 trace references include `docs/prototype-ready-local-development-path-package.md`, `docs/storage-objects-behavior-gate.md`, `docs/storage-objects-persistence-schema-gate.md`, `runtime/migrations/postgres/000006_create_storage_objects.sql`, `docs/storage-objects-repository-boundary.md`, `runtime/migrations/postgres/000007_create_friend_relationships.sql`, and `docs/friends-relationship-repository-boundary.md`.
 

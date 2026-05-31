@@ -250,9 +250,11 @@ minimum_operations_inspection_source_first_surface_implementation_decision: ADR-
 minimum_operations_inspection_source_first_surface_implementation_check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
 pitaya_aligned_server_to_server_rpc_boundary_gate_decision: ADR-0158
 pitaya_aligned_server_to_server_rpc_boundary_gate_check_rule: runtime.pitaya_aligned_server_to_server_rpc_boundary_gate
+pitaya_aligned_server_to_server_rpc_source_first_map_decision: ADR-0159
+pitaya_aligned_server_to_server_rpc_source_first_map_check_rule: runtime.pitaya_aligned_server_to_server_rpc_source_first_map
 historical_after_adr_0127:
   pitaya_reference_status: deferred_future_architecture_reference
-next_work_item: W-0251 Implement Pitaya-aligned server-to-server RPC source-first map
+next_work_item: W-0252 Define Pitaya-aligned service discovery boundary gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -366,13 +368,13 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, the minimum operations inspection surface gate, the source-first operations inspection implementation, the Pitaya distributed runtime vocabulary map, the frontend/backend role map, and the server-to-server RPC boundary gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime implementation, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, dashboards, frontend/backend server role implementation, server-to-server RPC implementation, remote calls, service discovery, distributed groups, or cluster-safe session routing. The next concrete work should implement only a Pitaya-aligned server-to-server RPC source-first map:
+After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, the minimum operations inspection surface gate, the source-first operations inspection implementation, the Pitaya distributed runtime vocabulary map, the frontend/backend role map, the server-to-server RPC boundary gate, and the server-to-server RPC source-first map, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime implementation, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, dashboards, frontend/backend server role implementation, server-to-server RPC implementation, remote calls, service discovery implementation, distributed groups, or cluster-safe session routing. The next concrete work should define only a Pitaya-aligned service discovery boundary gate:
 
 ```text
-next_work_item: W-0251 Implement Pitaya-aligned server-to-server RPC source-first map
-recommended_next_direction: implement_pitaya_aligned_server_to_server_rpc_source_first_map
+next_work_item: W-0252 Define Pitaya-aligned service discovery boundary gate
+recommended_next_direction: define_pitaya_aligned_service_discovery_boundary_gate
 primary_product_reference: Nakama
-pitaya_reference_status: server_to_server_rpc_vocabulary_boundary_defined_for_future_architecture_planning
+pitaya_reference_status: server_to_server_rpc_source_first_map_implemented
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 ```
 
@@ -400,6 +402,7 @@ Rationale:
 - `ADR-0156` defined the Pitaya-aligned frontend/backend role boundary gate, registered `runtime.pitaya_aligned_frontend_backend_role_boundary_gate`, and opened `W-0249 Implement Pitaya-aligned frontend/backend role source-first map`.
 - `ADR-0157` implemented `node tools/vibit inspect pitaya-roles --json`, registered `runtime.pitaya_aligned_frontend_backend_role_source_first_map`, and opened `W-0250 Define Pitaya-aligned server-to-server RPC boundary gate`.
 - `ADR-0158` defined the Pitaya-aligned server-to-server RPC boundary gate, registered `runtime.pitaya_aligned_server_to_server_rpc_boundary_gate`, and opened `W-0251 Implement Pitaya-aligned server-to-server RPC source-first map`.
+- `ADR-0159` implemented `node tools/vibit inspect pitaya-rpc --json`, registered `runtime.pitaya_aligned_server_to_server_rpc_source_first_map`, and opened `W-0252 Define Pitaya-aligned service discovery boundary gate`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
 - The operations inspection surface now makes local alpha status, route families, verification posture, and deferred operations surfaces inspectable without adding runtime endpoints.
 - The next source-first map should make future Pitaya-aligned server-to-server RPC and remote-call vocabulary inspectable before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.

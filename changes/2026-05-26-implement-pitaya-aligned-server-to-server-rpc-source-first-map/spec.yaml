@@ -1,0 +1,234 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-server-to-server-rpc-source-first-map
+date: 2026-05-31
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned server-to-server RPC inspection map and open a service discovery boundary gate follow-up without adding RPC implementation, remote calls, service discovery, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0159
+  referenced:
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_server_to_server_rpc_source_first_map: implemented
+  completed_work_item: W-0251
+  completed_milestone: M-179
+  previous_completed_work_item: W-0250
+  next_milestone: M-180
+  next_work_item: W-0252
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_server_to_server_rpc_source_first_map
+  next_direction: define_pitaya_aligned_service_discovery_boundary_gate
+  decision: ADR-0159
+  gate_decision: ADR-0158
+  check_rule: runtime.pitaya_aligned_server_to_server_rpc_source_first_map
+  command: node tools/vibit inspect pitaya-rpc --json
+  rpc_boundary_standard: docs/pitaya-aligned-server-to-server-rpc-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: server_to_server_rpc_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_rpc_vocabulary:
+    - server_to_server_rpc
+    - remote_call
+  related_vocabulary:
+    - route_handler
+    - module_handler
+    - application_dispatch
+    - service_discovery
+  current_single_process_rpc_mapping:
+    server_to_server_rpc:
+      current: no_rpc_current_single_process_application_dispatch
+      future_vocabulary: server_to_server_rpc
+      implementation_status: deferred_future_architecture_reference
+    remote_call:
+      current: no_remote_call_current_in_process_module_invocation
+      future_vocabulary: remote_call
+      implementation_status: deferred_future_architecture_reference
+    route_handler:
+      current: current_application_dispatch_and_protocol_bridge
+      future_vocabulary: backend_server_route_handler_boundary
+      implementation_status: current_single_process_only
+    module_handler:
+      current: current_module_handler_in_process_function_call
+      future_vocabulary: backend_server_module_handler_boundary
+      implementation_status: current_single_process_only
+    service_discovery:
+      current: no_service_discovery_current_static_single_process_composition
+      future_vocabulary: service_discovery
+      implementation_status: deferred_future_architecture_reference
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  service_discovery_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  distributed_groups_added: false
+  room_broadcast_fanout_added: false
+  cluster_safe_session_routing_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by making future server-to-server RPC vocabulary inspectable while preserving current single-process boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_and_service_discovery
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: server_to_server_rpc_source_first_map_implemented
+  adopted:
+    - server_to_server_rpc vocabulary inspection
+    - remote_call vocabulary inspection
+    - application dispatch to future RPC mapping
+    - module handler to future remote-call mapping
+    - service discovery deferral mapping
+  adapted:
+    - source-first repository inspection before RPC implementation
+    - explicit deferral flags before runtime behavior
+    - vibit module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - Pitaya package or route naming compatibility
+    - server-to-server RPC implementation in this slice
+    - remote call behavior in this slice
+    - service discovery implementation in this slice
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-rpc --json`.
+  - The inspection output includes allowed RPC vocabulary, related vocabulary, current single-process RPC mapping, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0251 map and W-0252 next-ready state.
+  - The slice does not add RPC implementation, remote call behavior, service discovery, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0159, change artifacts, conversation memory, inspect output markers, W-0251 completion, W-0252 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by `node tools/vibit check runtime --json`; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-implement-pitaya-aligned-server-to-server-rpc-source-first-map/
+    - decisions/ADR-0159-pitaya-aligned-server-to-server-rpc-source-first-map.md
+    - conversations/2026-05-26-pitaya-aligned-server-to-server-rpc-source-first-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - server-to-server RPC implementation
+    - remote call behavior
+    - service discovery
+    - frontend/backend server role implementation
+    - distributed runtime implementation
+    - distributed group or broadcast behavior
+    - room broadcast fanout
+    - cluster-safe session routing behavior
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - SDK publication
+    - hosted deployments
+    - release artifacts
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - modules/friends/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - modules/friends/AGENTS.md
+  - modules/friends/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect pitaya-rpc --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_server_to_server_rpc_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-server-to-server-rpc-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
