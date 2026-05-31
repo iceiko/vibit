@@ -1,0 +1,221 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate
+date: 2026-05-31
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned distributed runtime vocabulary reactivation boundary and open a source-first vocabulary map follow-up without adding distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0154
+  referenced:
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate: defined
+  completed_work_item: W-0246
+  completed_milestone: M-174
+  previous_completed_work_item: W-0245
+  next_milestone: M-175
+  next_work_item: W-0247
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+  next_direction: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
+  decision: ADR-0154
+  check_rule: runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+  source_operations_inspection_decision: ADR-0153
+  source_operations_inspection_check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
+  standard: docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md
+  translation: docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: vocabulary_reactivated_for_future_architecture_planning
+  implementation_scope: gate_only_architecture_vocabulary
+  future_implementation_work_item: W-0247
+  future_implementation_direction: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
+  allowed_vocabulary:
+    - acceptor
+    - frontend_server
+    - backend_server
+    - route_handler
+    - session_binding
+    - server_to_server_rpc
+    - remote_call
+    - service_discovery
+    - distributed_group
+    - room_broadcast
+    - cluster_safe_session_routing
+  current_single_process_mapping:
+    websocket_tcp_acceptors: current_websocket_acceptor_single_process_only
+    session_binding: current_first_message_connection_binding_single_process_only
+    route_handler_model: current_application_dispatch_and_protocol_bridge
+    frontend_backend_server_roles: deferred_future_architecture_reference
+    rpc_and_remote_calls: deferred_future_architecture_reference
+    groups_rooms_broadcast: deferred_future_architecture_reference
+    cluster_service_discovery: deferred_future_architecture_reference
+  distributed_runtime_implementation_added: false
+  frontend_backend_server_roles_added: false
+  server_to_server_rpc_added: false
+  service_discovery_added: false
+  distributed_groups_added: false
+  cluster_safe_session_routing_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining future distributed runtime vocabulary while preserving current single-process boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_and_service_discovery
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: vocabulary_reactivated_for_future_architecture_planning
+  adopted:
+    - acceptor vocabulary
+    - session binding vocabulary
+    - route handler vocabulary
+    - frontend/backend role vocabulary
+    - server-to-server RPC and remote call vocabulary
+    - service discovery vocabulary
+    - distributed group and broadcast vocabulary
+    - cluster-safe session routing vocabulary
+  adapted:
+    - vocabulary only before implementation
+    - source-first mapping before runtime behavior
+    - vibit module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - Pitaya package or route naming compatibility
+    - distributed runtime implementation in this slice
+
+acceptance_criteria:
+  - The gate defines allowed Pitaya-aligned distributed runtime vocabulary.
+  - The gate maps current single-process vibit concepts to future vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0247 as a narrow source-first vocabulary map work item.
+  - The gate does not add distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0154, gate standard, translation, change artifacts, vocabulary markers, W-0246 completion, W-0247 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md
+    - docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.zh-CN.md
+    - changes/2026-05-26-define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate/
+    - decisions/ADR-0154-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md
+    - conversations/2026-05-26-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - distributed runtime implementation
+    - frontend/backend server role implementation
+    - server-to-server RPC or remote call behavior
+    - service discovery
+    - distributed group or broadcast behavior
+    - cluster-safe session routing behavior
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - SDK publication
+    - hosted deployments
+    - release artifacts
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - modules/friends/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - modules/friends/AGENTS.md
+  - modules/friends/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+    - node tools/vibit check change define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

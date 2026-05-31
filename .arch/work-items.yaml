@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-174
+current_milestone: M-175
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: minimum_operations_inspection_source_first_surface_implemented
+    current_release_state: pitaya_aligned_distributed_runtime_vocabulary_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0246
+    next_ready_work_item: W-0247
     preferred_after_current:
-      - define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+      - implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3224,12 +3224,24 @@ milestones:
 
   - id: M-174
     title: Pitaya-Aligned Distributed Runtime Vocabulary Reactivation Gate
-    status: active
+    status: completed
     goal: Define a narrow Pitaya-aligned distributed runtime vocabulary reactivation gate after the source-first operations inspection surface, without implementing frontend/backend roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A gate records which Pitaya architecture vocabulary may be reactivated for future planning.
       - The gate maps existing single-process acceptor, session binding, and route handler concepts to future frontend/backend, RPC, service discovery, and distributed group vocabulary.
       - The gate preserves implementation deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding distributed runtime implementation, frontend/backend server role implementation, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the Pitaya-aligned distributed runtime vocabulary reactivation gate, accepted `ADR-0154`, registered `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`, completed `W-0246`, and opened `M-175/W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map` as next-ready. The gate reactivates Pitaya vocabulary for future architecture planning while preserving distributed runtime implementation, frontend/backend roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-175
+    title: Pitaya-Aligned Distributed Runtime Vocabulary Source-First Map
+    status: active
+    goal: Implement a source-first repository map for the Pitaya-aligned distributed runtime vocabulary defined by ADR-0154, without implementing frontend/backend roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A source-first repository inspection surface summarizes the Pitaya-aligned vocabulary and current single-process mapping.
+      - The map preserves vocabulary-only posture and does not add runtime behavior.
+      - Repository checks verify the map and deferrals.
     non_goals:
       - adding distributed runtime implementation, frontend/backend server role implementation, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
@@ -9591,7 +9603,7 @@ work_items:
   - id: W-0246
     milestone: M-174
     title: Define Pitaya-aligned distributed runtime vocabulary reactivation gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate
     depends_on:
       - W-0245
@@ -9610,4 +9622,34 @@ work_items:
     completion:
       - Define a Pitaya-aligned vocabulary gate for future distributed runtime planning.
       - Map current single-process acceptor, session binding, route handling, and group/broadcast deferrals to future architecture vocabulary.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0154
+    check_rule: runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+    next_milestone: M-175
+    next_ready_work_item: W-0247
+    selected_follow_up_direction: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
+    completion_summary: Defined the Pitaya-aligned distributed runtime vocabulary reactivation gate, accepted `ADR-0154`, and recorded allowed vocabulary for acceptors, frontend/backend roles, route handlers, session binding, server-to-server RPC, remote calls, service discovery, distributed groups, room broadcast, and cluster-safe session routing. Preserved distributed runtime implementation, runtime endpoint behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0247
+    milestone: M-175
+    title: Implement Pitaya-aligned distributed runtime vocabulary source-first map
+    status: next_ready
+    change: changes/2026-05-26-implement-pitaya-aligned-distributed-runtime-vocabulary-source-first-map
+    depends_on:
+      - W-0246
+    expected_change_id: implement-pitaya-aligned-distributed-runtime-vocabulary-source-first-map
+    tier: tier_2_architecture_implementation
+    selected_direction: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
+    gate_decision: ADR-0154
+    related_decisions:
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing distributed runtime behavior, frontend/backend server roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of implementing only a source-first Pitaya-aligned distributed runtime vocabulary map.
+    completion:
+      - Implement a source-first repository inspection map for Pitaya-aligned vocabulary.
+      - Summarize current single-process mapping and future distributed deferrals.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
