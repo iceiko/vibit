@@ -236,7 +236,7 @@ friends_relationship_repository_boundary_decision: ADR-0142
 friends_relationship_protocol_route_gate_decision: ADR-0148
 friends_relationship_protocol_route_implementation_decision: ADR-0149
 friends_relationship_protocol_route_local_proof_decision: ADR-0150
-next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
+next_work_item: W-0244 Define minimum operations inspection surface gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -353,8 +353,8 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source、friends relationship repository boundary、storage-neutral friends relationship repository interface implementation、friends relationship PostgreSQL adapter gate、friends relationship PostgreSQL adapter implementation、friends relationship runtime behavior gate、friends relationship runtime behavior implementation、friends relationship protocol route gate 和 friends relationship protocol route implementation 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime、broad social modules、event/audit tables、generated client libraries 或新的 protocol shape。下一个具体工作只应在 local alpha request flow 中证明 protected friends relationship protocol route slice：
 
 ```text
-next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
-recommended_next_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+next_work_item: W-0244 Define minimum operations inspection surface gate
+recommended_next_direction: define_minimum_operations_inspection_surface_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -376,7 +376,7 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 - `ADR-0147` 已实现 friends relationship runtime behavior service，注册 `runtime.friends_relationship_runtime_behavior_implementation`，并打开 `W-0240 Define friends relationship protocol route gate`。
 - `ADR-0148` 已定义 friends relationship protocol route gate，注册 `runtime.friends_relationship_protocol_route_gate`，并打开 `W-0241 Implement friends relationship protocol route`。
 - `ADR-0149` 已实现 friends relationship protocol route，注册 `runtime.friends_relationship_protocol_route_implementation`，并打开 `W-0242 Prove friends relationship protocol route in local alpha request flow`。
-- `ADR-0150` 已证明 friends relationship protocol route local flow，注册 `runtime.friends_relationship_protocol_route_local_proof`，并打开 `W-0243 Select next Nakama prototype-ready capability after friends relationship route proof`。
+- `ADR-0150` 已证明 friends relationship protocol route local flow，注册 `runtime.friends_relationship_protocol_route_local_proof`，并打开 `W-0244 Define minimum operations inspection surface gate`。
 - Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，protected protocol route family 现在已经可供 local alpha request-flow proof 使用。
 - 下一项 proof 应保持在该 gate 和 implementation 已定义的 route family 与 route policy 内，再让 groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖该 behavior。
 - Nakama-first product planning 可以避免近期 scope 被产品广度和 Pitaya-style distributed architecture 同时拉扯。

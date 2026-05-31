@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-171
+current_milestone: M-172
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: friends_relationship_protocol_route_local_proven
+    current_release_state: minimum_operations_inspection_surface_gate_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0243
+    next_ready_work_item: W-0244
     preferred_after_current:
-      - select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+      - define_minimum_operations_inspection_surface_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3188,7 +3188,7 @@ milestones:
 
   - id: M-171
     title: Next Nakama Prototype-Ready Capability Selection After Friends Route Proof
-    status: active
+    status: completed
     goal: Select the next bounded Nakama/Pitaya-aligned prototype-ready capability direction after proving the protected friends relationship route family locally, without implementing runtime behavior, protocol shape, generated output, persistence, dependencies, broad social scope, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility in the selection slice.
     completion_criteria:
       - The selected next direction is recorded in `.arch/work-items.yaml` and supporting architecture artifacts.
@@ -3196,6 +3196,18 @@ milestones:
       - The selection preserves all implementation, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
     non_goals:
       - adding new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_minimum_operations_inspection_surface_gate` as the next Nakama-first prototype-ready direction after friends relationship route proof, accepted `ADR-0151`, registered `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`, completed `W-0243`, and opened `M-172/W-0244 Define minimum operations inspection surface gate` as next-ready. Runtime behavior, operations/admin endpoint implementation, protocol routes, generated output, persistence, dependencies, broad social scope, hosted surfaces, SDKs, distributed runtime, and direct compatibility remained deferred.
+
+  - id: M-172
+    title: Minimum Operations Inspection Surface Gate
+    status: active
+    goal: Define the minimum source-first operations/admin inspection surface needed before broader prototype use, without implementing runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, distributed runtime, or direct Nakama/Pitaya API compatibility in the gate slice.
+    completion_criteria:
+      - The minimum inspectable state categories and redaction posture are documented before implementation.
+      - The gate defines ownership, test expectations, and stop conditions for any future operations inspection implementation.
+      - The gate preserves all runtime, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding operations/admin endpoint implementation, metrics endpoints, observability pipelines, dashboards, new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9459,16 +9471,17 @@ work_items:
   - id: W-0243
     milestone: M-171
     title: Select next Nakama prototype-ready capability after friends relationship route proof
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-select-next-nakama-prototype-ready-capability-after-friends-route-proof
     depends_on:
       - W-0242
     expected_change_id: select-next-nakama-prototype-ready-capability-after-friends-route-proof
     tier: tier_2_direction_selection
-    selected_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+    selected_direction: define_minimum_operations_inspection_surface_gate
     gate_density_strategy: ADR-0082
     related_decisions:
       - ADR-0150
+      - ADR-0151
       - ADR-0149
       - ADR-0148
       - ADR-0147
@@ -9481,4 +9494,36 @@ work_items:
     completion:
       - Select and record the next bounded Nakama prototype-ready capability after the friends relationship route local proof.
       - Keep the selection slice documentation-only and checkable.
+      - Preserve implementation/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.
+    decision: ADR-0151
+    check_rule: runtime.next_nakama_prototype_ready_capability_after_friends_route_proof
+    next_milestone: M-172
+    next_ready_work_item: W-0244
+    selected_follow_up_direction: define_minimum_operations_inspection_surface_gate
+    selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+    completion_summary: Selected `define_minimum_operations_inspection_surface_gate` as the next bounded Nakama-first prototype-ready capability after friends relationship route local proof, accepted `ADR-0151`, registered `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`, and opened `M-172/W-0244 Define minimum operations inspection surface gate`. Preserved runtime behavior, operations/admin implementation, protocol routes, generated output, repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals, hosted/SDK/release scope, and distributed runtime deferrals.
+
+  - id: W-0244
+    milestone: M-172
+    title: Define minimum operations inspection surface gate
+    status: next_ready
+    change: changes/2026-05-26-define-minimum-operations-inspection-surface-gate
+    depends_on:
+      - W-0243
+    expected_change_id: define-minimum-operations-inspection-surface-gate
+    tier: tier_2_operations_gate
+    selected_direction: define_minimum_operations_inspection_surface_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0151
+      - ADR-0150
+      - ADR-0128
+      - ADR-0127
+      - ADR-0105
+      - ADR-0078
+    ask_first:
+      - Implementing operations/admin endpoint behavior, metrics endpoints, observability pipelines, dashboards, runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility instead of defining only the minimum operations inspection surface gate.
+    completion:
+      - Define the minimum source-first operations inspection surface gate.
+      - Record inspectable state categories, redaction posture, ownership, tests, and stop conditions.
       - Preserve implementation/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.

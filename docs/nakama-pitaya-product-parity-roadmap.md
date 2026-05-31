@@ -244,7 +244,7 @@ friends_relationship_repository_boundary_decision: ADR-0142
 friends_relationship_protocol_route_gate_decision: ADR-0148
 friends_relationship_protocol_route_implementation_decision: ADR-0149
 friends_relationship_protocol_route_local_proof_decision: ADR-0150
-next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
+next_work_item: W-0244 Define minimum operations inspection surface gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -361,8 +361,8 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, and the friends relationship protocol route local proof, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime, broad social modules, event/audit tables, generated client libraries, or new protocol shape. The next concrete work should select only the next bounded Nakama prototype-ready capability direction:
 
 ```text
-next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
-recommended_next_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+next_work_item: W-0244 Define minimum operations inspection surface gate
+recommended_next_direction: define_minimum_operations_inspection_surface_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -384,7 +384,7 @@ Rationale:
 - `ADR-0147` implemented the friends relationship runtime behavior service, registered `runtime.friends_relationship_runtime_behavior_implementation`, and opened `W-0240 Define friends relationship protocol route gate`.
 - `ADR-0148` defined the friends relationship protocol route gate, registered `runtime.friends_relationship_protocol_route_gate`, and opened `W-0241 Implement friends relationship protocol route`.
 - `ADR-0149` implemented the friends relationship protocol route, registered `runtime.friends_relationship_protocol_route_implementation`, and opened `W-0242 Prove friends relationship protocol route in local alpha request flow`.
-- `ADR-0150` proved the friends relationship protocol route locally, registered `runtime.friends_relationship_protocol_route_local_proof`, and opened `W-0243 Select next Nakama prototype-ready capability after friends relationship route proof`.
+- `ADR-0150` proved the friends relationship protocol route locally, registered `runtime.friends_relationship_protocol_route_local_proof`, and opened `W-0244 Define minimum operations inspection surface gate`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
 - The next selection should decide the next capability direction before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.

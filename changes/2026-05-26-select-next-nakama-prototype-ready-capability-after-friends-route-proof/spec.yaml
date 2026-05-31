@@ -1,0 +1,270 @@
+schema_version: 0.1
+change_id: select-next-nakama-prototype-ready-capability-after-friends-route-proof
+date: 2026-05-31
+type: standard
+status: verified
+
+summary: Select the minimum operations inspection surface gate as the next Nakama-first prototype-ready capability after friends relationship route proof.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - operations
+
+decisions:
+  added:
+    - ADR-0151
+  referenced:
+    - ADR-0150
+    - ADR-0149
+    - ADR-0148
+    - ADR-0147
+    - ADR-0138
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+selected_direction: define_minimum_operations_inspection_surface_gate
+selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+selected_user_requirement: minimum_source_first_operations_inspection_surface
+
+candidate_directions:
+  - define_minimum_operations_inspection_surface_gate
+  - define_groups_relationship_lifecycle_gate
+  - define_parties_lifecycle_gate
+  - define_chat_streams_gate
+  - define_leaderboards_or_tournaments_gate
+  - define_matchmaking_gate
+  - define_authoritative_match_runtime_gate
+  - publish_sdk_or_generated_client_library
+  - reactivate_pitaya_distributed_architecture_review
+
+runtime:
+  next_nakama_prototype_ready_capability_after_friends_route_proof: completed
+  completed_work_item: W-0243
+  completed_milestone: M-171
+  previous_completed_work_item: W-0242
+  next_milestone: M-172
+  next_work_item: W-0244
+  next_work_item_status: next_ready
+  tier: tier_2_direction_selection
+  selected_direction: define_minimum_operations_inspection_surface_gate
+  selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+  selected_user_requirement: minimum_source_first_operations_inspection_surface
+  source_friends_relationship_route_local_proof_decision: ADR-0150
+  source_workflow_decision: ADR-0128
+  decision: ADR-0151
+  check_rule: runtime.next_nakama_prototype_ready_capability_after_friends_route_proof
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_work_item: W-0244
+  future_change_id: define-minimum-operations-inspection-surface-gate
+  target_stage: prototype_ready_foundation
+  implementation_authorized_by_this_selection: false
+  operations_inspection_surface_implementation_added: false
+  admin_console_added: false
+  metrics_endpoint_added: false
+  observability_pipeline_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protocol_bridge_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  application_bootstrap_handler_added: false
+  startup_wiring_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  authentication_session_behavior_changed: false
+  route_protection_changed: false
+  token_refresh_added: false
+  cleanup_job_added: false
+  delivery_guarantee_added: false
+  stream_subscription_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  sdk_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_beyond_github_release_added: false
+  paid_promotion_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Define the minimum source-first operations inspection surface needed for prototype authors to understand and troubleshoot local alpha server state before broader capability expansion.
+nakama_capability_family: admin_console_metrics_observability_and_operations
+
+nakama_capability_mapping:
+  family: admin_console_metrics_observability_and_operations
+  product_intent: Nakama-class frameworks become practical when operators and developers can inspect server health, version, configuration posture, active state, and runtime behavior without guessing from logs alone. vibit needs an agent-native, source-first gate for that minimum operations inspection posture before broadening into more social, realtime, competitive, or match runtime features.
+  existing_foundation:
+    - /healthz
+    - /readyz
+    - /version
+    - /configz
+    - docs/runtime-runbook.md
+    - docs/alpha-developer-flow.md
+    - examples/local-alpha-example-client.sh
+    - examples/local-alpha-request-loop.sh
+    - runtime/cmd/vibit-server
+    - tools/vibit
+  deferred:
+    - admin console implementation
+    - metrics endpoint implementation
+    - observability pipeline implementation
+    - live operations dashboard
+    - player/session/token/friends inspection endpoints
+    - WebSocket inspection routes
+    - hosted operations surface
+    - SDK publication
+    - generated client libraries
+    - chat
+    - groups
+    - parties
+    - matchmaking
+    - match runtime
+    - distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+decision_rationale:
+  selected:
+    direction: define_minimum_operations_inspection_surface_gate
+    reason: The local alpha now proves authenticated gameplay, storage, realtime outbound delivery, example-client flow, feature-request scaffolding, and friends relationship routes. Before adding more product breadth, prototype authors need a bounded operations inspection posture that explains what state can be inspected, what must remain redacted, and which surfaces are source-first versus future hosted/admin work.
+  deferred_candidates:
+    define_groups_relationship_lifecycle_gate: Product-useful after friends, but it expands social scope before the operations inspection posture is defined.
+    define_parties_lifecycle_gate: Useful realtime-social scope, but should wait until inspection expectations for sessions, connections, and routes are clearer.
+    define_chat_streams_gate: Useful, but stream and message visibility create redaction and observability questions that should be gated first.
+    define_leaderboards_or_tournaments_gate: Product-class capability, but less urgent than understanding the current prototype state.
+    define_matchmaking_gate: Important Nakama-class capability, but it depends on clearer operational visibility for sessions, connections, and queues.
+    define_authoritative_match_runtime_gate: Too broad before minimum operations inspection and additional realtime policy gates.
+    publish_sdk_or_generated_client_library: Premature while the source-first alpha is still changing quickly.
+    reactivate_pitaya_distributed_architecture_review: Explicitly deferred by the Nakama-first direction.
+
+workflow_phases:
+  user_requirement:
+    recorded: true
+    artifact: request.md
+  requirement_spec:
+    recorded: true
+    artifact: spec.yaml
+  nakama_capability_mapping:
+    recorded: true
+    family: admin_console_metrics_observability_and_operations
+  acceptance_criteria:
+    recorded: true
+  test_plan:
+    recorded: true
+  tests:
+    selection_slice_tests_applicable: false
+    rationale: This slice selects the follow-up gate only. W-0244 will define the test plan for any future minimum operations inspection surface.
+  implementation_boundaries:
+    recorded: true
+  verification_phase:
+    recorded: true
+  durable_memory:
+    recorded: true
+
+acceptance_criteria:
+  - The selected next capability family is `admin_console_metrics_observability_and_operations`.
+  - The selected next direction is `define_minimum_operations_inspection_surface_gate`.
+  - The selection records why minimum operations inspection should precede groups, parties, chat, leaderboards, matchmaking, match runtime, SDK publication, or distributed runtime.
+  - The selection opens W-0244 as a bounded gate before implementation.
+  - The selection does not add runtime behavior, operations/admin endpoints, protocol routes, Protobuf source, generated output, migrations, dependencies, persistence, startup wiring, SDKs, hosted deployments, release artifacts, broad product modules, Pitaya-style distributed architecture, or direct compatibility.
+
+test_plan:
+  selection_slice:
+    - Repository check for W-0243 completion and W-0244 next-ready state.
+    - Runtime check for ADR-0151, change artifacts, Nakama capability mapping, selected follow-up direction, deferral markers, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  follow_up_w_0244:
+    - Define accepted operations inspection surfaces before implementation.
+    - Define redaction tests for raw credentials, access tokens, keys, digests, DSNs, player/session/token identifiers, transport metadata, and configuration values.
+    - Define whether future implementation tests run as focused Go tests, scripts, repository checks, or documentation checks.
+    - Preserve no new protocol route, Protobuf, generated output, dependency, hosted admin console, SDK publication, or direct compatibility scope unless a later bounded item authorizes it.
+
+verification:
+  status: Verified
+  record: verification.md
+  required_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.next_nakama_prototype_ready_capability_after_friends_route_proof
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change select-next-nakama-prototype-ready-capability-after-friends-route-proof --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-select-next-nakama-prototype-ready-capability-after-friends-route-proof/
+    - decisions/ADR-0151-select-next-nakama-prototype-ready-capability-after-friends-route-proof.md
+    - conversations/2026-05-26-select-next-nakama-prototype-ready-capability-after-friends-route-proof.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/friends/AGENTS*.md
+    - modules/friends/module.yaml
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - operations inspection implementation in this selection slice
+    - admin console, metrics endpoint, or observability pipeline implementation
+    - SDK publication or generated client library
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - startup wiring
+    - persistence changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - authentication/session behavior changes
+    - token refresh or cleanup jobs
+    - stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, or distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/reference.yaml
+  - .arch/contracts.yaml
+  - .arch/conventions.yaml
+  - .arch/modules.yaml
+  - modules/friends/module.yaml
+  - modules/storage/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
