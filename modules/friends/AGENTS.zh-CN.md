@@ -30,7 +30,7 @@
 
 `M-170 Friends Relationship Protocol Route Local Proof` 已由 `W-0242` 完成。检查规则是 `runtime.friends_relationship_protocol_route_local_proof`。
 
-repository 下一项 work item 是 `W-0252 Define Pitaya-aligned service discovery boundary gate`。该 work 不属于本模块且必须保持 gate-only；在后续 bounded work item 明确授权前，不要在本模块添加 protocol shape changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、event/audit tables、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime behavior、frontend/backend server role implementation、server-to-server RPC behavior、remote calls、service discovery、operations/admin implementation 或 direct Nakama/Pitaya API compatibility。
+repository 下一项 work item 是 `W-0253 Implement Pitaya-aligned service discovery source-first map`。该 work 不属于本模块且必须保持 source-first；在后续 bounded work item 明确授权前，不要在本模块添加 protocol shape changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、event/audit tables、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime behavior、frontend/backend server role implementation、server-to-server RPC behavior、remote calls、service discovery implementation、service registries、service selectors、operations/admin implementation 或 direct Nakama/Pitaya API compatibility。
 
 ## 什么时候不要使用本模块
 
@@ -65,7 +65,7 @@ repository 下一项 work item 是 `W-0252 Define Pitaya-aligned service discove
 - Protocol route gate：`docs/friends-relationship-protocol-route-gate.md`
 - Protocol route implementation：`runtime.friends_relationship_protocol_route_implementation`
 - Protocol route local proof：`W-0242 Prove friends relationship protocol route in local alpha request flow`
-- Next Pitaya-aligned vocabulary follow-up：`W-0252 Define Pitaya-aligned service discovery boundary gate`
+- Next Pitaya-aligned vocabulary follow-up：`W-0253 Implement Pitaya-aligned service discovery source-first map`
 
 第一批 public runtime commands 和 queries 仍然 deferred。未来 runtime behavior 必须先从 validated request identity 派生 actor identity，再调用 repository interface；client-supplied player ids 不是 authentication proof。
 

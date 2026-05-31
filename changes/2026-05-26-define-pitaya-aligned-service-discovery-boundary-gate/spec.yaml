@@ -1,0 +1,217 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-service-discovery-boundary-gate
+date: 2026-05-31
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned service discovery boundary and open a source-first service discovery map follow-up without adding service discovery implementation, registries, selectors, node identity, RPC implementation, remote calls, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0160
+  referenced:
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_service_discovery_boundary_gate: defined
+  completed_work_item: W-0252
+  completed_milestone: M-180
+  previous_completed_work_item: W-0251
+  next_milestone: M-181
+  next_work_item: W-0253
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_service_discovery_boundary_gate
+  next_direction: implement_pitaya_aligned_service_discovery_source_first_map
+  decision: ADR-0160
+  check_rule: runtime.pitaya_aligned_service_discovery_boundary_gate
+  rpc_source_first_map_decision: ADR-0159
+  rpc_source_first_map_check_rule: runtime.pitaya_aligned_server_to_server_rpc_source_first_map
+  standard: docs/pitaya-aligned-service-discovery-boundary-gate.md
+  translation: docs/pitaya-aligned-service-discovery-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: service_discovery_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_service_discovery_vocabulary
+  future_implementation_work_item: W-0253
+  future_implementation_direction: implement_pitaya_aligned_service_discovery_source_first_map
+  allowed_service_discovery_vocabulary:
+    - service_discovery
+    - service_registry
+    - service_instance
+    - service_selector
+  related_vocabulary:
+    - frontend_server
+    - backend_server
+    - server_to_server_rpc
+    - remote_call
+    - route_handler
+    - module_handler
+    - static_process_composition
+  current_single_process_service_discovery_mapping:
+    service_discovery:
+      current: no_service_discovery_current_static_single_process_composition
+      future_vocabulary: service_discovery
+      implementation_status: deferred_future_architecture_reference
+    service_registry:
+      current: no_registry_current_startup_composition
+      future_vocabulary: service_registry
+      implementation_status: deferred_future_architecture_reference
+    service_instance:
+      current: single_process_runtime_components_not_network_instances
+      future_vocabulary: service_instance
+      implementation_status: deferred_future_architecture_reference
+    service_selector:
+      current: no_selector_current_direct_in_process_dispatch
+      future_vocabulary: service_selector
+      implementation_status: deferred_future_architecture_reference
+    route_handler:
+      current: current_application_dispatch_and_protocol_bridge
+      future_vocabulary: discoverable_backend_route_handler
+      implementation_status: current_single_process_only
+    module_handler:
+      current: current_module_handler_in_process_function_call
+      future_vocabulary: discoverable_backend_module_handler
+      implementation_status: current_single_process_only
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  distributed_groups_added: false
+  room_broadcast_fanout_added: false
+  cluster_safe_session_routing_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining future service discovery vocabulary while preserving current single-process static composition boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_and_service_discovery
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: service_discovery_vocabulary_boundary_defined_for_future_architecture_planning
+  adopted:
+    - service_discovery vocabulary
+    - service_registry vocabulary
+    - service_instance vocabulary
+    - service_selector vocabulary
+    - static startup composition to deferred discovery mapping
+    - route and module handler mapping to future discoverable backend ownership
+  adapted:
+    - service discovery vocabulary only before implementation
+    - source-first mapping before runtime topology
+    - vibit module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - Pitaya package, method, registry, or route naming compatibility
+    - service discovery implementation in this slice
+    - service registry or selector behavior in this slice
+    - node identity, heartbeat, membership, or topology behavior in this slice
+    - server-to-server RPC or remote call behavior in this slice
+    - distributed runtime implementation in this slice
+
+acceptance_criteria:
+  - The gate defines allowed service discovery vocabulary.
+  - The gate maps current static single-process vibit composition to future service discovery vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0253 as a narrow source-first service discovery map work item.
+  - The gate does not add service discovery implementation, registries, selectors, node identity, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0160, gate standard, translation, change artifacts, service discovery vocabulary markers, W-0252 completion, W-0253 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-service-discovery-boundary-gate.md
+    - docs/pitaya-aligned-service-discovery-boundary-gate.zh-CN.md
+    - changes/2026-05-26-define-pitaya-aligned-service-discovery-boundary-gate/
+    - decisions/ADR-0160-pitaya-aligned-service-discovery-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-service-discovery-boundary-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - service discovery implementation
+    - service registry behavior
+    - service selector behavior
+    - node registry behavior
+    - server identity behavior
+    - server-to-server RPC implementation
+    - remote call behavior
+    - frontend/backend server role implementation
+    - distributed runtime implementation
+    - distributed group or broadcast behavior
+    - room broadcast fanout
+    - cluster-safe session routing behavior
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_service_discovery_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-service-discovery-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
