@@ -182,6 +182,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.minimum_operations_inspection_surface_gate",
   "runtime.minimum_operations_inspection_source_first_surface_implementation",
   "runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate",
+  "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -261,6 +262,7 @@ Usage:
   vibit inspect generated --type <contract-type>
   vibit inspect next
   vibit inspect operations
+  vibit inspect pitaya-vocabulary
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -295,6 +297,8 @@ Commands:
   inspect generated        Print generated output metadata as JSON.
   inspect next             Print the next continuation work item as JSON.
   inspect operations       Print source-first operations inspection metadata as JSON.
+  inspect pitaya-vocabulary
+                           Print Pitaya-aligned distributed runtime vocabulary metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -3172,6 +3176,97 @@ function buildOperationsInspection(root) {
 
 function inspectOperations(root) {
   printJson(buildOperationsInspection(root));
+}
+
+function buildPitayaVocabularyInspection(root) {
+  return {
+    schema_version: "0.1",
+    kind: "pitaya_vocabulary_inspection",
+    project: "vibit",
+    status: "source_first_pitaya_aligned_distributed_runtime_vocabulary_map",
+    source: {
+      standard: "docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md",
+      gate_decision: "ADR-0154",
+      implementation_decision: "ADR-0155",
+      check_rule: "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map",
+      work_item: "W-0247",
+      change: "changes/2026-05-26-implement-pitaya-aligned-distributed-runtime-vocabulary-source-first-map",
+    },
+    allowed_vocabulary: [
+      "acceptor",
+      "frontend_server",
+      "backend_server",
+      "route_handler",
+      "session_binding",
+      "server_to_server_rpc",
+      "remote_call",
+      "service_discovery",
+      "distributed_group",
+      "room_broadcast",
+      "cluster_safe_session_routing",
+    ],
+    current_single_process_mapping: {
+      websocket_tcp_acceptors: "current_websocket_acceptor_single_process_only",
+      session_binding: "current_first_message_connection_binding_single_process_only",
+      route_handler_model: "current_application_dispatch_and_protocol_bridge",
+      frontend_backend_server_roles: "deferred_future_architecture_reference",
+      rpc_and_remote_calls: "deferred_future_architecture_reference",
+      groups_rooms_broadcast: "deferred_future_architecture_reference",
+      cluster_service_discovery: "deferred_future_architecture_reference",
+    },
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      "docs/pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate.md",
+      "docs/nakama-pitaya-product-parity-roadmap.md",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      distributed_runtime_implementation_added: false,
+      frontend_backend_server_roles_added: false,
+      server_to_server_rpc_added: false,
+      remote_call_behavior_added: false,
+      service_discovery_added: false,
+      distributed_groups_added: false,
+      room_broadcast_fanout_added: false,
+      cluster_safe_session_routing_added: false,
+      runtime_behavior_added: false,
+      runtime_endpoint_behavior_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      authentication_session_behavior_changed: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+    },
+    next: {
+      next_milestone: "M-176",
+      next_ready_work_item: "W-0248",
+      selected_follow_up_direction: "define_pitaya_aligned_frontend_backend_role_boundary_gate",
+    },
+  };
+}
+
+function inspectPitayaVocabulary(root) {
+  printJson(buildPitayaVocabularyInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -39445,6 +39540,248 @@ function checkRuntimePitayaAlignedDistributedRuntimeVocabularyReactivationGate(r
   });
 }
 
+function checkRuntimePitayaAlignedDistributedRuntimeVocabularySourceFirstMap(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map";
+  const decisionPath = "decisions/ADR-0155-pitaya-aligned-distributed-runtime-vocabulary-source-first-map.md";
+  const changePath = "changes/2026-05-26-implement-pitaya-aligned-distributed-runtime-vocabulary-source-first-map";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-distributed-runtime-vocabulary-source-first-map.md";
+
+  if (!pitayaAlignedDistributedRuntimeVocabularySourceFirstMapCompleted(root)) {
+    ok("Pitaya-aligned distributed runtime vocabulary source-first map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned distributed runtime vocabulary source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned distributed runtime vocabulary source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = buildPitayaVocabularyInspection(root);
+  const inspectionText = JSON.stringify(inspection);
+  const requiredInspectionMarkers = [
+    "\"kind\":\"pitaya_vocabulary_inspection\"",
+    "\"status\":\"source_first_pitaya_aligned_distributed_runtime_vocabulary_map\"",
+    "\"work_item\":\"W-0247\"",
+    "\"check_rule\":\"runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map\"",
+    "\"gate_decision\":\"ADR-0154\"",
+    "\"implementation_decision\":\"ADR-0155\"",
+    "\"acceptor\"",
+    "\"frontend_server\"",
+    "\"backend_server\"",
+    "\"route_handler\"",
+    "\"session_binding\"",
+    "\"server_to_server_rpc\"",
+    "\"remote_call\"",
+    "\"service_discovery\"",
+    "\"distributed_group\"",
+    "\"room_broadcast\"",
+    "\"cluster_safe_session_routing\"",
+    "\"websocket_tcp_acceptors\":\"current_websocket_acceptor_single_process_only\"",
+    "\"session_binding\":\"current_first_message_connection_binding_single_process_only\"",
+    "\"route_handler_model\":\"current_application_dispatch_and_protocol_bridge\"",
+    "\"frontend_backend_server_roles\":\"deferred_future_architecture_reference\"",
+    "\"rpc_and_remote_calls\":\"deferred_future_architecture_reference\"",
+    "\"groups_rooms_broadcast\":\"deferred_future_architecture_reference\"",
+    "\"cluster_service_discovery\":\"deferred_future_architecture_reference\"",
+    "\"distributed_runtime_implementation_added\":false",
+    "\"frontend_backend_server_roles_added\":false",
+    "\"server_to_server_rpc_added\":false",
+    "\"remote_call_behavior_added\":false",
+    "\"service_discovery_added\":false",
+    "\"distributed_groups_added\":false",
+    "\"room_broadcast_fanout_added\":false",
+    "\"cluster_safe_session_routing_added\":false",
+    "\"runtime_behavior_added\":false",
+    "\"runtime_endpoint_behavior_added\":false",
+    "\"protocol_route_added\":false",
+    "\"protobuf_source_added\":false",
+    "\"generated_output_added\":false",
+    "\"repository_interface_changed\":false",
+    "\"postgresql_adapter_changed\":false",
+    "\"migration_added\":false",
+    "\"dependency_added\":false",
+    "\"authentication_session_behavior_changed\":false",
+    "\"hosted_deployment_added\":false",
+    "\"sdk_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+    "\"raw_device_credentials_exposed\":false",
+    "\"raw_access_tokens_exposed\":false",
+    "\"lookup_digests_exposed\":false",
+    "\"verifier_digests_exposed\":false",
+    "\"verifier_keys_exposed\":false",
+    "\"postgres_dsns_with_credentials_exposed\":false",
+    "\"database_payloads_exposed\":false",
+    "\"local_secret_file_contents_exposed\":false",
+    "\"next_ready_work_item\":\"W-0248\"",
+    "\"selected_follow_up_direction\":\"define_pitaya_aligned_frontend_backend_role_boundary_gate\"",
+  ];
+  for (const marker of requiredInspectionMarkers) {
+    if (inspectionText.includes(marker)) {
+      ok(`inspect pitaya-vocabulary output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-vocabulary",
+      });
+    } else {
+      fail(`inspect pitaya-vocabulary output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-vocabulary",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-175"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0247"],
+    [".arch/work-items.yaml", "ADR-0155"],
+    [".arch/work-items.yaml", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    [".arch/work-items.yaml", "id: M-176"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Frontend Backend Role Boundary Gate"],
+    [".arch/work-items.yaml", "id: W-0248"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "define_pitaya_aligned_frontend_backend_role_boundary_gate"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map_completed: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map_decision: ADR-0155"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map_check_rule: runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map_command: node tools/vibit inspect pitaya-vocabulary --json"],
+    [".arch/runtime.yaml", "next_pitaya_frontend_backend_role_boundary_gate_work_item: W-0248"],
+    [".arch/runtime.yaml", "next_pitaya_frontend_backend_role_boundary_gate_direction: define_pitaya_aligned_frontend_backend_role_boundary_gate"],
+    [".arch/runtime.yaml", "distributed_runtime_implementation_added: false"],
+    [".arch/runtime.yaml", "frontend_backend_server_roles_added: false"],
+    [".arch/runtime.yaml", "server_to_server_rpc_added: false"],
+    [".arch/runtime.yaml", "service_discovery_added: false"],
+    [".arch/runtime.yaml", "cluster_safe_session_routing_added: false"],
+    [".arch/reference.yaml", "phase_2ff_pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    [".arch/reference.yaml", "phase_2fg_pitaya_aligned_frontend_backend_role_boundary_gate"],
+    [".arch/reference.yaml", "pitaya_vocabulary_inspection_command: node tools/vibit inspect pitaya-vocabulary --json"],
+    [".arch/conventions.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    [".arch/contracts.yaml", "pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0155",
+      "M-175/W-0247",
+      "node tools/vibit inspect pitaya-vocabulary --json",
+      "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map",
+      "M-176/W-0248",
+      "This decision does not add distributed runtime behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0247",
+      "ADR-0155",
+      "runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map",
+      "Unknown rule_id: runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map",
+      "Unknown command",
+      "W-0248",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0247",
+      "source-first repository inspection map",
+      "No distributed runtime implementation",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0248",
+      "No runtime behavior",
+      "No protocol shape",
+      "No generated output",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned distributed runtime vocabulary source-first map completes W-0247, adds inspect pitaya-vocabulary, opens W-0248, and preserves distributed runtime implementation, frontend/backend role implementation, RPC, service discovery, distributed groups, room broadcast fanout, cluster-safe session routing, runtime endpoint, protocol, generated output, persistence, dependency, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -41294,6 +41631,10 @@ function pitayaAlignedDistributedRuntimeVocabularyReactivationGateCompleted(root
   return workItemHasStatus(root, "W-0246", "completed");
 }
 
+function pitayaAlignedDistributedRuntimeVocabularySourceFirstMapCompleted(root) {
+  return workItemHasStatus(root, "W-0247", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -41326,6 +41667,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedDistributedRuntimeVocabularySourceFirstMapCompleted(root)) {
+    return "repository_next_work_item: W-0248";
+  }
   if (pitayaAlignedDistributedRuntimeVocabularyReactivationGateCompleted(root)) {
     return "repository_next_work_item: W-0247";
   }
@@ -41429,6 +41773,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedDistributedRuntimeVocabularySourceFirstMapCompleted(root)) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_frontend_backend_role_boundary_gate";
+  }
   if (pitayaAlignedDistributedRuntimeVocabularyReactivationGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map";
   }
@@ -41523,6 +41870,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedDistributedRuntimeVocabularySourceFirstMapCompleted(root)) {
+    return "W-0248 Define Pitaya-aligned frontend/backend role boundary gate";
+  }
   if (pitayaAlignedDistributedRuntimeVocabularyReactivationGateCompleted(root)) {
     return "W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map";
   }
@@ -41641,6 +41991,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0247", "next_ready_work_item: W-0248"],
     ["W-0246", "next_ready_work_item: W-0247"],
     ["W-0245", "next_ready_work_item: W-0246"],
     ["W-0244", "next_ready_work_item: W-0245"],
@@ -41716,6 +42067,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0247", "completed")) {
+    return "next_work_item: W-0248";
+  }
   if (workItemHasStatus(root, "W-0246", "completed")) {
     return "next_work_item: W-0247";
   }
@@ -41886,6 +42240,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0247", "define_pitaya_aligned_frontend_backend_role_boundary_gate"],
     ["W-0246", "implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
     ["W-0245", "define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate"],
     ["W-0244", "implement_minimum_operations_inspection_source_first_surface"],
@@ -41961,6 +42316,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0247", "W-0248 Define Pitaya-aligned frontend/backend role boundary gate"],
     ["W-0246", "W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map"],
     ["W-0245", "W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate"],
     ["W-0244", "W-0245 Implement minimum operations inspection source-first surface"],
@@ -42037,6 +42393,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0247", "current_phase: define_pitaya_aligned_frontend_backend_role_boundary_gate"],
     ["W-0246", "current_phase: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map"],
     ["W-0245", "current_phase: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate"],
     ["W-0244", "current_phase: implement_minimum_operations_inspection_source_first_surface"],
@@ -42690,6 +43047,7 @@ function checkRuntime(root) {
   checkRuntimeMinimumOperationsInspectionSurfaceGate(root, goFiles);
   checkRuntimeMinimumOperationsInspectionSourceFirstSurfaceImplementation(root, goFiles);
   checkRuntimePitayaAlignedDistributedRuntimeVocabularyReactivationGate(root, goFiles);
+  checkRuntimePitayaAlignedDistributedRuntimeVocabularySourceFirstMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -43417,6 +43775,11 @@ function main() {
 
   if (group === "inspect" && command === "operations" && !value) {
     inspectOperations(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "pitaya-vocabulary" && !value) {
+    inspectPitayaVocabulary(root);
     return;
   }
 

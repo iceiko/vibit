@@ -248,7 +248,7 @@ minimum_operations_inspection_surface_gate_decision: ADR-0152
 minimum_operations_inspection_surface_gate_check_rule: runtime.minimum_operations_inspection_surface_gate
 minimum_operations_inspection_source_first_surface_implementation_decision: ADR-0153
 minimum_operations_inspection_source_first_surface_implementation_check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
-next_work_item: W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map
+next_work_item: W-0248 Define Pitaya-aligned frontend/backend role boundary gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -365,8 +365,8 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, the minimum operations inspection surface gate, and the source-first operations inspection implementation, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime implementation, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, dashboards, frontend/backend server roles, server-to-server RPC, service discovery, distributed groups, or cluster-safe session routing. The next concrete work should define only a Pitaya-aligned distributed runtime vocabulary reactivation gate:
 
 ```text
-next_work_item: W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map
-recommended_next_direction: implement_pitaya_aligned_distributed_runtime_vocabulary_source_first_map
+next_work_item: W-0248 Define Pitaya-aligned frontend/backend role boundary gate
+recommended_next_direction: define_pitaya_aligned_frontend_backend_role_boundary_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -392,6 +392,7 @@ Rationale:
 - `ADR-0152` defined the minimum operations inspection surface gate, registered `runtime.minimum_operations_inspection_surface_gate`, and opened `W-0245 Implement minimum operations inspection source-first surface`.
 - `ADR-0153` implemented the source-first operations inspection surface, registered `runtime.minimum_operations_inspection_source_first_surface_implementation`, recorded the Pitaya deferred architecture map, and opened `W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate`.
 - `ADR-0154` defined the Pitaya-aligned distributed runtime vocabulary reactivation gate, registered `runtime.pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate`, and opened `W-0247 Implement Pitaya-aligned distributed runtime vocabulary source-first map`.
+- `ADR-0155` implemented `node tools/vibit inspect pitaya-vocabulary --json`, registered `runtime.pitaya_aligned_distributed_runtime_vocabulary_source_first_map`, and opened `W-0248 Define Pitaya-aligned frontend/backend role boundary gate`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
 - The operations inspection surface now makes local alpha status, route families, verification posture, and deferred operations surfaces inspectable without adding runtime endpoints.
 - The next source-first map should make future Pitaya-aligned distributed runtime vocabulary inspectable before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
