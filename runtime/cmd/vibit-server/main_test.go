@@ -377,6 +377,16 @@ func TestRandomStorageObjectIDGeneratorShape(t *testing.T) {
 	}
 }
 
+func TestRandomFriendRelationshipIDGeneratorShape(t *testing.T) {
+	id, err := (randomFriendRelationshipIDGenerator{}).GenerateFriendRelationshipID(context.Background())
+	if err != nil {
+		t.Fatalf("GenerateFriendRelationshipID() error = %v, want nil", err)
+	}
+	if !regexp.MustCompile(`^friend-relationship-[0-9a-f]{32}$`).MatchString(id) {
+		t.Fatalf("GenerateFriendRelationshipID() = %q, want friend-relationship- plus 32 lowercase hex chars", id)
+	}
+}
+
 type routeDispatcherFunc func(context.Context, app.RouteRequest) (app.ApplicationResult, error)
 
 func (f routeDispatcherFunc) Dispatch(ctx context.Context, request app.RouteRequest) (app.ApplicationResult, error) {

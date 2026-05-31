@@ -38,6 +38,9 @@ func RouteRequestWithDomainPayload(request app.RouteRequest) (app.RouteRequest, 
 	if storageRequest, handled, err := routeRequestWithStoragePayload(request); handled || err != nil {
 		return storageRequest, err
 	}
+	if friendsRequest, handled, err := routeRequestWithFriendsPayload(request); handled || err != nil {
+		return friendsRequest, err
+	}
 
 	switch request.Route {
 	case inventory.GrantItemRoute():
@@ -137,6 +140,9 @@ func protoPayloadFromRouteAndPayload(route app.RouteKey, payload any) (proto.Mes
 	}
 	if storagePayload, handled, err := protoPayloadFromStorageRoute(route, payload); handled || err != nil {
 		return storagePayload, err
+	}
+	if friendsPayload, handled, err := protoPayloadFromFriendsRoute(route, payload); handled || err != nil {
+		return friendsPayload, err
 	}
 
 	switch route {

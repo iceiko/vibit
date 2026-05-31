@@ -5,6 +5,7 @@ import (
 	"context"
 	"encoding/base64"
 	"errors"
+	"fmt"
 	"sort"
 	"strings"
 	"sync"
@@ -15,15 +16,18 @@ import (
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
+	appfriends "github.com/iceiko/vibit/runtime/internal/app/friends"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	sessionmodule "github.com/iceiko/vibit/runtime/internal/app/session"
 	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
+	friendsv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/friends/v1"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
 	presencev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	storagev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1"
 	authenticationmodule "github.com/iceiko/vibit/runtime/internal/modules/authentication"
+	friendsmodule "github.com/iceiko/vibit/runtime/internal/modules/friends"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	playermodule "github.com/iceiko/vibit/runtime/internal/modules/player"
 	storagemodule "github.com/iceiko/vibit/runtime/internal/modules/storage"
@@ -349,6 +353,222 @@ func TestStorageObjectsProtocolRouteLocalAlphaFlow(t *testing.T) {
 	assertNoFrameErrorSecretLeak(t, afterDelete, player.accessToken, player.deviceCredential, valueJSON)
 }
 
+func TestFriendsRelationshipProtocolRouteLocalAlphaFlow(t *testing.T) {
+	ctx := context.Background()
+	fixture := newAuthenticatedGameplayE2EFixture(t)
+	playerA := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-friends-a-e2e-1", "client-friends-a-e2e-1")
+	playerB := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-friends-b-e2e-1", "client-friends-b-e2e-1")
+
+	sessionA := app.Session{
+		ConnectionID:    playerA.connectionID,
+		SessionID:       playerA.sessionID,
+		PlayerID:        playerA.playerID,
+		ConnectionEpoch: 1,
+	}
+	targetA := app.Target{Scope: app.TargetScopePlayer, ID: playerA.playerID}
+	sessionB := app.Session{
+		ConnectionID:    playerB.connectionID,
+		SessionID:       playerB.sessionID,
+		PlayerID:        playerB.playerID,
+		ConnectionEpoch: 1,
+	}
+	targetB := app.Target{Scope: app.TargetScopePlayer, ID: playerB.playerID}
+
+	sendEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.SendFriendRequestRoute(),
+		requestID:       "friends-send-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.SendFriendRequestRequest{
+			TargetPlayerId: playerB.playerID,
+		},
+	})
+	send := mustDecodePayloadAs[*friendsv1.SendFriendRequestResponse](t, sendEnvelope)
+	if send.GetStatus() != string(appfriends.FriendRelationshipOperationStatusSent) ||
+		send.GetVersion() != int64(friendsmodule.InitialFriendRelationshipVersion) ||
+		send.GetRelationship().GetRequestedByPlayerId() != playerA.playerID ||
+		send.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusOutgoingRequestPending) {
+		t.Fatalf("SendFriendRequest response = %#v, want outgoing pending relationship", send)
+	}
+
+	statusForBEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.GetFriendRelationshipStatusRoute(),
+		requestID:       "friends-status-b-pending-1",
+		target:          targetB,
+		session:         sessionB,
+		connectionID:    playerB.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerB.accessToken,
+		payload: &friendsv1.GetFriendRelationshipStatusRequest{
+			TargetPlayerId: playerA.playerID,
+		},
+	})
+	statusForB := mustDecodePayloadAs[*friendsv1.GetFriendRelationshipStatusResponse](t, statusForBEnvelope)
+	if statusForB.GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusIncomingRequestPending) ||
+		statusForB.GetVersion() != send.GetVersion() {
+		t.Fatalf("GetFriendRelationshipStatus response = %#v, want incoming pending for target player", statusForB)
+	}
+
+	acceptVersion := send.GetVersion()
+	acceptEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.AcceptFriendRequestRoute(),
+		requestID:       "friends-accept-1",
+		target:          targetB,
+		session:         sessionB,
+		connectionID:    playerB.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerB.accessToken,
+		payload: &friendsv1.AcceptFriendRequestRequest{
+			TargetPlayerId:  playerA.playerID,
+			ExpectedVersion: &acceptVersion,
+		},
+	})
+	accept := mustDecodePayloadAs[*friendsv1.AcceptFriendRequestResponse](t, acceptEnvelope)
+	if accept.GetStatus() != string(appfriends.FriendRelationshipOperationStatusAccepted) ||
+		accept.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusFriends) ||
+		accept.GetVersion() != send.GetVersion()+1 {
+		t.Fatalf("AcceptFriendRequest response = %#v, want accepted friendship", accept)
+	}
+
+	listEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.ListFriendRelationshipsRoute(),
+		requestID:       "friends-list-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.ListFriendRelationshipsRequest{
+			Status: string(friendsmodule.FriendRelationshipStatusFriends),
+			Limit:  10,
+		},
+	})
+	list := mustDecodePayloadAs[*friendsv1.ListFriendRelationshipsResponse](t, listEnvelope)
+	if list.GetPage() == nil ||
+		len(list.GetPage().GetRelationships()) != 1 ||
+		list.GetPage().GetRelationships()[0].GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusFriends) ||
+		list.GetPage().GetNextPairToken() != "" {
+		t.Fatalf("ListFriendRelationships response = %#v, want one accepted friendship", list)
+	}
+
+	removeVersion := accept.GetVersion()
+	removeEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.RemoveFriendRoute(),
+		requestID:       "friends-remove-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.RemoveFriendRequest{
+			TargetPlayerId:  playerB.playerID,
+			ExpectedVersion: &removeVersion,
+		},
+	})
+	remove := mustDecodePayloadAs[*friendsv1.RemoveFriendResponse](t, removeEnvelope)
+	if remove.GetStatus() != string(appfriends.FriendRelationshipOperationStatusRemoved) ||
+		remove.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusRemoved) ||
+		remove.GetVersion() != accept.GetVersion()+1 {
+		t.Fatalf("RemoveFriend response = %#v, want removed relationship", remove)
+	}
+
+	blockVersion := remove.GetVersion()
+	blockEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.BlockPlayerRoute(),
+		requestID:       "friends-block-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.BlockPlayerRequest{
+			TargetPlayerId:  playerB.playerID,
+			ExpectedVersion: &blockVersion,
+		},
+	})
+	block := mustDecodePayloadAs[*friendsv1.BlockPlayerResponse](t, blockEnvelope)
+	if block.GetStatus() != string(appfriends.FriendRelationshipOperationStatusBlocked) ||
+		block.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusBlockedByActor) ||
+		block.GetVersion() != remove.GetVersion()+1 {
+		t.Fatalf("BlockPlayer response = %#v, want actor-side blocked relationship", block)
+	}
+
+	unblockVersion := block.GetVersion()
+	unblockEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.UnblockPlayerRoute(),
+		requestID:       "friends-unblock-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.UnblockPlayerRequest{
+			TargetPlayerId:  playerB.playerID,
+			ExpectedVersion: &unblockVersion,
+		},
+	})
+	unblock := mustDecodePayloadAs[*friendsv1.UnblockPlayerResponse](t, unblockEnvelope)
+	if unblock.GetStatus() != string(appfriends.FriendRelationshipOperationStatusUnblocked) ||
+		unblock.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusRemoved) ||
+		unblock.GetVersion() != block.GetVersion()+1 {
+		t.Fatalf("UnblockPlayer response = %#v, want removed relationship after unblock", unblock)
+	}
+
+	resendEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.SendFriendRequestRoute(),
+		requestID:       "friends-resend-1",
+		target:          targetA,
+		session:         sessionA,
+		connectionID:    playerA.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerA.accessToken,
+		payload: &friendsv1.SendFriendRequestRequest{
+			TargetPlayerId: playerB.playerID,
+		},
+	})
+	resend := mustDecodePayloadAs[*friendsv1.SendFriendRequestResponse](t, resendEnvelope)
+	if resend.GetStatus() != string(appfriends.FriendRelationshipOperationStatusSent) ||
+		resend.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusOutgoingRequestPending) ||
+		resend.GetVersion() != unblock.GetVersion()+1 {
+		t.Fatalf("second SendFriendRequest response = %#v, want new pending request after unblock", resend)
+	}
+
+	rejectVersion := resend.GetVersion()
+	rejectEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appfriends.RejectFriendRequestRoute(),
+		requestID:       "friends-reject-1",
+		target:          targetB,
+		session:         sessionB,
+		connectionID:    playerB.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     playerB.accessToken,
+		payload: &friendsv1.RejectFriendRequestRequest{
+			TargetPlayerId:  playerA.playerID,
+			ExpectedVersion: &rejectVersion,
+		},
+	})
+	reject := mustDecodePayloadAs[*friendsv1.RejectFriendRequestResponse](t, rejectEnvelope)
+	if reject.GetStatus() != string(appfriends.FriendRelationshipOperationStatusRequestRejected) ||
+		reject.GetRelationship().GetPublicStatus() != string(appfriends.FriendRelationshipPublicStatusRejected) ||
+		reject.GetVersion() != resend.GetVersion()+1 {
+		t.Fatalf("RejectFriendRequest response = %#v, want rejected relationship", reject)
+	}
+
+	assertNoFrameErrorSecretLeak(t, rejectEnvelope, playerA.accessToken, playerA.deviceCredential, playerB.accessToken, playerB.deviceCredential)
+}
+
 func TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation(t *testing.T) {
 	ctx := context.Background()
 
@@ -623,23 +843,25 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	playerRepository := newE2EPlayerRepository()
 	sessionRepository := newE2ESessionRepository()
 	storageRepository := newE2EStorageRepository(clock)
+	friendsRepository := newE2EFriendRelationshipRepository(clock)
 	runner := e2eUnitOfWorkRunner{unit: &e2eUnitOfWork{
 		authenticationRepository: authenticationRepository,
 		playerRepository:         playerRepository,
 		sessionRepository:        sessionRepository,
 		storageRepository:        storageRepository,
+		friendsRepository:        friendsRepository,
 	}}
 	service, err := appauth.NewService(appauth.ServiceDependencies{
 		UnitOfWorkRunner:              runner,
 		VerifierKeySet:                keySet,
-		AccessTokenRandom:             bytes.NewReader(bytesWithIncrementingSeed(70, appauth.RawSecretMaterialBytes)),
-		DeviceCredentialRandom:        bytes.NewReader(bytesWithIncrementingSeed(20, appauth.RawSecretMaterialBytes)),
+		AccessTokenRandom:             bytes.NewReader(bytesWithIncrementingSeed(70, appauth.RawSecretMaterialBytes*16)),
+		DeviceCredentialRandom:        bytes.NewReader(bytesWithIncrementingSeed(20, appauth.RawSecretMaterialBytes*16)),
 		Clock:                         clock,
-		TokenRecordIDGenerator:        e2eTokenRecordIDGenerator{},
-		SessionIDGenerator:            e2eSessionIDGenerator{},
-		PlayerIDGenerator:             e2ePlayerIDGenerator{},
-		PlayerAccountEventIDGenerator: e2ePlayerAccountEventIDGenerator{},
-		CredentialRecordIDGenerator:   e2eCredentialRecordIDGenerator{},
+		TokenRecordIDGenerator:        &e2eTokenRecordIDGenerator{},
+		SessionIDGenerator:            &e2eSessionIDGenerator{},
+		PlayerIDGenerator:             &e2ePlayerIDGenerator{},
+		PlayerAccountEventIDGenerator: &e2ePlayerAccountEventIDGenerator{},
+		CredentialRecordIDGenerator:   &e2eCredentialRecordIDGenerator{},
 		AccessTokenLifetime:           time.Hour,
 		TokenAudience:                 "gameplay-e2e",
 	})
@@ -676,6 +898,16 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	}
 	if err := (bootstrap.StorageRouteHandlers{Service: storageService}).RegisterRoutes(dispatcher); err != nil {
 		t.Fatalf("Register storage routes error = %v, want nil", err)
+	}
+	friendsService, err := appfriends.NewService(appfriends.ServiceDependencies{
+		UnitOfWorkRunner:        runner,
+		RelationshipIDGenerator: &e2eFriendRelationshipIDGenerator{},
+	})
+	if err != nil {
+		t.Fatalf("friends NewService() error = %v, want nil", err)
+	}
+	if err := (bootstrap.FriendsRouteHandlers{Service: friendsService}).RegisterRoutes(dispatcher); err != nil {
+		t.Fatalf("Register friends routes error = %v, want nil", err)
 	}
 
 	routeValidator := appauth.NewRouteAccessTokenValidator(service)
@@ -963,34 +1195,100 @@ func (c e2eClock) Now() time.Time {
 	return c.now
 }
 
-type e2eTokenRecordIDGenerator struct{}
-
-func (e2eTokenRecordIDGenerator) GenerateTokenRecordID(context.Context) (string, error) {
-	return "token-e2e-1", nil
+type e2eTokenRecordIDGenerator struct {
+	mu   sync.Mutex
+	next int
 }
 
-type e2eSessionIDGenerator struct{}
-
-func (e2eSessionIDGenerator) GenerateSessionID(context.Context) (string, error) {
-	return "runtime-session-e2e-1", nil
+func (g *e2eTokenRecordIDGenerator) GenerateTokenRecordID(context.Context) (string, error) {
+	return g.nextID("token-e2e")
 }
 
-type e2ePlayerIDGenerator struct{}
-
-func (e2ePlayerIDGenerator) GeneratePlayerID(context.Context) (string, error) {
-	return "player-e2e-1", nil
+type e2eSessionIDGenerator struct {
+	mu   sync.Mutex
+	next int
 }
 
-type e2ePlayerAccountEventIDGenerator struct{}
-
-func (e2ePlayerAccountEventIDGenerator) GeneratePlayerAccountEventID(context.Context) (string, error) {
-	return "player-event-e2e-1", nil
+func (g *e2eSessionIDGenerator) GenerateSessionID(context.Context) (string, error) {
+	return g.nextID("runtime-session-e2e")
 }
 
-type e2eCredentialRecordIDGenerator struct{}
+type e2ePlayerIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
 
-func (e2eCredentialRecordIDGenerator) GenerateCredentialRecordID(context.Context) (string, error) {
-	return "credential-e2e-1", nil
+func (g *e2ePlayerIDGenerator) GeneratePlayerID(context.Context) (string, error) {
+	return g.nextID("player-e2e")
+}
+
+type e2ePlayerAccountEventIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
+
+func (g *e2ePlayerAccountEventIDGenerator) GeneratePlayerAccountEventID(context.Context) (string, error) {
+	return g.nextID("player-event-e2e")
+}
+
+type e2eCredentialRecordIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
+
+func (g *e2eCredentialRecordIDGenerator) GenerateCredentialRecordID(context.Context) (string, error) {
+	return g.nextID("credential-e2e")
+}
+
+type e2eFriendRelationshipIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
+
+func (g *e2eFriendRelationshipIDGenerator) GenerateFriendRelationshipID(context.Context) (string, error) {
+	return g.nextID("friend-relationship-e2e")
+}
+
+func (g *e2eTokenRecordIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2eSessionIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2ePlayerIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2ePlayerAccountEventIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2eCredentialRecordIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2eFriendRelationshipIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
 }
 
 type e2eUnitOfWorkRunner struct {
@@ -1015,6 +1313,7 @@ type e2eUnitOfWork struct {
 	playerRepository         playermodule.Repository
 	sessionRepository        sessionmodule.Repository
 	storageRepository        storagemodule.Repository
+	friendsRepository        friendsmodule.Repository
 }
 
 func (u *e2eUnitOfWork) Context() context.Context {
@@ -1047,6 +1346,13 @@ func (u *e2eUnitOfWork) NewStorageObjectRepository() (storagemodule.Repository, 
 		return nil, errors.New("e2e: storage repository unavailable")
 	}
 	return u.storageRepository, nil
+}
+
+func (u *e2eUnitOfWork) NewFriendRelationshipRepository() (friendsmodule.Repository, error) {
+	if u == nil || u.friendsRepository == nil {
+		return nil, errors.New("e2e: friends relationship repository unavailable")
+	}
+	return u.friendsRepository, nil
 }
 
 type e2eAuthenticationRepository struct {
@@ -1521,6 +1827,363 @@ func e2eStorageRepositoryError(operation string, class storagemodule.StorageObje
 	}
 }
 
+type e2eFriendRelationshipRepository struct {
+	mu            sync.Mutex
+	clock         e2eClock
+	relationships map[e2eFriendRelationshipKey]friendsmodule.FriendRelationship
+}
+
+type e2eFriendRelationshipKey struct {
+	low  string
+	high string
+}
+
+func newE2EFriendRelationshipRepository(clock e2eClock) *e2eFriendRelationshipRepository {
+	return &e2eFriendRelationshipRepository{
+		clock:         clock,
+		relationships: make(map[e2eFriendRelationshipKey]friendsmodule.FriendRelationship),
+	}
+}
+
+func (r *e2eFriendRelationshipRepository) CreateOrUpdateFriendRequest(_ context.Context, input friendsmodule.SendFriendRequestInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeSendFriendRequestInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	pair, err := friendsmodule.NormalizeFriendRelationshipPair(friendsmodule.FriendRelationshipPair{
+		PlayerLowID:  normalized.Actor.PlayerID,
+		PlayerHighID: normalized.TargetPlayerID,
+	})
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictSelfRelationshipForbidden, false)
+	}
+	key := e2eFriendRelationshipKeyForPair(pair)
+	now := r.clock.Now().UTC()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	current, exists := r.relationships[key]
+	if !exists {
+		record := friendsmodule.FriendRelationship{
+			RelationshipID:      normalized.RelationshipID,
+			Pair:                pair,
+			LifecycleState:      friendsmodule.FriendRelationshipLifecyclePending,
+			RequestedByPlayerID: normalized.Actor.PlayerID,
+			Version:             friendsmodule.InitialFriendRelationshipVersion,
+			CreatedAt:           now,
+			UpdatedAt:           now,
+			StateChangedAt:      now,
+		}
+		return r.storeLocked(key, record)
+	}
+	if current.BlockState.BlockedByLowAt != nil || current.BlockState.BlockedByHighAt != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictBlockedRelationship, false)
+	}
+	switch current.LifecycleState {
+	case friendsmodule.FriendRelationshipLifecyclePending:
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictDuplicatePendingRequest, false)
+	case friendsmodule.FriendRelationshipLifecycleFriends:
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictAlreadyFriends, false)
+	case friendsmodule.FriendRelationshipLifecycleRejected, friendsmodule.FriendRelationshipLifecycleRemoved:
+		current.RelationshipID = normalized.RelationshipID
+		current.LifecycleState = friendsmodule.FriendRelationshipLifecyclePending
+		current.RequestedByPlayerID = normalized.Actor.PlayerID
+		current.RespondedByPlayerID = ""
+		current.RemovedByPlayerID = ""
+		current.Version++
+		current.UpdatedAt = now
+		current.StateChangedAt = now
+		current.RejectedAt = nil
+		current.RemovedAt = nil
+		return r.storeLocked(key, current)
+	default:
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("create_or_update_request", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+}
+
+func (r *e2eFriendRelationshipRepository) GetRelationshipByPair(_ context.Context, input friendsmodule.GetFriendRelationshipInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeGetFriendRelationshipInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("get_by_pair", friendsmodule.FriendRelationshipConflictPairIdentity, false)
+	}
+	key := e2eFriendRelationshipKeyForPair(normalized.Pair)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	record, ok := r.relationships[key]
+	if !ok {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("get_by_pair", friendsmodule.FriendRelationshipConflictNotFound, false)
+	}
+	return cloneFriendRelationshipForE2E(record), nil
+}
+
+func (r *e2eFriendRelationshipRepository) ListRelationshipsForPlayer(_ context.Context, input friendsmodule.ListFriendRelationshipsInput) (friendsmodule.ListFriendRelationshipsResult, error) {
+	normalized, err := friendsmodule.NormalizeListFriendRelationshipsInput(input)
+	if err != nil {
+		return friendsmodule.ListFriendRelationshipsResult{}, e2eFriendRelationshipRepositoryError("list_for_player", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	relationships := make([]friendsmodule.FriendRelationship, 0, len(r.relationships))
+	for _, record := range r.relationships {
+		if record.Pair.PlayerLowID != normalized.PlayerID && record.Pair.PlayerHighID != normalized.PlayerID {
+			continue
+		}
+		if e2eFriendRelationshipPairToken(record.Pair) <= normalized.AfterPairToken {
+			continue
+		}
+		if !e2eFriendRelationshipMatchesStatus(record, normalized.Status) {
+			continue
+		}
+		relationships = append(relationships, cloneFriendRelationshipForE2E(record))
+	}
+	sort.Slice(relationships, func(i, j int) bool {
+		left := e2eFriendRelationshipPairToken(relationships[i].Pair)
+		right := e2eFriendRelationshipPairToken(relationships[j].Pair)
+		return left < right
+	})
+
+	nextPairToken := ""
+	if len(relationships) > normalized.Limit {
+		nextPairToken = e2eFriendRelationshipPairToken(relationships[normalized.Limit].Pair)
+		relationships = relationships[:normalized.Limit]
+	}
+	return friendsmodule.NormalizeListFriendRelationshipsResult(friendsmodule.ListFriendRelationshipsResult{
+		Relationships: relationships,
+		NextPairToken: nextPairToken,
+	})
+}
+
+func (r *e2eFriendRelationshipRepository) AcceptFriendRequest(_ context.Context, input friendsmodule.AcceptFriendRequestInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeAcceptFriendRequestInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("accept_request", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	return r.transitionPendingRelationship("accept_request", normalized.Pair, normalized.Actor.PlayerID, normalized.ExpectedVersion, func(record friendsmodule.FriendRelationship, now time.Time) friendsmodule.FriendRelationship {
+		record.LifecycleState = friendsmodule.FriendRelationshipLifecycleFriends
+		record.RespondedByPlayerID = normalized.Actor.PlayerID
+		record.RemovedByPlayerID = ""
+		record.Version++
+		record.UpdatedAt = now
+		record.StateChangedAt = now
+		record.RejectedAt = nil
+		record.RemovedAt = nil
+		return record
+	})
+}
+
+func (r *e2eFriendRelationshipRepository) RejectFriendRequest(_ context.Context, input friendsmodule.RejectFriendRequestInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeRejectFriendRequestInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("reject_request", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	return r.transitionPendingRelationship("reject_request", normalized.Pair, normalized.Actor.PlayerID, normalized.ExpectedVersion, func(record friendsmodule.FriendRelationship, now time.Time) friendsmodule.FriendRelationship {
+		record.LifecycleState = friendsmodule.FriendRelationshipLifecycleRejected
+		record.RespondedByPlayerID = normalized.Actor.PlayerID
+		record.RemovedByPlayerID = ""
+		record.Version++
+		record.UpdatedAt = now
+		record.StateChangedAt = now
+		record.RejectedAt = &now
+		record.RemovedAt = nil
+		return record
+	})
+}
+
+func (r *e2eFriendRelationshipRepository) RemoveFriend(_ context.Context, input friendsmodule.RemoveFriendInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeRemoveFriendInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("remove_friend", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	key := e2eFriendRelationshipKeyForPair(normalized.Pair)
+	now := r.clock.Now().UTC()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	current, err := r.relationshipForMutationLocked("remove_friend", key, normalized.ExpectedVersion)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, err
+	}
+	if current.LifecycleState != friendsmodule.FriendRelationshipLifecyclePending &&
+		current.LifecycleState != friendsmodule.FriendRelationshipLifecycleFriends {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("remove_friend", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	if current.BlockState.BlockedByLowAt != nil || current.BlockState.BlockedByHighAt != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("remove_friend", friendsmodule.FriendRelationshipConflictBlockedRelationship, false)
+	}
+
+	current.LifecycleState = friendsmodule.FriendRelationshipLifecycleRemoved
+	current.RemovedByPlayerID = normalized.Actor.PlayerID
+	current.Version++
+	current.UpdatedAt = now
+	current.StateChangedAt = now
+	current.RemovedAt = &now
+	return r.storeLocked(key, current)
+}
+
+func (r *e2eFriendRelationshipRepository) SetPlayerBlock(_ context.Context, input friendsmodule.BlockPlayerInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeBlockPlayerInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("set_player_block", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	pair, err := friendsmodule.NormalizeFriendRelationshipPair(friendsmodule.FriendRelationshipPair{
+		PlayerLowID:  normalized.Actor.PlayerID,
+		PlayerHighID: normalized.TargetPlayerID,
+	})
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("set_player_block", friendsmodule.FriendRelationshipConflictSelfRelationshipForbidden, false)
+	}
+	key := e2eFriendRelationshipKeyForPair(pair)
+	now := r.clock.Now().UTC()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	current, err := r.relationshipForMutationLocked("set_player_block", key, normalized.ExpectedVersion)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, err
+	}
+	if normalized.Actor.PlayerID == current.Pair.PlayerLowID {
+		current.BlockState.BlockedByLowAt = &now
+	} else {
+		current.BlockState.BlockedByHighAt = &now
+	}
+	if current.LifecycleState == friendsmodule.FriendRelationshipLifecyclePending ||
+		current.LifecycleState == friendsmodule.FriendRelationshipLifecycleFriends {
+		current.LifecycleState = friendsmodule.FriendRelationshipLifecycleRemoved
+		current.RemovedByPlayerID = normalized.Actor.PlayerID
+		if current.RemovedAt == nil {
+			current.RemovedAt = &now
+		}
+	}
+	current.Version++
+	current.UpdatedAt = now
+	current.StateChangedAt = now
+	return r.storeLocked(key, current)
+}
+
+func (r *e2eFriendRelationshipRepository) ClearPlayerBlock(_ context.Context, input friendsmodule.UnblockPlayerInput) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeUnblockPlayerInput(input)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("clear_player_block", friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	pair, err := friendsmodule.NormalizeFriendRelationshipPair(friendsmodule.FriendRelationshipPair{
+		PlayerLowID:  normalized.Actor.PlayerID,
+		PlayerHighID: normalized.TargetPlayerID,
+	})
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError("clear_player_block", friendsmodule.FriendRelationshipConflictSelfRelationshipForbidden, false)
+	}
+	key := e2eFriendRelationshipKeyForPair(pair)
+	now := r.clock.Now().UTC()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	current, err := r.relationshipForMutationLocked("clear_player_block", key, normalized.ExpectedVersion)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, err
+	}
+	if normalized.Actor.PlayerID == current.Pair.PlayerLowID {
+		current.BlockState.BlockedByLowAt = nil
+	} else {
+		current.BlockState.BlockedByHighAt = nil
+	}
+	current.Version++
+	current.UpdatedAt = now
+	return r.storeLocked(key, current)
+}
+
+func (r *e2eFriendRelationshipRepository) transitionPendingRelationship(operation string, pair friendsmodule.FriendRelationshipPair, actorPlayerID string, expectedVersion *friendsmodule.FriendRelationshipVersion, transition func(friendsmodule.FriendRelationship, time.Time) friendsmodule.FriendRelationship) (friendsmodule.FriendRelationship, error) {
+	key := e2eFriendRelationshipKeyForPair(pair)
+	now := r.clock.Now().UTC()
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	current, err := r.relationshipForMutationLocked(operation, key, expectedVersion)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, err
+	}
+	if current.LifecycleState != friendsmodule.FriendRelationshipLifecyclePending || current.RequestedByPlayerID == actorPlayerID {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError(operation, friendsmodule.FriendRelationshipConflictInvalidTransition, false)
+	}
+	if current.BlockState.BlockedByLowAt != nil || current.BlockState.BlockedByHighAt != nil {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError(operation, friendsmodule.FriendRelationshipConflictBlockedRelationship, false)
+	}
+	current = transition(current, now)
+	return r.storeLocked(key, current)
+}
+
+func (r *e2eFriendRelationshipRepository) relationshipForMutationLocked(operation string, key e2eFriendRelationshipKey, expectedVersion *friendsmodule.FriendRelationshipVersion) (friendsmodule.FriendRelationship, error) {
+	current, ok := r.relationships[key]
+	if !ok {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError(operation, friendsmodule.FriendRelationshipConflictNotFound, false)
+	}
+	if expectedVersion != nil && current.Version != *expectedVersion {
+		return friendsmodule.FriendRelationship{}, e2eFriendRelationshipRepositoryError(operation, friendsmodule.FriendRelationshipConflictStaleVersion, true)
+	}
+	return current, nil
+}
+
+func (r *e2eFriendRelationshipRepository) storeLocked(key e2eFriendRelationshipKey, record friendsmodule.FriendRelationship) (friendsmodule.FriendRelationship, error) {
+	normalized, err := friendsmodule.NormalizeFriendRelationshipRecord(record)
+	if err != nil {
+		return friendsmodule.FriendRelationship{}, err
+	}
+	r.relationships[key] = cloneFriendRelationshipForE2E(normalized)
+	return cloneFriendRelationshipForE2E(normalized), nil
+}
+
+func e2eFriendRelationshipMatchesStatus(record friendsmodule.FriendRelationship, status friendsmodule.FriendRelationshipStatus) bool {
+	blocked := record.BlockState.BlockedByLowAt != nil || record.BlockState.BlockedByHighAt != nil
+	switch status {
+	case "":
+		return true
+	case friendsmodule.FriendRelationshipStatusPending:
+		return record.LifecycleState == friendsmodule.FriendRelationshipLifecyclePending && !blocked
+	case friendsmodule.FriendRelationshipStatusFriends:
+		return record.LifecycleState == friendsmodule.FriendRelationshipLifecycleFriends && !blocked
+	case friendsmodule.FriendRelationshipStatusBlocked:
+		return blocked
+	case friendsmodule.FriendRelationshipStatusEnded:
+		return (record.LifecycleState == friendsmodule.FriendRelationshipLifecycleRemoved ||
+			record.LifecycleState == friendsmodule.FriendRelationshipLifecycleRejected) && !blocked
+	default:
+		return false
+	}
+}
+
+func e2eFriendRelationshipKeyForPair(pair friendsmodule.FriendRelationshipPair) e2eFriendRelationshipKey {
+	return e2eFriendRelationshipKey{low: pair.PlayerLowID, high: pair.PlayerHighID}
+}
+
+func e2eFriendRelationshipPairToken(pair friendsmodule.FriendRelationshipPair) string {
+	return pair.PlayerLowID + "|" + pair.PlayerHighID
+}
+
+func e2eFriendRelationshipRepositoryError(operation string, class friendsmodule.FriendRelationshipConflictClass, retryable bool) error {
+	kind := friendsmodule.ErrFriendRelationshipConflict
+	if class == friendsmodule.FriendRelationshipConflictStorageUnavailable {
+		kind = friendsmodule.ErrFriendRelationshipUnavailable
+	}
+	return &friendsmodule.FriendRelationshipRepositoryError{
+		Kind: kind,
+		Conflict: friendsmodule.FriendRelationshipConflict{
+			Class:          class,
+			Retryable:      retryable,
+			RedactedReason: string(class),
+		},
+		Operation:      operation,
+		RedactedReason: string(class),
+	}
+}
+
 type e2eRegistryConnectionBinder struct {
 	binder   app.ConnectionBinder
 	registry *appconnection.InMemoryRegistry
@@ -1595,6 +2258,26 @@ func cloneStorageObjectForE2E(record storagemodule.StorageObject) storagemodule.
 	if record.DeletedAt != nil {
 		deletedAt := *record.DeletedAt
 		record.DeletedAt = &deletedAt
+	}
+	return record
+}
+
+func cloneFriendRelationshipForE2E(record friendsmodule.FriendRelationship) friendsmodule.FriendRelationship {
+	if record.BlockState.BlockedByLowAt != nil {
+		blockedAt := *record.BlockState.BlockedByLowAt
+		record.BlockState.BlockedByLowAt = &blockedAt
+	}
+	if record.BlockState.BlockedByHighAt != nil {
+		blockedAt := *record.BlockState.BlockedByHighAt
+		record.BlockState.BlockedByHighAt = &blockedAt
+	}
+	if record.RejectedAt != nil {
+		rejectedAt := *record.RejectedAt
+		record.RejectedAt = &rejectedAt
+	}
+	if record.RemovedAt != nil {
+		removedAt := *record.RemovedAt
+		record.RemovedAt = &removedAt
 	}
 	return record
 }

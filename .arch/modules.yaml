@@ -105,8 +105,8 @@ modules:
       application_handler: runtime/internal/app/bootstrap/storage.go
       protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
       protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
-      repository_next_work_item: W-0237
-      repository_next_work_item_scope: implement_friends_relationship_postgresql_adapter
+      repository_next_work_item: W-0243
+      repository_next_work_item_scope: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
       agent_native_feature_request_test_workflow_standard: docs/agent-native-feature-request-test-workflow.md
       agent_native_feature_request_test_workflow_check_rule: runtime.agent_native_feature_request_test_workflow
       nakama_aligned_feature_request_workflow_pilot_check_rule: runtime.nakama_aligned_feature_request_workflow_pilot
@@ -137,14 +137,66 @@ modules:
       postgresql_adapter_gate_decision: ADR-0144
       postgresql_adapter_gate_standard: docs/friends-relationship-postgresql-adapter-gate.md
       postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
-      status: repository_interface_implemented_adapter_behavior_deferred
+      postgresql_adapter_implementation_decision: ADR-0145
+      postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation
+      runtime_behavior_gate_decision: ADR-0146
+      runtime_behavior_gate_standard: docs/friends-relationship-runtime-behavior-gate.md
+      runtime_behavior_gate_translation: docs/friends-relationship-runtime-behavior-gate.zh-CN.md
+      runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate
+      runtime_behavior_implementation_decision: ADR-0147
+      runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation
+      protocol_route_gate_decision: ADR-0148
+      protocol_route_gate_standard: docs/friends-relationship-protocol-route-gate.md
+      protocol_route_gate_translation: docs/friends-relationship-protocol-route-gate.zh-CN.md
+      protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate
+      protocol_route_implementation_decision: ADR-0149
+      protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation
+      friends_relationship_protocol_route_local_proof_completed: true
+      friends_relationship_protocol_route_local_proof_decision: ADR-0150
+      friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof
+      friends_relationship_protocol_route_local_proof_work_item: W-0242
+      status: repository_interface_postgresql_adapter_runtime_behavior_protocol_route_implementation_and_local_proof_completed
       runtime_repository_interface: runtime/internal/modules/friends/repository.go
       runtime_repository_tests: runtime/internal/modules/friends/repository_test.go
       postgres_adapter_owner: runtime/internal/platform/persistence/postgres
-      postgres_adapter_source_planned: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
-      postgres_adapter_test_planned: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
-      repository_next_work_item: W-0237
-      repository_next_work_item_scope: implement_friends_relationship_postgresql_adapter
+      postgres_adapter_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+      postgres_adapter_test: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+      runtime_behavior_owner: runtime/internal/app/friends
+      runtime_behavior_source: runtime/internal/app/friends/service.go
+      runtime_behavior_test: runtime/internal/app/friends/service_test.go
+      protocol_route_next_work_item: W-0241
+      future_protocol_route_implementation_work_item: W-0241
+      future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route
+      future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto
+      future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go
+      future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go
+      future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go
+      protocol_source: proto/vibit/friends/v1/friends.proto
+      generated_go_output: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go
+      protocol_bridge: runtime/internal/platform/protocol/protobuf/friends_bridge.go
+      application_handler: runtime/internal/app/bootstrap/friends.go
+      route_keys_source: runtime/internal/app/friends/routes.go
+      startup_composition_source: runtime/cmd/vibit-server/main.go
+      protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+      protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
+      candidate_routes_recorded: true
+      first_payload_package: vibit.friends.v1
+      route_policy_requirement: request_token_required
+      authenticated_wrapper_required: true
+      request_identity_source: validated_authenticated_request_identity
+      metadata_only_player_id_allowed_as_proof: false
+      metadata_only_session_id_allowed_as_proof: false
+      client_supplied_actor_id_allowed_as_proof: false
+      client_supplied_target_player_id_allowed: true
+      public_error_mapping_recorded: true
+      nakama_reference_mapping_recorded: true
+      pitaya_reference_mapping_recorded: true
+      protocol_route_added: true
+      protobuf_source_added: true
+      generated_output_added: true
+      direct_nakama_pitaya_api_compatibility_added: false
+      repository_next_work_item: W-0243
+      repository_next_work_item_scope: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
     owns:
       - friend_relationships
       - friends_relationship_repository_interface_vocabulary

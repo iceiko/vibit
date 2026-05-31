@@ -172,6 +172,12 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.friends_relationship_repository_boundary",
   "runtime.friends_relationship_repository_interface_implementation",
   "runtime.friends_relationship_postgresql_adapter_gate",
+  "runtime.friends_relationship_postgresql_adapter_implementation",
+  "runtime.friends_relationship_runtime_behavior_gate",
+  "runtime.friends_relationship_runtime_behavior_implementation",
+  "runtime.friends_relationship_protocol_route_gate",
+  "runtime.friends_relationship_protocol_route_implementation",
+  "runtime.friends_relationship_protocol_route_local_proof",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -34326,8 +34332,29 @@ function checkRuntimeFriendsRelationshipPersistenceSchemaGate(root, goFiles) {
     { pattern: /\bFriendRelationship\b|\bFriendRelationships\b|\bFriendRelationshipRepository\b|\bfriend_relationships\b|\bfriends_relationship_persistence_schema_gate\b/, label: "friends relationship persistence schema gate runtime code" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (isFriendsRelationshipProtocolRouteImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0239 friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (workItemHasStatus(root, "W-0235", "completed") && file === "runtime/internal/modules/friends/repository.go") {
       ok(`${file} is allowed after completed W-0235 friends relationship repository interface implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isFriendsRelationshipPostgresqlAdapterImplementationRuntimeFile(root, file)) {
+      ok(`${file} is allowed after completed W-0237 friends relationship PostgreSQL adapter implementation`, {
         rule_id: ruleId,
         artifact: file,
       });
@@ -34656,7 +34683,28 @@ function checkRuntimeFriendsRelationshipMigrationSource(root, goFiles) {
     { pattern: /\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bRejectFriendRequest\b|\bRemoveFriend\b|\bBlockPlayer\b|\bUnblockPlayer\b|\bListFriendRelationships\b|\bGetFriendRelationshipStatus\b/, label: "friends relationship runtime behavior" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (isFriendsRelationshipProtocolRouteImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0239 friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root) && pathStartsWith(file, "runtime/internal/modules/friends/")) {
+      continue;
+    }
+    if (isFriendsRelationshipPostgresqlAdapterImplementationRuntimeFile(root, file)) {
+      ok(`${file} is allowed after completed W-0237 friends relationship PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
@@ -34679,10 +34727,17 @@ function checkRuntimeFriendsRelationshipMigrationSource(root, goFiles) {
     return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
   });
   if (friendsProto) {
-    fail(`${friendsProto} adds friends relationship protocol shape during migration-source-only slice`, {
-      rule_id: ruleId,
-      artifact: friendsProto,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during migration-source-only slice`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
   } else {
     ok("no friends relationship Protobuf shape is added by friends relationship migration source", {
       rule_id: ruleId,
@@ -35068,7 +35123,28 @@ function checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles) {
     { pattern: /\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bRejectFriendRequest\b|\bRemoveFriend\b|\bBlockPlayer\b|\bUnblockPlayer\b|\bListFriendRelationships\b|\bGetFriendRelationshipStatus\b/, label: "friends relationship runtime behavior" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (isFriendsRelationshipProtocolRouteImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
+    if (isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0239 friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     if (friendsRelationshipRepositoryInterfaceImplementationCompleted(root) && pathStartsWith(file, `${forbiddenRuntimeModulePath}/`)) {
+      continue;
+    }
+    if (isFriendsRelationshipPostgresqlAdapterImplementationRuntimeFile(root, file)) {
+      ok(`${file} is allowed after completed W-0237 friends relationship PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
       continue;
     }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
@@ -35087,7 +35163,12 @@ function checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles) {
       const text = sourceWithoutGoComments(readText(path.join(root, file)));
       return /\bfriend_relationships\b|\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/.test(text);
     });
-  if (friendsAdapterFiles.length === 0) {
+  if (friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    ok("friends relationship PostgreSQL adapter behavior is allowed after completed W-0237", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (friendsAdapterFiles.length === 0) {
     ok("no friends relationship PostgreSQL adapter behavior is added by the repository boundary gate", {
       rule_id: ruleId,
       artifact: "runtime/internal/platform/persistence/postgres",
@@ -35108,10 +35189,17 @@ function checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles) {
     return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
   });
   if (friendsProto) {
-    fail(`${friendsProto} adds friends relationship protocol shape during repository boundary gate`, {
-      rule_id: ruleId,
-      artifact: friendsProto,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during repository boundary gate`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
   } else {
     ok("no friends relationship Protobuf shape is added by friends relationship repository boundary", {
       rule_id: ruleId,
@@ -35126,10 +35214,17 @@ function checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles) {
     return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
   });
   if (friendsGenerated) {
-    fail(`${friendsGenerated} adds friends relationship generated output during repository boundary gate`, {
-      rule_id: ruleId,
-      artifact: friendsGenerated,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during repository boundary gate`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
   } else {
     ok("no friends relationship generated output is added by friends relationship repository boundary", {
       rule_id: ruleId,
@@ -35377,9 +35472,15 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
       "repository_interface: runtime/internal/modules/friends.Repository",
       "repository_source: runtime/internal/modules/friends/repository.go",
       "repository_tests: runtime/internal/modules/friends/repository_test.go",
-      "storage_adapter_added: false",
-      "postgresql_adapter_added: false",
-      "sql_execution_added: false",
+      ...(friendsRelationshipPostgresqlAdapterImplementationCompleted(root) ? [
+        "friends_relationship_postgresql_adapter_implementation_completed: true",
+        "postgresql_adapter_added: true",
+        "sql_execution_added: true",
+      ] : [
+        "storage_adapter_added: false",
+        "postgresql_adapter_added: false",
+        "sql_execution_added: false",
+      ]),
       "runtime_behavior_added: false",
       "protocol_route_added: false",
       "generated_output_added: false",
@@ -35499,7 +35600,12 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
       const text = sourceWithoutGoComments(readText(path.join(root, file)));
       return /\bfriend_relationships\b|\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/.test(text);
     });
-  if (friendsAdapterFiles.length === 0) {
+  if (friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    ok("friends relationship PostgreSQL adapter behavior is allowed after completed W-0237", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/platform/persistence/postgres",
+    });
+  } else if (friendsAdapterFiles.length === 0) {
     ok("no friends relationship PostgreSQL adapter behavior is added by friends relationship repository interface implementation", {
       rule_id: ruleId,
       artifact: "runtime/internal/platform/persistence/postgres",
@@ -35520,10 +35626,17 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
     return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
   });
   if (friendsProto) {
-    fail(`${friendsProto} adds friends relationship protocol shape during repository interface implementation`, {
-      rule_id: ruleId,
-      artifact: friendsProto,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during repository interface implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
   } else {
     ok("no friends relationship Protobuf shape is added by friends relationship repository interface implementation", {
       rule_id: ruleId,
@@ -35538,10 +35651,17 @@ function checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, 
     return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
   });
   if (friendsGenerated) {
-    fail(`${friendsGenerated} adds friends relationship generated output during repository interface implementation`, {
-      rule_id: ruleId,
-      artifact: friendsGenerated,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during repository interface implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
   } else {
     ok("no friends relationship generated output is added by friends relationship repository interface implementation", {
       rule_id: ruleId,
@@ -35858,11 +35978,20 @@ function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
       "friends_relationship_postgresql_adapter_gate_decision: ADR-0144",
       "friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate",
       "friends_relationship_postgresql_adapter_gate_work_item: W-0236",
-      "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
-      "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
-      "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
-      "postgresql_adapter_added: false",
-      "sql_execution_added: false",
+      ...(friendsRelationshipPostgresqlAdapterImplementationCompleted(root) ? [
+        "friends_relationship_postgresql_adapter_implementation_completed: true",
+        "postgres_adapter_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+        "postgres_adapter_test: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+        "postgres_adapter_constructor: NewFriendRelationshipRepositoryForUnitOfWork",
+        "postgresql_adapter_added: true",
+        "sql_execution_added: true",
+      ] : [
+        "future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+        "future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go",
+        "future_constructor_candidate: NewFriendRelationshipRepositoryForUnitOfWork",
+        "postgresql_adapter_added: false",
+        "sql_execution_added: false",
+      ]),
       "runtime_behavior_added: false",
       "protocol_route_added: false",
       "generated_output_added: false",
@@ -35983,6 +36112,13 @@ function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
     { pattern: /\bRegisterFriendRelationship\b|\bHandleFriendRelationship\b/, label: "friends relationship runtime registration" },
   ];
   for (const file of goFiles.filter((goFile) => !goFile.endsWith("_test.go"))) {
+    if (isFriendsRelationshipProtocolRouteImplementationFile(root, file)) {
+      ok(`${file} is allowed after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+      continue;
+    }
     const text = sourceWithoutGoComments(readText(path.join(root, file)));
     for (const match of textMatchesAny(text, forbiddenRuntimePatterns, root)) {
       fail(`${file} crosses friends relationship PostgreSQL adapter gate with ${match.label}`, {
@@ -35999,10 +36135,17 @@ function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
     return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
   });
   if (friendsProto) {
-    fail(`${friendsProto} adds friends relationship protocol shape during PostgreSQL adapter gate`, {
-      rule_id: ruleId,
-      artifact: friendsProto,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
   } else {
     ok("no friends relationship Protobuf shape is added by friends relationship PostgreSQL adapter gate", {
       rule_id: ruleId,
@@ -36017,10 +36160,17 @@ function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
     return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
   });
   if (friendsGenerated) {
-    fail(`${friendsGenerated} adds friends relationship generated output during PostgreSQL adapter gate`, {
-      rule_id: ruleId,
-      artifact: friendsGenerated,
-    });
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during PostgreSQL adapter gate`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
   } else {
     ok("no friends relationship generated output is added by friends relationship PostgreSQL adapter gate", {
       rule_id: ruleId,
@@ -36031,6 +36181,2153 @@ function checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles) {
   ok("Friends relationship PostgreSQL adapter gate completes W-0236, opens W-0237, records platform adapter ownership and SQL mapping posture, and preserves implementation/runtime/protocol/generated/dependency/event/direct compatibility deferrals", {
     rule_id: ruleId,
     artifact: standardPath,
+  });
+}
+
+function checkRuntimeFriendsRelationshipPostgresqlAdapterImplementation(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_postgresql_adapter_implementation";
+  const sourcePath = "runtime/internal/platform/persistence/postgres/friend_relationship_repository.go";
+  const testPath = "runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go";
+  const runnerPath = "runtime/internal/platform/persistence/postgres/runner.go";
+  const decisionPath = "decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md";
+  const changePath = "changes/2026-05-26-implement-friends-relationship-postgresql-adapter";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-postgresql-adapter-implementation.md";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    ok("friends relationship PostgreSQL adapter implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    sourcePath,
+    testPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-165"],
+    [".arch/work-items.yaml", "title: Friends Relationship PostgreSQL Adapter Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0237"],
+    [".arch/work-items.yaml", "title: Implement friends relationship PostgreSQL adapter"],
+    [".arch/work-items.yaml", "ADR-0145"],
+    [".arch/work-items.yaml", "id: M-166"],
+    [".arch/work-items.yaml", "title: Friends Relationship Runtime Behavior Gate"],
+    [".arch/work-items.yaml", "id: W-0238"],
+    [".arch/work-items.yaml", "title: Define friends relationship runtime behavior gate"],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_implementation: ADR-0145"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_implementation_decision: ADR-0145"],
+    [".arch/runtime.yaml", "friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation"],
+    [".arch/runtime.yaml", `adapter_source: ${sourcePath}`],
+    [".arch/runtime.yaml", `adapter_tests: ${testPath}`],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_gate:"],
+    [".arch/conventions.yaml", "friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation"],
+    [".arch/conventions.yaml", "friends_relationship_runtime_behavior_gate:"],
+    [".arch/contracts.yaml", "friends_relationship_postgresql_adapter_implementation_completed: true"],
+    [".arch/contracts.yaml", "friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_gate:"],
+    [".arch/reference.yaml", "phase_2ev_friends_relationship_postgresql_adapter_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0145"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_postgresql_adapter_implementation"],
+    [".arch/reference.yaml", "phase_2ew_friends_relationship_runtime_behavior_gate"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_postgresql_adapter_implementation_completed: true"],
+    [moduleManifestPath, "friends_relationship_postgresql_adapter_implementation_decision: ADR-0145"],
+    [moduleManifestPath, "friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation"],
+    [moduleManifestPath, "postgres_adapter_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go"],
+    [moduleManifestPath, "postgres_adapter_test: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_postgresql_adapter_implementation"],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_postgresql_adapter_implementation"],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_postgresql_adapter_implementation"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_postgresql_adapter_implementation"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_postgresql_adapter_implementation"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_postgresql_adapter_implementation"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_postgresql_adapter_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [sourcePath]: [
+      "type FriendRelationshipRepository struct",
+      "var _ friends.Repository = (*FriendRelationshipRepository)(nil)",
+      "func NewFriendRelationshipRepositoryForUnitOfWork",
+      "func (r *FriendRelationshipRepository) CreateOrUpdateFriendRequest",
+      "func (r *FriendRelationshipRepository) GetRelationshipByPair",
+      "func (r *FriendRelationshipRepository) ListRelationshipsForPlayer",
+      "func (r *FriendRelationshipRepository) AcceptFriendRequest",
+      "func (r *FriendRelationshipRepository) RejectFriendRequest",
+      "func (r *FriendRelationshipRepository) RemoveFriend",
+      "func (r *FriendRelationshipRepository) SetPlayerBlock",
+      "func (r *FriendRelationshipRepository) ClearPlayerBlock",
+      "INSERT INTO friend_relationships",
+      "FROM friend_relationships",
+      "UPDATE friend_relationships",
+      "ON CONFLICT (player_low_id, player_high_id) DO UPDATE",
+      "relationship_version = relationship_version + 1",
+      "friends.NormalizeFriendRelationshipRecord",
+      "friends.FriendRelationshipRepositoryError",
+    ],
+    [testPath]: [
+      "TestFriendRelationshipRepositoryCreateOrUpdateInsertsPendingRequest",
+      "TestFriendRelationshipRepositoryGetSelectsByCanonicalPair",
+      "TestFriendRelationshipRepositoryListIsPlayerScopedStatusFilteredAndOrdered",
+      "TestFriendRelationshipRepositoryLifecycleTransitionsUseExpectedVersion",
+      "TestFriendRelationshipRepositoryBlockAndUnblockUseActorSpecificColumns",
+      "TestFriendRelationshipRepositoryMapsConflictsAndRedactsDetails",
+      "TestFriendRelationshipRepositoryRejectsInvalidRows",
+      "TestFriendRelationshipRepositoryRequiresUnitOfWorkExecutor",
+      "TestFriendRelationshipRepositoryDefaultTestsDoNotRequireLivePostgreSQL",
+      "TestPostgresUnitOfWorkCreatesFriendRelationshipRepository",
+      "TestFriendRelationshipRepositoryImplementsFriendsRepository",
+    ],
+    [runnerPath]: [
+      "func (u UnitOfWork) NewFriendRelationshipRepository() (friends.Repository, error)",
+      "return NewFriendRelationshipRepositoryForUnitOfWork(executor), nil",
+    ],
+    [decisionPath]: [
+      "ADR-0145",
+      "runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+      "runtime.friends_relationship_postgresql_adapter_implementation",
+      "M-165/W-0237",
+      "W-0238 Define friends relationship runtime behavior gate",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0237",
+      "completed_milestone: M-165",
+      "previous_completed_work_item: W-0236",
+      "next_milestone: M-166",
+      "next_work_item: W-0238",
+      "next_work_item_status: next_ready",
+      "friends_relationship_postgresql_adapter_implementation_completed: true",
+      "friends_relationship_postgresql_adapter_implementation_decision: ADR-0145",
+      "friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation",
+      "postgresql_adapter_added: true",
+      "sql_execution_added: true",
+      "unit_of_work_repository_handoff_added: true",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0237",
+      "W-0238",
+      "ADR-0145",
+      "friend_relationships",
+      "runtime.friends_relationship_postgresql_adapter_implementation",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const forbiddenRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => ![sourcePath, runnerPath].includes(file))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/modules/friends/"))
+    .filter((file) => !isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file))
+    .filter((file) => !isFriendsRelationshipProtocolRouteImplementationFile(root, file))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bCreateOrUpdateFriendRequest\b|\bAcceptFriendRequest\b|\bRejectFriendRequest\b|\bRemoveFriend\b|\bSetPlayerBlock\b|\bClearPlayerBlock\b|\bFriendRelationshipHandler\b|\bFriendRelationshipRoute\b/.test(text);
+    });
+  for (const file of forbiddenRuntimeFiles) {
+    fail(`${file} adds friends relationship runtime behavior during PostgreSQL adapter implementation`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeFiles.length === 0) {
+    ok("no friends relationship runtime handlers or routes are added by PostgreSQL adapter implementation", {
+      rule_id: ruleId,
+      artifact: "runtime",
+    });
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
+  });
+  if (friendsProto) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
+  } else {
+    ok("no friends relationship Protobuf shape is added by friends relationship PostgreSQL adapter implementation", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const generatedFiles = discoverFilesUnder(root, "runtime/internal/generated")
+    .filter((file) => file.endsWith(".go"));
+  const friendsGenerated = generatedFiles.find((file) => {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsGenerated) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during PostgreSQL adapter implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
+  } else {
+    ok("no friends relationship generated output is added by friends relationship PostgreSQL adapter implementation", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated",
+    });
+  }
+
+  ok("Friends relationship PostgreSQL adapter implementation completes W-0237, opens W-0238, records platform adapter SQL mapping, and preserves runtime/protocol/generated/dependency/event/direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: sourcePath,
+  });
+}
+
+function checkRuntimeFriendsRelationshipRuntimeBehaviorGate(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_runtime_behavior_gate";
+  const standardPath = "docs/friends-relationship-runtime-behavior-gate.md";
+  const standardTranslationPath = "docs/friends-relationship-runtime-behavior-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md";
+  const changePath = "changes/2026-05-26-define-friends-relationship-runtime-behavior-gate";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-runtime-behavior-gate.md";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipRuntimeBehaviorGateCompleted(root)) {
+    ok("friends relationship runtime behavior gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-166"],
+    [".arch/work-items.yaml", "title: Friends Relationship Runtime Behavior Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0238"],
+    [".arch/work-items.yaml", "title: Define friends relationship runtime behavior gate"],
+    [".arch/work-items.yaml", "ADR-0146"],
+    [".arch/work-items.yaml", "id: M-167"],
+    [".arch/work-items.yaml", "title: Friends Relationship Runtime Behavior Implementation"],
+    [".arch/work-items.yaml", "id: W-0239"],
+    [".arch/work-items.yaml", "title: Implement friends relationship runtime behavior"],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_gate: ADR-0146"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_gate_decision: ADR-0146"],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_implementation:"],
+    [".arch/conventions.yaml", "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [".arch/conventions.yaml", "friends_relationship_runtime_behavior_implementation:"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_gate_defined: true"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_implementation:"],
+    [".arch/reference.yaml", "phase_2ew_friends_relationship_runtime_behavior_gate"],
+    [".arch/reference.yaml", "decision: ADR-0146"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [".arch/reference.yaml", "phase_2ex_friends_relationship_runtime_behavior_implementation"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_gate_defined: true"],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_gate_decision: ADR-0146"],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_runtime_behavior_gate"],
+    [moduleGuidePath, expectedReadmeNextWorkItemTitle(root)],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_runtime_behavior_gate"],
+    [moduleGuideTranslationPath, expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_runtime_behavior_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_runtime_behavior_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_runtime_behavior_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_runtime_behavior_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_runtime_behavior_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const requiredGateText = [
+    [standardPath, "friends_relationship_runtime_behavior_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0238"],
+    [standardPath, "decision: ADR-0146"],
+    [standardPath, "check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [standardPath, "source_postgresql_adapter_implementation_decision: ADR-0145"],
+    [standardPath, "repository_interface: runtime/internal/modules/friends.Repository"],
+    [standardPath, "future_runtime_owner_candidate: runtime/internal/app"],
+    [standardPath, "future_friends_application_package_candidate: runtime/internal/app/friends"],
+    [standardPath, "future_runtime_service_source_candidate: runtime/internal/app/friends/service.go"],
+    [standardPath, "request_identity_required: true"],
+    [standardPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardPath, "metadata_only_session_id_allowed_as_proof: false"],
+    [standardPath, "actor_identity_source: validated_request_identity_player_id"],
+    [standardPath, "actor_relative_public_status_required: true"],
+    [standardPath, "route_policy_requirement: request_token_required"],
+    [standardPath, "unit_of_work_handoff_required: true"],
+    [standardPath, "runtime_behavior_gate_only: true"],
+    [standardPath, "runtime_behavior_added: false"],
+    [standardPath, "runtime_handlers_added: false"],
+    [standardPath, "startup_wiring_added: false"],
+    [standardPath, "protocol_route_added: false"],
+    [standardPath, "protobuf_source_added: false"],
+    [standardPath, "generated_output_added: false"],
+    [standardPath, "repository_interface_changed: false"],
+    [standardPath, "postgresql_adapter_changed: false"],
+    [standardPath, "dependency_added: false"],
+    [standardPath, "migration_added: false"],
+    [standardPath, "authentication_session_behavior_changed: false"],
+    [standardPath, "event_audit_table_added: false"],
+    [standardPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardPath, "future_runtime_behavior_implementation_work_item: W-0239"],
+    [standardPath, "future_runtime_behavior_implementation_direction: implement_friends_relationship_runtime_behavior"],
+    [standardTranslationPath, "friends_relationship_runtime_behavior_gate: defined"],
+    [standardTranslationPath, "completed_work_item: W-0238"],
+    [standardTranslationPath, "decision: ADR-0146"],
+    [standardTranslationPath, "check_rule: runtime.friends_relationship_runtime_behavior_gate"],
+    [standardTranslationPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardTranslationPath, "actor_relative_public_status_required: true"],
+    [standardTranslationPath, "future_runtime_behavior_implementation_work_item: W-0239"],
+  ];
+  for (const [relativePath, requiredText] of requiredGateText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "friends_relationship_runtime_behavior_gate_decision: ADR-0146",
+      "friends_relationship_runtime_behavior_gate_standard: docs/friends-relationship-runtime-behavior-gate.md",
+      "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate",
+      "future_runtime_owner_candidate: runtime/internal/app",
+      "future_friends_application_package_candidate: runtime/internal/app/friends",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "actor_identity_source: validated_request_identity_player_id",
+      "actor_relative_public_status_required: true",
+      "route_policy_requirement: request_token_required",
+      "unit_of_work_handoff_required: true",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "friends_relationship_runtime_behavior_gate_decision: ADR-0146",
+      "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate",
+      "future_runtime_owner_candidate: runtime/internal/app",
+      "future_friends_application_package_candidate: runtime/internal/app/friends",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "friends_relationship_runtime_behavior_gate_defined: true",
+      "friends_relationship_runtime_behavior_gate_decision: ADR-0146",
+      "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate",
+      "friends_relationship_runtime_behavior_gate_work_item: W-0238",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "actor_relative_public_status_required: true",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "friends_relationship_runtime_behavior_gate_defined: true",
+      "friends_relationship_runtime_behavior_gate_decision: ADR-0146",
+      "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate",
+      "friends_relationship_runtime_behavior_gate_work_item: W-0238",
+      "friends_relationship_runtime_behavior_future_source: runtime/internal/app/friends/service.go",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0238",
+      "completed_milestone: M-166",
+      "previous_completed_work_item: W-0237",
+      "next_milestone: M-167",
+      "next_work_item: W-0239",
+      "next_work_item_status: next_ready",
+      "friends_relationship_runtime_behavior_gate_defined: true",
+      "friends_relationship_runtime_behavior_gate_decision: ADR-0146",
+      "friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "actor_identity_source: validated_request_identity_player_id",
+      "actor_relative_public_status_required: true",
+      "route_policy_requirement: request_token_required",
+      "runtime_behavior_added: false",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const servicePath = "runtime/internal/app/friends/service.go";
+  if (isFile(root, servicePath)) {
+    if (friendsRelationshipRuntimeBehaviorImplementationCompleted(root)) {
+      ok(`${servicePath} is authorized after completed W-0239 friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    } else {
+      fail(`${servicePath} is runtime behavior implementation and is not authorized by the gate-only W-0238 slice`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    }
+  } else {
+    ok("friends runtime behavior service implementation is deferred by W-0238", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/app/friends",
+    });
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
+  });
+  if (friendsProto) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
+  } else {
+    ok("no friends relationship Protobuf shape is added by friends relationship runtime behavior gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const generatedFiles = discoverFilesUnder(root, "runtime/internal/generated")
+    .filter((file) => file.endsWith(".go"));
+  const friendsGenerated = generatedFiles.find((file) => {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsGenerated) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during runtime behavior gate`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
+  } else {
+    ok("no friends relationship generated output is added by friends relationship runtime behavior gate", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated",
+    });
+  }
+
+  ok("Friends relationship runtime behavior gate completes W-0238, opens W-0239, records application-owned actor-relative behavior expectations, and preserves implementation/protocol/generated/dependency/event/direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: standardPath,
+  });
+}
+
+function checkRuntimeFriendsRelationshipRuntimeBehaviorImplementation(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_runtime_behavior_implementation";
+  const decisionPath = "decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md";
+  const changePath = "changes/2026-05-26-implement-friends-relationship-runtime-behavior";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-runtime-behavior-implementation.md";
+  const servicePath = "runtime/internal/app/friends/service.go";
+  const serviceTestPath = "runtime/internal/app/friends/service_test.go";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipRuntimeBehaviorImplementationCompleted(root)) {
+    ok("friends relationship runtime behavior implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    servicePath,
+    serviceTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-167"],
+    [".arch/work-items.yaml", "title: Friends Relationship Runtime Behavior Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0239"],
+    [".arch/work-items.yaml", "title: Implement friends relationship runtime behavior"],
+    [".arch/work-items.yaml", "ADR-0147"],
+    [".arch/work-items.yaml", "id: M-168"],
+    [".arch/work-items.yaml", "title: Friends Relationship Protocol Route Gate"],
+    [".arch/work-items.yaml", "id: W-0240"],
+    [".arch/work-items.yaml", "title: Define friends relationship protocol route gate"],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_implementation: ADR-0147"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_implementation_completed: true"],
+    [".arch/runtime.yaml", "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation"],
+    [".arch/conventions.yaml", "friends_relationship_runtime_behavior_implementation_completed: true"],
+    [".arch/conventions.yaml", "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_implementation_completed: true"],
+    [".arch/contracts.yaml", "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation"],
+    [".arch/reference.yaml", "phase_2ex_friends_relationship_runtime_behavior_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0147"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_runtime_behavior_implementation"],
+    [".arch/reference.yaml", "phase_2ey_friends_relationship_protocol_route_gate"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_implementation_completed: true"],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_implementation_decision: ADR-0147"],
+    [moduleManifestPath, "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_runtime_behavior_implementation"],
+    [moduleGuidePath, expectedReadmeNextWorkItemTitle(root)],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_runtime_behavior_implementation"],
+    [moduleGuideTranslationPath, expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_runtime_behavior_implementation"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_runtime_behavior_implementation"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_runtime_behavior_implementation"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_runtime_behavior_implementation"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_runtime_behavior_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "friends_relationship_runtime_behavior_implementation_decision: ADR-0147",
+      "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation",
+      "implementation_owner: runtime/internal/app/friends",
+      "runtime_service_source: runtime/internal/app/friends/service.go",
+      "runtime_service_test: runtime/internal/app/friends/service_test.go",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "actor_identity_source: validated_request_identity_player_id",
+      "actor_relative_public_status_required: true",
+      "unit_of_work_handoff_used: true",
+      "runtime_behavior_added: true",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "friends_relationship_runtime_behavior_implementation_decision: ADR-0147",
+      "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation",
+      "implementation_owner: runtime/internal/app/friends",
+      "request_identity_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "unit_of_work_handoff_used: true",
+      "runtime_behavior_added: true",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "friends_relationship_runtime_behavior_implementation_completed: true",
+      "friends_relationship_runtime_behavior_implementation_decision: ADR-0147",
+      "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation",
+      "friends_relationship_runtime_behavior_owner: runtime/internal/app/friends",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "actor_relative_public_status_required: true",
+      "runtime_behavior_added: true",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "friends_relationship_runtime_behavior_implementation_completed: true",
+      "friends_relationship_runtime_behavior_implementation_decision: ADR-0147",
+      "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation",
+      "runtime_behavior_added: true",
+      "runtime_behavior_owner: runtime/internal/app/friends",
+      "runtime_behavior_source: runtime/internal/app/friends/service.go",
+      "runtime_behavior_test: runtime/internal/app/friends/service_test.go",
+      "protocol_route_added: false",
+      "generated_output_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0239",
+      "completed_milestone: M-167",
+      "previous_completed_work_item: W-0238",
+      "friends_relationship_runtime_behavior_implementation_completed: true",
+      "friends_relationship_runtime_behavior_implementation_decision: ADR-0147",
+      "friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation",
+      "runtime_behavior_added: true",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const serviceText = sourceWithoutGoComments(readText(path.join(root, servicePath)));
+  for (const requiredPattern of [
+    /\bfunc\s+\(s Service\)\s+SendFriendRequest\b/,
+    /\bfunc\s+\(s Service\)\s+AcceptFriendRequest\b/,
+    /\bfunc\s+\(s Service\)\s+RejectFriendRequest\b/,
+    /\bfunc\s+\(s Service\)\s+RemoveFriend\b/,
+    /\bfunc\s+\(s Service\)\s+BlockPlayer\b/,
+    /\bfunc\s+\(s Service\)\s+UnblockPlayer\b/,
+    /\bfunc\s+\(s Service\)\s+ListFriendRelationships\b/,
+    /\bfunc\s+\(s Service\)\s+GetFriendRelationshipStatus\b/,
+    /\bactorFromValidatedIdentity\b/,
+    /\bIdentityValidationValidated\b/,
+    /\bPlayerIDValidated\b/,
+    /\bNewFriendRelationshipRepository\b/,
+    /\bFriendRelationshipPublicStatusOutgoingRequestPending\b/,
+    /\bPublicErrorFriendshipVersionMismatch\b/,
+  ]) {
+    if (requiredPattern.test(serviceText)) {
+      ok(`friends runtime service includes ${requiredPattern}`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    } else {
+      fail(`${servicePath} is missing required friends runtime behavior ${requiredPattern}`, {
+        rule_id: ruleId,
+        artifact: servicePath,
+      });
+    }
+  }
+
+  const forbiddenImports = parseGoImports(serviceText)
+    .filter((importPath) => (
+      importPath.includes("/internal/platform/persistence/postgres") ||
+      importPath.includes("/internal/platform/transport/ws") ||
+      importPath.includes("/internal/platform/protocol/protobuf") ||
+      importPath.includes("/internal/generated/proto") ||
+      importPath.includes("github.com/jackc/pgx") ||
+      importPath.includes("github.com/coder/websocket")
+    ));
+  for (const importPath of forbiddenImports) {
+    fail(`${servicePath} imports forbidden friends runtime dependency ${importPath}`, {
+      rule_id: ruleId,
+      artifact: servicePath,
+    });
+  }
+  if (forbiddenImports.length === 0) {
+    ok("friends runtime service keeps platform/protocol dependencies out", {
+      rule_id: ruleId,
+      artifact: servicePath,
+    });
+  }
+
+  const forbiddenRuntimeFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => file !== servicePath)
+    .filter((file) => !pathStartsWith(file, "runtime/internal/modules/friends/"))
+    .filter((file) => !isFriendsRelationshipPostgresqlAdapterImplementationRuntimeFile(root, file))
+    .filter((file) => !isFriendsRelationshipProtocolRouteImplementationFile(root, file))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bFriendRelationshipOperationStatus\b|\bFriendRelationshipPublicStatusOutgoingRequestPending\b|\bGetFriendRelationshipStatus\b|\bFriendRelationshipHandler\b|\bFriendRelationshipRoute\b/.test(text);
+    });
+  for (const file of forbiddenRuntimeFiles) {
+    fail(`${file} spreads friends relationship runtime behavior outside application service`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (forbiddenRuntimeFiles.length === 0) {
+    ok("friends relationship runtime behavior remains inside application service", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/app/friends",
+    });
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bFriendRelationship\b|\bfriend_relationships\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b/i.test(text);
+  });
+  if (friendsProto) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    } else {
+      fail(`${friendsProto} adds friends relationship protocol shape during runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: friendsProto,
+      });
+    }
+  } else {
+    ok("no friends relationship Protobuf shape is added by runtime behavior implementation", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const generatedFiles = discoverFilesUnder(root, "runtime/internal/generated")
+    .filter((file) => file.endsWith(".go"));
+  const friendsGenerated = generatedFiles.find((file) => {
+    const text = sourceWithoutGoComments(readText(path.join(root, file)));
+    return /\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsGenerated) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${friendsGenerated} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    } else {
+      fail(`${friendsGenerated} adds friends relationship generated output during runtime behavior implementation`, {
+        rule_id: ruleId,
+        artifact: friendsGenerated,
+      });
+    }
+  } else {
+    ok("no friends relationship generated output is added by runtime behavior implementation", {
+      rule_id: ruleId,
+      artifact: "runtime/internal/generated",
+    });
+  }
+}
+
+function checkRuntimeFriendsRelationshipProtocolRouteGate(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_protocol_route_gate";
+  const standardPath = "docs/friends-relationship-protocol-route-gate.md";
+  const standardTranslationPath = "docs/friends-relationship-protocol-route-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0148-friends-relationship-protocol-route-gate.md";
+  const changePath = "changes/2026-05-26-define-friends-relationship-protocol-route-gate";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-protocol-route-gate.md";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipProtocolRouteGateCompleted(root)) {
+    ok("friends relationship protocol route gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-168"],
+    [".arch/work-items.yaml", "title: Friends Relationship Protocol Route Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0240"],
+    [".arch/work-items.yaml", "title: Define friends relationship protocol route gate"],
+    [".arch/work-items.yaml", "ADR-0148"],
+    [".arch/work-items.yaml", "id: M-169"],
+    [".arch/work-items.yaml", "title: Friends Relationship Protocol Route Implementation"],
+    [".arch/work-items.yaml", "id: W-0241"],
+    [".arch/work-items.yaml", "title: Implement friends relationship protocol route"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_gate: ADR-0148"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_gate_standard: docs/friends-relationship-protocol-route-gate.md"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_gate:"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_gate:"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [".arch/reference.yaml", "phase_2ey_friends_relationship_protocol_route_gate"],
+    [".arch/reference.yaml", "phase_2ez_friends_relationship_protocol_route_implementation"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [".arch/modules.yaml", "protocol_route_gate_decision: ADR-0148"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_protocol_route_gate_defined: true"],
+    [moduleManifestPath, "friends_relationship_protocol_route_gate_decision: ADR-0148"],
+    [moduleManifestPath, "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_protocol_route_gate"],
+    [moduleGuidePath, expectedReadmeNextWorkItemTitle(root)],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_protocol_route_gate"],
+    [moduleGuideTranslationPath, expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0148-friends-relationship-protocol-route-gate.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0148-friends-relationship-protocol-route-gate.md"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0148-friends-relationship-protocol-route-gate.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0148-friends-relationship-protocol-route-gate.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_protocol_route_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_protocol_route_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_protocol_route_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "friends.SendFriendRequest",
+    "friends.AcceptFriendRequest",
+    "friends.RejectFriendRequest",
+    "friends.RemoveFriend",
+    "friends.BlockPlayer",
+    "friends.UnblockPlayer",
+    "friends.ListFriendRelationships",
+    "friends.GetFriendRelationshipStatus",
+  ];
+  const routeMarkerFiles = [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    ".arch/work-items.yaml",
+  ];
+  for (const file of routeMarkerFiles) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const requiredGateText = [
+    [standardPath, "friends_relationship_protocol_route_gate: defined"],
+    [standardPath, "implementation_authorized_by_this_standard: false"],
+    [standardPath, "completed_work_item: W-0240"],
+    [standardPath, "decision: ADR-0148"],
+    [standardPath, "check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [standardPath, "source_runtime_behavior_implementation_decision: ADR-0147"],
+    [standardPath, "repository_interface: runtime/internal/modules/friends.Repository"],
+    [standardPath, "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto"],
+    [standardPath, "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go"],
+    [standardPath, "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go"],
+    [standardPath, "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go"],
+    [standardPath, "route_policy_requirement: request_token_required"],
+    [standardPath, "authenticated_wrapper_required: true"],
+    [standardPath, "request_identity_source: validated_authenticated_request_identity"],
+    [standardPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardPath, "metadata_only_session_id_allowed_as_proof: false"],
+    [standardPath, "client_supplied_actor_id_allowed_as_proof: false"],
+    [standardPath, "client_supplied_target_player_id_allowed: true"],
+    [standardPath, "first_payload_package: vibit.friends.v1"],
+    [standardPath, "protobuf_envelope_change_status: unchanged"],
+    [standardPath, "websocket_transport_credential_neutral: true"],
+    [standardPath, "protocol_route_added: false"],
+    [standardPath, "protobuf_source_added: false"],
+    [standardPath, "generated_output_added: false"],
+    [standardPath, "startup_wiring_added: false"],
+    [standardPath, "repository_interface_changed: false"],
+    [standardPath, "postgresql_adapter_changed: false"],
+    [standardPath, "dependency_added: false"],
+    [standardPath, "migration_added: false"],
+    [standardPath, "authentication_session_behavior_changed: false"],
+    [standardPath, "event_audit_table_added: false"],
+    [standardPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardPath, "future_protocol_route_implementation_work_item: W-0241"],
+    [standardPath, "future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route"],
+    [standardPath, "Public Error Mapping"],
+    [standardPath, "Nakama Reference Mapping"],
+    [standardPath, "Pitaya Reference Mapping"],
+    [standardPath, "friend_request_send"],
+    [standardPath, "acceptor_session_handler_separation"],
+    [standardTranslationPath, "friends_relationship_protocol_route_gate: defined"],
+    [standardTranslationPath, "implementation_authorized_by_this_standard: false"],
+    [standardTranslationPath, "completed_work_item: W-0240"],
+    [standardTranslationPath, "decision: ADR-0148"],
+    [standardTranslationPath, "check_rule: runtime.friends_relationship_protocol_route_gate"],
+    [standardTranslationPath, "source_runtime_behavior_implementation_decision: ADR-0147"],
+    [standardTranslationPath, "repository_interface: runtime/internal/modules/friends.Repository"],
+    [standardTranslationPath, "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto"],
+    [standardTranslationPath, "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go"],
+    [standardTranslationPath, "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go"],
+    [standardTranslationPath, "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go"],
+    [standardTranslationPath, "route_policy_requirement: request_token_required"],
+    [standardTranslationPath, "authenticated_wrapper_required: true"],
+    [standardTranslationPath, "request_identity_source: validated_authenticated_request_identity"],
+    [standardTranslationPath, "metadata_only_player_id_allowed_as_proof: false"],
+    [standardTranslationPath, "metadata_only_session_id_allowed_as_proof: false"],
+    [standardTranslationPath, "client_supplied_actor_id_allowed_as_proof: false"],
+    [standardTranslationPath, "client_supplied_target_player_id_allowed: true"],
+    [standardTranslationPath, "first_payload_package: vibit.friends.v1"],
+    [standardTranslationPath, "protobuf_envelope_change_status: unchanged"],
+    [standardTranslationPath, "websocket_transport_credential_neutral: true"],
+    [standardTranslationPath, "protocol_route_added: false"],
+    [standardTranslationPath, "protobuf_source_added: false"],
+    [standardTranslationPath, "generated_output_added: false"],
+    [standardTranslationPath, "startup_wiring_added: false"],
+    [standardTranslationPath, "repository_interface_changed: false"],
+    [standardTranslationPath, "postgresql_adapter_changed: false"],
+    [standardTranslationPath, "dependency_added: false"],
+    [standardTranslationPath, "migration_added: false"],
+    [standardTranslationPath, "authentication_session_behavior_changed: false"],
+    [standardTranslationPath, "event_audit_table_added: false"],
+    [standardTranslationPath, "direct_nakama_pitaya_api_compatibility_added: false"],
+    [standardTranslationPath, "future_protocol_route_implementation_work_item: W-0241"],
+    [standardTranslationPath, "future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route"],
+  ];
+  for (const [relativePath, requiredText] of requiredGateText) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const statusMarkersByFile = {
+    ".arch/runtime.yaml": [
+      "friends_relationship_protocol_route_gate_decision: ADR-0148",
+      "friends_relationship_protocol_route_gate_standard: docs/friends-relationship-protocol-route-gate.md",
+      "friends_relationship_protocol_route_gate_translation: docs/friends-relationship-protocol-route-gate.zh-CN.md",
+      "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go",
+      "future_protocol_route_implementation_work_item: W-0241",
+      "future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.friends.v1",
+      "route_policy_requirement: request_token_required",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_actor_id_allowed_as_proof: false",
+      "client_supplied_target_player_id_allowed: true",
+      "public_error_mapping_recorded: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/conventions.yaml": [
+      "friends_relationship_protocol_route_gate_decision: ADR-0148",
+      "friends_relationship_protocol_route_gate_standard: docs/friends-relationship-protocol-route-gate.md",
+      "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.friends.v1",
+      "authenticated_wrapper_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "client_supplied_actor_id_allowed_as_proof: false",
+      "public_error_mapping_recorded: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/contracts.yaml": [
+      "friends_relationship_protocol_route_gate_defined: true",
+      "friends_relationship_protocol_route_gate_decision: ADR-0148",
+      "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go",
+      "future_protocol_route_implementation_work_item: W-0241",
+      "future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.friends.v1",
+      "authenticated_wrapper_required: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "client_supplied_actor_id_allowed_as_proof: false",
+      "public_error_mapping_recorded: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "startup_wiring_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    ".arch/reference.yaml": [
+      "phase_2ey_friends_relationship_protocol_route_gate",
+      "phase_2ez_friends_relationship_protocol_route_implementation",
+      "check_rule: runtime.friends_relationship_protocol_route_gate",
+      "future_protocol_route_implementation_work_item: W-0241",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [moduleManifestPath]: [
+      "friends_relationship_protocol_route_gate_defined: true",
+      "friends_relationship_protocol_route_gate_decision: ADR-0148",
+      "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate",
+      "friends_relationship_protocol_route_gate_work_item: W-0240",
+      "protocol_route_next_work_item: W-0241",
+      "future_protocol_route_implementation_work_item: W-0241",
+      "future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route",
+      "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go",
+      "candidate_routes_recorded: true",
+      "first_payload_package: vibit.friends.v1",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_actor_id_allowed_as_proof: false",
+      "public_error_mapping_recorded: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0240",
+      "completed_milestone: M-168",
+      "previous_completed_work_item: W-0239",
+      "next_milestone: M-169",
+      "next_work_item: W-0241",
+      "next_work_item_status: next_ready",
+      "selected_direction: define_friends_relationship_protocol_route_gate",
+      "next_direction: implement_friends_relationship_protocol_route",
+      "friends_relationship_protocol_route_gate_defined: true",
+      "friends_relationship_protocol_route_gate_decision: ADR-0148",
+      "friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate",
+      "future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto",
+      "future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+      "future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+      "future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go",
+      "future_protocol_route_implementation_work_item: W-0241",
+      "candidate_routes:",
+      "first_payload_package: vibit.friends.v1",
+      "route_policy_requirement: request_token_required",
+      "authenticated_wrapper_required: true",
+      "request_identity_source: validated_authenticated_request_identity",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "metadata_only_session_id_allowed_as_proof: false",
+      "client_supplied_actor_id_allowed_as_proof: false",
+      "client_supplied_target_player_id_allowed: true",
+      "protobuf_envelope_change_status: unchanged",
+      "websocket_transport_credential_neutral: true",
+      "public_error_mapping_recorded: true",
+      "nakama_reference_mapping_recorded: true",
+      "pitaya_reference_mapping_recorded: true",
+      "runtime_behavior_added: false",
+      "runtime_handlers_added: false",
+      "startup_wiring_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "event_audit_table_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(statusMarkersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const implementationCompleted = workItemHasStatus(root, "W-0241", "completed");
+  for (const file of [
+    "proto/vibit/friends/v1/friends.proto",
+    "runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+    "runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+    "runtime/internal/app/bootstrap/friends.go",
+  ]) {
+    if (isFile(root, file) && !implementationCompleted) {
+      fail(`${file} exists during friends relationship protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else if (isFile(root, file) && implementationCompleted) {
+      ok(`${file} exists after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      ok(`${file} is deferred by friends relationship protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const protoFiles = discoverFilesUnder(root, "proto")
+    .filter((file) => file.endsWith(".proto"));
+  const friendsProto = protoFiles.find((file) => {
+    const text = readText(path.join(root, file));
+    return /\bvibit\.friends\.v1\b|\bFriendRelationship\b|\bSendFriendRequest\b|\bAcceptFriendRequest\b|\bfriend_relationships\b/i.test(text);
+  });
+  if (friendsProto && !implementationCompleted) {
+    fail(`${friendsProto} adds friends relationship Protobuf shape during protocol route gate`, {
+      rule_id: ruleId,
+      artifact: friendsProto,
+    });
+  } else if (friendsProto && implementationCompleted) {
+    ok(`${friendsProto} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+      rule_id: ruleId,
+      artifact: friendsProto,
+    });
+  } else {
+    ok("no friends relationship Protobuf shape is added by protocol route gate", {
+      rule_id: ruleId,
+      artifact: "proto",
+    });
+  }
+
+  const forbiddenRouteFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/app/friends/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/modules/friends/"))
+    .filter((file) => !pathStartsWith(file, "runtime/internal/platform/persistence/postgres/"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bfriends\.(SendFriendRequest|AcceptFriendRequest|RejectFriendRequest|RemoveFriend|BlockPlayer|UnblockPlayer|ListFriendRelationships|GetFriendRelationshipStatus)\b|\bRegisterFriends|\bFriendRelationshipRoute|\bFriendsRouteHandlers\b|\bfriends_bridge\b/.test(text);
+    });
+  for (const file of forbiddenRouteFiles) {
+    if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+      ok(`${file} is authorized after completed W-0241 friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} adds friends relationship route implementation during protocol route gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+  if (forbiddenRouteFiles.length === 0) {
+    ok("no friends relationship route implementation is added by protocol route gate", {
+      rule_id: ruleId,
+      artifact: "runtime",
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/friend/i, label: "Nakama friends REST path" },
+    { pattern: /\bnk\.friends?_/i, label: "Nakama runtime friends API name" },
+    { pattern: /\bFriendsAdd\b|\bFriendsList\b|\bFriendsDelete\b/i, label: "Nakama friends API type name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  const compatibilityFiles = [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    ".arch/reference.yaml",
+  ];
+  for (const file of compatibilityFiles) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+}
+
+function checkRuntimeFriendsRelationshipProtocolRouteImplementation(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_protocol_route_implementation";
+  const decisionPath = "decisions/ADR-0149-friends-relationship-protocol-route-implementation.md";
+  const changePath = "changes/2026-05-26-implement-friends-relationship-protocol-route";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-protocol-route-implementation.md";
+  const protoPath = "proto/vibit/friends/v1/friends.proto";
+  const generatedPath = "runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go";
+  const routesPath = "runtime/internal/app/friends/routes.go";
+  const bootstrapPath = "runtime/internal/app/bootstrap/friends.go";
+  const bootstrapTestPath = "runtime/internal/app/bootstrap/friends_test.go";
+  const bridgePath = "runtime/internal/platform/protocol/protobuf/friends_bridge.go";
+  const bridgeTestPath = "runtime/internal/platform/protocol/protobuf/friends_bridge_test.go";
+  const mainPath = "runtime/cmd/vibit-server/main.go";
+  const mainTestPath = "runtime/cmd/vibit-server/main_test.go";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+    ok("friends relationship protocol route implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    protoPath,
+    generatedPath,
+    routesPath,
+    bootstrapPath,
+    bootstrapTestPath,
+    bridgePath,
+    bridgeTestPath,
+    mainPath,
+    mainTestPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship protocol route implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-169"],
+    [".arch/work-items.yaml", "title: Friends Relationship Protocol Route Implementation"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0241"],
+    [".arch/work-items.yaml", "title: Implement friends relationship protocol route"],
+    [".arch/work-items.yaml", "ADR-0149"],
+    [".arch/work-items.yaml", "id: M-170"],
+    [".arch/work-items.yaml", "id: W-0242"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_implementation: ADR-0149"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_implementation_completed: true"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_implementation_completed: true"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_implementation_completed: true"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation"],
+    [".arch/reference.yaml", "phase_2ez_friends_relationship_protocol_route_implementation"],
+    [".arch/reference.yaml", "decision: ADR-0149"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_protocol_route_implementation"],
+    [".arch/reference.yaml", "phase_2fa_friends_relationship_protocol_route_local_proof"],
+    [".arch/modules.yaml", "protocol_route_implementation_decision: ADR-0149"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_protocol_route_implementation_completed: true"],
+    [moduleManifestPath, "friends_relationship_protocol_route_implementation_decision: ADR-0149"],
+    [moduleManifestPath, "friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_protocol_route_implementation"],
+    [moduleGuidePath, expectedReadmeNextWorkItemTitle(root)],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_protocol_route_implementation"],
+    [moduleGuideTranslationPath, expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0149-friends-relationship-protocol-route-implementation.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0149-friends-relationship-protocol-route-implementation.md"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0149-friends-relationship-protocol-route-implementation.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0149-friends-relationship-protocol-route-implementation.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.friends_relationship_protocol_route_implementation"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_implementation"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_protocol_route_implementation"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_implementation"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.friends_relationship_protocol_route_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "friends.SendFriendRequest",
+    "friends.AcceptFriendRequest",
+    "friends.RejectFriendRequest",
+    "friends.RemoveFriend",
+    "friends.BlockPlayer",
+    "friends.UnblockPlayer",
+    "friends.ListFriendRelationships",
+    "friends.GetFriendRelationshipStatus",
+  ];
+  for (const file of [protoPath, routesPath, decisionPath, `${changePath}/spec.yaml`, ".arch/work-items.yaml"]) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const markersByFile = {
+    [protoPath]: [
+      "package vibit.friends.v1;",
+      "option go_package = \"github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/friends/v1;friendsv1\";",
+      "message FriendRelationship",
+      "message FriendRelationshipPage",
+      "message SendFriendRequestRequest",
+      "message SendFriendRequestResponse",
+      "message AcceptFriendRequestRequest",
+      "message AcceptFriendRequestResponse",
+      "message RejectFriendRequestRequest",
+      "message RejectFriendRequestResponse",
+      "message RemoveFriendRequest",
+      "message RemoveFriendResponse",
+      "message BlockPlayerRequest",
+      "message BlockPlayerResponse",
+      "message UnblockPlayerRequest",
+      "message UnblockPlayerResponse",
+      "message ListFriendRelationshipsRequest",
+      "message ListFriendRelationshipsResponse",
+      "message GetFriendRelationshipStatusRequest",
+      "message GetFriendRelationshipStatusResponse",
+      "optional int64 expected_version",
+      "@source docs/friends-relationship-protocol-route-gate.md",
+      "@source decisions/ADR-0148-friends-relationship-protocol-route-gate.md",
+      "@source decisions/ADR-0149-friends-relationship-protocol-route-implementation.md",
+    ],
+    [generatedPath]: [
+      "Code generated by protoc-gen-go. DO NOT EDIT.",
+      "source: vibit/friends/v1/friends.proto",
+    ],
+    [routesPath]: [
+      "CommandSendFriendRequest",
+      "CommandAcceptFriendRequest",
+      "CommandRejectFriendRequest",
+      "CommandRemoveFriend",
+      "CommandBlockPlayer",
+      "CommandUnblockPlayer",
+      "QueryListFriendRelationships",
+      "QueryGetFriendRelationshipStatus",
+      "SendFriendRequestRoute",
+      "AcceptFriendRequestRoute",
+      "RejectFriendRequestRoute",
+      "RemoveFriendRoute",
+      "BlockPlayerRoute",
+      "UnblockPlayerRoute",
+      "ListFriendRelationshipsRoute",
+      "GetFriendRelationshipStatusRoute",
+    ],
+    [bootstrapPath]: [
+      "type FriendsService interface",
+      "type FriendsRouteHandlers struct",
+      "RegisterRoutes",
+      "HandleSendFriendRequestRoute",
+      "HandleAcceptFriendRequestRoute",
+      "HandleRejectFriendRequestRoute",
+      "HandleRemoveFriendRoute",
+      "HandleBlockPlayerRoute",
+      "HandleUnblockPlayerRoute",
+      "HandleListFriendRelationshipsRoute",
+      "HandleGetFriendRelationshipStatusRoute",
+      "payload.Identity = request.Identity",
+      "friendsApplicationError",
+      "PublicErrorFriendshipInvalidRequest",
+      "PublicErrorFriendshipUnavailable",
+    ],
+    [bridgePath]: [
+      "routeRequestWithFriendsPayload",
+      "protoPayloadFromFriendsRoute",
+      "SendFriendRequestRequest",
+      "AcceptFriendRequestRequest",
+      "RejectFriendRequestRequest",
+      "RemoveFriendRequest",
+      "BlockPlayerRequest",
+      "UnblockPlayerRequest",
+      "ListFriendRelationshipsRequest",
+      "GetFriendRelationshipStatusRequest",
+      "SendFriendRequestResponse",
+      "AcceptFriendRequestResponse",
+      "RejectFriendRequestResponse",
+      "RemoveFriendResponse",
+      "BlockPlayerResponse",
+      "UnblockPlayerResponse",
+      "ListFriendRelationshipsResponse",
+      "GetFriendRelationshipStatusResponse",
+      "friendRelationshipVersionFromOptionalInt64",
+      "time.RFC3339Nano",
+    ],
+    [mainPath]: [
+      "appfriends.NewService",
+      "randomFriendRelationshipIDGenerator",
+      "bootstrap.FriendsRouteHandlers",
+      "appfriends.SendFriendRequestRoute()",
+      "appfriends.AcceptFriendRequestRoute()",
+      "appfriends.RejectFriendRequestRoute()",
+      "appfriends.RemoveFriendRoute()",
+      "appfriends.BlockPlayerRoute()",
+      "appfriends.UnblockPlayerRoute()",
+    ],
+    [mainTestPath]: [
+      "TestRandomFriendRelationshipIDGeneratorShape",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0241",
+      "completed_milestone: M-169",
+      "previous_completed_work_item: W-0240",
+      "next_milestone: M-170",
+      "next_work_item: W-0242",
+      "next_work_item_status: next_ready",
+      "friends_relationship_protocol_route_implementation_completed: true",
+      "friends_relationship_protocol_route_implementation_decision: ADR-0149",
+      "friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation",
+      "protocol_route_added: true",
+      "protobuf_source_added: true",
+      "generated_output_added: true",
+      "protocol_bridge_added: true",
+      "application_handler_added: true",
+      "postgres_startup_route_registration_added: true",
+      "transaction_bypass_added: true",
+      "metadata_only_player_id_allowed_as_proof: false",
+      "authenticated_wrapper_required: true",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const protoText = isFile(root, protoPath) ? readText(path.join(root, protoPath)) : "";
+  const forbiddenProtoPatterns = [
+    { pattern: /\bactor_player_id\b|\bowner_id\b/, label: "client-supplied actor or owner id proof" },
+    { pattern: /\bsession_id\b/, label: "client-supplied session id proof" },
+    { pattern: /\baccess_token\b|\bcredential_proof\b/, label: "credential carrier" },
+    { pattern: /\b(?:lookup|verifier)_digest\b/, label: "digest material" },
+    { pattern: /\bchat\b|\bgroup\b|\bparty\b|\bmatchmaking\b|\bmatch_runtime\b/i, label: "broader social or game feature field" },
+  ];
+  const protoMatches = textMatchesAny(protoText, forbiddenProtoPatterns);
+  if (protoMatches.length === 0) {
+    ok("friends proto omits actor proof, session proof, credential, digest, and broad social fields", {
+      rule_id: ruleId,
+      artifact: protoPath,
+    });
+  } else {
+    for (const match of protoMatches) {
+      fail(`${protoPath} includes forbidden friends protocol field: ${match.label}`, {
+        rule_id: ruleId,
+        artifact: protoPath,
+      });
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/friend/i, label: "Nakama friends REST path" },
+    { pattern: /\bnk\.friends?_/i, label: "Nakama runtime friends API name" },
+    { pattern: /\bFriendsAdd\b|\bFriendsList\b|\bFriendsDelete\b/i, label: "Nakama friends API type name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [protoPath, routesPath, bootstrapPath, bridgePath, decisionPath, `${changePath}/spec.yaml`]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  const forbiddenGoImports = [
+    "github.com/jackc/pgx",
+    "github.com/coder/websocket",
+    "github.com/aws/",
+    "github.com/minio/",
+  ];
+  for (const file of [routesPath, bootstrapPath, bridgePath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const imports = parseGoImports(readText(path.join(root, file)));
+    for (const importPath of imports) {
+      if (forbiddenGoImports.some((prefix) => importPath.startsWith(prefix))) {
+        fail(`${file} imports forbidden protocol-route dependency ${importPath}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("friends relationship protocol route implementation is bounded to protected relationship routes with generated Protobuf output, validated identity handoff, redacted errors, and Nakama/Pitaya-aligned capability/layering without direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
+  });
+}
+
+function checkRuntimeFriendsRelationshipProtocolRouteLocalProof(root, goFiles) {
+  const ruleId = "runtime.friends_relationship_protocol_route_local_proof";
+  const decisionPath = "decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md";
+  const changePath = "changes/2026-05-26-prove-friends-relationship-protocol-route-local-flow";
+  const conversationPath = "conversations/2026-05-26-friends-relationship-protocol-route-local-proof.md";
+  const e2ePath = "runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go";
+  const scriptPath = "examples/local-alpha-request-loop.sh";
+  const exampleClientPath = "examples/local-alpha-example-client.sh";
+  const examplesReadmePath = "examples/README.md";
+  const examplesReadmeTranslationPath = "examples/README.zh-CN.md";
+  const clientReadmePath = "examples/local-alpha-client/README.md";
+  const clientReadmeTranslationPath = "examples/local-alpha-client/README.zh-CN.md";
+  const moduleManifestPath = "modules/friends/module.yaml";
+  const moduleGuidePath = "modules/friends/AGENTS.md";
+  const moduleGuideTranslationPath = "modules/friends/AGENTS.zh-CN.md";
+
+  if (!friendsRelationshipProtocolRouteLocalProofCompleted(root)) {
+    ok("friends relationship protocol route local proof is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    e2ePath,
+    scriptPath,
+    exampleClientPath,
+    examplesReadmePath,
+    examplesReadmeTranslationPath,
+    clientReadmePath,
+    clientReadmeTranslationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for friends relationship protocol route local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for friends relationship protocol route local proof`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-170"],
+    [".arch/work-items.yaml", "title: Friends Relationship Protocol Route Local Proof"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0242"],
+    [".arch/work-items.yaml", "title: Prove friends relationship protocol route in local alpha request flow"],
+    [".arch/work-items.yaml", "ADR-0150"],
+    [".arch/work-items.yaml", "runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/work-items.yaml", "id: M-171"],
+    [".arch/work-items.yaml", "id: W-0243"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_local_proof: ADR-0150"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_local_proof_completed: true"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh"],
+    [".arch/runtime.yaml", "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_local_proof_completed: true"],
+    [".arch/conventions.yaml", "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_local_proof_completed: true"],
+    [".arch/contracts.yaml", "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/reference.yaml", "phase_2fa_friends_relationship_protocol_route_local_proof"],
+    [".arch/reference.yaml", "phase_2fb_next_nakama_prototype_ready_capability_after_friends_route_proof"],
+    [".arch/reference.yaml", "check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/modules.yaml", "friends_relationship_protocol_route_local_proof_completed: true"],
+    [".arch/modules.yaml", "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    [moduleManifestPath, "friends_relationship_protocol_route_local_proof_completed: true"],
+    [moduleManifestPath, "friends_relationship_protocol_route_local_proof_decision: ADR-0150"],
+    [moduleManifestPath, "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof"],
+    [moduleManifestPath, "friends_relationship_protocol_route_local_proof_work_item: W-0242"],
+    [moduleManifestPath, expectedRepositoryNextWorkItem(root)],
+    [moduleManifestPath, expectedRepositoryNextWorkItemScope(root)],
+    [moduleGuidePath, "runtime.friends_relationship_protocol_route_local_proof"],
+    [moduleGuidePath, expectedReadmeNextWorkItemTitle(root)],
+    [moduleGuideTranslationPath, "runtime.friends_relationship_protocol_route_local_proof"],
+    [moduleGuideTranslationPath, expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.friends_relationship_protocol_route_local_proof"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_local_proof"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.friends_relationship_protocol_route_local_proof"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.friends_relationship_protocol_route_local_proof"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.md", "decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md"],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", "decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md"],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", "decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md"],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", "decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md"],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["rules/check-rules.json", "runtime.friends_relationship_protocol_route_local_proof"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const routeMarkers = [
+    "friends.SendFriendRequest",
+    "friends.AcceptFriendRequest",
+    "friends.RejectFriendRequest",
+    "friends.RemoveFriend",
+    "friends.BlockPlayer",
+    "friends.UnblockPlayer",
+    "friends.ListFriendRelationships",
+    "friends.GetFriendRelationshipStatus",
+  ];
+  for (const file of [
+    e2ePath,
+    scriptPath,
+    exampleClientPath,
+    examplesReadmePath,
+    examplesReadmeTranslationPath,
+    clientReadmePath,
+    clientReadmeTranslationPath,
+    decisionPath,
+    `${changePath}/spec.yaml`,
+  ]) {
+    for (const marker of routeMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const markersByFile = {
+    [e2ePath]: [
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "AuthenticatedRequest",
+      "SendFriendRequestRequest",
+      "GetFriendRelationshipStatusRequest",
+      "AcceptFriendRequestRequest",
+      "ListFriendRelationshipsRequest",
+      "RemoveFriendRequest",
+      "BlockPlayerRequest",
+      "UnblockPlayerRequest",
+      "RejectFriendRequestRequest",
+      "assertNoFrameErrorSecretLeak",
+      "newE2EFriendRelationshipRepository",
+      "e2eFriendRelationshipRepository",
+      "authenticateAndBindLocalPlayer",
+      "bootstrap.FriendsRouteHandlers",
+      "appfriends.NewService",
+      "friendsRepository",
+    ],
+    [scriptPath]: [
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "friends route proof",
+      "send/status/accept/list/remove/block/unblock/reject",
+    ],
+    [exampleClientPath]: [
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "protected inventory/presence/storage/friends",
+      "friends.SendFriendRequest",
+      "friends.GetFriendRelationshipStatus",
+    ],
+    [examplesReadmePath]: [
+      "friends.SendFriendRequest",
+      "friends.AcceptFriendRequest",
+      "friends.RejectFriendRequest",
+      "friends.RemoveFriend",
+      "friends.BlockPlayer",
+      "friends.UnblockPlayer",
+      "friends.ListFriendRelationships",
+      "friends.GetFriendRelationshipStatus",
+      "Nakama-class",
+      "Pitaya-aligned",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [examplesReadmeTranslationPath]: [
+      "friends.SendFriendRequest",
+      "friends.AcceptFriendRequest",
+      "friends.RejectFriendRequest",
+      "friends.RemoveFriend",
+      "friends.BlockPlayer",
+      "friends.UnblockPlayer",
+      "friends.ListFriendRelationships",
+      "friends.GetFriendRelationshipStatus",
+      "Nakama-class",
+      "Pitaya-aligned",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [clientReadmePath]: [
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "friends.SendFriendRequest",
+      "friends.GetFriendRelationshipStatus",
+    ],
+    [clientReadmeTranslationPath]: [
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "friends.SendFriendRequest",
+      "friends.GetFriendRelationshipStatus",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0242",
+      "completed_milestone: M-170",
+      "previous_completed_work_item: W-0241",
+      "next_milestone: M-171",
+      "next_work_item: W-0243",
+      "next_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof",
+      "friends_relationship_protocol_route_local_proof_completed: true",
+      "friends_relationship_protocol_route_local_proof_decision: ADR-0150",
+      "friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof",
+      "proof_test_name: TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "local_test_friends_repository_added: true",
+      "production_friends_repository_changed: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "protocol_bridge_changed: false",
+      "application_handler_changed: false",
+      "friends_service_behavior_changed: false",
+      "postgres_startup_route_registration_changed: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "dependency_added: false",
+      "migration_added: false",
+      "authentication_session_behavior_changed: false",
+      "event_audit_table_added: false",
+      "groups_added: false",
+      "parties_added: false",
+      "chat_added: false",
+      "matchmaking_added: false",
+      "match_runtime_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0150",
+      "W-0242",
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "test-only friends relationship repository",
+      "Nakama",
+      "Pitaya",
+      "No direct Nakama or Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0242",
+      "W-0243",
+      "ADR-0150",
+      "TestFriendsRelationshipProtocolRouteLocalAlphaFlow",
+      "runtime.friends_relationship_protocol_route_local_proof",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const testOnlyRepositoryFiles = goFiles
+    .filter((file) => !file.endsWith("_test.go"))
+    .filter((file) => {
+      const text = sourceWithoutGoComments(readText(path.join(root, file)));
+      return /\bnewE2EFriendRelationshipRepository\b|\be2eFriendRelationshipRepository\b/.test(text);
+    });
+  for (const file of testOnlyRepositoryFiles) {
+    fail(`${file} references local proof friends relationship repository outside tests`, {
+      rule_id: ruleId,
+      artifact: file,
+    });
+  }
+  if (testOnlyRepositoryFiles.length === 0) {
+    ok("friends relationship route local proof repository remains test-only", {
+      rule_id: ruleId,
+      artifact: e2ePath,
+    });
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\b\/v2\/friend/i, label: "Nakama friends REST path" },
+    { pattern: /\bnk\.friends?_/i, label: "Nakama runtime friends API name" },
+    { pattern: /\bFriendsAdd\b|\bFriendsList\b|\bFriendsDelete\b/i, label: "Nakama friends API type name" },
+    { pattern: /\bconnector\.[A-Za-z0-9_]+Handler\.[A-Za-z0-9_]+\b/, label: "Pitaya route naming" },
+    { pattern: /\bpitaya\.(?:GetSession|Session|Handler|Group|RPC|Remote|Push|Send|Kick|Bind|Set|Get)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [
+    decisionPath,
+    `${changePath}/spec.yaml`,
+    e2ePath,
+    scriptPath,
+    exampleClientPath,
+    examplesReadmePath,
+    examplesReadmeTranslationPath,
+    clientReadmePath,
+    clientReadmeTranslationPath,
+  ]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("friends relationship protocol route local proof is bounded to the existing local alpha WebSocket/Protobuf route flow, test-only friends relationship repository support, redaction checks, and Nakama/Pitaya-aligned capability/layering without direct API compatibility", {
+    rule_id: ruleId,
+    artifact: changePath,
   });
 }
 
@@ -37843,7 +40140,80 @@ function friendsRelationshipPostgresqlAdapterGateCompleted(root) {
   return workItemHasStatus(root, "W-0236", "completed");
 }
 
+function friendsRelationshipPostgresqlAdapterImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0237", "completed");
+}
+
+function friendsRelationshipRuntimeBehaviorGateCompleted(root) {
+  return workItemHasStatus(root, "W-0238", "completed");
+}
+
+function friendsRelationshipRuntimeBehaviorImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0239", "completed");
+}
+
+function friendsRelationshipProtocolRouteGateCompleted(root) {
+  return workItemHasStatus(root, "W-0240", "completed");
+}
+
+function friendsRelationshipProtocolRouteImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0241", "completed");
+}
+
+function friendsRelationshipProtocolRouteLocalProofCompleted(root) {
+  return workItemHasStatus(root, "W-0242", "completed");
+}
+
+function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
+  if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+    return false;
+  }
+  return [
+    "proto/vibit/friends/v1/friends.proto",
+    "runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go",
+    "runtime/internal/app/friends/routes.go",
+    "runtime/internal/app/bootstrap/friends.go",
+    "runtime/internal/platform/protocol/protobuf/friends_bridge.go",
+    "runtime/internal/platform/protocol/protobuf/inventory_bridge.go",
+    "runtime/internal/platform/protocol/protobuf/payload_registry.go",
+    "runtime/cmd/vibit-server/main.go",
+  ].includes(file) ||
+    pathStartsWith(file, "runtime/internal/app/bootstrap/") && /friends/i.test(path.basename(file)) ||
+    pathStartsWith(file, "runtime/internal/platform/protocol/protobuf/") && /friends_bridge/i.test(path.basename(file)) ||
+    file === "runtime/cmd/vibit-server/main_test.go";
+}
+
+function isFriendsRelationshipPostgresqlAdapterImplementationRuntimeFile(root, file) {
+  return friendsRelationshipPostgresqlAdapterImplementationCompleted(root) && [
+    "runtime/internal/platform/persistence/postgres/friend_relationship_repository.go",
+    "runtime/internal/platform/persistence/postgres/runner.go",
+  ].includes(file);
+}
+
+function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
+  return friendsRelationshipRuntimeBehaviorImplementationCompleted(root) &&
+    pathStartsWith(file, "runtime/internal/app/friends/");
+}
+
 function expectedRepositoryNextWorkItem(root) {
+  if (friendsRelationshipProtocolRouteLocalProofCompleted(root)) {
+    return "repository_next_work_item: W-0243";
+  }
+  if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0242";
+  }
+  if (friendsRelationshipProtocolRouteGateCompleted(root)) {
+    return "repository_next_work_item: W-0241";
+  }
+  if (friendsRelationshipRuntimeBehaviorImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0240";
+  }
+  if (friendsRelationshipRuntimeBehaviorGateCompleted(root)) {
+    return "repository_next_work_item: W-0239";
+  }
+  if (friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0238";
+  }
   if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
     return "repository_next_work_item: W-0237";
   }
@@ -37917,6 +40287,24 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (friendsRelationshipProtocolRouteLocalProofCompleted(root)) {
+    return "repository_next_work_item_scope: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof";
+  }
+  if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: prove_friends_relationship_protocol_route_local_flow";
+  }
+  if (friendsRelationshipProtocolRouteGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_friends_relationship_protocol_route";
+  }
+  if (friendsRelationshipRuntimeBehaviorImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: define_friends_relationship_protocol_route_gate";
+  }
+  if (friendsRelationshipRuntimeBehaviorGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_friends_relationship_runtime_behavior";
+  }
+  if (friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: define_friends_relationship_runtime_behavior_gate";
+  }
   if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_friends_relationship_postgresql_adapter";
   }
@@ -37981,6 +40369,24 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (friendsRelationshipProtocolRouteLocalProofCompleted(root)) {
+    return "W-0243 Select next Nakama prototype-ready capability after friends relationship route proof";
+  }
+  if (friendsRelationshipProtocolRouteImplementationCompleted(root)) {
+    return "W-0242 Prove friends relationship protocol route in local alpha request flow";
+  }
+  if (friendsRelationshipProtocolRouteGateCompleted(root)) {
+    return "W-0241 Implement friends relationship protocol route";
+  }
+  if (friendsRelationshipRuntimeBehaviorImplementationCompleted(root)) {
+    return "W-0240 Define friends relationship protocol route gate";
+  }
+  if (friendsRelationshipRuntimeBehaviorGateCompleted(root)) {
+    return "W-0239 Implement friends relationship runtime behavior";
+  }
+  if (friendsRelationshipPostgresqlAdapterImplementationCompleted(root)) {
+    return "W-0238 Define friends relationship runtime behavior gate";
+  }
   if (friendsRelationshipPostgresqlAdapterGateCompleted(root)) {
     return "W-0237 Implement friends relationship PostgreSQL adapter";
   }
@@ -38069,6 +40475,12 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0242", "next_ready_work_item: W-0243"],
+    ["W-0241", "next_ready_work_item: W-0242"],
+    ["W-0240", "next_ready_work_item: W-0241"],
+    ["W-0239", "next_ready_work_item: W-0240"],
+    ["W-0238", "next_ready_work_item: W-0239"],
+    ["W-0237", "next_ready_work_item: W-0238"],
     ["W-0236", "next_ready_work_item: W-0237"],
     ["W-0235", "next_ready_work_item: W-0236"],
     ["W-0234", "next_ready_work_item: W-0235"],
@@ -38134,6 +40546,24 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0242", "completed")) {
+    return "next_work_item: W-0243";
+  }
+  if (workItemHasStatus(root, "W-0241", "completed")) {
+    return "next_work_item: W-0242";
+  }
+  if (workItemHasStatus(root, "W-0240", "completed")) {
+    return "next_work_item: W-0241";
+  }
+  if (workItemHasStatus(root, "W-0239", "completed")) {
+    return "next_work_item: W-0240";
+  }
+  if (workItemHasStatus(root, "W-0238", "completed")) {
+    return "next_work_item: W-0239";
+  }
+  if (workItemHasStatus(root, "W-0237", "completed")) {
+    return "next_work_item: W-0238";
+  }
   if (workItemHasStatus(root, "W-0236", "completed")) {
     return "next_work_item: W-0237";
   }
@@ -38274,6 +40704,12 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0242", "select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
+    ["W-0241", "prove_friends_relationship_protocol_route_local_flow"],
+    ["W-0240", "implement_friends_relationship_protocol_route"],
+    ["W-0239", "define_friends_relationship_protocol_route_gate"],
+    ["W-0238", "implement_friends_relationship_runtime_behavior"],
+    ["W-0237", "define_friends_relationship_runtime_behavior_gate"],
     ["W-0236", "implement_friends_relationship_postgresql_adapter"],
     ["W-0235", "define_friends_relationship_postgresql_adapter_gate"],
     ["W-0234", "implement_friends_relationship_repository_interface"],
@@ -38339,6 +40775,12 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0242", "W-0243 Select next Nakama prototype-ready capability after friends relationship route proof"],
+    ["W-0241", "W-0242 Prove friends relationship protocol route in local alpha request flow"],
+    ["W-0240", "W-0241 Implement friends relationship protocol route"],
+    ["W-0239", "W-0240 Define friends relationship protocol route gate"],
+    ["W-0238", "W-0239 Implement friends relationship runtime behavior"],
+    ["W-0237", "W-0238 Define friends relationship runtime behavior gate"],
     ["W-0236", "W-0237 Implement friends relationship PostgreSQL adapter"],
     ["W-0235", "W-0236 Define friends relationship PostgreSQL adapter gate"],
     ["W-0234", "W-0235 Implement storage-neutral friends relationship repository interface"],
@@ -38405,6 +40847,12 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0242", "current_phase: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
+    ["W-0241", "current_phase: prove_friends_relationship_protocol_route_local_flow"],
+    ["W-0240", "current_phase: implement_friends_relationship_protocol_route"],
+    ["W-0239", "current_phase: define_friends_relationship_protocol_route_gate"],
+    ["W-0238", "current_phase: implement_friends_relationship_runtime_behavior"],
+    ["W-0237", "current_phase: define_friends_relationship_runtime_behavior_gate"],
     ["W-0236", "current_phase: implement_friends_relationship_postgresql_adapter"],
     ["W-0235", "current_phase: define_friends_relationship_postgresql_adapter_gate"],
     ["W-0234", "current_phase: implement_friends_relationship_repository_interface"],
@@ -39038,6 +41486,12 @@ function checkRuntime(root) {
   checkRuntimeFriendsRelationshipRepositoryBoundary(root, goFiles);
   checkRuntimeFriendsRelationshipRepositoryInterfaceImplementation(root, goFiles);
   checkRuntimeFriendsRelationshipPostgresqlAdapterGate(root, goFiles);
+  checkRuntimeFriendsRelationshipPostgresqlAdapterImplementation(root, goFiles);
+  checkRuntimeFriendsRelationshipRuntimeBehaviorGate(root, goFiles);
+  checkRuntimeFriendsRelationshipRuntimeBehaviorImplementation(root, goFiles);
+  checkRuntimeFriendsRelationshipProtocolRouteGate(root, goFiles);
+  checkRuntimeFriendsRelationshipProtocolRouteImplementation(root, goFiles);
+  checkRuntimeFriendsRelationshipProtocolRouteLocalProof(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

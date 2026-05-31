@@ -18,14 +18,26 @@
 
 `M-164 Friends Relationship PostgreSQL Adapter Gate` 已由 `W-0236` 完成。检查规则是 `runtime.friends_relationship_postgresql_adapter_gate`。
 
-repository 下一项 work item 是 `W-0237 Implement friends relationship PostgreSQL adapter`。在后续 bounded work item 明确授权前，不要在本模块实现 runtime friendship behavior、protocol routes、Protobuf source、generated output、event/audit tables、超出 bounded adapter handoff 的 startup wiring、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime 或 direct Nakama/Pitaya API compatibility。
+`M-165 Friends Relationship PostgreSQL Adapter Implementation` 已由 `W-0237` 完成。检查规则是 `runtime.friends_relationship_postgresql_adapter_implementation`。
+
+`M-166 Friends Relationship Runtime Behavior Gate` 已由 `W-0238` 完成。检查规则是 `runtime.friends_relationship_runtime_behavior_gate`。
+
+`M-167 Friends Relationship Runtime Behavior Implementation` 已由 `W-0239` 完成。检查规则是 `runtime.friends_relationship_runtime_behavior_implementation`。
+
+`M-168 Friends Relationship Protocol Route Gate` 已由 `W-0240` 完成。检查规则是 `runtime.friends_relationship_protocol_route_gate`。
+
+`M-169 Friends Relationship Protocol Route Implementation` 已由 `W-0241` 完成。检查规则是 `runtime.friends_relationship_protocol_route_implementation`。
+
+`M-170 Friends Relationship Protocol Route Local Proof` 已由 `W-0242` 完成。检查规则是 `runtime.friends_relationship_protocol_route_local_proof`。
+
+repository 下一项 work item 是 `W-0243 Select next Nakama prototype-ready capability after friends relationship route proof`。该 selection-only slice 只应选择下一项 capability direction；在后续 bounded work item 明确授权前，不要在本模块添加 protocol shape changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、event/audit tables、groups、parties、chat、matchmaking、match runtime、SDK publication、hosted deployments、distributed runtime 或 direct Nakama/Pitaya API compatibility。
 
 ## 什么时候不要使用本模块
 
 不要用本模块处理：
 
 - WebSocket、HTTP、Protobuf 或 generated wire behavior。
-- PostgreSQL adapter implementation 或 SQL execution。
+- 本模块下的 PostgreSQL adapter implementation 或 SQL execution。
 - runtime friend request、accept、reject、remove、block、unblock、list 或 status behavior。
 - player account lifecycle。
 - authentication、token formats、credential storage 或 session validation。
@@ -45,7 +57,15 @@ repository 下一项 work item 是 `W-0237 Implement friends relationship Postgr
 - Tests：`runtime/internal/modules/friends/repository_test.go`
 - PostgreSQL adapter owner candidate：`runtime/internal/platform/persistence/postgres`
 - PostgreSQL adapter gate：`docs/friends-relationship-postgresql-adapter-gate.md`
-- PostgreSQL adapter implementation follow-up：`W-0237 Implement friends relationship PostgreSQL adapter`
+- PostgreSQL adapter implementation：`runtime/internal/platform/persistence/postgres/friend_relationship_repository.go`
+- PostgreSQL adapter tests：`runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go`
+- Runtime behavior gate：`docs/friends-relationship-runtime-behavior-gate.md`
+- Runtime behavior implementation：`runtime/internal/app/friends/service.go`
+- Runtime behavior tests：`runtime/internal/app/friends/service_test.go`
+- Protocol route gate：`docs/friends-relationship-protocol-route-gate.md`
+- Protocol route implementation：`runtime.friends_relationship_protocol_route_implementation`
+- Protocol route local proof：`W-0242 Prove friends relationship protocol route in local alpha request flow`
+- Next selection follow-up：`W-0243 Select next Nakama prototype-ready capability after friends relationship route proof`
 
 第一批 public runtime commands 和 queries 仍然 deferred。未来 runtime behavior 必须先从 validated request identity 派生 actor identity，再调用 repository interface；client-supplied player ids 不是 authentication proof。
 

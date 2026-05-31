@@ -146,18 +146,24 @@ purpose: >
   friends_relationship_repository_boundary: ADR-0142
   friends_relationship_repository_interface_implementation: ADR-0143
   friends_relationship_postgresql_adapter_gate: ADR-0144
+  friends_relationship_postgresql_adapter_implementation: ADR-0145
+  friends_relationship_runtime_behavior_gate: ADR-0146
+  friends_relationship_runtime_behavior_implementation: ADR-0147
+  friends_relationship_protocol_route_gate: ADR-0148
+  friends_relationship_protocol_route_implementation: ADR-0149
+  friends_relationship_protocol_route_local_proof: ADR-0150
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: implement_friends_relationship_postgresql_adapter
-  implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented
+  current_phase: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+  implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0237
+  next_ready_work_item: W-0243
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -208,6 +214,122 @@ architecture_scope:
   friends_relationship_postgresql_adapter_gate_check_rule: runtime.friends_relationship_postgresql_adapter_gate
   friends_relationship_postgresql_adapter_future_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
   friends_relationship_postgresql_adapter_future_tests: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+  friends_relationship_postgresql_adapter_implementation_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+  friends_relationship_postgresql_adapter_implementation_tests: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+  friends_relationship_postgresql_adapter_implementation_decision: ADR-0145
+  friends_relationship_postgresql_adapter_implementation_check_rule: runtime.friends_relationship_postgresql_adapter_implementation
+  friends_relationship_runtime_behavior_gate_standard: docs/friends-relationship-runtime-behavior-gate.md
+  friends_relationship_runtime_behavior_gate_translation: docs/friends-relationship-runtime-behavior-gate.zh-CN.md
+  friends_relationship_runtime_behavior_gate_decision: ADR-0146
+  friends_relationship_runtime_behavior_gate_check_rule: runtime.friends_relationship_runtime_behavior_gate
+  friends_relationship_runtime_behavior_implementation_source: runtime/internal/app/friends/service.go
+  friends_relationship_runtime_behavior_implementation_tests: runtime/internal/app/friends/service_test.go
+  friends_relationship_runtime_behavior_implementation_decision: ADR-0147
+  friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation
+  friends_relationship_protocol_route_gate_decision: ADR-0148
+  friends_relationship_protocol_route_gate_standard: docs/friends-relationship-protocol-route-gate.md
+  friends_relationship_protocol_route_gate_translation: docs/friends-relationship-protocol-route-gate.zh-CN.md
+  friends_relationship_protocol_route_gate_check_rule: runtime.friends_relationship_protocol_route_gate
+  friends_relationship_protocol_route_gate_completed_work_item: W-0240
+  friends_relationship_protocol_route_gate_next_work_item: W-0241
+  friends_relationship_protocol_route_implementation_completed: true
+  friends_relationship_protocol_route_implementation_decision: ADR-0149
+  friends_relationship_protocol_route_implementation_check_rule: runtime.friends_relationship_protocol_route_implementation
+  friends_relationship_protocol_route_implementation_source: proto/vibit/friends/v1/friends.proto
+  friends_relationship_protocol_route_implementation_generated_go: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go
+  friends_relationship_protocol_route_implementation_bridge: runtime/internal/platform/protocol/protobuf/friends_bridge.go
+  friends_relationship_protocol_route_implementation_handler: runtime/internal/app/bootstrap/friends.go
+  friends_relationship_protocol_route_implementation_routes: runtime/internal/app/friends/routes.go
+  friends_relationship_protocol_route_implementation_bridge_test: runtime/internal/platform/protocol/protobuf/friends_bridge_test.go
+  friends_relationship_protocol_route_implementation_handler_test: runtime/internal/app/bootstrap/friends_test.go
+  friends_relationship_protocol_route_implementation_startup: runtime/cmd/vibit-server/main.go
+  friends_relationship_protocol_route_implementation_startup_test: runtime/cmd/vibit-server/main_test.go
+  friends_relationship_protocol_route_implementation_completed_work_item: W-0241
+  friends_relationship_protocol_route_implementation_next_work_item: W-0242
+  friends_relationship_protocol_route_local_proof_completed: true
+  friends_relationship_protocol_route_local_proof_decision: ADR-0150
+  friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof
+  friends_relationship_protocol_route_local_proof_work_item: W-0242
+  friends_relationship_protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  friends_relationship_protocol_route_local_proof_script: examples/local-alpha-request-loop.sh
+  friends_relationship_protocol_route_local_proof_example_client_script: examples/local-alpha-example-client.sh
+  friends_relationship_protocol_route_local_proof_change: changes/2026-05-26-prove-friends-relationship-protocol-route-local-flow
+  friends_relationship_protocol_route_local_proof_conversation: conversations/2026-05-26-friends-relationship-protocol-route-local-proof.md
+  friends_relationship_protocol_route_local_proof_next_work_item: W-0243
+  source_runtime_behavior_implementation_decision: ADR-0147
+  future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/friends_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/friends.go
+  future_protocol_route_implementation_work_item: W-0241
+  future_protocol_route_implementation_direction: implement_friends_relationship_protocol_route
+  candidate_routes_recorded: true
+  first_payload_package: vibit.friends.v1
+  route_policy_requirement: request_token_required
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  client_supplied_actor_id_allowed_as_proof: false
+  client_supplied_target_player_id_allowed: true
+  public_error_mapping_recorded: true
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  protocol_route_added: true
+  protobuf_source_added: true
+  generated_output_added: true
+  protocol_bridge_added: true
+  application_handler_added: true
+  postgres_startup_route_registration_added: true
+  transaction_bypass_added: true
+  startup_wiring_added: true
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  authentication_session_behavior_changed: false
+  event_audit_table_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  friends_relationship_protocol_route_local_proof:
+    status: completed
+    milestone: M-170
+    completed_work_item: W-0242
+    decision: ADR-0150
+    change: changes/2026-05-26-prove-friends-relationship-protocol-route-local-flow
+    friends_relationship_protocol_route_local_proof_completed: true
+    friends_relationship_protocol_route_local_proof_decision: ADR-0150
+    friends_relationship_protocol_route_local_proof_check_rule: runtime.friends_relationship_protocol_route_local_proof
+    next_milestone: M-171
+    next_ready_work_item: W-0243
+    previous_completed_work_item: W-0241
+    selected_direction: prove_friends_relationship_protocol_route_local_flow
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+    proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+    proof_test_name: TestFriendsRelationshipProtocolRouteLocalAlphaFlow
+    proof_script: examples/local-alpha-request-loop.sh
+    example_client_script: examples/local-alpha-example-client.sh
+    source_protocol_route_implementation_decision: ADR-0149
+    local_test_friends_repository_added: true
+    production_friends_repository_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    protocol_bridge_changed: false
+    application_handler_changed: false
+    friends_service_behavior_changed: false
+    postgres_startup_route_registration_changed: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    event_audit_table_added: false
+    groups_added: false
+    parties_added: false
+    chat_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
   next_alpha_direction_after_storage_objects_local_proof_decision: ADR-0121
   first_server_push_realtime_messaging_gate_selected: true
   first_server_push_realtime_messaging_gate_standard: docs/first-server-push-realtime-messaging-gate.md
@@ -8459,6 +8581,170 @@ identity_session_boundary:
     event_audit_table_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     rule: W-0236 defined only the friends relationship PostgreSQL adapter gate before adapter implementation, SQL execution, runtime behavior, protocol, generated output, event/audit tables, or direct compatibility.
+  friends_relationship_postgresql_adapter_implementation:
+    status: completed
+    milestone: M-165
+    completed_work_item: W-0237
+    decision: ADR-0145
+    change: changes/2026-05-26-implement-friends-relationship-postgresql-adapter
+    check_rule: runtime.friends_relationship_postgresql_adapter_implementation
+    next_milestone: M-166
+    next_ready_work_item: W-0238
+    previous_completed_work_item: W-0236
+    selected_direction: implement_friends_relationship_postgresql_adapter
+    selected_follow_up_direction: define_friends_relationship_runtime_behavior_gate
+    expected_change: changes/2026-05-26-implement-friends-relationship-postgresql-adapter
+    source_postgresql_adapter_gate_decision: ADR-0144
+    source_repository_interface_decision: ADR-0143
+    source_migration_source_decision: ADR-0141
+    source_migration_source: runtime/migrations/postgres/000007_create_friend_relationships.sql
+    friend_relationships_logical_table: friend_relationships
+    repository_owner: runtime/internal/modules/friends
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
+    postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+    adapter_source: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    adapter_tests: runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go
+    constructor: NewFriendRelationshipRepositoryForUnitOfWork
+    unit_of_work_repository_handoff_source: runtime/internal/platform/persistence/postgres/runner.go
+    transaction_owner: caller_supplied_unit_of_work
+    sql_mapping_owner: postgresql_adapter
+    postgresql_adapter_added: true
+    sql_execution_added: true
+    unit_of_work_repository_handoff_added: true
+    create_or_update_request_mapping_added: true
+    get_by_pair_mapping_added: true
+    list_for_player_mapping_added: true
+    lifecycle_transition_mapping_added: true
+    actor_specific_block_mapping_added: true
+    relationship_version_increment_added: true
+    redacted_error_mapping_added: true
+    focused_fake_executor_tests_added: true
+    live_postgresql_required_for_default_verification: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    migration_added: false
+    dependency_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0237 implemented only the friends relationship PostgreSQL adapter before runtime behavior, protocol routes, generated output, migration, dependency, event/audit tables, or direct compatibility.
+  friends_relationship_runtime_behavior_gate:
+    status: completed
+    milestone: M-166
+    completed_work_item: W-0238
+    decision: ADR-0146
+    change: changes/2026-05-26-define-friends-relationship-runtime-behavior-gate
+    check_rule: runtime.friends_relationship_runtime_behavior_gate
+    next_milestone: M-167
+    next_ready_work_item: W-0239
+    previous_completed_work_item: W-0237
+    selected_direction: define_friends_relationship_runtime_behavior_gate
+    selected_follow_up_direction: implement_friends_relationship_runtime_behavior
+    expected_change: changes/2026-05-26-define-friends-relationship-runtime-behavior-gate
+    source_postgresql_adapter_implementation_decision: ADR-0145
+    source_postgresql_adapter: runtime/internal/platform/persistence/postgres/friend_relationship_repository.go
+    source_repository_interface_decision: ADR-0143
+    repository_interface: runtime/internal/modules/friends.Repository
+    repository_source: runtime/internal/modules/friends/repository.go
+    repository_tests: runtime/internal/modules/friends/repository_test.go
+    future_runtime_owner_candidate: runtime/internal/app
+    future_friends_application_package_candidate: runtime/internal/app/friends
+    future_runtime_service_source_candidate: runtime/internal/app/friends/service.go
+    future_runtime_service_test_candidate: runtime/internal/app/friends/service_test.go
+    request_identity_required: true
+    metadata_only_player_id_allowed_as_proof: false
+    metadata_only_session_id_allowed_as_proof: false
+    first_actor_kind: player
+    actor_identity_source: validated_request_identity_player_id
+    actor_relative_public_status_required: true
+    route_policy_requirement: request_token_required
+    unit_of_work_handoff_required: true
+    runtime_behavior_gate_only: true
+    runtime_behavior_added: false
+    runtime_handlers_added: false
+    startup_wiring_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    future_runtime_behavior_implementation_work_item: W-0239
+    future_runtime_behavior_implementation_direction: implement_friends_relationship_runtime_behavior
+    rule: W-0238 defined only the friends relationship runtime behavior gate before runtime service implementation, handlers, protocol routes, generated output, repository or adapter changes, migration, dependency, event/audit tables, broader social features, or direct compatibility.
+  friends_relationship_runtime_behavior_implementation:
+    status: completed
+    milestone: M-167
+    completed_work_item: W-0239
+    decision: ADR-0147
+    change: changes/2026-05-26-implement-friends-relationship-runtime-behavior
+    check_rule: runtime.friends_relationship_runtime_behavior_implementation
+    friends_relationship_runtime_behavior_implementation_completed: true
+    next_milestone: M-168
+    next_ready_work_item: W-0240
+    previous_completed_work_item: W-0238
+    selected_direction: implement_friends_relationship_runtime_behavior
+    selected_follow_up_direction: define_friends_relationship_protocol_route_gate
+    expected_change: changes/2026-05-26-implement-friends-relationship-runtime-behavior
+    source_runtime_behavior_gate_decision: ADR-0146
+    source_postgresql_adapter_implementation_decision: ADR-0145
+    source_repository_interface_decision: ADR-0143
+    implementation_owner: runtime/internal/app/friends
+    runtime_service_source: runtime/internal/app/friends/service.go
+    runtime_service_test: runtime/internal/app/friends/service_test.go
+    request_identity_required: true
+    metadata_only_player_id_allowed_as_proof: false
+    metadata_only_session_id_allowed_as_proof: false
+    actor_identity_source: validated_request_identity_player_id
+    actor_relative_public_status_required: true
+    route_policy_requirement: request_token_required
+    unit_of_work_handoff_used: true
+    operations_implemented:
+      - send_friend_request
+      - accept_friend_request
+      - reject_friend_request
+      - remove_friend
+      - block_player
+      - unblock_player
+      - list_friend_relationships
+      - get_friend_relationship_status
+    runtime_behavior_added: true
+    runtime_handlers_added: false
+    startup_wiring_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    rule: W-0239 implemented only the application-owned friends relationship runtime behavior service before protocol routes, generated output, startup wiring, event/audit tables, broader social features, distributed runtime, hosted surfaces, SDKs, or direct compatibility.
+  friends_relationship_protocol_route_gate:
+    status: next_ready
+    milestone: M-168
+    next_ready_work_item: W-0240
+    previous_completed_work_item: W-0239
+    selected_direction: define_friends_relationship_protocol_route_gate
+    expected_change: changes/2026-05-26-define-friends-relationship-protocol-route-gate
+    source_runtime_behavior_implementation_decision: ADR-0147
+    source_runtime_behavior_implementation: runtime/internal/app/friends/service.go
+    future_protocol_route_gate_only: true
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    startup_wiring_added: false
+    dependency_added: false
+    migration_added: false
+    event_audit_table_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
 
 persistence_model:
   decision: ADR-0011

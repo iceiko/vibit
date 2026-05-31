@@ -1,7 +1,7 @@
 # vibit Examples
 
 Status: Draft v0.1
-Last updated: 2026-05-22
+Last updated: 2026-05-31
 
 The paired Simplified Chinese translation is `examples/README.zh-CN.md`. The English file is authoritative.
 
@@ -24,7 +24,7 @@ examples/local-alpha-client/README.md
 The script wraps the focused authenticated gameplay E2E proof:
 
 ```bash
-cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestFriendsRelationshipProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
 ```
 
 It proves:
@@ -36,6 +36,7 @@ local onboarding
 -> protected inventory grant/read
 -> protected presence query
 -> protected own-player storage object put/get/list/delete
+-> protected friends send/status/accept/list/remove/block/unblock/reject
 -> presence online/offline proof after close and invalidation
 -> logout
 -> post-logout protected request rejection
@@ -43,6 +44,8 @@ local onboarding
 ```
 
 The storage object proof uses the existing `storage.GetOwnStorageObject`, `storage.ListOwnStorageObjects`, `storage.PutOwnStorageObject`, and `storage.DeleteOwnStorageObject` routes with `vibit.storage.v1` Protobuf payloads. It demonstrates Nakama-class durable player storage object capability coverage at the local request-flow level while preserving vibit's own route names and no direct Nakama/Pitaya API compatibility. It also demonstrates Pitaya-aligned layering by keeping transport, protocol adaptation, session metadata, route protection, application handlers, service behavior, and repository handoff separate.
+
+The friends relationship proof uses the existing `friends.SendFriendRequest`, `friends.AcceptFriendRequest`, `friends.RejectFriendRequest`, `friends.RemoveFriend`, `friends.BlockPlayer`, `friends.UnblockPlayer`, `friends.ListFriendRelationships`, and `friends.GetFriendRelationshipStatus` routes with `vibit.friends.v1` Protobuf payloads. It demonstrates Nakama-class player social graph capability coverage at the local request-flow level while preserving vibit's own route names and no direct Nakama/Pitaya API compatibility. It also demonstrates Pitaya-aligned layering by keeping transport, protocol adaptation, session metadata, route protection, application handlers, service behavior, and repository handoff separate.
 
 The script is intentionally redacted. It must not print raw credentials, raw access tokens, verifier keys, DSNs, digests, headers, cookies, query strings, WebSocket subprotocol values, remote addresses, or concrete transport metadata.
 

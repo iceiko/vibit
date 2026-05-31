@@ -241,7 +241,10 @@ scaffolded_nakama_feature_request_intake_pilot_decision: ADR-0138
 friends_relationship_lifecycle_gate_decision: ADR-0139
 friends_relationship_migration_source_decision: ADR-0141
 friends_relationship_repository_boundary_decision: ADR-0142
-next_work_item: W-0237 Implement friends relationship PostgreSQL adapter
+friends_relationship_protocol_route_gate_decision: ADR-0148
+friends_relationship_protocol_route_implementation_decision: ADR-0149
+friends_relationship_protocol_route_local_proof_decision: ADR-0150
+next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -355,11 +358,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, and the friends relationship PostgreSQL adapter gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime, runtime friendship behavior, protocol routes, or generated output. The next concrete work should implement only the friends relationship PostgreSQL adapter:
+After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, and the friends relationship protocol route local proof, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime, broad social modules, event/audit tables, generated client libraries, or new protocol shape. The next concrete work should select only the next bounded Nakama prototype-ready capability direction:
 
 ```text
-next_work_item: W-0237 Implement friends relationship PostgreSQL adapter
-recommended_next_direction: implement_friends_relationship_postgresql_adapter
+next_work_item: W-0243 Select next Nakama prototype-ready capability after friends relationship route proof
+recommended_next_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -376,7 +379,14 @@ Rationale:
 - `ADR-0142` defined the friends relationship repository boundary and opened `W-0235 Implement storage-neutral friends relationship repository interface`.
 - `ADR-0143` implemented the storage-neutral friends relationship repository interface, registered `runtime.friends_relationship_repository_interface_implementation`, and opened `W-0236 Define friends relationship PostgreSQL adapter gate`.
 - `ADR-0144` defined the friends relationship PostgreSQL adapter gate, registered `runtime.friends_relationship_postgresql_adapter_gate`, and opened `W-0237 Implement friends relationship PostgreSQL adapter`.
-- Friend relationship lifecycle is a core Nakama-class social graph primitive, and its PostgreSQL adapter should be implemented before runtime, protocol, groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on persistence behavior.
+- `ADR-0145` implemented the friends relationship PostgreSQL adapter, registered `runtime.friends_relationship_postgresql_adapter_implementation`, and opened `W-0238 Define friends relationship runtime behavior gate`.
+- `ADR-0146` defined the friends relationship runtime behavior gate, registered `runtime.friends_relationship_runtime_behavior_gate`, and opened `W-0239 Implement friends relationship runtime behavior`.
+- `ADR-0147` implemented the friends relationship runtime behavior service, registered `runtime.friends_relationship_runtime_behavior_implementation`, and opened `W-0240 Define friends relationship protocol route gate`.
+- `ADR-0148` defined the friends relationship protocol route gate, registered `runtime.friends_relationship_protocol_route_gate`, and opened `W-0241 Implement friends relationship protocol route`.
+- `ADR-0149` implemented the friends relationship protocol route, registered `runtime.friends_relationship_protocol_route_implementation`, and opened `W-0242 Prove friends relationship protocol route in local alpha request flow`.
+- `ADR-0150` proved the friends relationship protocol route locally, registered `runtime.friends_relationship_protocol_route_local_proof`, and opened `W-0243 Select next Nakama prototype-ready capability after friends relationship route proof`.
+- Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
+- The next selection should decide the next capability direction before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
 - Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
 - Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the source-first example path are clearer.
 

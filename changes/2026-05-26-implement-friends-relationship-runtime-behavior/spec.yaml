@@ -1,0 +1,134 @@
+schema_version: 0.1
+change_id: implement-friends-relationship-runtime-behavior
+date: 2026-05-26
+type: feature
+status: verified
+
+summary: Implement the application-owned friends relationship runtime behavior service without adding protocol routes, Protobuf source, generated output, dependencies, migrations, startup wiring, event/audit tables, broad social features, distributed runtime, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - friends
+
+decisions:
+  added:
+    - ADR-0147
+  referenced:
+    - ADR-0146
+    - ADR-0145
+    - ADR-0144
+    - ADR-0143
+    - ADR-0142
+    - ADR-0141
+    - ADR-0140
+    - ADR-0139
+    - ADR-0138
+    - ADR-0128
+    - ADR-0127
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  completed_work_item: W-0239
+  completed_milestone: M-167
+  previous_completed_work_item: W-0238
+  source_runtime_behavior_gate_decision: ADR-0146
+  source_postgresql_adapter_implementation_decision: ADR-0145
+  source_repository_interface_decision: ADR-0143
+  friends_relationship_runtime_behavior_implementation_completed: true
+  friends_relationship_runtime_behavior_implementation_decision: ADR-0147
+  friends_relationship_runtime_behavior_implementation_check_rule: runtime.friends_relationship_runtime_behavior_implementation
+  implementation_owner: runtime/internal/app/friends
+  runtime_service_source: runtime/internal/app/friends/service.go
+  runtime_service_test: runtime/internal/app/friends/service_test.go
+  request_identity_required: true
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  actor_identity_source: validated_request_identity_player_id
+  actor_relative_public_status_required: true
+  route_policy_requirement: request_token_required
+  unit_of_work_handoff_used: true
+  operations_implemented:
+    - send_friend_request
+    - accept_friend_request
+    - reject_friend_request
+    - remove_friend
+    - block_player
+    - unblock_player
+    - list_friend_relationships
+    - get_friend_relationship_status
+  runtime_behavior_added: true
+  runtime_handlers_added: false
+  startup_wiring_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  authentication_session_behavior_changed: false
+  event_audit_table_added: false
+  chat_added: false
+  groups_added: false
+  parties_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_table_referenced:
+    - friend_relationships
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - cd runtime && go test ./internal/app/friends ./internal/modules/friends ./internal/platform/persistence/postgres
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.friends_relationship_runtime_behavior_implementation
+    - node tools/vibit check change implement-friends-relationship-runtime-behavior --json
+    - node tools/vibit check module friends --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check

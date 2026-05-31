@@ -1276,6 +1276,14 @@
       "agent_guidance": "Read ADR-0120, ADR-0119, docs/storage-objects-protocol-route-gate.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing the local storage route proof. W-0212 may add only focused local proof tests, local-alpha script/readme updates, and metadata. Do not add protocol messages/routes, generated output, storage service behavior, repository/adapter/migration/dependency/auth/session changes, production memory storage behavior, broad storage features, release/deployment artifacts, or direct Nakama/Pitaya API compatibility."
     },
     {
+      "rule_id": "runtime.friends_relationship_protocol_route_local_proof",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship protocol route local proof",
+      "description": "The friends relationship protocol route local proof must prove the completed protected friends relationship route family through the local alpha WebSocket/Protobuf request flow using test-only friends repository support, script/readme updates, and metadata while preserving protocol shape, generated output, application service behavior, repository/adapter/migration/dependency/authentication/session behavior, event/audit tables, broad social features, hosted/SDK surfaces, and direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0150, ADR-0149, docs/friends-relationship-protocol-route-gate.md, docs/reference-game-server-alignment.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing the local friends route proof. W-0242 may add only focused local proof tests, local-alpha script/readme updates, and metadata for friends.SendFriendRequest, friends.AcceptFriendRequest, friends.RejectFriendRequest, friends.RemoveFriend, friends.BlockPlayer, friends.UnblockPlayer, friends.ListFriendRelationships, and friends.GetFriendRelationshipStatus. Do not add protocol messages/routes, generated output, friends service behavior, repository/adapter/migration/dependency/auth/session changes, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployment, or direct Nakama/Pitaya API compatibility."
+    },
+    {
       "rule_id": "runtime.next_alpha_direction_after_storage_objects_local_proof",
       "category": "runtime",
       "default_severity": "error",
@@ -1466,6 +1474,46 @@
       "title": "Friends relationship PostgreSQL adapter gate",
       "description": "The friends relationship PostgreSQL adapter gate must define the future platform adapter owner, source/test candidates, constructor and unit-of-work handoff, SQL mapping posture, conflict and redaction mapping, test expectations, W-0237 implementation follow-up, and preserve adapter implementation, SQL execution, runtime behavior, protocol routes, Protobuf source, generated output, dependencies, migration changes, authentication/session behavior, event/audit tables, SDK/hosted/distributed scope, and direct Nakama/Pitaya API compatibility deferrals.",
       "agent_guidance": "Read ADR-0144, ADR-0143, docs/friends-relationship-postgresql-adapter-gate.md, docs/friends-relationship-repository-boundary.md, and runtime/internal/modules/friends/repository.go before continuing from W-0236. W-0237 should implement only the friends relationship PostgreSQL adapter. Do not add runtime friendship behavior, protocol routes, Protobuf sources or generated output, migration changes, dependency additions, authentication/session behavior, event/audit tables, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.friends_relationship_postgresql_adapter_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship PostgreSQL adapter implementation",
+      "description": "The friends relationship PostgreSQL adapter implementation must add only the platform persistence adapter, focused fake-executor tests, and unit-of-work repository handoff for runtime/internal/modules/friends.Repository using the existing friend_relationships table while preserving runtime behavior, protocol routes, Protobuf source, generated output, dependencies, migration changes, authentication/session behavior, event/audit tables, SDK/hosted/distributed scope, and direct Nakama/Pitaya API compatibility deferrals.",
+      "agent_guidance": "Read ADR-0145, ADR-0144, ADR-0143, docs/friends-relationship-postgresql-adapter-gate.md, runtime/internal/modules/friends/repository.go, and runtime/migrations/postgres/000007_create_friend_relationships.sql before continuing from W-0237. W-0238 should define only the friends relationship runtime behavior gate. Do not add runtime friendship behavior implementation, protocol routes, Protobuf sources or generated output, migration changes, dependency additions, authentication/session behavior, event/audit tables, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.friends_relationship_runtime_behavior_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship runtime behavior gate",
+      "description": "The friends relationship runtime behavior gate must define only the future application-owned friends service posture: validated request identity actor derivation, metadata-only identity refusal, actor-relative public status behavior, request-token-required route policy, unit-of-work repository handoff, conflict/redaction/test expectations, W-0239 implementation follow-up, and deferrals for protocol, generated output, dependencies, migrations, event/audit tables, broader social scope, distributed runtime, hosted/SDK work, and direct Nakama/Pitaya API compatibility.",
+      "agent_guidance": "Read ADR-0146, ADR-0145, ADR-0143, docs/friends-relationship-runtime-behavior-gate.md, docs/friends-relationship-postgresql-adapter-gate.md, and runtime/internal/modules/friends/repository.go before continuing from W-0238. W-0239 should implement only the friends relationship runtime behavior inside runtime/internal/app/friends. Do not add protocol routes, Protobuf sources or generated output, migration changes, dependency additions, startup wiring beyond the bounded service slice, authentication/session behavior changes, event/audit tables, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.friends_relationship_runtime_behavior_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship runtime behavior implementation",
+      "description": "The friends relationship runtime behavior implementation must add only the application-owned service under runtime/internal/app/friends, derive actor identity from validated request identity, reject metadata-only identity before repository access, use the storage-neutral friends repository through unit-of-work handoff, implement send, accept, reject, remove, block, unblock, list, and status behavior, compute actor-relative public status, map conflicts through redacted public errors, and preserve protocol routes, Protobuf source, generated output, dependencies, migrations, event/audit tables, broader social scope, distributed runtime, hosted/SDK work, and direct Nakama/Pitaya API compatibility deferrals.",
+      "agent_guidance": "Read ADR-0147, ADR-0146, ADR-0145, ADR-0143, docs/friends-relationship-runtime-behavior-gate.md, runtime/internal/app/friends/service.go, and runtime/internal/modules/friends/repository.go before continuing from W-0239. W-0240 should define only the friends relationship protocol route gate. Do not add protocol route implementation, Protobuf sources or generated output, migration changes, dependency additions, startup wiring, authentication/session behavior changes, event/audit tables, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
+    },
+    {
+      "rule_id": "runtime.friends_relationship_protocol_route_gate",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship protocol route gate",
+      "description": "The friends relationship protocol route gate must define only the future protected friends relationship command/query route family, request-token policy, authenticated request identity handoff, candidate vibit.friends.v1 Protobuf shape, public error mapping, generated-output posture, W-0241 implementation follow-up, and Nakama/Pitaya reference mapping while preserving route implementation, Protobuf source, generated output, dependencies, migrations, startup wiring, authentication/session behavior changes, event/audit tables, broad social features, distributed runtime, hosted/SDK work, and direct compatibility deferrals.",
+      "agent_guidance": "Read ADR-0148, ADR-0147, docs/friends-relationship-protocol-route-gate.md, docs/friends-relationship-runtime-behavior-gate.md, docs/runtime-protocol-adapter.md, docs/generated-output.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing friends relationship protocol routes. W-0240 may define only the gate and opens W-0241. Do not add proto/vibit/friends/v1/friends.proto, generated output, runtime/internal/platform/protocol/protobuf/friends_bridge.go, runtime/internal/app/bootstrap/friends.go, startup wiring, dependencies, migrations, authentication/session behavior changes, event/audit tables, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility in this slice."
+    },
+    {
+      "rule_id": "runtime.friends_relationship_protocol_route_implementation",
+      "category": "runtime",
+      "default_severity": "error",
+      "title": "Friends relationship protocol route implementation",
+      "description": "The friends relationship protocol route implementation must expose only the protected friends relationship command/query route family authorized by ADR-0148 through Protobuf source/generated output, protocol bridge mapping, application route handlers, PostgreSQL startup registration, and focused tests while preserving application-owned service behavior, metadata-only identity refusal, request-token protection, redacted errors, and repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals.",
+      "agent_guidance": "Read ADR-0148, ADR-0149, docs/friends-relationship-protocol-route-gate.md, docs/runtime-protocol-adapter.md, docs/generated-output.md, and docs/nakama-pitaya-product-parity-roadmap.md before changing friends relationship protocol routes. W-0241 may add proto/vibit/friends/v1/friends.proto, generated Go protobuf output from buf, runtime/internal/platform/protocol/protobuf/friends_bridge.go, runtime/internal/app/bootstrap/friends.go, runtime/internal/app/friends/routes.go, PostgreSQL startup registration, transaction bypass for service-owned friends command routes, and focused tests for friends.SendFriendRequest, friends.AcceptFriendRequest, friends.RejectFriendRequest, friends.RemoveFriend, friends.BlockPlayer, friends.UnblockPlayer, friends.ListFriendRelationships, and friends.GetFriendRelationshipStatus. Do not add repository interface changes, PostgreSQL adapter changes, migrations, dependencies, authentication/session behavior changes, route-protection semantic changes, event/audit tables, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, SDK publication, hosted demos, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility."
     },
     {
       "rule_id": "generator.created_artifact",

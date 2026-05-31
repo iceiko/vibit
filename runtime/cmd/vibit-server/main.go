@@ -17,6 +17,7 @@ import (
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
+	appfriends "github.com/iceiko/vibit/runtime/internal/app/friends"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
@@ -158,6 +159,19 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 		return nil, func() {}, err
 	}
 
+	friendsService, err := appfriends.NewService(appfriends.ServiceDependencies{
+		UnitOfWorkRunner:        transactionRunner,
+		RelationshipIDGenerator: randomFriendRelationshipIDGenerator{},
+	})
+	if err != nil {
+		pool.Close()
+		return nil, func() {}, err
+	}
+	if err := (bootstrap.FriendsRouteHandlers{Service: friendsService}).RegisterRoutes(persistentDispatcher); err != nil {
+		pool.Close()
+		return nil, func() {}, err
+	}
+
 	transactionalDispatcher := app.TransactionalDispatcher{
 		Dispatcher: persistentDispatcher,
 		Runner:     transactionRunner,
@@ -166,6 +180,12 @@ func newPostgresHTTPHandler(ctx context.Context, lookup func(string) (string, bo
 			app.LogoutAccessTokenRoute(),
 			appstorage.PutOwnStorageObjectRoute(),
 			appstorage.DeleteOwnStorageObjectRoute(),
+			appfriends.SendFriendRequestRoute(),
+			appfriends.AcceptFriendRequestRoute(),
+			appfriends.RejectFriendRequestRoute(),
+			appfriends.RemoveFriendRoute(),
+			appfriends.BlockPlayerRoute(),
+			appfriends.UnblockPlayerRoute(),
 		},
 	}
 	connectionBinder := registryConnectionBinder{
@@ -456,6 +476,16 @@ func (randomStorageObjectIDGenerator) GenerateStorageObjectID(context.Context) (
 		return "", fmt.Errorf("storage startup: generate storage object id: %w", err)
 	}
 	return "storage-object-" + hex.EncodeToString(raw[:]), nil
+}
+
+type randomFriendRelationshipIDGenerator struct{}
+
+func (randomFriendRelationshipIDGenerator) GenerateFriendRelationshipID(context.Context) (string, error) {
+	var raw [16]byte
+	if _, err := rand.Read(raw[:]); err != nil {
+		return "", fmt.Errorf("friends startup: generate friend relationship id: %w", err)
+	}
+	return "friend-relationship-" + hex.EncodeToString(raw[:]), nil
 }
 
 type websocketProtocolHandler struct {

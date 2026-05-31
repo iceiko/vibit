@@ -1,7 +1,7 @@
 # Local Alpha Example Client Path
 
 Status: Draft v0.1
-Last updated: 2026-05-24
+Last updated: 2026-05-31
 
 The paired Simplified Chinese translation is `README.zh-CN.md`. The English file is authoritative.
 
@@ -18,7 +18,7 @@ examples/local-alpha-example-client.sh
 The script runs the focused local alpha Protobuf E2E proof inside the Go runtime:
 
 ```bash
-cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
+cd runtime && go test ./internal/platform/protocol/protobuf -run 'TestAuthenticatedGameplayE2EUsesExistingOnboardingLoginBindingInventoryPresenceAndLogout|TestStorageObjectsProtocolRouteLocalAlphaFlow|TestFriendsRelationshipProtocolRouteLocalAlphaFlow|TestPresenceStatusLocalAlphaFlowReportsOfflineAfterCloseAndInvalidation|TestAuthenticatedGameplayFailurePathsLocalAlphaFlow' -v
 ```
 
 ## Demonstrated Flow
@@ -32,6 +32,7 @@ local onboarding
 -> protected inventory grant/read
 -> protected presence query
 -> protected own-player storage object put/get/list/delete
+-> protected friends send/status/accept/list/remove/block/unblock/reject
 -> presence online/offline proof after close and invalidation
 -> logout
 -> rejected post-logout protected request
@@ -50,6 +51,14 @@ storage.PutOwnStorageObject
 storage.GetOwnStorageObject
 storage.ListOwnStorageObjects
 storage.DeleteOwnStorageObject
+friends.SendFriendRequest
+friends.GetFriendRelationshipStatus
+friends.AcceptFriendRequest
+friends.ListFriendRelationships
+friends.RemoveFriend
+friends.BlockPlayer
+friends.UnblockPlayer
+friends.RejectFriendRequest
 runtime.authentication.LogoutAccessToken
 ```
 
@@ -57,7 +66,7 @@ runtime.authentication.LogoutAccessToken
 
 This path is intended for developers and AI agents who need to see the current alpha capability loop without reverse-engineering the internal E2E test first. It keeps the proof source-first because the current generated Protobuf Go output lives under `runtime/internal/`, and local onboarding is still an application-owned setup behavior rather than a public client route.
 
-The path maps to Nakama's developer-experience pressure: a backend framework should make it easy to understand how a client exercises authentication, protected gameplay requests, player storage, presence, logout, and failure behavior. vibit adapts that pressure without copying Nakama public routes, payloads, SDK shapes, token semantics, runtime APIs, or compatibility promises.
+The path maps to Nakama's developer-experience pressure: a backend framework should make it easy to understand how a client exercises authentication, protected gameplay requests, player storage, friends relationship social graph behavior, presence, logout, and failure behavior. vibit adapts that pressure without copying Nakama public routes, payloads, SDK shapes, token semantics, runtime APIs, or compatibility promises.
 
 ## What This Is Not
 
@@ -71,7 +80,7 @@ This path does not:
 - change runtime, authentication, session, persistence, migration, startup, or transport behavior;
 - add dependencies;
 - add hosted deployment or release artifacts;
-- add stream subscriptions, chat rooms, groups, broadcast fanout, delivery guarantees, matchmaking, match runtime, operations/admin behavior, or distributed runtime;
+- add stream subscriptions, chat rooms, groups, parties, broadcast fanout, delivery guarantees, matchmaking, match runtime, operations/admin behavior, or distributed runtime;
 - add direct Nakama/Pitaya API compatibility.
 
 Pitaya remains deferred as a future distributed architecture reference. This path does not introduce frontend/backend server roles, RPC, service discovery, groups, cluster routing, or distributed sessions.
@@ -105,7 +114,9 @@ Architecture and continuation verification should also include:
 ```bash
 node tools/vibit inspect next --json
 node tools/vibit inspect rule runtime.local_alpha_example_client_path_implementation
+node tools/vibit inspect rule runtime.friends_relationship_protocol_route_local_proof
 node tools/vibit check change implement-local-alpha-example-client-path --json
+node tools/vibit check change prove-friends-relationship-protocol-route-local-flow --json
 node tools/vibit check runtime --json
 node tools/vibit check all --json
 git diff --check

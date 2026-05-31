@@ -1,0 +1,120 @@
+syntax = "proto3";
+
+package vibit.friends.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/friends/v1;friendsv1";
+
+// @source docs/friends-relationship-protocol-route-gate.md
+// @source decisions/ADR-0148-friends-relationship-protocol-route-gate.md
+// @source decisions/ADR-0149-friends-relationship-protocol-route-implementation.md
+// @source proto/vibit/friends/v1/friends.proto
+// @route friends.SendFriendRequest
+// @route friends.AcceptFriendRequest
+// @route friends.RejectFriendRequest
+// @route friends.RemoveFriend
+// @route friends.BlockPlayer
+// @route friends.UnblockPlayer
+// @route friends.ListFriendRelationships
+// @route friends.GetFriendRelationshipStatus
+
+message FriendRelationship {
+  string relationship_id = 1;
+  string player_low_id = 2;
+  string player_high_id = 3;
+  string requested_by_player_id = 4;
+  string lifecycle_state = 5;
+  string public_status = 6;
+  int64 version = 7;
+  string created_at = 8;
+  string updated_at = 9;
+}
+
+message FriendRelationshipPage {
+  repeated FriendRelationship relationships = 1;
+  string next_pair_token = 2;
+}
+
+message SendFriendRequestRequest {
+  string target_player_id = 1;
+}
+
+message SendFriendRequestResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message AcceptFriendRequestRequest {
+  string target_player_id = 1;
+  optional int64 expected_version = 2;
+}
+
+message AcceptFriendRequestResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message RejectFriendRequestRequest {
+  string target_player_id = 1;
+  optional int64 expected_version = 2;
+}
+
+message RejectFriendRequestResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message RemoveFriendRequest {
+  string target_player_id = 1;
+  optional int64 expected_version = 2;
+}
+
+message RemoveFriendResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message BlockPlayerRequest {
+  string target_player_id = 1;
+  optional int64 expected_version = 2;
+}
+
+message BlockPlayerResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message UnblockPlayerRequest {
+  string target_player_id = 1;
+  optional int64 expected_version = 2;
+}
+
+message UnblockPlayerResponse {
+  FriendRelationship relationship = 1;
+  string status = 2;
+  int64 version = 3;
+}
+
+message ListFriendRelationshipsRequest {
+  string status = 1;
+  int32 limit = 2;
+  string after_pair_token = 3;
+}
+
+message ListFriendRelationshipsResponse {
+  FriendRelationshipPage page = 1;
+}
+
+message GetFriendRelationshipStatusRequest {
+  string target_player_id = 1;
+}
+
+message GetFriendRelationshipStatusResponse {
+  string public_status = 1;
+  FriendRelationship relationship = 2;
+  int64 version = 3;
+}

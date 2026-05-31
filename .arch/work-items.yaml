@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-164
+current_milestone: M-171
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: friends_relationship_repository_interface_implemented
+    current_release_state: friends_relationship_protocol_route_local_proven
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0236
+    next_ready_work_item: W-0243
     preferred_after_current:
-      - define_friends_relationship_postgresql_adapter_gate
+      - select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3109,7 +3109,7 @@ milestones:
 
   - id: M-165
     title: Friends Relationship PostgreSQL Adapter Implementation
-    status: active
+    status: completed
     goal: Implement the friends relationship PostgreSQL adapter under `runtime/internal/platform/persistence/postgres` using the storage-neutral friends repository interface and the existing `friend_relationships` migration source.
     completion_criteria:
       - The adapter implements `runtime/internal/modules/friends.Repository` under the PostgreSQL platform package.
@@ -3119,6 +3119,83 @@ milestones:
       - No runtime friendship behavior, protocol route, Protobuf source, generated output, dependency, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the adapter implementation itself.
     non_goals:
       - adding runtime handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring beyond any already-authorized unit-of-work handoff, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the friends relationship PostgreSQL adapter under `runtime/internal/platform/persistence/postgres`, added `runtime/internal/platform/persistence/postgres/friend_relationship_repository.go` and focused fake-executor tests in `runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go`, added unit-of-work repository handoff through `UnitOfWork.NewFriendRelationshipRepository`, mapped create/update request, pair lookup, player-scoped list, accept, reject, remove, block, and unblock operations to the existing `friend_relationships` table with canonical pair handling, actor-specific block columns, relationship version increments, row scanning through friends normalizers, redacted friends repository errors, and accepted `ADR-0145` plus `runtime.friends_relationship_postgresql_adapter_implementation` check coverage. Runtime friendship behavior, protocol routes, Protobuf sources/generated output, dependencies, migration changes, event/audit tables, startup wiring beyond the bounded unit-of-work handoff, hosted deployments, release artifacts, public announcements, paid promotion, broader social features, distributed runtime, and direct compatibility remain deferred.
+
+  - id: M-166
+    title: Friends Relationship Runtime Behavior Gate
+    status: completed
+    goal: Define the runtime behavior gate for friends relationship application semantics before adding runtime service behavior, handlers, protocol routes, generated output, event/audit tables, or broader social features.
+    completion_criteria:
+      - The future application owner, validated request identity derivation, actor-relative behavior, permissions, route-policy expectations, repository/unit-of-work handoff, conflict mapping, redaction posture, tests, and stop conditions are defined before implementation.
+      - Nakama remains the primary product capability reference and Pitaya remains deferred.
+      - A bounded follow-up is opened only if implementation can preserve current ask-first boundaries.
+      - No runtime behavior implementation, protocol route, Protobuf source, generated output, dependency, migration, hosted, SDK, distributed runtime, event/audit table, or direct compatibility scope is added in the gate itself.
+    non_goals:
+      - adding runtime friendship handlers, protocol routes, Protobuf source, generated output, dependencies, startup wiring beyond gate metadata, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the friends relationship runtime behavior gate in `docs/friends-relationship-runtime-behavior-gate.md` and its Simplified Chinese translation, accepted `ADR-0146`, registered `runtime.friends_relationship_runtime_behavior_gate`, recorded future owner `runtime/internal/app`, future package/source/test candidates under `runtime/internal/app/friends`, validated request identity as the actor source, metadata-only identity refusal, actor-relative public status behavior, conservative `request_token_required` route-policy posture, repository/unit-of-work handoff, conflict mapping, redaction posture, focused implementation test expectations, and opened `M-167/W-0239 Implement friends relationship runtime behavior` as the next-ready follow-up. No runtime friendship behavior implementation, runtime handler, startup wiring, protocol route, Protobuf source, generated output, repository or adapter change, migration, dependency, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-167
+    title: Friends Relationship Runtime Behavior Implementation
+    status: completed
+    goal: Implement the application-owned friends relationship runtime behavior service using validated request identity and the storage-neutral friends repository through unit-of-work boundaries.
+    completion_criteria:
+      - The service is owned under `runtime/internal/app/friends` or an equivalent application-owned package ratified by the implementation slice.
+      - The implementation derives actor identity from validated request identity and rejects metadata-only identity before repository mutation.
+      - Send, accept, reject, remove, block, unblock, list, and status behavior preserve actor-relative semantics, conflict mapping, redaction, and unit-of-work handoff from `ADR-0146`.
+      - Focused service tests cover validated identity, metadata-only rejection, self-targeting, actor-relative status, lifecycle conflicts, redaction, and no protocol/transport dependency.
+      - No protocol route, Protobuf source, generated output, dependency, migration, startup wiring beyond application service tests, event/audit table, hosted, SDK, distributed runtime, or direct compatibility scope is added in the implementation itself.
+    non_goals:
+      - adding protocol routes, Protobuf source, generated output, dependencies, migration changes, startup wiring beyond application-owned service behavior, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the application-owned friends relationship runtime behavior service under `runtime/internal/app/friends`, accepted `ADR-0147`, registered `runtime.friends_relationship_runtime_behavior_implementation`, added focused service tests, derived actor identity from validated request identity, rejected metadata-only identity before id generation or repository access, used the storage-neutral friends repository through unit-of-work handoff, implemented send, accept, reject, remove, block, unblock, list, and status behavior, preserved actor-relative public status, conflict mapping, and redaction, and opened `M-168/W-0240 Define friends relationship protocol route gate` as the next-ready follow-up. No protocol route, Protobuf source, generated output, dependency, migration, startup wiring beyond application-owned service tests, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: M-168
+    title: Friends Relationship Protocol Route Gate
+    status: completed
+    goal: Define the future protocol route gate for exposing friends relationship behavior without implementing routes, Protobuf source, generated output, startup wiring, event/audit tables, broad social features, distributed runtime, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The gate names the future protected friends relationship command/query route family and maps it to the application service from `ADR-0147`.
+      - The gate records request identity handoff, route policy, public error mapping, Protobuf/generation expectations, and compatibility posture.
+      - The gate preserves protocol route implementation, Protobuf source, generated output, startup wiring, dependencies, migrations, event/audit tables, chat, groups, parties, matchmaking, match runtime, hosted, SDK, distributed runtime, and direct compatibility deferrals.
+      - Repository checks, manifests, module docs, README/alpha docs, and ADR/conversation records identify the next bounded implementation slice only after the gate is accepted.
+    non_goals:
+      - adding protocol route implementation, Protobuf source, generated output, dependencies, migration changes, startup wiring, automatic migration application, event/audit tables, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined `docs/friends-relationship-protocol-route-gate.md` and `docs/friends-relationship-protocol-route-gate.zh-CN.md`, accepted `ADR-0148`, registered `runtime.friends_relationship_protocol_route_gate`, and recorded future protected routes `friends.SendFriendRequest`, `friends.AcceptFriendRequest`, `friends.RejectFriendRequest`, `friends.RemoveFriend`, `friends.BlockPlayer`, `friends.UnblockPlayer`, `friends.ListFriendRelationships`, and `friends.GetFriendRelationshipStatus`, candidate `vibit.friends.v1` Protobuf message shapes, protected-route policy `request_token_required`, authenticated-wrapper and validated request identity handoff, metadata-only `player_id` and `session_id` refusal, no client-supplied actor id proof, public `FRIENDSHIP_*` error mapping, protocol adapter/application handler/startup ownership, generated-output expectations, redaction rules, required future tests, and Nakama/Pitaya reference mapping. No route implementation, Protobuf source/generated output, startup wiring, runtime handlers, repository interface changes, PostgreSQL adapter changes, dependencies, migrations, authentication/session behavior changes, event/audit tables, stream subscriptions, chat, groups, parties, matchmaking, match runtime, hosted deployments, release artifacts, public announcements, paid promotion, SDKs, distributed runtime, or direct compatibility were added.
+
+  - id: M-169
+    title: Friends Relationship Protocol Route Implementation
+    status: completed
+    goal: Implement the protected friends relationship protocol route family authorized by `ADR-0148` without expanding repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session semantics, event/audit tables, broad social features, distributed runtime, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The implementation adds the route family authorized by `ADR-0148` and maps it to the application service from `ADR-0147`.
+      - The implementation preserves request-token protection, authenticated wrapper handoff, validated request identity as actor proof, metadata-only identity refusal, public error mapping, and generated-output traceability.
+      - Focused tests cover route registration, payload mapping, actor identity handoff, public status mapping, public error mapping, redaction, and no transport/persistence ownership leakage.
+      - No repository interface, PostgreSQL adapter, migration, dependency, authentication/session behavior, event/audit table, broad social feature, distributed runtime, hosted, SDK, or direct compatibility scope is added unless a later bounded work item explicitly authorizes it.
+    non_goals:
+      - adding repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, Pitaya-style distributed architecture, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the protected friends relationship protocol route family authorized by `ADR-0148`, added `proto/vibit/friends/v1/friends.proto`, generated Go Protobuf output under `runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go`, route keys under `runtime/internal/app/friends/routes.go`, application route handlers under `runtime/internal/app/bootstrap/friends.go`, protocol bridge mapping under `runtime/internal/platform/protocol/protobuf/friends_bridge.go`, PostgreSQL startup registration, transaction bypass for service-owned friends command routes, focused route/bridge/startup tests, accepted `ADR-0149`, and registered `runtime.friends_relationship_protocol_route_implementation`. The implementation exposes `friends.SendFriendRequest`, `friends.AcceptFriendRequest`, `friends.RejectFriendRequest`, `friends.RemoveFriend`, `friends.BlockPlayer`, `friends.UnblockPlayer`, `friends.ListFriendRelationships`, and `friends.GetFriendRelationshipStatus` while preserving validated request identity handoff, metadata-only identity refusal, request-token protection, redacted errors, application-owned service behavior, repository interface, PostgreSQL adapter, migration, dependency, authentication/session, event/audit, broad social, distributed runtime, hosted/SDK, and direct Nakama/Pitaya API compatibility deferrals.
+
+  - id: M-170
+    title: Friends Relationship Protocol Route Local Proof
+    status: completed
+    goal: Prove the completed friends relationship protocol route family through a focused local alpha request flow without changing protocol shape, service behavior, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session semantics, broad social scope, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The proof exercises the completed friends relationship route implementation through the existing WebSocket/Protobuf protected-route flow.
+      - The proof preserves generated output, application service behavior, route protection, and persistence boundaries.
+      - Any test-only fixtures remain clearly local proof support and do not become production memory social graph behavior.
+    non_goals:
+      - adding new protocol messages or routes, generated output changes, friends service behavior changes, repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Proved the completed friends relationship protocol route family through the authenticated local alpha WebSocket/Protobuf request flow with `TestFriendsRelationshipProtocolRouteLocalAlphaFlow`, accepted `ADR-0150`, registered `runtime.friends_relationship_protocol_route_local_proof`, updated local alpha example scripts and docs, and opened `M-171/W-0243 Select next Nakama prototype-ready capability after friends relationship route proof` as the next-ready bounded follow-up. Protocol shape, generated output, application service behavior, repository interfaces, PostgreSQL adapter behavior, migrations, dependencies, authentication/session behavior, event/audit tables, broad social features, hosted/SDK/release scope, distributed runtime, and direct compatibility remained deferred.
+
+  - id: M-171
+    title: Next Nakama Prototype-Ready Capability Selection After Friends Route Proof
+    status: active
+    goal: Select the next bounded Nakama/Pitaya-aligned prototype-ready capability direction after proving the protected friends relationship route family locally, without implementing runtime behavior, protocol shape, generated output, persistence, dependencies, broad social scope, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility in the selection slice.
+    completion_criteria:
+      - The selected next direction is recorded in `.arch/work-items.yaml` and supporting architecture artifacts.
+      - The selection considers current alpha gaps after friends relationship route proof.
+      - The selection preserves all implementation, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9160,7 +9237,7 @@ work_items:
   - id: W-0237
     milestone: M-165
     title: Implement friends relationship PostgreSQL adapter
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-friends-relationship-postgresql-adapter
     depends_on:
       - W-0236
@@ -9187,3 +9264,221 @@ work_items:
       - Use the existing `friend_relationships` migration source and caller-supplied unit-of-work executor handoff.
       - Preserve SQL mapping, conflict mapping, redaction, transaction-control, and test expectations from `ADR-0144`.
       - Preserve runtime behavior, protocol routes, Protobuf source, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0145
+    check_rule: runtime.friends_relationship_postgresql_adapter_implementation
+    next_milestone: M-166
+    next_ready_work_item: W-0238
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: define_friends_relationship_runtime_behavior_gate
+    completion_summary: Implemented `runtime/internal/platform/persistence/postgres/friend_relationship_repository.go` and `runtime/internal/platform/persistence/postgres/friend_relationship_repository_test.go`, mapping `runtime/internal/modules/friends.Repository` to the existing `friend_relationships` table through caller-supplied unit-of-work executors. The adapter covers create/update request, pair lookup, player-scoped list with status filtering and one-row-overflow pagination, accept/reject/remove lifecycle transitions with optional expected-version checks, actor-specific block/unblock columns without implicit friendship restoration, canonical pair normalization, relationship version increments, row scanning through friends normalizers, redacted friends repository errors, fake-executor tests, no live PostgreSQL requirement, and `UnitOfWork.NewFriendRelationshipRepository`. No runtime friendship handlers, protocol routes, Protobuf sources/generated output, dependencies, migration changes, authentication/session behavior changes, event/audit tables, hosted deployments, release artifacts, public announcements, paid promotion, broader social features, distributed runtime, or direct compatibility were added.
+
+  - id: W-0238
+    milestone: M-166
+    title: Define friends relationship runtime behavior gate
+    status: completed
+    change: changes/2026-05-26-define-friends-relationship-runtime-behavior-gate
+    depends_on:
+      - W-0237
+    expected_change_id: define-friends-relationship-runtime-behavior-gate
+    tier: tier_2_functional
+    selected_direction: define_friends_relationship_runtime_behavior_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0145
+      - ADR-0144
+      - ADR-0143
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding runtime friendship behavior implementation, protocol routes, Protobuf messages, generated output, dependencies, migration changes, startup wiring beyond gate metadata, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of defining only the friends relationship runtime behavior gate.
+    completion:
+      - Define the future friends relationship runtime behavior owner, validated request identity derivation, actor-relative behavior, permission and route-policy posture, repository/unit-of-work handoff, conflict mapping, redaction posture, test expectations, and stop conditions.
+      - Preserve runtime behavior implementation, protocol routes, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0146
+    check_rule: runtime.friends_relationship_runtime_behavior_gate
+    next_milestone: M-167
+    next_ready_work_item: W-0239
+    selected_nakama_capability_family: friends_groups_and_parties
+    selected_follow_up_direction: implement_friends_relationship_runtime_behavior
+    completion_summary: Defined the friends relationship runtime behavior gate, added the English standard and Simplified Chinese translation, accepted `ADR-0146`, registered `runtime.friends_relationship_runtime_behavior_gate`, recorded future application owner `runtime/internal/app`, future package/source/test candidates under `runtime/internal/app/friends`, validated request identity actor derivation, metadata-only `player_id` and `session_id` proof refusal, actor-relative public relationship status behavior, conservative `request_token_required` route-policy posture, repository/unit-of-work handoff, conflict mapping, redaction posture, focused implementation test expectations, and opened `M-167/W-0239 Implement friends relationship runtime behavior` as the next-ready follow-up. No runtime friendship behavior implementation, runtime handler, startup wiring, protocol route, Protobuf source, generated output, repository interface change, PostgreSQL adapter change, migration, dependency, event/audit table, broader social feature, hosted deployment, SDK, release artifact, distributed runtime, or direct compatibility scope was added.
+
+  - id: W-0239
+    milestone: M-167
+    title: Implement friends relationship runtime behavior
+    status: completed
+    change: changes/2026-05-26-implement-friends-relationship-runtime-behavior
+    depends_on:
+      - W-0238
+    expected_change_id: implement-friends-relationship-runtime-behavior
+    tier: tier_2_functional
+    selected_direction: implement_friends_relationship_runtime_behavior
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0146
+      - ADR-0145
+      - ADR-0144
+      - ADR-0143
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding protocol routes, Protobuf messages, generated output, dependencies, migration changes, startup wiring beyond application-owned service behavior, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of implementing only the friends relationship runtime behavior service.
+    completion:
+      - Implement the application-owned friends relationship runtime behavior service using validated request identity and existing friends repository/unit-of-work boundaries.
+      - Preserve actor-relative public status, metadata-only identity rejection, lifecycle conflict mapping, redaction, and test expectations from `ADR-0146`.
+      - Preserve protocol routes, Protobuf source, generated output, dependencies, migrations, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0147
+    check_rule: runtime.friends_relationship_runtime_behavior_implementation
+    next_milestone: M-168
+    next_ready_work_item: W-0240
+    selected_follow_up_direction: define_friends_relationship_protocol_route_gate
+    completion_summary: Implemented the application-owned friends relationship runtime behavior service under `runtime/internal/app/friends`, added focused service tests, accepted `ADR-0147`, registered `runtime.friends_relationship_runtime_behavior_implementation`, enforced validated player request identity and metadata-only identity refusal before id generation or repository access, used `NewFriendRelationshipRepository` through unit-of-work handoff, generated server-owned relationship ids, implemented send, incoming-only accept/reject, remove, block, unblock, list, and status behavior, computed actor-relative public status, mapped repository conflicts to redacted public errors, and kept protocol routes, Protobuf source, generated output, dependencies, migrations, startup wiring beyond service tests, event/audit tables, broad social features, distributed runtime, hosted/SDK/release scope, and direct compatibility deferred.
+
+  - id: W-0240
+    milestone: M-168
+    title: Define friends relationship protocol route gate
+    status: completed
+    change: changes/2026-05-26-define-friends-relationship-protocol-route-gate
+    depends_on:
+      - W-0239
+    expected_change_id: define-friends-relationship-protocol-route-gate
+    tier: tier_2_functional
+    selected_direction: define_friends_relationship_protocol_route_gate
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0147
+      - ADR-0146
+      - ADR-0145
+      - ADR-0144
+      - ADR-0143
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Adding protocol route implementation, Protobuf messages, generated output, dependencies, migration changes, startup wiring, authentication/session behavior changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of defining only the friends relationship protocol route gate.
+    completion:
+      - Define the future friends relationship protected route family, route policy, request/response shape expectations, service handoff, public error mapping, generated output posture, verification expectations, and stop conditions.
+      - Preserve protocol route implementation, Protobuf source, generated output, dependencies, event/audit tables, hosted, SDK, distributed runtime, and direct compatibility deferrals unless a later bounded work item explicitly authorizes them.
+    decision: ADR-0148
+    check_rule: runtime.friends_relationship_protocol_route_gate
+    next_milestone: M-169
+    next_ready_work_item: W-0241
+    selected_follow_up_direction: implement_friends_relationship_protocol_route
+    completion_summary: Defined `docs/friends-relationship-protocol-route-gate.md` and `docs/friends-relationship-protocol-route-gate.zh-CN.md`, added `ADR-0148`, registered `runtime.friends_relationship_protocol_route_gate`, recorded future protected routes `friends.SendFriendRequest`, `friends.AcceptFriendRequest`, `friends.RejectFriendRequest`, `friends.RemoveFriend`, `friends.BlockPlayer`, `friends.UnblockPlayer`, `friends.ListFriendRelationships`, and `friends.GetFriendRelationshipStatus`, candidate `vibit.friends.v1` Protobuf shapes, request-token protection, authenticated wrapper handoff, validated request identity as actor proof, metadata-only identity refusal, no client-supplied actor id proof, public `FRIENDSHIP_*` error mapping, generated-output expectations, Nakama/Pitaya reference mapping, required future tests, and stop conditions. No route implementation, Protobuf source/generated output, dependencies, migrations, startup wiring, authentication/session changes, event/audit tables, broad social features, distributed runtime, hosted/SDK/release scope, or direct compatibility were added.
+
+  - id: W-0241
+    milestone: M-169
+    title: Implement friends relationship protocol route
+    status: completed
+    change: changes/2026-05-26-implement-friends-relationship-protocol-route
+    depends_on:
+      - W-0240
+    expected_change_id: implement-friends-relationship-protocol-route
+    tier: tier_2_protocol
+    selected_direction: implement_friends_relationship_protocol_route
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0149
+      - ADR-0148
+      - ADR-0147
+      - ADR-0146
+      - ADR-0145
+      - ADR-0144
+      - ADR-0143
+      - ADR-0142
+      - ADR-0141
+      - ADR-0140
+      - ADR-0139
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0082
+      - ADR-0078
+    ask_first:
+      - Repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, automatic startup migration behavior, authentication/session behavior changes, route-protection semantic changes, delivery guarantees, stream subscriptions, chat rooms, groups, parties, broadcast fanout, matchmaking, match runtime, operations/admin behavior, SDK publication, generated client libraries, Pitaya-style distributed architecture, hosted deployments, release artifacts, public announcements, paid promotion, event/audit tables, or direct Nakama/Pitaya API compatibility instead of implementing only the friends relationship protocol route family authorized by ADR-0148.
+    completion:
+      - Implement the friends relationship protocol route family authorized by `ADR-0148`.
+      - Add Protobuf source/generated output, protocol bridge mapping, route registration, and focused tests for the eight protected friends relationship routes.
+      - Preserve application-owned service behavior, metadata-only identity refusal, protected-route policy, redacted errors, and repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals.
+    check_rule: runtime.friends_relationship_protocol_route_implementation
+    next_milestone: M-170
+    next_ready_work_item: W-0242
+    selected_follow_up_direction: prove_friends_relationship_protocol_route_local_flow
+    completion_summary: Implemented `vibit.friends.v1` Protobuf source/generated output, friends route keys, protocol bridge mapping, bootstrap handlers, PostgreSQL startup registration, command transaction bypass, and focused tests for all eight protected friends relationship routes. Preserved application-owned service behavior, validated request identity actor proof, metadata-only identity refusal, redacted public errors, and repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals.
+
+  - id: W-0242
+    milestone: M-170
+    title: Prove friends relationship protocol route in local alpha request flow
+    status: completed
+    change: changes/2026-05-26-prove-friends-relationship-protocol-route-local-flow
+    depends_on:
+      - W-0241
+    expected_change_id: prove-friends-relationship-protocol-route-local-flow
+    tier: tier_2_protocol
+    selected_direction: prove_friends_relationship_protocol_route_local_flow
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0149
+      - ADR-0148
+      - ADR-0147
+      - ADR-0145
+      - ADR-0128
+      - ADR-0078
+    ask_first:
+      - New protocol messages or routes, generated output changes, friends service behavior changes, repository interface changes, PostgreSQL adapter changes, migration changes, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility instead of proving only the completed friends relationship route family through a local alpha request flow.
+    completion:
+      - Prove the completed friends relationship protocol route through the existing protected WebSocket/Protobuf request flow.
+      - Keep proof support local and test-focused.
+      - Preserve protocol shape, generated output, service behavior, repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals.
+    decision: ADR-0150
+    check_rule: runtime.friends_relationship_protocol_route_local_proof
+    next_milestone: M-171
+    next_ready_work_item: W-0243
+    selected_follow_up_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+    completion_summary: Added `TestFriendsRelationshipProtocolRouteLocalAlphaFlow` to the existing authenticated local alpha Protobuf E2E fixture, registered the completed friends route family in that proof path, added a test-only friends relationship repository and multi-player test ID/material support, exercised send/status/accept/list/remove/block/unblock/resend/reject through authenticated WebSocket/Protobuf frame handling, updated source-first local alpha example scripts and docs, accepted `ADR-0150`, and registered `runtime.friends_relationship_protocol_route_local_proof`. Preserved protocol shape, generated output, application service behavior, repository interfaces, PostgreSQL adapter, migrations, dependencies, authentication/session behavior, event/audit tables, broad social features, hosted/SDK/release scope, distributed runtime, and direct compatibility deferrals.
+
+  - id: W-0243
+    milestone: M-171
+    title: Select next Nakama prototype-ready capability after friends relationship route proof
+    status: next_ready
+    change: changes/2026-05-26-select-next-nakama-prototype-ready-capability-after-friends-route-proof
+    depends_on:
+      - W-0242
+    expected_change_id: select-next-nakama-prototype-ready-capability-after-friends-route-proof
+    tier: tier_2_direction_selection
+    selected_direction: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof
+    gate_density_strategy: ADR-0082
+    related_decisions:
+      - ADR-0150
+      - ADR-0149
+      - ADR-0148
+      - ADR-0147
+      - ADR-0138
+      - ADR-0128
+      - ADR-0127
+      - ADR-0078
+    ask_first:
+      - Implementing runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility instead of selecting only the next bounded prototype-ready capability direction.
+    completion:
+      - Select and record the next bounded Nakama prototype-ready capability after the friends relationship route local proof.
+      - Keep the selection slice documentation-only and checkable.
+      - Preserve implementation/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.
