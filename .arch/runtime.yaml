@@ -153,18 +153,19 @@ purpose: >
   friends_relationship_protocol_route_implementation: ADR-0149
   friends_relationship_protocol_route_local_proof: ADR-0150
   next_nakama_prototype_ready_capability_after_friends_route_proof: ADR-0151
+  minimum_operations_inspection_surface_gate: ADR-0152
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: define_minimum_operations_inspection_surface_gate
+  current_phase: implement_minimum_operations_inspection_source_first_surface
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0244
+  next_ready_work_item: W-0245
   primary_product_reference: Nakama
   pitaya_reference_status: deferred_future_architecture_reference
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -264,6 +265,16 @@ architecture_scope:
   selected_next_nakama_capability_family_after_friends_route_proof: admin_console_metrics_observability_and_operations
   selected_next_nakama_capability_direction_after_friends_route_proof: define_minimum_operations_inspection_surface_gate
   future_minimum_operations_inspection_surface_gate_work_item: W-0244
+  minimum_operations_inspection_surface_gate_defined: true
+  minimum_operations_inspection_surface_gate_decision: ADR-0152
+  minimum_operations_inspection_surface_gate_check_rule: runtime.minimum_operations_inspection_surface_gate
+  minimum_operations_inspection_surface_gate_work_item: W-0244
+  minimum_operations_inspection_surface_gate_standard: docs/minimum-operations-inspection-surface-gate.md
+  minimum_operations_inspection_surface_gate_translation: docs/minimum-operations-inspection-surface-gate.zh-CN.md
+  minimum_operations_inspection_surface_gate_posture: source_first_local_operations_inspection
+  future_minimum_operations_inspection_surface_implementation_work_item: W-0245
+  future_minimum_operations_inspection_surface_implementation_direction: implement_minimum_operations_inspection_source_first_surface
+  future_minimum_operations_inspection_surface_cli_candidate: tools/vibit inspect operations
   source_runtime_behavior_implementation_decision: ADR-0147
   future_protocol_source_candidate: proto/vibit/friends/v1/friends.proto
   future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go
@@ -372,6 +383,77 @@ architecture_scope:
     groups_added: false
     parties_added: false
     chat_added: false
+    matchmaking_added: false
+    match_runtime_added: false
+    sdk_added: false
+    hosted_deployment_added: false
+    release_artifact_added: false
+    distributed_runtime_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  minimum_operations_inspection_surface_gate:
+    status: completed
+    milestone: M-172
+    completed_work_item: W-0244
+    decision: ADR-0152
+    change: changes/2026-05-26-define-minimum-operations-inspection-surface-gate
+    check_rule: runtime.minimum_operations_inspection_surface_gate
+    next_milestone: M-173
+    next_ready_work_item: W-0245
+    previous_completed_work_item: W-0243
+    selected_direction: define_minimum_operations_inspection_surface_gate
+    selected_follow_up_direction: implement_minimum_operations_inspection_source_first_surface
+    selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+    source_selection_decision: ADR-0151
+    source_friends_route_proof_decision: ADR-0150
+    source_workflow_decision: ADR-0128
+    standard: docs/minimum-operations-inspection-surface-gate.md
+    translation: docs/minimum-operations-inspection-surface-gate.zh-CN.md
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: prototype_ready_foundation
+    surface_posture: source_first_local_operations_inspection
+    future_cli_inspection_candidate: tools/vibit inspect operations
+    accepted_existing_runtime_surfaces:
+      - /healthz
+      - /readyz
+      - /version
+      - /configz
+    minimum_inspectable_state_categories:
+      - process_liveness_and_readiness
+      - runtime_version_and_release_posture
+      - runtime_store_and_configuration_posture
+      - protocol_route_family_inventory
+      - local_alpha_flow_steps
+      - persistence_and_migration_posture
+      - authentication_session_connection_posture
+      - generated_output_and_proto_posture
+      - repository_check_and_verification_posture
+      - deferred_operations_surfaces
+    redaction_required: true
+    implementation_authorized_by_this_gate: false
+    operations_inspection_surface_implementation_added: false
+    operations_admin_endpoint_added: false
+    admin_console_added: false
+    metrics_endpoint_added: false
+    observability_pipeline_added: false
+    dashboard_added: false
+    runtime_behavior_added_by_this_gate: false
+    runtime_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    event_audit_table_added: false
+    groups_added: false
+    parties_added: false
+    chat_added: false
+    stream_subscription_added: false
     matchmaking_added: false
     match_runtime_added: false
     sdk_added: false

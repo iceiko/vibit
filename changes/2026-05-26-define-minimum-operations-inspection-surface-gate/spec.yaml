@@ -1,0 +1,245 @@
+schema_version: 0.1
+change_id: define-minimum-operations-inspection-surface-gate
+date: 2026-05-31
+type: standard
+status: verified
+
+summary: Define the minimum source-first operations inspection surface gate and open a bounded source-first implementation follow-up without adding operations/admin implementation, metrics, observability, runtime behavior, protocol shape, generated output, migrations, dependencies, hosted surfaces, SDKs, distributed runtime, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - operations
+
+decisions:
+  added:
+    - ADR-0152
+  referenced:
+    - ADR-0151
+    - ADR-0150
+    - ADR-0128
+    - ADR-0127
+    - ADR-0105
+    - ADR-0095
+    - ADR-0082
+    - ADR-0078
+
+runtime:
+  minimum_operations_inspection_surface_gate: defined
+  completed_work_item: W-0244
+  completed_milestone: M-172
+  previous_completed_work_item: W-0243
+  next_milestone: M-173
+  next_work_item: W-0245
+  next_work_item_status: next_ready
+  selected_direction: define_minimum_operations_inspection_surface_gate
+  next_direction: implement_minimum_operations_inspection_source_first_surface
+  selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+  decision: ADR-0152
+  check_rule: runtime.minimum_operations_inspection_surface_gate
+  source_selection_decision: ADR-0151
+  source_friends_route_proof_decision: ADR-0150
+  source_workflow_decision: ADR-0128
+  standard: docs/minimum-operations-inspection-surface-gate.md
+  translation: docs/minimum-operations-inspection-surface-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  surface_posture: source_first_local_operations_inspection
+  admin_console_posture: deferred
+  metrics_endpoint_posture: deferred
+  observability_pipeline_posture: deferred
+  future_implementation_work_item: W-0245
+  future_implementation_direction: implement_minimum_operations_inspection_source_first_surface
+  future_cli_inspection_candidate: tools/vibit inspect operations
+  future_docs_candidate: docs/runtime-runbook.md
+  future_acceptance_checklist_candidate: docs/alpha-acceptance-checklist.md
+  accepted_existing_runtime_surfaces:
+    - /healthz
+    - /readyz
+    - /version
+    - /configz
+  accepted_existing_source_surfaces:
+    - .arch/work-items.yaml
+    - .arch/runtime.yaml
+    - docs/runtime-runbook.md
+    - docs/alpha-developer-flow.md
+    - docs/alpha-acceptance-checklist.md
+    - examples/local-alpha-example-client.sh
+    - examples/local-alpha-request-loop.sh
+    - tools/vibit
+  minimum_inspectable_state_categories:
+    - process_liveness_and_readiness
+    - runtime_version_and_release_posture
+    - runtime_store_and_configuration_posture
+    - protocol_route_family_inventory
+    - local_alpha_flow_steps
+    - persistence_and_migration_posture
+    - authentication_session_connection_posture
+    - generated_output_and_proto_posture
+    - repository_check_and_verification_posture
+    - deferred_operations_surfaces
+  redaction_required: true
+  implementation_authorized_by_this_gate: false
+  runtime_behavior_added_by_this_gate: false
+  operations_admin_endpoint_added: false
+  admin_console_added: false
+  metrics_endpoint_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  event_audit_table_added: false
+  groups_added: false
+  parties_added: false
+  chat_added: false
+  stream_subscription_added: false
+  matchmaking_added: false
+  match_runtime_added: false
+  sdk_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Define the minimum source-first operations inspection surface needed for prototype authors to understand and troubleshoot local alpha server state before broader capability expansion.
+nakama_capability_family: admin_console_metrics_observability_and_operations
+
+nakama_capability_mapping:
+  family: admin_console_metrics_observability_and_operations
+  product_intent: Nakama-class frameworks need operators and developers to inspect health, version, configuration posture, active capability state, and runtime behavior without guessing from logs alone. vibit adapts this to a source-first local operations inspection posture before building admin console, metrics, or hosted operations surfaces.
+  adopted:
+    - operations visibility pressure
+    - health/version/configuration posture inspection
+    - capability and verification posture inspection
+  adapted:
+    - source-first repository inspection before runtime admin endpoints
+    - redacted local alpha categories before live state inspectors
+  rejected:
+    - direct Nakama API compatibility
+    - Nakama console routes or dashboard behavior
+    - production metrics naming or hosted operations promises
+  pitaya_status: deferred_future_architecture_reference
+
+acceptance_criteria:
+  - The gate defines the minimum source-first operations inspection posture.
+  - The gate records accepted existing runtime and source surfaces.
+  - The gate records minimum inspectable state categories.
+  - The gate records redaction requirements, ownership, future implementation candidates, verification commands, and stop conditions.
+  - The gate opens W-0245 as a narrow source-first implementation work item.
+  - The gate does not add operations/admin implementation, runtime behavior, protocol shape, generated output, persistence, migrations, dependencies, hosted surfaces, SDKs, distributed runtime, or direct compatibility scope.
+
+test_plan:
+  repository_checks:
+    - Repository check for W-0244 completion and W-0245 next-ready state.
+    - Runtime check for ADR-0152, gate standard, translation, change artifacts, redaction markers, accepted existing surfaces, file candidates, deferrals, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/minimum-operations-inspection-surface-gate.md
+    - docs/minimum-operations-inspection-surface-gate.zh-CN.md
+    - changes/2026-05-26-define-minimum-operations-inspection-surface-gate/
+    - decisions/ADR-0152-minimum-operations-inspection-surface-gate.md
+    - conversations/2026-05-26-minimum-operations-inspection-surface-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/friends/AGENTS*.md
+    - modules/friends/module.yaml
+    - modules/storage/AGENTS*.md
+    - modules/storage/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - operations/admin endpoint implementation
+    - admin console implementation
+    - metrics endpoint implementation
+    - observability pipeline implementation
+    - dashboard implementation
+    - runtime behavior changes
+    - protocol route changes
+    - Protobuf source changes
+    - generated output changes
+    - migration changes
+    - dependency changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - startup wiring
+    - persistence changes
+    - authentication/session behavior changes
+    - event/audit table changes
+    - groups, parties, chat, stream subscriptions, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, distributed runtime, or direct compatibility
+
+memory_updates:
+  - .arch/work-items.yaml
+  - .arch/runtime.yaml
+  - .arch/conventions.yaml
+  - .arch/contracts.yaml
+  - .arch/reference.yaml
+  - .arch/modules.yaml
+  - modules/storage/module.yaml
+  - modules/friends/module.yaml
+  - README.md
+  - README.zh-CN.md
+  - AGENTS.md
+  - AGENTS.zh-CN.md
+  - runtime/AGENTS.md
+  - runtime/AGENTS.zh-CN.md
+  - modules/storage/AGENTS.md
+  - modules/storage/AGENTS.zh-CN.md
+  - modules/friends/AGENTS.md
+  - modules/friends/AGENTS.zh-CN.md
+  - docs/v0.1-alpha-goal.md
+  - docs/v0.1-alpha-goal.zh-CN.md
+  - docs/alpha-developer-flow.md
+  - docs/alpha-developer-flow.zh-CN.md
+  - docs/alpha-acceptance-checklist.md
+  - docs/alpha-acceptance-checklist.zh-CN.md
+  - docs/product-maturity-milestones.md
+  - docs/product-maturity-milestones.zh-CN.md
+  - docs/nakama-pitaya-product-parity-roadmap.md
+  - docs/nakama-pitaya-product-parity-roadmap.zh-CN.md
+  - docs/minimum-operations-inspection-surface-gate.md
+  - docs/minimum-operations-inspection-surface-gate.zh-CN.md
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  release_status_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.minimum_operations_inspection_surface_gate
+    - node tools/vibit check change define-minimum-operations-inspection-surface-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

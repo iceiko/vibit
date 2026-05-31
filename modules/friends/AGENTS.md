@@ -30,7 +30,7 @@ The current implemented slice is intentionally narrow:
 
 `M-170 Friends Relationship Protocol Route Local Proof` is completed by `W-0242`. The check rule is `runtime.friends_relationship_protocol_route_local_proof`.
 
-The repository next work item is `W-0244 Define minimum operations inspection surface gate`. That work is outside this module and must stay gate-only; do not add protocol shape changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime, operations/admin implementation, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
+The repository next work item is `W-0245 Implement minimum operations inspection source-first surface`. That work is outside this module and must stay source-first; do not add protocol shape changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime, operations/admin implementation, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
 
 ## When Not To Use This Module
 
@@ -65,7 +65,7 @@ If a requirement needs one of those concepts, create or update the owning bounda
 - Protocol route gate: `docs/friends-relationship-protocol-route-gate.md`
 - Protocol route implementation: `proto/vibit/friends/v1/friends.proto`, `runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go`, `runtime/internal/platform/protocol/protobuf/friends_bridge.go`, `runtime/internal/app/bootstrap/friends.go`, and `runtime/internal/app/friends/routes.go`
 - Protocol route local proof: `W-0242 Prove friends relationship protocol route in local alpha request flow`
-- Next operations gate follow-up: `W-0244 Define minimum operations inspection surface gate`
+- Next operations source-first follow-up: `W-0245 Implement minimum operations inspection source-first surface`
 
 The first public runtime commands and queries are still deferred. Future runtime behavior must derive actor identity from validated request identity before calling this repository interface; client-supplied player ids are not authentication proof.
 

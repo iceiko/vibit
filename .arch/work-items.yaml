@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-172
+current_milestone: M-173
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: minimum_operations_inspection_surface_gate_selected
+    current_release_state: minimum_operations_inspection_surface_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0244
+    next_ready_work_item: W-0245
     preferred_after_current:
-      - define_minimum_operations_inspection_surface_gate
+      - implement_minimum_operations_inspection_source_first_surface
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3200,12 +3200,24 @@ milestones:
 
   - id: M-172
     title: Minimum Operations Inspection Surface Gate
-    status: active
+    status: completed
     goal: Define the minimum source-first operations/admin inspection surface needed before broader prototype use, without implementing runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, distributed runtime, or direct Nakama/Pitaya API compatibility in the gate slice.
     completion_criteria:
       - The minimum inspectable state categories and redaction posture are documented before implementation.
       - The gate defines ownership, test expectations, and stop conditions for any future operations inspection implementation.
       - The gate preserves all runtime, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding operations/admin endpoint implementation, metrics endpoints, observability pipelines, dashboards, new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the minimum source-first operations inspection surface gate, accepted `ADR-0152`, registered `runtime.minimum_operations_inspection_surface_gate`, completed `W-0244`, and opened `M-173/W-0245 Implement minimum operations inspection source-first surface` as next-ready. Preserved operations/admin endpoint implementation, metrics, observability, dashboards, runtime behavior, protocol routes, generated output, repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals, hosted/SDK/release scope, and distributed runtime deferrals.
+
+  - id: M-173
+    title: Minimum Operations Inspection Source-First Surface Implementation
+    status: active
+    goal: Implement the minimum source-first operations inspection surface authorized by ADR-0152, preferably through tools/vibit repository inspection and documentation updates, without adding runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, distributed runtime, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A source-first operations inspection surface summarizes accepted local alpha runtime/source categories.
+      - Redaction tests or repository checks prove raw credentials, tokens, digests, verifier keys, DSNs, transport metadata, sensitive identifiers, and database payloads are not exposed.
+      - The implementation remains within the ADR-0152 gate and preserves all runtime, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
     non_goals:
       - adding operations/admin endpoint implementation, metrics endpoints, observability pipelines, dashboards, new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
 
@@ -9506,7 +9518,7 @@ work_items:
   - id: W-0244
     milestone: M-172
     title: Define minimum operations inspection surface gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-define-minimum-operations-inspection-surface-gate
     depends_on:
       - W-0243
@@ -9527,3 +9539,33 @@ work_items:
       - Define the minimum source-first operations inspection surface gate.
       - Record inspectable state categories, redaction posture, ownership, tests, and stop conditions.
       - Preserve implementation/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.
+    decision: ADR-0152
+    check_rule: runtime.minimum_operations_inspection_surface_gate
+    next_milestone: M-173
+    next_ready_work_item: W-0245
+    selected_follow_up_direction: implement_minimum_operations_inspection_source_first_surface
+    selected_nakama_capability_family: admin_console_metrics_observability_and_operations
+    completion_summary: Defined `source_first_local_operations_inspection` as the minimum operations inspection gate, accepted `ADR-0152`, registered `runtime.minimum_operations_inspection_surface_gate`, and opened `M-173/W-0245 Implement minimum operations inspection source-first surface`. Preserved operations/admin endpoint implementation, metrics endpoints, observability pipelines, dashboards, runtime behavior, protocol routes, generated output, repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals, hosted/SDK/release scope, and distributed runtime deferrals.
+
+  - id: W-0245
+    milestone: M-173
+    title: Implement minimum operations inspection source-first surface
+    status: next_ready
+    change: changes/2026-05-26-implement-minimum-operations-inspection-source-first-surface
+    depends_on:
+      - W-0244
+    expected_change_id: implement-minimum-operations-inspection-source-first-surface
+    tier: tier_2_operations_implementation
+    selected_direction: implement_minimum_operations_inspection_source_first_surface
+    gate_decision: ADR-0152
+    related_decisions:
+      - ADR-0152
+      - ADR-0151
+      - ADR-0095
+      - ADR-0078
+    ask_first:
+      - Implementing operations/admin endpoint behavior, metrics endpoints, observability pipelines, dashboards, runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility instead of implementing only the source-first operations inspection surface authorized by ADR-0152.
+    completion:
+      - Implement a source-first operations inspection surface for accepted local alpha categories.
+      - Prove redaction for credentials, tokens, digests, verifier keys, DSNs, transport metadata, sensitive identifiers, and database payloads.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.

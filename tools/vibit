@@ -179,6 +179,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.friends_relationship_protocol_route_implementation",
   "runtime.friends_relationship_protocol_route_local_proof",
   "runtime.next_nakama_prototype_ready_capability_after_friends_route_proof",
+  "runtime.minimum_operations_inspection_surface_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -38536,6 +38537,272 @@ function checkRuntimeNextNakamaPrototypeReadyCapabilityAfterFriendsRouteProof(ro
   });
 }
 
+function checkRuntimeMinimumOperationsInspectionSurfaceGate(root, goFiles) {
+  const ruleId = "runtime.minimum_operations_inspection_surface_gate";
+  const standardPath = "docs/minimum-operations-inspection-surface-gate.md";
+  const standardTranslationPath = "docs/minimum-operations-inspection-surface-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0152-minimum-operations-inspection-surface-gate.md";
+  const changePath = "changes/2026-05-26-define-minimum-operations-inspection-surface-gate";
+  const conversationPath = "conversations/2026-05-26-minimum-operations-inspection-surface-gate.md";
+
+  if (!minimumOperationsInspectionSurfaceGateCompleted(root)) {
+    ok("minimum operations inspection surface gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for minimum operations inspection surface gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for minimum operations inspection surface gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-172"],
+    [".arch/work-items.yaml", "title: Minimum Operations Inspection Surface Gate"],
+    [".arch/work-items.yaml", "id: W-0244"],
+    [".arch/work-items.yaml", "title: Define minimum operations inspection surface gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "ADR-0152"],
+    [".arch/work-items.yaml", "check_rule: runtime.minimum_operations_inspection_surface_gate"],
+    [".arch/work-items.yaml", "id: M-173"],
+    [".arch/work-items.yaml", "title: Minimum Operations Inspection Source-First Surface"],
+    [".arch/work-items.yaml", "id: W-0245"],
+    [".arch/work-items.yaml", "title: Implement minimum operations inspection source-first surface"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "expected_change_id: implement-minimum-operations-inspection-source-first-surface"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate: ADR-0152"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_defined: true"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_decision: ADR-0152"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_check_rule: runtime.minimum_operations_inspection_surface_gate"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_standard: docs/minimum-operations-inspection-surface-gate.md"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_translation: docs/minimum-operations-inspection-surface-gate.zh-CN.md"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_surface_gate_posture: source_first_local_operations_inspection"],
+    [".arch/runtime.yaml", "future_minimum_operations_inspection_surface_implementation_work_item: W-0245"],
+    [".arch/runtime.yaml", "future_minimum_operations_inspection_surface_implementation_direction: implement_minimum_operations_inspection_source_first_surface"],
+    [".arch/runtime.yaml", "future_minimum_operations_inspection_surface_cli_candidate: tools/vibit inspect operations"],
+    [".arch/runtime.yaml", "/healthz"],
+    [".arch/runtime.yaml", "/readyz"],
+    [".arch/runtime.yaml", "/version"],
+    [".arch/runtime.yaml", "/configz"],
+    [".arch/runtime.yaml", "process_liveness_and_readiness"],
+    [".arch/runtime.yaml", "runtime_store_and_configuration_posture"],
+    [".arch/runtime.yaml", "protocol_route_family_inventory"],
+    [".arch/runtime.yaml", "authentication_session_connection_posture"],
+    [".arch/runtime.yaml", "generated_output_and_proto_posture"],
+    [".arch/runtime.yaml", "repository_check_and_verification_posture"],
+    [".arch/runtime.yaml", "deferred_operations_surfaces"],
+    [".arch/runtime.yaml", "redaction_required: true"],
+    [".arch/runtime.yaml", "implementation_authorized_by_this_gate: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added_by_this_gate: false"],
+    [".arch/runtime.yaml", "operations_admin_endpoint_added: false"],
+    [".arch/runtime.yaml", "admin_console_added: false"],
+    [".arch/runtime.yaml", "metrics_endpoint_added: false"],
+    [".arch/runtime.yaml", "observability_pipeline_added: false"],
+    [".arch/runtime.yaml", "dashboard_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "authentication_session_behavior_changed: false"],
+    [".arch/runtime.yaml", "event_audit_table_added: false"],
+    [".arch/runtime.yaml", "sdk_added: false"],
+    [".arch/runtime.yaml", "hosted_deployment_added: false"],
+    [".arch/runtime.yaml", "distributed_runtime_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/conventions.yaml", "check_rule: runtime.minimum_operations_inspection_surface_gate"],
+    [".arch/conventions.yaml", "decision: ADR-0152"],
+    [".arch/conventions.yaml", "source_first_local_operations_inspection"],
+    [".arch/conventions.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.minimum_operations_inspection_surface_gate"],
+    [".arch/contracts.yaml", "decision: ADR-0152"],
+    [".arch/contracts.yaml", "source_first_local_operations_inspection"],
+    [".arch/contracts.yaml", "protocol_route_added: false"],
+    [".arch/contracts.yaml", "protobuf_source_added: false"],
+    [".arch/contracts.yaml", "generated_output_added: false"],
+    [".arch/reference.yaml", "phase_2fc_minimum_operations_inspection_surface_gate"],
+    [".arch/reference.yaml", "phase_2fd_minimum_operations_inspection_source_first_surface"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.minimum_operations_inspection_surface_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.minimum_operations_inspection_surface_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.minimum_operations_inspection_surface_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.minimum_operations_inspection_surface_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.minimum_operations_inspection_surface_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const sharedMarkers = [
+    "minimum_operations_inspection_surface_gate: defined",
+    "completed_work_item: W-0244",
+    "decision: ADR-0152",
+    "check_rule: runtime.minimum_operations_inspection_surface_gate",
+    "future_implementation_work_item: W-0245",
+    "source_first_local_operations_inspection",
+    "tools/vibit inspect operations",
+    "/healthz",
+    "/readyz",
+    "/version",
+    "/configz",
+    "process_liveness_and_readiness",
+    "runtime_store_and_configuration_posture",
+    "protocol_route_family_inventory",
+    "authentication_session_connection_posture",
+    "generated_output_and_proto_posture",
+    "repository_check_and_verification_posture",
+    "deferred_operations_surfaces",
+    "redaction_required: true",
+    "operations_admin_endpoint_added: false",
+    "admin_console_added: false",
+    "metrics_endpoint_added: false",
+    "observability_pipeline_added: false",
+    "dashboard_added: false",
+    "runtime_behavior_added",
+    "protocol_route_added: false",
+    "protobuf_source_added: false",
+    "generated_output_added: false",
+    "migration_added: false",
+    "dependency_added: false",
+    "direct_nakama_pitaya_api_compatibility_added: false",
+  ];
+  for (const file of [standardPath, standardTranslationPath, `${changePath}/spec.yaml`]) {
+    for (const marker of sharedMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0152",
+      "source_first_local_operations_inspection",
+      "tools/vibit inspect operations",
+      "M-173/W-0245",
+      "This decision completes `M-172/W-0244`",
+      "runtime.minimum_operations_inspection_surface_gate",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0244",
+      "ADR-0152",
+      "runtime.minimum_operations_inspection_surface_gate",
+      "source_first_local_operations_inspection",
+      "tools/vibit inspect operations",
+      "M-173/W-0245",
+      "Unknown rule_id: runtime.minimum_operations_inspection_surface_gate",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0244",
+      "ADR-0152",
+      "minimum operations inspection",
+      "source-first",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0245",
+      "source_first_local_operations_inspection",
+      "No runtime behavior",
+      "No protocol",
+      "No generated output",
+      "No migrations",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Minimum operations inspection surface gate completes W-0244, opens W-0245, defines source-first local operations inspection categories and redaction posture, and keeps operations/admin endpoints, metrics, observability, runtime, protocol, generated output, migrations, dependencies, hosted surfaces, SDKs, distributed runtime, and direct compatibility deferred", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -40373,6 +40640,10 @@ function nextNakamaPrototypeReadyCapabilityAfterFriendsRouteProofCompleted(root)
   return workItemHasStatus(root, "W-0243", "completed");
 }
 
+function minimumOperationsInspectionSurfaceGateCompleted(root) {
+  return workItemHasStatus(root, "W-0244", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -40405,6 +40676,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
+    return "repository_next_work_item: W-0245";
+  }
   if (nextNakamaPrototypeReadyCapabilityAfterFriendsRouteProofCompleted(root)) {
     return "repository_next_work_item: W-0244";
   }
@@ -40499,6 +40773,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_minimum_operations_inspection_source_first_surface";
+  }
   if (nextNakamaPrototypeReadyCapabilityAfterFriendsRouteProofCompleted(root)) {
     return "repository_next_work_item_scope: define_minimum_operations_inspection_surface_gate";
   }
@@ -40584,6 +40861,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
+    return "W-0245 Implement minimum operations inspection source-first surface";
+  }
   if (nextNakamaPrototypeReadyCapabilityAfterFriendsRouteProofCompleted(root)) {
     return "W-0244 Define minimum operations inspection surface gate";
   }
@@ -40693,6 +40973,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0244", "next_ready_work_item: W-0245"],
     ["W-0243", "next_ready_work_item: W-0244"],
     ["W-0242", "next_ready_work_item: W-0243"],
     ["W-0241", "next_ready_work_item: W-0242"],
@@ -40765,6 +41046,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0244", "completed")) {
+    return "next_work_item: W-0245";
+  }
   if (workItemHasStatus(root, "W-0243", "completed")) {
     return "next_work_item: W-0244";
   }
@@ -40926,6 +41210,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0244", "implement_minimum_operations_inspection_source_first_surface"],
     ["W-0243", "define_minimum_operations_inspection_surface_gate"],
     ["W-0242", "select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
     ["W-0241", "prove_friends_relationship_protocol_route_local_flow"],
@@ -40998,6 +41283,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0244", "W-0245 Implement minimum operations inspection source-first surface"],
     ["W-0243", "W-0244 Define minimum operations inspection surface gate"],
     ["W-0242", "W-0243 Select next Nakama prototype-ready capability after friends relationship route proof"],
     ["W-0241", "W-0242 Prove friends relationship protocol route in local alpha request flow"],
@@ -41071,6 +41357,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0244", "current_phase: implement_minimum_operations_inspection_source_first_surface"],
     ["W-0243", "current_phase: define_minimum_operations_inspection_surface_gate"],
     ["W-0242", "current_phase: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
     ["W-0241", "current_phase: prove_friends_relationship_protocol_route_local_flow"],
@@ -41718,6 +42005,7 @@ function checkRuntime(root) {
   checkRuntimeFriendsRelationshipProtocolRouteImplementation(root, goFiles);
   checkRuntimeFriendsRelationshipProtocolRouteLocalProof(root, goFiles);
   checkRuntimeNextNakamaPrototypeReadyCapabilityAfterFriendsRouteProof(root, goFiles);
+  checkRuntimeMinimumOperationsInspectionSurfaceGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

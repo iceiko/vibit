@@ -192,10 +192,10 @@ node tools/vibit check work --json
 当前 next work item 是：
 
 ```text
-W-0244 Define minimum operations inspection surface gate
+W-0245 Implement minimum operations inspection source-first surface
 ```
 
-使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 到 `W-0242` 已完成 friends relationship lifecycle、persistence、repository、PostgreSQL adapter、runtime behavior、protocol route 和 local proof path。`W-0243` 已在 friends route proof 之后选择 minimum operations inspection surface gate，接受 `decisions/ADR-0151-select-next-nakama-prototype-ready-capability-after-friends-route-proof.md`，并注册 `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`。下一方向是 `define_minimum_operations_inspection_surface_gate`。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
+使用 `.arch/work-items.yaml` 作为 continuation source of truth。`W-0231` 到 `W-0242` 已完成 friends relationship lifecycle、persistence、repository、PostgreSQL adapter、runtime behavior、protocol route 和 local proof path。`W-0243` 已在 friends route proof 之后选择 minimum operations inspection surface gate，接受 `decisions/ADR-0151-select-next-nakama-prototype-ready-capability-after-friends-route-proof.md`，并注册 `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`。`W-0244` 已定义 minimum operations inspection surface gate，接受 `decisions/ADR-0152-minimum-operations-inspection-surface-gate.md`，注册 `runtime.minimum_operations_inspection_surface_gate`，并打开 `W-0245`。下一方向是 `implement_minimum_operations_inspection_source_first_surface`。`continue` 或 `继续推进` 的意思是：推进一个 `next_ready` work item，除非遇到 ask-first boundary、verification failure 或 required maintainer confirmation。
 
 近期 friends relationship trace decisions 继续记录在 `decisions/ADR-0141-friends-relationship-migration-source.md`、`decisions/ADR-0142-friends-relationship-repository-boundary.md`、`decisions/ADR-0143-friends-relationship-repository-interface-implementation.md`、`decisions/ADR-0144-friends-relationship-postgresql-adapter-gate.md`、`decisions/ADR-0145-friends-relationship-postgresql-adapter-implementation.md`、`decisions/ADR-0146-friends-relationship-runtime-behavior-gate.md`、`decisions/ADR-0147-friends-relationship-runtime-behavior-implementation.md`、`decisions/ADR-0148-friends-relationship-protocol-route-gate.md`、`decisions/ADR-0149-friends-relationship-protocol-route-implementation.md` 和 `decisions/ADR-0150-friends-relationship-protocol-route-local-proof.md`。
 
