@@ -32,6 +32,16 @@ Text WebSocket messages 会被 transport adapter 拒绝。该 endpoint 不接受
 
 这些 endpoints 是 local alpha troubleshooting surfaces，不是 production operations API、admin console、metrics backend、protocol route 或 release packaging surface。
 
+Source-first operations inspection surface 是：
+
+```bash
+node tools/vibit inspect operations --json
+```
+
+这个命令汇总已提交的 local alpha runtime/source posture：既有 troubleshooting endpoints、route families、local alpha flow steps、persistence and migration posture、generated-output posture、repository verification posture、redaction flags，以及 Pitaya deferred architecture map。它是 repository inspection command，不是 runtime endpoint、admin console、metrics backend、dashboard、database inspector 或 compatibility surface。
+
+Pitaya map 有意保持 deferred。它记录当前 WebSocket acceptor、first-message connection binding 和 application route handler model 都是 single-process concepts，而 frontend/backend server roles、RPC/remotes、distributed groups/broadcast 和 service discovery 仍是未来 architecture work。
+
 当前有两种 startup composition：
 
 ```text
@@ -236,6 +246,16 @@ sed -n '1,220p' docs/alpha-acceptance-checklist.md
 ```
 
 在 packaging 或 publishing work 前，确认 ready、manual、deferred 和 blocked 状态。该 checklist 保持 release publishing、release packaging、public local onboarding、production signup、broad operations/admin behavior、broad product modules 和 direct Nakama/Pitaya API compatibility deferred。
+
+### Source-First Operations Inspection
+
+运行 repository inspection command：
+
+```bash
+node tools/vibit inspect operations --json
+```
+
+确认它报告 source-first local operations posture、redacted status、current route families、verification commands 和 Pitaya deferred architecture mapping，并且不会打印 secrets、带 credentials 的 DSN、raw credentials、raw access tokens、digests、transport metadata、database payloads 或 local secret file contents。
 
 ### PostgreSQL Runtime Path
 

@@ -25,8 +25,8 @@ product_parity_roadmap:
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_minimum_operations_inspection_source_first_surface
-  recommended_next_direction: implement_minimum_operations_inspection_source_first_surface
+  current_near_term_priority: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+  recommended_next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: minimum_operations_inspection_surface_gate_defined
+  current_state: minimum_operations_inspection_source_first_surface_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0245
-  immediate_next_direction: implement_minimum_operations_inspection_source_first_surface
+  immediate_next_work_item: W-0246
+  immediate_next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -5356,16 +5356,53 @@ phase_plan:
     postgresql_adapter_change_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2fd_minimum_operations_inspection_source_first_surface:
-    status: active
+    status: completed
     milestone: M-173
-    next_ready_work_item: W-0245
+    completed_work_item: W-0245
     previous_completed_work_item: W-0244
     selected_direction: implement_minimum_operations_inspection_source_first_surface
     gate_decision: ADR-0152
+    implementation_decision: ADR-0153
+    check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
+    command: node tools/vibit inspect operations --json
+    next_ready_work_item: W-0246
+    selected_follow_up_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
     primary_product_reference: Nakama
     pitaya_reference_status: deferred_future_architecture_reference
     target_stage: prototype_ready_foundation
     implementation_scope: source_first_repository_inspection
+    pitaya_architecture_map_recorded: true
+    websocket_tcp_acceptors: current_websocket_acceptor_single_process_only
+    session_binding: current_first_message_connection_binding_single_process_only
+    route_handler_model: current_application_dispatch_and_protocol_bridge
+    frontend_backend_server_roles: deferred_future_architecture_reference
+    rpc_and_remote_calls: deferred_future_architecture_reference
+    groups_rooms_broadcast: deferred_future_architecture_reference
+    cluster_service_discovery: deferred_future_architecture_reference
+    runtime_endpoint_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2fe_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate:
+    status: active
+    milestone: M-174
+    next_ready_work_item: W-0246
+    previous_completed_work_item: W-0245
+    selected_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+    source_operations_inspection_decision: ADR-0153
+    primary_product_reference: Nakama
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: prototype_ready_foundation
+    implementation_scope: gate_only_architecture_vocabulary
+    future_vocabulary_candidates:
+      - frontend_backend_server_roles
+      - server_to_server_rpc
+      - service_discovery
+      - distributed_groups
+      - cluster_safe_session_routing
+    distributed_runtime_implementation_allowed: false
     runtime_endpoint_behavior_allowed: false
     protocol_shape_change_allowed: false
     generated_output_allowed: false

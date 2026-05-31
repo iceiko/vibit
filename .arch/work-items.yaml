@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-173
+current_milestone: M-174
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: minimum_operations_inspection_surface_gate_defined
+    current_release_state: minimum_operations_inspection_source_first_surface_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0245
+    next_ready_work_item: W-0246
     preferred_after_current:
-      - implement_minimum_operations_inspection_source_first_surface
+      - define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3212,7 +3212,7 @@ milestones:
 
   - id: M-173
     title: Minimum Operations Inspection Source-First Surface Implementation
-    status: active
+    status: completed
     goal: Implement the minimum source-first operations inspection surface authorized by ADR-0152, preferably through tools/vibit repository inspection and documentation updates, without adding runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, distributed runtime, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first operations inspection surface summarizes accepted local alpha runtime/source categories.
@@ -3220,6 +3220,18 @@ milestones:
       - The implementation remains within the ADR-0152 gate and preserves all runtime, protocol, persistence, dependency, hosted, SDK, distributed-runtime, and direct-compatibility deferrals unless a later bounded work item authorizes them.
     non_goals:
       - adding operations/admin endpoint implementation, metrics endpoints, observability pipelines, dashboards, new runtime behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, groups, parties, chat, stream subscriptions, event/audit tables, matchmaking, match runtime, SDK publication, hosted deployments, release artifacts, public announcements, paid promotion, distributed runtime, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect operations --json` as the source-first local operations inspection surface, accepted `ADR-0153`, registered `runtime.minimum_operations_inspection_source_first_surface_implementation`, completed `W-0245`, and opened `M-174/W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate` as next-ready. The inspection output summarizes existing local alpha status endpoints, source surfaces, route families, local alpha flow steps, persistence/migration posture, generated-output posture, repository verification posture, redaction flags, and a Pitaya deferred architecture map without adding runtime endpoint behavior, metrics, observability, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, distributed runtime implementation, or direct compatibility.
+
+  - id: M-174
+    title: Pitaya-Aligned Distributed Runtime Vocabulary Reactivation Gate
+    status: active
+    goal: Define a narrow Pitaya-aligned distributed runtime vocabulary reactivation gate after the source-first operations inspection surface, without implementing frontend/backend roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A gate records which Pitaya architecture vocabulary may be reactivated for future planning.
+      - The gate maps existing single-process acceptor, session binding, and route handler concepts to future frontend/backend, RPC, service discovery, and distributed group vocabulary.
+      - The gate preserves implementation deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding distributed runtime implementation, frontend/backend server role implementation, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9550,7 +9562,7 @@ work_items:
   - id: W-0245
     milestone: M-173
     title: Implement minimum operations inspection source-first surface
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-minimum-operations-inspection-source-first-surface
     depends_on:
       - W-0244
@@ -9569,3 +9581,33 @@ work_items:
       - Implement a source-first operations inspection surface for accepted local alpha categories.
       - Prove redaction for credentials, tokens, digests, verifier keys, DSNs, transport metadata, sensitive identifiers, and database payloads.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed/direct-compatibility deferrals.
+    decision: ADR-0153
+    check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
+    next_milestone: M-174
+    next_ready_work_item: W-0246
+    selected_follow_up_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+    completion_summary: Implemented `node tools/vibit inspect operations --json` as a source-first repository inspection command for accepted local alpha operations categories, redaction posture, existing route families, local alpha flow, verification posture, and Pitaya deferred architecture mapping. Preserved operations/admin endpoint behavior, metrics endpoints, observability pipelines, dashboards, runtime behavior, protocol routes, Protobuf source, generated output, repository/adapter/migration/dependency/authentication/session/event/direct-compatibility deferrals, hosted/SDK/release scope, and distributed runtime implementation deferrals.
+
+  - id: W-0246
+    milestone: M-174
+    title: Define Pitaya-aligned distributed runtime vocabulary reactivation gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate
+    depends_on:
+      - W-0245
+    expected_change_id: define-pitaya-aligned-distributed-runtime-vocabulary-reactivation-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
+    gate_decision: ADR-0153
+    related_decisions:
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing distributed runtime behavior, frontend/backend server roles, server-to-server RPC, service discovery, distributed groups, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of defining only a Pitaya-aligned distributed runtime vocabulary reactivation gate.
+    completion:
+      - Define a Pitaya-aligned vocabulary gate for future distributed runtime planning.
+      - Map current single-process acceptor, session binding, route handling, and group/broadcast deferrals to future architecture vocabulary.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

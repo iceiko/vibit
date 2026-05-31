@@ -246,7 +246,9 @@ friends_relationship_protocol_route_implementation_decision: ADR-0149
 friends_relationship_protocol_route_local_proof_decision: ADR-0150
 minimum_operations_inspection_surface_gate_decision: ADR-0152
 minimum_operations_inspection_surface_gate_check_rule: runtime.minimum_operations_inspection_surface_gate
-next_work_item: W-0245 Implement minimum operations inspection source-first surface
+minimum_operations_inspection_source_first_surface_implementation_decision: ADR-0153
+minimum_operations_inspection_source_first_surface_implementation_check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation
+next_work_item: W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -360,11 +362,11 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. Near-Term Recommendation
 
-After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, and the minimum operations inspection surface gate, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, or dashboards. The next concrete work should implement only the source-first operations inspection surface inside ADR-0152:
+After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, the minimum operations inspection surface gate, and the source-first operations inspection implementation, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime implementation, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, dashboards, frontend/backend server roles, server-to-server RPC, service discovery, distributed groups, or cluster-safe session routing. The next concrete work should define only a Pitaya-aligned distributed runtime vocabulary reactivation gate:
 
 ```text
-next_work_item: W-0245 Implement minimum operations inspection source-first surface
-recommended_next_direction: implement_minimum_operations_inspection_source_first_surface
+next_work_item: W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate
+recommended_next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
 primary_product_reference: Nakama
 pitaya_reference_status: deferred_future_architecture_reference
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -388,10 +390,12 @@ Rationale:
 - `ADR-0149` implemented the friends relationship protocol route, registered `runtime.friends_relationship_protocol_route_implementation`, and opened `W-0242 Prove friends relationship protocol route in local alpha request flow`.
 - `ADR-0150` proved the friends relationship protocol route locally and registered `runtime.friends_relationship_protocol_route_local_proof`.
 - `ADR-0152` defined the minimum operations inspection surface gate, registered `runtime.minimum_operations_inspection_surface_gate`, and opened `W-0245 Implement minimum operations inspection source-first surface`.
+- `ADR-0153` implemented the source-first operations inspection surface, registered `runtime.minimum_operations_inspection_source_first_surface_implementation`, recorded the Pitaya deferred architecture map, and opened `W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
-- The next selection should decide the next capability direction before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
-- Nakama-first product planning prevents near-term scope from being split between product breadth and Pitaya-style distributed architecture.
-- Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred until single-process behavior and the source-first example path are clearer.
+- The operations inspection surface now makes local alpha status, route families, verification posture, and deferred operations surfaces inspectable without adding runtime endpoints.
+- The next gate should define vocabulary for future Pitaya-aligned distributed runtime discussion before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
+- Nakama-first product planning still prevents near-term scope from being split between product breadth and Pitaya-style distributed implementation.
+- Pitaya-style cluster/RPC/frontend-backend concerns should stay deferred to vocabulary and gate records until a later explicit implementation work item authorizes them.
 
 ## 8. Non-Goals
 

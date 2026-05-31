@@ -37,8 +37,9 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0245 Implement minimum operations inspection source-first surface` continuation step.
-- [x] The current `next_direction: implement_minimum_operations_inspection_source_first_surface` follows the completed friends relationship protocol route local proof, W-0243 post-proof selection, and W-0244 minimum operations inspection surface gate.
+- [x] `node tools/vibit inspect next` identifies the current `W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate` continuation step.
+- [x] `node tools/vibit inspect operations --json` reports the source-first local operations posture, route families, redaction flags, and Pitaya deferred architecture mapping.
+- [x] The current `next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate` follows the completed friends relationship protocol route local proof, W-0243 post-proof selection, W-0244 minimum operations inspection surface gate, and W-0245 source-first operations inspection implementation.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -100,6 +101,7 @@ Run from the repository root unless noted:
 
 ```bash
 node tools/vibit inspect next
+node tools/vibit inspect operations --json
 node tools/vibit check work --json
 node tools/vibit check all --json
 git diff --check
@@ -129,7 +131,7 @@ The alpha developer flow is now packaged in:
 docs/alpha-developer-flow.md
 ```
 
-The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, local alpha example client path implementation, feature request scaffolding, scaffolded Nakama feature request intake pilot, friends relationship lifecycle gate, friends relationship persistence schema gate, friends relationship migration source, friends relationship repository boundary, friends relationship repository interface implementation, friends relationship PostgreSQL adapter gate, friends relationship PostgreSQL adapter implementation, friends relationship runtime behavior gate, friends relationship protocol route gate, friends relationship protocol route implementation, friends relationship protocol route local proof, next Nakama prototype-ready capability after friends route proof, and minimum operations inspection surface gate artifacts remain recorded in their existing documents. The friends route local proof is recorded in `ADR-0150` with check rule `runtime.friends_relationship_protocol_route_local_proof`; the post-proof selection is recorded in `ADR-0151` with check rule `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`; the operations gate is recorded in `ADR-0152` with check rule `runtime.minimum_operations_inspection_surface_gate`. The next work is `W-0245 Implement minimum operations inspection source-first surface`; next_direction: implement_minimum_operations_inspection_source_first_surface.
+The release, discovery, prototype-ready, storage objects, realtime outbound delivery, Nakama-first direction, agent-native feature request/test workflow, Nakama-aligned presence/status pilot, presence/status local proof hardening, authenticated gameplay failure-path verification, next Nakama prototype-ready capability selection, local alpha example client path gate, local alpha example client path implementation, feature request scaffolding, scaffolded Nakama feature request intake pilot, friends relationship lifecycle gate, friends relationship persistence schema gate, friends relationship migration source, friends relationship repository boundary, friends relationship repository interface implementation, friends relationship PostgreSQL adapter gate, friends relationship PostgreSQL adapter implementation, friends relationship runtime behavior gate, friends relationship protocol route gate, friends relationship protocol route implementation, friends relationship protocol route local proof, next Nakama prototype-ready capability after friends route proof, minimum operations inspection surface gate, and minimum operations inspection source-first surface implementation artifacts remain recorded in their existing documents. The friends route local proof is recorded in `ADR-0150` with check rule `runtime.friends_relationship_protocol_route_local_proof`; the post-proof selection is recorded in `ADR-0151` with check rule `runtime.next_nakama_prototype_ready_capability_after_friends_route_proof`; the operations gate is recorded in `ADR-0152` with check rule `runtime.minimum_operations_inspection_surface_gate`; the operations inspection implementation is recorded in `ADR-0153` with check rule `runtime.minimum_operations_inspection_source_first_surface_implementation`. The next work is `W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate`; next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate.
 
 Trace references for alpha acceptance include `docs/first-alpha-user-discovery-loop.md`, `docs/first-alpha-feedback-intake-surfaces.md`, `docs/product-maturity-milestones.md`, `docs/prototype-ready-foundation-execution-plan.md`, `docs/prototype-ready-local-development-path-gate.md`, `docs/storage-objects-behavior-gate.md`, and `docs/storage-objects-persistence-schema-gate.md`.
 
@@ -172,6 +174,8 @@ first_server_push_realtime_messaging_runtime_slice_completed: true
 realtime_protocol_websocket_outbound_delivery_gate_defined: true
 realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
-next_direction: implement_minimum_operations_inspection_source_first_surface
+operations_inspection_source_first_surface_implemented: true
+pitaya_deferred_architecture_map_recorded: true
+next_direction: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate
 next_work_status: next_ready
 ```

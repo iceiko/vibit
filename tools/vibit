@@ -180,6 +180,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.friends_relationship_protocol_route_local_proof",
   "runtime.next_nakama_prototype_ready_capability_after_friends_route_proof",
   "runtime.minimum_operations_inspection_surface_gate",
+  "runtime.minimum_operations_inspection_source_first_surface_implementation",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -258,6 +259,7 @@ Usage:
   vibit inspect generated --module <module>
   vibit inspect generated --type <contract-type>
   vibit inspect next
+  vibit inspect operations
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -291,6 +293,7 @@ Commands:
   inspect contracts        Print registered contract index metadata as JSON.
   inspect generated        Print generated output metadata as JSON.
   inspect next             Print the next continuation work item as JSON.
+  inspect operations       Print source-first operations inspection metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -2913,6 +2916,261 @@ function inspectReference(root) {
       distributed_runtime: text ? listAfterPath(text, ["capability_families", "distributed_runtime"]) : [],
     },
   });
+}
+
+function buildOperationsInspection(root) {
+  const runtimeManifestPath = ".arch/runtime.yaml";
+  const referenceManifestPath = ".arch/reference.yaml";
+  const runtimeText = isFile(root, runtimeManifestPath) ? readText(path.join(root, runtimeManifestPath)) : "";
+  const referenceText = isFile(root, referenceManifestPath) ? readText(path.join(root, referenceManifestPath)) : "";
+  const state = loadWorkState(root);
+  const nextReady = state.exists ? state.current.next_ready[0] || null : null;
+
+  return {
+    schema_version: "0.1",
+    kind: "operations_inspection",
+    project: "vibit",
+    status: "source_first_local_operations_inspection",
+    source: {
+      standard: "docs/minimum-operations-inspection-surface-gate.md",
+      decision: "ADR-0152",
+      implementation_decision: "ADR-0153",
+      check_rule: "runtime.minimum_operations_inspection_source_first_surface_implementation",
+      work_item: "W-0245",
+      change: "changes/2026-05-26-implement-minimum-operations-inspection-source-first-surface",
+    },
+    current_work: {
+      milestone: state.current_milestone || null,
+      next_ready: nextReady,
+      can_continue: Boolean(nextReady),
+    },
+    runtime_surfaces: [
+      {
+        path: "/healthz",
+        category: "process_liveness_and_readiness",
+        posture: "existing_local_troubleshooting_endpoint",
+        exposes_sensitive_state: false,
+      },
+      {
+        path: "/readyz",
+        category: "process_liveness_and_readiness",
+        posture: "existing_local_troubleshooting_endpoint",
+        exposes_sensitive_state: false,
+      },
+      {
+        path: "/version",
+        category: "runtime_version_and_release_posture",
+        posture: "existing_local_troubleshooting_endpoint",
+        exposes_sensitive_state: false,
+      },
+      {
+        path: "/configz",
+        category: "runtime_store_and_configuration_posture",
+        posture: "existing_redacted_local_troubleshooting_endpoint",
+        exposes_sensitive_state: false,
+      },
+    ],
+    source_surfaces: [
+      ".arch/work-items.yaml",
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      "docs/runtime-runbook.md",
+      "docs/alpha-developer-flow.md",
+      "docs/alpha-acceptance-checklist.md",
+      "examples/local-alpha-example-client.sh",
+      "examples/local-alpha-request-loop.sh",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    inspectable_categories: [
+      {
+        id: "process_liveness_and_readiness",
+        source_kind: "runtime_endpoint_summary",
+        status: "accepted_existing_surface",
+      },
+      {
+        id: "runtime_version_and_release_posture",
+        source_kind: "runtime_endpoint_summary",
+        status: "accepted_existing_surface",
+      },
+      {
+        id: "runtime_store_and_configuration_posture",
+        source_kind: "runtime_endpoint_summary",
+        status: "redacted_existing_surface",
+      },
+      {
+        id: "protocol_route_family_inventory",
+        source_kind: "committed_source_summary",
+        status: "source_first",
+      },
+      {
+        id: "local_alpha_flow_steps",
+        source_kind: "committed_script_and_test_summary",
+        status: "source_first",
+      },
+      {
+        id: "persistence_and_migration_posture",
+        source_kind: "committed_migration_source_summary",
+        status: "source_first",
+      },
+      {
+        id: "authentication_session_connection_posture",
+        source_kind: "manifest_and_runbook_summary",
+        status: "source_first",
+      },
+      {
+        id: "generated_output_and_proto_posture",
+        source_kind: "source_trace_summary",
+        status: "source_first",
+      },
+      {
+        id: "repository_check_and_verification_posture",
+        source_kind: "tooling_summary",
+        status: "source_first",
+      },
+      {
+        id: "deferred_operations_surfaces",
+        source_kind: "deferral_summary",
+        status: "deferred",
+      },
+    ],
+    route_families: [
+      {
+        module: "runtime.authentication",
+        routes: [
+          "runtime.authentication.AuthenticateWithDeviceCredential",
+          "runtime.authentication.BindConnection",
+          "runtime.authentication.LogoutAccessToken",
+        ],
+        protection: "route_policy_specific",
+      },
+      {
+        module: "inventory",
+        routes: [
+          "inventory.GrantItem",
+          "inventory.GetInventory",
+        ],
+        protection: "authenticated_request_required",
+      },
+      {
+        module: "runtime.presence",
+        routes: [
+          "runtime.presence.GetPlayerPresence",
+        ],
+        protection: "authenticated_request_required",
+      },
+      {
+        module: "storage",
+        routes: [
+          "storage.GetOwnStorageObject",
+          "storage.ListOwnStorageObjects",
+          "storage.PutOwnStorageObject",
+          "storage.DeleteOwnStorageObject",
+        ],
+        protection: "authenticated_request_required",
+      },
+      {
+        module: "friends",
+        routes: [
+          "friends.SendFriendRequest",
+          "friends.AcceptFriendRequest",
+          "friends.RejectFriendRequest",
+          "friends.RemoveFriend",
+          "friends.BlockPlayer",
+          "friends.UnblockPlayer",
+          "friends.ListFriendRelationships",
+          "friends.GetFriendRelationshipStatus",
+        ],
+        protection: "authenticated_request_required",
+      },
+    ],
+    local_alpha_flow_steps: [
+      "local_onboarding_application_service",
+      "device_credential_login",
+      "first_message_connection_binding",
+      "protected_inventory",
+      "protected_presence_query",
+      "protected_storage_objects",
+      "protected_friends_relationships",
+      "logout",
+      "post_logout_protected_request_rejection",
+    ],
+    persistence: {
+      migration_sources_path: "runtime/migrations/postgres",
+      startup_applies_migrations: false,
+      source_first_only: true,
+      database_payload_dump_added: false,
+    },
+    generated_output: {
+      proto_source_path: "proto/",
+      generated_proto_path: "runtime/internal/generated/proto/",
+      generated_files_hand_edited_by_this_surface: false,
+    },
+    verification: {
+      commands: [
+        "node tools/vibit inspect operations --json",
+        "node tools/vibit check runtime --json",
+        "node tools/vibit check all --json",
+        "git diff --check",
+      ],
+      known_warning: "runtime.identity_boundary",
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      verifier_key_set_ids_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      http_headers_cookies_query_strings_exposed: false,
+      websocket_subprotocols_remote_addresses_exposed: false,
+      sensitive_identifiers_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+    },
+    reference_alignment: {
+      primary_product_reference: "Nakama",
+      nakama_capability_family: "admin_console_metrics_observability_and_operations",
+      pitaya_reference_status: referenceText.includes("deferred_future_architecture_reference")
+        ? "deferred_future_architecture_reference"
+        : firstScalar(runtimeText, "pitaya_reference_status") || "deferred_future_architecture_reference",
+      pitaya_architecture_map: {
+        websocket_tcp_acceptors: "current_websocket_acceptor_single_process_only",
+        session_binding: "current_first_message_connection_binding_single_process_only",
+        route_handler_model: "current_application_dispatch_and_protocol_bridge",
+        frontend_backend_server_roles: "deferred_future_architecture_reference",
+        rpc_and_remote_calls: "deferred_future_architecture_reference",
+        groups_rooms_broadcast: "deferred_future_architecture_reference",
+        cluster_service_discovery: "deferred_future_architecture_reference",
+      },
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    deferrals: {
+      operations_admin_endpoint_added: false,
+      admin_console_added: false,
+      metrics_endpoint_added: false,
+      observability_pipeline_added: false,
+      dashboard_added: false,
+      runtime_behavior_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      distributed_runtime_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+  };
+}
+
+function inspectOperations(root) {
+  printJson(buildOperationsInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -38803,6 +39061,172 @@ function checkRuntimeMinimumOperationsInspectionSurfaceGate(root, goFiles) {
   });
 }
 
+function checkRuntimeMinimumOperationsInspectionSourceFirstSurfaceImplementation(root, goFiles) {
+  const ruleId = "runtime.minimum_operations_inspection_source_first_surface_implementation";
+  const decisionPath = "decisions/ADR-0153-minimum-operations-inspection-source-first-surface-implementation.md";
+  const changePath = "changes/2026-05-26-implement-minimum-operations-inspection-source-first-surface";
+  const conversationPath = "conversations/2026-05-26-minimum-operations-inspection-source-first-surface-implementation.md";
+
+  if (!minimumOperationsInspectionSourceFirstSurfaceImplementationCompleted(root)) {
+    ok("minimum operations inspection source-first surface implementation is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for minimum operations inspection source-first surface implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for minimum operations inspection source-first surface implementation`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = buildOperationsInspection(root);
+  const inspectionText = JSON.stringify(inspection);
+  const requiredInspectionMarkers = [
+    "\"kind\":\"operations_inspection\"",
+    "\"status\":\"source_first_local_operations_inspection\"",
+    "\"work_item\":\"W-0245\"",
+    "\"check_rule\":\"runtime.minimum_operations_inspection_source_first_surface_implementation\"",
+    "\"implementation_decision\":\"ADR-0153\"",
+    "\"process_liveness_and_readiness\"",
+    "\"runtime_version_and_release_posture\"",
+    "\"runtime_store_and_configuration_posture\"",
+    "\"protocol_route_family_inventory\"",
+    "\"local_alpha_flow_steps\"",
+    "\"persistence_and_migration_posture\"",
+    "\"authentication_session_connection_posture\"",
+    "\"generated_output_and_proto_posture\"",
+    "\"repository_check_and_verification_posture\"",
+    "\"deferred_operations_surfaces\"",
+    "\"friends.SendFriendRequest\"",
+    "\"storage.PutOwnStorageObject\"",
+    "\"runtime.presence.GetPlayerPresence\"",
+    "\"pitaya_architecture_map\"",
+    "\"frontend_backend_server_roles\":\"deferred_future_architecture_reference\"",
+    "\"rpc_and_remote_calls\":\"deferred_future_architecture_reference\"",
+    "\"cluster_service_discovery\":\"deferred_future_architecture_reference\"",
+    "\"raw_device_credentials_exposed\":false",
+    "\"raw_access_tokens_exposed\":false",
+    "\"lookup_digests_exposed\":false",
+    "\"verifier_keys_exposed\":false",
+    "\"postgres_dsns_with_credentials_exposed\":false",
+    "\"database_payloads_exposed\":false",
+    "\"local_secret_file_contents_exposed\":false",
+    "\"distributed_runtime_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+  ];
+  for (const marker of requiredInspectionMarkers) {
+    if (inspectionText.includes(marker)) {
+      ok(`inspect operations output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect operations",
+      });
+    } else {
+      fail(`inspect operations output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect operations",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-173"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0245"],
+    [".arch/work-items.yaml", "ADR-0153"],
+    [".arch/work-items.yaml", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    [".arch/work-items.yaml", "id: M-174"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Distributed Runtime Vocabulary Reactivation Gate"],
+    [".arch/work-items.yaml", "id: W-0246"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_source_first_surface_implementation_decision: ADR-0153"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_source_first_surface_implementation_completed: true"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_source_first_surface_implementation_check_rule: runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    [".arch/runtime.yaml", "minimum_operations_inspection_source_first_surface_command: node tools/vibit inspect operations --json"],
+    [".arch/runtime.yaml", "pitaya_architecture_map_recorded: true"],
+    [".arch/runtime.yaml", "frontend_backend_server_roles: deferred_future_architecture_reference"],
+    [".arch/runtime.yaml", "rpc_and_remote_calls: deferred_future_architecture_reference"],
+    [".arch/runtime.yaml", "cluster_service_discovery: deferred_future_architecture_reference"],
+    [".arch/runtime.yaml", "distributed_runtime_added: false"],
+    [".arch/reference.yaml", "phase_2fd_minimum_operations_inspection_source_first_surface"],
+    [".arch/reference.yaml", "phase_2fe_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate"],
+    [".arch/reference.yaml", "pitaya_reference_status: deferred_future_architecture_reference"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["docs/runtime-runbook.md", "node tools/vibit inspect operations --json"],
+    ["docs/runtime-runbook.zh-CN.md", "node tools/vibit inspect operations --json"],
+    ["docs/alpha-acceptance-checklist.md", "node tools/vibit inspect operations --json"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "node tools/vibit inspect operations --json"],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.md", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.minimum_operations_inspection_source_first_surface_implementation"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Minimum operations inspection source-first surface implementation completes W-0245, adds inspect operations, records a Pitaya deferred architecture map, opens W-0246, and preserves runtime endpoint, metrics, observability, protocol, generated output, persistence, dependency, hosted, SDK, distributed runtime, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -40644,6 +41068,10 @@ function minimumOperationsInspectionSurfaceGateCompleted(root) {
   return workItemHasStatus(root, "W-0244", "completed");
 }
 
+function minimumOperationsInspectionSourceFirstSurfaceImplementationCompleted(root) {
+  return workItemHasStatus(root, "W-0245", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -40676,6 +41104,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (minimumOperationsInspectionSourceFirstSurfaceImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0246";
+  }
   if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
     return "repository_next_work_item: W-0245";
   }
@@ -40773,6 +41204,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (minimumOperationsInspectionSourceFirstSurfaceImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate";
+  }
   if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_minimum_operations_inspection_source_first_surface";
   }
@@ -40861,6 +41295,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (minimumOperationsInspectionSourceFirstSurfaceImplementationCompleted(root)) {
+    return "W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate";
+  }
   if (minimumOperationsInspectionSurfaceGateCompleted(root)) {
     return "W-0245 Implement minimum operations inspection source-first surface";
   }
@@ -40973,6 +41410,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0245", "next_ready_work_item: W-0246"],
     ["W-0244", "next_ready_work_item: W-0245"],
     ["W-0243", "next_ready_work_item: W-0244"],
     ["W-0242", "next_ready_work_item: W-0243"],
@@ -41046,6 +41484,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0245", "completed")) {
+    return "next_work_item: W-0246";
+  }
   if (workItemHasStatus(root, "W-0244", "completed")) {
     return "next_work_item: W-0245";
   }
@@ -41210,6 +41651,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0245", "define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate"],
     ["W-0244", "implement_minimum_operations_inspection_source_first_surface"],
     ["W-0243", "define_minimum_operations_inspection_surface_gate"],
     ["W-0242", "select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
@@ -41283,6 +41725,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0245", "W-0246 Define Pitaya-aligned distributed runtime vocabulary reactivation gate"],
     ["W-0244", "W-0245 Implement minimum operations inspection source-first surface"],
     ["W-0243", "W-0244 Define minimum operations inspection surface gate"],
     ["W-0242", "W-0243 Select next Nakama prototype-ready capability after friends relationship route proof"],
@@ -41357,6 +41800,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0245", "current_phase: define_pitaya_aligned_distributed_runtime_vocabulary_reactivation_gate"],
     ["W-0244", "current_phase: implement_minimum_operations_inspection_source_first_surface"],
     ["W-0243", "current_phase: define_minimum_operations_inspection_surface_gate"],
     ["W-0242", "current_phase: select_next_nakama_prototype_ready_capability_after_friends_relationship_route_proof"],
@@ -42006,6 +42450,7 @@ function checkRuntime(root) {
   checkRuntimeFriendsRelationshipProtocolRouteLocalProof(root, goFiles);
   checkRuntimeNextNakamaPrototypeReadyCapabilityAfterFriendsRouteProof(root, goFiles);
   checkRuntimeMinimumOperationsInspectionSurfaceGate(root, goFiles);
+  checkRuntimeMinimumOperationsInspectionSourceFirstSurfaceImplementation(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -42728,6 +43173,11 @@ function main() {
 
   if (group === "inspect" && command === "next" && !value) {
     inspectNext(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "operations" && !value) {
+    inspectOperations(root);
     return;
   }
 

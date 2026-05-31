@@ -33,6 +33,16 @@ The process also mounts small JSON troubleshooting endpoints:
 
 These endpoints are local alpha troubleshooting surfaces, not a production operations API, admin console, metrics backend, protocol route, or release packaging surface.
 
+The source-first operations inspection surface is:
+
+```bash
+node tools/vibit inspect operations --json
+```
+
+This command summarizes committed local alpha runtime/source posture: existing troubleshooting endpoints, route families, local alpha flow steps, persistence and migration posture, generated-output posture, repository verification posture, redaction flags, and a Pitaya deferred architecture map. It is a repository inspection command, not a runtime endpoint, admin console, metrics backend, dashboard, database inspector, or compatibility surface.
+
+The Pitaya map is intentionally deferred. It records that the current WebSocket acceptor, first-message connection binding, and application route handler model are single-process concepts, while frontend/backend server roles, RPC/remotes, distributed groups/broadcast, and service discovery remain future architecture work.
+
 There are two startup compositions:
 
 ```text
@@ -237,6 +247,16 @@ sed -n '1,220p' docs/alpha-acceptance-checklist.md
 ```
 
 Confirm the ready, manual, deferred, and blocked states before packaging or publishing work. The checklist keeps release publishing, release packaging, public local onboarding, production signup, broad operations/admin behavior, broad product modules, and direct Nakama/Pitaya API compatibility deferred.
+
+### Source-First Operations Inspection
+
+Run the repository inspection command:
+
+```bash
+node tools/vibit inspect operations --json
+```
+
+Confirm that it reports source-first local operations posture, redacted status, current route families, verification commands, and Pitaya deferred architecture mapping without printing secrets, DSNs with credentials, raw credentials, raw access tokens, digests, transport metadata, database payloads, or local secret file contents.
 
 ### PostgreSQL Runtime Path
 
