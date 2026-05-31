@@ -1,0 +1,195 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-server-to-server-rpc-boundary-gate
+date: 2026-05-31
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned server-to-server RPC boundary and open a source-first RPC map follow-up without adding RPC implementation, remote calls, service discovery, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0158
+  referenced:
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_server_to_server_rpc_boundary_gate: defined
+  completed_work_item: W-0250
+  completed_milestone: M-178
+  previous_completed_work_item: W-0249
+  next_milestone: M-179
+  next_work_item: W-0251
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_server_to_server_rpc_boundary_gate
+  next_direction: implement_pitaya_aligned_server_to_server_rpc_source_first_map
+  decision: ADR-0158
+  check_rule: runtime.pitaya_aligned_server_to_server_rpc_boundary_gate
+  role_source_first_map_decision: ADR-0157
+  role_source_first_map_check_rule: runtime.pitaya_aligned_frontend_backend_role_source_first_map
+  standard: docs/pitaya-aligned-server-to-server-rpc-boundary-gate.md
+  translation: docs/pitaya-aligned-server-to-server-rpc-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: server_to_server_rpc_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_server_to_server_rpc_vocabulary
+  future_implementation_work_item: W-0251
+  future_implementation_direction: implement_pitaya_aligned_server_to_server_rpc_source_first_map
+  allowed_rpc_vocabulary:
+    - server_to_server_rpc
+    - remote_call
+  related_vocabulary:
+    - route_handler
+    - module_handler
+    - application_dispatch
+    - service_discovery
+  current_single_process_rpc_mapping:
+    server_to_server_rpc:
+      current: no_rpc_current_single_process_application_dispatch
+      future_vocabulary: server_to_server_rpc
+      implementation_status: deferred_future_architecture_reference
+    remote_call:
+      current: no_remote_call_current_in_process_module_invocation
+      future_vocabulary: remote_call
+      implementation_status: deferred_future_architecture_reference
+    route_handler:
+      current: current_application_dispatch_and_protocol_bridge
+      future_vocabulary: backend_server_route_handler_boundary
+      implementation_status: current_single_process_only
+    module_handler:
+      current: current_module_handler_in_process_function_call
+      future_vocabulary: backend_server_module_handler_boundary
+      implementation_status: current_single_process_only
+    service_discovery:
+      current: no_service_discovery_current_static_single_process_composition
+      future_vocabulary: service_discovery
+      implementation_status: deferred_future_architecture_reference
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  service_discovery_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  distributed_groups_added: false
+  room_broadcast_fanout_added: false
+  cluster_safe_session_routing_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining future server-to-server RPC vocabulary while preserving current single-process boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_and_service_discovery
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: server_to_server_rpc_vocabulary_boundary_defined_for_future_architecture_planning
+  adopted:
+    - server_to_server_rpc vocabulary
+    - remote_call vocabulary
+    - service_discovery vocabulary as deferred architecture concept
+    - application dispatch and module handler mapping to deferred RPC vocabulary
+  adapted:
+    - RPC vocabulary only before implementation
+    - source-first mapping before runtime topology
+    - vibit module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - Pitaya package, method, or route naming compatibility
+    - server-to-server RPC implementation in this slice
+    - remote call behavior in this slice
+    - service discovery in this slice
+    - distributed runtime implementation in this slice
+
+acceptance_criteria:
+  - The gate defines allowed server-to-server RPC and remote-call vocabulary.
+  - The gate maps current single-process vibit concepts to future RPC vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0251 as a narrow source-first RPC map work item.
+  - The gate does not add RPC implementation, remote calls, service discovery, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0158, gate standard, translation, change artifacts, RPC vocabulary markers, W-0250 completion, W-0251 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-server-to-server-rpc-boundary-gate.md
+    - docs/pitaya-aligned-server-to-server-rpc-boundary-gate.zh-CN.md
+    - changes/2026-05-26-define-pitaya-aligned-server-to-server-rpc-boundary-gate/
+    - decisions/ADR-0158-pitaya-aligned-server-to-server-rpc-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-server-to-server-rpc-boundary-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - server-to-server RPC implementation
+    - remote call behavior
+    - service discovery
+    - frontend/backend server role implementation
+    - distributed runtime implementation
+    - distributed group or broadcast behavior
+    - room broadcast fanout
+    - cluster-safe session routing behavior
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_server_to_server_rpc_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-server-to-server-rpc-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
