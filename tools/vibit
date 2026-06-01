@@ -190,6 +190,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_service_discovery_boundary_gate",
   "runtime.pitaya_aligned_service_discovery_source_first_map",
   "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
+  "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -273,6 +274,7 @@ Usage:
   vibit inspect pitaya-roles
   vibit inspect pitaya-rpc
   vibit inspect pitaya-discovery
+  vibit inspect pitaya-groups
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -313,6 +315,7 @@ Commands:
   inspect pitaya-rpc      Print Pitaya-aligned server-to-server RPC metadata as JSON.
   inspect pitaya-discovery
                            Print Pitaya-aligned service discovery metadata as JSON.
+  inspect pitaya-groups   Print Pitaya-aligned distributed group and broadcast metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -3632,6 +3635,150 @@ function buildPitayaDiscoveryInspection(root) {
 
 function inspectPitayaDiscovery(root) {
   printJson(buildPitayaDiscoveryInspection(root));
+}
+
+function buildPitayaGroupsInspection(root) {
+  return {
+    schema_version: "0.1",
+    kind: "pitaya_groups_inspection",
+    project: "vibit",
+    status: "source_first_pitaya_aligned_distributed_group_broadcast_map",
+    source: {
+      standard: "docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md",
+      gate_decision: "ADR-0162",
+      implementation_decision: "ADR-0163",
+      check_rule: "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
+      work_item: "W-0255",
+      change: "changes/2026-05-26-implement-pitaya-aligned-distributed-group-broadcast-source-first-map",
+    },
+    allowed_group_broadcast_vocabulary: [
+      "distributed_group",
+      "room_broadcast",
+      "broadcast_target",
+      "group_membership",
+      "broadcast_fanout",
+    ],
+    related_vocabulary: [
+      "target_scope",
+      "server_push_intent",
+      "route_handler",
+      "module_handler",
+      "frontend_server",
+      "backend_server",
+      "service_discovery",
+      "server_to_server_rpc",
+      "remote_call",
+      "cluster_safe_session_routing",
+    ],
+    current_single_process_group_broadcast_mapping: {
+      target_scope: {
+        current: "protocol_envelope_target_metadata_only",
+        future_vocabulary: "broadcast_target",
+        implementation_status: "current_single_process_intent_only",
+      },
+      server_push_intent: {
+        current: "application_owned_realtime_outbound_intent_single_process_delivery",
+        future_vocabulary: "room_broadcast",
+        implementation_status: "current_single_process_delivery_only",
+      },
+      distributed_group: {
+        current: "no_distributed_group_current_single_process_target_scope_only",
+        future_vocabulary: "distributed_group",
+        implementation_status: "deferred_future_architecture_reference",
+      },
+      group_membership: {
+        current: "no_group_membership_registry_or_subscription_state",
+        future_vocabulary: "group_membership",
+        implementation_status: "deferred_future_architecture_reference",
+      },
+      room_broadcast: {
+        current: "no_room_broadcast_fanout_current_server_push_intent_only",
+        future_vocabulary: "room_broadcast",
+        implementation_status: "deferred_future_architecture_reference",
+      },
+      broadcast_target: {
+        current: "target_scope_values_are_metadata_not_distributed_targets",
+        future_vocabulary: "broadcast_target",
+        implementation_status: "current_metadata_only",
+      },
+      broadcast_fanout: {
+        current: "no_cluster_fanout_no_delivery_guarantee",
+        future_vocabulary: "broadcast_fanout",
+        implementation_status: "deferred_future_architecture_reference",
+      },
+      cluster_safe_session_routing: {
+        current: "no_cluster_safe_session_routing_current_single_process_connection_binding",
+        future_vocabulary: "cluster_safe_session_routing",
+        implementation_status: "deferred_future_architecture_reference",
+      },
+    },
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      "docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md",
+      "docs/nakama-pitaya-product-parity-roadmap.md",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      distributed_group_implementation_added: false,
+      distributed_groups_added: false,
+      group_membership_registry_added: false,
+      room_broadcast_fanout_added: false,
+      broadcast_delivery_guarantee_added: false,
+      stream_subscription_added: false,
+      groups_parties_chat_runtime_behavior_added: false,
+      match_runtime_behavior_added: false,
+      service_discovery_implementation_added: false,
+      service_registry_added: false,
+      service_selector_added: false,
+      node_registry_added: false,
+      server_identity_added: false,
+      server_to_server_rpc_implementation_added: false,
+      remote_call_behavior_added: false,
+      frontend_server_implementation_added: false,
+      backend_server_implementation_added: false,
+      frontend_backend_server_roles_added: false,
+      distributed_runtime_implementation_added: false,
+      cluster_safe_session_routing_added: false,
+      runtime_behavior_added: false,
+      runtime_endpoint_behavior_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      authentication_session_behavior_changed: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+      node_credentials_exposed: false,
+      transport_metadata_exposed: false,
+    },
+    next: {
+      next_milestone: "M-184",
+      next_ready_work_item: "W-0256",
+      selected_follow_up_direction: "define_pitaya_aligned_cluster_safe_session_routing_boundary_gate",
+    },
+  };
+}
+
+function inspectPitayaGroups(root) {
+  printJson(buildPitayaGroupsInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -41811,6 +41958,273 @@ function checkRuntimePitayaAlignedDistributedGroupBroadcastBoundaryGate(root, go
   });
 }
 
+function checkRuntimePitayaAlignedDistributedGroupBroadcastSourceFirstMap(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map";
+  const decisionPath = "decisions/ADR-0163-pitaya-aligned-distributed-group-broadcast-source-first-map.md";
+  const changePath = "changes/2026-05-26-implement-pitaya-aligned-distributed-group-broadcast-source-first-map";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-distributed-group-broadcast-source-first-map.md";
+
+  if (!pitayaAlignedDistributedGroupBroadcastSourceFirstMapCompleted(root)) {
+    ok("Pitaya-aligned distributed group and broadcast source-first map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned distributed group and broadcast source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned distributed group and broadcast source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = buildPitayaGroupsInspection(root);
+  const inspectionText = JSON.stringify(inspection);
+  const requiredInspectionMarkers = [
+    "\"kind\":\"pitaya_groups_inspection\"",
+    "\"status\":\"source_first_pitaya_aligned_distributed_group_broadcast_map\"",
+    "\"work_item\":\"W-0255\"",
+    "\"check_rule\":\"runtime.pitaya_aligned_distributed_group_broadcast_source_first_map\"",
+    "\"gate_decision\":\"ADR-0162\"",
+    "\"implementation_decision\":\"ADR-0163\"",
+    "\"distributed_group\"",
+    "\"room_broadcast\"",
+    "\"broadcast_target\"",
+    "\"group_membership\"",
+    "\"broadcast_fanout\"",
+    "\"target_scope\"",
+    "\"server_push_intent\"",
+    "\"route_handler\"",
+    "\"module_handler\"",
+    "\"frontend_server\"",
+    "\"backend_server\"",
+    "\"service_discovery\"",
+    "\"server_to_server_rpc\"",
+    "\"remote_call\"",
+    "\"cluster_safe_session_routing\"",
+    "\"protocol_envelope_target_metadata_only\"",
+    "\"application_owned_realtime_outbound_intent_single_process_delivery\"",
+    "\"no_distributed_group_current_single_process_target_scope_only\"",
+    "\"no_group_membership_registry_or_subscription_state\"",
+    "\"no_room_broadcast_fanout_current_server_push_intent_only\"",
+    "\"target_scope_values_are_metadata_not_distributed_targets\"",
+    "\"no_cluster_fanout_no_delivery_guarantee\"",
+    "\"no_cluster_safe_session_routing_current_single_process_connection_binding\"",
+    "\"distributed_group_implementation_added\":false",
+    "\"distributed_groups_added\":false",
+    "\"group_membership_registry_added\":false",
+    "\"room_broadcast_fanout_added\":false",
+    "\"broadcast_delivery_guarantee_added\":false",
+    "\"stream_subscription_added\":false",
+    "\"groups_parties_chat_runtime_behavior_added\":false",
+    "\"match_runtime_behavior_added\":false",
+    "\"service_discovery_implementation_added\":false",
+    "\"service_registry_added\":false",
+    "\"service_selector_added\":false",
+    "\"node_registry_added\":false",
+    "\"server_identity_added\":false",
+    "\"server_to_server_rpc_implementation_added\":false",
+    "\"remote_call_behavior_added\":false",
+    "\"frontend_server_implementation_added\":false",
+    "\"backend_server_implementation_added\":false",
+    "\"frontend_backend_server_roles_added\":false",
+    "\"distributed_runtime_implementation_added\":false",
+    "\"cluster_safe_session_routing_added\":false",
+    "\"runtime_behavior_added\":false",
+    "\"runtime_endpoint_behavior_added\":false",
+    "\"protocol_route_added\":false",
+    "\"protobuf_source_added\":false",
+    "\"generated_output_added\":false",
+    "\"repository_interface_changed\":false",
+    "\"postgresql_adapter_changed\":false",
+    "\"migration_added\":false",
+    "\"dependency_added\":false",
+    "\"authentication_session_behavior_changed\":false",
+    "\"hosted_deployment_added\":false",
+    "\"sdk_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+    "\"raw_device_credentials_exposed\":false",
+    "\"raw_access_tokens_exposed\":false",
+    "\"lookup_digests_exposed\":false",
+    "\"verifier_digests_exposed\":false",
+    "\"verifier_keys_exposed\":false",
+    "\"postgres_dsns_with_credentials_exposed\":false",
+    "\"database_payloads_exposed\":false",
+    "\"local_secret_file_contents_exposed\":false",
+    "\"node_credentials_exposed\":false",
+    "\"transport_metadata_exposed\":false",
+    "\"next_ready_work_item\":\"W-0256\"",
+    "\"selected_follow_up_direction\":\"define_pitaya_aligned_cluster_safe_session_routing_boundary_gate\"",
+  ];
+  for (const marker of requiredInspectionMarkers) {
+    if (inspectionText.includes(marker)) {
+      ok(`inspect pitaya-groups output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-groups",
+      });
+    } else {
+      fail(`inspect pitaya-groups output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-groups",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-183"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0255"],
+    [".arch/work-items.yaml", "ADR-0163"],
+    [".arch/work-items.yaml", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/work-items.yaml", "id: M-184"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Cluster-Safe Session Routing Boundary Gate"],
+    [".arch/work-items.yaml", "id: W-0256"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map_completed: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map_decision: ADR-0163"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map_check_rule: runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map_command: node tools/vibit inspect pitaya-groups --json"],
+    [".arch/runtime.yaml", "next_pitaya_cluster_safe_session_routing_boundary_gate_work_item: W-0256"],
+    [".arch/runtime.yaml", "next_pitaya_cluster_safe_session_routing_boundary_gate_direction: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
+    [".arch/runtime.yaml", "distributed_group_implementation_added: false"],
+    [".arch/runtime.yaml", "group_membership_registry_added: false"],
+    [".arch/runtime.yaml", "room_broadcast_fanout_added: false"],
+    [".arch/runtime.yaml", "broadcast_delivery_guarantee_added: false"],
+    [".arch/runtime.yaml", "stream_subscription_added: false"],
+    [".arch/runtime.yaml", "cluster_safe_session_routing_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/reference.yaml", "phase_2fn_pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/reference.yaml", "phase_2fo_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
+    [".arch/reference.yaml", "pitaya_groups_inspection_command: node tools/vibit inspect pitaya-groups --json"],
+    [".arch/conventions.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/contracts.yaml", "pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", "node tools/vibit inspect pitaya-groups --json"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "node tools/vibit inspect pitaya-groups --json"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "node tools/vibit inspect pitaya-groups --json"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "node tools/vibit inspect pitaya-groups --json"],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0163",
+      "M-183/W-0255",
+      "node tools/vibit inspect pitaya-groups --json",
+      "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
+      "M-184/W-0256",
+      "This decision does not add distributed group implementation",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0255",
+      "ADR-0163",
+      "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
+      "Unknown rule_id: runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
+      "Unknown command",
+      "change directory does not exist",
+      "W-0256",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0255",
+      "source-first repository inspection map",
+      "No distributed group implementation",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0256",
+      "No runtime behavior",
+      "No protocol shape",
+      "No generated output",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Members?)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned distributed group and broadcast source-first map completes W-0255, adds inspect pitaya-groups, opens W-0256, and preserves distributed group implementation, group membership registries, room broadcast fanout, delivery guarantees, stream subscriptions, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, cluster-safe session routing, runtime endpoint, protocol, generated output, persistence, dependency, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -43692,6 +44106,10 @@ function pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root) {
   return workItemHasStatus(root, "W-0254", "completed");
 }
 
+function pitayaAlignedDistributedGroupBroadcastSourceFirstMapCompleted(root) {
+  return workItemHasStatus(root, "W-0255", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -43724,6 +44142,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedDistributedGroupBroadcastSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item: W-0256";
+  }
   if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
     return "repository_next_work_item: W-0255";
   }
@@ -43851,6 +44272,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedDistributedGroupBroadcastSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate";
+  }
   if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_pitaya_aligned_distributed_group_broadcast_source_first_map";
   }
@@ -43969,6 +44393,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedDistributedGroupBroadcastSourceFirstMapCompleted(root)) {
+    return "W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate";
+  }
   if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
     return "W-0255 Implement Pitaya-aligned distributed group and broadcast source-first map";
   }
@@ -44111,6 +44538,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0255", "next_ready_work_item: W-0256"],
     ["W-0254", "next_ready_work_item: W-0255"],
     ["W-0253", "next_ready_work_item: W-0254"],
     ["W-0252", "next_ready_work_item: W-0253"],
@@ -44194,6 +44622,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0255", "completed")) {
+    return "next_work_item: W-0256";
+  }
   if (workItemHasStatus(root, "W-0254", "completed")) {
     return "next_work_item: W-0255";
   }
@@ -44388,6 +44819,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0255", "define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
     ["W-0254", "implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
     ["W-0253", "define_pitaya_aligned_distributed_group_broadcast_boundary_gate"],
     ["W-0252", "implement_pitaya_aligned_service_discovery_source_first_map"],
@@ -44471,6 +44903,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0255", "W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate"],
     ["W-0254", "W-0255 Implement Pitaya-aligned distributed group and broadcast source-first map"],
     ["W-0253", "W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate"],
     ["W-0252", "W-0253 Implement Pitaya-aligned service discovery source-first map"],
@@ -44555,6 +44988,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0255", "current_phase: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
     ["W-0254", "current_phase: implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
     ["W-0253", "current_phase: define_pitaya_aligned_distributed_group_broadcast_boundary_gate"],
     ["W-0252", "current_phase: implement_pitaya_aligned_service_discovery_source_first_map"],
@@ -45224,6 +45658,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedServiceDiscoveryBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedServiceDiscoverySourceFirstMap(root, goFiles);
   checkRuntimePitayaAlignedDistributedGroupBroadcastBoundaryGate(root, goFiles);
+  checkRuntimePitayaAlignedDistributedGroupBroadcastSourceFirstMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -45971,6 +46406,11 @@ function main() {
 
   if (group === "inspect" && command === "pitaya-discovery" && !value) {
     inspectPitayaDiscovery(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "pitaya-groups" && !value) {
+    inspectPitayaGroups(root);
     return;
   }
 

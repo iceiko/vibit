@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-183
+current_milestone: M-184
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_distributed_group_broadcast_boundary_gate_defined
+    current_release_state: pitaya_aligned_distributed_group_broadcast_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0255
+    next_ready_work_item: W-0256
     preferred_after_current:
-      - implement_pitaya_aligned_distributed_group_broadcast_source_first_map
+      - define_pitaya_aligned_cluster_safe_session_routing_boundary_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3332,7 +3332,7 @@ milestones:
 
   - id: M-183
     title: Pitaya-Aligned Distributed Group And Broadcast Source-First Map
-    status: active
+    status: completed
     goal: Implement a source-first repository map for the Pitaya-aligned distributed group and broadcast vocabulary defined by ADR-0162, without implementing distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, groups, parties, chat, service discovery, RPC, remote calls, frontend/backend roles, distributed runtime behavior, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first repository inspection surface summarizes distributed group and broadcast vocabulary and current target-scope/server-push intent mapping.
@@ -3340,6 +3340,18 @@ milestones:
       - Repository checks verify the map and deferrals.
     non_goals:
       - adding distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, groups, parties, chat rooms, matchmaking, match runtime, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, distributed runtime implementation, cluster-safe session routing, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-groups --json` as a source-first repository inspection map for Pitaya-aligned distributed group and broadcast vocabulary, current target-scope metadata, server-push intent, single-process delivery, absent distributed group state, absent group membership registry, absent room broadcast fanout, source surfaces, deferrals, and redaction flags. Accepted `ADR-0163`, registered `runtime.pitaya_aligned_distributed_group_broadcast_source_first_map`, completed `W-0255`, and opened `M-184/W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate` as next-ready. Preserved distributed group implementation, group membership registries, room broadcast fanout, delivery guarantees, stream subscriptions, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, cluster-safe session routing, runtime endpoint behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-184
+    title: Pitaya-Aligned Cluster-Safe Session Routing Boundary Gate
+    status: active
+    goal: Define a narrow Pitaya-aligned cluster-safe session routing boundary gate after the distributed group and broadcast source-first map, without implementing cluster-safe session routing, distributed runtime behavior, distributed groups, room broadcast fanout, service discovery, RPC, remote calls, frontend/backend roles, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A gate records cluster-safe session routing vocabulary for future planning.
+      - The gate maps current single-process connection/session binding to deferred cluster-safe routing vocabulary.
+      - The gate preserves implementation deferrals unless a later bounded work item authorizes them.
+    non_goals:
+      - adding cluster-safe session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -9997,7 +10009,7 @@ work_items:
   - id: W-0255
     milestone: M-183
     title: Implement Pitaya-aligned distributed group and broadcast source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-distributed-group-broadcast-source-first-map
     depends_on:
       - W-0254
@@ -10024,4 +10036,43 @@ work_items:
     completion:
       - Implement a source-first repository inspection map for distributed group and broadcast vocabulary.
       - Summarize current target-scope metadata, server-push intent, single-process delivery, and group/broadcast deferrals.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0163
+    check_rule: runtime.pitaya_aligned_distributed_group_broadcast_source_first_map
+    next_milestone: M-184
+    next_ready_work_item: W-0256
+    selected_follow_up_direction: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate
+    completion_summary: Implemented `node tools/vibit inspect pitaya-groups --json` as a source-first repository inspection map for Pitaya-aligned distributed group and broadcast vocabulary, current target-scope metadata, server-push intent, single-process delivery, absent distributed group state, absent group membership registry, absent room broadcast fanout, source surfaces, deferrals, and redaction flags. Preserved distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, cluster-safe session routing, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0256
+    milestone: M-184
+    title: Define Pitaya-aligned cluster-safe session routing boundary gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-cluster-safe-session-routing-boundary-gate
+    depends_on:
+      - W-0255
+    expected_change_id: define-pitaya-aligned-cluster-safe-session-routing-boundary-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate
+    gate_decision: ADR-0163
+    related_decisions:
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing cluster-safe session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of defining only a cluster-safe session routing boundary gate.
+    completion:
+      - Define a Pitaya-aligned cluster-safe session routing boundary gate.
+      - Map current single-process connection/session binding surfaces to deferred cluster-safe routing vocabulary.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
