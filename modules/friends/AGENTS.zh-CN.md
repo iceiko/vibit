@@ -105,4 +105,6 @@ repository 下一项 work item 是 `W-0268 Define Pitaya-aligned session binding
 
 ## Repository Continuation
 
-`ADR-0181` 已注册 `runtime.next_pitaya_aligned_direction_after_runtime_observability_map`，完成 `W-0273 Select next Pitaya-aligned direction after runtime observability map`，选择 `define_pitaya_aligned_metrics_tracing_boundary_gate`，并打开 `W-0274 Define Pitaya-aligned metrics and tracing boundary gate` 作为 repository next work item。`node tools/vibit inspect pitaya-observability --json` inspection 仍可用。该 work 仍不属于 friends module。
+`ADR-0181` 此前完成 `W-0273 Select next Pitaya-aligned direction after runtime observability map`，并选择 `define_pitaya_aligned_metrics_tracing_boundary_gate` 作为 follow-up。这仍是 repository historical context，不会新增 friends module scope。
+
+`ADR-0182` 已注册 `runtime.pitaya_aligned_metrics_tracing_boundary_gate`，完成 `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`，选择 `implement_pitaya_aligned_metrics_tracing_source_first_map`，并打开 `W-0275 Implement Pitaya-aligned metrics and tracing source-first map` 作为 repository next work item。`node tools/vibit inspect pitaya-observability --json` inspection 仍可用。该 work 仍不属于 friends module。

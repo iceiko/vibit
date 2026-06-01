@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: metrics_tracing_boundary_gate_selected
+  pitaya_reference_status: metrics_tracing_vocabulary_boundary_defined_for_future_architecture_planning
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_pitaya_aligned_metrics_tracing_boundary_gate
-  recommended_next_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
+  current_near_term_priority: implement_pitaya_aligned_metrics_tracing_source_first_map
+  recommended_next_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: next_pitaya_aligned_direction_after_runtime_observability_map_completed
+  current_state: pitaya_aligned_metrics_tracing_boundary_gate_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0274
-  immediate_next_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
+  immediate_next_work_item: W-0275
+  immediate_next_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -6420,15 +6420,44 @@ phase_plan:
     dependency_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2gg_pitaya_aligned_metrics_tracing_boundary_gate:
-    status: next_ready
+    status: completed
     milestone: M-202
     work_item: W-0274
+    decision: ADR-0182
+    check_rule: runtime.pitaya_aligned_metrics_tracing_boundary_gate
+    standard: docs/pitaya-aligned-metrics-tracing-boundary-gate.md
+    translation: docs/pitaya-aligned-metrics-tracing-boundary-gate.zh-CN.md
     selection_decision: ADR-0181
     selected_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
+    next_milestone: M-203
+    next_ready_work_item: W-0275
     primary_product_reference: Nakama
-    pitaya_reference_status: metrics_tracing_boundary_gate_selected
+    pitaya_reference_status: metrics_tracing_vocabulary_boundary_defined_for_future_architecture_planning
     target_stage: prototype_ready_foundation
     implementation_scope: gate_only_metrics_tracing_vocabulary
+    runtime_endpoint_behavior_allowed: false
+    metrics_endpoint_allowed: false
+    tracing_pipeline_allowed: false
+    observability_pipeline_allowed: false
+    dashboard_allowed: false
+    admin_console_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2gh_pitaya_aligned_metrics_tracing_source_first_map:
+    status: next_ready
+    milestone: M-203
+    work_item: W-0275
+    gate_decision: ADR-0182
+    selected_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
+    primary_product_reference: Nakama
+    pitaya_reference_status: metrics_tracing_vocabulary_boundary_defined_for_future_architecture_planning
+    target_stage: prototype_ready_foundation
+    implementation_scope: source_first_repository_inspection
     runtime_endpoint_behavior_allowed: false
     metrics_endpoint_allowed: false
     tracing_pipeline_allowed: false

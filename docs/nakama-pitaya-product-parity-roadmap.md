@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0274 Define Pitaya-aligned metrics and tracing boundary gate
-recommended_next_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
+next_work_item: W-0275 Implement Pitaya-aligned metrics and tracing source-first map
+recommended_next_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
 ```
 
-`ADR-0181` registered `runtime.next_pitaya_aligned_direction_after_runtime_observability_map`, completed `W-0273 Select next Pitaya-aligned direction after runtime observability map`, selected `define_pitaya_aligned_metrics_tracing_boundary_gate`, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0182` registered `runtime.pitaya_aligned_metrics_tracing_boundary_gate`, completed `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`, selected `implement_pitaya_aligned_metrics_tracing_source_first_map`, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.

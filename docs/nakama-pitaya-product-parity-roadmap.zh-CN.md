@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0274 Define Pitaya-aligned metrics and tracing boundary gate
-recommended_next_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
+next_work_item: W-0275 Implement Pitaya-aligned metrics and tracing source-first map
+recommended_next_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
 ```
 
-`ADR-0181` 已注册 `runtime.next_pitaya_aligned_direction_after_runtime_observability_map`，完成 `W-0273 Select next Pitaya-aligned direction after runtime observability map`，选择 `define_pitaya_aligned_metrics_tracing_boundary_gate`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0182` 已注册 `runtime.pitaya_aligned_metrics_tracing_boundary_gate`，完成 `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`，选择 `implement_pitaya_aligned_metrics_tracing_source_first_map`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。

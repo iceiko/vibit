@@ -118,4 +118,6 @@ Run `node tools/vibit check runtime` after changing storage runtime source. When
 
 ## Repository Continuation
 
-`ADR-0181` registered `runtime.next_pitaya_aligned_direction_after_runtime_observability_map`, completed `W-0273 Select next Pitaya-aligned direction after runtime observability map`, selected `define_pitaya_aligned_metrics_tracing_boundary_gate`, and opened `W-0274 Define Pitaya-aligned metrics and tracing boundary gate` as the repository next work item. The `node tools/vibit inspect pitaya-observability --json` inspection remains available. This remains outside the storage module.
+`ADR-0181` previously completed `W-0273 Select next Pitaya-aligned direction after runtime observability map` and selected `define_pitaya_aligned_metrics_tracing_boundary_gate` as the follow-up. This remains historical repository context and does not add storage module scope.
+
+`ADR-0182` registered `runtime.pitaya_aligned_metrics_tracing_boundary_gate`, completed `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`, selected `implement_pitaya_aligned_metrics_tracing_source_first_map`, and opened `W-0275 Implement Pitaya-aligned metrics and tracing source-first map` as the repository next work item. The `node tools/vibit inspect pitaya-observability --json` inspection remains available. This remains outside the storage module.
