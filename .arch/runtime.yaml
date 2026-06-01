@@ -174,20 +174,21 @@ purpose: >
   pitaya_aligned_serializer_message_forwarding_boundary_gate: ADR-0170
   pitaya_aligned_serializer_message_forwarding_source_first_map: ADR-0171
   next_pitaya_aligned_direction_after_serializer_message_forwarding_map: ADR-0172
+  pitaya_aligned_acceptor_connection_lifecycle_boundary_gate: ADR-0173
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+  current_phase: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0265
+  next_ready_work_item: W-0266
   primary_product_reference: Nakama
-  pitaya_reference_status: acceptor_connection_lifecycle_boundary_gate_selected
+  pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -1961,13 +1962,132 @@ architecture_scope:
     sdk_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   pitaya_aligned_acceptor_connection_lifecycle_boundary_gate:
-    status: planned
+    status: completed
     milestone: M-193
-    next_ready_work_item: W-0265
+    completed_work_item: W-0265
+    decision: ADR-0173
+    change: changes/2026-05-26-define-pitaya-aligned-acceptor-connection-lifecycle-boundary-gate
+    check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    previous_completed_work_item: W-0264
+    next_milestone: M-194
+    next_ready_work_item: W-0266
     previous_direction_decision: ADR-0172
+    serializer_message_forwarding_source_first_map_decision: ADR-0171
+    serializer_message_forwarding_source_first_map_check_rule: runtime.pitaya_aligned_serializer_message_forwarding_source_first_map
     selected_direction: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_defined: true
+    pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_decision: ADR-0173
+    pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    next_pitaya_acceptor_connection_lifecycle_source_first_map_work_item: W-0266
+    next_pitaya_acceptor_connection_lifecycle_source_first_map_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
     implementation_scope: gate_only_acceptor_connection_lifecycle_vocabulary
-    pitaya_reference_status: acceptor_connection_lifecycle_boundary_gate_selected
+    pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+    standard: docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.md
+    translation: docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.zh-CN.md
+    future_implementation_work_item: W-0266
+    future_implementation_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    allowed_acceptor_connection_lifecycle_vocabulary:
+      - acceptor_boundary
+      - websocket_acceptor
+      - connection_id
+      - connection_epoch
+      - session_binding
+      - active_connection_registry
+      - close_handoff
+      - presence_lifecycle_handoff
+    current_single_process_acceptor_connection_mapping:
+      websocket_acceptor:
+        current: single_process_websocket_server_accept_loop
+        future_vocabulary: acceptor_boundary
+        implementation_status: no_tcp_acceptor_or_distributed_acceptor
+      connection_identity:
+        current: server_observed_connection_id
+        future_vocabulary: connection_id
+        implementation_status: local_process_metadata
+      connection_epoch:
+        current: server_observed_connection_epoch
+        future_vocabulary: connection_epoch
+        implementation_status: no_distributed_routing_epoch
+      first_message_binding:
+        current: authentication_bind_connection_route
+        future_vocabulary: session_binding
+        implementation_status: no_handshake_authentication_or_reconnect_binding
+      active_connection_registry:
+        current: application_owned_connection_registry
+        future_vocabulary: active_connection_registry
+        implementation_status: no_connection_owner_node_registry
+      close_handoff:
+        current: transport_close_to_application_policy
+        future_vocabulary: close_handoff
+        implementation_status: no_remote_disconnect_handoff
+      presence_lifecycle:
+        current: server_owned_presence_snapshot
+        future_vocabulary: presence_lifecycle_handoff
+        implementation_status: no_distributed_presence_lifecycle
+    acceptor_behavior_added: false
+    tcp_acceptor_added: false
+    websocket_acceptor_behavior_changed: false
+    connection_lifecycle_behavior_changed: false
+    session_binding_behavior_added: false
+    kick_disconnect_behavior_added: false
+    concrete_socket_close_behavior_changed: false
+    serializer_behavior_added: false
+    message_forwarding_behavior_added: false
+    route_handler_implementation_added: false
+    route_handler_pipeline_implementation_added: false
+    handler_routing_behavior_added: false
+    handler_pipeline_behavior_added: false
+    pipeline_middleware_behavior_added: false
+    backend_route_targeting_added: false
+    cluster_safe_session_routing_added: false
+    session_location_registry_added: false
+    connection_owner_node_registry_added: false
+    routing_epoch_behavior_added: false
+    session_route_target_added: false
+    remote_connection_handoff_added: false
+    reconnect_route_added: false
+    distributed_session_routing_added: false
+    distributed_group_implementation_added: false
+    distributed_groups_added: false
+    group_membership_registry_added: false
+    room_broadcast_fanout_added: false
+    broadcast_delivery_guarantee_added: false
+    stream_subscription_added: false
+    service_discovery_implementation_added: false
+    service_registry_added: false
+    service_selector_added: false
+    node_registry_added: false
+    server_identity_added: false
+    server_to_server_rpc_implementation_added: false
+    remote_call_behavior_added: false
+    frontend_server_implementation_added: false
+    backend_server_implementation_added: false
+    frontend_backend_server_roles_added: false
+    distributed_runtime_implementation_added: false
+    runtime_behavior_added: false
+    runtime_endpoint_behavior_added: false
+    metrics_endpoint_added: false
+    tracing_pipeline_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    hosted_deployment_added: false
+    sdk_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  pitaya_aligned_acceptor_connection_lifecycle_source_first_map:
+    status: planned
+    milestone: M-194
+    next_ready_work_item: W-0266
+    gate_decision: ADR-0173
+    selected_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    implementation_scope: source_first_repository_inspection
+    pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
   minimum_operations_inspection_surface_gate:
     status: completed
     milestone: M-172

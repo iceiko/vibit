@@ -1,0 +1,123 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-acceptor-connection-lifecycle-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned acceptor and connection lifecycle boundary and open a source-first acceptor/connection lifecycle map follow-up without adding acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0173
+  referenced:
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_acceptor_connection_lifecycle_boundary_gate: defined
+  completed_work_item: W-0265
+  completed_milestone: M-193
+  previous_completed_work_item: W-0264
+  next_milestone: M-194
+  next_work_item: W-0266
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+  next_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  decision: ADR-0173
+  check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+  previous_direction_decision: ADR-0172
+  serializer_message_forwarding_source_first_map_decision: ADR-0171
+  serializer_message_forwarding_source_first_map_check_rule: runtime.pitaya_aligned_serializer_message_forwarding_source_first_map
+  standard: docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.md
+  translation: docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_acceptor_connection_lifecycle_vocabulary
+  future_implementation_work_item: W-0266
+  future_implementation_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  allowed_acceptor_connection_lifecycle_vocabulary:
+    - acceptor_boundary
+    - websocket_acceptor
+    - connection_id
+    - connection_epoch
+    - session_binding
+    - active_connection_registry
+    - close_handoff
+    - presence_lifecycle_handoff
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_acceptor_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  concrete_socket_close_behavior_changed: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  route_handler_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The gate defines allowed acceptor and connection lifecycle vocabulary.
+  - The gate maps current WebSocket acceptor, connection id/epoch, first-message binding, active connection registry, close handoff, and presence lifecycle surfaces to future acceptor/connection lifecycle vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0266 as a narrow source-first acceptor and connection lifecycle map work item.
+  - The gate does not add acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-acceptor-connection-lifecycle-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
