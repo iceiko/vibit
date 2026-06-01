@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-194
+current_milestone: M-195
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_defined
+    current_release_state: pitaya_aligned_acceptor_connection_lifecycle_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0266
+    next_ready_work_item: W-0267
     preferred_after_current:
-      - implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+      - select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3470,7 +3470,8 @@ milestones:
 
   - id: M-194
     title: Pitaya-Aligned Acceptor And Connection Lifecycle Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-194
     goal: Implement a source-first inspection map for Pitaya-aligned acceptor and connection lifecycle vocabulary after the boundary gate, without implementing acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first inspection map reports the acceptor and connection lifecycle vocabulary boundary.
@@ -3478,6 +3479,18 @@ milestones:
       - Repository checks verify the map and deferrals.
     non_goals:
       - adding acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-acceptor-connection --json` as a source-first repository inspection map for Pitaya-aligned acceptor and connection lifecycle vocabulary, current single-process WebSocket accept loop, server-observed connection id and epoch, first-message authentication binding route, application-owned connection registry, transport close handoff, presence lifecycle mapping, source surfaces, deferrals, and redaction flags. Accepted `ADR-0174`, registered `runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map`, completed `W-0266`, and opened `M-195/W-0267 Select next Pitaya-aligned direction after acceptor and connection lifecycle map` as next-ready. Preserved acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-195
+    title: Select Next Pitaya-Aligned Direction After Acceptor And Connection Lifecycle Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the acceptor and connection lifecycle source-first map, without implementing acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction is selected after the acceptor and connection lifecycle source-first map.
+      - Repository memory records candidate directions and explicit implementation deferrals.
+      - Repository checks verify the selection-only follow-up and next-ready state.
+    non_goals:
+      - adding acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -10609,7 +10622,7 @@ work_items:
   - id: W-0266
     milestone: M-194
     title: Implement Pitaya-aligned acceptor and connection lifecycle source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map
     depends_on:
       - W-0265
@@ -10647,4 +10660,55 @@ work_items:
     completion:
       - Implement a source-first Pitaya-aligned acceptor and connection lifecycle inspection map.
       - Report the current WebSocket acceptor, connection id/epoch, first-message binding, active connection registry, close handoff, presence lifecycle mapping, source surfaces, deferrals, and redaction posture.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0174
+    check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    command: node tools/vibit inspect pitaya-acceptor-connection --json
+    next_milestone: M-195
+    next_ready_work_item: W-0267
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    completion_summary: Implemented a source-first acceptor and connection lifecycle inspection map through `node tools/vibit inspect pitaya-acceptor-connection --json`, registered `runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map`, accepted `ADR-0174`, and opened `W-0267 Select next Pitaya-aligned direction after acceptor and connection lifecycle map` as next-ready. Preserved acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0267
+    milestone: M-195
+    title: Select next Pitaya-aligned direction after acceptor and connection lifecycle map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-acceptor-connection-lifecycle-map
+    depends_on:
+      - W-0266
+    expected_change_id: select-next-pitaya-aligned-direction-after-acceptor-connection-lifecycle-map
+    tier: tier_2_architecture_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    source_map_decision: ADR-0174
+    related_decisions:
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of selecting only the next Pitaya-aligned direction.
+    completion:
+      - Select the next Pitaya-aligned direction after the acceptor and connection lifecycle source-first map.
+      - Record candidate directions and why implementation remains deferred.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

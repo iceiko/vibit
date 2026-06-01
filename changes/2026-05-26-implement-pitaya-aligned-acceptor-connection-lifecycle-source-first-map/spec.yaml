@@ -1,0 +1,254 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned acceptor and connection lifecycle inspection map and open a next Pitaya direction selection follow-up without adding acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, distributed runtime behavior, service discovery implementation, RPC implementation, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0174
+  referenced:
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_acceptor_connection_lifecycle_source_first_map: implemented
+  completed_work_item: W-0266
+  completed_milestone: M-194
+  previous_completed_work_item: W-0265
+  next_milestone: M-195
+  next_work_item: W-0267
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+  decision: ADR-0174
+  gate_decision: ADR-0173
+  check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  command: node tools/vibit inspect pitaya-acceptor-connection --json
+  acceptor_connection_lifecycle_boundary_standard: docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_acceptor_connection_lifecycle_vocabulary:
+    - acceptor_boundary
+    - websocket_acceptor
+    - connection_id
+    - connection_epoch
+    - session_binding
+    - active_connection_registry
+    - close_handoff
+    - presence_lifecycle_handoff
+  related_vocabulary:
+    - first_message_binding
+    - runtime_session
+    - route_request
+    - server_push_delivery
+    - cluster_safe_session_routing
+    - message_forwarding
+    - route_handler
+    - serializer_boundary
+    - frontend_server
+    - backend_server
+    - server_to_server_rpc
+    - remote_call
+    - service_discovery
+  current_single_process_acceptor_connection_mapping:
+    websocket_acceptor:
+      current: single_process_websocket_server_accept_loop
+      future_vocabulary: acceptor_boundary
+      implementation_status: no_tcp_acceptor_or_distributed_acceptor
+    connection_identity:
+      current: server_observed_connection_id
+      future_vocabulary: connection_id
+      implementation_status: local_process_metadata
+    connection_epoch:
+      current: server_observed_connection_epoch
+      future_vocabulary: connection_epoch
+      implementation_status: no_distributed_routing_epoch
+    first_message_binding:
+      current: authentication_bind_connection_route
+      future_vocabulary: session_binding
+      implementation_status: no_handshake_authentication_or_reconnect_binding
+    active_connection_registry:
+      current: application_owned_connection_registry
+      future_vocabulary: active_connection_registry
+      implementation_status: no_connection_owner_node_registry
+    close_handoff:
+      current: transport_close_to_application_policy
+      future_vocabulary: close_handoff
+      implementation_status: no_remote_disconnect_handoff
+    presence_lifecycle:
+      current: server_owned_presence_snapshot
+      future_vocabulary: presence_lifecycle_handoff
+      implementation_status: no_distributed_presence_lifecycle
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_acceptor_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  concrete_socket_close_behavior_changed: false
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+  adopted:
+    - acceptor and connection lifecycle vocabulary inspection
+    - acceptor boundary vocabulary inspection
+    - WebSocket acceptor vocabulary inspection
+    - connection id and connection epoch vocabulary inspection
+    - session binding vocabulary inspection
+    - active connection registry vocabulary inspection
+    - close handoff and presence lifecycle handoff vocabulary inspection
+  adapted:
+    - source-first repository inspection before acceptor, lifecycle, kick/disconnect, metrics, tracing, or distributed runtime implementation
+    - current WebSocket accept loop remains owned by the transport layer
+    - current first-message binding remains a system route behavior
+    - current active connection registry remains application-owned and single-process
+    - current close and presence lifecycle surfaces remain unchanged
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, route, handler, acceptor, connection, session, registry, selector, or configuration naming compatibility
+    - acceptor behavior, TCP acceptors, WebSocket behavior changes, session binding behavior, kick/disconnect behavior, remote connection handoff, or distributed session routing in this slice
+    - service discovery, RPC, remote call, frontend/backend role, cluster-safe session routing, distributed group, broadcast fanout, metrics endpoint, tracing pipeline, or distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-acceptor-connection --json`.
+  - The inspection output includes allowed acceptor and connection lifecycle vocabulary, related vocabulary, current single-process acceptor and connection lifecycle mapping, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0266 map and W-0267 next-ready state.
+  - The slice does not add acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, route handler implementation, backend route targeting, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map/
+    - decisions/ADR-0174-pitaya-aligned-acceptor-connection-lifecycle-source-first-map.md
+    - conversations/2026-05-26-pitaya-aligned-acceptor-connection-lifecycle-source-first-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - acceptor behavior
+    - TCP acceptors
+    - WebSocket behavior changes
+    - connection lifecycle behavior changes
+    - session binding behavior
+    - kick/disconnect behavior
+    - route handler implementation
+    - backend route targeting
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - metrics endpoints
+    - tracing pipelines
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect pitaya-acceptor-connection --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

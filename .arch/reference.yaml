@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
-  recommended_next_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  current_near_term_priority: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+  recommended_next_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_defined
+  current_state: pitaya_aligned_acceptor_connection_lifecycle_source_first_map_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0266
-  immediate_next_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+  immediate_next_work_item: W-0267
+  immediate_next_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -6106,21 +6106,78 @@ phase_plan:
     tracing_pipeline_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2fy_pitaya_aligned_acceptor_connection_lifecycle_source_first_map:
-    status: planned
+    status: completed
     milestone: M-194
-    next_ready_work_item: W-0266
+    completed_work_item: W-0266
+    previous_completed_work_item: W-0265
+    next_ready_work_item: W-0267
     gate_decision: ADR-0173
+    decision: ADR-0174
+    check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    pitaya_acceptor_connection_inspection_command: node tools/vibit inspect pitaya-acceptor-connection --json
     selected_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
     primary_product_reference: Nakama
-    pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
     target_stage: prototype_ready_foundation
     implementation_scope: source_first_repository_inspection
+    allowed_acceptor_connection_lifecycle_vocabulary:
+      - acceptor_boundary
+      - websocket_acceptor
+      - connection_id
+      - connection_epoch
+      - session_binding
+      - active_connection_registry
+      - close_handoff
+      - presence_lifecycle_handoff
+    current_single_process_acceptor_connection_mapping:
+      websocket_acceptor: single_process_websocket_server_accept_loop
+      connection_identity: server_observed_connection_id
+      connection_epoch: server_observed_connection_epoch
+      first_message_binding: authentication_bind_connection_route
+      active_connection_registry: application_owned_connection_registry
+      close_handoff: transport_close_to_application_policy
+      presence_lifecycle: server_owned_presence_snapshot
     acceptor_behavior_allowed: false
     tcp_acceptor_allowed: false
     websocket_acceptor_behavior_change_allowed: false
     connection_lifecycle_behavior_change_allowed: false
     session_binding_behavior_allowed: false
     kick_disconnect_behavior_allowed: false
+    serializer_behavior_allowed: false
+    message_forwarding_behavior_allowed: false
+    route_handler_implementation_allowed: false
+    backend_route_targeting_allowed: false
+    cluster_safe_session_routing_allowed: false
+    distributed_runtime_implementation_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    metrics_endpoint_allowed: false
+    tracing_pipeline_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2fz_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map:
+    status: planned
+    milestone: M-195
+    next_ready_work_item: W-0267
+    source_map_decision: ADR-0174
+    selected_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    primary_product_reference: Nakama
+    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+    target_stage: prototype_ready_foundation
+    implementation_scope: direction_selection_only
+    acceptor_behavior_allowed: false
+    tcp_acceptor_allowed: false
+    websocket_acceptor_behavior_change_allowed: false
+    connection_lifecycle_behavior_change_allowed: false
+    session_binding_behavior_allowed: false
+    kick_disconnect_behavior_allowed: false
+    serializer_behavior_allowed: false
+    message_forwarding_behavior_allowed: false
+    route_handler_implementation_allowed: false
+    backend_route_targeting_allowed: false
     protocol_shape_change_allowed: false
     generated_output_allowed: false
     repository_interface_change_allowed: false

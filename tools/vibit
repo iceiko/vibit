@@ -201,6 +201,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_serializer_message_forwarding_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_serializer_message_forwarding_map",
   "runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate",
+  "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -288,6 +289,7 @@ Usage:
   vibit inspect pitaya-sessions
   vibit inspect pitaya-routes
   vibit inspect pitaya-serializer-forwarding
+  vibit inspect pitaya-acceptor-connection
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -333,6 +335,8 @@ Commands:
   inspect pitaya-routes   Print Pitaya-aligned route handler pipeline metadata as JSON.
   inspect pitaya-serializer-forwarding
                            Print Pitaya-aligned serializer and message forwarding metadata as JSON.
+  inspect pitaya-acceptor-connection
+                           Print Pitaya-aligned acceptor and connection lifecycle metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -4301,6 +4305,177 @@ function buildPitayaSerializerForwardingInspection(root) {
 
 function inspectPitayaSerializerForwarding(root) {
   printJson(buildPitayaSerializerForwardingInspection(root));
+}
+
+function buildPitayaAcceptorConnectionInspection(root) {
+  return {
+    schema_version: "0.1",
+    kind: "pitaya_acceptor_connection_lifecycle_inspection",
+    project: "vibit",
+    status: "source_first_pitaya_aligned_acceptor_connection_lifecycle_map",
+    source: {
+      standard: "docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.md",
+      gate_decision: "ADR-0173",
+      implementation_decision: "ADR-0174",
+      check_rule: "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
+      work_item: "W-0266",
+      change: "changes/2026-05-26-implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map",
+    },
+    allowed_acceptor_connection_lifecycle_vocabulary: [
+      "acceptor_boundary",
+      "websocket_acceptor",
+      "connection_id",
+      "connection_epoch",
+      "session_binding",
+      "active_connection_registry",
+      "close_handoff",
+      "presence_lifecycle_handoff",
+    ],
+    related_vocabulary: [
+      "first_message_binding",
+      "runtime_session",
+      "route_request",
+      "server_push_delivery",
+      "cluster_safe_session_routing",
+      "message_forwarding",
+      "route_handler",
+      "serializer_boundary",
+      "frontend_server",
+      "backend_server",
+      "server_to_server_rpc",
+      "remote_call",
+      "service_discovery",
+    ],
+    current_single_process_acceptor_connection_mapping: {
+      websocket_acceptor: {
+        current: "single_process_websocket_server_accept_loop",
+        future_vocabulary: "acceptor_boundary",
+        implementation_status: "no_tcp_acceptor_or_distributed_acceptor",
+      },
+      connection_identity: {
+        current: "server_observed_connection_id",
+        future_vocabulary: "connection_id",
+        implementation_status: "local_process_metadata",
+      },
+      connection_epoch: {
+        current: "server_observed_connection_epoch",
+        future_vocabulary: "connection_epoch",
+        implementation_status: "no_distributed_routing_epoch",
+      },
+      first_message_binding: {
+        current: "authentication_bind_connection_route",
+        future_vocabulary: "session_binding",
+        implementation_status: "no_handshake_authentication_or_reconnect_binding",
+      },
+      active_connection_registry: {
+        current: "application_owned_connection_registry",
+        future_vocabulary: "active_connection_registry",
+        implementation_status: "no_connection_owner_node_registry",
+      },
+      close_handoff: {
+        current: "transport_close_to_application_policy",
+        future_vocabulary: "close_handoff",
+        implementation_status: "no_remote_disconnect_handoff",
+      },
+      presence_lifecycle: {
+        current: "server_owned_presence_snapshot",
+        future_vocabulary: "presence_lifecycle_handoff",
+        implementation_status: "no_distributed_presence_lifecycle",
+      },
+    },
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      "docs/pitaya-aligned-acceptor-connection-lifecycle-boundary-gate.md",
+      "docs/runtime-protocol-adapter.md",
+      "docs/game-protocol.md",
+      "docs/nakama-pitaya-product-parity-roadmap.md",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      acceptor_behavior_added: false,
+      tcp_acceptor_added: false,
+      websocket_acceptor_behavior_changed: false,
+      connection_lifecycle_behavior_changed: false,
+      session_binding_behavior_added: false,
+      kick_disconnect_behavior_added: false,
+      concrete_socket_close_behavior_changed: false,
+      serializer_behavior_added: false,
+      message_forwarding_behavior_added: false,
+      route_handler_implementation_added: false,
+      route_handler_pipeline_implementation_added: false,
+      handler_routing_behavior_added: false,
+      handler_pipeline_behavior_added: false,
+      pipeline_middleware_behavior_added: false,
+      backend_route_targeting_added: false,
+      cluster_safe_session_routing_added: false,
+      session_location_registry_added: false,
+      connection_owner_node_registry_added: false,
+      routing_epoch_behavior_added: false,
+      session_route_target_added: false,
+      remote_connection_handoff_added: false,
+      reconnect_route_added: false,
+      distributed_session_routing_added: false,
+      distributed_group_implementation_added: false,
+      distributed_groups_added: false,
+      group_membership_registry_added: false,
+      room_broadcast_fanout_added: false,
+      broadcast_delivery_guarantee_added: false,
+      stream_subscription_added: false,
+      service_discovery_implementation_added: false,
+      service_registry_added: false,
+      service_selector_added: false,
+      node_registry_added: false,
+      server_identity_added: false,
+      server_to_server_rpc_implementation_added: false,
+      remote_call_behavior_added: false,
+      frontend_server_implementation_added: false,
+      backend_server_implementation_added: false,
+      frontend_backend_server_roles_added: false,
+      distributed_runtime_implementation_added: false,
+      runtime_behavior_added: false,
+      runtime_endpoint_behavior_added: false,
+      metrics_endpoint_added: false,
+      tracing_pipeline_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      authentication_session_behavior_changed: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+      node_credentials_exposed: false,
+      transport_metadata_exposed: false,
+      connection_metadata_payloads_exposed: false,
+      route_payloads_exposed: false,
+    },
+    next: {
+      next_milestone: "M-195",
+      next_ready_work_item: "W-0267",
+      selected_follow_up_direction: "select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map",
+    },
+  };
+}
+
+function inspectPitayaAcceptorConnection(root) {
+  printJson(buildPitayaAcceptorConnectionInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -45259,6 +45434,301 @@ function checkRuntimePitayaAlignedAcceptorConnectionLifecycleBoundaryGate(root, 
   });
 }
 
+function checkRuntimePitayaAlignedAcceptorConnectionLifecycleSourceFirstMap(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map";
+  const decisionPath = "decisions/ADR-0174-pitaya-aligned-acceptor-connection-lifecycle-source-first-map.md";
+  const changePath = "changes/2026-05-26-implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-acceptor-connection-lifecycle-source-first-map.md";
+
+  if (!pitayaAlignedAcceptorConnectionLifecycleSourceFirstMapCompleted(root)) {
+    ok("Pitaya-aligned acceptor and connection lifecycle source-first map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned acceptor and connection lifecycle source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned acceptor and connection lifecycle source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = buildPitayaAcceptorConnectionInspection(root);
+  const inspectionText = JSON.stringify(inspection);
+  const requiredInspectionMarkers = [
+    "\"kind\":\"pitaya_acceptor_connection_lifecycle_inspection\"",
+    "\"status\":\"source_first_pitaya_aligned_acceptor_connection_lifecycle_map\"",
+    "\"work_item\":\"W-0266\"",
+    "\"check_rule\":\"runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map\"",
+    "\"gate_decision\":\"ADR-0173\"",
+    "\"implementation_decision\":\"ADR-0174\"",
+    "\"acceptor_boundary\"",
+    "\"websocket_acceptor\"",
+    "\"connection_id\"",
+    "\"connection_epoch\"",
+    "\"session_binding\"",
+    "\"active_connection_registry\"",
+    "\"close_handoff\"",
+    "\"presence_lifecycle_handoff\"",
+    "\"first_message_binding\"",
+    "\"runtime_session\"",
+    "\"route_request\"",
+    "\"server_push_delivery\"",
+    "\"cluster_safe_session_routing\"",
+    "\"message_forwarding\"",
+    "\"single_process_websocket_server_accept_loop\"",
+    "\"server_observed_connection_id\"",
+    "\"server_observed_connection_epoch\"",
+    "\"authentication_bind_connection_route\"",
+    "\"application_owned_connection_registry\"",
+    "\"transport_close_to_application_policy\"",
+    "\"server_owned_presence_snapshot\"",
+    "\"no_tcp_acceptor_or_distributed_acceptor\"",
+    "\"no_distributed_routing_epoch\"",
+    "\"no_handshake_authentication_or_reconnect_binding\"",
+    "\"no_connection_owner_node_registry\"",
+    "\"no_remote_disconnect_handoff\"",
+    "\"no_distributed_presence_lifecycle\"",
+    "\"acceptor_behavior_added\":false",
+    "\"tcp_acceptor_added\":false",
+    "\"websocket_acceptor_behavior_changed\":false",
+    "\"connection_lifecycle_behavior_changed\":false",
+    "\"session_binding_behavior_added\":false",
+    "\"kick_disconnect_behavior_added\":false",
+    "\"concrete_socket_close_behavior_changed\":false",
+    "\"serializer_behavior_added\":false",
+    "\"message_forwarding_behavior_added\":false",
+    "\"route_handler_implementation_added\":false",
+    "\"route_handler_pipeline_implementation_added\":false",
+    "\"handler_routing_behavior_added\":false",
+    "\"handler_pipeline_behavior_added\":false",
+    "\"pipeline_middleware_behavior_added\":false",
+    "\"backend_route_targeting_added\":false",
+    "\"cluster_safe_session_routing_added\":false",
+    "\"session_location_registry_added\":false",
+    "\"connection_owner_node_registry_added\":false",
+    "\"routing_epoch_behavior_added\":false",
+    "\"remote_connection_handoff_added\":false",
+    "\"distributed_session_routing_added\":false",
+    "\"service_discovery_implementation_added\":false",
+    "\"server_to_server_rpc_implementation_added\":false",
+    "\"distributed_runtime_implementation_added\":false",
+    "\"runtime_behavior_added\":false",
+    "\"runtime_endpoint_behavior_added\":false",
+    "\"metrics_endpoint_added\":false",
+    "\"tracing_pipeline_added\":false",
+    "\"protocol_route_added\":false",
+    "\"protobuf_source_added\":false",
+    "\"generated_output_added\":false",
+    "\"repository_interface_changed\":false",
+    "\"postgresql_adapter_changed\":false",
+    "\"migration_added\":false",
+    "\"dependency_added\":false",
+    "\"authentication_session_behavior_changed\":false",
+    "\"hosted_deployment_added\":false",
+    "\"sdk_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+    "\"raw_device_credentials_exposed\":false",
+    "\"raw_access_tokens_exposed\":false",
+    "\"lookup_digests_exposed\":false",
+    "\"verifier_digests_exposed\":false",
+    "\"verifier_keys_exposed\":false",
+    "\"postgres_dsns_with_credentials_exposed\":false",
+    "\"database_payloads_exposed\":false",
+    "\"local_secret_file_contents_exposed\":false",
+    "\"node_credentials_exposed\":false",
+    "\"transport_metadata_exposed\":false",
+    "\"connection_metadata_payloads_exposed\":false",
+    "\"route_payloads_exposed\":false",
+    "\"next_ready_work_item\":\"W-0267\"",
+    "\"selected_follow_up_direction\":\"select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map\"",
+  ];
+  for (const marker of requiredInspectionMarkers) {
+    if (inspectionText.includes(marker)) {
+      ok(`inspect pitaya-acceptor-connection output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-acceptor-connection",
+      });
+    } else {
+      fail(`inspect pitaya-acceptor-connection output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-acceptor-connection",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-195"],
+    [".arch/work-items.yaml", "id: M-194"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Acceptor And Connection Lifecycle Source-First Map"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0266"],
+    [".arch/work-items.yaml", "decision: ADR-0174"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    [".arch/work-items.yaml", "command: node tools/vibit inspect pitaya-acceptor-connection --json"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
+    [".arch/work-items.yaml", "id: M-195"],
+    [".arch/work-items.yaml", "title: Select Next Pitaya-Aligned Direction After Acceptor And Connection Lifecycle Map"],
+    [".arch/work-items.yaml", "id: W-0267"],
+    [".arch/work-items.yaml", "title: Select next Pitaya-aligned direction after acceptor and connection lifecycle map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map: ADR-0174"],
+    [".arch/runtime.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map_implemented: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map_check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map_command: node tools/vibit inspect pitaya-acceptor-connection --json"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_acceptor_connection_lifecycle_map_work_item: W-0267"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_acceptor_connection_lifecycle_map_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "current_single_process_acceptor_connection_mapping:"],
+    [".arch/runtime.yaml", "acceptor_behavior_added: false"],
+    [".arch/runtime.yaml", "tcp_acceptor_added: false"],
+    [".arch/runtime.yaml", "websocket_acceptor_behavior_changed: false"],
+    [".arch/runtime.yaml", "connection_lifecycle_behavior_changed: false"],
+    [".arch/runtime.yaml", "session_binding_behavior_added: false"],
+    [".arch/runtime.yaml", "kick_disconnect_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2fy_pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    [".arch/reference.yaml", "pitaya_acceptor_connection_inspection_command: node tools/vibit inspect pitaya-acceptor-connection --json"],
+    [".arch/reference.yaml", "phase_2fz_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
+    [".arch/conventions.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    [".arch/conventions.yaml", "command: node tools/vibit inspect pitaya-acceptor-connection --json"],
+    [".arch/contracts.yaml", "pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    [".arch/contracts.yaml", "command: node tools/vibit inspect pitaya-acceptor-connection --json"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", "node tools/vibit inspect pitaya-acceptor-connection --json"],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", "node tools/vibit inspect pitaya-acceptor-connection --json"],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", "node tools/vibit inspect pitaya-acceptor-connection --json"],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", "node tools/vibit inspect pitaya-acceptor-connection --json"],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0174",
+      "M-194/W-0266",
+      "node tools/vibit inspect pitaya-acceptor-connection --json",
+      "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
+      "M-195/W-0267",
+      "This decision does not add acceptor behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0266",
+      "ADR-0174",
+      "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
+      "Unknown rule_id: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
+      "Unknown command",
+      "change directory does not exist",
+      "W-0267",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0266",
+      "source-first repository inspection map",
+      "No acceptor behavior",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0267",
+      "No runtime behavior",
+      "No protocol shape",
+      "No generated output",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward|connect|disconnect|socket|presence)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward|connect|disconnect|socket|presence)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Disconnect|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward|Acceptor|Connection|Accept|Close|Bind|Presence)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned acceptor and connection lifecycle source-first map completes W-0266, adds inspect pitaya-acceptor-connection, opens W-0267, and preserves acceptor, TCP, WebSocket, connection lifecycle, session binding, kick/disconnect, serializer, forwarding, route handler, backend targeting, runtime, protocol, generated, persistence, dependency, metrics, tracing, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -47184,6 +47654,10 @@ function pitayaAlignedAcceptorConnectionLifecycleBoundaryGateCompleted(root) {
   return workItemHasStatus(root, "W-0265", "completed");
 }
 
+function pitayaAlignedAcceptorConnectionLifecycleSourceFirstMapCompleted(root) {
+  return workItemHasStatus(root, "W-0266", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -47216,6 +47690,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedAcceptorConnectionLifecycleSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item: W-0267";
+  }
   if (pitayaAlignedAcceptorConnectionLifecycleBoundaryGateCompleted(root)) {
     return "repository_next_work_item: W-0266";
   }
@@ -47376,6 +47853,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedAcceptorConnectionLifecycleSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item_scope: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map";
+  }
   if (pitayaAlignedAcceptorConnectionLifecycleBoundaryGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map";
   }
@@ -47527,6 +48007,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedAcceptorConnectionLifecycleSourceFirstMapCompleted(root)) {
+    return "W-0267 Select next Pitaya-aligned direction after acceptor and connection lifecycle map";
+  }
   if (pitayaAlignedAcceptorConnectionLifecycleBoundaryGateCompleted(root)) {
     return "W-0266 Implement Pitaya-aligned acceptor and connection lifecycle source-first map";
   }
@@ -47702,6 +48185,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0266", "next_ready_work_item: W-0267"],
     ["W-0265", "next_ready_work_item: W-0266"],
     ["W-0264", "next_ready_work_item: W-0265"],
     ["W-0263", "next_ready_work_item: W-0264"],
@@ -47796,6 +48280,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0266", "completed")) {
+    return "next_work_item: W-0267";
+  }
   if (workItemHasStatus(root, "W-0265", "completed")) {
     return "next_work_item: W-0266";
   }
@@ -48023,6 +48510,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0266", "select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
     ["W-0265", "implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
     ["W-0264", "define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate"],
     ["W-0263", "select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map"],
@@ -48117,6 +48605,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0266", "W-0267 Select next Pitaya-aligned direction after acceptor and connection lifecycle map"],
     ["W-0265", "W-0266 Implement Pitaya-aligned acceptor and connection lifecycle source-first map"],
     ["W-0264", "W-0265 Define Pitaya-aligned acceptor and connection lifecycle boundary gate"],
     ["W-0263", "W-0264 Select next Pitaya-aligned direction after serializer and message forwarding map"],
@@ -48212,6 +48701,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0266", "current_phase: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
     ["W-0265", "current_phase: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
     ["W-0264", "current_phase: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate"],
     ["W-0263", "current_phase: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map"],
@@ -48903,6 +49393,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedSerializerMessageForwardingSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterSerializerMessageForwardingMap(root, goFiles);
   checkRuntimePitayaAlignedAcceptorConnectionLifecycleBoundaryGate(root, goFiles);
+  checkRuntimePitayaAlignedAcceptorConnectionLifecycleSourceFirstMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -49670,6 +50161,11 @@ function main() {
 
   if (group === "inspect" && command === "pitaya-serializer-forwarding" && !value) {
     inspectPitayaSerializerForwarding(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "pitaya-acceptor-connection" && !value) {
+    inspectPitayaAcceptorConnection(root);
     return;
   }
 

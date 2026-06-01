@@ -7481,13 +7481,39 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
     sdk_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   pitaya_aligned_acceptor_connection_lifecycle_source_first_map:
-    status: planned
+    status: completed
     milestone: M-194
-    next_ready_work_item: W-0266
+    completed_work_item: W-0266
+    previous_completed_work_item: W-0265
+    next_milestone: M-195
+    next_ready_work_item: W-0267
     gate_decision: ADR-0173
+    decision: ADR-0174
+    check_rule: runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    command: node tools/vibit inspect pitaya-acceptor-connection --json
     selected_direction: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
     implementation_scope: source_first_repository_inspection
-    pitaya_reference_status: acceptor_connection_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+    acceptor_behavior_added: false
+    tcp_acceptor_added: false
+    websocket_acceptor_behavior_changed: false
+    connection_lifecycle_behavior_changed: false
+    session_binding_behavior_added: false
+    kick_disconnect_behavior_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map:
+    status: planned
+    milestone: M-195
+    next_ready_work_item: W-0267
+    source_map_decision: ADR-0174
+    selected_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    implementation_scope: direction_selection_only
+    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
 
 server_runtime:
   first_reference_language: Go
