@@ -226,10 +226,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0273 Select next Pitaya-aligned direction after runtime observability map
-next_direction: select_next_pitaya_aligned_direction_after_runtime_observability_map
+next_work_item: W-0274 Define Pitaya-aligned metrics and tracing boundary gate
+next_direction: define_pitaya_aligned_metrics_tracing_boundary_gate
 ```
 
-`ADR-0180` 已注册 `runtime.pitaya_aligned_runtime_observability_source_first_map`，完成 `W-0272 Implement Pitaya-aligned runtime observability source-first map`，选择 `select_next_pitaya_aligned_direction_after_runtime_observability_map`，并打开 `W-0273 Select next Pitaya-aligned direction after runtime observability map`。
+`ADR-0181` 已注册 `runtime.next_pitaya_aligned_direction_after_runtime_observability_map`，完成 `W-0273 Select next Pitaya-aligned direction after runtime observability map`，选择 `define_pitaya_aligned_metrics_tracing_boundary_gate`，并打开 `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`。
 
 前一项 session lifecycle inspection 仍可通过 `node tools/vibit inspect pitaya-session-lifecycle --json` 使用；runtime observability inspection 可通过 `node tools/vibit inspect pitaya-observability --json` 使用。
