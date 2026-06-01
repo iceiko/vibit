@@ -178,20 +178,21 @@ purpose: >
   pitaya_aligned_acceptor_connection_lifecycle_source_first_map: ADR-0174
   next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map: ADR-0175
   pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate: ADR-0176
+  pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map: ADR-0177
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+  current_phase: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0269
+  next_ready_work_item: W-0270
   primary_product_reference: Nakama
-  pitaya_reference_status: session_binding_kick_disconnect_session_data_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -2388,13 +2389,180 @@ architecture_scope:
     tracing_pipeline_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map:
-    status: planned
+    status: completed
     milestone: M-197
-    next_ready_work_item: W-0269
+    completed_work_item: W-0269
+    decision: ADR-0177
+    change: changes/2026-05-26-implement-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map
+    check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
     gate_decision: ADR-0176
+    previous_completed_work_item: W-0268
+    next_milestone: M-198
+    next_ready_work_item: W-0270
     selected_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map_implemented: true
+    pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map_decision: ADR-0177
+    pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map_check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+    pitaya_aligned_session_lifecycle_inspection_command: node tools/vibit inspect pitaya-session-lifecycle --json
+    next_pitaya_direction_selection_after_session_binding_kick_disconnect_session_data_map_work_item: W-0270
+    next_pitaya_direction_selection_after_session_binding_kick_disconnect_session_data_map_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
     implementation_scope: source_first_repository_inspection
-    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_planned
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
+    allowed_session_binding_kick_disconnect_session_data_vocabulary:
+      - session_binding_boundary
+      - connection_bound_session
+      - session_data
+      - session_data_scope
+      - server_initiated_disconnect
+      - server_initiated_kick
+      - session_unbind
+      - session_close_reason
+      - connection_session_handoff
+      - presence_session_handoff
+    related_vocabulary:
+      - first_message_binding
+      - runtime_session
+      - active_connection_registry
+      - logout_service_behavior
+      - websocket_close_handoff
+      - presence_lifecycle
+      - cluster_safe_session_routing
+      - acceptor_boundary
+      - connection_epoch
+      - route_request
+    current_single_process_session_binding_kick_disconnect_session_data_mapping:
+      first_message_binding:
+        current: authentication_bind_connection_route
+        future_vocabulary: session_binding_boundary
+        implementation_status: no_handshake_authentication_or_reconnect_binding_change
+      runtime_session_validation:
+        current: request_level_access_token_validation_and_request_identity_handoff
+        future_vocabulary: connection_bound_session
+        implementation_status: no_session_persistence_or_every_request_policy_change
+      session_metadata:
+        current: request_identity_and_connection_metadata
+        future_vocabulary: session_data
+        implementation_status: no_session_data_store_or_public_api
+      session_data_scope:
+        current: no_general_session_data_scope
+        future_vocabulary: session_data_scope
+        implementation_status: planning_vocabulary_only
+      active_connection_registry:
+        current: application_owned_connection_registry
+        future_vocabulary: connection_session_handoff
+        implementation_status: no_cluster_safe_session_location_registry
+      logout_disconnect_handoff:
+        current: logout_service_revokes_token_and_transport_close_policy_remains_unchanged
+        future_vocabulary: server_initiated_disconnect
+        implementation_status: no_server_initiated_disconnect_behavior
+      kick_policy:
+        current: no_kick_policy_or_route
+        future_vocabulary: server_initiated_kick
+        implementation_status: planning_vocabulary_only
+      session_unbind:
+        current: close_handoff_and_connection_registry_cleanup
+        future_vocabulary: session_unbind
+        implementation_status: no_remote_unbind_or_reconnect_routing
+      close_reason:
+        current: existing_transport_close_reason_mapping
+        future_vocabulary: session_close_reason
+        implementation_status: no_close_policy_change
+      presence_lifecycle:
+        current: server_owned_presence_snapshot
+        future_vocabulary: presence_session_handoff
+        implementation_status: no_distributed_presence_session_handoff
+    source_surfaces:
+      - .arch/runtime.yaml
+      - .arch/reference.yaml
+      - .arch/work-items.yaml
+      - docs/pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.md
+      - docs/runtime-protocol-adapter.md
+      - docs/game-protocol.md
+      - docs/nakama-pitaya-product-parity-roadmap.md
+      - tools/vibit
+      - rules/check-rules.json
+    commands_added: []
+    queries_added: []
+    events_added: []
+    errors_added: []
+    permissions_added: []
+    session_binding_behavior_added: false
+    kick_disconnect_behavior_added: false
+    server_initiated_disconnect_behavior_added: false
+    server_initiated_kick_behavior_added: false
+    session_data_behavior_added: false
+    session_data_persistence_added: false
+    session_unbind_behavior_added: false
+    session_close_reason_behavior_changed: false
+    connection_session_handoff_behavior_added: false
+    presence_session_handoff_behavior_added: false
+    acceptor_behavior_added: false
+    tcp_acceptor_added: false
+    websocket_acceptor_behavior_changed: false
+    websocket_behavior_changed: false
+    connection_lifecycle_behavior_changed: false
+    route_handler_implementation_added: false
+    route_handler_pipeline_implementation_added: false
+    handler_routing_behavior_added: false
+    handler_pipeline_behavior_added: false
+    pipeline_middleware_behavior_added: false
+    backend_route_targeting_added: false
+    cluster_safe_session_routing_added: false
+    session_location_registry_added: false
+    connection_owner_node_registry_added: false
+    routing_epoch_behavior_added: false
+    session_route_target_added: false
+    remote_connection_handoff_added: false
+    reconnect_route_added: false
+    distributed_session_routing_added: false
+    distributed_group_implementation_added: false
+    distributed_groups_added: false
+    group_membership_registry_added: false
+    room_broadcast_fanout_added: false
+    broadcast_delivery_guarantee_added: false
+    stream_subscription_added: false
+    service_discovery_implementation_added: false
+    service_registry_added: false
+    service_selector_added: false
+    node_registry_added: false
+    server_identity_added: false
+    server_to_server_rpc_implementation_added: false
+    remote_call_behavior_added: false
+    frontend_server_implementation_added: false
+    backend_server_implementation_added: false
+    frontend_backend_server_roles_added: false
+    distributed_runtime_implementation_added: false
+    runtime_behavior_added: false
+    runtime_endpoint_behavior_added: false
+    metrics_endpoint_added: false
+    tracing_pipeline_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    hosted_deployment_added: false
+    sdk_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    raw_device_credentials_exposed: false
+    raw_access_tokens_exposed: false
+    lookup_digests_exposed: false
+    verifier_digests_exposed: false
+    verifier_keys_exposed: false
+    postgres_dsns_with_credentials_exposed: false
+    database_payloads_exposed: false
+    local_secret_file_contents_exposed: false
+    node_credentials_exposed: false
+    transport_metadata_exposed: false
+    connection_metadata_payloads_exposed: false
+    session_data_payloads_exposed: false
+    route_payloads_exposed: false
   minimum_operations_inspection_surface_gate:
     status: completed
     milestone: M-172

@@ -120,4 +120,4 @@ Storage module 的 storage-object work 已完成到 local proof，后续 realtim
 
 ## Repository Continuation
 
-`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`，并打开 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map` 作为 repository next work item。该 work 仍不属于 storage module。
+`ADR-0177` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`，完成 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`，添加 `node tools/vibit inspect pitaya-session-lifecycle --json`，并打开 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map` 作为 repository next work item。该 work 仍不属于 storage module。

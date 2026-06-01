@@ -1,0 +1,274 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned session binding, kick/disconnect, and session data inspection map and open a next Pitaya direction selection follow-up without adding session binding behavior, kick/disconnect behavior, session data behavior or persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, backend route targeting, distributed runtime behavior, service discovery implementation, RPC implementation, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0177
+  referenced:
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map: implemented
+  completed_work_item: W-0269
+  completed_milestone: M-197
+  previous_completed_work_item: W-0268
+  next_milestone: M-198
+  next_work_item: W-0270
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+  decision: ADR-0177
+  gate_decision: ADR-0176
+  check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+  command: node tools/vibit inspect pitaya-session-lifecycle --json
+  session_binding_kick_disconnect_session_data_boundary_standard: docs/pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_session_binding_kick_disconnect_session_data_vocabulary:
+    - session_binding_boundary
+    - connection_bound_session
+    - session_data
+    - session_data_scope
+    - server_initiated_disconnect
+    - server_initiated_kick
+    - session_unbind
+    - session_close_reason
+    - connection_session_handoff
+    - presence_session_handoff
+  related_vocabulary:
+    - first_message_binding
+    - runtime_session
+    - active_connection_registry
+    - logout_service_behavior
+    - websocket_close_handoff
+    - presence_lifecycle
+    - cluster_safe_session_routing
+    - acceptor_boundary
+    - connection_epoch
+    - route_request
+  current_single_process_session_binding_kick_disconnect_session_data_mapping:
+    first_message_binding:
+      current: authentication_bind_connection_route
+      future_vocabulary: session_binding_boundary
+      implementation_status: no_handshake_authentication_or_reconnect_binding_change
+    runtime_session_validation:
+      current: request_level_access_token_validation_and_request_identity_handoff
+      future_vocabulary: connection_bound_session
+      implementation_status: no_session_persistence_or_every_request_policy_change
+    session_metadata:
+      current: request_identity_and_connection_metadata
+      future_vocabulary: session_data
+      implementation_status: no_session_data_store_or_public_api
+    session_data_scope:
+      current: no_general_session_data_scope
+      future_vocabulary: session_data_scope
+      implementation_status: planning_vocabulary_only
+    active_connection_registry:
+      current: application_owned_connection_registry
+      future_vocabulary: connection_session_handoff
+      implementation_status: no_cluster_safe_session_location_registry
+    logout_disconnect_handoff:
+      current: logout_service_revokes_token_and_transport_close_policy_remains_unchanged
+      future_vocabulary: server_initiated_disconnect
+      implementation_status: no_server_initiated_disconnect_behavior
+    kick_policy:
+      current: no_kick_policy_or_route
+      future_vocabulary: server_initiated_kick
+      implementation_status: planning_vocabulary_only
+    session_unbind:
+      current: close_handoff_and_connection_registry_cleanup
+      future_vocabulary: session_unbind
+      implementation_status: no_remote_unbind_or_reconnect_routing
+    close_reason:
+      current: existing_transport_close_reason_mapping
+      future_vocabulary: session_close_reason
+      implementation_status: no_close_policy_change
+    presence_lifecycle:
+      current: server_owned_presence_snapshot
+      future_vocabulary: presence_session_handoff
+      implementation_status: no_distributed_presence_session_handoff
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  server_initiated_disconnect_behavior_added: false
+  server_initiated_kick_behavior_added: false
+  session_data_behavior_added: false
+  session_data_persistence_added: false
+  session_unbind_behavior_added: false
+  session_close_reason_behavior_changed: false
+  connection_session_handoff_behavior_added: false
+  presence_session_handoff_behavior_added: false
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_behavior_changed: false
+  websocket_acceptor_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
+  adopted:
+    - session binding vocabulary inspection
+    - connection-bound session vocabulary inspection
+    - session data and session data scope vocabulary inspection
+    - server-initiated disconnect and kick vocabulary inspection
+    - session unbind, close reason, connection handoff, and presence handoff vocabulary inspection
+  adapted:
+    - source-first repository inspection before session binding, kick/disconnect, session data, metrics, tracing, or distributed runtime implementation
+    - current first-message binding remains a system route behavior
+    - current request-level validation remains an authenticated-request wrapper behavior
+    - current active connection registry remains application-owned and single-process
+    - current close and presence lifecycle surfaces remain unchanged
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, route, handler, acceptor, connection, session, registry, selector, or configuration naming compatibility
+    - session binding behavior, kick/disconnect behavior, session data behavior, session data persistence, remote connection handoff, or distributed session routing in this slice
+    - service discovery, RPC, remote call, frontend/backend role, cluster-safe session routing, distributed group, broadcast fanout, metrics endpoint, tracing pipeline, or distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-session-lifecycle --json`.
+  - The inspection output includes allowed session binding, kick/disconnect, and session data vocabulary, related vocabulary, current single-process mapping, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0269 map and W-0270 next-ready state.
+  - The slice does not add session binding behavior, kick/disconnect behavior, session data behavior or persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, backend route targeting, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-implement-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map/
+    - decisions/ADR-0177-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map.md
+    - conversations/2026-05-26-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - session binding behavior
+    - kick/disconnect behavior
+    - session data behavior
+    - session data persistence
+    - acceptor behavior
+    - TCP acceptors
+    - WebSocket behavior changes
+    - connection lifecycle behavior changes
+    - route handler implementation
+    - backend route targeting
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - metrics endpoints
+    - tracing pipelines
+    - distributed runtime behavior
+    - hosted deployments
+    - SDK publication
+    - direct compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect pitaya-session-lifecycle --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change implement-pitaya-aligned-session-binding-kick-disconnect-session-data-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

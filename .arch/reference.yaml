@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: session_binding_kick_disconnect_session_data_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
-  recommended_next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+  current_near_term_priority: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+  recommended_next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -6227,15 +6227,46 @@ phase_plan:
     tracing_pipeline_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2gb_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map:
-    status: planned
+    status: completed
     milestone: M-197
-    next_ready_work_item: W-0269
+    completed_work_item: W-0269
+    decision: ADR-0177
+    check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+    next_milestone: M-198
+    next_ready_work_item: W-0270
     gate_decision: ADR-0176
     selected_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    pitaya_session_lifecycle_inspection_command: node tools/vibit inspect pitaya-session-lifecycle --json
     primary_product_reference: Nakama
-    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_planned
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
     target_stage: prototype_ready_foundation
     implementation_scope: source_first_repository_inspection
+    session_binding_behavior_allowed: false
+    kick_disconnect_behavior_allowed: false
+    session_data_behavior_allowed: false
+    session_data_persistence_allowed: false
+    acceptor_behavior_allowed: false
+    websocket_acceptor_behavior_change_allowed: false
+    connection_lifecycle_behavior_change_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    metrics_endpoint_allowed: false
+    tracing_pipeline_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2gc_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map:
+    status: active
+    milestone: M-198
+    next_ready_work_item: W-0270
+    source_map_decision: ADR-0177
+    selected_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    primary_product_reference: Nakama
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_completed_next_direction_selection_active
+    target_stage: prototype_ready_foundation
+    implementation_scope: selection_only
     session_binding_behavior_allowed: false
     kick_disconnect_behavior_allowed: false
     session_data_behavior_allowed: false

@@ -301,6 +301,6 @@ agent-native server framework
 
 ## Current Continuation
 
-`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`，并打开 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map` 作为 next-ready。
+`ADR-0177` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`，完成 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`，实现 `node tools/vibit inspect pitaya-session-lifecycle --json`，并打开 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map` 作为 next-ready。
 
-下一方向是 `implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`。
+下一方向是 `select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`。

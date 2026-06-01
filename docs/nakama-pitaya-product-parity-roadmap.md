@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map
-recommended_next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+next_work_item: W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map
+recommended_next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
 ```
 
-`ADR-0176` registered `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`, completed `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`, and keeps behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0177` registered `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`, completed `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`, implemented `node tools/vibit inspect pitaya-session-lifecycle --json`, and keeps behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
