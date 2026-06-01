@@ -30,7 +30,7 @@ The current implemented slice is intentionally narrow:
 
 `M-170 Friends Relationship Protocol Route Local Proof` is completed by `W-0242`. The check rule is `runtime.friends_relationship_protocol_route_local_proof`.
 
-The repository next work item is `W-0253 Implement Pitaya-aligned service discovery source-first map`. That work is outside this module and must stay source-first; do not add protocol shape changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime behavior, frontend/backend server role implementation, server-to-server RPC behavior, remote calls, service discovery implementation, service registries, service selectors, operations/admin implementation, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
+The repository next work item is `W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate`. That work is outside this module and must stay gate-only and source-first; do not add protocol shape changes, repository interface changes, PostgreSQL adapter changes, migrations, dependencies, event/audit tables, groups, parties, chat, matchmaking, match runtime, SDK publication, hosted deployments, distributed runtime behavior, frontend/backend server role implementation, server-to-server RPC behavior, remote calls, service discovery implementation, service registries, service selectors, distributed groups, room broadcast fanout, operations/admin implementation, or direct Nakama/Pitaya API compatibility in this module until a later bounded work item authorizes that scope.
 
 ## When Not To Use This Module
 
@@ -65,7 +65,7 @@ If a requirement needs one of those concepts, create or update the owning bounda
 - Protocol route gate: `docs/friends-relationship-protocol-route-gate.md`
 - Protocol route implementation: `proto/vibit/friends/v1/friends.proto`, `runtime/internal/generated/proto/vibit/friends/v1/friends.pb.go`, `runtime/internal/platform/protocol/protobuf/friends_bridge.go`, `runtime/internal/app/bootstrap/friends.go`, and `runtime/internal/app/friends/routes.go`
 - Protocol route local proof: `W-0242 Prove friends relationship protocol route in local alpha request flow`
-- Next Pitaya-aligned vocabulary follow-up: `W-0253 Implement Pitaya-aligned service discovery source-first map`
+- Next Pitaya-aligned vocabulary follow-up: `W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate`
 
 The first public runtime commands and queries are still deferred. Future runtime behavior must derive actor identity from validated request identity before calling this repository interface; client-supplied player ids are not authentication proof.
 

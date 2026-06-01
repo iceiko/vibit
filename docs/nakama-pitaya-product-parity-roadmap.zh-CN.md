@@ -1,7 +1,7 @@
 # Nakama 优先产品能力路线图
 
 状态：Draft v0.2
-最后更新：2026-05-24
+最后更新：2026-05-31
 范围：vibit 面向 Nakama 优先游戏后端目标的产品路线图标准
 
 英文文件 `docs/nakama-pitaya-product-parity-roadmap.md` 是权威版本。本文是简体中文译本。
@@ -17,7 +17,7 @@ decision: ADR-0078
 check_rule: runtime.reference_product_parity_roadmap
 reference_posture_update: ADR-0127
 primary_product_reference: Nakama
-pitaya_reference_status: frontend_backend_role_source_first_map_implemented
+pitaya_reference_status: service_discovery_source_first_map_implemented
 parity_goal: nakama_first_same_class_common_capability_coverage
 api_compatibility_goal: false
 direct_nakama_pitaya_api_compatibility_added: false
@@ -246,7 +246,9 @@ pitaya_aligned_server_to_server_rpc_source_first_map_decision: ADR-0159
 pitaya_aligned_server_to_server_rpc_source_first_map_check_rule: runtime.pitaya_aligned_server_to_server_rpc_source_first_map
 pitaya_aligned_service_discovery_boundary_gate_decision: ADR-0160
 pitaya_aligned_service_discovery_boundary_gate_check_rule: runtime.pitaya_aligned_service_discovery_boundary_gate
-next_work_item: W-0253 Implement Pitaya-aligned service discovery source-first map
+pitaya_aligned_service_discovery_source_first_map_decision: ADR-0161
+pitaya_aligned_service_discovery_source_first_map_check_rule: runtime.pitaya_aligned_service_discovery_source_first_map
+next_work_item: W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate
 ```
 
 目标：从开发者可以检查的 source-first alpha，推进到可以用于严肃小型 prototype 的 foundation。
@@ -360,13 +362,13 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 
 ## 7. 近期建议
 
-Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source、friends relationship repository boundary、storage-neutral friends relationship repository interface implementation、friends relationship PostgreSQL adapter gate、friends relationship PostgreSQL adapter implementation、friends relationship runtime behavior gate、friends relationship runtime behavior implementation、friends relationship protocol route gate、friends relationship protocol route implementation、friends relationship protocol route local proof、post-proof next capability selection、minimum operations inspection surface gate、source-first operations inspection implementation、Pitaya distributed runtime vocabulary map、frontend/backend role map、server-to-server RPC boundary gate、server-to-server RPC source-first map 和 service discovery boundary gate 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime implementation、broad social modules、event/audit tables、generated client libraries、新的 protocol shape、admin endpoints、metrics endpoints、observability pipelines、dashboards、frontend/backend server role implementation、server-to-server RPC implementation、remote calls、service discovery implementation、service registries、service selectors、node identity、distributed groups 或 cluster-safe session routing。下一个具体工作只应实现 source-first Pitaya-aligned service discovery map：
+Authenticated failure-path proof、next capability selection、example client path gate、example client path implementation、follow-up scaffolding selection、feature request scaffolding gate、feature request scaffolding implementation、scaffolded Nakama intake pilot、friends relationship lifecycle gate、friends relationship persistence schema gate、friends relationship migration source、friends relationship repository boundary、storage-neutral friends relationship repository interface implementation、friends relationship PostgreSQL adapter gate、friends relationship PostgreSQL adapter implementation、friends relationship runtime behavior gate、friends relationship runtime behavior implementation、friends relationship protocol route gate、friends relationship protocol route implementation、friends relationship protocol route local proof、post-proof next capability selection、minimum operations inspection surface gate、source-first operations inspection implementation、Pitaya distributed runtime vocabulary map、frontend/backend role map、server-to-server RPC boundary gate、server-to-server RPC source-first map、service discovery boundary gate 和 service discovery source-first map 之后，下一个具体工作不应直接跳到 chat、groups、matchmaking、match runtime、SDK publication、hosted demos、distributed runtime implementation、broad social modules、event/audit tables、generated client libraries、新的 protocol shape、admin endpoints、metrics endpoints、observability pipelines、dashboards、frontend/backend server role implementation、server-to-server RPC implementation、remote calls、service discovery implementation、service registries、service selectors、node identity、distributed groups、room broadcast fanout 或 cluster-safe session routing。下一个具体工作只应定义 gate-only Pitaya-aligned distributed group and broadcast boundary：
 
 ```text
-next_work_item: W-0253 Implement Pitaya-aligned service discovery source-first map
-recommended_next_direction: implement_pitaya_aligned_service_discovery_source_first_map
+next_work_item: W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate
+recommended_next_direction: define_pitaya_aligned_distributed_group_broadcast_boundary_gate
 primary_product_reference: Nakama
-pitaya_reference_status: service_discovery_vocabulary_boundary_defined_for_future_architecture_planning
+pitaya_reference_status: service_discovery_source_first_map_implemented
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 ```
 
@@ -396,9 +398,11 @@ ai_native_development_testing_goal: user_requirement_to_spec_tests_implementatio
 - `ADR-0158` 已定义 Pitaya-aligned server-to-server RPC boundary gate，注册 `runtime.pitaya_aligned_server_to_server_rpc_boundary_gate`，并打开 `W-0251 Implement Pitaya-aligned server-to-server RPC source-first map`。
 - `ADR-0159` 已实现 `node tools/vibit inspect pitaya-rpc --json`，注册 `runtime.pitaya_aligned_server_to_server_rpc_source_first_map`，并打开 `W-0252 Define Pitaya-aligned service discovery boundary gate`。
 - `ADR-0160` 已定义 Pitaya-aligned service discovery boundary gate，注册 `runtime.pitaya_aligned_service_discovery_boundary_gate`，并打开 `W-0253 Implement Pitaya-aligned service discovery source-first map`。
+- `ADR-0161` 已实现 `node tools/vibit inspect pitaya-discovery --json`，注册 `runtime.pitaya_aligned_service_discovery_source_first_map`，并打开 `W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate`。
 - Friend relationship lifecycle 是 Nakama-class social graph 的核心 primitive，protected protocol route family 现在已经可供 local alpha request-flow proof 使用。
 - Operations inspection surface 现在已经让 local alpha status、route families、verification posture 和 deferred operations surfaces 可以在 source-first 方式下检查，同时没有添加 runtime endpoints。
-- 下一项 source-first map 应让未来 Pitaya-aligned service discovery、registry、instance 和 selector vocabulary 可以被检查，再让 groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖更大范围。
+- Service discovery source-first map 现在已让未来 Pitaya-aligned service discovery、registry、instance 和 selector vocabulary 可以被检查，再让 groups、parties、chat targeting、invites、matchmaking filters 或 match runtime social context 依赖更大范围。
+- 下一项 gate 应定义 distributed group and broadcast vocabulary，但不添加 group implementation、room broadcast fanout、distributed runtime behavior、service discovery behavior、RPC behavior、protocol shape、persistence、dependencies 或 direct compatibility。
 - Nakama-first product planning 仍可避免近期 scope 被产品广度和 Pitaya-style distributed implementation 同时拉扯。
 - Pitaya-style cluster/RPC/frontend-backend concerns 应继续限制在 vocabulary records 和 source-first maps 内，直到后续明确 implementation work item 授权。
 
