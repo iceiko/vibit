@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map
-recommended_next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+next_work_item: W-0271 Define Pitaya-aligned runtime observability boundary gate
+recommended_next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
 ```
 
-`ADR-0177` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`，完成 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`，实现 `node tools/vibit inspect pitaya-session-lifecycle --json`，并继续延后 behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0178` 已注册 `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`，完成 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`，选择 `define_pitaya_aligned_runtime_observability_boundary_gate`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。

@@ -247,8 +247,8 @@ Friends relationship 的追溯引用包括 `decisions/ADR-0142-friends-relations
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map
-next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+next_work_item: W-0271 Define Pitaya-aligned runtime observability boundary gate
+next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
 ```
 
-`ADR-0177` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`，完成 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`，并添加 `node tools/vibit inspect pitaya-session-lifecycle --json`。
+`ADR-0178` 已注册 `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`，完成 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`，选择 `define_pitaya_aligned_runtime_observability_boundary_gate`，并打开 `W-0271 Define Pitaya-aligned runtime observability boundary gate`。

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-198
+current_milestone: M-199
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map_implemented
+    current_release_state: next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map_completed
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0270
+    next_ready_work_item: W-0271
     preferred_after_current:
-      - implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+      - define_pitaya_aligned_runtime_observability_boundary_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3522,7 +3522,7 @@ milestones:
 
   - id: M-198
     title: Select Next Pitaya-Aligned Direction After Session Binding Kick Disconnect Session Data Map
-    status: active
+    status: completed
     goal: Select the next bounded Pitaya-aligned direction after the session binding, kick/disconnect, and session data source-first map, without implementing session binding behavior, kick/disconnect behavior, session data behavior or persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The next Pitaya-aligned direction is selected after the session binding, kick/disconnect, and session data source-first map.
@@ -3530,6 +3530,18 @@ milestones:
       - Repository checks verify the selection-only follow-up and next-ready state.
     non_goals:
       - adding session binding behavior, kick/disconnect behavior, session data behavior, session data persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_pitaya_aligned_runtime_observability_boundary_gate` as the next bounded Pitaya-aligned direction after the session binding, kick/disconnect, and session data source-first map, accepted `ADR-0178`, registered `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`, completed `W-0270`, and opened `M-199/W-0271 Define Pitaya-aligned runtime observability boundary gate` as next-ready. Preserved runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, session binding behavior, kick/disconnect behavior, session data behavior and persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-199
+    title: Pitaya-Aligned Runtime Observability Boundary Gate
+    status: active
+    goal: Define the Pitaya-aligned runtime observability boundary gate after the session binding, kick/disconnect, and session data source-first map, without implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The gate defines allowed runtime observability vocabulary for future Pitaya-aligned planning.
+      - Current minimum operations inspection, health/readiness/version/config, route inventory, repository checks, and verification posture are mapped to future observability vocabulary.
+      - Repository checks verify the boundary gate, deferrals, ADR, change artifacts, and next-ready state.
+    non_goals:
+      - implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -10866,7 +10878,7 @@ work_items:
   - id: W-0270
     milestone: M-198
     title: Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map
     depends_on:
       - W-0269
@@ -10908,4 +10920,59 @@ work_items:
     completion:
       - Select the next Pitaya-aligned direction after the session binding, kick/disconnect, and session data source-first map.
       - Record candidate directions and why implementation remains deferred.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0178
+    check_rule: runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    next_milestone: M-199
+    next_ready_work_item: W-0271
+    selected_follow_up_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+    completion_summary: Selected `define_pitaya_aligned_runtime_observability_boundary_gate` as the next bounded Pitaya-aligned direction after the session binding, kick/disconnect, and session data source-first map and opened `W-0271 Define Pitaya-aligned runtime observability boundary gate` as next-ready. Preserved runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, session binding behavior, kick/disconnect behavior, session data behavior and persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0271
+    milestone: M-199
+    title: Define Pitaya-aligned runtime observability boundary gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-runtime-observability-boundary-gate
+    depends_on:
+      - W-0270
+    expected_change_id: define-pitaya-aligned-runtime-observability-boundary-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+    selection_decision: ADR-0178
+    related_decisions:
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, session binding behavior, kick/disconnect behavior, session data behavior, session data persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya compatibility instead of defining only a runtime observability boundary gate.
+    completion:
+      - Define a Pitaya-aligned runtime observability boundary gate.
+      - Map current minimum operations inspection, health/readiness/version/config, route inventory, verification, and deferred operations surfaces to future observability vocabulary.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

@@ -227,8 +227,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map
-next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+next_work_item: W-0271 Define Pitaya-aligned runtime observability boundary gate
+next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
 ```
 
-`ADR-0177` registered `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`, completed `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`, and added `node tools/vibit inspect pitaya-session-lifecycle --json`.
+`ADR-0178` registered `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`, completed `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`, selected `define_pitaya_aligned_runtime_observability_boundary_gate`, and opened `W-0271 Define Pitaya-aligned runtime observability boundary gate`.
+
+The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`.

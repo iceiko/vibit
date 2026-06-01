@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_implemented
+  pitaya_reference_status: runtime_observability_boundary_gate_selected
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
-  recommended_next_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+  current_near_term_priority: define_pitaya_aligned_runtime_observability_boundary_gate
+  recommended_next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate_defined
+  current_state: next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map_completed
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0269
-  immediate_next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+  immediate_next_work_item: W-0271
+  immediate_next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -6102,8 +6102,6 @@ phase_plan:
     repository_interface_change_allowed: false
     postgresql_adapter_change_allowed: false
     dependency_allowed: false
-    metrics_endpoint_allowed: false
-    tracing_pipeline_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2fy_pitaya_aligned_acceptor_connection_lifecycle_source_first_map:
     status: completed
@@ -6258,15 +6256,26 @@ phase_plan:
     tracing_pipeline_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2gc_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map:
-    status: active
+    status: completed
     milestone: M-198
-    next_ready_work_item: W-0270
+    completed_work_item: W-0270
+    decision: ADR-0178
+    check_rule: runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
     source_map_decision: ADR-0177
-    selected_direction: select_next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    selected_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+    selected_follow_up_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+    next_milestone: M-199
+    next_ready_work_item: W-0271
     primary_product_reference: Nakama
-    pitaya_reference_status: session_binding_kick_disconnect_session_data_source_first_map_completed_next_direction_selection_active
+    pitaya_reference_status: runtime_observability_boundary_gate_selected
     target_stage: prototype_ready_foundation
     implementation_scope: selection_only
+    implementation_authorized_by_this_selection: false
+    runtime_endpoint_behavior_allowed: false
+    metrics_endpoint_allowed: false
+    tracing_pipeline_allowed: false
+    observability_pipeline_allowed: false
+    dashboard_allowed: false
     session_binding_behavior_allowed: false
     kick_disconnect_behavior_allowed: false
     session_data_behavior_allowed: false
@@ -6281,6 +6290,28 @@ phase_plan:
     dependency_allowed: false
     metrics_endpoint_allowed: false
     tracing_pipeline_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2gd_pitaya_aligned_runtime_observability_boundary_gate:
+    status: active
+    milestone: M-199
+    next_ready_work_item: W-0271
+    selection_decision: ADR-0178
+    selected_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+    primary_product_reference: Nakama
+    pitaya_reference_status: runtime_observability_boundary_gate_selected
+    target_stage: prototype_ready_foundation
+    implementation_scope: gate_only_runtime_observability_vocabulary
+    runtime_endpoint_behavior_allowed: false
+    metrics_endpoint_allowed: false
+    tracing_pipeline_allowed: false
+    observability_pipeline_allowed: false
+    dashboard_allowed: false
+    admin_console_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
     status: planned

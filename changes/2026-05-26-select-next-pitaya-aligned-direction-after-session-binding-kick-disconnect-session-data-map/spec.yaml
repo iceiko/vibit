@@ -1,0 +1,237 @@
+schema_version: 0.1
+change_id: select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Select the Pitaya-aligned runtime observability boundary gate as the next bounded direction after the session binding, kick/disconnect, and session data source-first map, without adding runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, session binding behavior, kick/disconnect behavior, session data behavior or persistence, transport behavior changes, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0178
+  referenced:
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map: completed
+  completed_work_item: W-0270
+  completed_milestone: M-198
+  previous_completed_work_item: W-0269
+  next_milestone: M-199
+  next_work_item: W-0271
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+  decision: ADR-0178
+  source_map_decision: ADR-0177
+  check_rule: runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_observability_boundary_gate_selected
+  implementation_scope: direction_selection_only
+  implementation_authorized_by_this_selection: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  player_session_token_inspector_added: false
+  event_audit_table_added: false
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  session_data_behavior_added: false
+  session_data_persistence_added: false
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by choosing the next bounded alignment direction after the session binding, kick/disconnect, and session data source-first map.
+nakama_capability_family: distributed_runtime_observability_planning
+
+candidate_directions:
+  selected:
+    - define_pitaya_aligned_runtime_observability_boundary_gate
+  deferred:
+    - implement_runtime_endpoint_behavior
+    - implement_metrics_endpoints
+    - implement_tracing_pipeline
+    - implement_observability_pipeline
+    - implement_dashboard_or_admin_console
+    - return_to_nakama_product_module_expansion
+    - implement_session_binding_or_kick_disconnect_behavior
+    - implement_distributed_runtime_behavior
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_observability_boundary_gate_selected
+  adopted:
+    - runtime observability vocabulary as the next planning surface
+    - current minimum operations inspection remains source-first and local
+    - current health, readiness, version, config, route inventory, and verification facts remain vibit-owned
+  adapted:
+    - selection-only repository memory before any runtime observability gate
+    - explicit no-implementation flags before runtime endpoints, metrics, tracing, dashboards, dependencies, or distributed runtime changes
+    - Nakama remains the primary product reference while Pitaya supplies deferred architecture vocabulary
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - runtime endpoint behavior in this slice
+    - metrics endpoint behavior in this slice
+    - tracing or observability pipelines in this slice
+    - dashboard or admin console behavior in this slice
+
+acceptance_criteria:
+  - The next Pitaya-aligned direction is selected as `define_pitaya_aligned_runtime_observability_boundary_gate`.
+  - `M-199/W-0271 Define Pitaya-aligned runtime observability boundary gate` is next-ready.
+  - Repository checks verify ADR-0178, change artifacts, rule registration, W-0270 completion, W-0271 next-ready state, and explicit implementation deferrals.
+  - The slice does not add runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, session binding behavior, kick/disconnect behavior, session data behavior or persistence, transport behavior changes, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0178, W-0270 completion, W-0271 next-ready state, change artifacts, conversation memory, rule registration, and deferral flags.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by `node tools/vibit check runtime --json`; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map/
+    - decisions/ADR-0178-select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map.md
+    - conversations/2026-05-26-select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - metrics endpoints
+    - tracing pipelines
+    - observability pipelines
+    - dashboards
+    - admin console behavior
+    - player/session/token inspectors
+    - event/audit tables
+    - session binding behavior
+    - kick or disconnect behavior
+    - session data behavior
+    - session data persistence
+    - acceptor behavior
+    - TCP acceptors
+    - WebSocket transport behavior changes
+    - connection lifecycle behavior changes
+    - route handler implementation
+    - handler routing behavior
+    - handler pipeline behavior
+    - pipeline middleware behavior
+    - backend route targeting
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map
+    - node tools/vibit check change select-next-pitaya-aligned-direction-after-session-binding-kick-disconnect-session-data-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
