@@ -197,6 +197,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
   "runtime.pitaya_aligned_route_handler_pipeline_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_route_handler_pipeline_map",
+  "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -44064,6 +44065,257 @@ function checkRuntimeNextPitayaAlignedDirectionAfterRouteHandlerPipelineMap(root
   });
 }
 
+function checkRuntimePitayaAlignedSerializerMessageForwardingBoundaryGate(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate";
+  const standardPath = "docs/pitaya-aligned-serializer-message-forwarding-boundary-gate.md";
+  const standardTranslationPath = "docs/pitaya-aligned-serializer-message-forwarding-boundary-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0170-pitaya-aligned-serializer-message-forwarding-boundary-gate.md";
+  const changePath = "changes/2026-05-26-define-pitaya-aligned-serializer-message-forwarding-boundary-gate";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-serializer-message-forwarding-boundary-gate.md";
+
+  if (!pitayaAlignedSerializerMessageForwardingBoundaryGateCompleted(root)) {
+    ok("Pitaya-aligned serializer and message forwarding boundary gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned serializer and message forwarding boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned serializer and message forwarding boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-191"],
+    [".arch/work-items.yaml", "id: M-190"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Serializer And Message Forwarding Boundary Gate"],
+    [".arch/work-items.yaml", "id: W-0262"],
+    [".arch/work-items.yaml", "title: Define Pitaya-aligned serializer and message forwarding boundary gate"],
+    [".arch/work-items.yaml", "decision: ADR-0170"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/work-items.yaml", "id: M-191"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Serializer And Message Forwarding Source-First Map"],
+    [".arch/work-items.yaml", "id: W-0263"],
+    [".arch/work-items.yaml", "title: Implement Pitaya-aligned serializer and message forwarding source-first map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_serializer_message_forwarding_boundary_gate: ADR-0170"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "pitaya_aligned_serializer_message_forwarding_boundary_gate_defined: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_serializer_message_forwarding_boundary_gate_check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    [".arch/runtime.yaml", "next_pitaya_serializer_message_forwarding_source_first_map_work_item: W-0263"],
+    [".arch/runtime.yaml", "next_pitaya_serializer_message_forwarding_source_first_map_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/runtime.yaml", "implementation_scope: gate_only_serializer_message_forwarding_vocabulary"],
+    [".arch/runtime.yaml", "pitaya_reference_status: serializer_message_forwarding_vocabulary_boundary_defined_for_future_architecture_planning"],
+    [".arch/runtime.yaml", "allowed_serializer_message_forwarding_vocabulary:"],
+    [".arch/runtime.yaml", "serializer_boundary"],
+    [".arch/runtime.yaml", "serializer_format"],
+    [".arch/runtime.yaml", "encode_boundary"],
+    [".arch/runtime.yaml", "decode_boundary"],
+    [".arch/runtime.yaml", "message_forwarding"],
+    [".arch/runtime.yaml", "forwarding_target"],
+    [".arch/runtime.yaml", "forwarding_envelope"],
+    [".arch/runtime.yaml", "delivery_handoff"],
+    [".arch/runtime.yaml", "current_single_process_serializer_forwarding_mapping:"],
+    [".arch/runtime.yaml", "protocol_bridge:"],
+    [".arch/runtime.yaml", "future_vocabulary: serializer_boundary"],
+    [".arch/runtime.yaml", "future_vocabulary: message_forwarding"],
+    [".arch/runtime.yaml", "future_vocabulary: delivery_handoff"],
+    [".arch/runtime.yaml", "serializer_behavior_added: false"],
+    [".arch/runtime.yaml", "message_forwarding_behavior_added: false"],
+    [".arch/runtime.yaml", "route_handler_implementation_added: false"],
+    [".arch/runtime.yaml", "route_handler_pipeline_implementation_added: false"],
+    [".arch/runtime.yaml", "handler_routing_behavior_added: false"],
+    [".arch/runtime.yaml", "handler_pipeline_behavior_added: false"],
+    [".arch/runtime.yaml", "pipeline_middleware_behavior_added: false"],
+    [".arch/runtime.yaml", "backend_route_targeting_added: false"],
+    [".arch/runtime.yaml", "cluster_safe_session_routing_added: false"],
+    [".arch/runtime.yaml", "service_discovery_implementation_added: false"],
+    [".arch/runtime.yaml", "server_to_server_rpc_implementation_added: false"],
+    [".arch/runtime.yaml", "remote_call_behavior_added: false"],
+    [".arch/runtime.yaml", "frontend_backend_server_roles_added: false"],
+    [".arch/runtime.yaml", "distributed_runtime_implementation_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2fu_pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    [".arch/reference.yaml", "phase_2fv_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    [".arch/conventions.yaml", "selected_follow_up_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/conventions.yaml", "serializer_behavior_added: false"],
+    [".arch/conventions.yaml", "message_forwarding_behavior_added: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    [".arch/contracts.yaml", "selected_follow_up_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
+    [".arch/contracts.yaml", "serializer_behavior_added: false"],
+    [".arch/contracts.yaml", "message_forwarding_behavior_added: false"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "pitaya_aligned_serializer_message_forwarding_boundary_gate: defined",
+      "completed_work_item: W-0262",
+      "future_implementation_work_item: W-0263",
+      "allowed_serializer_message_forwarding_vocabulary:",
+      "current_single_process_serializer_forwarding_mapping:",
+      "serializer_behavior_added: false",
+      "message_forwarding_behavior_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0170",
+      "M-190/W-0262",
+      "M-191/W-0263",
+      "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate",
+      "This decision does not add serializer behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "pitaya_aligned_serializer_message_forwarding_boundary_gate: defined",
+      "completed_work_item: W-0262",
+      "completed_milestone: M-190",
+      "previous_completed_work_item: W-0261",
+      "next_milestone: M-191",
+      "next_work_item: W-0263",
+      "selected_direction: define_pitaya_aligned_serializer_message_forwarding_boundary_gate",
+      "next_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map",
+      "check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate",
+      "serializer_behavior_added: false",
+      "message_forwarding_behavior_added: false",
+      "route_handler_implementation_added: false",
+      "handler_routing_behavior_added: false",
+      "handler_pipeline_behavior_added: false",
+      "pipeline_middleware_behavior_added: false",
+      "backend_route_targeting_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0262",
+      "W-0263",
+      "ADR-0170",
+      "runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate",
+      "No ignored credential file contents",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned serializer and message forwarding boundary gate completes W-0262, opens W-0263, and preserves serializer, forwarding, route handler, handler routing, pipeline, backend targeting, runtime, protocol, generated, persistence, dependency, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -45973,6 +46225,10 @@ function nextPitayaAlignedDirectionAfterRouteHandlerPipelineMapCompleted(root) {
   return workItemHasStatus(root, "W-0261", "completed");
 }
 
+function pitayaAlignedSerializerMessageForwardingBoundaryGateCompleted(root) {
+  return workItemHasStatus(root, "W-0262", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -46005,6 +46261,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedSerializerMessageForwardingBoundaryGateCompleted(root)) {
+    return "repository_next_work_item: W-0263";
+  }
   if (nextPitayaAlignedDirectionAfterRouteHandlerPipelineMapCompleted(root)) {
     return "repository_next_work_item: W-0262";
   }
@@ -46153,6 +46412,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedSerializerMessageForwardingBoundaryGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_serializer_message_forwarding_source_first_map";
+  }
   if (nextPitayaAlignedDirectionAfterRouteHandlerPipelineMapCompleted(root)) {
     return "repository_next_work_item_scope: define_pitaya_aligned_serializer_message_forwarding_boundary_gate";
   }
@@ -46292,6 +46554,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedSerializerMessageForwardingBoundaryGateCompleted(root)) {
+    return "W-0263 Implement Pitaya-aligned serializer and message forwarding source-first map";
+  }
   if (nextPitayaAlignedDirectionAfterRouteHandlerPipelineMapCompleted(root)) {
     return "W-0262 Define Pitaya-aligned serializer and message forwarding boundary gate";
   }
@@ -46455,6 +46720,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0262", "next_ready_work_item: W-0263"],
     ["W-0261", "next_ready_work_item: W-0262"],
     ["W-0260", "next_ready_work_item: W-0261"],
     ["W-0259", "next_ready_work_item: W-0260"],
@@ -46545,6 +46811,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0262", "completed")) {
+    return "next_work_item: W-0263";
+  }
   if (workItemHasStatus(root, "W-0261", "completed")) {
     return "next_work_item: W-0262";
   }
@@ -46760,6 +47029,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0262", "implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
     ["W-0261", "define_pitaya_aligned_serializer_message_forwarding_boundary_gate"],
     ["W-0260", "select_next_pitaya_aligned_direction_after_route_handler_pipeline_map"],
     ["W-0259", "implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
@@ -46850,6 +47120,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0262", "W-0263 Implement Pitaya-aligned serializer and message forwarding source-first map"],
     ["W-0261", "W-0262 Define Pitaya-aligned serializer and message forwarding boundary gate"],
     ["W-0260", "W-0261 Select next Pitaya-aligned direction after route handler pipeline map"],
     ["W-0259", "W-0260 Implement Pitaya-aligned route handler pipeline source-first map"],
@@ -46941,6 +47212,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0262", "current_phase: implement_pitaya_aligned_serializer_message_forwarding_source_first_map"],
     ["W-0261", "current_phase: define_pitaya_aligned_serializer_message_forwarding_boundary_gate"],
     ["W-0260", "current_phase: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map"],
     ["W-0259", "current_phase: implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
@@ -47624,6 +47896,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedRouteHandlerPipelineBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedRouteHandlerPipelineSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterRouteHandlerPipelineMap(root, goFiles);
+  checkRuntimePitayaAlignedSerializerMessageForwardingBoundaryGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

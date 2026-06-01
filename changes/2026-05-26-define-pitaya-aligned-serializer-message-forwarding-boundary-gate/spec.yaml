@@ -1,0 +1,111 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-serializer-message-forwarding-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned serializer and message forwarding boundary and open a source-first serializer/message forwarding map follow-up without adding serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0170
+  referenced:
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_serializer_message_forwarding_boundary_gate: defined
+  completed_work_item: W-0262
+  completed_milestone: M-190
+  previous_completed_work_item: W-0261
+  next_milestone: M-191
+  next_work_item: W-0263
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_serializer_message_forwarding_boundary_gate
+  next_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map
+  decision: ADR-0170
+  check_rule: runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate
+  previous_direction_decision: ADR-0169
+  route_handler_pipeline_source_first_map_decision: ADR-0168
+  route_handler_pipeline_source_first_map_check_rule: runtime.pitaya_aligned_route_handler_pipeline_source_first_map
+  standard: docs/pitaya-aligned-serializer-message-forwarding-boundary-gate.md
+  translation: docs/pitaya-aligned-serializer-message-forwarding-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: serializer_message_forwarding_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_serializer_message_forwarding_vocabulary
+  future_implementation_work_item: W-0263
+  future_implementation_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map
+  allowed_serializer_message_forwarding_vocabulary:
+    - serializer_boundary
+    - serializer_format
+    - encode_boundary
+    - decode_boundary
+    - message_forwarding
+    - forwarding_target
+    - forwarding_envelope
+    - delivery_handoff
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  route_handler_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The gate defines allowed serializer and message forwarding vocabulary.
+  - The gate maps current protocol bridge, generated payload bridge, outbound message, target-scope metadata, and delivery surfaces to future serializer/message forwarding vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0263 as a narrow source-first serializer and message forwarding map work item.
+  - The gate does not add serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_serializer_message_forwarding_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-serializer-message-forwarding-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
