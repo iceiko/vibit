@@ -7507,13 +7507,36 @@ confirm_next_alpha_direction_after_realtime_outbound_delivery_slice:
     dependency_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map:
-    status: planned
+    status: completed
     milestone: M-195
-    next_ready_work_item: W-0267
+    completed_work_item: W-0267
+    decision: ADR-0175
+    check_rule: runtime.next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    next_ready_work_item: W-0268
     source_map_decision: ADR-0174
     selected_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    selected_follow_up_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
     implementation_scope: direction_selection_only
-    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_boundary_gate_selected
+    implementation_authorized_by_this_selection: false
+    session_binding_behavior_added: false
+    kick_disconnect_behavior_added: false
+    session_data_behavior_added: false
+    session_data_persistence_added: false
+    acceptor_behavior_added: false
+    connection_lifecycle_behavior_changed: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    dependency_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate:
+    status: planned
+    milestone: M-196
+    next_ready_work_item: W-0268
+    selected_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
+    implementation_scope: gate_only_session_binding_kick_disconnect_session_data_vocabulary
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_boundary_gate_selected
 
 server_runtime:
   first_reference_language: Go

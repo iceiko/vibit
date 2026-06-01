@@ -176,20 +176,21 @@ purpose: >
   next_pitaya_aligned_direction_after_serializer_message_forwarding_map: ADR-0172
   pitaya_aligned_acceptor_connection_lifecycle_boundary_gate: ADR-0173
   pitaya_aligned_acceptor_connection_lifecycle_source_first_map: ADR-0174
+  next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map: ADR-0175
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+  current_phase: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0267
+  next_ready_work_item: W-0268
   primary_product_reference: Nakama
-  pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+  pitaya_reference_status: session_binding_kick_disconnect_session_data_boundary_gate_selected
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -2087,7 +2088,7 @@ architecture_scope:
     completed_work_item: W-0266
     previous_completed_work_item: W-0265
     next_milestone: M-195
-    next_ready_work_item: W-0267
+    next_ready_work_item: W-0268
     gate_decision: ADR-0173
     decision: ADR-0174
     change: changes/2026-05-26-implement-pitaya-aligned-acceptor-connection-lifecycle-source-first-map
@@ -2204,13 +2205,91 @@ architecture_scope:
     sdk_added: false
     direct_nakama_pitaya_api_compatibility_added: false
   next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map:
-    status: planned
+    status: completed
     milestone: M-195
-    next_ready_work_item: W-0267
+    completed_work_item: W-0267
+    decision: ADR-0175
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-acceptor-connection-lifecycle-map
+    check_rule: runtime.next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    previous_completed_work_item: W-0266
+    next_milestone: M-196
+    next_ready_work_item: W-0268
     source_map_decision: ADR-0174
     selected_direction: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    selected_follow_up_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
+    next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map_completed: true
+    next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map_decision: ADR-0175
+    next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map_check_rule: runtime.next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map
+    selected_next_pitaya_direction_after_acceptor_connection_lifecycle_map: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
+    future_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate_work_item: W-0268
     implementation_scope: direction_selection_only
-    pitaya_reference_status: acceptor_connection_lifecycle_source_first_map_implemented
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_boundary_gate_selected
+    implementation_authorized_by_this_selection: false
+    session_binding_behavior_added: false
+    kick_disconnect_behavior_added: false
+    session_data_behavior_added: false
+    session_data_persistence_added: false
+    acceptor_behavior_added: false
+    websocket_acceptor_behavior_changed: false
+    tcp_acceptor_added: false
+    connection_lifecycle_behavior_changed: false
+    concrete_socket_close_behavior_changed: false
+    serializer_behavior_added: false
+    message_forwarding_behavior_added: false
+    route_handler_implementation_added: false
+    route_handler_pipeline_implementation_added: false
+    handler_routing_behavior_added: false
+    handler_pipeline_behavior_added: false
+    pipeline_middleware_behavior_added: false
+    backend_route_targeting_added: false
+    cluster_safe_session_routing_added: false
+    session_location_registry_added: false
+    connection_owner_node_registry_added: false
+    routing_epoch_behavior_added: false
+    session_route_target_added: false
+    remote_connection_handoff_added: false
+    reconnect_route_added: false
+    distributed_session_routing_added: false
+    distributed_group_implementation_added: false
+    distributed_groups_added: false
+    group_membership_registry_added: false
+    room_broadcast_fanout_added: false
+    broadcast_delivery_guarantee_added: false
+    stream_subscription_added: false
+    service_discovery_implementation_added: false
+    service_registry_added: false
+    service_selector_added: false
+    node_registry_added: false
+    server_identity_added: false
+    server_to_server_rpc_implementation_added: false
+    remote_call_behavior_added: false
+    frontend_server_implementation_added: false
+    backend_server_implementation_added: false
+    frontend_backend_server_roles_added: false
+    distributed_runtime_implementation_added: false
+    runtime_behavior_added: false
+    runtime_endpoint_behavior_added: false
+    metrics_endpoint_added: false
+    tracing_pipeline_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    dependency_added: false
+    migration_added: false
+    authentication_session_behavior_changed: false
+    hosted_deployment_added: false
+    sdk_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate:
+    status: planned
+    milestone: M-196
+    next_ready_work_item: W-0268
+    selection_decision: ADR-0175
+    selected_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
+    implementation_scope: gate_only_session_binding_kick_disconnect_session_data_vocabulary
+    pitaya_reference_status: session_binding_kick_disconnect_session_data_boundary_gate_selected
   minimum_operations_inspection_surface_gate:
     status: completed
     milestone: M-172
