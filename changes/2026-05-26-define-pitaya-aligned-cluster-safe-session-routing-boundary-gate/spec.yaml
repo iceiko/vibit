@@ -1,0 +1,274 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-cluster-safe-session-routing-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned cluster-safe session routing boundary and open a source-first session routing map follow-up without adding cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote handoff, reconnect routing, distributed runtime behavior, service discovery implementation, RPC implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0164
+  referenced:
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_cluster_safe_session_routing_boundary_gate: defined
+  completed_work_item: W-0256
+  completed_milestone: M-184
+  previous_completed_work_item: W-0255
+  next_milestone: M-185
+  next_work_item: W-0257
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate
+  next_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+  decision: ADR-0164
+  check_rule: runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate
+  distributed_group_broadcast_source_first_map_decision: ADR-0163
+  distributed_group_broadcast_source_first_map_check_rule: runtime.pitaya_aligned_distributed_group_broadcast_source_first_map
+  standard: docs/pitaya-aligned-cluster-safe-session-routing-boundary-gate.md
+  translation: docs/pitaya-aligned-cluster-safe-session-routing-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: cluster_safe_session_routing_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_cluster_safe_session_routing_vocabulary
+  future_implementation_work_item: W-0257
+  future_implementation_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+  allowed_cluster_safe_session_routing_vocabulary:
+    - cluster_safe_session_routing
+    - session_location
+    - connection_owner_node
+    - routing_epoch
+    - session_route_target
+    - connection_handoff
+    - reconnect_route
+  related_vocabulary:
+    - connection_id
+    - connection_epoch
+    - first_message_connection_binding
+    - active_connection_registry
+    - runtime_session
+    - bound_connection_identity
+    - request_token_identity
+    - session_validated_identity
+    - single_process_connection_binding
+    - frontend_server
+    - backend_server
+    - service_discovery
+    - server_to_server_rpc
+    - remote_call
+    - distributed_group
+    - room_broadcast
+  current_single_process_session_routing_mapping:
+    connection_id:
+      current: server_observed_connection_id_epoch
+      future_vocabulary: connection_owner_node
+      implementation_status: current_single_process_connection_binding
+    connection_epoch:
+      current: server_observed_connection_id_epoch
+      future_vocabulary: routing_epoch
+      implementation_status: current_single_process_connection_binding
+    first_message_connection_binding:
+      current: current_single_process_connection_binding
+      future_vocabulary: session_location
+      implementation_status: active_connection_registry_single_process
+    active_connection_registry:
+      current: active_connection_registry_single_process
+      future_vocabulary: session_location
+      implementation_status: no_cross_node_session_location
+    runtime_session:
+      current: metadata_only_session_id_not_routing_proof
+      future_vocabulary: session_route_target
+      implementation_status: no_cluster_route_target
+    bound_connection_identity:
+      current: current_single_process_connection_binding
+      future_vocabulary: session_location
+      implementation_status: no_distributed_session_routing
+    request_token_identity:
+      current: request_level_identity_not_cluster_route
+      future_vocabulary: session_route_target
+      implementation_status: no_cluster_route_target
+    session_validated_identity:
+      current: request_validation_status_not_cluster_route
+      future_vocabulary: session_route_target
+      implementation_status: no_cross_node_session_location
+    connection_handoff:
+      current: no_remote_connection_handoff
+      future_vocabulary: connection_handoff
+      implementation_status: deferred_future_architecture_reference
+    reconnect_route:
+      current: reconnect_epoch_local_only_not_cluster_routing
+      future_vocabulary: reconnect_route
+      implementation_status: deferred_future_architecture_reference
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining future cluster-safe session routing vocabulary while preserving current single-process connection binding, active connection registry, runtime session validation, and request identity boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_service_discovery_and_session_routing
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: cluster_safe_session_routing_vocabulary_boundary_defined_for_future_architecture_planning
+  adopted:
+    - cluster_safe_session_routing vocabulary
+    - session_location vocabulary
+    - connection_owner_node vocabulary
+    - routing_epoch vocabulary
+    - session_route_target vocabulary
+    - connection_handoff vocabulary
+    - reconnect_route vocabulary
+    - single-process connection binding to deferred session location mapping
+    - active connection registry to deferred session location mapping
+  adapted:
+    - session routing vocabulary only before implementation
+    - source-first mapping before registries, handoff, or routing behavior
+    - vibit application identity validation and module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, session, route, registry, selector, or handoff naming compatibility
+    - cluster-safe session routing behavior in this slice
+    - session location registries in this slice
+    - connection owner node registries in this slice
+    - routing epoch behavior, session route targets, remote handoff, reconnect routing, or distributed session routing in this slice
+    - service discovery, RPC, remote call, frontend/backend role, distributed group, broadcast fanout, or distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The gate defines allowed cluster-safe session routing vocabulary.
+  - The gate maps current connection/session binding surfaces to future cluster-safe session routing vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0257 as a narrow source-first cluster-safe session routing map work item.
+  - The gate does not add cluster-safe session routing behavior, registries, handoff, reconnect routing, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0164, gate standard, translation, change artifacts, cluster-safe session routing vocabulary markers, W-0256 completion, W-0257 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-cluster-safe-session-routing-boundary-gate.md
+    - docs/pitaya-aligned-cluster-safe-session-routing-boundary-gate.zh-CN.md
+    - changes/2026-05-26-define-pitaya-aligned-cluster-safe-session-routing-boundary-gate/
+    - decisions/ADR-0164-pitaya-aligned-cluster-safe-session-routing-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-cluster-safe-session-routing-boundary-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - cluster-safe session routing behavior
+    - session location registries
+    - connection owner node registries
+    - routing epoch behavior
+    - session route targets
+    - remote connection handoff
+    - reconnect routing
+    - distributed session routing
+    - distributed runtime implementation
+    - distributed group implementation
+    - group membership registries
+    - room broadcast fanout
+    - delivery guarantees
+    - stream subscriptions
+    - service discovery implementation
+    - service registry behavior
+    - service selector behavior
+    - node registry behavior
+    - server identity behavior
+    - server-to-server RPC implementation
+    - remote call behavior
+    - frontend/backend server role implementation
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-cluster-safe-session-routing-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

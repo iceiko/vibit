@@ -258,7 +258,7 @@ pitaya_aligned_service_discovery_source_first_map_decision: ADR-0161
 pitaya_aligned_service_discovery_source_first_map_check_rule: runtime.pitaya_aligned_service_discovery_source_first_map
 historical_after_adr_0127:
   pitaya_reference_status: deferred_future_architecture_reference
-next_work_item: W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate
+next_work_item: W-0257 Implement Pitaya-aligned cluster-safe session routing source-first map
 ```
 
 Goal: move from a source-first alpha that developers can inspect to a foundation they can use for a serious small prototype.
@@ -375,8 +375,8 @@ user requirement -> spec -> acceptance criteria -> test plan -> tests -> contrac
 After authenticated failure-path proof, next capability selection, the example client path gate, the example client path implementation, the follow-up scaffolding selection, the feature request scaffolding gate, the feature request scaffolding implementation, the scaffolded Nakama intake pilot, the friends relationship lifecycle gate, the friends relationship persistence schema gate, the friends relationship migration source, the friends relationship repository boundary, the storage-neutral friends relationship repository interface implementation, the friends relationship PostgreSQL adapter gate, the friends relationship PostgreSQL adapter implementation, the friends relationship runtime behavior gate, the friends relationship runtime behavior implementation, the friends relationship protocol route gate, the friends relationship protocol route implementation, the friends relationship protocol route local proof, the post-proof next capability selection, the minimum operations inspection surface gate, the source-first operations inspection implementation, the Pitaya distributed runtime vocabulary map, the frontend/backend role map, the server-to-server RPC boundary gate, the server-to-server RPC source-first map, the service discovery boundary gate, and the service discovery source-first map, the next concrete work should not jump directly to chat, groups, matchmaking, match runtime, SDK publication, hosted demos, distributed runtime implementation, broad social modules, event/audit tables, generated client libraries, new protocol shape, admin endpoints, metrics endpoints, observability pipelines, dashboards, frontend/backend server role implementation, server-to-server RPC implementation, remote calls, service discovery implementation, service registries, service selectors, node identity, distributed groups, room broadcast fanout, or cluster-safe session routing. The next concrete work should define only a gate-only Pitaya-aligned distributed group and broadcast boundary:
 
 ```text
-next_work_item: W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate
-recommended_next_direction: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate
+next_work_item: W-0257 Implement Pitaya-aligned cluster-safe session routing source-first map
+recommended_next_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
 primary_product_reference: Nakama
 pitaya_reference_status: distributed_group_broadcast_vocabulary_boundary_defined_for_future_architecture_planning
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
@@ -409,7 +409,7 @@ Rationale:
 - `ADR-0159` implemented `node tools/vibit inspect pitaya-rpc --json`, registered `runtime.pitaya_aligned_server_to_server_rpc_source_first_map`, and opened `W-0252 Define Pitaya-aligned service discovery boundary gate`.
 - `ADR-0160` defined the Pitaya-aligned service discovery boundary gate, registered `runtime.pitaya_aligned_service_discovery_boundary_gate`, and opened `W-0253 Implement Pitaya-aligned service discovery source-first map`.
 - `ADR-0161` implemented `node tools/vibit inspect pitaya-discovery --json`, registered `runtime.pitaya_aligned_service_discovery_source_first_map`, and opened `W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate`.
-- `ADR-0162` defined the Pitaya-aligned distributed group and broadcast boundary gate, registered `runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate`, and opened `W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate`.
+- `ADR-0162` defined the Pitaya-aligned distributed group and broadcast boundary gate, registered `runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate`, and opened `W-0257 Implement Pitaya-aligned cluster-safe session routing source-first map`.
 - Friend relationship lifecycle is a core Nakama-class social graph primitive, and its protected protocol route family is now proven through the local alpha request flow.
 - The operations inspection surface now makes local alpha status, route families, verification posture, and deferred operations surfaces inspectable without adding runtime endpoints.
 - The service discovery source-first map now makes future Pitaya-aligned service discovery, registry, instance, and selector vocabulary inspectable before groups, parties, chat targeting, invites, matchmaking filters, or match runtime social context depend on broader scope.
