@@ -448,3 +448,12 @@ Agents 禁止：
 - 在 single-process semantics 测试稳定前启动 distributed runtime work。
 - 把 product parity 当成削弱 generated-file、redaction、permission、session 或 module-boundary rules 的许可。
 - 对非平凡用户可见需求跳过 acceptance criteria 或 test planning。
+
+## Current Continuation
+
+```yaml
+next_work_item: W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map
+recommended_next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+```
+
+`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`，并继续延后 behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。

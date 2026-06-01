@@ -203,6 +203,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_acceptor_connection_lifecycle_boundary_gate",
   "runtime.pitaya_aligned_acceptor_connection_lifecycle_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map",
+  "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -45942,6 +45943,274 @@ function checkRuntimeNextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleM
   });
 }
 
+function checkRuntimePitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGate(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate";
+  const standardPath = "docs/pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.md";
+  const standardTranslationPath = "docs/pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0176-pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.md";
+  const changePath = "changes/2026-05-26-define-pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-session-binding-kick-disconnect-session-data-boundary-gate.md";
+
+  if (!pitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGateCompleted(root)) {
+    ok("Pitaya-aligned session binding, kick/disconnect, and session data boundary gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-197"],
+    [".arch/work-items.yaml", "id: M-196"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Session Binding Kick Disconnect Session Data Boundary Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0268"],
+    [".arch/work-items.yaml", "title: Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate"],
+    [".arch/work-items.yaml", "decision: ADR-0176"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/work-items.yaml", "id: M-197"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Session Binding Kick Disconnect Session Data Source-First Map"],
+    [".arch/work-items.yaml", "id: W-0269"],
+    [".arch/work-items.yaml", "title: Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate: ADR-0176"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate_defined: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate_check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    [".arch/runtime.yaml", "next_pitaya_session_binding_kick_disconnect_session_data_source_first_map_work_item: W-0269"],
+    [".arch/runtime.yaml", "next_pitaya_session_binding_kick_disconnect_session_data_source_first_map_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/runtime.yaml", "implementation_scope: gate_only_session_binding_kick_disconnect_session_data_vocabulary"],
+    [".arch/runtime.yaml", "pitaya_reference_status: session_binding_kick_disconnect_session_data_vocabulary_boundary_defined_for_future_architecture_planning"],
+    [".arch/runtime.yaml", "allowed_session_binding_kick_disconnect_session_data_vocabulary:"],
+    [".arch/runtime.yaml", "session_binding_boundary"],
+    [".arch/runtime.yaml", "connection_bound_session"],
+    [".arch/runtime.yaml", "session_data"],
+    [".arch/runtime.yaml", "session_data_scope"],
+    [".arch/runtime.yaml", "server_initiated_disconnect"],
+    [".arch/runtime.yaml", "server_initiated_kick"],
+    [".arch/runtime.yaml", "session_unbind"],
+    [".arch/runtime.yaml", "session_close_reason"],
+    [".arch/runtime.yaml", "connection_session_handoff"],
+    [".arch/runtime.yaml", "presence_session_handoff"],
+    [".arch/runtime.yaml", "current_single_process_session_binding_kick_disconnect_session_data_mapping:"],
+    [".arch/runtime.yaml", "future_vocabulary: session_binding_boundary"],
+    [".arch/runtime.yaml", "future_vocabulary: connection_bound_session"],
+    [".arch/runtime.yaml", "future_vocabulary: session_data"],
+    [".arch/runtime.yaml", "future_vocabulary: server_initiated_disconnect"],
+    [".arch/runtime.yaml", "future_vocabulary: server_initiated_kick"],
+    [".arch/runtime.yaml", "future_vocabulary: session_unbind"],
+    [".arch/runtime.yaml", "future_vocabulary: presence_session_handoff"],
+    [".arch/runtime.yaml", "session_binding_behavior_added: false"],
+    [".arch/runtime.yaml", "kick_disconnect_behavior_added: false"],
+    [".arch/runtime.yaml", "session_data_behavior_added: false"],
+    [".arch/runtime.yaml", "session_data_persistence_added: false"],
+    [".arch/runtime.yaml", "acceptor_behavior_added: false"],
+    [".arch/runtime.yaml", "tcp_acceptor_added: false"],
+    [".arch/runtime.yaml", "websocket_acceptor_behavior_changed: false"],
+    [".arch/runtime.yaml", "connection_lifecycle_behavior_changed: false"],
+    [".arch/runtime.yaml", "route_handler_implementation_added: false"],
+    [".arch/runtime.yaml", "backend_route_targeting_added: false"],
+    [".arch/runtime.yaml", "cluster_safe_session_routing_added: false"],
+    [".arch/runtime.yaml", "distributed_session_routing_added: false"],
+    [".arch/runtime.yaml", "service_discovery_implementation_added: false"],
+    [".arch/runtime.yaml", "server_to_server_rpc_implementation_added: false"],
+    [".arch/runtime.yaml", "distributed_runtime_implementation_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "metrics_endpoint_added: false"],
+    [".arch/runtime.yaml", "tracing_pipeline_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2ga_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    [".arch/reference.yaml", "phase_2gb_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    [".arch/conventions.yaml", "selected_follow_up_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/conventions.yaml", "session_binding_behavior_added: false"],
+    [".arch/conventions.yaml", "kick_disconnect_behavior_added: false"],
+    [".arch/conventions.yaml", "session_data_behavior_added: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    [".arch/contracts.yaml", "selected_follow_up_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
+    [".arch/contracts.yaml", "commands_added: []"],
+    [".arch/contracts.yaml", "session_binding_behavior_added: false"],
+    [".arch/contracts.yaml", "kick_disconnect_behavior_added: false"],
+    [".arch/contracts.yaml", "session_data_behavior_added: false"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate: defined",
+      "completed_work_item: W-0268",
+      "future_implementation_work_item: W-0269",
+      "allowed_session_binding_kick_disconnect_session_data_vocabulary:",
+      "current_single_process_session_binding_kick_disconnect_session_data_mapping:",
+      "session_binding_behavior_added: false",
+      "kick_disconnect_behavior_added: false",
+      "session_data_behavior_added: false",
+      "session_data_persistence_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [decisionPath]: [
+      "ADR-0176",
+      "M-196/W-0268",
+      "M-197/W-0269",
+      "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate",
+      "This decision does not add session binding behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate: defined",
+      "completed_work_item: W-0268",
+      "completed_milestone: M-196",
+      "previous_completed_work_item: W-0267",
+      "next_milestone: M-197",
+      "next_work_item: W-0269",
+      "selected_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate",
+      "next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map",
+      "check_rule: runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate",
+      "session_binding_behavior_added: false",
+      "kick_disconnect_behavior_added: false",
+      "session_data_behavior_added: false",
+      "session_data_persistence_added: false",
+      "acceptor_behavior_added: false",
+      "tcp_acceptor_added: false",
+      "websocket_acceptor_behavior_changed: false",
+      "connection_lifecycle_behavior_changed: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "metrics_endpoint_added: false",
+      "tracing_pipeline_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0268",
+      "W-0269",
+      "ADR-0176",
+      "runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate",
+      "No ignored credential file contents",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward|connect|disconnect|kick)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward|connect|disconnect|kick)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Disconnect|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward|Acceptor|Connection|Accept|Close|Bind|Presence)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned session binding, kick/disconnect, and session data boundary gate completes W-0268, opens W-0269, and preserves session binding, kick/disconnect, session data, acceptor, TCP, WebSocket, connection lifecycle, route handler, backend targeting, runtime, protocol, generated, persistence, dependency, metrics, tracing, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -47875,6 +48144,10 @@ function nextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleMapCompleted(
   return workItemHasStatus(root, "W-0267", "completed");
 }
 
+function pitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGateCompleted(root) {
+  return workItemHasStatus(root, "W-0268", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -47907,6 +48180,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGateCompleted(root)) {
+    return "repository_next_work_item: W-0269";
+  }
   if (nextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleMapCompleted(root)) {
     return "repository_next_work_item: W-0268";
   }
@@ -48073,6 +48349,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map";
+  }
   if (nextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleMapCompleted(root)) {
     return "repository_next_work_item_scope: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate";
   }
@@ -48230,6 +48509,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGateCompleted(root)) {
+    return "W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map";
+  }
   if (nextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleMapCompleted(root)) {
     return "W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate";
   }
@@ -48411,6 +48693,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0268", "next_ready_work_item: W-0269"],
     ["W-0267", "next_ready_work_item: W-0268"],
     ["W-0266", "next_ready_work_item: W-0267"],
     ["W-0265", "next_ready_work_item: W-0266"],
@@ -48507,6 +48790,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0268", "completed")) {
+    return "next_work_item: W-0269";
+  }
   if (workItemHasStatus(root, "W-0267", "completed")) {
     return "next_work_item: W-0268";
   }
@@ -48740,6 +49026,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0268", "implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
     ["W-0267", "define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
     ["W-0266", "select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
     ["W-0265", "implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
@@ -48836,6 +49123,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0268", "W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map"],
     ["W-0267", "W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate"],
     ["W-0266", "W-0267 Select next Pitaya-aligned direction after acceptor and connection lifecycle map"],
     ["W-0265", "W-0266 Implement Pitaya-aligned acceptor and connection lifecycle source-first map"],
@@ -48933,6 +49221,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0268", "current_phase: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map"],
     ["W-0267", "current_phase: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate"],
     ["W-0266", "current_phase: select_next_pitaya_aligned_direction_after_acceptor_connection_lifecycle_map"],
     ["W-0265", "current_phase: implement_pitaya_aligned_acceptor_connection_lifecycle_source_first_map"],
@@ -49628,6 +49917,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedAcceptorConnectionLifecycleBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedAcceptorConnectionLifecycleSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterAcceptorConnectionLifecycleMap(root, goFiles);
+  checkRuntimePitayaAlignedSessionBindingKickDisconnectSessionDataBoundaryGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

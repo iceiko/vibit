@@ -244,3 +244,12 @@ This document records product maturity goals. It does not itself:
 - add Pitaya-style distributed architecture before a later ADR reactivates it;
 - add direct Nakama/Pitaya API compatibility;
 - declare the current alpha production-ready.
+
+## Current Continuation
+
+```yaml
+next_work_item: W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map
+next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+```
+
+`ADR-0176` registered `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate` and completed `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`.

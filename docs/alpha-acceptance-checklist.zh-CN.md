@@ -184,6 +184,10 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: define_pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate
+next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
 next_work_status: next_ready
 ```
+
+Current next work item: `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map`。
+
+Current check rule: `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`。

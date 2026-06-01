@@ -222,3 +222,12 @@ cd runtime && go test ./...
 examples/local-alpha-request-loop.sh
 git diff --check
 ```
+
+## Current Continuation
+
+```yaml
+next_work_item: W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map
+next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+```
+
+`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`，并打开 W-0269 source-first map follow-up。

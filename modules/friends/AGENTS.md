@@ -102,3 +102,7 @@ For the current repository interface slice, tests must cover:
 - Absence of secret, transport, protocol, distributed, chat, group, party, match, and direct compatibility fields.
 
 Run `node tools/vibit check runtime` after changing friends runtime source. When Go is available, also run `cd runtime && go test ./...`.
+
+## Repository Continuation
+
+`ADR-0176` registered `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`, completed `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`, and opened `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map` as the repository next work item. This remains outside the friends module.

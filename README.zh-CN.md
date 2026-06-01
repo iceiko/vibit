@@ -298,3 +298,9 @@ node tools/vibit check schemas
 ```text
 agent-native server framework
 ```
+
+## Current Continuation
+
+`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`，并打开 `W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map` 作为 next-ready。
+
+下一方向是 `implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map`。

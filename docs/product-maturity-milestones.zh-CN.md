@@ -243,3 +243,12 @@ Friends relationship 的追溯引用包括 `decisions/ADR-0142-friends-relations
 - 在后续 ADR 重新激活前添加 Pitaya-style distributed architecture；
 - 添加 direct Nakama/Pitaya API compatibility；
 - 声明当前 alpha production-ready。
+
+## Current Continuation
+
+```yaml
+next_work_item: W-0269 Implement Pitaya-aligned session binding, kick/disconnect, and session data source-first map
+next_direction: implement_pitaya_aligned_session_binding_kick_disconnect_session_data_source_first_map
+```
+
+`ADR-0176` 已注册 `runtime.pitaya_aligned_session_binding_kick_disconnect_session_data_boundary_gate`，并完成 `W-0268 Define Pitaya-aligned session binding, kick/disconnect, and session data boundary gate`。
