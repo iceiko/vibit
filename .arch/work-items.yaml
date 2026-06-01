@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-187
+current_milestone: M-188
 
 release_targets:
   short_term:
@@ -3380,7 +3380,7 @@ milestones:
 
   - id: M-187
     title: Pitaya-Aligned Route Handler Pipeline Boundary Gate
-    status: active
+    status: completed
     goal: Define a narrow Pitaya-aligned route handler pipeline boundary gate after the next-direction selection, without implementing route handlers, handler routing behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A gate records route handler, handler routing, pipeline, serializer, and forwarding vocabulary for future planning.
@@ -3388,6 +3388,18 @@ milestones:
       - The gate preserves implementation deferrals unless a later bounded work item authorizes them.
     non_goals:
       - adding route handler implementation, handler routing behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined a gate-only Pitaya-aligned route handler pipeline boundary for `route_handler`, `route_key`, `handler_dispatch`, `handler_pipeline`, `pipeline_step`, `serializer_boundary`, `message_forwarding`, and `route_target`, mapped current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, and outbound message surfaces to deferred route handler pipeline vocabulary, accepted `ADR-0167`, registered `runtime.pitaya_aligned_route_handler_pipeline_boundary_gate`, completed `W-0259`, and opened `M-188/W-0260 Implement Pitaya-aligned route handler pipeline source-first map` as next-ready. Preserved route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-188
+    title: Pitaya-Aligned Route Handler Pipeline Source-First Map
+    status: active
+    goal: Implement a source-first repository map for the Pitaya-aligned route handler pipeline vocabulary defined by ADR-0167, without implementing route handlers, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A source-first repository inspection surface summarizes route handler pipeline vocabulary and current protocol/dispatch/bridge mapping.
+      - The map preserves route-handler-pipeline-vocabulary-only posture and does not add runtime behavior.
+      - Repository checks verify the map and deferrals.
+    non_goals:
+      - adding route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -10203,7 +10215,7 @@ work_items:
   - id: W-0259
     milestone: M-187
     title: Define Pitaya-aligned route handler pipeline boundary gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-define-pitaya-aligned-route-handler-pipeline-boundary-gate
     depends_on:
       - W-0258
@@ -10234,4 +10246,47 @@ work_items:
     completion:
       - Define a Pitaya-aligned route handler pipeline boundary gate.
       - Map current vibit route dispatch and protocol adapter surfaces to deferred route handler pipeline vocabulary.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0167
+    check_rule: runtime.pitaya_aligned_route_handler_pipeline_boundary_gate
+    next_milestone: M-188
+    next_ready_work_item: W-0260
+    selected_follow_up_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map
+    completion_summary: Defined a gate-only Pitaya-aligned route handler pipeline boundary for `route_handler`, `route_key`, `handler_dispatch`, `handler_pipeline`, `pipeline_step`, `serializer_boundary`, `message_forwarding`, and `route_target`, mapped current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, and outbound message surfaces to deferred vocabulary, and preserved route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0260
+    milestone: M-188
+    title: Implement Pitaya-aligned route handler pipeline source-first map
+    status: next_ready
+    change: changes/2026-05-26-implement-pitaya-aligned-route-handler-pipeline-source-first-map
+    depends_on:
+      - W-0259
+    expected_change_id: implement-pitaya-aligned-route-handler-pipeline-source-first-map
+    tier: tier_2_architecture_implementation
+    selected_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map
+    gate_decision: ADR-0167
+    related_decisions:
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing route handlers, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of implementing only a source-first route handler pipeline map.
+    completion:
+      - Implement a source-first repository inspection map for route handler pipeline vocabulary.
+      - Summarize current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, outbound message, and implementation deferrals.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

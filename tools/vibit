@@ -194,6 +194,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate",
   "runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map",
+  "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -42989,7 +42990,7 @@ function checkRuntimeNextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMap
   }
 
   const requiredReferences = [
-    [".arch/work-items.yaml", "current_milestone: M-187"],
+    [".arch/work-items.yaml", "current_milestone: M-188"],
     [".arch/work-items.yaml", "id: M-186"],
     [".arch/work-items.yaml", "title: Select Next Pitaya-Aligned Direction After Cluster-Safe Session Routing Map"],
     [".arch/work-items.yaml", "status: completed"],
@@ -43152,6 +43153,245 @@ function checkRuntimeNextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMap
   }
 
   ok("Next Pitaya-aligned direction after cluster-safe session routing map completes W-0258, selects route handler pipeline boundary gating, opens W-0259, and adds no route handler, pipeline, serializer, forwarding, runtime, protocol, generated, persistence, dependency, hosted, SDK, or direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
+function checkRuntimePitayaAlignedRouteHandlerPipelineBoundaryGate(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate";
+  const standardPath = "docs/pitaya-aligned-route-handler-pipeline-boundary-gate.md";
+  const standardTranslationPath = "docs/pitaya-aligned-route-handler-pipeline-boundary-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0167-pitaya-aligned-route-handler-pipeline-boundary-gate.md";
+  const changePath = "changes/2026-05-26-define-pitaya-aligned-route-handler-pipeline-boundary-gate";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-route-handler-pipeline-boundary-gate.md";
+
+  if (!pitayaAlignedRouteHandlerPipelineBoundaryGateCompleted(root)) {
+    ok("Pitaya-aligned route handler pipeline boundary gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned route handler pipeline boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned route handler pipeline boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const sharedMarkers = [
+    "pitaya_aligned_route_handler_pipeline_boundary_gate: defined",
+    "completed_work_item: W-0259",
+    "decision: ADR-0167",
+    "check_rule: runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
+    "previous_direction_decision: ADR-0166",
+    "cluster_safe_session_routing_source_first_map_decision: ADR-0165",
+    "standard: docs/pitaya-aligned-route-handler-pipeline-boundary-gate.md",
+    "translation: docs/pitaya-aligned-route-handler-pipeline-boundary-gate.zh-CN.md",
+    "pitaya_reference_status: route_handler_pipeline_vocabulary_boundary_defined_for_future_architecture_planning",
+    "implementation_scope: gate_only_route_handler_pipeline_vocabulary",
+    "future_implementation_work_item: W-0260",
+    "future_implementation_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map",
+    "route_handler",
+    "route_key",
+    "handler_dispatch",
+    "handler_pipeline",
+    "pipeline_step",
+    "serializer_boundary",
+    "message_forwarding",
+    "route_target",
+    "protocol_envelope",
+    "route_request",
+    "application_dispatch",
+    "command_handler",
+    "query_handler",
+    "protocol_bridge",
+    "target_scope",
+    "current_single_process_route_handler_mapping",
+    "kind_module_name_structured_routing",
+    "app_route_request_handoff",
+    "explicit_command_query_dispatch",
+    "application_unit_of_work_wrapper",
+    "explicit_generated_payload_bridge",
+    "server_push_intent_to_protocol_envelope",
+    "current_protocol_adapter_owned_shape",
+    "current_application_dispatch",
+    "no_pitaya_handler_pipeline",
+    "current_vibit_transaction_boundary_only",
+    "no_pluggable_serializer_behavior",
+    "no_cross_node_forwarding",
+    "route_handler_implementation_added: false",
+    "handler_routing_behavior_added: false",
+    "handler_pipeline_behavior_added: false",
+    "pipeline_middleware_behavior_added: false",
+    "serializer_behavior_added: false",
+    "message_forwarding_behavior_added: false",
+    "backend_route_targeting_added: false",
+    "runtime_behavior_added: false",
+    "protocol_route_added: false",
+    "protobuf_source_added: false",
+    "generated_output_added: false",
+    "repository_interface_changed: false",
+    "postgresql_adapter_changed: false",
+    "migration_added: false",
+    "dependency_added: false",
+    "direct_nakama_pitaya_api_compatibility_added: false",
+  ];
+  for (const file of [standardPath, standardTranslationPath, `${changePath}/spec.yaml`]) {
+    for (const marker of sharedMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-188"],
+    [".arch/work-items.yaml", "id: M-187"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0259"],
+    [".arch/work-items.yaml", "decision: ADR-0167"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/work-items.yaml", "id: M-188"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Route Handler Pipeline Source-First Map"],
+    [".arch/work-items.yaml", "id: W-0260"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_route_handler_pipeline_boundary_gate: ADR-0167"],
+    [".arch/runtime.yaml", "pitaya_aligned_route_handler_pipeline_boundary_gate_defined: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_route_handler_pipeline_boundary_gate_check_rule: runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/runtime.yaml", "next_pitaya_route_handler_pipeline_source_first_map_work_item: W-0260"],
+    [".arch/runtime.yaml", "next_pitaya_route_handler_pipeline_source_first_map_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/reference.yaml", "phase_2fr_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/reference.yaml", "phase_2fs_pitaya_aligned_route_handler_pipeline_source_first_map"],
+    [".arch/conventions.yaml", "pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/contracts.yaml", "pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0167",
+      "M-187/W-0259",
+      "M-188/W-0260",
+      "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "This decision does not add route handler implementation",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0259",
+      "ADR-0167",
+      "runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "Unknown rule_id: runtime.pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "change directory does not exist",
+      "W-0260",
+      "does not implement route handlers, pipelines, serializers, or forwarding",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0259",
+      "route handler pipeline boundary gate",
+      "No route handler implementation",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0260",
+      "No runtime behavior",
+      "No protocol shape",
+      "No generated output",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned route handler pipeline boundary gate completes W-0259, defines route handler pipeline vocabulary boundaries, opens W-0260, and preserves route handler, handler routing, pipeline, serializer, forwarding, runtime, protocol, generated, persistence, dependency, hosted, SDK, and direct compatibility deferrals", {
     rule_id: ruleId,
     artifact: `${changePath}/spec.yaml`,
   });
@@ -45054,6 +45294,10 @@ function nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(ro
   return workItemHasStatus(root, "W-0258", "completed");
 }
 
+function pitayaAlignedRouteHandlerPipelineBoundaryGateCompleted(root) {
+  return workItemHasStatus(root, "W-0259", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -45086,6 +45330,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedRouteHandlerPipelineBoundaryGateCompleted(root)) {
+    return "repository_next_work_item: W-0260";
+  }
   if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
     return "repository_next_work_item: W-0259";
   }
@@ -45225,6 +45472,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedRouteHandlerPipelineBoundaryGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_route_handler_pipeline_source_first_map";
+  }
   if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
     return "repository_next_work_item_scope: define_pitaya_aligned_route_handler_pipeline_boundary_gate";
   }
@@ -45355,6 +45605,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedRouteHandlerPipelineBoundaryGateCompleted(root)) {
+    return "W-0260 Implement Pitaya-aligned route handler pipeline source-first map";
+  }
   if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
     return "W-0259 Define Pitaya-aligned route handler pipeline boundary gate";
   }
@@ -45509,6 +45762,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0259", "next_ready_work_item: W-0260"],
     ["W-0258", "next_ready_work_item: W-0259"],
     ["W-0257", "next_ready_work_item: W-0258"],
     ["W-0256", "next_ready_work_item: W-0257"],
@@ -45596,6 +45850,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0259", "completed")) {
+    return "next_work_item: W-0260";
+  }
   if (workItemHasStatus(root, "W-0258", "completed")) {
     return "next_work_item: W-0259";
   }
@@ -45802,6 +46059,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0259", "implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
     ["W-0258", "define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
     ["W-0257", "select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
     ["W-0256", "implement_pitaya_aligned_cluster_safe_session_routing_source_first_map"],
@@ -45889,6 +46147,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0259", "W-0260 Implement Pitaya-aligned route handler pipeline source-first map"],
     ["W-0258", "W-0259 Define Pitaya-aligned route handler pipeline boundary gate"],
     ["W-0257", "W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map"],
     ["W-0256", "W-0257 Implement Pitaya-aligned cluster-safe session routing source-first map"],
@@ -45977,6 +46236,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0259", "current_phase: implement_pitaya_aligned_route_handler_pipeline_source_first_map"],
     ["W-0258", "current_phase: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
     ["W-0257", "current_phase: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
     ["W-0256", "current_phase: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map"],
@@ -46654,6 +46914,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedClusterSafeSessionRoutingBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedClusterSafeSessionRoutingSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMap(root, goFiles);
+  checkRuntimePitayaAlignedRouteHandlerPipelineBoundaryGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
