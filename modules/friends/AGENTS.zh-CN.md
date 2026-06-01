@@ -105,4 +105,4 @@ repository 下一项 work item 是 `W-0268 Define Pitaya-aligned session binding
 
 ## Repository Continuation
 
-`ADR-0178` 已注册 `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`，完成 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`，选择 `define_pitaya_aligned_runtime_observability_boundary_gate`，并打开 `W-0271 Define Pitaya-aligned runtime observability boundary gate` 作为 repository next work item。该 work 仍不属于 friends module。
+`ADR-0179` 已注册 `runtime.pitaya_aligned_runtime_observability_boundary_gate`，完成 `W-0271 Define Pitaya-aligned runtime observability boundary gate`，选择 `implement_pitaya_aligned_runtime_observability_source_first_map`，并打开 `W-0272 Implement Pitaya-aligned runtime observability source-first map` 作为 repository next work item。该 work 仍不属于 friends module。

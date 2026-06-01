@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0271 Define Pitaya-aligned runtime observability boundary gate
-recommended_next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+next_work_item: W-0272 Implement Pitaya-aligned runtime observability source-first map
+recommended_next_direction: implement_pitaya_aligned_runtime_observability_source_first_map
 ```
 
-`ADR-0178` registered `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`, completed `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`, selected `define_pitaya_aligned_runtime_observability_boundary_gate`, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0179` registered `runtime.pitaya_aligned_runtime_observability_boundary_gate`, completed `W-0271 Define Pitaya-aligned runtime observability boundary gate`, selected `implement_pitaya_aligned_runtime_observability_source_first_map`, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.

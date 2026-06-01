@@ -1,0 +1,177 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-runtime-observability-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned runtime observability boundary and open a source-first runtime observability map follow-up without adding runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, transport behavior changes, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0179
+  referenced:
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_runtime_observability_boundary_gate: defined
+  completed_work_item: W-0271
+  completed_milestone: M-199
+  previous_completed_work_item: W-0270
+  next_milestone: M-200
+  next_work_item: W-0272
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+  next_direction: implement_pitaya_aligned_runtime_observability_source_first_map
+  decision: ADR-0179
+  check_rule: runtime.pitaya_aligned_runtime_observability_boundary_gate
+  selection_decision: ADR-0178
+  session_lifecycle_source_first_map_decision: ADR-0177
+  minimum_operations_inspection_gate_decision: ADR-0152
+  minimum_operations_inspection_source_first_decision: ADR-0153
+  standard: docs/pitaya-aligned-runtime-observability-boundary-gate.md
+  translation: docs/pitaya-aligned-runtime-observability-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_observability_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_runtime_observability_vocabulary
+  future_implementation_work_item: W-0272
+  future_implementation_direction: implement_pitaya_aligned_runtime_observability_source_first_map
+  allowed_runtime_observability_vocabulary:
+    - runtime_observability_boundary
+    - operations_snapshot
+    - health_readiness_signal
+    - version_release_posture
+    - configuration_posture
+    - route_inventory_snapshot
+    - verification_posture
+    - redaction_posture
+    - deferred_operations_surface
+    - node_local_runtime_surface
+  current_source_first_runtime_observability_mapping:
+    minimum_operations_inspection:
+      current: node_tools_vibit_inspect_operations
+      future_vocabulary: operations_snapshot
+      implementation_status: source_first_repository_inspection_only
+    health_and_readiness:
+      current: existing_local_healthz_and_readyz_endpoint_summary
+      future_vocabulary: health_readiness_signal
+      implementation_status: no_new_runtime_endpoint_behavior
+    version_surface:
+      current: existing_local_version_endpoint_summary
+      future_vocabulary: version_release_posture
+      implementation_status: no_release_or_hosted_surface_change
+    configuration_surface:
+      current: existing_redacted_configz_endpoint_summary
+      future_vocabulary: configuration_posture
+      implementation_status: no_secret_or_dsn_exposure
+    route_inventory:
+      current: source_first_protocol_route_family_inventory
+      future_vocabulary: route_inventory_snapshot
+      implementation_status: no_protocol_route_or_wire_shape_change
+    repository_verification:
+      current: tools_vibit_check_work_runtime_memory_schemas_all
+      future_vocabulary: verification_posture
+      implementation_status: no_new_test_framework_or_dependency
+    redaction_policy:
+      current: existing_operations_redaction_requirements
+      future_vocabulary: redaction_posture
+      implementation_status: no_identifier_or_payload_log_safety_expansion
+    deferred_operations_surfaces:
+      current: admin_metrics_tracing_dashboard_inspectors_deferred
+      future_vocabulary: deferred_operations_surface
+      implementation_status: planning_vocabulary_only
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  player_session_token_inspector_added: false
+  event_audit_table_added: false
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  session_data_behavior_added: false
+  session_data_persistence_added: false
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  route_handler_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  service_discovery_implementation_added: false
+  server_to_server_rpc_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The gate defines allowed runtime observability vocabulary.
+  - The gate maps current minimum operations inspection, health/readiness/version/config endpoint summaries, route inventory, repository verification, redaction posture, and deferred operations surfaces to future observability vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0272 as a narrow source-first runtime observability map work item.
+  - The gate does not add runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_runtime_observability_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-runtime-observability-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

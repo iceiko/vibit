@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0271 Define Pitaya-aligned runtime observability boundary gate
-recommended_next_direction: define_pitaya_aligned_runtime_observability_boundary_gate
+next_work_item: W-0272 Implement Pitaya-aligned runtime observability source-first map
+recommended_next_direction: implement_pitaya_aligned_runtime_observability_source_first_map
 ```
 
-`ADR-0178` 已注册 `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`，完成 `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`，选择 `define_pitaya_aligned_runtime_observability_boundary_gate`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0179` 已注册 `runtime.pitaya_aligned_runtime_observability_boundary_gate`，完成 `W-0271 Define Pitaya-aligned runtime observability boundary gate`，选择 `implement_pitaya_aligned_runtime_observability_source_first_map`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。

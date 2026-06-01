@@ -105,4 +105,4 @@ Run `node tools/vibit check runtime` after changing friends runtime source. When
 
 ## Repository Continuation
 
-`ADR-0178` registered `runtime.next_pitaya_aligned_direction_after_session_binding_kick_disconnect_session_data_map`, completed `W-0270 Select next Pitaya-aligned direction after session binding, kick/disconnect, and session data map`, selected `define_pitaya_aligned_runtime_observability_boundary_gate`, and opened `W-0271 Define Pitaya-aligned runtime observability boundary gate` as the repository next work item. This remains outside the friends module.
+`ADR-0179` registered `runtime.pitaya_aligned_runtime_observability_boundary_gate`, completed `W-0271 Define Pitaya-aligned runtime observability boundary gate`, selected `implement_pitaya_aligned_runtime_observability_source_first_map`, and opened `W-0272 Implement Pitaya-aligned runtime observability source-first map` as the repository next work item. This remains outside the friends module.
