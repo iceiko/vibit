@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0276 Select next Pitaya-aligned direction after metrics and tracing map
-recommended_next_direction: select_next_pitaya_aligned_direction_after_metrics_tracing_map
+next_work_item: W-0277 Define Pitaya-aligned dashboard and admin operations boundary gate
+recommended_next_direction: define_pitaya_aligned_dashboard_admin_operations_boundary_gate
 ```
 
-`ADR-0183` 已注册 `runtime.pitaya_aligned_metrics_tracing_source_first_map`，完成 `W-0275 Implement Pitaya-aligned metrics and tracing source-first map`，实现 `node tools/vibit inspect pitaya-metrics-tracing --json`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0184` 已注册 `runtime.next_pitaya_aligned_direction_after_metrics_tracing_map`，完成 `W-0276 Select next Pitaya-aligned direction after metrics and tracing map`，选择 `define_pitaya_aligned_dashboard_admin_operations_boundary_gate`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、admin console behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
