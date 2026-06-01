@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-192
+current_milestone: M-193
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_serializer_message_forwarding_source_first_map_implemented
+    current_release_state: pitaya_aligned_acceptor_connection_lifecycle_boundary_gate_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0264
+    next_ready_work_item: W-0265
     preferred_after_current:
-      - select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+      - define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3444,7 +3444,8 @@ milestones:
 
   - id: M-192
     title: Select Next Pitaya-Aligned Direction After Serializer And Message Forwarding Map
-    status: active
+    status: completed
+    historical_current_milestone: M-192
     goal: Select the next bounded Pitaya-aligned direction after the serializer and message forwarding source-first map, without implementing serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The next Pitaya-aligned direction is selected as a bounded follow-up.
@@ -3452,6 +3453,18 @@ milestones:
       - Repository checks verify the selection and next-ready state.
     non_goals:
       - adding serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate` as the next bounded Pitaya-aligned direction after the serializer and message forwarding source-first map, accepted `ADR-0172`, registered `runtime.next_pitaya_aligned_direction_after_serializer_message_forwarding_map`, completed `W-0264`, and opened `M-193/W-0265 Define Pitaya-aligned acceptor and connection lifecycle boundary gate` as next-ready. Preserved acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-193
+    title: Pitaya-Aligned Acceptor And Connection Lifecycle Boundary Gate
+    status: active
+    goal: Define a gate-only Pitaya-aligned acceptor and connection lifecycle boundary after the serializer and message forwarding direction selection, without implementing acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A gate-only acceptor and connection lifecycle vocabulary boundary is defined.
+      - Current single-process WebSocket, connection registry, first-message binding, close handoff, and presence lifecycle surfaces are mapped without adding behavior.
+      - Repository checks verify the gate and implementation deferrals.
+    non_goals:
+      - adding acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -10488,7 +10501,7 @@ work_items:
   - id: W-0264
     milestone: M-192
     title: Select next Pitaya-aligned direction after serializer and message forwarding map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map
     depends_on:
       - W-0263
@@ -10524,4 +10537,52 @@ work_items:
     completion:
       - Select the next Pitaya-aligned direction after the serializer and message forwarding source-first map.
       - Record candidate directions and why implementation remains deferred.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0172
+    check_rule: runtime.next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+    next_milestone: M-193
+    next_ready_work_item: W-0265
+    selected_follow_up_direction: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    completion_summary: Selected `define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate` as the next bounded Pitaya-aligned direction after the serializer and message forwarding source-first map and opened `W-0265 Define Pitaya-aligned acceptor and connection lifecycle boundary gate` as next-ready. Preserved acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, metrics/tracing behavior, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0265
+    milestone: M-193
+    title: Define Pitaya-aligned acceptor and connection lifecycle boundary gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-acceptor-connection-lifecycle-boundary-gate
+    depends_on:
+      - W-0264
+    expected_change_id: define-pitaya-aligned-acceptor-connection-lifecycle-boundary-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+    gate_decision: ADR-0172
+    related_decisions:
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of defining only an acceptor and connection lifecycle boundary gate.
+    completion:
+      - Define a Pitaya-aligned acceptor and connection lifecycle boundary gate.
+      - Map current WebSocket acceptor, connection registry, first-message binding, close handoff, connection epoch, and presence lifecycle surfaces to deferred acceptor/connection lifecycle vocabulary.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

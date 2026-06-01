@@ -1,0 +1,215 @@
+schema_version: 0.1
+change_id: select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Select the Pitaya-aligned acceptor and connection lifecycle boundary gate as the next bounded direction after the serializer and message forwarding source-first map, without adding acceptor behavior, connection lifecycle behavior, session binding behavior, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0172
+  referenced:
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  next_pitaya_aligned_direction_after_serializer_message_forwarding_map: completed
+  completed_work_item: W-0264
+  completed_milestone: M-192
+  previous_completed_work_item: W-0263
+  next_milestone: M-193
+  next_work_item: W-0265
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+  decision: ADR-0172
+  source_map_decision: ADR-0171
+  check_rule: runtime.next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+  primary_product_reference: Nakama
+  pitaya_reference_status: acceptor_connection_lifecycle_boundary_gate_selected
+  implementation_scope: direction_selection_only
+  implementation_authorized_by_this_selection: false
+  acceptor_behavior_added: false
+  websocket_acceptor_behavior_changed: false
+  tcp_acceptor_added: false
+  connection_lifecycle_behavior_changed: false
+  session_binding_behavior_changed: false
+  kick_disconnect_behavior_added: false
+  concrete_socket_close_behavior_changed: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by choosing the next bounded alignment direction after the serializer and message forwarding source-first map.
+nakama_capability_family: distributed_runtime_acceptor_connection_lifecycle_planning
+
+candidate_directions:
+  selected:
+    - define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate
+  deferred:
+    - define_pitaya_aligned_monitoring_tracing_boundary_gate
+    - return_to_nakama_product_module_expansion
+    - implement_serializer_or_message_forwarding_behavior
+    - implement_distributed_runtime_behavior
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: acceptor_connection_lifecycle_boundary_gate_selected
+  adopted:
+    - acceptor and connection lifecycle vocabulary as the next planning surface
+    - current WebSocket acceptor and connection lifecycle records remain vibit-owned
+    - current first-message binding, close handoff, connection epoch, and presence lifecycle remain single-process facts to map later
+  adapted:
+    - selection-only repository memory before any acceptor or connection lifecycle gate
+    - explicit no-implementation flags before transport, session binding, kick/disconnect, TCP acceptor, metrics, tracing, or distributed runtime changes
+    - Nakama remains the primary product reference while Pitaya supplies deferred architecture vocabulary
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - acceptor behavior changes in this slice
+    - connection lifecycle behavior changes in this slice
+    - session binding behavior changes in this slice
+    - kick/disconnect behavior in this slice
+    - serializer or message forwarding behavior in this slice
+
+acceptance_criteria:
+  - The next Pitaya-aligned direction is selected as `define_pitaya_aligned_acceptor_connection_lifecycle_boundary_gate`.
+  - `M-193/W-0265 Define Pitaya-aligned acceptor and connection lifecycle boundary gate` is next-ready.
+  - Repository checks verify ADR-0172, change artifacts, rule registration, W-0264 completion, W-0265 next-ready state, and explicit implementation deferrals.
+  - The slice does not add acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, session binding behavior changes, kick/disconnect behavior, serializer behavior, message forwarding behavior, route handler implementation, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0172, W-0264 completion, W-0265 next-ready state, change artifacts, conversation memory, rule registration, and deferral flags.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by `node tools/vibit check runtime --json`; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map/
+    - decisions/ADR-0172-select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map.md
+    - conversations/2026-05-26-select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - acceptor behavior
+    - TCP acceptors
+    - WebSocket transport behavior changes
+    - connection lifecycle behavior changes
+    - session binding behavior changes
+    - kick or disconnect behavior
+    - serializer behavior
+    - message forwarding behavior
+    - route handler implementation
+    - handler routing behavior
+    - handler pipeline behavior
+    - pipeline middleware behavior
+    - backend route targeting
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - metrics endpoints or tracing pipelines
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+    - node tools/vibit check change select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
