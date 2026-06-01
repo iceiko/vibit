@@ -189,6 +189,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_server_to_server_rpc_source_first_map",
   "runtime.pitaya_aligned_service_discovery_boundary_gate",
   "runtime.pitaya_aligned_service_discovery_source_first_map",
+  "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -41563,6 +41564,253 @@ function checkRuntimePitayaAlignedServiceDiscoverySourceFirstMap(root, goFiles) 
   });
 }
 
+function checkRuntimePitayaAlignedDistributedGroupBroadcastBoundaryGate(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate";
+  const standardPath = "docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md";
+  const standardTranslationPath = "docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0162-pitaya-aligned-distributed-group-broadcast-boundary-gate.md";
+  const changePath = "changes/2026-05-26-define-pitaya-aligned-distributed-group-broadcast-boundary-gate";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-distributed-group-broadcast-boundary-gate.md";
+
+  if (!pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
+    ok("Pitaya-aligned distributed group and broadcast boundary gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    standardTranslationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned distributed group and broadcast boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned distributed group and broadcast boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const sharedMarkers = [
+    "pitaya_aligned_distributed_group_broadcast_boundary_gate: defined",
+    "completed_work_item: W-0254",
+    "decision: ADR-0162",
+    "check_rule: runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
+    "service_discovery_source_first_map_decision: ADR-0161",
+    "service_discovery_source_first_map_check_rule: runtime.pitaya_aligned_service_discovery_source_first_map",
+    "standard: docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md",
+    "translation: docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.zh-CN.md",
+    "primary_product_reference: Nakama",
+    "pitaya_reference_status: distributed_group_broadcast_vocabulary_boundary_defined_for_future_architecture_planning",
+    "implementation_scope: gate_only_distributed_group_broadcast_vocabulary",
+    "future_implementation_work_item: W-0255",
+    "future_implementation_direction: implement_pitaya_aligned_distributed_group_broadcast_source_first_map",
+    "distributed_group",
+    "room_broadcast",
+    "broadcast_target",
+    "group_membership",
+    "broadcast_fanout",
+    "target_scope",
+    "server_push_intent",
+    "route_handler",
+    "module_handler",
+    "frontend_server",
+    "backend_server",
+    "service_discovery",
+    "server_to_server_rpc",
+    "remote_call",
+    "cluster_safe_session_routing",
+    "protocol_envelope_target_metadata_only",
+    "application_owned_realtime_outbound_intent_single_process_delivery",
+    "no_distributed_group_current_single_process_target_scope_only",
+    "no_group_membership_registry_or_subscription_state",
+    "no_room_broadcast_fanout_current_server_push_intent_only",
+    "target_scope_values_are_metadata_not_distributed_targets",
+    "no_cluster_fanout_no_delivery_guarantee",
+    "distributed_group_implementation_added: false",
+    "distributed_groups_added: false",
+    "group_membership_registry_added: false",
+    "room_broadcast_fanout_added: false",
+    "broadcast_delivery_guarantee_added: false",
+    "stream_subscription_added: false",
+    "groups_parties_chat_runtime_behavior_added: false",
+    "match_runtime_behavior_added: false",
+    "service_discovery_implementation_added: false",
+    "service_registry_added: false",
+    "service_selector_added: false",
+    "node_registry_added: false",
+    "server_identity_added: false",
+    "server_to_server_rpc_implementation_added: false",
+    "remote_call_behavior_added: false",
+    "frontend_server_implementation_added: false",
+    "backend_server_implementation_added: false",
+    "frontend_backend_server_roles_added: false",
+    "distributed_runtime_implementation_added: false",
+    "cluster_safe_session_routing_added: false",
+    "runtime_behavior_added: false",
+    "runtime_endpoint_behavior_added: false",
+    "protocol_route_added: false",
+    "protobuf_source_added: false",
+    "generated_output_added: false",
+    "repository_interface_changed: false",
+    "postgresql_adapter_changed: false",
+    "migration_added: false",
+    "dependency_added: false",
+    "direct_nakama_pitaya_api_compatibility_added: false",
+  ];
+  for (const file of [standardPath, standardTranslationPath, `${changePath}/spec.yaml`]) {
+    for (const marker of sharedMarkers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "id: M-182"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0254"],
+    [".arch/work-items.yaml", "ADR-0162"],
+    [".arch/work-items.yaml", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    [".arch/work-items.yaml", "id: M-183"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Distributed Group And Broadcast Source-First Map"],
+    [".arch/work-items.yaml", "id: W-0255"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_boundary_gate_defined: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_boundary_gate_decision: ADR-0162"],
+    [".arch/runtime.yaml", "pitaya_aligned_distributed_group_broadcast_boundary_gate_check_rule: runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    [".arch/runtime.yaml", "next_pitaya_distributed_group_broadcast_source_first_map_work_item: W-0255"],
+    [".arch/runtime.yaml", "next_pitaya_distributed_group_broadcast_source_first_map_direction: implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/runtime.yaml", "distributed_group_implementation_added: false"],
+    [".arch/runtime.yaml", "room_broadcast_fanout_added: false"],
+    [".arch/runtime.yaml", "broadcast_delivery_guarantee_added: false"],
+    [".arch/runtime.yaml", "stream_subscription_added: false"],
+    [".arch/runtime.yaml", "service_discovery_implementation_added: false"],
+    [".arch/runtime.yaml", "server_to_server_rpc_implementation_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/reference.yaml", "phase_2fm_pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    [".arch/reference.yaml", "phase_2fn_pitaya_aligned_distributed_group_broadcast_source_first_map"],
+    [".arch/reference.yaml", "pitaya_reference_status: distributed_group_broadcast_vocabulary_boundary_defined_for_future_architecture_planning"],
+    [".arch/conventions.yaml", "pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    [".arch/contracts.yaml", "pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0162",
+      "M-182/W-0254",
+      "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
+      "M-183/W-0255",
+      "This decision does not add distributed group implementation",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0254",
+      "ADR-0162",
+      "runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
+      "Unknown rule_id: runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate",
+      "change directory does not exist",
+      "W-0255",
+    ],
+    [`${changePath}/request.md`]: [
+      "W-0254",
+      "distributed group and broadcast boundary gate",
+      "No distributed group implementation",
+    ],
+    [`${changePath}/impact.md`]: [
+      "W-0255",
+      "No runtime behavior",
+      "No protocol shape",
+      "No generated output",
+      "No dependencies",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Members?)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, standardTranslationPath, decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned distributed group and broadcast boundary gate completes W-0254, defines group and broadcast vocabulary boundaries, opens W-0255, and preserves distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, cluster-safe session routing, runtime endpoint, protocol, generated output, persistence, dependency, hosted, SDK, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -43440,6 +43688,10 @@ function pitayaAlignedServiceDiscoverySourceFirstMapCompleted(root) {
   return workItemHasStatus(root, "W-0253", "completed");
 }
 
+function pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root) {
+  return workItemHasStatus(root, "W-0254", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -43472,6 +43724,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
+    return "repository_next_work_item: W-0255";
+  }
   if (pitayaAlignedServiceDiscoverySourceFirstMapCompleted(root)) {
     return "repository_next_work_item: W-0254";
   }
@@ -43596,6 +43851,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_distributed_group_broadcast_source_first_map";
+  }
   if (pitayaAlignedServiceDiscoverySourceFirstMapCompleted(root)) {
     return "repository_next_work_item_scope: define_pitaya_aligned_distributed_group_broadcast_boundary_gate";
   }
@@ -43711,6 +43969,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (pitayaAlignedDistributedGroupBroadcastBoundaryGateCompleted(root)) {
+    return "W-0255 Implement Pitaya-aligned distributed group and broadcast source-first map";
+  }
   if (pitayaAlignedServiceDiscoverySourceFirstMapCompleted(root)) {
     return "W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate";
   }
@@ -43850,6 +44111,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0254", "next_ready_work_item: W-0255"],
     ["W-0253", "next_ready_work_item: W-0254"],
     ["W-0252", "next_ready_work_item: W-0253"],
     ["W-0251", "next_ready_work_item: W-0252"],
@@ -43932,6 +44194,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0254", "completed")) {
+    return "next_work_item: W-0255";
+  }
   if (workItemHasStatus(root, "W-0253", "completed")) {
     return "next_work_item: W-0254";
   }
@@ -44123,6 +44388,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0254", "implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
     ["W-0253", "define_pitaya_aligned_distributed_group_broadcast_boundary_gate"],
     ["W-0252", "implement_pitaya_aligned_service_discovery_source_first_map"],
     ["W-0251", "define_pitaya_aligned_service_discovery_boundary_gate"],
@@ -44205,6 +44471,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0254", "W-0255 Implement Pitaya-aligned distributed group and broadcast source-first map"],
     ["W-0253", "W-0254 Define Pitaya-aligned distributed group and broadcast boundary gate"],
     ["W-0252", "W-0253 Implement Pitaya-aligned service discovery source-first map"],
     ["W-0251", "W-0252 Define Pitaya-aligned service discovery boundary gate"],
@@ -44288,6 +44555,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0254", "current_phase: implement_pitaya_aligned_distributed_group_broadcast_source_first_map"],
     ["W-0253", "current_phase: define_pitaya_aligned_distributed_group_broadcast_boundary_gate"],
     ["W-0252", "current_phase: implement_pitaya_aligned_service_discovery_source_first_map"],
     ["W-0251", "current_phase: define_pitaya_aligned_service_discovery_boundary_gate"],
@@ -44955,6 +45223,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedServerToServerRpcSourceFirstMap(root, goFiles);
   checkRuntimePitayaAlignedServiceDiscoveryBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedServiceDiscoverySourceFirstMap(root, goFiles);
+  checkRuntimePitayaAlignedDistributedGroupBroadcastBoundaryGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

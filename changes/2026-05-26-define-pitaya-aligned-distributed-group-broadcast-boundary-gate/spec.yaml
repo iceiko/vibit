@@ -1,0 +1,248 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-distributed-group-broadcast-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define a gate-only Pitaya-aligned distributed group and broadcast boundary and open a source-first group/broadcast map follow-up without adding distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, service discovery implementation, RPC implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0162
+  referenced:
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_distributed_group_broadcast_boundary_gate: defined
+  completed_work_item: W-0254
+  completed_milestone: M-182
+  previous_completed_work_item: W-0253
+  next_milestone: M-183
+  next_work_item: W-0255
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_distributed_group_broadcast_boundary_gate
+  next_direction: implement_pitaya_aligned_distributed_group_broadcast_source_first_map
+  decision: ADR-0162
+  check_rule: runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate
+  service_discovery_source_first_map_decision: ADR-0161
+  service_discovery_source_first_map_check_rule: runtime.pitaya_aligned_service_discovery_source_first_map
+  standard: docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md
+  translation: docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: distributed_group_broadcast_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_distributed_group_broadcast_vocabulary
+  future_implementation_work_item: W-0255
+  future_implementation_direction: implement_pitaya_aligned_distributed_group_broadcast_source_first_map
+  allowed_group_broadcast_vocabulary:
+    - distributed_group
+    - room_broadcast
+    - broadcast_target
+    - group_membership
+    - broadcast_fanout
+  related_vocabulary:
+    - target_scope
+    - server_push_intent
+    - route_handler
+    - module_handler
+    - frontend_server
+    - backend_server
+    - service_discovery
+    - server_to_server_rpc
+    - remote_call
+    - cluster_safe_session_routing
+  current_single_process_group_broadcast_mapping:
+    target_scope:
+      current: protocol_envelope_target_metadata_only
+      future_vocabulary: broadcast_target
+      implementation_status: current_single_process_intent_only
+    server_push_intent:
+      current: application_owned_realtime_outbound_intent_single_process_delivery
+      future_vocabulary: room_broadcast
+      implementation_status: current_single_process_delivery_only
+    distributed_group:
+      current: no_distributed_group_current_single_process_target_scope_only
+      future_vocabulary: distributed_group
+      implementation_status: deferred_future_architecture_reference
+    group_membership:
+      current: no_group_membership_registry_or_subscription_state
+      future_vocabulary: group_membership
+      implementation_status: deferred_future_architecture_reference
+    room_broadcast:
+      current: no_room_broadcast_fanout_current_server_push_intent_only
+      future_vocabulary: room_broadcast
+      implementation_status: deferred_future_architecture_reference
+    broadcast_target:
+      current: target_scope_values_are_metadata_not_distributed_targets
+      future_vocabulary: broadcast_target
+      implementation_status: current_metadata_only
+    broadcast_fanout:
+      current: no_cluster_fanout_no_delivery_guarantee
+      future_vocabulary: broadcast_fanout
+      implementation_status: deferred_future_architecture_reference
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  groups_parties_chat_runtime_behavior_added: false
+  match_runtime_behavior_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  cluster_safe_session_routing_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining future distributed group and broadcast vocabulary while preserving current single-process target-scope metadata and server-push intent boundaries.
+nakama_capability_family: distributed_runtime_frontend_backend_rpc_and_service_discovery
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: distributed_group_broadcast_vocabulary_boundary_defined_for_future_architecture_planning
+  adopted:
+    - distributed_group vocabulary
+    - room_broadcast vocabulary
+    - broadcast_target vocabulary
+    - group_membership vocabulary
+    - broadcast_fanout vocabulary
+    - target-scope metadata to deferred broadcast target mapping
+    - server-push intent to deferred room broadcast mapping
+  adapted:
+    - group and broadcast vocabulary only before implementation
+    - source-first mapping before fanout or membership state
+    - vibit module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, group, room, stream, or route naming compatibility
+    - distributed group implementation in this slice
+    - room broadcast fanout in this slice
+    - delivery guarantees, retries, ordering, durable offsets, queueing, or backpressure in this slice
+    - stream subscription, group membership, group, party, chat, matchmaking, or match runtime behavior in this slice
+    - service discovery, RPC, remote call, frontend/backend role, distributed runtime, or cluster routing behavior in this slice
+
+acceptance_criteria:
+  - The gate defines allowed distributed group and broadcast vocabulary.
+  - The gate maps current target-scope metadata and server-push intent to future distributed group and broadcast vocabulary.
+  - The gate records ownership, future implementation candidate, verification commands, and stop conditions.
+  - The gate opens W-0255 as a narrow source-first distributed group and broadcast map work item.
+  - The gate does not add distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0162, gate standard, translation, change artifacts, distributed group and broadcast vocabulary markers, W-0254 completion, W-0255 next-ready state, and rule registration.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Not required for this gate because no runtime or Go behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.md
+    - docs/pitaya-aligned-distributed-group-broadcast-boundary-gate.zh-CN.md
+    - changes/2026-05-26-define-pitaya-aligned-distributed-group-broadcast-boundary-gate/
+    - decisions/ADR-0162-pitaya-aligned-distributed-group-broadcast-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-distributed-group-broadcast-boundary-gate.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - distributed group implementation
+    - room broadcast fanout
+    - delivery guarantees
+    - retries
+    - ordering
+    - durable offsets
+    - queueing
+    - backpressure behavior
+    - stream subscriptions
+    - group membership registries
+    - group runtime behavior
+    - party runtime behavior
+    - chat runtime behavior
+    - matchmaking behavior
+    - match runtime behavior
+    - service discovery implementation
+    - service registry behavior
+    - service selector behavior
+    - node registry behavior
+    - server identity behavior
+    - server-to-server RPC implementation
+    - remote call behavior
+    - frontend/backend server role implementation
+    - distributed runtime implementation
+    - cluster-safe session routing behavior
+    - runtime endpoint behavior
+    - metrics endpoints
+    - observability pipelines
+    - dashboards
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_distributed_group_broadcast_boundary_gate
+    - node tools/vibit check change define-pitaya-aligned-distributed-group-broadcast-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified
