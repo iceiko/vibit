@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-203
+current_milestone: M-204
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_metrics_tracing_boundary_gate_completed
+    current_release_state: pitaya_aligned_metrics_tracing_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0275
+    next_ready_work_item: W-0276
     preferred_after_current:
-      - implement_pitaya_aligned_metrics_tracing_source_first_map
+      - select_next_pitaya_aligned_direction_after_metrics_tracing_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3586,12 +3586,25 @@ milestones:
 
   - id: M-203
     title: Pitaya-Aligned Metrics And Tracing Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-203
     goal: Implement a source-first inspection map for Pitaya-aligned metrics and tracing vocabulary after the boundary gate, without implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first inspection map reports the metrics and tracing boundary vocabulary.
       - Current runtime observability, operations, health/readiness, route inventory, verification, redaction, trace, correlation, sampling, and deferred telemetry posture are inspectable without adding behavior.
       - Repository checks verify the map and deferrals.
+    non_goals:
+      - implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-metrics-tracing --json` as a source-first repository inspection map for Pitaya-aligned metrics and tracing vocabulary, current runtime observability mapping, operations posture, trace/correlation/sampling deferrals, redaction posture, source surfaces, and deferrals. Accepted `ADR-0183`, registered `runtime.pitaya_aligned_metrics_tracing_source_first_map`, completed `W-0275`, and opened `M-204/W-0276 Select next Pitaya-aligned direction after metrics and tracing map` as next-ready. Preserved runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-204
+    title: Select Next Pitaya-Aligned Direction After Metrics And Tracing Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the metrics and tracing source-first map, without implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction is selected after the metrics and tracing source-first map.
+      - Repository memory records candidate directions and explicit implementation deferrals.
+      - Repository checks verify the selection-only follow-up and next-ready state.
     non_goals:
       - implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
 
@@ -11212,7 +11225,7 @@ work_items:
   - id: W-0275
     milestone: M-203
     title: Implement Pitaya-aligned metrics and tracing source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-metrics-tracing-source-first-map
     depends_on:
       - W-0274
@@ -11260,4 +11273,65 @@ work_items:
     completion:
       - Implement a source-first Pitaya-aligned metrics and tracing inspection map.
       - Report the metrics/tracing boundary vocabulary, current runtime observability mapping, operations posture, trace/correlation/sampling deferrals, redaction, source surfaces, and deferrals.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0183
+    check_rule: runtime.pitaya_aligned_metrics_tracing_source_first_map
+    command: node tools/vibit inspect pitaya-metrics-tracing --json
+    next_milestone: M-204
+    next_ready_work_item: W-0276
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_metrics_tracing_map
+    completion_summary: Implemented the source-first metrics and tracing inspection map through `node tools/vibit inspect pitaya-metrics-tracing --json` and opened `W-0276 Select next Pitaya-aligned direction after metrics and tracing map` as next-ready. Preserved runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: W-0276
+    milestone: M-204
+    title: Select next Pitaya-aligned direction after metrics and tracing map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-metrics-tracing-map
+    depends_on:
+      - W-0275
+    expected_change_id: select-next-pitaya-aligned-direction-after-metrics-tracing-map
+    tier: tier_2_architecture_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_metrics_tracing_map
+    source_map_decision: ADR-0183
+    related_decisions:
+      - ADR-0183
+      - ADR-0182
+      - ADR-0181
+      - ADR-0180
+      - ADR-0179
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, session binding behavior, kick/disconnect behavior, session data behavior, session data persistence, acceptor behavior, TCP acceptors, WebSocket behavior changes, connection lifecycle behavior changes, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya compatibility instead of selecting only the next Pitaya-aligned direction.
+    completion:
+      - Select the next Pitaya-aligned direction after the metrics and tracing source-first map.
+      - Record candidate directions and why implementation remains deferred.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

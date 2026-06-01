@@ -227,10 +227,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0275 Implement Pitaya-aligned metrics and tracing source-first map
-next_direction: implement_pitaya_aligned_metrics_tracing_source_first_map
+next_work_item: W-0276 Select next Pitaya-aligned direction after metrics and tracing map
+next_direction: select_next_pitaya_aligned_direction_after_metrics_tracing_map
 ```
 
-`ADR-0182` registered `runtime.pitaya_aligned_metrics_tracing_boundary_gate`, completed `W-0274 Define Pitaya-aligned metrics and tracing boundary gate`, selected `implement_pitaya_aligned_metrics_tracing_source_first_map`, and opened `W-0275 Implement Pitaya-aligned metrics and tracing source-first map`.
+`ADR-0183` registered `runtime.pitaya_aligned_metrics_tracing_source_first_map`, completed `W-0275 Implement Pitaya-aligned metrics and tracing source-first map`, implemented `node tools/vibit inspect pitaya-metrics-tracing --json`, and opened `W-0276 Select next Pitaya-aligned direction after metrics and tracing map`.
 
-The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`.
+The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`; the metrics/tracing inspection is available through `node tools/vibit inspect pitaya-metrics-tracing --json`.
