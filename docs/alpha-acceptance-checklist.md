@@ -185,12 +185,12 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_runtime_observability_source_first_map
+next_direction: select_next_pitaya_aligned_direction_after_runtime_observability_map
 next_work_status: next_ready
 ```
 
-Current next work item: `W-0272 Implement Pitaya-aligned runtime observability source-first map`.
+Current next work item: `W-0273 Select next Pitaya-aligned direction after runtime observability map`.
 
-Current check rule: `runtime.pitaya_aligned_runtime_observability_boundary_gate`.
+Current check rule: `runtime.pitaya_aligned_runtime_observability_source_first_map`.
 
 Current inspection command: `node tools/vibit inspect pitaya-session-lifecycle --json`.

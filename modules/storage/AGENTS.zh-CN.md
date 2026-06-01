@@ -120,4 +120,4 @@ Storage module 的 storage-object work 已完成到 local proof，后续 realtim
 
 ## Repository Continuation
 
-`ADR-0179` 已注册 `runtime.pitaya_aligned_runtime_observability_boundary_gate`，完成 `W-0271 Define Pitaya-aligned runtime observability boundary gate`，选择 `implement_pitaya_aligned_runtime_observability_source_first_map`，并打开 `W-0272 Implement Pitaya-aligned runtime observability source-first map` 作为 repository next work item。该 work 仍不属于 storage module。
+`ADR-0180` 已注册 `runtime.pitaya_aligned_runtime_observability_source_first_map`，完成 `W-0272 Implement Pitaya-aligned runtime observability source-first map`，提供 `node tools/vibit inspect pitaya-observability --json`，选择 `select_next_pitaya_aligned_direction_after_runtime_observability_map`，并打开 `W-0273 Select next Pitaya-aligned direction after runtime observability map` 作为 repository next work item。该 work 仍不属于 storage module。

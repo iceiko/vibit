@@ -1,0 +1,129 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-runtime-observability-source-first-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned runtime observability inspection map and open a next Pitaya direction selection follow-up without adding runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, player/session/token inspectors, event/audit tables, transport behavior changes, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0180
+  referenced:
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_runtime_observability_source_first_map: implemented
+  completed_work_item: W-0272
+  completed_milestone: M-200
+  previous_completed_work_item: W-0271
+  next_milestone: M-201
+  next_work_item: W-0273
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_runtime_observability_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_runtime_observability_map
+  decision: ADR-0180
+  gate_decision: ADR-0179
+  check_rule: runtime.pitaya_aligned_runtime_observability_source_first_map
+  command: node tools/vibit inspect pitaya-observability --json
+  runtime_observability_boundary_standard: docs/pitaya-aligned-runtime-observability-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_observability_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_runtime_observability_vocabulary:
+    - runtime_observability_boundary
+    - operations_snapshot
+    - health_readiness_signal
+    - version_release_posture
+    - configuration_posture
+    - route_inventory_snapshot
+    - verification_posture
+    - redaction_posture
+    - deferred_operations_surface
+    - node_local_runtime_surface
+  related_vocabulary:
+    - minimum_operations_inspection
+    - health_readiness_version_config_surface
+    - route_inventory
+    - runtime_session
+    - active_connection_registry
+    - acceptor_boundary
+    - distributed_runtime_vocabulary
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  player_session_token_inspector_added: false
+  event_audit_table_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-observability --json`.
+  - The inspection output includes allowed runtime observability vocabulary, related vocabulary, current mappings, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0272 map and W-0273 next-ready state.
+  - The slice does not add runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect pitaya-observability --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_runtime_observability_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-runtime-observability-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

@@ -248,8 +248,8 @@ This document records product maturity goals. It does not itself:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0272 Implement Pitaya-aligned runtime observability source-first map
-next_direction: implement_pitaya_aligned_runtime_observability_source_first_map
+next_work_item: W-0273 Select next Pitaya-aligned direction after runtime observability map
+next_direction: select_next_pitaya_aligned_direction_after_runtime_observability_map
 ```
 
-`ADR-0179` registered `runtime.pitaya_aligned_runtime_observability_boundary_gate`, completed `W-0271 Define Pitaya-aligned runtime observability boundary gate`, selected `implement_pitaya_aligned_runtime_observability_source_first_map`, and opened `W-0272 Implement Pitaya-aligned runtime observability source-first map`.
+`ADR-0180` registered `runtime.pitaya_aligned_runtime_observability_source_first_map`, completed `W-0272 Implement Pitaya-aligned runtime observability source-first map`, selected `select_next_pitaya_aligned_direction_after_runtime_observability_map`, and opened `W-0273 Select next Pitaya-aligned direction after runtime observability map`.
