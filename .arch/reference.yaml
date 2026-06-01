@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: cluster_safe_session_routing_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: cluster_safe_session_routing_source_first_map_implemented
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
-  recommended_next_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+  current_near_term_priority: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+  recommended_next_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: pitaya_aligned_cluster_safe_session_routing_boundary_gate_defined
+  current_state: pitaya_aligned_cluster_safe_session_routing_source_first_map_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0257
-  immediate_next_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+  immediate_next_work_item: W-0258
+  immediate_next_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -5720,16 +5720,52 @@ phase_plan:
     postgresql_adapter_change_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2fp_pitaya_aligned_cluster_safe_session_routing_source_first_map:
-    status: active
+    status: completed
     milestone: M-185
-    next_ready_work_item: W-0257
+    completed_work_item: W-0257
+    decision: ADR-0165
+    check_rule: runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map
+    pitaya_sessions_inspection_command: node tools/vibit inspect pitaya-sessions --json
+    next_ready_work_item: W-0258
     previous_completed_work_item: W-0256
     selected_direction: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
     gate_decision: ADR-0164
     primary_product_reference: Nakama
-    pitaya_reference_status: cluster_safe_session_routing_source_first_map_next_ready
+    pitaya_reference_status: cluster_safe_session_routing_source_first_map_implemented
     target_stage: prototype_ready_foundation
     implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_allowed: false
+    frontend_backend_server_role_implementation_allowed: false
+    server_to_server_rpc_implementation_allowed: false
+    remote_call_behavior_allowed: false
+    service_discovery_allowed: false
+    service_registry_allowed: false
+    service_selector_allowed: false
+    node_identity_allowed: false
+    distributed_group_allowed: false
+    room_broadcast_fanout_allowed: false
+    cluster_safe_session_routing_allowed: false
+    session_location_registry_allowed: false
+    connection_owner_node_registry_allowed: false
+    remote_connection_handoff_allowed: false
+    runtime_endpoint_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2fq_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map:
+    status: active
+    milestone: M-186
+    next_ready_work_item: W-0258
+    previous_completed_work_item: W-0257
+    selected_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+    gate_decision: ADR-0165
+    primary_product_reference: Nakama
+    pitaya_reference_status: next_pitaya_aligned_direction_selection_after_cluster_safe_session_routing_map
+    target_stage: prototype_ready_foundation
+    implementation_scope: direction_selection_only
     distributed_runtime_implementation_allowed: false
     frontend_backend_server_role_implementation_allowed: false
     server_to_server_rpc_implementation_allowed: false

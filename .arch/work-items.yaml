@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-185
+current_milestone: M-186
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_cluster_safe_session_routing_boundary_gate_defined
+    current_release_state: pitaya_aligned_cluster_safe_session_routing_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0257
+    next_ready_work_item: W-0258
     preferred_after_current:
-      - implement_pitaya_aligned_cluster_safe_session_routing_source_first_map
+      - select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3356,12 +3356,24 @@ milestones:
 
   - id: M-185
     title: Pitaya-Aligned Cluster-Safe Session Routing Source-First Map
-    status: active
+    status: completed
     goal: Implement a source-first repository map for the Pitaya-aligned cluster-safe session routing vocabulary defined by ADR-0164, without implementing cluster-safe session routing, session location registries, connection owner node registries, routing epoch behavior, remote handoff, reconnect routing, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, distributed groups, room broadcast fanout, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first repository inspection surface summarizes cluster-safe session routing vocabulary and current connection/session mapping.
       - The map preserves session-routing-vocabulary-only posture and does not add runtime behavior.
       - Repository checks verify the map and deferrals.
+    non_goals:
+      - adding cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-sessions --json` as a source-first repository inspection map for Pitaya-aligned cluster-safe session routing vocabulary, current single-process connection id, connection epoch, first-message binding, active connection registry, runtime session, bound identity, request token identity, session validation, absent remote handoff, absent reconnect routing, source surfaces, deferrals, and redaction flags. Accepted `ADR-0165`, registered `runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map`, completed `W-0257`, and opened `M-186/W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map` as next-ready. Preserved cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote handoff, reconnect routing, distributed session routing, distributed runtime implementation, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed groups, room broadcast fanout, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-186
+    title: Select Next Pitaya-Aligned Direction After Cluster-Safe Session Routing Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the cluster-safe session routing source-first map, without implementing cluster-safe session routing, session location registries, connection owner node registries, routing epoch behavior, remote handoff, reconnect routing, distributed session routing, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, distributed groups, room broadcast fanout, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction is selected as a bounded follow-up.
+      - Candidate directions and deferrals are recorded before implementation.
+      - Repository checks verify the selection and next-ready state.
     non_goals:
       - adding cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
@@ -10098,7 +10110,7 @@ work_items:
   - id: W-0257
     milestone: M-185
     title: Implement Pitaya-aligned cluster-safe session routing source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-cluster-safe-session-routing-source-first-map
     depends_on:
       - W-0256
@@ -10127,4 +10139,45 @@ work_items:
     completion:
       - Implement a source-first repository inspection map for cluster-safe session routing vocabulary.
       - Summarize current connection id, connection epoch, first-message binding, active connection registry, runtime session validation, bound identity, and request identity mappings.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0165
+    check_rule: runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map
+    next_milestone: M-186
+    next_ready_work_item: W-0258
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+    completion_summary: Implemented `node tools/vibit inspect pitaya-sessions --json` as a source-first repository inspection map for Pitaya-aligned cluster-safe session routing vocabulary, current connection/session mapping, source surfaces, deferrals, and redaction flags. Preserved cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote handoff, reconnect routing, distributed session routing, service discovery implementation, RPC implementation, remote calls, frontend/backend role implementation, distributed runtime implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0258
+    milestone: M-186
+    title: Select next Pitaya-aligned direction after cluster-safe session routing map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map
+    depends_on:
+      - W-0257
+    expected_change_id: select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map
+    tier: tier_2_direction_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+    gate_decision: ADR-0165
+    related_decisions:
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of selecting only the next Pitaya-aligned direction.
+    completion:
+      - Select the next Pitaya-aligned direction after the cluster-safe session routing source-first map.
+      - Record candidate directions and why implementation remains deferred.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
