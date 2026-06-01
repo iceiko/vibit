@@ -1,0 +1,181 @@
+schema_version: 0.1
+change_id: select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Select the Pitaya-aligned route handler pipeline boundary gate as the next bounded direction after the cluster-safe session routing source-first map, without adding route handler implementation, handler routing behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0166
+  referenced:
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  next_pitaya_aligned_direction_after_cluster_safe_session_routing_map: completed
+  completed_work_item: W-0258
+  completed_milestone: M-186
+  previous_completed_work_item: W-0257
+  next_milestone: M-187
+  next_work_item: W-0259
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate
+  decision: ADR-0166
+  gate_decision: ADR-0165
+  check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+  primary_product_reference: Nakama
+  pitaya_reference_status: route_handler_pipeline_boundary_gate_selected
+  implementation_scope: direction_selection_only
+  implementation_authorized_by_this_selection: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by choosing the next bounded alignment direction after the cluster-safe session routing source-first map.
+nakama_capability_family: distributed_runtime_route_handler_pipeline_planning
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: route_handler_pipeline_boundary_gate_selected
+  adopted:
+    - route handler pipeline vocabulary as the next planning surface
+    - handler routing boundary as future vocabulary
+    - pipeline middleware boundary as future vocabulary
+    - serializer boundary as future vocabulary
+    - message forwarding boundary as future vocabulary
+  adapted:
+    - selection-only repository memory before any route handler pipeline gate
+    - explicit no-implementation flags before route dispatch or forwarding changes
+    - vibit runtime adapter and module contracts remain authoritative
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - route handler implementation in this slice
+    - handler routing behavior in this slice
+    - pipeline middleware behavior in this slice
+    - serializer behavior in this slice
+    - message forwarding behavior in this slice
+
+acceptance_criteria:
+  - The next Pitaya-aligned direction is selected as `define_pitaya_aligned_route_handler_pipeline_boundary_gate`.
+  - `M-187/W-0259 Define Pitaya-aligned route handler pipeline boundary gate` is next-ready.
+  - Repository checks verify ADR-0166, change artifacts, rule registration, W-0258 completion, W-0259 next-ready state, and explicit implementation deferrals.
+  - The slice does not add route handler implementation, handler routing behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0166, W-0258 completion, W-0259 next-ready state, change artifacts, conversation memory, rule registration, and deferral flags.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by `node tools/vibit check runtime --json`; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map/
+    - decisions/ADR-0166-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map.md
+    - conversations/2026-05-26-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - route handler implementation
+    - handler routing behavior
+    - pipeline middleware behavior
+    - serializer behavior
+    - message forwarding behavior
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+    - node tools/vibit check change select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  status: Verified

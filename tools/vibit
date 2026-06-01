@@ -193,6 +193,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_distributed_group_broadcast_source_first_map",
   "runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate",
   "runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map",
+  "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -42950,6 +42951,212 @@ function checkRuntimePitayaAlignedClusterSafeSessionRoutingSourceFirstMap(root, 
   });
 }
 
+function checkRuntimeNextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMap(root, goFiles) {
+  const ruleId = "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map";
+  const decisionPath = "decisions/ADR-0166-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map.md";
+  const changePath = "changes/2026-05-26-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map";
+  const conversationPath = "conversations/2026-05-26-select-next-pitaya-aligned-direction-after-cluster-safe-session-routing-map.md";
+
+  if (!nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
+    ok("next Pitaya-aligned direction after cluster-safe session routing map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for next Pitaya-aligned direction after cluster-safe session routing map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for next Pitaya-aligned direction after cluster-safe session routing map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-187"],
+    [".arch/work-items.yaml", "id: M-186"],
+    [".arch/work-items.yaml", "title: Select Next Pitaya-Aligned Direction After Cluster-Safe Session Routing Map"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0258"],
+    [".arch/work-items.yaml", "title: Select next Pitaya-aligned direction after cluster-safe session routing map"],
+    [".arch/work-items.yaml", "decision: ADR-0166"],
+    [".arch/work-items.yaml", "check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    [".arch/work-items.yaml", "selected_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/work-items.yaml", "id: M-187"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Route Handler Pipeline Boundary Gate"],
+    [".arch/work-items.yaml", "id: W-0259"],
+    [".arch/work-items.yaml", "title: Define Pitaya-aligned route handler pipeline boundary gate"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "next_pitaya_aligned_direction_after_cluster_safe_session_routing_map: ADR-0166"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "next_pitaya_aligned_direction_after_cluster_safe_session_routing_map_completed: true"],
+    [".arch/runtime.yaml", "next_pitaya_aligned_direction_after_cluster_safe_session_routing_map_check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    [".arch/runtime.yaml", "selected_next_pitaya_direction_after_cluster_safe_session_routing_map: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/runtime.yaml", "future_pitaya_aligned_route_handler_pipeline_boundary_gate_work_item: W-0259"],
+    [".arch/runtime.yaml", "implementation_authorized_by_this_selection: false"],
+    [".arch/runtime.yaml", "route_handler_pipeline_implementation_added: false"],
+    [".arch/runtime.yaml", "handler_routing_behavior_added: false"],
+    [".arch/runtime.yaml", "pipeline_middleware_behavior_added: false"],
+    [".arch/runtime.yaml", "serializer_behavior_added: false"],
+    [".arch/runtime.yaml", "message_forwarding_behavior_added: false"],
+    [".arch/runtime.yaml", "runtime_behavior_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2fq_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    [".arch/reference.yaml", "phase_2fr_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    [".arch/conventions.yaml", "selected_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/conventions.yaml", "route_handler_pipeline_implementation_added: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    [".arch/contracts.yaml", "selected_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
+    [".arch/contracts.yaml", "route_handler_pipeline_implementation_added: false"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedStorageGuideNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0166",
+      "M-186/W-0258",
+      "M-187/W-0259",
+      "define_pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "route handler pipeline boundary gate",
+      "This decision does not implement route handlers",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "completed_work_item: W-0258",
+      "completed_milestone: M-186",
+      "previous_completed_work_item: W-0257",
+      "next_milestone: M-187",
+      "next_work_item: W-0259",
+      "selected_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "check_rule: runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map",
+      "next_pitaya_aligned_direction_after_cluster_safe_session_routing_map: completed",
+      "implementation_authorized_by_this_selection: false",
+      "route_handler_pipeline_implementation_added: false",
+      "handler_routing_behavior_added: false",
+      "pipeline_middleware_behavior_added: false",
+      "serializer_behavior_added: false",
+      "message_forwarding_behavior_added: false",
+      "runtime_behavior_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0258",
+      "W-0259",
+      "ADR-0166",
+      "define_pitaya_aligned_route_handler_pipeline_boundary_gate",
+      "does not implement route handlers, pipelines, serializers, or forwarding",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Next Pitaya-aligned direction after cluster-safe session routing map completes W-0258, selects route handler pipeline boundary gating, opens W-0259, and adds no route handler, pipeline, serializer, forwarding, runtime, protocol, generated, persistence, dependency, hosted, SDK, or direct compatibility scope", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -44843,6 +45050,10 @@ function pitayaAlignedClusterSafeSessionRoutingSourceFirstMapCompleted(root) {
   return workItemHasStatus(root, "W-0257", "completed");
 }
 
+function nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root) {
+  return workItemHasStatus(root, "W-0258", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -44875,6 +45086,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
+    return "repository_next_work_item: W-0259";
+  }
   if (pitayaAlignedClusterSafeSessionRoutingSourceFirstMapCompleted(root)) {
     return "repository_next_work_item: W-0258";
   }
@@ -45011,6 +45225,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_route_handler_pipeline_boundary_gate";
+  }
   if (pitayaAlignedClusterSafeSessionRoutingSourceFirstMapCompleted(root)) {
     return "repository_next_work_item_scope: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map";
   }
@@ -45138,6 +45355,9 @@ function expectedRepositoryNextWorkItemScope(root) {
 }
 
 function expectedStorageGuideNextWorkItemTitle(root) {
+  if (nextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMapCompleted(root)) {
+    return "W-0259 Define Pitaya-aligned route handler pipeline boundary gate";
+  }
   if (pitayaAlignedClusterSafeSessionRoutingSourceFirstMapCompleted(root)) {
     return "W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map";
   }
@@ -45289,6 +45509,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0258", "next_ready_work_item: W-0259"],
     ["W-0257", "next_ready_work_item: W-0258"],
     ["W-0256", "next_ready_work_item: W-0257"],
     ["W-0255", "next_ready_work_item: W-0256"],
@@ -45375,6 +45596,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0258", "completed")) {
+    return "next_work_item: W-0259";
+  }
   if (workItemHasStatus(root, "W-0257", "completed")) {
     return "next_work_item: W-0258";
   }
@@ -45578,6 +45802,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0258", "define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
     ["W-0257", "select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
     ["W-0256", "implement_pitaya_aligned_cluster_safe_session_routing_source_first_map"],
     ["W-0255", "define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
@@ -45664,6 +45889,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0258", "W-0259 Define Pitaya-aligned route handler pipeline boundary gate"],
     ["W-0257", "W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map"],
     ["W-0256", "W-0257 Implement Pitaya-aligned cluster-safe session routing source-first map"],
     ["W-0255", "W-0256 Define Pitaya-aligned cluster-safe session routing boundary gate"],
@@ -45751,6 +45977,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0258", "current_phase: define_pitaya_aligned_route_handler_pipeline_boundary_gate"],
     ["W-0257", "current_phase: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map"],
     ["W-0256", "current_phase: implement_pitaya_aligned_cluster_safe_session_routing_source_first_map"],
     ["W-0255", "current_phase: define_pitaya_aligned_cluster_safe_session_routing_boundary_gate"],
@@ -46426,6 +46653,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedDistributedGroupBroadcastSourceFirstMap(root, goFiles);
   checkRuntimePitayaAlignedClusterSafeSessionRoutingBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedClusterSafeSessionRoutingSourceFirstMap(root, goFiles);
+  checkRuntimeNextPitayaAlignedDirectionAfterClusterSafeSessionRoutingMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

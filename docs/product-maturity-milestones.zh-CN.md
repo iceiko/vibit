@@ -27,11 +27,11 @@ stage_4_nakama_first_ai_native_product: long_term_target
 stage_4_nakama_pitaya_class_product: long_term_target
 reference_posture_update: ADR-0127
 primary_product_reference: Nakama
-pitaya_reference_status: cluster_safe_session_routing_source_first_map_implemented
+pitaya_reference_status: route_handler_pipeline_boundary_gate_selected
 ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
 feedback_intake_surface: .github/ISSUE_TEMPLATE/alpha-feedback.yml
 feedback_intake_standard: docs/first-alpha-feedback-intake-surfaces.md
-next_direction: select_next_pitaya_aligned_direction_after_cluster_safe_session_routing_map
+next_direction: define_pitaya_aligned_route_handler_pipeline_boundary_gate
 runtime_behavior_added: false
 protocol_route_added: false
 protobuf_source_added: false
@@ -203,13 +203,13 @@ Stage 4 不意味着 direct Nakama/Pitaya API compatibility，除非后续 ADR �
 
 ## 7. 下一个产品方向
 
-Pitaya-aligned cluster-safe session routing source-first map 之后，下一个产品方向是：
+Post-session-routing Pitaya-aligned direction selection 之后，下一个产品方向是：
 
 ```text
-W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map
+W-0259 Define Pitaya-aligned route handler pipeline boundary gate
 ```
 
-Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0164` 已定义 Pitaya-aligned cluster-safe session routing boundary gate，检查规则是 `runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate`；`ADR-0165` 已实现 `node tools/vibit inspect pitaya-sessions --json`，检查规则是 `runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map`。下一项 work 是 `W-0258 Select next Pitaya-aligned direction after cluster-safe session routing map`；它只应选择 bounded follow-up，同时继续延后 protocol shape changes、service behavior changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、stream subscriptions、chat rooms、groups、parties、distributed group behavior、group membership registries、broadcast fanout、delivery guarantees、distributed runtime implementation、frontend/backend server role implementation、server-to-server RPC implementation、remote calls、service discovery implementation、service registries、service selectors、node identity、cluster-safe session routing behavior、session location registries、connection owner node registries、routing epoch behavior、session route targets、remote connection handoff、distributed session routing、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、event/audit tables、admin endpoints、metrics endpoints、observability pipelines、dashboards 和 direct compatibility，除非后续明确 work item 授权。
+Agent-native feature request and test workflow 已记录在 `docs/agent-native-feature-request-test-workflow.md` 和 `ADR-0128`。`ADR-0164` 已定义 Pitaya-aligned cluster-safe session routing boundary gate，检查规则是 `runtime.pitaya_aligned_cluster_safe_session_routing_boundary_gate`；`ADR-0165` 已实现 `node tools/vibit inspect pitaya-sessions --json`，检查规则是 `runtime.pitaya_aligned_cluster_safe_session_routing_source_first_map`；`ADR-0166` 已选择 `define_pitaya_aligned_route_handler_pipeline_boundary_gate`，检查规则是 `runtime.next_pitaya_aligned_direction_after_cluster_safe_session_routing_map`。下一项 work 是 `W-0259 Define Pitaya-aligned route handler pipeline boundary gate`；它只应定义 bounded gate，同时继续延后 route handler implementation、handler routing behavior、pipeline middleware behavior、serializer behavior、message forwarding behavior、protocol shape changes、service behavior changes、repository interface changes、PostgreSQL adapter changes、migrations、dependencies、stream subscriptions、chat rooms、groups、parties、distributed group behavior、group membership registries、broadcast fanout、delivery guarantees、distributed runtime implementation、frontend/backend server role implementation、server-to-server RPC implementation、remote calls、service discovery implementation、service registries、service selectors、node identity、cluster-safe session routing behavior、session location registries、connection owner node registries、routing epoch behavior、session route targets、remote connection handoff、distributed session routing、matchmaking、match runtime、SDK publication、hosted deployments、release artifacts、public announcements、event/audit tables、admin endpoints、metrics endpoints、observability pipelines、dashboards 和 direct compatibility，除非后续明确 work item 授权。
 
 Stage 2 的追溯引用包括 `docs/prototype-ready-local-development-path-package.md`、`docs/storage-objects-behavior-gate.md`、`docs/storage-objects-persistence-schema-gate.md`、`runtime/migrations/postgres/000006_create_storage_objects.sql`、`docs/storage-objects-repository-boundary.md`、`runtime/migrations/postgres/000007_create_friend_relationships.sql` 和 `docs/friends-relationship-repository-boundary.md`。
 
