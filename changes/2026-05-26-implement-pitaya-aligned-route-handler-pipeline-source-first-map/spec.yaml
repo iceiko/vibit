@@ -1,0 +1,236 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-route-handler-pipeline-source-first-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned route handler pipeline inspection map and open a next Pitaya direction selection follow-up without adding route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, distributed runtime behavior, service discovery implementation, RPC implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0168
+  referenced:
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_route_handler_pipeline_source_first_map: implemented
+  completed_work_item: W-0260
+  completed_milestone: M-188
+  previous_completed_work_item: W-0259
+  next_milestone: M-189
+  next_work_item: W-0261
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map
+  decision: ADR-0168
+  gate_decision: ADR-0167
+  check_rule: runtime.pitaya_aligned_route_handler_pipeline_source_first_map
+  command: node tools/vibit inspect pitaya-routes --json
+  route_handler_pipeline_boundary_standard: docs/pitaya-aligned-route-handler-pipeline-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: route_handler_pipeline_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_route_handler_pipeline_vocabulary:
+    - route_handler
+    - route_key
+    - handler_dispatch
+    - handler_pipeline
+    - pipeline_step
+    - serializer_boundary
+    - message_forwarding
+    - route_target
+  related_vocabulary:
+    - protocol_envelope
+    - route_request
+    - application_dispatch
+    - command_handler
+    - query_handler
+    - protocol_bridge
+    - target_scope
+    - frontend_server
+    - backend_server
+    - server_to_server_rpc
+    - remote_call
+    - service_discovery
+    - cluster_safe_session_routing
+  current_single_process_route_handler_mapping:
+    protocol_envelope:
+      current: kind_module_name_structured_routing
+      future_vocabulary: route_key
+      implementation_status: current_protocol_adapter_owned_shape
+    route_request:
+      current: app_route_request_handoff
+      future_vocabulary: route_handler
+      implementation_status: current_application_dispatch
+    application_dispatch:
+      current: explicit_command_query_dispatch
+      future_vocabulary: handler_dispatch
+      implementation_status: no_pitaya_handler_pipeline
+    transactional_dispatch:
+      current: application_unit_of_work_wrapper
+      future_vocabulary: pipeline_step
+      implementation_status: current_vibit_transaction_boundary_only
+    protocol_bridge:
+      current: explicit_generated_payload_bridge
+      future_vocabulary: serializer_boundary
+      implementation_status: no_pluggable_serializer_behavior
+    outbound_message:
+      current: server_push_intent_to_protocol_envelope
+      future_vocabulary: message_forwarding
+      implementation_status: no_cross_node_forwarding
+    route_target:
+      current: target_scope_metadata_only
+      future_vocabulary: route_target
+      implementation_status: no_backend_route_targeting
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: route_handler_pipeline_source_first_map_implemented
+  adopted:
+    - route handler pipeline vocabulary inspection
+    - route key vocabulary inspection
+    - handler dispatch vocabulary inspection
+    - handler pipeline vocabulary inspection
+    - serializer boundary vocabulary inspection
+    - message forwarding vocabulary inspection
+    - route target vocabulary inspection
+  adapted:
+    - source-first repository inspection before handler routing, pipeline, serializer, forwarding, or backend targeting implementation
+    - current kind/module/name routing remains the concrete route identity
+    - current application dispatch remains the concrete handler dispatch
+    - current generated Protobuf bridge remains the concrete serializer boundary
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, route, handler, serializer, pipeline, forwarding, registry, selector, or configuration naming compatibility
+    - route handler implementation in this slice
+    - handler routing, handler pipeline, pipeline middleware, serializer, message forwarding, or backend route targeting behavior in this slice
+    - service discovery, RPC, remote call, frontend/backend role, cluster-safe session routing, distributed group, broadcast fanout, or distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-routes --json`.
+  - The inspection output includes allowed route handler pipeline vocabulary, related vocabulary, current single-process route handler mapping, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0260 map and W-0261 next-ready state.
+  - The slice does not add route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-implement-pitaya-aligned-route-handler-pipeline-source-first-map/
+    - decisions/ADR-0168-pitaya-aligned-route-handler-pipeline-source-first-map.md
+    - conversations/2026-05-26-pitaya-aligned-route-handler-pipeline-source-first-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - route handler implementation
+    - handler routing behavior
+    - handler pipeline behavior
+    - pipeline middleware behavior
+    - serializer behavior
+    - message forwarding behavior
+    - backend route targeting
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect pitaya-routes --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_route_handler_pipeline_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-route-handler-pipeline-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

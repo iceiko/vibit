@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-188
+current_milestone: M-189
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_route_handler_pipeline_boundary_gate_selected
+    current_release_state: pitaya_aligned_route_handler_pipeline_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0259
+    next_ready_work_item: W-0261
     preferred_after_current:
-      - define_pitaya_aligned_route_handler_pipeline_boundary_gate
+      - select_next_pitaya_aligned_direction_after_route_handler_pipeline_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3392,12 +3392,25 @@ milestones:
 
   - id: M-188
     title: Pitaya-Aligned Route Handler Pipeline Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-188
     goal: Implement a source-first repository map for the Pitaya-aligned route handler pipeline vocabulary defined by ADR-0167, without implementing route handlers, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first repository inspection surface summarizes route handler pipeline vocabulary and current protocol/dispatch/bridge mapping.
       - The map preserves route-handler-pipeline-vocabulary-only posture and does not add runtime behavior.
       - Repository checks verify the map and deferrals.
+    non_goals:
+      - adding route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-routes --json` as a source-first repository inspection map for Pitaya-aligned route handler pipeline vocabulary, current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, outbound message, target-scope metadata, source surfaces, deferrals, and redaction flags. Accepted `ADR-0168`, registered `runtime.pitaya_aligned_route_handler_pipeline_source_first_map`, completed `W-0260`, and opened `M-189/W-0261 Select next Pitaya-aligned direction after route handler pipeline map` as next-ready. Preserved route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-189
+    title: Select Next Pitaya-Aligned Direction After Route Handler Pipeline Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the route handler pipeline source-first map, without implementing route handlers, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction is selected as a bounded follow-up.
+      - Candidate directions and deferrals are recorded before implementation.
+      - Repository checks verify the selection and next-ready state.
     non_goals:
       - adding route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
@@ -10257,7 +10270,7 @@ work_items:
   - id: W-0260
     milestone: M-188
     title: Implement Pitaya-aligned route handler pipeline source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-route-handler-pipeline-source-first-map
     depends_on:
       - W-0259
@@ -10289,4 +10302,48 @@ work_items:
     completion:
       - Implement a source-first repository inspection map for route handler pipeline vocabulary.
       - Summarize current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, outbound message, and implementation deferrals.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0168
+    check_rule: runtime.pitaya_aligned_route_handler_pipeline_source_first_map
+    next_milestone: M-189
+    next_ready_work_item: W-0261
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map
+    completion_summary: Implemented `node tools/vibit inspect pitaya-routes --json` as a source-first repository inspection map for Pitaya-aligned route handler pipeline vocabulary, current protocol envelope, route request, application dispatch, transactional dispatch, protocol bridge, outbound message, target-scope metadata, source surfaces, deferrals, and redaction flags. Preserved route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0261
+    milestone: M-189
+    title: Select next Pitaya-aligned direction after route handler pipeline map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-route-handler-pipeline-map
+    depends_on:
+      - W-0260
+    expected_change_id: select-next-pitaya-aligned-direction-after-route-handler-pipeline-map
+    tier: tier_2_direction_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map
+    gate_decision: ADR-0168
+    related_decisions:
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing route handlers, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of selecting only the next Pitaya-aligned direction.
+    completion:
+      - Select the next Pitaya-aligned direction after the route handler pipeline source-first map.
+      - Record candidate directions and why implementation remains deferred.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

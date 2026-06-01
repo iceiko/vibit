@@ -36,7 +36,7 @@ Review alpha flow 时使用这些状态：
 - [x] `docs/v0.1-alpha-goal.md` 和 `docs/v0.1-alpha-goal.zh-CN.md` 定义短期 `v0.1 alpha` 目标。
 - [x] `AGENTS.md`、`AGENTS.zh-CN.md`、`runtime/AGENTS.md` 和 `runtime/AGENTS.zh-CN.md` 指向当前 continuation queue。
 - [x] `.arch/work-items.yaml` 记录当前 continuation state。
-- [x] `node tools/vibit inspect next` 能识别当前 `W-0260 Implement Pitaya-aligned route handler pipeline source-first map` continuation step。
+- [x] `node tools/vibit inspect next` 能识别当前 `W-0261 Select next Pitaya-aligned direction after route handler pipeline map` continuation step。
 - [x] `node tools/vibit inspect operations --json` 会报告 source-first local operations posture、route families、redaction flags 和 Pitaya deferred architecture mapping。
 - [x] `node tools/vibit inspect pitaya-vocabulary --json` 会报告 source-first Pitaya vocabulary map 和 deferrals。
 - [x] `node tools/vibit inspect pitaya-roles --json` 会报告 source-first Pitaya frontend/backend role map 和 deferrals。
@@ -44,7 +44,8 @@ Review alpha flow 时使用这些状态：
 - [x] `node tools/vibit inspect pitaya-discovery --json` 会报告 source-first Pitaya service discovery map 和 deferrals。
 - [x] `node tools/vibit inspect pitaya-groups --json` 会报告 source-first Pitaya distributed group and broadcast map 和 deferrals。
 - [x] `node tools/vibit inspect pitaya-sessions --json` 会报告 source-first Pitaya cluster-safe session routing map 和 deferrals。
-- [x] 当前 `next_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map` 接续已完成的 friends relationship protocol route local proof、W-0243 post-proof selection、W-0244 minimum operations inspection surface gate、W-0245 source-first operations inspection implementation、W-0246 Pitaya vocabulary gate、W-0247 source-first vocabulary map、W-0248 frontend/backend role boundary gate、W-0249 source-first role map、W-0250 server-to-server RPC boundary gate、W-0251 server-to-server RPC source-first map、W-0252 service discovery boundary gate、W-0253 service discovery source-first map、W-0254 distributed group/broadcast boundary gate、W-0255 distributed group/broadcast source-first map、W-0256 cluster-safe session routing boundary gate、W-0257 cluster-safe session routing source-first map、W-0258 next Pitaya-aligned direction selection 和 W-0259 route handler pipeline boundary gate。
+- [x] `node tools/vibit inspect pitaya-routes --json` 会报告 source-first Pitaya route handler pipeline map 和 deferrals。
+- [x] 当前 `next_direction: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map` 接续已完成的 friends relationship protocol route local proof、W-0243 post-proof selection、W-0244 minimum operations inspection surface gate、W-0245 source-first operations inspection implementation、W-0246 Pitaya vocabulary gate、W-0247 source-first vocabulary map、W-0248 frontend/backend role boundary gate、W-0249 source-first role map、W-0250 server-to-server RPC boundary gate、W-0251 server-to-server RPC source-first map、W-0252 service discovery boundary gate、W-0253 service discovery source-first map、W-0254 distributed group/broadcast boundary gate、W-0255 distributed group/broadcast source-first map、W-0256 cluster-safe session routing boundary gate、W-0257 cluster-safe session routing source-first map、W-0258 next Pitaya-aligned direction selection、W-0259 route handler pipeline boundary gate 和 W-0260 route handler pipeline source-first map。
 - [x] `docs/prototype-ready-local-development-path-package.md` 已打包可重复 source-first local path。
 
 ## 4. Local Prerequisites
@@ -181,6 +182,6 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_route_handler_pipeline_source_first_map
+next_direction: select_next_pitaya_aligned_direction_after_route_handler_pipeline_map
 next_work_status: next_ready
 ```
