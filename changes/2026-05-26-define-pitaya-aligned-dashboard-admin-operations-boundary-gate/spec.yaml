@@ -1,0 +1,232 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-dashboard-admin-operations-boundary-gate
+date: 2026-06-01
+type: standard
+status: verified
+
+summary: Define the Pitaya-aligned dashboard and admin operations boundary gate and open the source-first dashboard/admin operations map follow-up, without adding runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0185
+  referenced:
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_dashboard_admin_operations_boundary_gate: defined
+  completed_work_item: W-0277
+  completed_milestone: M-205
+  previous_completed_work_item: W-0276
+  next_milestone: M-206
+  next_work_item: W-0278
+  next_work_item_status: next_ready
+  next_direction: implement_pitaya_aligned_dashboard_admin_operations_source_first_map
+  decision: ADR-0185
+  check_rule: runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate
+  standard: docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.md
+  translation: docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.zh-CN.md
+  selection_decision: ADR-0184
+  source_map_decision: ADR-0183
+  gate_decision: ADR-0182
+  primary_product_reference: Nakama
+  pitaya_reference_status: dashboard_admin_operations_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_dashboard_admin_operations_vocabulary
+  implementation_authorized_by_this_gate: false
+  future_implementation_work_item: W-0278
+  future_implementation_direction: implement_pitaya_aligned_dashboard_admin_operations_source_first_map
+  allowed_dashboard_admin_operations_vocabulary:
+    - dashboard_admin_boundary
+    - admin_operation_surface
+    - operator_action_boundary
+    - dashboard_read_model
+    - source_first_operations_snapshot
+    - inspector_redaction_posture
+    - event_audit_deferral
+    - local_operations_diagnostic_surface
+    - future_admin_authorization_boundary
+    - hosted_operations_deferral
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  player_session_token_inspector_added: false
+  event_audit_table_added: false
+  session_binding_behavior_added: false
+  kick_disconnect_behavior_added: false
+  session_data_behavior_added: false
+  session_data_persistence_added: false
+  acceptor_behavior_added: false
+  tcp_acceptor_added: false
+  websocket_behavior_changed: false
+  connection_lifecycle_behavior_changed: false
+  route_handler_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  service_discovery_implementation_added: false
+  server_to_server_rpc_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by defining the dashboard and admin operations boundary gate after the metrics and tracing source-first map.
+nakama_capability_family: admin_console_metrics_observability_and_operations
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: dashboard_admin_operations_vocabulary_boundary_defined_for_future_architecture_planning
+  adopted:
+    - dashboard/admin operations become planning vocabulary only
+    - current operations, runtime observability, metrics/tracing, health/readiness, route inventory, verification, and redaction facts remain source-first
+  adapted:
+    - gate-only repository memory before any dashboard/admin source-first map
+    - explicit no-implementation flags before runtime endpoints, dashboards, admin console behavior, inspectors, event/audit storage, dependencies, or distributed runtime changes
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - runtime endpoint behavior in this slice
+    - dashboard or admin console behavior in this slice
+    - player/session/token inspector behavior in this slice
+    - event/audit table behavior in this slice
+
+acceptance_criteria:
+  - The gate defines allowed dashboard/admin operations vocabulary.
+  - `M-206/W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map` is next-ready.
+  - Repository checks verify ADR-0185, standards, change artifacts, rule registration, W-0277 completion, W-0278 next-ready state, and explicit implementation deferrals.
+  - The slice does not add runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0185, W-0277 completion, W-0278 next-ready state, standards, change artifacts, conversation memory, rule registration, and deferral flags.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by repository runtime checks; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-define-pitaya-aligned-dashboard-admin-operations-boundary-gate/
+    - decisions/ADR-0185-pitaya-aligned-dashboard-admin-operations-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-dashboard-admin-operations-boundary-gate.md
+    - docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.md
+    - docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.zh-CN.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - metrics endpoints
+    - tracing pipelines
+    - observability pipelines
+    - dashboards
+    - admin console behavior
+    - player/session/token inspectors
+    - event/audit tables
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change define-pitaya-aligned-dashboard-admin-operations-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
