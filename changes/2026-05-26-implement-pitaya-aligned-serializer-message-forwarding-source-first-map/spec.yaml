@@ -1,0 +1,248 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-serializer-message-forwarding-source-first-map
+date: 2026-06-01
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned serializer and message forwarding inspection map and open a next Pitaya direction selection follow-up without adding route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, distributed runtime behavior, service discovery implementation, RPC implementation, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0171
+  referenced:
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_serializer_message_forwarding_source_first_map: implemented
+  completed_work_item: W-0263
+  completed_milestone: M-191
+  previous_completed_work_item: W-0262
+  next_milestone: M-192
+  next_work_item: W-0264
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+  decision: ADR-0171
+  gate_decision: ADR-0170
+  check_rule: runtime.pitaya_aligned_serializer_message_forwarding_source_first_map
+  command: node tools/vibit inspect pitaya-serializer-forwarding --json
+  serializer_message_forwarding_boundary_standard: docs/pitaya-aligned-serializer-message-forwarding-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: serializer_message_forwarding_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_serializer_message_forwarding_vocabulary:
+    - serializer_boundary
+    - serializer_format
+    - encode_boundary
+    - decode_boundary
+    - message_forwarding
+    - forwarding_target
+    - forwarding_envelope
+    - delivery_handoff
+  related_vocabulary:
+    - protocol_bridge
+    - generated_payload_bridge
+    - protobuf_envelope
+    - payload_encoding
+    - payload_decoding
+    - outbound_message
+    - target_scope
+    - route_target
+    - delivery_handoff
+    - route_handler
+    - frontend_server
+    - backend_server
+    - server_to_server_rpc
+    - remote_call
+    - service_discovery
+    - cluster_safe_session_routing
+  current_single_process_serializer_forwarding_mapping:
+    protocol_bridge:
+      current: explicit_generated_payload_bridge
+      future_vocabulary: serializer_boundary
+      implementation_status: no_pluggable_serializer_behavior
+    envelope_encoding:
+      current: protobuf_envelope_owned_by_protocol_adapter
+      future_vocabulary: serializer_format
+      implementation_status: no_serializer_registry
+    payload_encoding:
+      current: generated_payload_bridge_functions
+      future_vocabulary: encode_boundary
+      implementation_status: no_custom_encode_pipeline
+    payload_decoding:
+      current: generated_payload_bridge_functions
+      future_vocabulary: decode_boundary
+      implementation_status: no_custom_decode_pipeline
+    outbound_message:
+      current: server_push_intent_to_protocol_envelope
+      future_vocabulary: message_forwarding
+      implementation_status: no_cross_node_forwarding
+    target_scope:
+      current: metadata_only_target_scope
+      future_vocabulary: forwarding_target
+      implementation_status: no_backend_route_targeting
+    forwarding_envelope:
+      current: no_internal_forwarding_envelope
+      future_vocabulary: forwarding_envelope
+      implementation_status: not_implemented
+    delivery_handoff:
+      current: single_process_websocket_delivery
+      future_vocabulary: delivery_handoff
+      implementation_status: no_remote_delivery_handoff
+  route_handler_implementation_added: false
+  route_handler_pipeline_implementation_added: false
+  handler_routing_behavior_added: false
+  handler_pipeline_behavior_added: false
+  pipeline_middleware_behavior_added: false
+  serializer_behavior_added: false
+  message_forwarding_behavior_added: false
+  backend_route_targeting_added: false
+  cluster_safe_session_routing_added: false
+  session_location_registry_added: false
+  connection_owner_node_registry_added: false
+  routing_epoch_behavior_added: false
+  session_route_target_added: false
+  remote_connection_handoff_added: false
+  reconnect_route_added: false
+  distributed_session_routing_added: false
+  distributed_group_implementation_added: false
+  distributed_groups_added: false
+  group_membership_registry_added: false
+  room_broadcast_fanout_added: false
+  broadcast_delivery_guarantee_added: false
+  stream_subscription_added: false
+  service_discovery_implementation_added: false
+  service_registry_added: false
+  service_selector_added: false
+  node_registry_added: false
+  server_identity_added: false
+  server_to_server_rpc_implementation_added: false
+  remote_call_behavior_added: false
+  frontend_server_implementation_added: false
+  backend_server_implementation_added: false
+  frontend_backend_server_roles_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: serializer_message_forwarding_source_first_map_implemented
+  adopted:
+    - serializer and message forwarding vocabulary inspection
+    - serializer boundary vocabulary inspection
+    - serializer format vocabulary inspection
+    - encode boundary vocabulary inspection
+    - decode boundary vocabulary inspection
+    - message forwarding vocabulary inspection
+    - forwarding target vocabulary inspection
+    - forwarding envelope vocabulary inspection
+    - delivery handoff vocabulary inspection
+  adapted:
+    - source-first repository inspection before serializer, forwarding, backend targeting, or remote delivery implementation
+    - current Protobuf envelope remains owned by the protocol adapter
+    - current generated Protobuf bridge functions remain the concrete payload encode and decode boundary
+    - current outbound message path remains single-process WebSocket delivery
+    - current target-scope metadata remains metadata only and does not imply backend route targeting
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - Pitaya or Nakama package, method, route, handler, serializer, forwarding, registry, selector, or configuration naming compatibility
+    - serializer behavior, message forwarding behavior, forwarding workers, serializer registries, or backend route targeting behavior in this slice
+    - service discovery, RPC, remote call, frontend/backend role, cluster-safe session routing, distributed group, broadcast fanout, or distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-serializer-forwarding --json`.
+  - The inspection output includes allowed serializer and message forwarding vocabulary, related vocabulary, current single-process serializer and forwarding mapping, source surfaces, deferrals, and redaction flags.
+  - Repository checks verify the W-0263 map and W-0264 next-ready state.
+  - The slice does not add route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, serializer behavior, message forwarding behavior, backend route targeting, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-implement-pitaya-aligned-serializer-message-forwarding-source-first-map/
+    - decisions/ADR-0171-pitaya-aligned-serializer-message-forwarding-source-first-map.md
+    - conversations/2026-05-26-pitaya-aligned-serializer-message-forwarding-source-first-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - route handler implementation
+    - handler routing behavior
+    - handler pipeline behavior
+    - pipeline middleware behavior
+    - serializer behavior
+    - message forwarding behavior
+    - backend route targeting
+    - protocol messages or routes
+    - Protobuf source
+    - generated output
+    - repository interfaces
+    - PostgreSQL adapters
+    - migrations
+    - dependencies
+    - authentication/session behavior changes
+    - hosted deployment
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect pitaya-serializer-forwarding --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_serializer_message_forwarding_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-serializer-message-forwarding-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

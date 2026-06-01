@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-191
+current_milestone: M-192
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: pitaya_aligned_serializer_message_forwarding_boundary_gate_defined
+    current_release_state: pitaya_aligned_serializer_message_forwarding_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0263
+    next_ready_work_item: W-0264
     preferred_after_current:
-      - implement_pitaya_aligned_serializer_message_forwarding_source_first_map
+      - select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3431,12 +3431,25 @@ milestones:
 
   - id: M-191
     title: Pitaya-Aligned Serializer And Message Forwarding Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-191
     goal: Implement a source-first repository map for the Pitaya-aligned serializer and message forwarding vocabulary defined by ADR-0170, without implementing serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first repository inspection surface summarizes serializer and message forwarding vocabulary and current protocol/outbound mapping.
       - The map preserves serializer-forwarding-vocabulary-only posture and does not add runtime behavior.
       - Repository checks verify the map and deferrals.
+    non_goals:
+      - adding serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented `node tools/vibit inspect pitaya-serializer-forwarding --json` as a source-first repository inspection map for Pitaya-aligned serializer and message forwarding vocabulary, current protocol bridge, Protobuf envelope encoding, generated payload encode/decode bridge functions, outbound message handoff, target-scope metadata, absent forwarding envelope, single-process delivery handoff, source surfaces, deferrals, and redaction flags. Accepted `ADR-0171`, registered `runtime.pitaya_aligned_serializer_message_forwarding_source_first_map`, completed `W-0263`, and opened `M-192/W-0264 Select next Pitaya-aligned direction after serializer and message forwarding map` as next-ready. Preserved serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: M-192
+    title: Select Next Pitaya-Aligned Direction After Serializer And Message Forwarding Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the serializer and message forwarding source-first map, without implementing serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, distributed runtime behavior, service discovery, RPC, remote calls, frontend/backend roles, cluster-safe session routing, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction is selected as a bounded follow-up.
+      - Candidate directions and deferrals are recorded before implementation.
+      - Repository checks verify the selection and next-ready state.
     non_goals:
       - adding serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, distributed session routing, distributed runtime implementation, distributed group implementation, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery implementation, service registries, service selectors, node identity, server-to-server RPC implementation, remote call behavior, frontend/backend server role implementation, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility
 
@@ -10428,7 +10441,7 @@ work_items:
   - id: W-0263
     milestone: M-191
     title: Implement Pitaya-aligned serializer and message forwarding source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-serializer-message-forwarding-source-first-map
     depends_on:
       - W-0262
@@ -10463,4 +10476,52 @@ work_items:
     completion:
       - Implement a source-first repository inspection map for serializer and message forwarding vocabulary.
       - Summarize current protocol bridge, generated payload bridge, outbound message, target-scope metadata, and implementation deferrals.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0171
+    check_rule: runtime.pitaya_aligned_serializer_message_forwarding_source_first_map
+    command: node tools/vibit inspect pitaya-serializer-forwarding --json
+    next_milestone: M-192
+    next_ready_work_item: W-0264
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+    completion_summary: Implemented a source-first serializer and message forwarding inspection map through `node tools/vibit inspect pitaya-serializer-forwarding --json`, registered `runtime.pitaya_aligned_serializer_message_forwarding_source_first_map`, accepted `ADR-0171`, and opened `W-0264 Select next Pitaya-aligned direction after serializer and message forwarding map` as next-ready. Preserved serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, backend route targeting, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, and direct compatibility deferrals.
+
+  - id: W-0264
+    milestone: M-192
+    title: Select next Pitaya-aligned direction after serializer and message forwarding map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map
+    depends_on:
+      - W-0263
+    expected_change_id: select-next-pitaya-aligned-direction-after-serializer-message-forwarding-map
+    tier: tier_2_architecture_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
+    source_map_decision: ADR-0171
+    related_decisions:
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing serializer behavior, message forwarding behavior, route handler implementation, handler routing behavior, handler pipeline behavior, pipeline middleware behavior, backend route targeting, cluster-safe session routing behavior, session location registries, connection owner node registries, routing epoch behavior, remote connection handoff, reconnect routing, distributed session routing, distributed runtime behavior, distributed groups, room broadcast fanout, delivery guarantees, stream subscriptions, group membership registries, service discovery, service registries, service selectors, node identity, server-to-server RPC, remote call behavior, frontend/backend server roles, runtime endpoint behavior, metrics endpoints, observability pipelines, dashboards, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, or direct Nakama/Pitaya API compatibility instead of selecting only the next Pitaya-aligned direction.
+    completion:
+      - Select the next Pitaya-aligned direction after the serializer and message forwarding source-first map.
+      - Record candidate directions and why implementation remains deferred.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

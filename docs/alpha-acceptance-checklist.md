@@ -37,7 +37,7 @@ Use these states when reviewing the alpha flow:
 - [x] `docs/v0.1-alpha-goal.md` and `docs/v0.1-alpha-goal.zh-CN.md` define the short-term `v0.1 alpha` target.
 - [x] `AGENTS.md`, `AGENTS.zh-CN.md`, `runtime/AGENTS.md`, and `runtime/AGENTS.zh-CN.md` point agents to the current continuation queue.
 - [x] `.arch/work-items.yaml` records the current continuation state.
-- [x] `node tools/vibit inspect next` identifies the current `W-0263 Implement Pitaya-aligned serializer and message forwarding source-first map` continuation step.
+- [x] `node tools/vibit inspect next` identifies the current `W-0264 Select next Pitaya-aligned direction after serializer and message forwarding map` continuation step.
 - [x] `node tools/vibit inspect operations --json` reports the source-first local operations posture, route families, redaction flags, and Pitaya deferred architecture mapping.
 - [x] `node tools/vibit inspect pitaya-vocabulary --json` reports the source-first Pitaya vocabulary map and deferrals.
 - [x] `node tools/vibit inspect pitaya-roles --json` reports the source-first Pitaya frontend/backend role map and deferrals.
@@ -46,7 +46,8 @@ Use these states when reviewing the alpha flow:
 - [x] `node tools/vibit inspect pitaya-groups --json` reports the source-first Pitaya distributed group and broadcast map and deferrals.
 - [x] `node tools/vibit inspect pitaya-sessions --json` reports the source-first Pitaya cluster-safe session routing map and deferrals.
 - [x] `node tools/vibit inspect pitaya-routes --json` reports the source-first Pitaya route handler pipeline map and deferrals.
-- [x] The current `next_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map` follows the completed friends relationship protocol route local proof, W-0243 post-proof selection, W-0244 minimum operations inspection surface gate, W-0245 source-first operations inspection implementation, W-0246 Pitaya vocabulary gate, W-0247 source-first vocabulary map, W-0248 frontend/backend role boundary gate, W-0249 source-first role map, W-0250 server-to-server RPC boundary gate, W-0251 server-to-server RPC source-first map, W-0252 service discovery boundary gate, W-0253 service discovery source-first map, W-0254 distributed group/broadcast boundary gate, W-0255 distributed group/broadcast source-first map, W-0256 cluster-safe session routing boundary gate, W-0257 cluster-safe session routing source-first map, W-0258 next Pitaya-aligned direction selection, W-0259 route handler pipeline boundary gate, W-0260 route handler pipeline source-first map, W-0261 next Pitaya-aligned direction selection after the route handler pipeline map, and W-0262 serializer and message forwarding boundary gate.
+- [x] `node tools/vibit inspect pitaya-serializer-forwarding --json` reports the source-first Pitaya serializer and message forwarding map and deferrals.
+- [x] The current `next_direction: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map` follows the completed friends relationship protocol route local proof, W-0243 post-proof selection, W-0244 minimum operations inspection surface gate, W-0245 source-first operations inspection implementation, W-0246 Pitaya vocabulary gate, W-0247 source-first vocabulary map, W-0248 frontend/backend role boundary gate, W-0249 source-first role map, W-0250 server-to-server RPC boundary gate, W-0251 server-to-server RPC source-first map, W-0252 service discovery boundary gate, W-0253 service discovery source-first map, W-0254 distributed group/broadcast boundary gate, W-0255 distributed group/broadcast source-first map, W-0256 cluster-safe session routing boundary gate, W-0257 cluster-safe session routing source-first map, W-0258 next Pitaya-aligned direction selection, W-0259 route handler pipeline boundary gate, W-0260 route handler pipeline source-first map, W-0261 next Pitaya-aligned direction selection after the route handler pipeline map, W-0262 serializer and message forwarding boundary gate, and W-0263 serializer and message forwarding source-first map.
 - [x] `docs/prototype-ready-local-development-path-package.md` packages the repeatable source-first local path.
 
 ## 4. Local Prerequisites
@@ -183,6 +184,6 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_serializer_message_forwarding_source_first_map
+next_direction: select_next_pitaya_aligned_direction_after_serializer_message_forwarding_map
 next_work_status: next_ready
 ```
