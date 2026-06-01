@@ -14,4 +14,4 @@
 - [x] Preserve cluster-safe session routing behavior, session location registry, connection owner node registry, routing epoch behavior, remote handoff, reconnect routing, distributed runtime, distributed group, broadcast fanout, service discovery, registry, selector, node identity, RPC, remote-call, runtime, protocol, generated-output, persistence, dependency, hosted, SDK, release, and direct-compatibility deferrals.
 - [x] Run targeted verification.
 - [x] Run full verification.
-- [ ] Commit and push.
+- [x] Commit and push.
