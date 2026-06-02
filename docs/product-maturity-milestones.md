@@ -248,8 +248,8 @@ This document records product maturity goals. It does not itself:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate
-next_direction: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate
+next_work_item: W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map
+next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
 ```
 
-`ADR-0187` registered `runtime.next_pitaya_aligned_direction_after_dashboard_admin_operations_map`, completed `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`, selected `define_pitaya_aligned_runtime_component_lifecycle_boundary_gate`, and opened `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`.
+`ADR-0188` registered `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate`, completed `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`, selected `implement_pitaya_aligned_runtime_component_lifecycle_source_first_map`, and opened `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`.

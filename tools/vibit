@@ -215,6 +215,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate",
   "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_dashboard_admin_operations_map",
+  "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -49664,6 +49665,244 @@ function checkRuntimeNextPitayaAlignedDirectionAfterDashboardAdminOperationsMap(
   });
 }
 
+function checkRuntimePitayaAlignedRuntimeComponentLifecycleBoundaryGate(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate";
+  const standardPath = "docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md";
+  const translationPath = "docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.zh-CN.md";
+  const decisionPath = "decisions/ADR-0188-pitaya-aligned-runtime-component-lifecycle-boundary-gate.md";
+  const changePath = "changes/2026-05-26-define-pitaya-aligned-runtime-component-lifecycle-boundary-gate";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-runtime-component-lifecycle-boundary-gate.md";
+
+  if (!pitayaAlignedRuntimeComponentLifecycleBoundaryGateCompleted(root)) {
+    ok("Pitaya-aligned runtime component lifecycle boundary gate is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    standardPath,
+    translationPath,
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned runtime component lifecycle boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned runtime component lifecycle boundary gate`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-209"],
+    [".arch/work-items.yaml", "id: M-208"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Runtime Component Lifecycle Boundary Gate"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0280"],
+    [".arch/work-items.yaml", "title: Define Pitaya-aligned runtime component lifecycle boundary gate"],
+    [".arch/work-items.yaml", "decision: ADR-0188"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    [".arch/work-items.yaml", "standard: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md"],
+    [".arch/work-items.yaml", "translation: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.zh-CN.md"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
+    [".arch/work-items.yaml", "id: M-209"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Runtime Component Lifecycle Source-First Map"],
+    [".arch/work-items.yaml", "id: W-0281"],
+    [".arch/work-items.yaml", "title: Implement Pitaya-aligned runtime component lifecycle source-first map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/runtime.yaml", "pitaya_aligned_runtime_component_lifecycle_boundary_gate: ADR-0188"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "pitaya_aligned_runtime_component_lifecycle_boundary_gate_defined: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_runtime_component_lifecycle_boundary_gate_check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    [".arch/runtime.yaml", "future_pitaya_aligned_runtime_component_lifecycle_source_first_map_work_item: W-0281"],
+    [".arch/runtime.yaml", "future_pitaya_aligned_runtime_component_lifecycle_source_first_map_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
+    [".arch/runtime.yaml", "implementation_scope: gate_only_runtime_component_lifecycle_vocabulary"],
+    [".arch/runtime.yaml", "runtime_component_boundary"],
+    [".arch/runtime.yaml", "component_lifecycle_phase"],
+    [".arch/runtime.yaml", "component_start_boundary"],
+    [".arch/runtime.yaml", "component_shutdown_boundary"],
+    [".arch/runtime.yaml", "handler_registration_boundary"],
+    [".arch/runtime.yaml", "component_dependency_boundary"],
+    [".arch/runtime.yaml", "runtime_component_lifecycle_behavior_added: false"],
+    [".arch/runtime.yaml", "handler_registration_behavior_added: false"],
+    [".arch/runtime.yaml", "startup_hook_behavior_added: false"],
+    [".arch/runtime.yaml", "shutdown_hook_behavior_added: false"],
+    [".arch/runtime.yaml", "runtime_endpoint_behavior_added: false"],
+    [".arch/runtime.yaml", "dashboard_added: false"],
+    [".arch/runtime.yaml", "admin_console_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2gm_pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    [".arch/reference.yaml", "phase_2gn_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    [".arch/conventions.yaml", "selected_follow_up_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
+    [".arch/conventions.yaml", "handler_registration_behavior_added: false"],
+    [".arch/contracts.yaml", "check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    [".arch/contracts.yaml", "selected_follow_up_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
+    [".arch/contracts.yaml", "commands_added: []"],
+    [".arch/contracts.yaml", "handler_registration_behavior_added: false"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [standardPath]: [
+      "pitaya_aligned_runtime_component_lifecycle_boundary_gate: defined",
+      "allowed_runtime_component_lifecycle_vocabulary",
+      "runtime_component_boundary",
+      "component_lifecycle_phase",
+      "component_start_boundary",
+      "component_shutdown_boundary",
+      "handler_registration_boundary",
+      "component_dependency_boundary",
+      "This document defines a runtime component lifecycle vocabulary gate only",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [decisionPath]: [
+      "ADR-0188",
+      "M-208/W-0280",
+      "M-209/W-0281",
+      "implement_pitaya_aligned_runtime_component_lifecycle_source_first_map",
+      "This decision does not add runtime component lifecycle behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "pitaya_aligned_runtime_component_lifecycle_boundary_gate: defined",
+      "completed_work_item: W-0280",
+      "completed_milestone: M-208",
+      "previous_completed_work_item: W-0279",
+      "next_milestone: M-209",
+      "next_work_item: W-0281",
+      "next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map",
+      "decision: ADR-0188",
+      "check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate",
+      "standard: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md",
+      "translation: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.zh-CN.md",
+      "runtime_component_lifecycle_behavior_added: false",
+      "handler_registration_behavior_added: false",
+      "startup_hook_behavior_added: false",
+      "shutdown_hook_behavior_added: false",
+      "runtime_endpoint_behavior_added: false",
+      "dashboard_added: false",
+      "admin_console_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+    [conversationPath]: [
+      "W-0280",
+      "W-0281",
+      "ADR-0188",
+      "runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate",
+      "Keep runtime component lifecycle behavior",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin|component|lifecycle)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin|component|lifecycle)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Disconnect|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward|Acceptor|Connection|Accept|Close|Bind|Presence|Trace|Debug|Dashboard|Observability|Stats|Admin|Component|Lifecycle)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [standardPath, translationPath, decisionPath, `${changePath}/spec.yaml`, `${changePath}/request.md`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned runtime component lifecycle boundary gate completes W-0280, opens W-0281, defines runtime component lifecycle vocabulary, and preserves runtime component lifecycle behavior, handler registration behavior, startup hooks, shutdown hooks, runtime endpoint, dashboard, admin, protocol, generated, persistence, dependency, hosted, SDK, release, distributed runtime, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -51645,6 +51884,10 @@ function nextPitayaAlignedDirectionAfterDashboardAdminOperationsMapCompleted(roo
   return workItemHasStatus(root, "W-0279", "completed");
 }
 
+function pitayaAlignedRuntimeComponentLifecycleBoundaryGateCompleted(root) {
+  return workItemHasStatus(root, "W-0280", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -51677,6 +51920,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedRuntimeComponentLifecycleBoundaryGateCompleted(root)) {
+    return "repository_next_work_item: W-0281";
+  }
   if (nextPitayaAlignedDirectionAfterDashboardAdminOperationsMapCompleted(root)) {
     return "repository_next_work_item: W-0280";
   }
@@ -51879,6 +52125,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedRuntimeComponentLifecycleBoundaryGateCompleted(root)) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map";
+  }
   if (nextPitayaAlignedDirectionAfterDashboardAdminOperationsMapCompleted(root)) {
     return "repository_next_work_item_scope: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate";
   }
@@ -52268,6 +52517,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0280", "next_ready_work_item: W-0281"],
     ["W-0279", "next_ready_work_item: W-0280"],
     ["W-0278", "next_ready_work_item: W-0279"],
     ["W-0277", "next_ready_work_item: W-0278"],
@@ -52376,6 +52626,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0280", "completed")) {
+    return "next_work_item: W-0281";
+  }
   if (workItemHasStatus(root, "W-0279", "completed")) {
     return "next_work_item: W-0280";
   }
@@ -52645,6 +52898,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0280", "implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
     ["W-0279", "define_pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
     ["W-0278", "select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
     ["W-0277", "implement_pitaya_aligned_dashboard_admin_operations_source_first_map"],
@@ -52753,6 +53007,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0280", "W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map"],
     ["W-0279", "W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate"],
     ["W-0278", "W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map"],
     ["W-0277", "W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map"],
@@ -52862,6 +53117,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0280", "current_phase: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map"],
     ["W-0279", "current_phase: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate"],
     ["W-0278", "current_phase: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
     ["W-0277", "current_phase: implement_pitaya_aligned_dashboard_admin_operations_source_first_map"],
@@ -53581,6 +53837,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedDashboardAdminOperationsBoundaryGate(root, goFiles);
   checkRuntimePitayaAlignedDashboardAdminOperationsSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterDashboardAdminOperationsMap(root, goFiles);
+  checkRuntimePitayaAlignedRuntimeComponentLifecycleBoundaryGate(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);

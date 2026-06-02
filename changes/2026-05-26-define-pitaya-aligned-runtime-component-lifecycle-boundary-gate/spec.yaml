@@ -1,0 +1,193 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-runtime-component-lifecycle-boundary-gate
+date: 2026-06-02
+type: standard
+status: verified
+
+summary: Define the Pitaya-aligned runtime component lifecycle boundary gate, without adding runtime component lifecycle behavior, handler registration behavior, component discovery or loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0188
+  referenced:
+    - ADR-0187
+    - ADR-0186
+    - ADR-0185
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_runtime_component_lifecycle_boundary_gate: defined
+  completed_work_item: W-0280
+  completed_milestone: M-208
+  previous_completed_work_item: W-0279
+  next_milestone: M-209
+  next_work_item: W-0281
+  next_work_item_status: next_ready
+  next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+  decision: ADR-0188
+  check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate
+  selection_decision: ADR-0187
+  source_map_decision: ADR-0186
+  standard: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+  translation: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_component_lifecycle_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_runtime_component_lifecycle_vocabulary
+  implementation_authorized_by_this_gate: false
+  future_implementation_work_item: W-0281
+  future_implementation_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+  allowed_runtime_component_lifecycle_vocabulary:
+    - runtime_component_boundary
+    - component_lifecycle_phase
+    - component_start_boundary
+    - component_shutdown_boundary
+    - handler_registration_boundary
+    - component_dependency_boundary
+    - bootstrap_composition_boundary
+    - component_state_posture
+    - local_component_inventory
+    - distributed_component_lifecycle_deferral
+  runtime_component_lifecycle_behavior_added: false
+  component_lifecycle_behavior_added: false
+  handler_registration_behavior_added: false
+  component_discovery_added: false
+  component_loading_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  dashboard_added: false
+  admin_console_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md` and `.zh-CN.md` define the gate-only vocabulary.
+  - `ADR-0188` records the boundary decision.
+  - `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate` is registered and enforced by `tools/vibit`.
+  - `M-209/W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map` is next-ready.
+  - The slice does not add runtime component lifecycle behavior, handler registration behavior, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+    - docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.zh-CN.md
+    - decisions/ADR-0188-pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+    - changes/2026-05-26-define-pitaya-aligned-runtime-component-lifecycle-boundary-gate/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - runtime component lifecycle behavior
+    - handler registration behavior
+    - component discovery or loading
+    - startup hooks
+    - shutdown hooks
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - dashboards
+    - admin console behavior
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change define-pitaya-aligned-runtime-component-lifecycle-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

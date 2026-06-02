@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate
-recommended_next_direction: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate
+next_work_item: W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map
+recommended_next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
 ```
 
-`ADR-0187` registered `runtime.next_pitaya_aligned_direction_after_dashboard_admin_operations_map`, completed `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`, selected `define_pitaya_aligned_runtime_component_lifecycle_boundary_gate`, opened `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`, and keeps runtime component lifecycle behavior, handler registration behavior, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0188` registered `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate`, completed `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`, selected `implement_pitaya_aligned_runtime_component_lifecycle_source_first_map`, opened `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`, and keeps runtime component lifecycle behavior, handler registration behavior, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.

@@ -185,11 +185,11 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate
+next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
 next_work_status: next_ready
 ```
 
-Current next work item: `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`.
+Current next work item: `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`.
 
 Current check rule: `runtime.pitaya_aligned_dashboard_admin_operations_source_first_map`.
 
