@@ -184,11 +184,11 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+next_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
 next_work_status: next_ready
 ```
 
-Current next work item: `W-0288 Select next Pitaya-aligned direction after component discovery and module loading map`。
+Current next work item: `W-0289 Define Pitaya-aligned startup and shutdown hook boundary gate`。
 
 Current check rule: `runtime.pitaya_aligned_handler_module_registration_source_first_map`。
 

@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-216
+current_milestone: M-217
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: component_discovery_module_loading_source_first_map_implemented
+    current_release_state: startup_shutdown_hook_boundary_gate_selected
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0288
+    next_ready_work_item: W-0289
     preferred_after_current:
-      - select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+      - define_pitaya_aligned_startup_shutdown_hook_boundary_gate
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3754,7 +3754,7 @@ milestones:
 
   - id: M-216
     title: Select Next Pitaya-Aligned Direction After Component Discovery And Module Loading Map
-    status: active
+    status: completed
     goal: Select the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map, without implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The next Pitaya-aligned direction after the component discovery and module loading source-first map is selected.
@@ -3762,6 +3762,18 @@ milestones:
       - Repository checks verify the selection and explicit implementation deferrals.
     non_goals:
       - implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_pitaya_aligned_startup_shutdown_hook_boundary_gate` as the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map, accepted `ADR-0196`, registered `runtime.next_pitaya_aligned_direction_after_component_discovery_module_loading_map`, completed `W-0288`, and opened `M-217/W-0289 Define Pitaya-aligned startup and shutdown hook boundary gate` as next-ready. Preserved component discovery behavior, component loading behavior, component module loading behavior, startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-217
+    title: Pitaya-Aligned Startup And Shutdown Hook Boundary Gate
+    status: active
+    goal: Define only the Pitaya-aligned startup and shutdown hook boundary vocabulary after the component discovery and module loading source-first map, without implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - Startup and shutdown hook vocabulary is defined as a boundary gate only.
+      - Current explicit bootstrap composition and lifecycle hook deferrals are mapped without adding behavior.
+      - Repository checks verify the gate and explicit implementation deferrals.
+    non_goals:
+      - implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -12251,7 +12263,7 @@ work_items:
   - id: W-0288
     milestone: M-216
     title: Select next Pitaya-aligned direction after component discovery and module loading map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-component-discovery-module-loading-map
     depends_on:
       - W-0287
@@ -12314,4 +12326,81 @@ work_items:
     completion:
       - Select the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map.
       - Open the selected follow-up work item.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-216
+    previous_completed_work_item: W-0287
+    next_milestone: M-217
+    next_ready_work_item: W-0289
+    decision: ADR-0196
+    check_rule: runtime.next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+    selected_follow_up_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+    completion_summary: Selected `define_pitaya_aligned_startup_shutdown_hook_boundary_gate` as the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map and opened `W-0289 Define Pitaya-aligned startup and shutdown hook boundary gate` as next-ready. Preserved component discovery behavior, component loading behavior, component module loading behavior, startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: W-0289
+    milestone: M-217
+    title: Define Pitaya-aligned startup and shutdown hook boundary gate
+    status: next_ready
+    change: changes/2026-05-26-define-pitaya-aligned-startup-shutdown-hook-boundary-gate
+    depends_on:
+      - W-0288
+    expected_change_id: define-pitaya-aligned-startup-shutdown-hook-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+    selection_decision: ADR-0196
+    source_map_decision: ADR-0195
+    gate_decision: ADR-0194
+    related_decisions:
+      - ADR-0196
+      - ADR-0195
+      - ADR-0194
+      - ADR-0193
+      - ADR-0192
+      - ADR-0191
+      - ADR-0190
+      - ADR-0189
+      - ADR-0188
+      - ADR-0187
+      - ADR-0186
+      - ADR-0185
+      - ADR-0184
+      - ADR-0183
+      - ADR-0182
+      - ADR-0181
+      - ADR-0180
+      - ADR-0179
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the startup and shutdown hook boundary gate.
+    completion:
+      - Define Pitaya-aligned startup and shutdown hook vocabulary.
+      - Map current explicit bootstrap composition and lifecycle hook deferrals without adding behavior.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

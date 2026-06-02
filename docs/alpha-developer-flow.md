@@ -227,8 +227,8 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0288 Select next Pitaya-aligned direction after component discovery and module loading map
-next_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+next_work_item: W-0289 Define Pitaya-aligned startup and shutdown hook boundary gate
+next_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
 ```
 
 `ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, and completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`; `ADR-0190` registered `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`, completed `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, and selected `define_pitaya_aligned_handler_module_registration_boundary_gate`; `ADR-0191` registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283 Define Pitaya-aligned handler module registration boundary gate`, and opened `W-0284 Implement Pitaya-aligned handler module registration source-first map`; `ADR-0192` registered `runtime.pitaya_aligned_handler_module_registration_source_first_map`, implemented `node tools/vibit inspect pitaya-handler-modules --json`, and completed `W-0284`; `ADR-0193` registered `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`, completed `W-0285`, selected `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`, and opened `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`.
