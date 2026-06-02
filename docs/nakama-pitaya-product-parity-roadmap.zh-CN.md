@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0286 Define Pitaya-aligned component discovery and module loading boundary gate
-recommended_next_direction: define_pitaya_aligned_component_discovery_module_loading_boundary_gate
+next_work_item: W-0287 Implement Pitaya-aligned component discovery and module loading source-first map
+recommended_next_direction: implement_pitaya_aligned_component_discovery_module_loading_source_first_map
 ```
 
 `ADR-0192` 已注册 `runtime.pitaya_aligned_handler_module_registration_source_first_map`，实现 `node tools/vibit inspect pitaya-handler-modules --json`，并完成 `W-0284 Implement Pitaya-aligned handler module registration source-first map`；`ADR-0193` 注册 `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`，完成 `W-0285`，选择 `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`，打开 `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`，并继续延后 handler module registration behavior、handler registration behavior、dynamic handler registration、component module loading、runtime endpoint behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
