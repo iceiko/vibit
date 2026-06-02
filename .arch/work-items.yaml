@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-211
+current_milestone: M-212
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: next_pitaya_aligned_direction_after_runtime_component_lifecycle_map_selected
+    current_release_state: pitaya_aligned_handler_module_registration_boundary_gate_defined
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0283
+    next_ready_work_item: W-0284
     preferred_after_current:
-      - define_pitaya_aligned_handler_module_registration_boundary_gate
+      - implement_pitaya_aligned_handler_module_registration_source_first_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3690,14 +3690,27 @@ milestones:
 
   - id: M-211
     title: Pitaya-Aligned Handler Module Registration Boundary Gate
-    status: active
+    status: completed
+    historical_current_milestone: M-211
     goal: Define a Pitaya-aligned handler module registration boundary gate after the runtime component lifecycle source-first map, without implementing runtime component lifecycle behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - The handler module registration boundary vocabulary is defined.
       - Repository memory maps the vocabulary to current explicit route registration and application module ownership.
-      - Repository checks verify W-0283 next-ready state and explicit implementation deferrals.
+      - Repository checks verify W-0283 completion, W-0284 next-ready state, and explicit implementation deferrals.
     non_goals:
       - implementing runtime component lifecycle behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the gate-only Pitaya-aligned handler module registration vocabulary boundary, accepted `ADR-0191`, registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283`, and opened `M-212/W-0284 Implement Pitaya-aligned handler module registration source-first map` as next-ready. Preserved runtime component lifecycle behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery/loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-212
+    title: Pitaya-Aligned Handler Module Registration Source-First Map
+    status: active
+    goal: Implement a source-first inspection map for Pitaya-aligned handler module registration vocabulary after the boundary gate, without implementing handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - A source-first inspection map reports the handler module registration boundary vocabulary.
+      - Current bootstrap composition, explicit route registration, payload registry, application module ownership, dependency handoff, execution context handoff, and distributed registration deferral are inspectable without adding behavior.
+      - Repository checks verify the map and deferrals.
+    non_goals:
+      - implementing handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
 
 work_items:
   - id: W-0001
@@ -11823,7 +11836,7 @@ work_items:
   - id: W-0283
     milestone: M-211
     title: Define Pitaya-aligned handler module registration boundary gate
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-define-pitaya-aligned-handler-module-registration-boundary-gate
     depends_on:
       - W-0282
@@ -11880,4 +11893,74 @@ work_items:
     completion:
       - Define Pitaya-aligned handler module registration vocabulary.
       - Map current explicit route registration, generated payload registry, application module ownership, and bootstrap composition to the vocabulary.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    decision: ADR-0191
+    check_rule: runtime.pitaya_aligned_handler_module_registration_boundary_gate
+    standard: docs/pitaya-aligned-handler-module-registration-boundary-gate.md
+    translation: docs/pitaya-aligned-handler-module-registration-boundary-gate.zh-CN.md
+    next_milestone: M-212
+    next_ready_work_item: W-0284
+    selected_follow_up_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+    completion_summary: Defined the gate-only Pitaya-aligned handler module registration vocabulary boundary and opened `W-0284 Implement Pitaya-aligned handler module registration source-first map` as next-ready. Preserved handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery/loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: W-0284
+    milestone: M-212
+    title: Implement Pitaya-aligned handler module registration source-first map
+    status: next_ready
+    change: changes/2026-05-26-implement-pitaya-aligned-handler-module-registration-source-first-map
+    depends_on:
+      - W-0283
+    expected_change_id: implement-pitaya-aligned-handler-module-registration-source-first-map
+    tier: tier_2_architecture_inspection
+    selected_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+    gate_decision: ADR-0191
+    related_decisions:
+      - ADR-0191
+      - ADR-0190
+      - ADR-0189
+      - ADR-0188
+      - ADR-0187
+      - ADR-0186
+      - ADR-0185
+      - ADR-0184
+      - ADR-0183
+      - ADR-0182
+      - ADR-0181
+      - ADR-0180
+      - ADR-0179
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only a source-first handler module registration inspection map.
+    completion:
+      - Implement a source-first Pitaya-aligned handler module registration inspection map.
+      - Report the handler module registration boundary vocabulary, current bootstrap/route/payload/application/dependency/context/distributed mapping, source surfaces, and deferrals.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

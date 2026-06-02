@@ -248,8 +248,8 @@ This document records product maturity goals. It does not itself:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0283 Define Pitaya-aligned handler module registration boundary gate
-next_direction: define_pitaya_aligned_handler_module_registration_boundary_gate
+next_work_item: W-0284 Implement Pitaya-aligned handler module registration source-first map
+next_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
 ```
 
-`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, and completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`; `ADR-0190` registered `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`, completed `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, selected `define_pitaya_aligned_handler_module_registration_boundary_gate`, and opened `W-0283 Define Pitaya-aligned handler module registration boundary gate`.
+`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, and completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`; `ADR-0190` registered `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`, completed `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, and selected `define_pitaya_aligned_handler_module_registration_boundary_gate`; `ADR-0191` registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283 Define Pitaya-aligned handler module registration boundary gate`, and opened `W-0284 Implement Pitaya-aligned handler module registration source-first map`.

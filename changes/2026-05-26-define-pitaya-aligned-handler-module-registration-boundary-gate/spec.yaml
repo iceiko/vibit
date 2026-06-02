@@ -1,0 +1,202 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-handler-module-registration-boundary-gate
+date: 2026-06-02
+type: standard
+status: verified
+
+summary: Define the Pitaya-aligned handler module registration boundary gate, without adding handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery or loading, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0191
+  referenced:
+    - ADR-0190
+    - ADR-0189
+    - ADR-0188
+    - ADR-0187
+    - ADR-0186
+    - ADR-0185
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_handler_module_registration_boundary_gate: defined
+  completed_work_item: W-0283
+  completed_milestone: M-211
+  previous_completed_work_item: W-0282
+  next_milestone: M-212
+  next_work_item: W-0284
+  next_work_item_status: next_ready
+  next_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+  decision: ADR-0191
+  check_rule: runtime.pitaya_aligned_handler_module_registration_boundary_gate
+  selection_decision: ADR-0190
+  runtime_component_lifecycle_source_first_map_decision: ADR-0189
+  runtime_component_lifecycle_boundary_gate_decision: ADR-0188
+  standard: docs/pitaya-aligned-handler-module-registration-boundary-gate.md
+  translation: docs/pitaya-aligned-handler-module-registration-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: handler_module_registration_vocabulary_boundary_defined_for_future_architecture_planning
+  implementation_scope: gate_only_handler_module_registration_vocabulary
+  implementation_authorized_by_this_gate: false
+  future_implementation_work_item: W-0284
+  future_implementation_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+  allowed_handler_module_registration_vocabulary:
+    - handler_module_boundary
+    - handler_registration_boundary
+    - route_handler_ownership
+    - explicit_registration_source
+    - payload_registry_boundary
+    - module_bootstrap_boundary
+    - handler_dependency_boundary
+    - handler_execution_context_boundary
+    - local_handler_inventory
+    - dynamic_registration_deferral
+    - distributed_handler_module_deferral
+  runtime_component_lifecycle_behavior_added: false
+  handler_module_registration_behavior_added: false
+  handler_registration_behavior_added: false
+  dynamic_handler_registration_added: false
+  component_discovery_added: false
+  component_loading_added: false
+  component_module_loading_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  dashboard_added: false
+  admin_console_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `docs/pitaya-aligned-handler-module-registration-boundary-gate.md` and `.zh-CN.md` define the gate-only vocabulary.
+  - `ADR-0191` records the boundary decision.
+  - `runtime.pitaya_aligned_handler_module_registration_boundary_gate` is registered and enforced by `tools/vibit`.
+  - `M-212/W-0284 Implement Pitaya-aligned handler module registration source-first map` is next-ready.
+  - The slice does not add handler module registration behavior, handler registration behavior, dynamic handler registration, component module loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - docs/pitaya-aligned-handler-module-registration-boundary-gate.md
+    - docs/pitaya-aligned-handler-module-registration-boundary-gate.zh-CN.md
+    - decisions/ADR-0191-pitaya-aligned-handler-module-registration-boundary-gate.md
+    - conversations/2026-05-26-pitaya-aligned-handler-module-registration-boundary-gate.md
+    - changes/2026-05-26-define-pitaya-aligned-handler-module-registration-boundary-gate/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - handler module registration behavior
+    - handler registration behavior
+    - dynamic handler registration
+    - component discovery or loading
+    - component module loading
+    - startup hooks
+    - shutdown hooks
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - dashboards
+    - admin console behavior
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_handler_module_registration_boundary_gate
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change define-pitaya-aligned-handler-module-registration-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

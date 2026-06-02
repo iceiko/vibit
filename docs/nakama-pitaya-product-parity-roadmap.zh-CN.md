@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0283 Define Pitaya-aligned handler module registration boundary gate
-recommended_next_direction: define_pitaya_aligned_handler_module_registration_boundary_gate
+next_work_item: W-0284 Implement Pitaya-aligned handler module registration source-first map
+recommended_next_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
 ```
 
-`ADR-0189` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`，实现 `node tools/vibit inspect pitaya-component-lifecycle --json`，完成 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`，打开 `W-0283 Define Pitaya-aligned handler module registration boundary gate`，并继续延后 runtime component lifecycle behavior、handler registration behavior、runtime endpoint behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0191` 已注册 `runtime.pitaya_aligned_handler_module_registration_boundary_gate`，完成 `W-0283 Define Pitaya-aligned handler module registration boundary gate`，打开 `W-0284 Implement Pitaya-aligned handler module registration source-first map`，并继续延后 handler module registration behavior、handler registration behavior、dynamic handler registration、component module loading、runtime endpoint behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。

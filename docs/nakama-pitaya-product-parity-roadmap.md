@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0283 Define Pitaya-aligned handler module registration boundary gate
-recommended_next_direction: define_pitaya_aligned_handler_module_registration_boundary_gate
+next_work_item: W-0284 Implement Pitaya-aligned handler module registration source-first map
+recommended_next_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
 ```
 
-`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`, opened `W-0283 Define Pitaya-aligned handler module registration boundary gate`, and keeps runtime component lifecycle behavior, handler registration behavior, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0191` registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283 Define Pitaya-aligned handler module registration boundary gate`, opened `W-0284 Implement Pitaya-aligned handler module registration source-first map`, and keeps handler module registration behavior, handler registration behavior, dynamic handler registration, component module loading, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
