@@ -1,0 +1,230 @@
+schema_version: 0.1
+change_id: select-next-pitaya-aligned-direction-after-handler-module-registration-map
+date: 2026-06-02
+type: tooling
+status: verified
+
+summary: Select the Pitaya-aligned component discovery and module loading boundary gate as the next bounded direction after the handler module registration source-first map, without adding handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery or loading behavior, component module loading behavior, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0193
+  referenced:
+    - ADR-0192
+    - ADR-0191
+    - ADR-0190
+    - ADR-0189
+    - ADR-0188
+    - ADR-0187
+    - ADR-0186
+    - ADR-0185
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  next_pitaya_aligned_direction_after_handler_module_registration_map: completed
+  completed_work_item: W-0285
+  completed_milestone: M-213
+  previous_completed_work_item: W-0284
+  next_milestone: M-214
+  next_work_item: W-0286
+  next_work_item_status: next_ready
+  selected_direction: define_pitaya_aligned_component_discovery_module_loading_boundary_gate
+  decision: ADR-0193
+  check_rule: runtime.next_pitaya_aligned_direction_after_handler_module_registration_map
+  source_map_decision: ADR-0192
+  gate_decision: ADR-0191
+  primary_product_reference: Nakama
+  pitaya_reference_status: component_discovery_module_loading_boundary_gate_selected
+  implementation_scope: direction_selection_only
+  implementation_authorized_by_this_selection: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  handler_module_registration_behavior_added: false
+  handler_registration_behavior_added: false
+  dynamic_handler_registration_added: false
+  component_discovery_added: false
+  component_loading_added: false
+  component_module_loading_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: Continue toward Pitaya by choosing the next bounded alignment direction after the handler module registration source-first map.
+nakama_capability_family: runtime_component_lifecycle_and_server_architecture
+pitaya_capability_family: component_discovery_module_loading_and_handler_module_ownership
+
+candidate_directions:
+  selected:
+    - define_pitaya_aligned_component_discovery_module_loading_boundary_gate
+  deferred:
+    - implement_handler_module_registration_behavior
+    - implement_handler_registration_behavior
+    - implement_dynamic_handler_registration
+    - implement_component_discovery_behavior
+    - implement_component_loading_behavior
+    - implement_component_module_loading_behavior
+    - add_startup_shutdown_hooks
+    - implement_dashboard_or_admin_console
+    - implement_runtime_endpoint_behavior
+    - return_to_nakama_product_module_expansion
+    - implement_distributed_runtime_behavior
+
+reference_mapping:
+  primary_product_reference: Nakama
+  pitaya_reference_status: component_discovery_module_loading_boundary_gate_selected
+  adopted:
+    - handler module registration map remains the source-first parent surface
+    - component discovery and module loading becomes the next planning vocabulary
+    - current explicit bootstrap, application module ownership, and dynamic loading deferrals remain vibit-owned
+  adapted:
+    - selection-only repository memory before any component discovery or module loading gate
+    - explicit no-implementation flags before handler module registration, dynamic handler registration, component discovery, component loading, module loading, startup hooks, shutdown hooks, protocol, persistence, dependencies, or distributed runtime changes
+    - Nakama remains the primary product reference while Pitaya supplies deferred architecture vocabulary
+  rejected:
+    - direct Pitaya API compatibility
+    - direct Nakama API compatibility
+    - handler module registration behavior in this slice
+    - component discovery or module loading behavior in this slice
+    - dynamic handler registration in this slice
+    - startup or shutdown hook behavior in this slice
+    - distributed runtime behavior in this slice
+
+acceptance_criteria:
+  - The next Pitaya-aligned direction is selected as `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`.
+  - `M-214/W-0286 Define Pitaya-aligned component discovery and module loading boundary gate` is next-ready.
+  - Repository checks verify ADR-0193, change artifacts, rule registration, W-0285 completion, W-0286 next-ready state, and explicit implementation deferrals.
+  - The slice does not add handler module registration behavior, handler registration behavior, dynamic handler registration, component discovery/loading behavior, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+test_plan:
+  repository_checks:
+    - Repository check for ADR-0193, W-0285 completion, W-0286 next-ready state, change artifacts, conversation memory, rule registration, and deferral flags.
+    - Memory/schema/work/all checks for repository consistency.
+  go_tests:
+    - Covered by repository runtime checks; no runtime behavior changes are added.
+
+implementation_boundaries:
+  allowed:
+    - changes/2026-05-26-select-next-pitaya-aligned-direction-after-handler-module-registration-map/
+    - decisions/ADR-0193-select-next-pitaya-aligned-direction-after-handler-module-registration-map.md
+    - conversations/2026-05-26-select-next-pitaya-aligned-direction-after-handler-module-registration-map.md
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - handler module registration behavior
+    - handler registration behavior
+    - dynamic handler registration
+    - component discovery behavior
+    - component loading behavior
+    - component module loading behavior
+    - startup hooks
+    - shutdown hooks
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - dashboards
+    - admin console behavior
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.next_pitaya_aligned_direction_after_handler_module_registration_map
+    - node tools/vibit check change select-next-pitaya-aligned-direction-after-handler-module-registration-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
