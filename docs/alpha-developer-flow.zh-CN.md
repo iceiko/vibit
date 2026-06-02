@@ -226,10 +226,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map
-next_direction: select_next_pitaya_aligned_direction_after_runtime_component_lifecycle_map
+next_work_item: W-0283 Define Pitaya-aligned handler module registration boundary gate
+next_direction: define_pitaya_aligned_handler_module_registration_boundary_gate
 ```
 
-`ADR-0189` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`，实现 `node tools/vibit inspect pitaya-component-lifecycle --json`，完成 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`，并打开 `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`。
+`ADR-0189` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`，实现 `node tools/vibit inspect pitaya-component-lifecycle --json`，并完成 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`；`ADR-0190` 注册 `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`，完成 `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`，选择 `define_pitaya_aligned_handler_module_registration_boundary_gate`，并打开 `W-0283 Define Pitaya-aligned handler module registration boundary gate`。
 
 前一项 session lifecycle inspection 仍可通过 `node tools/vibit inspect pitaya-session-lifecycle --json` 使用；runtime observability inspection 可通过 `node tools/vibit inspect pitaya-observability --json` 使用。
