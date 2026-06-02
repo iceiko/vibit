@@ -193,20 +193,21 @@ purpose: >
   pitaya_aligned_runtime_component_lifecycle_source_first_map: ADR-0189
   next_pitaya_aligned_direction_after_runtime_component_lifecycle_map: ADR-0190
   pitaya_aligned_handler_module_registration_boundary_gate: ADR-0191
+  pitaya_aligned_handler_module_registration_source_first_map: ADR-0192
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: implement_pitaya_aligned_handler_module_registration_source_first_map
+  current_phase: select_next_pitaya_aligned_direction_after_handler_module_registration_map
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0284
+  next_ready_work_item: W-0285
   primary_product_reference: Nakama
-  pitaya_reference_status: handler_module_registration_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: handler_module_registration_source_first_map_implemented
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -3539,6 +3540,96 @@ architecture_scope:
     startup_hook_behavior_added: false
     shutdown_hook_behavior_added: false
     runtime_endpoint_behavior_added: false
+    dashboard_added: false
+    admin_console_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    hosted_deployment_added: false
+    sdk_added: false
+    release_artifact_added: false
+    distributed_runtime_implementation_added: false
+    runtime_behavior_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  pitaya_aligned_handler_module_registration_source_first_map:
+    status: completed
+    milestone: M-212
+    completed_work_item: W-0284
+    decision: ADR-0192
+    change: changes/2026-05-26-implement-pitaya-aligned-handler-module-registration-source-first-map
+    check_rule: runtime.pitaya_aligned_handler_module_registration_source_first_map
+    command: node tools/vibit inspect pitaya-handler-modules --json
+    gate_decision: ADR-0191
+    selection_decision: ADR-0190
+    runtime_component_lifecycle_source_first_map_decision: ADR-0189
+    previous_completed_work_item: W-0283
+    next_milestone: M-213
+    next_ready_work_item: W-0285
+    selected_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_handler_module_registration_map
+    pitaya_aligned_handler_module_registration_source_first_map_implemented: true
+    pitaya_aligned_handler_module_registration_source_first_map_decision: ADR-0192
+    pitaya_aligned_handler_module_registration_source_first_map_check_rule: runtime.pitaya_aligned_handler_module_registration_source_first_map
+    pitaya_handler_modules_inspection_command: node tools/vibit inspect pitaya-handler-modules --json
+    next_pitaya_direction_selection_after_handler_module_registration_map_work_item: W-0285
+    next_pitaya_direction_selection_after_handler_module_registration_map_direction: select_next_pitaya_aligned_direction_after_handler_module_registration_map
+    implementation_scope: source_first_repository_inspection
+    pitaya_reference_status: handler_module_registration_source_first_map_implemented
+    allowed_handler_module_registration_vocabulary:
+      - handler_module_boundary
+      - handler_registration_boundary
+      - route_handler_ownership
+      - explicit_registration_source
+      - payload_registry_boundary
+      - module_bootstrap_boundary
+      - handler_dependency_boundary
+      - handler_execution_context_boundary
+      - local_handler_inventory
+      - dynamic_registration_deferral
+      - distributed_handler_module_deferral
+    current_source_first_handler_module_registration_mapping:
+      module_bootstrap: runtime_cmd_and_app_bootstrap_source_files
+      explicit_route_registration: application_route_registration_source_files
+      payload_registry: protobuf_bridge_and_payload_registry_source_files
+      application_module_ownership: runtime_internal_app_and_modules_service_packages
+      dependency_handoff: unit_of_work_and_repository_interface_boundaries
+      execution_context: application_request_context_and_session_handoff_boundaries
+      distributed_registration: deferred_without_registry_discovery_or_node_ownership
+    source_surfaces:
+      - .arch/runtime.yaml
+      - .arch/reference.yaml
+      - .arch/work-items.yaml
+      - docs/pitaya-aligned-handler-module-registration-boundary-gate.md
+      - docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+      - docs/runtime-protocol-adapter.md
+      - docs/game-protocol.md
+      - runtime/cmd/vibit-server
+      - runtime/internal/app/bootstrap
+      - runtime/internal/app
+      - runtime/internal/modules
+      - runtime/internal/platform/protocol/protobuf
+      - runtime/internal/platform/tx
+      - tools/vibit
+      - rules/check-rules.json
+    handler_module_registration_behavior_added: false
+    handler_registration_behavior_added: false
+    dynamic_handler_registration_added: false
+    component_discovery_added: false
+    component_loading_added: false
+    component_module_loading_added: false
+    startup_hook_behavior_added: false
+    shutdown_hook_behavior_added: false
+    runtime_endpoint_behavior_added: false
+    metrics_endpoint_added: false
+    tracing_pipeline_added: false
+    observability_pipeline_added: false
     dashboard_added: false
     admin_console_added: false
     protocol_route_added: false

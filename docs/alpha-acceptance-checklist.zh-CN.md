@@ -184,12 +184,12 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_handler_module_registration_source_first_map
+next_direction: select_next_pitaya_aligned_direction_after_handler_module_registration_map
 next_work_status: next_ready
 ```
 
-Current next work item: `W-0284 Implement Pitaya-aligned handler module registration source-first map`。
+Current next work item: `W-0285 Select next Pitaya-aligned direction after handler module registration map`。
 
-Current check rule: `runtime.pitaya_aligned_handler_module_registration_boundary_gate`。
+Current check rule: `runtime.pitaya_aligned_handler_module_registration_source_first_map`。
 
 Current inspection commands: `node tools/vibit inspect pitaya-session-lifecycle --json`、`node tools/vibit inspect pitaya-observability --json`、`node tools/vibit inspect pitaya-metrics-tracing --json` 和 `node tools/vibit inspect pitaya-component-lifecycle --json`。
