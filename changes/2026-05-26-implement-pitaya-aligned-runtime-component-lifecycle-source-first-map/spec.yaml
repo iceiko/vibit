@@ -1,0 +1,149 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-runtime-component-lifecycle-source-first-map
+date: 2026-06-02
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned runtime component lifecycle inspection map and open a next Pitaya direction selection follow-up without adding runtime component lifecycle behavior, handler registration behavior, component discovery or loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+decisions:
+  added:
+    - ADR-0189
+  referenced:
+    - ADR-0188
+    - ADR-0187
+    - ADR-0186
+    - ADR-0185
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_runtime_component_lifecycle_source_first_map: implemented
+  completed_work_item: W-0281
+  completed_milestone: M-209
+  previous_completed_work_item: W-0280
+  next_milestone: M-210
+  next_work_item: W-0282
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_runtime_component_lifecycle_map
+  decision: ADR-0189
+  gate_decision: ADR-0188
+  selection_decision: ADR-0187
+  check_rule: runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map
+  command: node tools/vibit inspect pitaya-component-lifecycle --json
+  runtime_component_lifecycle_boundary_standard: docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: runtime_component_lifecycle_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_runtime_component_lifecycle_vocabulary:
+    - runtime_component_boundary
+    - component_lifecycle_phase
+    - component_start_boundary
+    - component_shutdown_boundary
+    - handler_registration_boundary
+    - component_dependency_boundary
+    - bootstrap_composition_boundary
+    - component_state_posture
+    - local_component_inventory
+    - distributed_component_lifecycle_deferral
+  current_source_first_runtime_component_lifecycle_mapping:
+    bootstrap_composition: runtime_cmd_and_app_bootstrap_source_files
+    handler_registration: explicit_route_registration_and_payload_registry_source_files
+    application_services: runtime_internal_app_and_modules_service_packages
+    repository_wiring: unit_of_work_and_repository_interface_composition
+    protocol_adapter_composition: protobuf_bridges_and_payload_registry
+    lifecycle_state: process_startup_and_existing_transport_close_behavior
+    operations_cross_reference: tools_vibit_operations_dashboard_admin_and_runtime_checks
+    distributed_component_lifecycle: deferred_without_registry_coordinator_or_node_ownership
+  runtime_component_lifecycle_behavior_added: false
+  component_lifecycle_behavior_added: false
+  handler_registration_behavior_added: false
+  component_discovery_added: false
+  component_loading_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  player_session_token_inspector_added: false
+  event_audit_table_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-component-lifecycle --json`.
+  - The inspection output includes allowed runtime component lifecycle vocabulary, current mappings, source surfaces, redaction posture, and deferrals.
+  - Repository checks verify the W-0281 map and W-0282 next-ready state.
+  - The slice does not add runtime component lifecycle behavior, handler registration behavior, component discovery/loading, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect pitaya-component-lifecycle --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-runtime-component-lifecycle-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

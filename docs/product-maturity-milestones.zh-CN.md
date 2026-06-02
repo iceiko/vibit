@@ -247,8 +247,8 @@ Friends relationship 的追溯引用包括 `decisions/ADR-0142-friends-relations
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map
-next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+next_work_item: W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map
+next_direction: select_next_pitaya_aligned_direction_after_runtime_component_lifecycle_map
 ```
 
-`ADR-0188` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate`，完成 `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`，选择 `implement_pitaya_aligned_runtime_component_lifecycle_source_first_map`，并打开 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`。
+`ADR-0189` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`，实现 `node tools/vibit inspect pitaya-component-lifecycle --json`，完成 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`，并打开 `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`。

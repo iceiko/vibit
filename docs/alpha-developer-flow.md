@@ -227,10 +227,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map
-next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+next_work_item: W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map
+next_direction: select_next_pitaya_aligned_direction_after_runtime_component_lifecycle_map
 ```
 
-`ADR-0188` registered `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate`, completed `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`, selected `implement_pitaya_aligned_runtime_component_lifecycle_source_first_map`, and opened `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`.
+`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`, and opened `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`.
 
-The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`; the metrics/tracing inspection is available through `node tools/vibit inspect pitaya-metrics-tracing --json`.
+The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`; the metrics/tracing inspection is available through `node tools/vibit inspect pitaya-metrics-tracing --json`; the runtime component lifecycle inspection is available through `node tools/vibit inspect pitaya-component-lifecycle --json`.

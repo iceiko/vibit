@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map
-recommended_next_direction: implement_pitaya_aligned_runtime_component_lifecycle_source_first_map
+next_work_item: W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map
+recommended_next_direction: select_next_pitaya_aligned_direction_after_runtime_component_lifecycle_map
 ```
 
-`ADR-0188` registered `runtime.pitaya_aligned_runtime_component_lifecycle_boundary_gate`, completed `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`, selected `implement_pitaya_aligned_runtime_component_lifecycle_source_first_map`, opened `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`, and keeps runtime component lifecycle behavior, handler registration behavior, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`, opened `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, and keeps runtime component lifecycle behavior, handler registration behavior, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
