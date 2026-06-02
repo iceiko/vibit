@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: startup_shutdown_hook_boundary_gate_selected
+  pitaya_reference_status: startup_shutdown_hook_vocabulary_boundary_defined_for_future_architecture_planning
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
-  recommended_next_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+  current_near_term_priority: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+  recommended_next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: startup_shutdown_hook_boundary_gate_selected
+  current_state: startup_shutdown_hook_boundary_gate_defined
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0289
-  immediate_next_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+  immediate_next_work_item: W-0290
+  immediate_next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -6867,28 +6867,65 @@ phase_plan:
     dependency_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2gv_pitaya_aligned_startup_shutdown_hook_boundary_gate:
-    status: next_ready
+    status: completed
     milestone: M-217
     work_item: W-0289
+    decision: ADR-0197
+    change: changes/2026-05-26-define-pitaya-aligned-startup-shutdown-hook-boundary-gate
+    check_rule: runtime.pitaya_aligned_startup_shutdown_hook_boundary_gate
+    standard: docs/pitaya-aligned-startup-shutdown-hook-boundary-gate.md
+    translation: docs/pitaya-aligned-startup-shutdown-hook-boundary-gate.zh-CN.md
     selection_decision: ADR-0196
     source_map_decision: ADR-0195
     gate_decision: ADR-0194
     selected_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    next_milestone: M-218
+    next_ready_work_item: W-0290
     primary_product_reference: Nakama
-    pitaya_reference_status: startup_shutdown_hook_boundary_gate_next_ready
+    pitaya_reference_status: startup_shutdown_hook_vocabulary_boundary_defined_for_future_architecture_planning
     target_stage: prototype_ready_foundation
     implementation_scope: gate_only_startup_shutdown_hook_vocabulary
     implementation_authorized_by_this_gate: false
+    startup_shutdown_hook_boundary_gate_defined: true
+    startup_hook_behavior_allowed: false
+    shutdown_hook_behavior_allowed: false
+    lifecycle_hook_execution_allowed: false
+    dependency_container_behavior_allowed: false
     handler_module_registration_behavior_allowed: false
     handler_registration_behavior_allowed: false
     dynamic_handler_registration_allowed: false
     component_discovery_behavior_allowed: false
     component_loading_behavior_allowed: false
     component_module_loading_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2gw_pitaya_aligned_startup_shutdown_hook_source_first_map:
+    status: next_ready
+    milestone: M-218
+    work_item: W-0290
+    gate_decision: ADR-0197
+    selection_decision: ADR-0196
+    source_map_decision: ADR-0195
+    selected_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    primary_product_reference: Nakama
+    pitaya_reference_status: startup_shutdown_hook_source_first_map_next_ready
+    target_stage: prototype_ready_foundation
+    implementation_scope: source_first_repository_inspection
     startup_hook_behavior_allowed: false
     shutdown_hook_behavior_allowed: false
     lifecycle_hook_execution_allowed: false
     dependency_container_behavior_allowed: false
+    handler_module_registration_behavior_allowed: false
+    handler_registration_behavior_allowed: false
+    dynamic_handler_registration_allowed: false
+    component_discovery_behavior_allowed: false
+    component_loading_behavior_allowed: false
+    component_module_loading_behavior_allowed: false
     protocol_shape_change_allowed: false
     generated_output_allowed: false
     repository_interface_change_allowed: false

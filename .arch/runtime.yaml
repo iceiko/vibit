@@ -198,20 +198,21 @@ purpose: >
   pitaya_aligned_component_discovery_module_loading_boundary_gate: ADR-0194
   pitaya_aligned_component_discovery_module_loading_source_first_map: ADR-0195
   next_pitaya_aligned_direction_after_component_discovery_module_loading_map: ADR-0196
+  pitaya_aligned_startup_shutdown_hook_boundary_gate: ADR-0197
 
 architecture_scope:
   framework_standard: agent_native_language_portable
   first_reference_implementation: go
-  current_phase: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+  current_phase: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
   implementation_code_status: pre_alpha_runtime_with_authentication_sessions_logout_connection_lifecycle_presence_lifecycle_presence_protocol_query_local_onboarding_authenticated_e2e_storage_objects_protocol_route_implemented_local_proven_realtime_protocol_websocket_outbound_delivery_implemented_local_alpha_example_client_path_implemented_agent_native_scaffolding_implemented_friends_relationship_protocol_route_implemented_local_proven
   short_term_release_target: v0.1_alpha
   release_target_standard: docs/v0.1-alpha-goal.md
   release_target_decision: ADR-0086
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  next_ready_work_item: W-0289
+  next_ready_work_item: W-0290
   primary_product_reference: Nakama
-  pitaya_reference_status: startup_shutdown_hook_boundary_gate_selected
+  pitaya_reference_status: startup_shutdown_hook_vocabulary_boundary_defined_for_future_architecture_planning
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -3902,6 +3903,95 @@ architecture_scope:
     metrics_endpoint_added: false
     tracing_pipeline_added: false
     observability_pipeline_added: false
+    dashboard_added: false
+    admin_console_added: false
+    protocol_route_added: false
+    protobuf_source_added: false
+    generated_output_added: false
+    repository_interface_changed: false
+    postgresql_adapter_changed: false
+    migration_added: false
+    dependency_added: false
+    persistence_added: false
+    startup_wiring_added: false
+    authentication_session_behavior_changed: false
+    hosted_deployment_added: false
+    sdk_added: false
+    release_artifact_added: false
+    distributed_runtime_implementation_added: false
+    runtime_behavior_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  pitaya_aligned_startup_shutdown_hook_boundary_gate:
+    status: completed
+    milestone: M-217
+    completed_work_item: W-0289
+    decision: ADR-0197
+    change: changes/2026-05-26-define-pitaya-aligned-startup-shutdown-hook-boundary-gate
+    check_rule: runtime.pitaya_aligned_startup_shutdown_hook_boundary_gate
+    standard: docs/pitaya-aligned-startup-shutdown-hook-boundary-gate.md
+    translation: docs/pitaya-aligned-startup-shutdown-hook-boundary-gate.zh-CN.md
+    selection_decision: ADR-0196
+    source_map_decision: ADR-0195
+    component_discovery_module_loading_gate_decision: ADR-0194
+    previous_completed_work_item: W-0288
+    next_milestone: M-218
+    next_ready_work_item: W-0290
+    selected_direction: define_pitaya_aligned_startup_shutdown_hook_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    pitaya_aligned_startup_shutdown_hook_boundary_gate_defined: true
+    pitaya_aligned_startup_shutdown_hook_boundary_gate_decision: ADR-0197
+    pitaya_aligned_startup_shutdown_hook_boundary_gate_check_rule: runtime.pitaya_aligned_startup_shutdown_hook_boundary_gate
+    future_pitaya_aligned_startup_shutdown_hook_source_first_map_work_item: W-0290
+    future_pitaya_aligned_startup_shutdown_hook_source_first_map_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    implementation_scope: gate_only_startup_shutdown_hook_vocabulary
+    implementation_authorized_by_this_gate: false
+    pitaya_reference_status: startup_shutdown_hook_vocabulary_boundary_defined_for_future_architecture_planning
+    allowed_startup_shutdown_hook_vocabulary:
+      - startup_hook_boundary
+      - shutdown_hook_boundary
+      - lifecycle_hook_boundary
+      - explicit_bootstrap_order_source
+      - startup_ordering_deferral
+      - shutdown_ordering_deferral
+      - dependency_handoff_deferral
+      - module_loading_handoff_deferral
+      - distributed_lifecycle_deferral
+    current_source_first_startup_shutdown_hook_mapping:
+      explicit_bootstrap_composition:
+        current: runtime/cmd/vibit-server and runtime/internal/app/bootstrap source files
+        future_vocabulary: explicit_bootstrap_order_source
+        implementation_status: source_first_repository_inspection_only
+      startup_hooks:
+        current: deferred
+        future_vocabulary: startup_hook_boundary
+        implementation_status: no_startup_hook_behavior
+      shutdown_hooks:
+        current: deferred
+        future_vocabulary: shutdown_hook_boundary
+        implementation_status: no_shutdown_hook_behavior
+      lifecycle_hook_execution:
+        current: deferred
+        future_vocabulary: lifecycle_hook_boundary
+        implementation_status: no_lifecycle_hook_execution
+      dependency_handoff:
+        current: explicit constructor and unit-of-work handoff only
+        future_vocabulary: dependency_handoff_deferral
+        implementation_status: no_dependency_container_behavior
+      distributed_lifecycle:
+        current: deferred
+        future_vocabulary: distributed_lifecycle_deferral
+        implementation_status: no_distributed_runtime_behavior
+    startup_hook_behavior_added: false
+    shutdown_hook_behavior_added: false
+    lifecycle_hook_execution_added: false
+    dependency_container_behavior_added: false
+    component_discovery_behavior_added: false
+    component_loading_behavior_added: false
+    component_module_loading_behavior_added: false
+    handler_module_registration_behavior_added: false
+    handler_registration_behavior_added: false
+    dynamic_handler_registration_added: false
+    runtime_endpoint_behavior_added: false
     dashboard_added: false
     admin_console_added: false
     protocol_route_added: false
