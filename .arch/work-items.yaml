@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-215
+current_milestone: M-216
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: component_discovery_module_loading_boundary_gate_selected
+    current_release_state: component_discovery_module_loading_source_first_map_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0286
+    next_ready_work_item: W-0288
     preferred_after_current:
-      - define_pitaya_aligned_component_discovery_module_loading_boundary_gate
+      - select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -3741,12 +3741,25 @@ milestones:
 
   - id: M-215
     title: Pitaya-Aligned Component Discovery And Module Loading Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-215
     goal: Implement a source-first inspection map for Pitaya-aligned component discovery and module loading vocabulary after the boundary gate, without implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first inspection map reports the component discovery and module loading boundary vocabulary.
       - Current explicit bootstrap composition, application module ownership, handler module registration mapping, and dynamic loading deferrals are inspectable without adding behavior.
       - Repository checks verify the map and deferrals.
+    non_goals:
+      - implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the source-first Pitaya-aligned component discovery and module loading inspection map through `node tools/vibit inspect pitaya-component-loading --json`, accepted `ADR-0195`, registered `runtime.pitaya_aligned_component_discovery_module_loading_source_first_map`, completed `W-0287`, and opened `M-216/W-0288 Select next Pitaya-aligned direction after component discovery and module loading map` as next-ready. Preserved component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-216
+    title: Select Next Pitaya-Aligned Direction After Component Discovery And Module Loading Map
+    status: active
+    goal: Select the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map, without implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction after the component discovery and module loading source-first map is selected.
+      - Repository memory records the selected follow-up as a bounded work item.
+      - Repository checks verify the selection and explicit implementation deferrals.
     non_goals:
       - implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
 
@@ -12162,13 +12175,16 @@ work_items:
   - id: W-0287
     milestone: M-215
     title: Implement Pitaya-aligned component discovery and module loading source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-component-discovery-module-loading-source-first-map
     depends_on:
       - W-0286
     expected_change_id: implement-pitaya-aligned-component-discovery-module-loading-source-first-map
-    tier: tier_2_architecture_boundary
+    tier: tier_2_architecture_inspection
     selected_direction: implement_pitaya_aligned_component_discovery_module_loading_source_first_map
+    decision: ADR-0195
+    check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map
+    command: node tools/vibit inspect pitaya-component-loading --json
     gate_decision: ADR-0194
     selection_decision: ADR-0193
     source_map_decision: ADR-0192
@@ -12224,4 +12240,78 @@ work_items:
     completion:
       - Implement a source-first component discovery and module loading inspection map.
       - Report current explicit bootstrap composition, application module ownership, handler module registration mapping, and dynamic loading deferrals without adding behavior.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-215
+    previous_completed_work_item: W-0286
+    next_milestone: M-216
+    next_ready_work_item: W-0288
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+    completion_summary: Implemented the source-first Pitaya-aligned component discovery and module loading inspection map and opened `W-0288 Select next Pitaya-aligned direction after component discovery and module loading map` as next-ready. Preserved component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: W-0288
+    milestone: M-216
+    title: Select next Pitaya-aligned direction after component discovery and module loading map
+    status: next_ready
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-component-discovery-module-loading-map
+    depends_on:
+      - W-0287
+    expected_change_id: select-next-pitaya-aligned-direction-after-component-discovery-module-loading-map
+    tier: tier_2_architecture_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+    source_map_decision: ADR-0195
+    gate_decision: ADR-0194
+    selection_decision: ADR-0193
+    related_decisions:
+      - ADR-0195
+      - ADR-0194
+      - ADR-0193
+      - ADR-0192
+      - ADR-0191
+      - ADR-0190
+      - ADR-0189
+      - ADR-0188
+      - ADR-0187
+      - ADR-0186
+      - ADR-0185
+      - ADR-0184
+      - ADR-0183
+      - ADR-0182
+      - ADR-0181
+      - ADR-0180
+      - ADR-0179
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of selecting only the next bounded direction.
+    completion:
+      - Select the next bounded Pitaya-aligned direction after the component discovery and module loading source-first map.
+      - Open the selected follow-up work item.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.

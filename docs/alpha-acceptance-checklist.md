@@ -185,11 +185,11 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_component_discovery_module_loading_source_first_map
+next_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
 next_work_status: next_ready
 ```
 
-Current next work item: `W-0287 Implement Pitaya-aligned component discovery and module loading source-first map`.
+Current next work item: `W-0288 Select next Pitaya-aligned direction after component discovery and module loading map`.
 
 Current check rule: `runtime.pitaya_aligned_handler_module_registration_source_first_map`.
 

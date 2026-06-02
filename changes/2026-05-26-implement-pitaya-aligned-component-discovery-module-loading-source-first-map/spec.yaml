@@ -1,0 +1,171 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-component-discovery-module-loading-source-first-map
+date: 2026-06-02
+type: tooling
+status: verified
+
+summary: Implement a source-first Pitaya-aligned component discovery and module loading inspection map and open a next Pitaya direction selection follow-up without adding component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0195
+  referenced:
+    - ADR-0194
+    - ADR-0193
+    - ADR-0192
+    - ADR-0191
+    - ADR-0190
+    - ADR-0189
+    - ADR-0188
+    - ADR-0187
+    - ADR-0186
+    - ADR-0185
+    - ADR-0184
+    - ADR-0183
+    - ADR-0182
+    - ADR-0181
+    - ADR-0180
+    - ADR-0179
+    - ADR-0178
+    - ADR-0177
+    - ADR-0176
+    - ADR-0175
+    - ADR-0174
+    - ADR-0173
+    - ADR-0172
+    - ADR-0171
+    - ADR-0170
+    - ADR-0169
+    - ADR-0168
+    - ADR-0167
+    - ADR-0166
+    - ADR-0165
+    - ADR-0164
+    - ADR-0163
+    - ADR-0162
+    - ADR-0161
+    - ADR-0160
+    - ADR-0159
+    - ADR-0158
+    - ADR-0157
+    - ADR-0156
+    - ADR-0155
+    - ADR-0154
+    - ADR-0153
+    - ADR-0152
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_component_discovery_module_loading_source_first_map: implemented
+  completed_work_item: W-0287
+  completed_milestone: M-215
+  previous_completed_work_item: W-0286
+  next_milestone: M-216
+  next_work_item: W-0288
+  next_work_item_status: next_ready
+  selected_direction: implement_pitaya_aligned_component_discovery_module_loading_source_first_map
+  next_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map
+  decision: ADR-0195
+  gate_decision: ADR-0194
+  selection_decision: ADR-0193
+  source_map_decision: ADR-0192
+  check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map
+  command: node tools/vibit inspect pitaya-component-loading --json
+  component_discovery_module_loading_boundary_standard: docs/pitaya-aligned-component-discovery-module-loading-boundary-gate.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: component_discovery_module_loading_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  allowed_component_discovery_module_loading_vocabulary:
+    - component_discovery_boundary
+    - component_loading_boundary
+    - component_module_loading_boundary
+    - explicit_component_inventory
+    - bootstrap_component_source
+    - application_module_ownership
+    - handler_module_registration_handoff
+    - dynamic_loading_deferral
+    - distributed_component_discovery_deferral
+  current_source_first_component_discovery_module_loading_mapping:
+    explicit_bootstrap_composition: runtime_cmd_and_app_bootstrap_source_files
+    application_module_ownership: runtime_internal_app_and_modules_service_packages
+    handler_module_registration_mapping: handler_module_registration_boundary_and_source_first_map
+    component_inventory: committed_source_surfaces_only
+    dynamic_loading: deferred_without_runtime_loader_scanner_plugin_loader_or_dependency_container
+    distributed_discovery: deferred_without_component_registry_service_discovery_or_node_ownership
+  component_discovery_added: false
+  component_loading_added: false
+  component_module_loading_added: false
+  component_inventory_runtime_behavior_added: false
+  handler_module_registration_behavior_added: false
+  handler_registration_behavior_added: false
+  dynamic_handler_registration_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  metrics_endpoint_added: false
+  tracing_pipeline_added: false
+  observability_pipeline_added: false
+  dashboard_added: false
+  admin_console_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - The repository exposes `node tools/vibit inspect pitaya-component-loading --json`.
+  - The inspection output includes allowed component discovery and module loading vocabulary, current mappings, source surfaces, redaction posture, and deferrals.
+  - Repository checks verify the W-0287 map and W-0288 next-ready state.
+  - The slice does not add component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, startup hooks, shutdown hooks, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect pitaya-component-loading --json
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.pitaya_aligned_component_discovery_module_loading_source_first_map
+    - node tools/vibit check change implement-pitaya-aligned-component-discovery-module-loading-source-first-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check

@@ -316,6 +316,7 @@ Usage:
   vibit inspect pitaya-dashboard-admin
   vibit inspect pitaya-component-lifecycle
   vibit inspect pitaya-handler-modules
+  vibit inspect pitaya-component-loading
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -375,6 +376,8 @@ Commands:
                            Print Pitaya-aligned runtime component lifecycle metadata as JSON.
   inspect pitaya-handler-modules
                            Print Pitaya-aligned handler module registration metadata as JSON.
+  inspect pitaya-component-loading
+                           Print Pitaya-aligned component discovery and module loading metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -5559,6 +5562,172 @@ function buildPitayaHandlerModulesInspection(root) {
 
 function inspectPitayaHandlerModules(root) {
   printJson(buildPitayaHandlerModulesInspection(root));
+}
+
+function buildPitayaComponentLoadingInspection(root) {
+  const workState = loadWorkState(root);
+  const nextReady = workState.exists ? workState.current.next_ready[0] || null : null;
+  return {
+    schema_version: "0.1",
+    kind: "pitaya_aligned_component_discovery_module_loading_inspection",
+    project: "vibit",
+    status: "source_first_pitaya_aligned_component_discovery_module_loading_map",
+    source: {
+      gate_standard: "docs/pitaya-aligned-component-discovery-module-loading-boundary-gate.md",
+      gate_translation: "docs/pitaya-aligned-component-discovery-module-loading-boundary-gate.zh-CN.md",
+      gate_decision: "ADR-0194",
+      implementation_decision: "ADR-0195",
+      selection_decision: "ADR-0193",
+      handler_module_registration_source_first_map_decision: "ADR-0192",
+      handler_module_registration_boundary_gate_decision: "ADR-0191",
+      runtime_component_lifecycle_source_first_map_decision: "ADR-0189",
+      check_rule: "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map",
+      work_item: "W-0287",
+      change: "changes/2026-05-26-implement-pitaya-aligned-component-discovery-module-loading-source-first-map",
+    },
+    current_work: {
+      milestone: "M-216",
+      next_ready: nextReady,
+      can_continue: Boolean(nextReady),
+    },
+    allowed_component_discovery_module_loading_vocabulary: [
+      "component_discovery_boundary",
+      "component_loading_boundary",
+      "component_module_loading_boundary",
+      "explicit_component_inventory",
+      "bootstrap_component_source",
+      "application_module_ownership",
+      "handler_module_registration_handoff",
+      "dynamic_loading_deferral",
+      "distributed_component_discovery_deferral",
+    ],
+    related_vocabulary: [
+      "handler_module_boundary",
+      "handler_registration_boundary",
+      "module_bootstrap_boundary",
+      "explicit_registration_source",
+      "payload_registry_boundary",
+      "runtime_component_boundary",
+      "application_dispatch",
+      "unit_of_work_boundary",
+      "source_first_operations_snapshot",
+      "redaction_posture",
+      "distributed_runtime_deferral",
+    ],
+    current_source_first_component_discovery_module_loading_mapping: {
+      explicit_bootstrap_composition: {
+        current: "runtime/cmd/vibit-server and runtime/internal/app/bootstrap source files",
+        future_vocabulary: "bootstrap_component_source",
+        implementation_status: "source_first_repository_inspection_only",
+      },
+      application_module_ownership: {
+        current: "runtime/internal/app service packages and runtime/internal/modules domain packages",
+        future_vocabulary: "application_module_ownership",
+        implementation_status: "no_component_module_loading_behavior",
+      },
+      handler_module_registration_mapping: {
+        current: "docs/pitaya-aligned-handler-module-registration-boundary-gate.md and tools/vibit inspect pitaya-handler-modules --json",
+        future_vocabulary: "handler_module_registration_handoff",
+        implementation_status: "no_handler_module_registration_behavior",
+      },
+      component_inventory: {
+        current: "committed architecture manifests, bootstrap source files, application service packages, domain module packages, protocol bridge files, and rule catalog entries",
+        future_vocabulary: "explicit_component_inventory",
+        implementation_status: "source_first_repository_inspection_only",
+      },
+      dynamic_loading: {
+        current: "no dynamic module loader, runtime scanner, plugin loader, or dependency container",
+        future_vocabulary: "dynamic_loading_deferral",
+        implementation_status: "no_dynamic_loading_behavior",
+      },
+      distributed_discovery: {
+        current: "no distributed component registry, service discovery integration, or node ownership model",
+        future_vocabulary: "distributed_component_discovery_deferral",
+        implementation_status: "planning_vocabulary_only",
+      },
+    },
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      "docs/pitaya-aligned-component-discovery-module-loading-boundary-gate.md",
+      "docs/pitaya-aligned-handler-module-registration-boundary-gate.md",
+      "docs/pitaya-aligned-runtime-component-lifecycle-boundary-gate.md",
+      "docs/runtime-protocol-adapter.md",
+      "docs/game-protocol.md",
+      "docs/nakama-pitaya-product-parity-roadmap.md",
+      "runtime/cmd/vibit-server",
+      "runtime/internal/app/bootstrap",
+      "runtime/internal/app",
+      "runtime/internal/modules",
+      "runtime/internal/platform/protocol/protobuf",
+      "runtime/internal/platform/tx",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      component_discovery_added: false,
+      component_loading_added: false,
+      component_module_loading_added: false,
+      component_inventory_runtime_behavior_added: false,
+      handler_module_registration_behavior_added: false,
+      handler_registration_behavior_added: false,
+      dynamic_handler_registration_added: false,
+      startup_hook_behavior_added: false,
+      shutdown_hook_behavior_added: false,
+      runtime_endpoint_behavior_added: false,
+      metrics_endpoint_added: false,
+      tracing_pipeline_added: false,
+      observability_pipeline_added: false,
+      dashboard_added: false,
+      admin_console_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      persistence_added: false,
+      startup_wiring_added: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      release_artifact_added: false,
+      distributed_runtime_implementation_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      http_headers_cookies_query_strings_exposed: false,
+      websocket_subprotocols_remote_addresses_exposed: false,
+      sensitive_identifiers_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+      route_payloads_exposed: false,
+      session_data_payloads_exposed: false,
+      component_lifecycle_payloads_exposed: false,
+      handler_registration_payloads_exposed: false,
+      handler_module_registration_payloads_exposed: false,
+      component_inventory_payloads_exposed: false,
+      module_loading_payloads_exposed: false,
+      concrete_transport_metadata_exposed: false,
+    },
+    next: {
+      next_milestone: "M-216",
+      next_ready_work_item: "W-0288",
+      selected_follow_up_direction: "select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map",
+    },
+  };
+}
+
+function inspectPitayaComponentLoading(root) {
+  printJson(buildPitayaComponentLoadingInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -51544,7 +51713,7 @@ function checkRuntimePitayaAlignedComponentDiscoveryModuleLoadingBoundaryGate(ro
   }
 
   const requiredReferences = [
-    [".arch/work-items.yaml", "current_milestone: M-215"],
+    [".arch/work-items.yaml", pitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMapCompleted(root) ? "current_milestone: M-216" : "current_milestone: M-215"],
     [".arch/work-items.yaml", "id: M-214"],
     [".arch/work-items.yaml", "title: Pitaya-Aligned Component Discovery And Module Loading Boundary Gate"],
     [".arch/work-items.yaml", "status: completed"],
@@ -51749,6 +51918,300 @@ function checkRuntimePitayaAlignedComponentDiscoveryModuleLoadingBoundaryGate(ro
   }
 
   ok("Pitaya-aligned component discovery and module loading boundary gate completes W-0286, opens W-0287, and preserves component discovery, component loading, component module loading, handler module registration, handler registration, dynamic handler registration, startup hook, shutdown hook, runtime endpoint, dashboard, admin, protocol, generated, persistence, dependency, hosted, SDK, release, distributed runtime, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
+function checkRuntimePitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMap(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map";
+  const decisionPath = "decisions/ADR-0195-pitaya-aligned-component-discovery-module-loading-source-first-map.md";
+  const changePath = "changes/2026-05-26-implement-pitaya-aligned-component-discovery-module-loading-source-first-map";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-component-discovery-module-loading-source-first-map.md";
+
+  if (!pitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMapCompleted(root)) {
+    ok("Pitaya-aligned component discovery and module loading source-first map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned component discovery and module loading source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned component discovery and module loading source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = JSON.stringify(buildPitayaComponentLoadingInspection(root));
+  const outputMarkers = [
+    "\"kind\":\"pitaya_aligned_component_discovery_module_loading_inspection\"",
+    "\"status\":\"source_first_pitaya_aligned_component_discovery_module_loading_map\"",
+    "\"gate_decision\":\"ADR-0194\"",
+    "\"implementation_decision\":\"ADR-0195\"",
+    "\"check_rule\":\"runtime.pitaya_aligned_component_discovery_module_loading_source_first_map\"",
+    "\"component_discovery_boundary\"",
+    "\"component_loading_boundary\"",
+    "\"component_module_loading_boundary\"",
+    "\"explicit_component_inventory\"",
+    "\"bootstrap_component_source\"",
+    "\"application_module_ownership\"",
+    "\"handler_module_registration_handoff\"",
+    "\"dynamic_loading_deferral\"",
+    "\"distributed_component_discovery_deferral\"",
+    "\"explicit_bootstrap_composition\"",
+    "\"handler_module_registration_mapping\"",
+    "\"component_inventory\"",
+    "\"dynamic_loading\"",
+    "\"distributed_discovery\"",
+    "\"component_discovery_added\":false",
+    "\"component_loading_added\":false",
+    "\"component_module_loading_added\":false",
+    "\"component_inventory_runtime_behavior_added\":false",
+    "\"handler_module_registration_behavior_added\":false",
+    "\"handler_registration_behavior_added\":false",
+    "\"dynamic_handler_registration_added\":false",
+    "\"startup_hook_behavior_added\":false",
+    "\"shutdown_hook_behavior_added\":false",
+    "\"runtime_endpoint_behavior_added\":false",
+    "\"dashboard_added\":false",
+    "\"admin_console_added\":false",
+    "\"protocol_route_added\":false",
+    "\"protobuf_source_added\":false",
+    "\"generated_output_added\":false",
+    "\"repository_interface_changed\":false",
+    "\"postgresql_adapter_changed\":false",
+    "\"migration_added\":false",
+    "\"dependency_added\":false",
+    "\"distributed_runtime_implementation_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+    "\"component_inventory_payloads_exposed\":false",
+    "\"module_loading_payloads_exposed\":false",
+    "\"selected_follow_up_direction\":\"select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map\"",
+  ];
+  for (const marker of outputMarkers) {
+    if (inspection.includes(marker)) {
+      ok(`inspect pitaya-component-loading output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-component-loading",
+      });
+    } else {
+      fail(`inspect pitaya-component-loading output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-component-loading",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-216"],
+    [".arch/work-items.yaml", "id: M-215"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Component Discovery And Module Loading Source-First Map"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0287"],
+    [".arch/work-items.yaml", "title: Implement Pitaya-aligned component discovery and module loading source-first map"],
+    [".arch/work-items.yaml", "decision: ADR-0195"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    [".arch/work-items.yaml", "command: node tools/vibit inspect pitaya-component-loading --json"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/work-items.yaml", "id: M-216"],
+    [".arch/work-items.yaml", "title: Select Next Pitaya-Aligned Direction After Component Discovery And Module Loading Map"],
+    [".arch/work-items.yaml", "id: W-0288"],
+    [".arch/work-items.yaml", "title: Select next Pitaya-aligned direction after component discovery and module loading map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_component_discovery_module_loading_source_first_map: ADR-0195"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "pitaya_aligned_component_discovery_module_loading_source_first_map_implemented: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_component_discovery_module_loading_source_first_map_check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_component_loading_inspection_command: node tools/vibit inspect pitaya-component-loading --json"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_component_discovery_module_loading_map_work_item: W-0288"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_component_discovery_module_loading_map_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/runtime.yaml", "implementation_scope: source_first_repository_inspection"],
+    [".arch/runtime.yaml", "pitaya_reference_status: component_discovery_module_loading_source_first_map_implemented"],
+    [".arch/runtime.yaml", "component_discovery_boundary"],
+    [".arch/runtime.yaml", "component_loading_boundary"],
+    [".arch/runtime.yaml", "component_module_loading_boundary"],
+    [".arch/runtime.yaml", "explicit_component_inventory"],
+    [".arch/runtime.yaml", "bootstrap_component_source"],
+    [".arch/runtime.yaml", "application_module_ownership"],
+    [".arch/runtime.yaml", "handler_module_registration_handoff"],
+    [".arch/runtime.yaml", "dynamic_loading_deferral"],
+    [".arch/runtime.yaml", "distributed_component_discovery_deferral"],
+    [".arch/runtime.yaml", "component_discovery_added: false"],
+    [".arch/runtime.yaml", "component_loading_added: false"],
+    [".arch/runtime.yaml", "component_module_loading_added: false"],
+    [".arch/runtime.yaml", "handler_module_registration_behavior_added: false"],
+    [".arch/runtime.yaml", "handler_registration_behavior_added: false"],
+    [".arch/runtime.yaml", "dynamic_handler_registration_added: false"],
+    [".arch/runtime.yaml", "startup_hook_behavior_added: false"],
+    [".arch/runtime.yaml", "shutdown_hook_behavior_added: false"],
+    [".arch/runtime.yaml", "runtime_endpoint_behavior_added: false"],
+    [".arch/runtime.yaml", "dashboard_added: false"],
+    [".arch/runtime.yaml", "admin_console_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2gt_pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    [".arch/reference.yaml", "phase_2gu_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    [".arch/conventions.yaml", "command: node tools/vibit inspect pitaya-component-loading --json"],
+    [".arch/conventions.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/contracts.yaml", "check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    [".arch/contracts.yaml", "command: node tools/vibit inspect pitaya-component-loading --json"],
+    [".arch/contracts.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0195",
+      "M-215/W-0287",
+      "node tools/vibit inspect pitaya-component-loading --json",
+      "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map",
+      "M-216/W-0288",
+      "This decision does not add component discovery behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0287",
+      "ADR-0195",
+      "runtime.pitaya_aligned_component_discovery_module_loading_source_first_map",
+      "Unknown rule_id: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map",
+      "Unknown command",
+      "change directory does not exist",
+      "W-0288",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "pitaya_aligned_component_discovery_module_loading_source_first_map: implemented",
+      "completed_work_item: W-0287",
+      "completed_milestone: M-215",
+      "previous_completed_work_item: W-0286",
+      "next_milestone: M-216",
+      "next_work_item: W-0288",
+      "command: node tools/vibit inspect pitaya-component-loading --json",
+      "check_rule: runtime.pitaya_aligned_component_discovery_module_loading_source_first_map",
+      "component_discovery_added: false",
+      "component_loading_added: false",
+      "component_module_loading_added: false",
+      "handler_module_registration_behavior_added: false",
+      "handler_registration_behavior_added: false",
+      "dynamic_handler_registration_added: false",
+      "startup_hook_behavior_added: false",
+      "shutdown_hook_behavior_added: false",
+      "runtime_endpoint_behavior_added: false",
+      "dashboard_added: false",
+      "admin_console_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin|component|lifecycle|handler|module|discovery|loader)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin|component|lifecycle|handler|module|discovery|loader)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Disconnect|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward|Acceptor|Connection|Accept|Close|Bind|Presence|Trace|Debug|Dashboard|Observability|Stats|Admin|Component|Lifecycle|Module|Loader)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned component discovery and module loading source-first map completes W-0287, adds inspect pitaya-component-loading, opens W-0288, and preserves component discovery, component loading, component module loading, handler module registration, handler registration, dynamic handler registration, startup hook, shutdown hook, runtime endpoint, dashboard, admin, protocol, generated, persistence, dependency, hosted, SDK, release, distributed runtime, and direct compatibility deferrals", {
     rule_id: ruleId,
     artifact: `${changePath}/spec.yaml`,
   });
@@ -53763,6 +54226,10 @@ function pitayaAlignedComponentDiscoveryModuleLoadingBoundaryGateCompleted(root)
   return workItemHasStatus(root, "W-0286", "completed");
 }
 
+function pitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMapCompleted(root) {
+  return workItemHasStatus(root, "W-0287", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -53795,6 +54262,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item: W-0288";
+  }
   if (pitayaAlignedComponentDiscoveryModuleLoadingBoundaryGateCompleted(root)) {
     return "repository_next_work_item: W-0287";
   }
@@ -54018,6 +54488,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item_scope: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map";
+  }
   if (pitayaAlignedComponentDiscoveryModuleLoadingBoundaryGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_pitaya_aligned_component_discovery_module_loading_source_first_map";
   }
@@ -54428,6 +54901,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0287", "next_ready_work_item: W-0288"],
     ["W-0286", "next_ready_work_item: W-0287"],
     ["W-0285", "next_ready_work_item: W-0286"],
     ["W-0284", "next_ready_work_item: W-0285"],
@@ -54543,6 +55017,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0287", "completed")) {
+    return "next_work_item: W-0288";
+  }
   if (workItemHasStatus(root, "W-0286", "completed")) {
     return "next_work_item: W-0287";
   }
@@ -54833,6 +55310,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0287", "select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
     ["W-0286", "implement_pitaya_aligned_component_discovery_module_loading_source_first_map"],
     ["W-0285", "define_pitaya_aligned_component_discovery_module_loading_boundary_gate"],
     ["W-0284", "select_next_pitaya_aligned_direction_after_handler_module_registration_map"],
@@ -54948,6 +55426,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0287", "W-0288 Select next Pitaya-aligned direction after component discovery and module loading map"],
     ["W-0286", "W-0287 Implement Pitaya-aligned component discovery and module loading source-first map"],
     ["W-0285", "W-0286 Define Pitaya-aligned component discovery and module loading boundary gate"],
     ["W-0284", "W-0285 Select next Pitaya-aligned direction after handler module registration map"],
@@ -55064,6 +55543,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0287", "current_phase: select_next_pitaya_aligned_direction_after_component_discovery_module_loading_map"],
     ["W-0286", "current_phase: implement_pitaya_aligned_component_discovery_module_loading_source_first_map"],
     ["W-0285", "current_phase: define_pitaya_aligned_component_discovery_module_loading_boundary_gate"],
     ["W-0284", "current_phase: select_next_pitaya_aligned_direction_after_handler_module_registration_map"],
@@ -55797,6 +56277,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedHandlerModuleRegistrationSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterHandlerModuleRegistrationMap(root, goFiles);
   checkRuntimePitayaAlignedComponentDiscoveryModuleLoadingBoundaryGate(root, goFiles);
+  checkRuntimePitayaAlignedComponentDiscoveryModuleLoadingSourceFirstMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -56599,6 +57080,11 @@ function main() {
 
   if (group === "inspect" && command === "pitaya-handler-modules" && !value) {
     inspectPitayaHandlerModules(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "pitaya-component-loading" && !value) {
+    inspectPitayaComponentLoading(root);
     return;
   }
 
