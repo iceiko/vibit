@@ -462,8 +462,8 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map
-recommended_next_direction: implement_pitaya_aligned_dashboard_admin_operations_source_first_map
+next_work_item: W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map
+recommended_next_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map
 ```
 
-`ADR-0185` registered `runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate`, completed `W-0277 Define Pitaya-aligned dashboard and admin operations boundary gate`, defined gate-only dashboard/admin operations vocabulary, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.
+`ADR-0186` registered `runtime.pitaya_aligned_dashboard_admin_operations_source_first_map`, completed `W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map`, implemented `node tools/vibit inspect pitaya-dashboard-admin --json`, and keeps runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.

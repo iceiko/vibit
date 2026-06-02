@@ -247,8 +247,8 @@ Friends relationship 的追溯引用包括 `decisions/ADR-0142-friends-relations
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map
-next_direction: implement_pitaya_aligned_dashboard_admin_operations_source_first_map
+next_work_item: W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map
+next_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map
 ```
 
-`ADR-0185` 已注册 `runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate`，完成 `W-0277 Define Pitaya-aligned dashboard and admin operations boundary gate`，定义 gate-only dashboard/admin operations vocabulary，并打开 `W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map`。
+`ADR-0186` 已注册 `runtime.pitaya_aligned_dashboard_admin_operations_source_first_map`，完成 `W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map`，实现 `node tools/vibit inspect pitaya-dashboard-admin --json`，并打开 `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`。

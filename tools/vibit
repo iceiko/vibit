@@ -213,6 +213,7 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_metrics_tracing_source_first_map",
   "runtime.next_pitaya_aligned_direction_after_metrics_tracing_map",
   "runtime.pitaya_aligned_dashboard_admin_operations_boundary_gate",
+  "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
   "runtime.layer_boundary",
   "runtime.toolchain",
   "runtime.test_file",
@@ -304,6 +305,7 @@ Usage:
   vibit inspect pitaya-session-lifecycle
   vibit inspect pitaya-observability
   vibit inspect pitaya-metrics-tracing
+  vibit inspect pitaya-dashboard-admin
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -357,6 +359,8 @@ Commands:
                            Print Pitaya-aligned runtime observability metadata as JSON.
   inspect pitaya-metrics-tracing
                            Print Pitaya-aligned metrics and tracing metadata as JSON.
+  inspect pitaya-dashboard-admin
+                           Print Pitaya-aligned dashboard and admin operations metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -5037,6 +5041,176 @@ function buildPitayaMetricsTracingInspection(root) {
 
 function inspectPitayaMetricsTracing(root) {
   printJson(buildPitayaMetricsTracingInspection(root));
+}
+
+function buildPitayaDashboardAdminInspection(root) {
+  const workState = loadWorkState(root);
+  const nextReady = workState.exists ? workState.current.next_ready[0] || null : null;
+  return {
+    schema_version: "0.1",
+    kind: "pitaya_aligned_dashboard_admin_operations_inspection",
+    project: "vibit",
+    status: "source_first_pitaya_aligned_dashboard_admin_operations_map",
+    source: {
+      gate_standard: "docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.md",
+      gate_translation: "docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.zh-CN.md",
+      gate_decision: "ADR-0185",
+      implementation_decision: "ADR-0186",
+      selection_decision: "ADR-0184",
+      check_rule: "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
+      work_item: "W-0278",
+      change: "changes/2026-05-26-implement-pitaya-aligned-dashboard-admin-operations-source-first-map",
+    },
+    current_work: {
+      milestone: "M-207",
+      next_ready: nextReady,
+      can_continue: Boolean(nextReady),
+    },
+    allowed_dashboard_admin_operations_vocabulary: [
+      "dashboard_admin_boundary",
+      "admin_operation_surface",
+      "operator_action_boundary",
+      "dashboard_read_model",
+      "source_first_operations_snapshot",
+      "inspector_redaction_posture",
+      "event_audit_deferral",
+      "local_operations_diagnostic_surface",
+      "future_admin_authorization_boundary",
+      "hosted_operations_deferral",
+    ],
+    related_vocabulary: [
+      "metrics_tracing_boundary",
+      "runtime_observability_boundary",
+      "operations_snapshot",
+      "health_readiness_signal",
+      "route_inventory_snapshot",
+      "verification_posture",
+      "redaction_posture",
+      "deferred_telemetry_pipeline",
+      "node_local_runtime_surface",
+    ],
+    current_source_first_dashboard_admin_operations_mapping: {
+      operations_snapshot: {
+        current: "node tools/vibit inspect operations --json",
+        future_vocabulary: "source_first_operations_snapshot",
+        implementation_status: "source_first_repository_inspection_only",
+      },
+      runtime_observability_map: {
+        current: "node tools/vibit inspect pitaya-observability --json",
+        future_vocabulary: "dashboard_read_model",
+        implementation_status: "no_dashboard_or_admin_console_behavior",
+      },
+      metrics_tracing_map: {
+        current: "node tools/vibit inspect pitaya-metrics-tracing --json",
+        future_vocabulary: "dashboard_admin_boundary",
+        implementation_status: "no_metrics_endpoint_or_tracing_pipeline_behavior",
+      },
+      health_readiness_version_config: {
+        current: "existing /healthz, /readyz, /version, and /configz local troubleshooting surface summary",
+        future_vocabulary: "local_operations_diagnostic_surface",
+        implementation_status: "no_new_runtime_endpoint_behavior",
+      },
+      route_inventory_snapshot: {
+        current: "source-first protocol route family inventory",
+        future_vocabulary: "dashboard_read_model",
+        implementation_status: "no_protocol_route_or_wire_shape_change",
+      },
+      verification_posture: {
+        current: "tools/vibit repository checks and known warning posture",
+        future_vocabulary: "admin_operation_surface",
+        implementation_status: "no_admin_operation_execution_behavior",
+      },
+      operator_action_boundary: {
+        current: "no operator action command, query, handler, or route behavior",
+        future_vocabulary: "operator_action_boundary",
+        implementation_status: "planning_vocabulary_only",
+      },
+      inspector_redaction_policy: {
+        current: "operations, runtime observability, and metrics/tracing redaction requirements",
+        future_vocabulary: "inspector_redaction_posture",
+        implementation_status: "no_player_session_token_inspector_behavior",
+      },
+      audit_event_posture: {
+        current: "no event/audit tables or admin audit runtime behavior",
+        future_vocabulary: "event_audit_deferral",
+        implementation_status: "planning_vocabulary_only",
+      },
+      admin_authorization_posture: {
+        current: "no admin user, role, permission, or authentication behavior selected",
+        future_vocabulary: "future_admin_authorization_boundary",
+        implementation_status: "planning_vocabulary_only",
+      },
+      hosted_operations_posture: {
+        current: "no hosted dashboard, admin console, SDK, release artifact, or deployment surface",
+        future_vocabulary: "hosted_operations_deferral",
+        implementation_status: "planning_vocabulary_only",
+      },
+    },
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      "docs/pitaya-aligned-dashboard-admin-operations-boundary-gate.md",
+      "docs/pitaya-aligned-metrics-tracing-boundary-gate.md",
+      "docs/pitaya-aligned-runtime-observability-boundary-gate.md",
+      "docs/minimum-operations-inspection-surface-gate.md",
+      "docs/runtime-runbook.md",
+      "docs/alpha-developer-flow.md",
+      "docs/alpha-acceptance-checklist.md",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      runtime_endpoint_behavior_added: false,
+      metrics_endpoint_added: false,
+      tracing_pipeline_added: false,
+      observability_pipeline_added: false,
+      dashboard_added: false,
+      admin_console_added: false,
+      player_session_token_inspector_added: false,
+      event_audit_table_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      release_artifact_added: false,
+      distributed_runtime_implementation_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      http_headers_cookies_query_strings_exposed: false,
+      websocket_subprotocols_remote_addresses_exposed: false,
+      sensitive_identifiers_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+      route_payloads_exposed: false,
+      session_data_payloads_exposed: false,
+      dashboard_payloads_exposed: false,
+      admin_console_payloads_exposed: false,
+      concrete_transport_metadata_exposed: false,
+    },
+    next: {
+      next_milestone: "M-207",
+      next_ready_work_item: "W-0279",
+      selected_follow_up_direction: "select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map",
+    },
+  };
+}
+
+function inspectPitayaDashboardAdmin(root) {
+  printJson(buildPitayaDashboardAdminInspection(root));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -49015,6 +49189,269 @@ function checkRuntimePitayaAlignedDashboardAdminOperationsBoundaryGate(root, goF
   });
 }
 
+function checkRuntimePitayaAlignedDashboardAdminOperationsSourceFirstMap(root, goFiles) {
+  const ruleId = "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map";
+  const decisionPath = "decisions/ADR-0186-pitaya-aligned-dashboard-admin-operations-source-first-map.md";
+  const changePath = "changes/2026-05-26-implement-pitaya-aligned-dashboard-admin-operations-source-first-map";
+  const conversationPath = "conversations/2026-05-26-pitaya-aligned-dashboard-admin-operations-source-first-map.md";
+
+  if (!pitayaAlignedDashboardAdminOperationsSourceFirstMapCompleted(root)) {
+    ok("Pitaya-aligned dashboard and admin operations source-first map is not completed yet", {
+      rule_id: ruleId,
+      artifact: ".arch/work-items.yaml",
+    });
+    return;
+  }
+
+  for (const file of [
+    decisionPath,
+    conversationPath,
+    `${changePath}/spec.yaml`,
+    `${changePath}/request.md`,
+    `${changePath}/impact.md`,
+    `${changePath}/plan.md`,
+    `${changePath}/checklist.md`,
+    `${changePath}/verification.md`,
+  ]) {
+    if (isFile(root, file)) {
+      ok(`${file} exists for Pitaya-aligned dashboard and admin operations source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      fail(`${file} is missing for Pitaya-aligned dashboard and admin operations source-first map`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    }
+  }
+
+  const inspection = JSON.stringify(buildPitayaDashboardAdminInspection(root));
+  const outputMarkers = [
+    "\"kind\":\"pitaya_aligned_dashboard_admin_operations_inspection\"",
+    "\"status\":\"source_first_pitaya_aligned_dashboard_admin_operations_map\"",
+    "\"implementation_decision\":\"ADR-0186\"",
+    "\"check_rule\":\"runtime.pitaya_aligned_dashboard_admin_operations_source_first_map\"",
+    "\"dashboard_admin_boundary\"",
+    "\"admin_operation_surface\"",
+    "\"operator_action_boundary\"",
+    "\"dashboard_read_model\"",
+    "\"source_first_operations_snapshot\"",
+    "\"inspector_redaction_posture\"",
+    "\"event_audit_deferral\"",
+    "\"local_operations_diagnostic_surface\"",
+    "\"future_admin_authorization_boundary\"",
+    "\"hosted_operations_deferral\"",
+    "\"runtime_endpoint_behavior_added\":false",
+    "\"metrics_endpoint_added\":false",
+    "\"tracing_pipeline_added\":false",
+    "\"observability_pipeline_added\":false",
+    "\"dashboard_added\":false",
+    "\"admin_console_added\":false",
+    "\"player_session_token_inspector_added\":false",
+    "\"event_audit_table_added\":false",
+    "\"direct_nakama_pitaya_api_compatibility_added\":false",
+    "\"selected_follow_up_direction\":\"select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map\"",
+  ];
+  for (const marker of outputMarkers) {
+    if (inspection.includes(marker)) {
+      ok(`inspect pitaya-dashboard-admin output includes ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-dashboard-admin",
+      });
+    } else {
+      fail(`inspect pitaya-dashboard-admin output is missing ${marker}`, {
+        rule_id: ruleId,
+        artifact: "tools/vibit inspect pitaya-dashboard-admin",
+      });
+    }
+  }
+
+  const requiredReferences = [
+    [".arch/work-items.yaml", "current_milestone: M-207"],
+    [".arch/work-items.yaml", "id: M-206"],
+    [".arch/work-items.yaml", "title: Pitaya-Aligned Dashboard And Admin Operations Source-First Map"],
+    [".arch/work-items.yaml", "status: completed"],
+    [".arch/work-items.yaml", "id: W-0278"],
+    [".arch/work-items.yaml", "title: Implement Pitaya-aligned dashboard and admin operations source-first map"],
+    [".arch/work-items.yaml", "decision: ADR-0186"],
+    [".arch/work-items.yaml", "check_rule: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    [".arch/work-items.yaml", "command: node tools/vibit inspect pitaya-dashboard-admin --json"],
+    [".arch/work-items.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/work-items.yaml", "id: M-207"],
+    [".arch/work-items.yaml", "title: Select Next Pitaya-Aligned Direction After Dashboard/Admin Operations Map"],
+    [".arch/work-items.yaml", "id: W-0279"],
+    [".arch/work-items.yaml", "title: Select next Pitaya-aligned direction after dashboard/admin operations map"],
+    [".arch/work-items.yaml", "status: next_ready"],
+    [".arch/work-items.yaml", "select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/runtime.yaml", "pitaya_aligned_dashboard_admin_operations_source_first_map: ADR-0186"],
+    [".arch/runtime.yaml", expectedRuntimeLifecycleCurrentPhase(root)],
+    [".arch/runtime.yaml", expectedRuntimeNextReadyWorkItem(root)],
+    [".arch/runtime.yaml", "pitaya_aligned_dashboard_admin_operations_source_first_map_implemented: true"],
+    [".arch/runtime.yaml", "pitaya_aligned_dashboard_admin_operations_source_first_map_check_rule: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    [".arch/runtime.yaml", "pitaya_dashboard_admin_operations_inspection_command: node tools/vibit inspect pitaya-dashboard-admin --json"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_dashboard_admin_operations_map_work_item: W-0279"],
+    [".arch/runtime.yaml", "next_pitaya_direction_selection_after_dashboard_admin_operations_map_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/runtime.yaml", "implementation_scope: source_first_repository_inspection"],
+    [".arch/runtime.yaml", "pitaya_reference_status: dashboard_admin_operations_source_first_map_implemented"],
+    [".arch/runtime.yaml", "runtime_endpoint_behavior_added: false"],
+    [".arch/runtime.yaml", "metrics_endpoint_added: false"],
+    [".arch/runtime.yaml", "tracing_pipeline_added: false"],
+    [".arch/runtime.yaml", "observability_pipeline_added: false"],
+    [".arch/runtime.yaml", "dashboard_added: false"],
+    [".arch/runtime.yaml", "admin_console_added: false"],
+    [".arch/runtime.yaml", "player_session_token_inspector_added: false"],
+    [".arch/runtime.yaml", "event_audit_table_added: false"],
+    [".arch/runtime.yaml", "protocol_route_added: false"],
+    [".arch/runtime.yaml", "protobuf_source_added: false"],
+    [".arch/runtime.yaml", "generated_output_added: false"],
+    [".arch/runtime.yaml", "repository_interface_changed: false"],
+    [".arch/runtime.yaml", "postgresql_adapter_changed: false"],
+    [".arch/runtime.yaml", "migration_added: false"],
+    [".arch/runtime.yaml", "dependency_added: false"],
+    [".arch/runtime.yaml", "hosted_deployment_added: false"],
+    [".arch/runtime.yaml", "sdk_added: false"],
+    [".arch/runtime.yaml", "release_artifact_added: false"],
+    [".arch/runtime.yaml", "direct_nakama_pitaya_api_compatibility_added: false"],
+    [".arch/reference.yaml", "phase_2gk_pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    [".arch/reference.yaml", "phase_2gl_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/reference.yaml", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    [".arch/conventions.yaml", "check_rule: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    [".arch/conventions.yaml", "command: node tools/vibit inspect pitaya-dashboard-admin --json"],
+    [".arch/conventions.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/contracts.yaml", "check_rule: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    [".arch/contracts.yaml", "command: node tools/vibit inspect pitaya-dashboard-admin --json"],
+    [".arch/contracts.yaml", "selected_follow_up_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItem(root)],
+    [".arch/modules.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/storage/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItem(root)],
+    ["modules/friends/module.yaml", expectedRepositoryNextWorkItemScope(root)],
+    ["modules/friends/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/friends/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["modules/storage/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.md", expectedAlphaGoalNextDirection(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextWorkItem(root)],
+    ["docs/v0.1-alpha-goal.zh-CN.md", expectedAlphaGoalNextDirection(root)],
+    ["README.md", expectedReadmeNextWorkItemTitle(root)],
+    ["README.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-developer-flow.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-developer-flow.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/alpha-acceptance-checklist.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/product-maturity-milestones.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/product-maturity-milestones.zh-CN.md", `next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["docs/nakama-pitaya-product-parity-roadmap.zh-CN.md", `recommended_next_direction: ${expectedAlphaGoalNextDirection(root)}`],
+    ["AGENTS.md", "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    ["AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["AGENTS.zh-CN.md", "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    ["AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.md", "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    ["runtime/AGENTS.md", expectedReadmeNextWorkItemTitle(root)],
+    ["runtime/AGENTS.zh-CN.md", "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+    ["runtime/AGENTS.zh-CN.md", expectedReadmeNextWorkItemTitle(root)],
+    ["rules/check-rules.json", "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map"],
+  ];
+  for (const [relativePath, requiredText] of requiredReferences) {
+    checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+  }
+
+  const markersByFile = {
+    [decisionPath]: [
+      "ADR-0186",
+      "M-206/W-0278",
+      "node tools/vibit inspect pitaya-dashboard-admin --json",
+      "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
+      "M-207/W-0279",
+      "This decision does not add runtime endpoint behavior",
+      "direct Nakama/Pitaya API compatibility",
+    ],
+    [conversationPath]: [
+      "W-0278",
+      "ADR-0186",
+      "runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
+      "Unknown rule_id: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
+      "Unknown command",
+      "change directory does not exist",
+      "W-0279",
+    ],
+    [`${changePath}/spec.yaml`]: [
+      "pitaya_aligned_dashboard_admin_operations_source_first_map: implemented",
+      "completed_work_item: W-0278",
+      "completed_milestone: M-206",
+      "previous_completed_work_item: W-0277",
+      "next_milestone: M-207",
+      "next_work_item: W-0279",
+      "command: node tools/vibit inspect pitaya-dashboard-admin --json",
+      "check_rule: runtime.pitaya_aligned_dashboard_admin_operations_source_first_map",
+      "runtime_endpoint_behavior_added: false",
+      "metrics_endpoint_added: false",
+      "tracing_pipeline_added: false",
+      "observability_pipeline_added: false",
+      "dashboard_added: false",
+      "admin_console_added: false",
+      "player_session_token_inspector_added: false",
+      "event_audit_table_added: false",
+      "protocol_route_added: false",
+      "protobuf_source_added: false",
+      "generated_output_added: false",
+      "repository_interface_changed: false",
+      "postgresql_adapter_changed: false",
+      "migration_added: false",
+      "dependency_added: false",
+      "direct_nakama_pitaya_api_compatibility_added: false",
+    ],
+  };
+  for (const [file, markers] of Object.entries(markersByFile)) {
+    for (const marker of markers) {
+      checkRequiredText(root, file, marker, ruleId, marker);
+    }
+  }
+
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|pipeline|serializer|forward|connect|disconnect|kick|trace|debug|dashboard|observability|admin)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|ServiceDiscovery|Discovery|Registry|Room|Channel|Kick|Disconnect|Members?|SessionRouter|SessionLocation|Handler|Pipeline|Serializer|Forward|Acceptor|Connection|Accept|Close|Bind|Presence|Trace|Debug|Dashboard|Observability|Stats|Admin)\b/i, label: "Pitaya API namespace" },
+  ];
+  for (const file of [decisionPath, `${changePath}/spec.yaml`, conversationPath]) {
+    if (!isFile(root, file)) {
+      continue;
+    }
+    const text = readText(path.join(root, file));
+    const matches = textMatchesAny(text, directCompatibilityPatterns);
+    if (matches.length === 0) {
+      ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+        rule_id: ruleId,
+        artifact: file,
+      });
+    } else {
+      for (const match of matches) {
+        fail(`${file} adds direct compatibility marker: ${match.label}`, {
+          rule_id: ruleId,
+          artifact: file,
+        });
+      }
+    }
+  }
+
+  ok("Pitaya-aligned dashboard and admin operations source-first map completes W-0278, adds inspect pitaya-dashboard-admin, opens W-0279, and preserves runtime endpoint, metrics, tracing, observability pipeline, dashboard, admin, inspector, event/audit, protocol, generated, persistence, dependency, hosted, SDK, release, distributed runtime, and direct compatibility deferrals", {
+    rule_id: ruleId,
+    artifact: `${changePath}/spec.yaml`,
+  });
+}
+
 function checkRuntimeAuthenticationCommandProtocolLoginRouteGate(root, goFiles) {
   const ruleId = "runtime.authentication_command_protocol_login_route_gate";
   const standardPath = "docs/authentication-command-protocol-login-route-gate.md";
@@ -50988,6 +51425,10 @@ function pitayaAlignedDashboardAdminOperationsBoundaryGateCompleted(root) {
   return workItemHasStatus(root, "W-0277", "completed");
 }
 
+function pitayaAlignedDashboardAdminOperationsSourceFirstMapCompleted(root) {
+  return workItemHasStatus(root, "W-0278", "completed");
+}
+
 function isFriendsRelationshipProtocolRouteImplementationFile(root, file) {
   if (!friendsRelationshipProtocolRouteImplementationCompleted(root)) {
     return false;
@@ -51020,6 +51461,9 @@ function isFriendsRelationshipRuntimeBehaviorImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
+  if (pitayaAlignedDashboardAdminOperationsSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item: W-0279";
+  }
   if (pitayaAlignedDashboardAdminOperationsBoundaryGateCompleted(root)) {
     return "repository_next_work_item: W-0278";
   }
@@ -51216,6 +51660,9 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
+  if (pitayaAlignedDashboardAdminOperationsSourceFirstMapCompleted(root)) {
+    return "repository_next_work_item_scope: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map";
+  }
   if (pitayaAlignedDashboardAdminOperationsBoundaryGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_pitaya_aligned_dashboard_admin_operations_source_first_map";
   }
@@ -51599,6 +52046,7 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0278", "next_ready_work_item: W-0279"],
     ["W-0277", "next_ready_work_item: W-0278"],
     ["W-0276", "next_ready_work_item: W-0277"],
     ["W-0275", "next_ready_work_item: W-0276"],
@@ -51705,6 +52153,9 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0278", "completed")) {
+    return "next_work_item: W-0279";
+  }
   if (workItemHasStatus(root, "W-0277", "completed")) {
     return "next_work_item: W-0278";
   }
@@ -51968,6 +52419,7 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0278", "select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
     ["W-0277", "implement_pitaya_aligned_dashboard_admin_operations_source_first_map"],
     ["W-0276", "define_pitaya_aligned_dashboard_admin_operations_boundary_gate"],
     ["W-0275", "select_next_pitaya_aligned_direction_after_metrics_tracing_map"],
@@ -52074,6 +52526,7 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0278", "W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map"],
     ["W-0277", "W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map"],
     ["W-0276", "W-0277 Define Pitaya-aligned dashboard and admin operations boundary gate"],
     ["W-0275", "W-0276 Select next Pitaya-aligned direction after metrics and tracing map"],
@@ -52181,6 +52634,7 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0278", "current_phase: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map"],
     ["W-0277", "current_phase: implement_pitaya_aligned_dashboard_admin_operations_source_first_map"],
     ["W-0276", "current_phase: define_pitaya_aligned_dashboard_admin_operations_boundary_gate"],
     ["W-0275", "current_phase: select_next_pitaya_aligned_direction_after_metrics_tracing_map"],
@@ -52896,6 +53350,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedMetricsTracingSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterMetricsTracingMap(root, goFiles);
   checkRuntimePitayaAlignedDashboardAdminOperationsBoundaryGate(root, goFiles);
+  checkRuntimePitayaAlignedDashboardAdminOperationsSourceFirstMap(root, goFiles);
   checkRuntimeLocalVerifierKeyConfigurationLoadingGate(root, goFiles);
   checkRuntimeEnvironmentVerifierKeyLoaderGate(root, goFiles);
   checkRuntimeTokenCredentialMaterialGenerationImplementationGate(root, goFiles);
@@ -53683,6 +54138,11 @@ function main() {
 
   if (group === "inspect" && command === "pitaya-metrics-tracing" && !value) {
     inspectPitayaMetricsTracing(root);
+    return;
+  }
+
+  if (group === "inspect" && command === "pitaya-dashboard-admin" && !value) {
+    inspectPitayaDashboardAdmin(root);
     return;
   }
 
