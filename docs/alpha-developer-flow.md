@@ -227,10 +227,10 @@ git diff --check
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map
-next_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map
+next_work_item: W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate
+next_direction: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate
 ```
 
-`ADR-0186` registered `runtime.pitaya_aligned_dashboard_admin_operations_source_first_map`, completed `W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map`, implemented `node tools/vibit inspect pitaya-dashboard-admin --json`, and opened `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`.
+`ADR-0187` registered `runtime.next_pitaya_aligned_direction_after_dashboard_admin_operations_map`, completed `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`, selected `define_pitaya_aligned_runtime_component_lifecycle_boundary_gate`, and opened `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`.
 
 The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`; the metrics/tracing inspection is available through `node tools/vibit inspect pitaya-metrics-tracing --json`.

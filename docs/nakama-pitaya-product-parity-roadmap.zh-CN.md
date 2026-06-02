@@ -452,8 +452,8 @@ Agents 禁止：
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map
-recommended_next_direction: select_next_pitaya_aligned_direction_after_dashboard_admin_operations_map
+next_work_item: W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate
+recommended_next_direction: define_pitaya_aligned_runtime_component_lifecycle_boundary_gate
 ```
 
-`ADR-0186` 已注册 `runtime.pitaya_aligned_dashboard_admin_operations_source_first_map`，完成 `W-0278 Implement Pitaya-aligned dashboard and admin operations source-first map`，实现 `node tools/vibit inspect pitaya-dashboard-admin --json`，并继续延后 runtime endpoint behavior、metrics endpoints、tracing pipelines、observability pipelines、dashboards、admin console behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+`ADR-0187` 已注册 `runtime.next_pitaya_aligned_direction_after_dashboard_admin_operations_map`，完成 `W-0279 Select next Pitaya-aligned direction after dashboard/admin operations map`，选择 `define_pitaya_aligned_runtime_component_lifecycle_boundary_gate`，打开 `W-0280 Define Pitaya-aligned runtime component lifecycle boundary gate`，并继续延后 runtime component lifecycle behavior、handler registration behavior、runtime endpoint behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
