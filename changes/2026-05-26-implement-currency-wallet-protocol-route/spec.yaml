@@ -1,0 +1,227 @@
+schema_version: 0.1
+change_id: implement-currency-wallet-protocol-route
+date: 2026-05-26
+type: protocol
+status: verified
+
+summary: Implement the protected currency wallet protocol route family with Protobuf source/generated output, route keys, bridge mapping, application handlers, server-side grant policy, focused route tests, and a local authenticated gameplay proof while preserving reward, inventory, purchase, catalog, event, payment, migration, dependency, startup, hosted, SDK, distributed runtime, and direct compatibility deferrals.
+
+affected_modules:
+  - runtime
+  - currency
+  - storage
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0210
+  referenced:
+    - ADR-0209
+    - ADR-0208
+    - ADR-0207
+    - ADR-0206
+    - ADR-0205
+    - ADR-0204
+    - ADR-0203
+    - ADR-0202
+    - ADR-0201
+    - ADR-0200
+    - ADR-0199
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  go_code_added: true
+  generated_code_added: true
+  completed_work_item: W-0302
+  completed_milestone: M-230
+  previous_completed_work_item: W-0301
+  next_milestone: none
+  next_work_item: none
+  next_work_item_status: no_next_ready_work_item
+  tier: tier_2_protocol
+  selected_direction: implement_currency_wallet_protocol_route
+  next_direction: no_next_ready_work_item
+  currency_wallet_protocol_route_implementation_completed: true
+  currency_wallet_protocol_route_implementation_decision: ADR-0210
+  currency_wallet_protocol_route_implementation_check_rule: runtime.currency_wallet_protocol_route_implementation
+  source_protocol_route_gate_decision: ADR-0209
+  source_protocol_route_gate_standard: docs/currency-wallet-protocol-route-gate.md
+  source_runtime_behavior_implementation_decision: ADR-0208
+  source_runtime_behavior_implementation: runtime/internal/app/currency/service.go
+  protocol_source: proto/vibit/currency/v1/currency.proto
+  generated_go_output: runtime/internal/generated/proto/vibit/currency/v1/currency.pb.go
+  protocol_bridge: runtime/internal/platform/protocol/protobuf/currency_bridge.go
+  protocol_bridge_test: runtime/internal/platform/protocol/protobuf/currency_bridge_test.go
+  application_handler: runtime/internal/app/bootstrap/currency.go
+  application_handler_test: runtime/internal/app/bootstrap/currency_test.go
+  route_keys_source: runtime/internal/app/currency/routes.go
+  route_keys_test: runtime/internal/app/currency/routes_test.go
+  local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  protocol_dispatch_bridge: runtime/internal/platform/protocol/protobuf/inventory_bridge.go
+  payload_registry: runtime/internal/platform/protocol/protobuf/payload_registry.go
+  authenticated_frame_handler: runtime/internal/platform/protocol/protobuf/frame_handler.go
+  candidate_routes:
+    - currency.EnsurePlayerWallet
+    - currency.GetOwnWallet
+    - currency.ListOwnWalletBalances
+    - currency.GrantCurrency
+    - currency.SpendCurrency
+    - currency.ListOwnWalletTransactions
+  route_kinds:
+    EnsurePlayerWallet: command
+    GetOwnWallet: query
+    ListOwnWalletBalances: query
+    GrantCurrency: command
+    SpendCurrency: command
+    ListOwnWalletTransactions: query
+  first_payload_package: vibit.currency.v1
+  route_policy_requirement: request_token_required
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  client_supplied_owner_id_allowed_as_proof: false
+  client_supplied_wallet_id_allowed_for_lookup: false
+  client_supplied_actor_id_allowed_as_proof: false
+  server_authoritative_grant_policy_required: true
+  zero_field_authenticated_payload_allowed: true
+  zero_field_authenticated_payload_rule: allow_only_when_inner_protobuf_descriptor_has_zero_fields
+  protobuf_envelope_change_status: unchanged
+  websocket_transport_credential_neutral: true
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  protocol_route_added: true
+  protobuf_source_added: true
+  generated_output_added: true
+  protocol_bridge_added: true
+  application_handler_added: true
+  route_registration_added: true
+  local_authenticated_gameplay_proof_added: true
+  startup_wiring_added: false
+  postgres_startup_route_registration_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  payment_behavior_added: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  hosted_deployment_added: false
+  release_artifact_added: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - buf generate
+    - buf lint
+    - cd runtime && go test ./internal/app/currency ./internal/app/bootstrap ./internal/platform/protocol/protobuf -count=1
+    - cd runtime && go test ./internal/platform/protocol/protobuf -run TestCurrencyWalletProtocolRouteLocalAlphaFlow -count=1
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_protocol_route_implementation
+    - node tools/vibit check change implement-currency-wallet-protocol-route --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - git diff --check
+  stop_conditions:
+    - reward_integration_requires_later_gate
+    - inventory_integration_requires_later_gate
+    - purchase_behavior_requires_later_gate
+    - catalog_event_payment_behavior_requires_later_gate
+    - migration_change_requires_authorization
+    - dependency_requires_authorization
+    - startup_wiring_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - direct_compatibility_requires_authorization
+
+contracts:
+  commands:
+    added:
+      - EnsurePlayerWallet
+      - GrantCurrency
+      - SpendCurrency
+    changed: []
+    removed: []
+  queries:
+    added:
+      - GetOwnWallet
+      - ListOwnWalletBalances
+      - ListOwnWalletTransactions
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_tables_referenced:
+    - currency_wallets
+    - currency_wallet_balances
+    - currency_wallet_transactions
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - buf generate
+    - buf lint
+    - cd runtime && go test ./internal/app/currency ./internal/app/bootstrap ./internal/platform/protocol/protobuf -count=1
+    - cd runtime && go test ./internal/platform/protocol/protobuf -run TestCurrencyWalletProtocolRouteLocalAlphaFlow -count=1
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_protocol_route_implementation
+    - node tools/vibit check change implement-currency-wallet-protocol-route --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check generated --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+
+user_requirement: "Continue the next ready work item and implement the currency wallet protocol route without crossing reward, inventory, purchase, catalog, event, payment, migration, dependency, hosted, SDK, distributed runtime, or direct compatibility boundaries."
+user_visible_outcome: Currency wallet ensure/get/list/grant/spend/transaction routes are available through the existing protected WebSocket/Protobuf request path in focused tests, and the repository reports no further next-ready work item after W-0302.

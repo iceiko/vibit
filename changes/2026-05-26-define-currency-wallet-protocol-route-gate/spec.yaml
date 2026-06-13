@@ -1,0 +1,217 @@
+schema_version: 0.1
+change_id: define-currency-wallet-protocol-route-gate
+date: 2026-05-26
+type: docs
+status: verified
+
+summary: Define the currency wallet protocol route gate aligned with Nakama economy capability pressure and Pitaya route/session/handler separation, without adding route implementation, Protobuf source, generated output, startup wiring, reward/inventory/purchase behavior, catalog/event/payment behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - currency
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0209
+  referenced:
+    - ADR-0208
+    - ADR-0207
+    - ADR-0206
+    - ADR-0205
+    - ADR-0204
+    - ADR-0203
+    - ADR-0202
+    - ADR-0201
+    - ADR-0200
+    - ADR-0199
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  go_code_added: false
+  generated_code_added: false
+  completed_work_item: W-0301
+  completed_milestone: M-229
+  previous_completed_work_item: W-0300
+  next_milestone: M-230
+  next_work_item: W-0302
+  next_work_item_status: next_ready
+  tier: tier_2_protocol
+  selected_direction: define_currency_wallet_protocol_route_gate
+  next_direction: implement_currency_wallet_protocol_route
+  currency_wallet_protocol_route_gate_defined: true
+  currency_wallet_protocol_route_gate_decision: ADR-0209
+  currency_wallet_protocol_route_gate_check_rule: runtime.currency_wallet_protocol_route_gate
+  source_runtime_behavior_implementation_decision: ADR-0208
+  source_runtime_behavior_implementation: runtime/internal/app/currency/service.go
+  source_runtime_behavior_tests: runtime/internal/app/currency/service_test.go
+  source_runtime_behavior_gate_decision: ADR-0207
+  source_repository_interface_decision: ADR-0204
+  source_repository_interface: runtime/internal/modules/currency.Repository
+  future_protocol_source_candidate: proto/vibit/currency/v1/currency.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/currency/v1/currency.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/currency_bridge.go
+  future_protocol_bridge_test_candidate: runtime/internal/platform/protocol/protobuf/currency_bridge_test.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/currency.go
+  future_application_handler_test_candidate: runtime/internal/app/bootstrap/currency_test.go
+  future_protocol_route_implementation_work_item: W-0302
+  future_protocol_route_implementation_direction: implement_currency_wallet_protocol_route
+  candidate_routes:
+    - currency.EnsurePlayerWallet
+    - currency.GetOwnWallet
+    - currency.ListOwnWalletBalances
+    - currency.GrantCurrency
+    - currency.SpendCurrency
+    - currency.ListOwnWalletTransactions
+  candidate_route_kinds:
+    EnsurePlayerWallet: command
+    GetOwnWallet: query
+    ListOwnWalletBalances: query
+    GrantCurrency: command
+    SpendCurrency: command
+    ListOwnWalletTransactions: query
+  first_payload_package: vibit.currency.v1
+  route_policy_requirement: request_token_required
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  client_supplied_owner_id_allowed_as_proof: false
+  client_supplied_wallet_id_allowed_for_lookup: false
+  client_supplied_actor_id_allowed_as_proof: false
+  server_authoritative_grant_policy_required: true
+  first_owner_kind: player
+  protobuf_envelope_change_status: unchanged
+  websocket_transport_credential_neutral: true
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  public_error_mapping_recorded: true
+  local_proof_expectations_recorded: true
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  runtime_handlers_added: false
+  startup_wiring_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  payment_behavior_added: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_protocol_route_gate
+    - node tools/vibit check change define-currency-wallet-protocol-route-gate --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - protocol_route_implementation_requires_separate_work_item
+    - protobuf_source_requires_implementation_authorization
+    - generated_output_requires_buf_generation
+    - startup_wiring_requires_implementation_authorization
+    - reward_inventory_purchase_catalog_event_payment_behavior_requires_later_gates
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_tables_referenced:
+    - currency_wallets
+    - currency_wallet_balances
+    - currency_wallet_transactions
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_protocol_route_gate
+    - node tools/vibit check change define-currency-wallet-protocol-route-gate --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+
+user_requirement: "Continue up to twenty next-ready work items from W-0294 while preserving ask-first boundaries."
+user_visible_outcome: Future agents can inspect the currency wallet protocol route gate before adding Protobuf routes and generated output.

@@ -1,0 +1,207 @@
+schema_version: 0.1
+change_id: implement-currency-wallet-postgresql-adapter
+date: 2026-05-26
+type: feature
+status: verified
+
+summary: Implement the currency wallet PostgreSQL adapter without adding runtime behavior, protocol routes, generated output, dependencies, migration changes, reward/inventory/purchase integration, catalog/event tables, hosted surfaces, SDKs, release artifacts, distributed runtime, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - currency
+  - storage
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0206
+  referenced:
+    - ADR-0205
+    - ADR-0204
+    - ADR-0203
+    - ADR-0202
+    - ADR-0201
+    - ADR-0200
+    - ADR-0199
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0298
+  completed_milestone: M-226
+  previous_completed_work_item: W-0297
+  next_milestone: M-227
+  next_work_item: W-0299
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: implement_currency_wallet_postgresql_adapter
+  next_direction: define_currency_wallet_runtime_behavior_gate
+  currency_wallet_postgresql_adapter_implementation_completed: true
+  currency_wallet_postgresql_adapter_implementation_decision: ADR-0206
+  currency_wallet_postgresql_adapter_implementation_check_rule: runtime.currency_wallet_postgresql_adapter_implementation
+  source_adapter_gate_decision: ADR-0205
+  source_adapter_gate_standard: docs/currency-wallet-postgresql-adapter-gate.md
+  source_repository_interface_decision: ADR-0204
+  source_repository_interface: runtime/internal/modules/currency.Repository
+  source_repository_interface_source: runtime/internal/modules/currency/repository.go
+  source_migration_source_decision: ADR-0202
+  source_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  currency_wallets_logical_table: currency_wallets
+  currency_wallet_balances_logical_table: currency_wallet_balances
+  currency_wallet_transactions_logical_table: currency_wallet_transactions
+  adapter_owner: runtime/internal/platform/persistence/postgres
+  adapter_source: runtime/internal/platform/persistence/postgres/currency_wallet_repository.go
+  adapter_tests: runtime/internal/platform/persistence/postgres/currency_wallet_repository_test.go
+  unit_of_work_repository_handoff_added: true
+  unit_of_work_repository_handoff_source: runtime/internal/platform/persistence/postgres/runner.go
+  postgresql_adapter_added: true
+  sql_execution_added: true
+  create_wallet_mapping_added: true
+  get_wallet_mapping_added: true
+  get_wallet_for_owner_mapping_added: true
+  list_balances_mapping_added: true
+  record_grant_mapping_added: true
+  record_spend_mapping_added: true
+  list_transactions_mapping_added: true
+  idempotency_conflict_mapping_added: true
+  insufficient_balance_mapping_added: true
+  redacted_error_mapping_added: true
+  focused_fake_executor_tests_added: true
+  live_postgresql_required_for_default_verification: false
+  public_announcements_beyond_github_release_authorized_by_this_change: false
+  paid_promotion_authorized_by_this_change: false
+  hosted_deployment_authorized_by_this_change: false
+  additional_release_artifacts_authorized_by_this_change: false
+  release_binary_created: false
+  release_package_created: false
+  release_container_created: false
+  release_checksum_created: false
+  release_provenance_created: false
+  release_signing_created: false
+  install_script_created: false
+  registry_publication_created: false
+  public_announcement_executed: false
+  paid_promotion_executed: false
+  hosted_deployment_added: false
+  runtime_behavior_added: false
+  authentication_session_behavior_changed: false
+  route_protection_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  payment_behavior_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  required_verification_commands:
+    - cd runtime && go test ./internal/platform/persistence/postgres
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_postgresql_adapter_implementation
+    - node tools/vibit check change implement-currency-wallet-postgresql-adapter --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  stop_conditions:
+    - runtime_behavior_requires_separate_work_item
+    - protocol_route_requires_separate_work_item
+    - protobuf_or_generated_output_requires_authorization
+    - migration_change_requires_authorization
+    - dependency_requires_authorization
+    - catalog_or_event_table_requires_authorization
+    - reward_inventory_purchase_scope_requires_authorization
+    - hosted_deployment_requires_authorization
+    - additional_release_artifact_requires_authorization
+    - public_announcement_requires_authorization
+    - paid_promotion_requires_authorization
+    - authentication_session_scope_requires_authorization
+    - distributed_runtime_requires_authorization
+    - direct_compatibility_requires_authorization
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_tables_referenced:
+    - currency_wallets
+    - currency_wallet_balances
+    - currency_wallet_transactions
+  ownership_changes:
+    - runtime/internal/platform/persistence/postgres implements the currency wallet PostgreSQL adapter
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - cd runtime && go test ./internal/platform/persistence/postgres
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_postgresql_adapter_implementation
+    - node tools/vibit check change implement-currency-wallet-postgresql-adapter --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check

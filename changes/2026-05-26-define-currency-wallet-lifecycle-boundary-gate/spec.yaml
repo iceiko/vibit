@@ -1,0 +1,286 @@
+schema_version: 0.1
+change_id: define-currency-wallet-lifecycle-boundary-gate
+date: 2026-06-07
+type: feature
+status: verified
+
+summary: Define the currency wallet lifecycle boundary gate and open the persistence schema gate follow-up without adding currency wallet behavior, balance tables, wallet transaction behavior, reward integration, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - currency
+
+contracts:
+  commands:
+    added:
+      - GrantCurrency
+      - SpendCurrency
+    changed: []
+    removed: []
+  queries:
+    added:
+      - GetCurrencyWallet
+      - ListCurrencyBalances
+      - GetCurrencyTransaction
+    changed: []
+    removed: []
+  events:
+    added:
+      - CurrencyGranted
+      - CurrencySpent
+      - CurrencyBalanceChanged
+      - CurrencyTransactionRecorded
+    changed: []
+    removed: []
+  errors:
+    added:
+      - CURRENCY_INVALID_CODE
+      - CURRENCY_WALLET_NOT_FOUND
+      - CURRENCY_INSUFFICIENT_BALANCE
+      - CURRENCY_INVALID_AMOUNT
+      - CURRENCY_DUPLICATE_TRANSACTION
+      - CURRENCY_INVALID_TRANSITION
+      - CURRENCY_METADATA_IDENTITY_NOT_AUTHENTICATED
+    changed: []
+    removed: []
+  permissions:
+    added:
+      - validated_player_identity
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  ownership_changes: []
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Define a currency wallet lifecycle gate for vibit so future currency catalog, wallet read, balance read, grant, spend, balance change recording, and transaction read behavior can be specified before runtime behavior, protocol routes, persistence, generated output, or broader economy features are implemented."
+user_visible_outcome: A completed gate standard records future currency wallet lifecycle semantics, acceptance criteria, tests, identity rules, invariants, redaction, deferrals, and opens the persistence schema gate before implementation.
+capability_family: economy_inventory_rewards_currencies_and_progression
+
+capability_mapping:
+  family: economy_inventory_rewards_currencies_and_progression
+  product_intent: Currency wallets are a core economy primitive in Nakama-class and Hiro-class backends and should precede richer economy surfaces such as rewards, purchases, inventory pricing, progression, and live operations.
+  adopted:
+    - Currency catalog reads, wallet reads, balance reads, grants, spends, balance change recording, and transaction reads are treated as first-class future economy semantics.
+    - Server-authoritative balance mutations, validated player identity, idempotency, explicit errors, events, permissions, redaction, and tests must be defined before behavior is implemented.
+  adapted:
+    - vibit uses its own contract-first lifecycle vocabulary rather than direct external API compatibility.
+    - Grants are service-authoritative; player-initiated spends and reads require validated player identity.
+    - The next step is a persistence schema gate, not runtime behavior.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - reward integration, inventory integration, purchase behavior, transfers, reservations, settlement, SDKs, hosted surfaces, distributed runtime, and broad economy expansion in this gate
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  currency_wallet_lifecycle_boundary_gate: defined
+  completed_work_item: W-0292
+  completed_milestone: M-220
+  previous_completed_work_item: W-0291
+  next_milestone: M-221
+  next_work_item: W-0293
+  next_work_item_status: next_ready
+  tier: tier_2_architecture_gate
+  selected_direction: define_currency_wallet_lifecycle_boundary_gate
+  next_direction: define_currency_wallet_persistence_schema_gate
+  decision: ADR-0200
+  check_rule: runtime.currency_wallet_lifecycle_boundary_gate
+  gate_standard: docs/currency-wallet-lifecycle-boundary-gate.md
+  gate_standard_translation: docs/currency-wallet-lifecycle-boundary-gate.zh-CN.md
+  selection_decision: ADR-0199
+  source_map_decision: ADR-0198
+  startup_shutdown_hook_gate_decision: ADR-0197
+  selected_capability_family: economy_inventory_rewards_currencies_and_progression
+  selected_module_candidate: currency
+  primary_product_reference: Nakama
+  secondary_product_reference: Hiro
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  future_persistence_schema_gate_work_item: W-0293
+  future_persistence_schema_gate_direction: define_currency_wallet_persistence_schema_gate
+  semantic_gate_only_scope: true
+  command_vocabulary_recorded: true
+  query_vocabulary_recorded: true
+  event_vocabulary_recorded: true
+  error_vocabulary_recorded: true
+  permission_vocabulary_recorded: true
+  wallet_lifecycle_state_model_recorded: true
+  lifecycle_invariants_recorded: true
+  idempotency_posture_recorded: true
+  test_plan_recorded: true
+  redaction_posture_recorded: true
+  permission_required: validated_player_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  runtime_behavior_added: false
+  currency_wallet_behavior_added: false
+  currency_balance_table_added: false
+  wallet_transaction_behavior_added: false
+  currency_reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  grant_spend_behavior_added: false
+  audit_event_table_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  migration_added: false
+  persistence_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+semantic_scope:
+  - currency_catalog_read
+  - wallet_read
+  - balance_read
+  - grant_currency
+  - spend_currency
+  - balance_change_recording
+  - transaction_read
+
+wallet_lifecycle_states:
+  - active
+  - suspended
+  - closed
+
+permissions:
+  required:
+    - validated_player_identity
+  actor_identity_source: validated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  future_grant_permission_model: service_authoritative_deferred
+
+lifecycle_invariants:
+  - currency_codes_validated_by_future_catalog_before_mutation
+  - grant_and_spend_amounts_must_be_positive
+  - balance_reads_do_not_require_mutation_authority
+  - negative_balance_forbidden_by_default
+  - mutation_idempotency_required
+  - mutations_transactional
+  - durable_transaction_or_ledger_fact_required_before_behavior
+  - grants_service_authoritative_not_client_authoritative
+  - public_failures_collapse_private_wallet_balance_catalog_or_transaction_details_where_privacy_requires
+  - wallet_player_transaction_balance_idempotency_and_ledger_details_not_log_safe_by_default
+
+acceptance_criteria:
+  - The gate defines future currency catalog read, wallet read, balance read, grant, spend, balance change recording, and transaction read semantics.
+  - The gate records future command, query, event, error, permission, wallet lifecycle state, invariant, idempotency, redaction, and test vocabulary.
+  - The gate requires validated player identity for player-owned wallet reads and player-initiated spends and rejects metadata-only `player_id` or `session_id` as proof.
+  - The gate maps the capability to Nakama/Hiro economy capability coverage while keeping Pitaya deferred.
+  - The gate opens W-0293 as `Define currency wallet persistence schema gate`.
+  - The gate adds no runtime behavior, balance table, wallet transaction behavior, reward integration, protocol route, Protobuf source, generated output, migration, repository interface, PostgreSQL adapter, dependency, startup wiring, hosted surface, distributed runtime, or direct compatibility scope.
+
+test_plan:
+  positive_behavior:
+    - Future tests must cover granting currency through a service-authoritative path.
+    - Future tests must cover spending currency for a validated player wallet.
+    - Future tests must cover reading a player-owned wallet.
+    - Future tests must cover listing player-owned currency balances.
+    - Future tests must cover reading a currency transaction by permitted owner.
+    - Future tests must cover idempotency that rejects duplicate mutation application.
+  negative_behavior:
+    - Future tests must cover invalid currency code.
+    - Future tests must cover zero or negative mutation amount.
+    - Future tests must cover insufficient balance.
+    - Future tests must cover missing wallet.
+    - Future tests must cover suspended or closed wallet transition.
+    - Future tests must cover duplicate transaction with conflicting payload.
+    - Future tests must cover metadata-only identity.
+  permission_and_authentication:
+    - Future tests must require validated player identity for player-owned reads and spends.
+    - Future tests must reject client-supplied actor id as proof.
+    - Future tests must reject metadata-only `player_id` and `session_id` as proof.
+    - Future tests must reject client-authoritative grants before mutation.
+  persistence_and_transactions:
+    - Future schema and repository tests must be defined after W-0293 and before migration, adapter, or runtime implementation.
+    - Future mutation transitions must be transactional.
+    - Future balance changes and transaction records must stay consistent inside the unit-of-work boundary.
+    - Future duplicate idempotency keys must not double-apply mutations.
+  failure_and_redaction:
+    - Future public errors must not leak private wallet, balance, catalog, or transaction details where privacy requires collapse.
+    - Future logs must not expose raw credentials, tokens, verifier keys, digests, transport metadata, wallet ids, player ids, detailed balances, idempotency keys, or ledger internals.
+
+implementation_boundaries:
+  allowed:
+    - docs/currency-wallet-lifecycle-boundary-gate.md
+    - docs/currency-wallet-lifecycle-boundary-gate.zh-CN.md
+    - decisions/ADR-0200-currency-wallet-lifecycle-boundary-gate.md
+    - conversations/2026-05-26-currency-wallet-lifecycle-boundary-gate.md
+    - changes/2026-05-26-define-currency-wallet-lifecycle-boundary-gate/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - currency wallet behavior
+    - balance tables
+    - wallet transaction behavior
+    - reward integration
+    - inventory integration
+    - purchase behavior
+    - grant execution
+    - spend execution
+    - transfer behavior
+    - reservation or settlement behavior
+    - audit/event tables
+    - runtime behavior changes
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - startup wiring
+    - authentication/session behavior changes
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.currency_wallet_lifecycle_boundary_gate
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change define-currency-wallet-lifecycle-boundary-gate --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check

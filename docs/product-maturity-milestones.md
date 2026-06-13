@@ -248,8 +248,22 @@ This document records product maturity goals. It does not itself:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0290 Implement Pitaya-aligned startup and shutdown hook source-first map
-next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+next_work_item: none
+next_direction: no_next_ready_work_item
+latest_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
 ```
 
+Current currency wallet runtime behavior gate decision: `decisions/ADR-0207-currency-wallet-runtime-behavior-gate.md`.
+Current currency wallet runtime behavior implementation decision: `decisions/ADR-0208-currency-wallet-runtime-behavior-implementation.md`.
+Current currency wallet protocol route gate decision: `decisions/ADR-0209-currency-wallet-protocol-route-gate.md`.
+Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`.
+No repository next work item is currently ready.
+
+Current currency wallet PostgreSQL adapter implementation decision: `decisions/ADR-0206-currency-wallet-postgresql-adapter-implementation.md`.
+
+Current currency wallet PostgreSQL adapter gate decision: `decisions/ADR-0205-currency-wallet-postgresql-adapter-gate.md`.
+
 `ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, and completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`; `ADR-0190` registered `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`, completed `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, and selected `define_pitaya_aligned_handler_module_registration_boundary_gate`; `ADR-0191` registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283 Define Pitaya-aligned handler module registration boundary gate`, and opened `W-0284 Implement Pitaya-aligned handler module registration source-first map`; `ADR-0192` registered `runtime.pitaya_aligned_handler_module_registration_source_first_map`, implemented `node tools/vibit inspect pitaya-handler-modules --json`, and completed `W-0284`; `ADR-0193` registered `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`, completed `W-0285`, selected `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`, and opened `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`.
+
+
+Currency wallet repository boundary decision: `decisions/ADR-0203-currency-wallet-repository-boundary.md`.

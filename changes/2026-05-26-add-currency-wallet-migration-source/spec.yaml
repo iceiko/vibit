@@ -1,0 +1,198 @@
+schema_version: 0.1
+change_id: add-currency-wallet-migration-source
+date: 2026-06-07
+type: feature
+status: verified
+
+summary: Add the currency wallet PostgreSQL migration source and open the repository boundary follow-up without adding runtime behavior, protocol shape, generated output, repositories, adapters, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - currency
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: true
+  migration_sources:
+    - runtime/migrations/postgres/000008_create_currency_wallets.sql
+  repository_interfaces_changed: false
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - future currency wallet repository ownership remains candidate-only under runtime/internal/modules/currency
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: true
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Add the currency wallet migration source after the persistence schema gate while preserving runtime, protocol, generated, repository, adapter, dependency, hosted, SDK, distributed, and direct compatibility deferrals."
+user_visible_outcome: A completed migration-source-only slice adds the currency wallet SQL migration source and opens the repository boundary follow-up.
+capability_family: economy_inventory_rewards_currencies_and_progression
+
+capability_mapping:
+  family: economy_inventory_rewards_currencies_and_progression
+  product_intent: Durable wallet, balance, transaction, and idempotency SQL source is required for Nakama/Hiro-class economy behavior before runtime grant, spend, read, reward, purchase, or inventory integration behavior can be implemented safely.
+  adopted:
+    - PostgreSQL is the first durable currency wallet store.
+    - Wallet, balance, and transaction table source exists before repository and adapter work.
+    - Transaction rows own durable idempotency uniqueness for future grant/spend behavior.
+  adapted:
+    - vibit records local schema source without direct external API compatibility.
+    - Currency catalog, reward integration, purchase behavior, and inventory pricing remain deferred.
+    - The next step is repository boundary definition, not repository implementation.
+  rejected:
+    - direct Nakama API compatibility unless a later ADR explicitly authorizes it
+    - direct Pitaya API compatibility unless a later ADR explicitly authorizes it
+    - external economy services, payment provider dependencies, rewards, purchases, inventory pricing, reservations, settlement, refunds, transfers, SDKs, hosted surfaces, and broad economy expansion in this slice
+  pitaya_status: deferred_future_architecture_reference
+
+runtime:
+  currency_wallet_migration_source: added
+  completed_work_item: W-0294
+  completed_milestone: M-222
+  previous_completed_work_item: W-0293
+  next_milestone: M-223
+  next_work_item: W-0295
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: add_currency_wallet_migration_source
+  next_direction: define_currency_wallet_repository_boundary
+  decision: ADR-0202
+  check_rule: runtime.currency_wallet_migration_source
+  source_schema_gate_decision: ADR-0201
+  source_schema_gate_standard: docs/currency-wallet-persistence-schema-gate.md
+  selected_capability_family: economy_inventory_rewards_currencies_and_progression
+  primary_product_reference: Nakama
+  secondary_product_reference: Hiro
+  pitaya_reference_status: deferred_future_architecture_reference
+  ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
+  selected_first_currency_wallet_store: postgres
+  migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  currency_wallets_logical_table: currency_wallets
+  currency_wallet_balances_logical_table: currency_wallet_balances
+  currency_wallet_transactions_logical_table: currency_wallet_transactions
+  currency_wallets_table_added: true
+  currency_wallet_balances_table_added: true
+  currency_wallet_transactions_table_added: true
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  wallet_owner_unique_index_added: true
+  balance_primary_key_added: true
+  transaction_idempotency_unique_index_added: true
+  transaction_wallet_created_at_index_added: true
+  transaction_wallet_currency_created_at_index_added: true
+  migration_source_only_scope: true
+  runtime_behavior_added: false
+  wallet_transaction_behavior_added: false
+  grant_spend_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  persistence_execution_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  paid_currency_behavior_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+schema:
+  selected_store: postgres
+  migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  logical_tables:
+    - currency_wallets
+    - currency_wallet_balances
+    - currency_wallet_transactions
+  deferred_tables:
+    - currency_catalog
+    - currency_wallet_events
+  wallet_table:
+    logical_table: currency_wallets
+    primary_key:
+      - wallet_id
+    logical_owner_identity:
+      - owner_kind
+      - owner_id
+    owner_kind_first_value: player
+    owner_player_fk: player_accounts(player_id)
+    allowed_lifecycle_states:
+      - active
+      - suspended
+      - closed
+  balance_table:
+    logical_table: currency_wallet_balances
+    primary_key:
+      - wallet_id
+      - currency_code
+    amount_type: BIGINT
+    negative_balance_allowed_by_default: false
+  transaction_table:
+    logical_table: currency_wallet_transactions
+    primary_key:
+      - transaction_id
+    transaction_kinds:
+      - grant
+      - spend
+    idempotency_unique_identity:
+      - wallet_id
+      - idempotency_scope
+      - idempotency_key
+
+verification:
+  required_commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.currency_wallet_migration_source
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change add-currency-wallet-migration-source --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  status: Verified

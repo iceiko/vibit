@@ -16,17 +16,20 @@ import (
 	appauth "github.com/iceiko/vibit/runtime/internal/app/authentication"
 	"github.com/iceiko/vibit/runtime/internal/app/bootstrap"
 	appconnection "github.com/iceiko/vibit/runtime/internal/app/connection"
+	appcurrency "github.com/iceiko/vibit/runtime/internal/app/currency"
 	appfriends "github.com/iceiko/vibit/runtime/internal/app/friends"
 	apppresence "github.com/iceiko/vibit/runtime/internal/app/presence"
 	sessionmodule "github.com/iceiko/vibit/runtime/internal/app/session"
 	appstorage "github.com/iceiko/vibit/runtime/internal/app/storage"
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
+	currencyv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/currency/v1"
 	friendsv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/friends/v1"
 	inventoryv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/inventory/v1"
 	presencev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/presence/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	storagev1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/storage/v1"
 	authenticationmodule "github.com/iceiko/vibit/runtime/internal/modules/authentication"
+	currencymodule "github.com/iceiko/vibit/runtime/internal/modules/currency"
 	friendsmodule "github.com/iceiko/vibit/runtime/internal/modules/friends"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	playermodule "github.com/iceiko/vibit/runtime/internal/modules/player"
@@ -351,6 +354,197 @@ func TestStorageObjectsProtocolRouteLocalAlphaFlow(t *testing.T) {
 	})
 	assertErrorEnvelope(t, afterDelete, app.ErrorCode(appstorage.PublicErrorStorageObjectNotFound))
 	assertNoFrameErrorSecretLeak(t, afterDelete, player.accessToken, player.deviceCredential, valueJSON)
+}
+
+func TestCurrencyWalletProtocolRouteLocalAlphaFlow(t *testing.T) {
+	ctx := context.Background()
+	fixture := newAuthenticatedGameplayE2EFixture(t)
+	player := fixture.authenticateAndBindLocalPlayer(t, ctx, "ws-currency-e2e-1", "client-currency-e2e-1")
+	session := app.Session{
+		ConnectionID:    player.connectionID,
+		SessionID:       player.sessionID,
+		PlayerID:        player.playerID,
+		ConnectionEpoch: 1,
+	}
+	target := app.Target{Scope: app.TargetScopePlayer, ID: player.playerID}
+	metadataJSON := `{"source":"e2e","reward":"daily"}`
+
+	ensureEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.EnsurePlayerWalletRoute(),
+		requestID:       "currency-ensure-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload:         &currencyv1.EnsurePlayerWalletRequest{},
+	})
+	ensure := mustDecodePayloadAs[*currencyv1.EnsurePlayerWalletResponse](t, ensureEnvelope)
+	if ensure.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusEnsured) ||
+		ensure.GetWallet().GetWalletId() != "currency-wallet-e2e-1" ||
+		ensure.GetWallet().GetOwnerKind() != string(currencymodule.CurrencyWalletOwnerKindPlayer) ||
+		ensure.GetWallet().GetLifecycleState() != string(currencymodule.CurrencyWalletLifecycleActive) ||
+		ensure.GetWallet().GetWalletVersion() != int64(currencymodule.InitialCurrencyWalletVersion) {
+		t.Fatalf("EnsurePlayerWallet response = %#v, want ensured active player wallet", ensure)
+	}
+
+	getEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.GetOwnWalletRoute(),
+		requestID:       "currency-get-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload:         &currencyv1.GetOwnWalletRequest{},
+	})
+	get := mustDecodePayloadAs[*currencyv1.GetOwnWalletResponse](t, getEnvelope)
+	if get.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusFound) ||
+		get.GetWallet().GetWalletId() != ensure.GetWallet().GetWalletId() ||
+		get.GetWallet().GetWalletVersion() != ensure.GetWallet().GetWalletVersion() {
+		t.Fatalf("GetOwnWallet response = %#v, want ensured wallet", get)
+	}
+
+	grantEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.GrantCurrencyRoute(),
+		requestID:       "currency-grant-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &currencyv1.GrantCurrencyRequest{
+			CurrencyCode:      "GEMS",
+			Amount:            125,
+			IdempotencyKey:    "grant-e2e-1",
+			IdempotencyScope:  "local-e2e",
+			ReasonCode:        "daily_reward",
+			ExternalReference: "reward-e2e-1",
+			MetadataJson:      metadataJSON,
+		},
+	})
+	grant := mustDecodePayloadAs[*currencyv1.GrantCurrencyResponse](t, grantEnvelope)
+	if grant.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusGranted) ||
+		grant.GetTransaction().GetTransactionId() != "currency-transaction-e2e-1" ||
+		grant.GetTransaction().GetCurrencyCode() != "GEMS" ||
+		grant.GetTransaction().GetTransactionKind() != string(currencymodule.CurrencyWalletTransactionGrant) ||
+		grant.GetTransaction().GetAmountDelta() != 125 ||
+		grant.GetTransaction().GetBalanceAfter() != 125 ||
+		grant.GetTransaction().GetActorKind() != string(currencymodule.CurrencyWalletActorSystem) ||
+		grant.GetTransaction().GetMetadataJson() != metadataJSON {
+		t.Fatalf("GrantCurrency response = %#v, want server-authorized grant transaction", grant)
+	}
+
+	spendEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.SpendCurrencyRoute(),
+		requestID:       "currency-spend-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &currencyv1.SpendCurrencyRequest{
+			CurrencyCode:      "GEMS",
+			Amount:            40,
+			IdempotencyKey:    "spend-e2e-1",
+			IdempotencyScope:  "local-e2e",
+			ReasonCode:        "upgrade",
+			ExternalReference: "upgrade-e2e-1",
+			MetadataJson:      `{"source":"e2e","sink":"upgrade"}`,
+		},
+	})
+	spend := mustDecodePayloadAs[*currencyv1.SpendCurrencyResponse](t, spendEnvelope)
+	if spend.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusSpent) ||
+		spend.GetTransaction().GetTransactionId() != "currency-transaction-e2e-2" ||
+		spend.GetTransaction().GetCurrencyCode() != "GEMS" ||
+		spend.GetTransaction().GetTransactionKind() != string(currencymodule.CurrencyWalletTransactionSpend) ||
+		spend.GetTransaction().GetAmountDelta() != -40 ||
+		spend.GetTransaction().GetBalanceAfter() != 85 ||
+		spend.GetTransaction().GetActorKind() != string(currencymodule.CurrencyWalletActorPlayer) {
+		t.Fatalf("SpendCurrency response = %#v, want player spend transaction", spend)
+	}
+
+	balancesEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.ListOwnWalletBalancesRoute(),
+		requestID:       "currency-balances-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &currencyv1.ListOwnWalletBalancesRequest{
+			Limit: 10,
+		},
+	})
+	balances := mustDecodePayloadAs[*currencyv1.ListOwnWalletBalancesResponse](t, balancesEnvelope)
+	if balances.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusListed) ||
+		len(balances.GetBalances()) != 1 ||
+		balances.GetBalances()[0].GetCurrencyCode() != "GEMS" ||
+		balances.GetBalances()[0].GetBalanceAmount() != 85 ||
+		balances.GetBalances()[0].GetBalanceVersion() != 2 ||
+		balances.GetNextCurrencyCode() != "" {
+		t.Fatalf("ListOwnWalletBalances response = %#v, want one updated GEMS balance", balances)
+	}
+
+	transactionsEnvelope := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.ListOwnWalletTransactionsRoute(),
+		requestID:       "currency-transactions-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload: &currencyv1.ListOwnWalletTransactionsRequest{
+			CurrencyCode: "GEMS",
+			Limit:        10,
+		},
+	})
+	transactions := mustDecodePayloadAs[*currencyv1.ListOwnWalletTransactionsResponse](t, transactionsEnvelope)
+	if transactions.GetStatus() != string(appcurrency.CurrencyWalletOperationStatusListed) ||
+		len(transactions.GetTransactions()) != 2 ||
+		transactions.GetTransactions()[0].GetTransactionId() != grant.GetTransaction().GetTransactionId() ||
+		transactions.GetTransactions()[1].GetTransactionId() != spend.GetTransaction().GetTransactionId() ||
+		transactions.GetNextTransactionId() != "" ||
+		transactions.GetNextTransactionTime() != "" {
+		t.Fatalf("ListOwnWalletTransactions response = %#v, want grant and spend transactions in order", transactions)
+	}
+
+	afterLogout := fixture.handleFrame(t, &frameStep{
+		route:           app.LogoutAccessTokenRoute(),
+		requestID:       "currency-logout-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		payload: &authenticationv1.LogoutAccessTokenRequest{
+			AccessToken:  player.accessToken,
+			LogoutReason: "currency_e2e_logout",
+		},
+	})
+	logout := mustDecodePayloadAs[*authenticationv1.LogoutAccessTokenResponse](t, afterLogout)
+	if logout.GetLogoutStatus() != string(appauth.LogoutStatusRevoked) || !logout.GetRevoked() {
+		t.Fatalf("LogoutAccessToken response = %#v, want revoked currency route token", logout)
+	}
+
+	protectedAfterLogout := fixture.handleFrame(t, &frameStep{
+		route:           appcurrency.GetOwnWalletRoute(),
+		requestID:       "currency-get-after-logout-1",
+		target:          target,
+		session:         session,
+		connectionID:    player.connectionID,
+		connectionEpoch: 1,
+		authenticated:   true,
+		accessToken:     player.accessToken,
+		payload:         &currencyv1.GetOwnWalletRequest{},
+	})
+	assertErrorEnvelope(t, protectedAfterLogout, app.ErrorCodeAuthenticationTokenInvalid)
+	assertNoFrameErrorSecretLeak(t, protectedAfterLogout, player.accessToken, player.deviceCredential, metadataJSON)
 }
 
 func TestFriendsRelationshipProtocolRouteLocalAlphaFlow(t *testing.T) {
@@ -844,12 +1038,14 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	sessionRepository := newE2ESessionRepository()
 	storageRepository := newE2EStorageRepository(clock)
 	friendsRepository := newE2EFriendRelationshipRepository(clock)
+	currencyRepository := newE2ECurrencyWalletRepository(clock)
 	runner := e2eUnitOfWorkRunner{unit: &e2eUnitOfWork{
 		authenticationRepository: authenticationRepository,
 		playerRepository:         playerRepository,
 		sessionRepository:        sessionRepository,
 		storageRepository:        storageRepository,
 		friendsRepository:        friendsRepository,
+		currencyRepository:       currencyRepository,
 	}}
 	service, err := appauth.NewService(appauth.ServiceDependencies{
 		UnitOfWorkRunner:              runner,
@@ -908,6 +1104,23 @@ func newAuthenticatedGameplayE2EFixture(t *testing.T) authenticatedGameplayE2EFi
 	}
 	if err := (bootstrap.FriendsRouteHandlers{Service: friendsService}).RegisterRoutes(dispatcher); err != nil {
 		t.Fatalf("Register friends routes error = %v, want nil", err)
+	}
+	currencyService, err := appcurrency.NewService(appcurrency.ServiceDependencies{
+		UnitOfWorkRunner:       runner,
+		WalletIDGenerator:      &e2eCurrencyWalletIDGenerator{},
+		TransactionIDGenerator: &e2eCurrencyTransactionIDGenerator{},
+	})
+	if err != nil {
+		t.Fatalf("currency NewService() error = %v, want nil", err)
+	}
+	if err := (bootstrap.CurrencyRouteHandlers{
+		Service: currencyService,
+		GrantPolicy: bootstrap.StaticCurrencyGrantPolicy{
+			Allowed:       true,
+			SystemActorID: "currency-route-local-proof",
+		},
+	}).RegisterRoutes(dispatcher); err != nil {
+		t.Fatalf("Register currency routes error = %v, want nil", err)
 	}
 
 	routeValidator := appauth.NewRouteAccessTokenValidator(service)
@@ -1249,6 +1462,24 @@ func (g *e2eFriendRelationshipIDGenerator) GenerateFriendRelationshipID(context.
 	return g.nextID("friend-relationship-e2e")
 }
 
+type e2eCurrencyWalletIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
+
+func (g *e2eCurrencyWalletIDGenerator) GenerateCurrencyWalletID(context.Context) (string, error) {
+	return g.nextID("currency-wallet-e2e")
+}
+
+type e2eCurrencyTransactionIDGenerator struct {
+	mu   sync.Mutex
+	next int
+}
+
+func (g *e2eCurrencyTransactionIDGenerator) GenerateCurrencyWalletTransactionID(context.Context) (string, error) {
+	return g.nextID("currency-transaction-e2e")
+}
+
 func (g *e2eTokenRecordIDGenerator) nextID(prefix string) (string, error) {
 	g.mu.Lock()
 	defer g.mu.Unlock()
@@ -1291,6 +1522,20 @@ func (g *e2eFriendRelationshipIDGenerator) nextID(prefix string) (string, error)
 	return fmt.Sprintf("%s-%d", prefix, g.next), nil
 }
 
+func (g *e2eCurrencyWalletIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
+func (g *e2eCurrencyTransactionIDGenerator) nextID(prefix string) (string, error) {
+	g.mu.Lock()
+	defer g.mu.Unlock()
+	g.next++
+	return fmt.Sprintf("%s-%d", prefix, g.next), nil
+}
+
 type e2eUnitOfWorkRunner struct {
 	unit *e2eUnitOfWork
 }
@@ -1314,6 +1559,7 @@ type e2eUnitOfWork struct {
 	sessionRepository        sessionmodule.Repository
 	storageRepository        storagemodule.Repository
 	friendsRepository        friendsmodule.Repository
+	currencyRepository       currencymodule.Repository
 }
 
 func (u *e2eUnitOfWork) Context() context.Context {
@@ -1353,6 +1599,13 @@ func (u *e2eUnitOfWork) NewFriendRelationshipRepository() (friendsmodule.Reposit
 		return nil, errors.New("e2e: friends relationship repository unavailable")
 	}
 	return u.friendsRepository, nil
+}
+
+func (u *e2eUnitOfWork) NewCurrencyWalletRepository() (currencymodule.Repository, error) {
+	if u == nil || u.currencyRepository == nil {
+		return nil, errors.New("e2e: currency wallet repository unavailable")
+	}
+	return u.currencyRepository, nil
 }
 
 type e2eAuthenticationRepository struct {
@@ -2184,6 +2437,334 @@ func e2eFriendRelationshipRepositoryError(operation string, class friendsmodule.
 	}
 }
 
+type e2eCurrencyWalletRepository struct {
+	mu                   sync.Mutex
+	clock                e2eClock
+	wallets              map[currencymodule.CurrencyWalletID]currencymodule.CurrencyWallet
+	walletIDByOwner      map[e2eCurrencyWalletOwnerKey]currencymodule.CurrencyWalletID
+	balances             map[e2eCurrencyWalletBalanceKey]currencymodule.CurrencyWalletBalance
+	transactions         []currencymodule.CurrencyWalletTransaction
+	transactionByID      map[currencymodule.CurrencyWalletTransactionID]currencymodule.CurrencyWalletTransaction
+	transactionByIdemKey map[e2eCurrencyWalletIdempotencyKey]currencymodule.CurrencyWalletTransaction
+}
+
+type e2eCurrencyWalletOwnerKey struct {
+	kind currencymodule.CurrencyWalletOwnerKind
+	id   string
+}
+
+type e2eCurrencyWalletBalanceKey struct {
+	walletID     currencymodule.CurrencyWalletID
+	currencyCode currencymodule.CurrencyCode
+}
+
+type e2eCurrencyWalletIdempotencyKey struct {
+	walletID currencymodule.CurrencyWalletID
+	scope    currencymodule.CurrencyWalletIdempotencyScope
+	key      currencymodule.CurrencyWalletIdempotencyKey
+}
+
+func newE2ECurrencyWalletRepository(clock e2eClock) *e2eCurrencyWalletRepository {
+	return &e2eCurrencyWalletRepository{
+		clock:                clock,
+		wallets:              make(map[currencymodule.CurrencyWalletID]currencymodule.CurrencyWallet),
+		walletIDByOwner:      make(map[e2eCurrencyWalletOwnerKey]currencymodule.CurrencyWalletID),
+		balances:             make(map[e2eCurrencyWalletBalanceKey]currencymodule.CurrencyWalletBalance),
+		transactionByID:      make(map[currencymodule.CurrencyWalletTransactionID]currencymodule.CurrencyWalletTransaction),
+		transactionByIdemKey: make(map[e2eCurrencyWalletIdempotencyKey]currencymodule.CurrencyWalletTransaction),
+	}
+}
+
+func (r *e2eCurrencyWalletRepository) CreateCurrencyWallet(_ context.Context, input currencymodule.CreateCurrencyWalletInput) (currencymodule.CurrencyWallet, error) {
+	normalized, err := currencymodule.NormalizeCreateCurrencyWalletInput(input)
+	if err != nil {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("create", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+	now := r.clock.Now().UTC()
+	record := currencymodule.CurrencyWallet{
+		WalletID:       normalized.WalletID,
+		Owner:          normalized.Owner,
+		LifecycleState: normalized.InitialState,
+		WalletVersion:  normalized.InitialVersion,
+		CreatedAt:      now,
+		UpdatedAt:      now,
+		StateChangedAt: now,
+	}
+	record, err = currencymodule.NormalizeCurrencyWalletRecord(record)
+	if err != nil {
+		return currencymodule.CurrencyWallet{}, err
+	}
+	ownerKey := e2eCurrencyOwnerKey(record.Owner)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.wallets[record.WalletID]; ok {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("create", currencymodule.CurrencyWalletConflictWalletAlreadyExists, false)
+	}
+	if _, ok := r.walletIDByOwner[ownerKey]; ok {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("create", currencymodule.CurrencyWalletConflictWalletAlreadyExists, false)
+	}
+	r.wallets[record.WalletID] = cloneCurrencyWalletForE2E(record)
+	r.walletIDByOwner[ownerKey] = record.WalletID
+	return cloneCurrencyWalletForE2E(record), nil
+}
+
+func (r *e2eCurrencyWalletRepository) GetCurrencyWallet(_ context.Context, input currencymodule.GetCurrencyWalletInput) (currencymodule.CurrencyWallet, error) {
+	normalized, err := currencymodule.NormalizeGetCurrencyWalletInput(input)
+	if err != nil {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("get", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	record, ok := r.wallets[normalized.WalletID]
+	if !ok {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("get", currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	return cloneCurrencyWalletForE2E(record), nil
+}
+
+func (r *e2eCurrencyWalletRepository) GetCurrencyWalletForOwner(_ context.Context, input currencymodule.GetCurrencyWalletForOwnerInput) (currencymodule.CurrencyWallet, error) {
+	normalized, err := currencymodule.NormalizeGetCurrencyWalletForOwnerInput(input)
+	if err != nil {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("get_for_owner", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	walletID, ok := r.walletIDByOwner[e2eCurrencyOwnerKey(normalized.Owner)]
+	if !ok {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("get_for_owner", currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	record, ok := r.wallets[walletID]
+	if !ok {
+		return currencymodule.CurrencyWallet{}, e2eCurrencyWalletRepositoryError("get_for_owner", currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	return cloneCurrencyWalletForE2E(record), nil
+}
+
+func (r *e2eCurrencyWalletRepository) ListCurrencyWalletBalances(_ context.Context, input currencymodule.ListCurrencyWalletBalancesInput) (currencymodule.ListCurrencyWalletBalancesResult, error) {
+	normalized, err := currencymodule.NormalizeListCurrencyWalletBalancesInput(input)
+	if err != nil {
+		return currencymodule.ListCurrencyWalletBalancesResult{}, e2eCurrencyWalletRepositoryError("list_balances", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.wallets[normalized.WalletID]; !ok {
+		return currencymodule.ListCurrencyWalletBalancesResult{}, e2eCurrencyWalletRepositoryError("list_balances", currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	balances := make([]currencymodule.CurrencyWalletBalance, 0, len(r.balances))
+	for _, record := range r.balances {
+		if record.WalletID != normalized.WalletID || record.CurrencyCode <= normalized.AfterCurrencyCode {
+			continue
+		}
+		balances = append(balances, cloneCurrencyWalletBalanceForE2E(record))
+	}
+	sort.Slice(balances, func(i, j int) bool {
+		return balances[i].CurrencyCode < balances[j].CurrencyCode
+	})
+	var nextCurrencyCode currencymodule.CurrencyCode
+	if len(balances) > normalized.Limit {
+		nextCurrencyCode = balances[normalized.Limit].CurrencyCode
+		balances = balances[:normalized.Limit]
+	}
+	return currencymodule.NormalizeListCurrencyWalletBalancesResult(currencymodule.ListCurrencyWalletBalancesResult{
+		Balances:         balances,
+		NextCurrencyCode: nextCurrencyCode,
+	})
+}
+
+func (r *e2eCurrencyWalletRepository) RecordCurrencyGrant(_ context.Context, input currencymodule.RecordCurrencyGrantInput) (currencymodule.CurrencyWalletTransaction, error) {
+	normalized, err := currencymodule.NormalizeRecordCurrencyGrantInput(input)
+	if err != nil {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError("record_grant", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+	return r.recordCurrencyMutation("record_grant", normalized.WalletID, normalized.TransactionID, normalized.CurrencyCode, normalized.Amount, normalized.IdempotencyKey, normalized.IdempotencyScope, normalized.Actor, normalized.ReasonCode, normalized.ExternalReference, normalized.MetadataJSON, normalized.ExpectedWalletVersion, normalized.ExpectedBalanceVersion)
+}
+
+func (r *e2eCurrencyWalletRepository) RecordCurrencySpend(_ context.Context, input currencymodule.RecordCurrencySpendInput) (currencymodule.CurrencyWalletTransaction, error) {
+	normalized, err := currencymodule.NormalizeRecordCurrencySpendInput(input)
+	if err != nil {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError("record_spend", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+	return r.recordCurrencyMutation("record_spend", normalized.WalletID, normalized.TransactionID, normalized.CurrencyCode, -normalized.Amount, normalized.IdempotencyKey, normalized.IdempotencyScope, normalized.Actor, normalized.ReasonCode, normalized.ExternalReference, normalized.MetadataJSON, normalized.ExpectedWalletVersion, normalized.ExpectedBalanceVersion)
+}
+
+func (r *e2eCurrencyWalletRepository) ListCurrencyWalletTransactions(_ context.Context, input currencymodule.ListCurrencyWalletTransactionsInput) (currencymodule.ListCurrencyWalletTransactionsResult, error) {
+	normalized, err := currencymodule.NormalizeListCurrencyWalletTransactionsInput(input)
+	if err != nil {
+		return currencymodule.ListCurrencyWalletTransactionsResult{}, e2eCurrencyWalletRepositoryError("list_transactions", currencymodule.CurrencyWalletConflictStorageUnavailable, false)
+	}
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+	if _, ok := r.wallets[normalized.WalletID]; !ok {
+		return currencymodule.ListCurrencyWalletTransactionsResult{}, e2eCurrencyWalletRepositoryError("list_transactions", currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	transactions := make([]currencymodule.CurrencyWalletTransaction, 0, len(r.transactions))
+	for _, record := range r.transactions {
+		if record.WalletID != normalized.WalletID {
+			continue
+		}
+		if normalized.CurrencyCode != "" && record.CurrencyCode != normalized.CurrencyCode {
+			continue
+		}
+		if !normalized.AfterTransactionTime.IsZero() {
+			if record.CreatedAt.Before(normalized.AfterTransactionTime) {
+				continue
+			}
+			if record.CreatedAt.Equal(normalized.AfterTransactionTime) && record.TransactionID <= normalized.AfterTransactionID {
+				continue
+			}
+		} else if normalized.AfterTransactionID != "" && record.TransactionID <= normalized.AfterTransactionID {
+			continue
+		}
+		transactions = append(transactions, cloneCurrencyWalletTransactionForE2E(record))
+	}
+	sort.Slice(transactions, func(i, j int) bool {
+		if transactions[i].CreatedAt.Equal(transactions[j].CreatedAt) {
+			return transactions[i].TransactionID < transactions[j].TransactionID
+		}
+		return transactions[i].CreatedAt.Before(transactions[j].CreatedAt)
+	})
+	var nextTransactionID currencymodule.CurrencyWalletTransactionID
+	var nextTransactionCreateAt time.Time
+	if len(transactions) > normalized.Limit {
+		nextTransactionID = transactions[normalized.Limit].TransactionID
+		nextTransactionCreateAt = transactions[normalized.Limit].CreatedAt
+		transactions = transactions[:normalized.Limit]
+	}
+	return currencymodule.NormalizeListCurrencyWalletTransactionsResult(currencymodule.ListCurrencyWalletTransactionsResult{
+		Transactions:            transactions,
+		NextTransactionID:       nextTransactionID,
+		NextTransactionCreateAt: nextTransactionCreateAt,
+	})
+}
+
+func (r *e2eCurrencyWalletRepository) recordCurrencyMutation(
+	operation string,
+	walletID currencymodule.CurrencyWalletID,
+	transactionID currencymodule.CurrencyWalletTransactionID,
+	currencyCode currencymodule.CurrencyCode,
+	amountDelta currencymodule.CurrencyAmount,
+	idempotencyKey currencymodule.CurrencyWalletIdempotencyKey,
+	idempotencyScope currencymodule.CurrencyWalletIdempotencyScope,
+	actor currencymodule.CurrencyWalletActor,
+	reasonCode string,
+	externalReference string,
+	metadataJSON []byte,
+	expectedWalletVersion *currencymodule.CurrencyWalletVersion,
+	expectedBalanceVersion *currencymodule.CurrencyBalanceVersion,
+) (currencymodule.CurrencyWalletTransaction, error) {
+	kind := currencymodule.CurrencyWalletTransactionGrant
+	if amountDelta < 0 {
+		kind = currencymodule.CurrencyWalletTransactionSpend
+	}
+	now := r.clock.Now().UTC().Add(time.Duration(len(r.transactions)+1) * time.Second)
+
+	r.mu.Lock()
+	defer r.mu.Unlock()
+
+	if _, ok := r.transactionByID[transactionID]; ok {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictDuplicateTransaction, false)
+	}
+	idemKey := e2eCurrencyWalletIdempotencyKey{
+		walletID: walletID,
+		scope:    idempotencyScope,
+		key:      idempotencyKey,
+	}
+	if _, ok := r.transactionByIdemKey[idemKey]; ok {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictDuplicateTransaction, false)
+	}
+	wallet, ok := r.wallets[walletID]
+	if !ok {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictWalletNotFound, false)
+	}
+	if wallet.LifecycleState != currencymodule.CurrencyWalletLifecycleActive {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictWalletNotActive, false)
+	}
+	if expectedWalletVersion != nil && wallet.WalletVersion != *expectedWalletVersion {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictStaleWalletVersion, true)
+	}
+
+	balanceKey := e2eCurrencyWalletBalanceKey{walletID: walletID, currencyCode: currencyCode}
+	balance, exists := r.balances[balanceKey]
+	if !exists {
+		if amountDelta < 0 {
+			return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictInsufficientBalance, false)
+		}
+		balance = currencymodule.CurrencyWalletBalance{
+			WalletID:       walletID,
+			CurrencyCode:   currencyCode,
+			BalanceVersion: currencymodule.InitialCurrencyBalanceVersion,
+			CreatedAt:      now,
+			UpdatedAt:      now,
+		}
+	} else if expectedBalanceVersion != nil && balance.BalanceVersion != *expectedBalanceVersion {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictStaleBalanceVersion, true)
+	}
+
+	nextBalance := balance.BalanceAmount + amountDelta
+	if nextBalance < 0 {
+		return currencymodule.CurrencyWalletTransaction{}, e2eCurrencyWalletRepositoryError(operation, currencymodule.CurrencyWalletConflictInsufficientBalance, false)
+	}
+	balance.BalanceAmount = nextBalance
+	if exists {
+		balance.BalanceVersion++
+	}
+	balance.UpdatedAt = now
+	balance, err := currencymodule.NormalizeCurrencyWalletBalanceRecord(balance)
+	if err != nil {
+		return currencymodule.CurrencyWalletTransaction{}, err
+	}
+	transaction, err := currencymodule.NormalizeCurrencyWalletTransactionRecord(currencymodule.CurrencyWalletTransaction{
+		TransactionID:     transactionID,
+		WalletID:          walletID,
+		CurrencyCode:      currencyCode,
+		TransactionKind:   kind,
+		AmountDelta:       amountDelta,
+		BalanceAfter:      nextBalance,
+		IdempotencyKey:    idempotencyKey,
+		IdempotencyScope:  idempotencyScope,
+		Actor:             actor,
+		ReasonCode:        reasonCode,
+		ExternalReference: externalReference,
+		MetadataJSON:      cloneBytesForE2E(metadataJSON),
+		CreatedAt:         now,
+	})
+	if err != nil {
+		return currencymodule.CurrencyWalletTransaction{}, err
+	}
+
+	r.balances[balanceKey] = cloneCurrencyWalletBalanceForE2E(balance)
+	r.transactions = append(r.transactions, cloneCurrencyWalletTransactionForE2E(transaction))
+	r.transactionByID[transaction.TransactionID] = cloneCurrencyWalletTransactionForE2E(transaction)
+	r.transactionByIdemKey[idemKey] = cloneCurrencyWalletTransactionForE2E(transaction)
+	return cloneCurrencyWalletTransactionForE2E(transaction), nil
+}
+
+func e2eCurrencyOwnerKey(owner currencymodule.CurrencyWalletOwner) e2eCurrencyWalletOwnerKey {
+	return e2eCurrencyWalletOwnerKey{kind: owner.Kind, id: owner.ID}
+}
+
+func e2eCurrencyWalletRepositoryError(operation string, class currencymodule.CurrencyWalletConflictClass, retryable bool) error {
+	kind := currencymodule.ErrCurrencyWalletConflict
+	if class == currencymodule.CurrencyWalletConflictStorageUnavailable {
+		kind = currencymodule.ErrCurrencyWalletUnavailable
+	}
+	return &currencymodule.CurrencyWalletRepositoryError{
+		Kind: kind,
+		Conflict: currencymodule.CurrencyWalletConflict{
+			Class:          class,
+			Retryable:      retryable,
+			RedactedReason: string(class),
+		},
+		Operation:      operation,
+		RedactedReason: string(class),
+	}
+}
+
 type e2eRegistryConnectionBinder struct {
 	binder   app.ConnectionBinder
 	registry *appconnection.InMemoryRegistry
@@ -2279,5 +2860,26 @@ func cloneFriendRelationshipForE2E(record friendsmodule.FriendRelationship) frie
 		removedAt := *record.RemovedAt
 		record.RemovedAt = &removedAt
 	}
+	return record
+}
+
+func cloneCurrencyWalletForE2E(record currencymodule.CurrencyWallet) currencymodule.CurrencyWallet {
+	if record.SuspendedAt != nil {
+		suspendedAt := *record.SuspendedAt
+		record.SuspendedAt = &suspendedAt
+	}
+	if record.ClosedAt != nil {
+		closedAt := *record.ClosedAt
+		record.ClosedAt = &closedAt
+	}
+	return record
+}
+
+func cloneCurrencyWalletBalanceForE2E(record currencymodule.CurrencyWalletBalance) currencymodule.CurrencyWalletBalance {
+	return record
+}
+
+func cloneCurrencyWalletTransactionForE2E(record currencymodule.CurrencyWalletTransaction) currencymodule.CurrencyWalletTransaction {
+	record.MetadataJSON = cloneBytesForE2E(record.MetadataJSON)
 	return record
 }

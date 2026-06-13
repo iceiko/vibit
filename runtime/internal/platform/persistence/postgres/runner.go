@@ -8,6 +8,7 @@ import (
 
 	"github.com/iceiko/vibit/runtime/internal/app/session"
 	"github.com/iceiko/vibit/runtime/internal/modules/authentication"
+	"github.com/iceiko/vibit/runtime/internal/modules/currency"
 	"github.com/iceiko/vibit/runtime/internal/modules/friends"
 	"github.com/iceiko/vibit/runtime/internal/modules/inventory"
 	"github.com/iceiko/vibit/runtime/internal/modules/player"
@@ -150,4 +151,12 @@ func (u UnitOfWork) NewFriendRelationshipRepository() (friends.Repository, error
 		return nil, err
 	}
 	return NewFriendRelationshipRepositoryForUnitOfWork(executor), nil
+}
+
+func (u UnitOfWork) NewCurrencyWalletRepository() (currency.Repository, error) {
+	executor, err := u.Executor()
+	if err != nil {
+		return nil, err
+	}
+	return NewCurrencyWalletRepositoryForUnitOfWork(executor), nil
 }

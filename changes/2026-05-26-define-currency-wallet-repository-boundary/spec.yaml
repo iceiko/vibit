@@ -1,0 +1,250 @@
+schema_version: 0.1
+change_id: define-currency-wallet-repository-boundary
+date: 2026-06-07
+type: feature
+status: verified
+
+summary: Define the currency wallet repository boundary and open the repository interface implementation follow-up without adding repository interface implementation, PostgreSQL adapters, runtime behavior, protocol shape, generated output, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+  - currency
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  repository_interfaces_changed: false
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - future currency wallet repository ownership candidate recorded under runtime/internal/modules/currency
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: false
+  postgresql_adapters_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Define the currency wallet repository boundary after the migration source while preserving repository implementation, adapter, runtime, protocol, generated, dependency, hosted, SDK, distributed, and direct compatibility deferrals."
+user_visible_outcome: A completed repository-boundary-only slice records future currency wallet repository value types, capabilities, conflicts, idempotency handoff, transaction posture, adapter expectations, and opens the repository interface follow-up.
+capability_family: economy_inventory_rewards_currencies_and_progression
+
+runtime:
+  currency_wallet_repository_boundary: defined
+  implementation_authorized_by_this_standard: false
+  completed_work_item: W-0295
+  completed_milestone: M-223
+  previous_completed_work_item: W-0294
+  next_milestone: M-224
+  next_work_item: W-0296
+  next_work_item_status: next_ready
+  tier: tier_2_architecture_boundary
+  selected_direction: define_currency_wallet_repository_boundary
+  next_direction: implement_currency_wallet_repository_interface
+  decision: ADR-0203
+  check_rule: runtime.currency_wallet_repository_boundary
+  standard: docs/currency-wallet-repository-boundary.md
+  translation: docs/currency-wallet-repository-boundary.zh-CN.md
+  source_migration_source_decision: ADR-0202
+  source_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  source_schema_gate_decision: ADR-0201
+  source_lifecycle_gate_decision: ADR-0200
+  future_repository_owner_candidate: runtime/internal/modules/currency
+  future_repository_interface_candidate: runtime/internal/modules/currency.Repository
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  currency_wallets_logical_table: currency_wallets
+  currency_wallet_balances_logical_table: currency_wallet_balances
+  currency_wallet_transactions_logical_table: currency_wallet_transactions
+  candidate_value_types_recorded: true
+  candidate_repository_capabilities_recorded: true
+  identity_handoff_recorded: true
+  transaction_idempotency_handoff_recorded: true
+  version_conflict_handoff_recorded: true
+  redaction_posture_recorded: true
+  postgresql_adapter_expectations_recorded: true
+  stop_conditions_recorded: true
+  future_repository_interface_work_item: W-0296
+  future_repository_interface_direction: implement_currency_wallet_repository_interface
+  repository_boundary_gate_only: true
+  repository_interface_added: false
+  repository_interface_changed: false
+  postgresql_adapter_added: false
+  postgresql_adapter_changed: false
+  runtime_behavior_added: false
+  wallet_transaction_behavior_added: false
+  grant_spend_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  paid_currency_behavior_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+repository_boundary:
+  candidate_value_types:
+    - CurrencyWallet
+    - CurrencyWalletID
+    - CurrencyWalletOwner
+    - CurrencyWalletLifecycleState
+    - CurrencyWalletVersion
+    - CurrencyWalletBalance
+    - CurrencyCode
+    - CurrencyAmount
+    - CurrencyBalanceVersion
+    - CurrencyWalletTransaction
+    - CurrencyWalletTransactionID
+    - CurrencyWalletTransactionKind
+    - CurrencyWalletActor
+    - CurrencyWalletIdempotencyKey
+    - CurrencyWalletIdempotencyScope
+    - CreateCurrencyWalletInput
+    - GetCurrencyWalletInput
+    - GetCurrencyWalletForOwnerInput
+    - ListCurrencyWalletBalancesInput
+    - RecordCurrencyGrantInput
+    - RecordCurrencySpendInput
+    - ListCurrencyWalletTransactionsInput
+    - CurrencyWalletConflict
+    - CurrencyWalletRepositoryError
+  candidate_repository_capabilities:
+    - CreateCurrencyWallet
+    - GetCurrencyWallet
+    - GetCurrencyWalletForOwner
+    - ListCurrencyWalletBalances
+    - RecordCurrencyGrant
+    - RecordCurrencySpend
+    - ListCurrencyWalletTransactions
+  candidate_conflict_classes:
+    - wallet_not_found
+    - wallet_already_exists
+    - wallet_owner_mismatch
+    - wallet_not_active
+    - currency_balance_not_found
+    - invalid_currency_code
+    - invalid_currency_amount
+    - insufficient_balance
+    - duplicate_transaction
+    - conflicting_duplicate_transaction
+    - invalid_idempotency_key
+    - invalid_transaction_kind
+    - version_mismatch
+    - stale_wallet_version
+    - stale_balance_version
+    - storage_unavailable
+
+test_plan:
+  positive_behavior:
+    - Not applicable in this gate; no runtime behavior is added.
+  negative_behavior:
+    - Not applicable in this gate; no runtime behavior is added.
+  repository_checks:
+    - node tools/vibit check change define-currency-wallet-repository-boundary --json
+    - node tools/vibit inspect rule runtime.currency_wallet_repository_boundary
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+
+implementation_boundaries:
+  allowed:
+    - docs/currency-wallet-repository-boundary.md
+    - docs/currency-wallet-repository-boundary.zh-CN.md
+    - decisions/ADR-0203-currency-wallet-repository-boundary.md
+    - conversations/2026-05-26-currency-wallet-repository-boundary.md
+    - changes/2026-05-26-define-currency-wallet-repository-boundary/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - Go repository interface implementation
+    - PostgreSQL adapter implementation
+    - SQL execution from Go
+    - runtime currency wallet behavior
+    - grant execution
+    - spend execution
+    - reward integration
+    - inventory integration
+    - purchase behavior
+    - paid currency behavior
+    - currency catalog table creation
+    - currency wallet event table creation
+    - reservations, settlement, refunds, or transfers
+    - protocol routes
+    - Protobuf source
+    - generated output
+    - dependencies
+    - startup wiring
+    - authentication/session behavior changes
+    - hosted deployments
+    - SDK publication
+    - release artifacts
+    - distributed runtime
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_repository_boundary
+    - node tools/vibit check change define-currency-wallet-repository-boundary --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+  status: Verified

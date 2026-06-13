@@ -1,0 +1,164 @@
+schema_version: 0.1
+change_id: implement-currency-wallet-repository-interface
+date: 2026-06-07
+type: feature
+status: verified
+
+summary: Implement the storage-neutral currency wallet repository interface without PostgreSQL adapter behavior, SQL execution, runtime wallet behavior, protocol routes, generated output, migration changes, reward/inventory/purchase integration, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - currency
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0204
+  referenced:
+    - ADR-0203
+    - ADR-0202
+    - ADR-0201
+    - ADR-0200
+    - ADR-0199
+    - ADR-0078
+    - ADR-0019
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources_changed: []
+  logical_tables_added: []
+  repository_interfaces_added: true
+  postgresql_adapters_changed: false
+  ownership_changes:
+    - runtime/internal/modules/currency owns storage-neutral currency wallet repository vocabulary.
+    - modules/currency/module.yaml records module ownership and forbidden scope.
+    - ADR-0204 records the repository interface implementation decision.
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  protobuf_messages_added: false
+  generated_outputs_changed: false
+  migrations_added: false
+  dependencies_added: false
+  repository_interfaces_added: true
+  postgresql_adapters_added: false
+  release_status_changed: false
+  additional_release_artifacts_created: false
+  public_announcement_executed: false
+  hosted_deployment_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+user_requirement: "Implement the storage-neutral currency wallet repository interface after the currency wallet repository boundary, preserving Nakama/Hiro economy planning and deferring PostgreSQL adapter, runtime, protocol, generated, reward, inventory, purchase, and direct compatibility scope."
+user_visible_outcome: Future agents can inspect a typed currency wallet repository interface, module manifest, and tests before implementing the PostgreSQL adapter gate or runtime wallet behavior.
+capability_family: economy_inventory_rewards_currencies_and_progression
+
+runtime:
+  go_code_added: true
+  generated_code_added: false
+  completed_work_item: W-0296
+  completed_milestone: M-224
+  previous_completed_work_item: W-0295
+  next_milestone: M-225
+  next_work_item: W-0297
+  next_work_item_status: next_ready
+  tier: tier_2_data
+  selected_direction: implement_currency_wallet_repository_interface
+  next_direction: define_currency_wallet_postgresql_adapter_gate
+  decision: ADR-0204
+  check_rule: runtime.currency_wallet_repository_interface_implementation
+  currency_wallet_repository_interface_implementation_completed: true
+  currency_wallet_repository_interface_implementation_decision: ADR-0204
+  currency_wallet_repository_interface_implementation_check_rule: runtime.currency_wallet_repository_interface_implementation
+  source_repository_boundary_decision: ADR-0203
+  source_repository_boundary_standard: docs/currency-wallet-repository-boundary.md
+  source_migration_source_decision: ADR-0202
+  source_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  repository_owner: runtime/internal/modules/currency
+  repository_interface: runtime/internal/modules/currency.Repository
+  repository_source: runtime/internal/modules/currency/repository.go
+  repository_tests: runtime/internal/modules/currency/repository_test.go
+  module_manifest: modules/currency/module.yaml
+  module_agent_guide: modules/currency/AGENTS.md
+  module_agent_guide_translation: modules/currency/AGENTS.zh-CN.md
+  interface_added: true
+  value_types_added: true
+  normalizers_added: true
+  redacted_errors_added: true
+  module_manifest_added: true
+  postgresql_adapter_added: false
+  postgresql_adapter_changed: false
+  sql_execution_added: false
+  runtime_behavior_added: false
+  wallet_transaction_behavior_added: false
+  grant_spend_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  paid_currency_behavior_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  future_postgresql_adapter_gate_work_item: W-0297
+  future_postgresql_adapter_gate_direction: define_currency_wallet_postgresql_adapter_gate
+
+verification:
+  status: Verified
+  commands:
+    - cd runtime && go test ./internal/modules/currency
+    - cd runtime && go test ./...
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.currency_wallet_repository_interface_implementation
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change implement-currency-wallet-repository-interface --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check
+    - rg -n 'ghp_[A-Za-z0-9_]{20,}|github_pat_[A-Za-z0-9_]+' --glob '!node_modules/**' --glob '!.git/**' --glob '!.vibit.local.env'

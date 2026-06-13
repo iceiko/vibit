@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-218
+current_milestone: M-230
 
 release_targets:
   short_term:
@@ -13,12 +13,12 @@ release_targets:
     decision: ADR-0086
     defined_by_work_item: W-0179
     goal: Make the first developer-usable alpha that external contributors can run, inspect, and build from.
-    current_release_state: startup_shutdown_hook_boundary_gate_defined
+    current_release_state: currency_wallet_protocol_route_implemented
     release_declared: true
     release_identifier: v0.1.0-alpha.1
-    next_ready_work_item: W-0290
+    next_ready_work_item: none
     preferred_after_current:
-      - implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+      - no_next_ready_work_item
   long_term:
     id: ai_era_nakama_pitaya_class_server_framework
     standard: docs/nakama-pitaya-product-parity-roadmap.md
@@ -32,6 +32,7 @@ release_targets:
 
 continuation_semantics:
   default_step_unit: work_item
+  historical_next_ready_status_marker: "status: next_ready"
   one_step_request:
     phrases:
       - continue
@@ -3779,7 +3780,8 @@ milestones:
 
   - id: M-218
     title: Pitaya-Aligned Startup And Shutdown Hook Source-First Map
-    status: active
+    status: completed
+    historical_current_milestone: M-218
     goal: Implement a source-first inspection map for Pitaya-aligned startup and shutdown hook vocabulary after the boundary gate, without implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
     completion_criteria:
       - A source-first inspection map reports the startup and shutdown hook boundary vocabulary.
@@ -3787,6 +3789,151 @@ milestones:
       - Repository checks verify the map and explicit implementation deferrals.
     non_goals:
       - implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the source-first Pitaya-aligned startup and shutdown hook inspection map through `node tools/vibit inspect pitaya-startup-shutdown --json`, accepted `ADR-0198`, registered `runtime.pitaya_aligned_startup_shutdown_hook_source_first_map`, completed `W-0290`, and opened `M-219/W-0291 Select next Pitaya-aligned direction after startup and shutdown hook map` as next-ready. Preserved startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-219
+    title: Select Next Pitaya-Aligned Direction After Startup And Shutdown Hook Map
+    status: completed
+    goal: Select the next bounded Pitaya-aligned direction after the startup and shutdown hook source-first map, without implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The next Pitaya-aligned direction after the startup and shutdown hook source-first map is selected.
+      - Repository memory records the selected follow-up as a bounded work item.
+      - Repository checks verify the selection and explicit implementation deferrals.
+    non_goals:
+      - implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboard behavior, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Selected `define_currency_wallet_lifecycle_boundary_gate` as the next bounded direction after the Pitaya-aligned startup and shutdown hook source-first map, accepted `ADR-0199`, registered `runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map`, completed `W-0291`, and opened `M-220/W-0292 Define currency wallet lifecycle boundary gate` as next-ready. Preserved currency wallet behavior, balance tables, wallet transaction behavior, reward integration, startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery/loading behavior, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-220
+    title: Currency Wallet Lifecycle Boundary Gate
+    status: completed
+    goal: Define a gate-only currency wallet lifecycle boundary as the first Phase 3 core game backend module direction after the Pitaya-aligned startup and shutdown hook map, without implementing currency wallet behavior, balance tables, wallet transaction behavior, reward integration, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - Currency wallet lifecycle vocabulary is defined as a boundary gate only.
+      - Nakama/Hiro economy capability mapping is recorded without adopting direct public APIs.
+      - Repository checks verify the gate and explicit implementation deferrals.
+    non_goals:
+      - implementing currency wallet behavior, balance tables, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, audit/event tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the gate-only currency wallet lifecycle vocabulary boundary, accepted `ADR-0200`, registered `runtime.currency_wallet_lifecycle_boundary_gate`, completed `W-0292`, and opened `M-221/W-0293 Define currency wallet persistence schema gate` as next-ready. Preserved currency wallet behavior, balance tables, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend execution, audit/event tables, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-221
+    title: Currency Wallet Persistence Schema Gate
+    status: completed
+    goal: Define a gate-only currency wallet persistence schema boundary after the lifecycle vocabulary gate, without adding migration source, balance tables, wallet transaction behavior, runtime behavior, protocol shape, generated output, repository interfaces, PostgreSQL adapters, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - Currency wallet persistence schema candidates are defined as a gate only.
+      - Balance, wallet, transaction or ledger, catalog, and idempotency persistence posture is recorded without creating migration source.
+      - Repository checks verify the schema gate and explicit implementation deferrals.
+    non_goals:
+      - implementing currency wallet behavior, balance tables, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, audit/event tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the gate-only currency wallet persistence schema boundary, accepted `ADR-0201`, registered `runtime.currency_wallet_persistence_schema_gate`, completed `W-0293`, recorded future PostgreSQL table candidates for `currency_wallets`, `currency_wallet_balances`, and `currency_wallet_transactions`, selected `runtime/migrations/postgres/000008_create_currency_wallets.sql` as the future migration source candidate, and opened `M-222/W-0294 Add currency wallet migration source` as next-ready. Preserved migration source creation, currency wallet tables, runtime behavior, protocol shape, generated output, repositories, adapters, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-222
+    title: Currency Wallet Migration Source
+    status: completed
+    goal: Add the first currency wallet SQL migration source after the persistence schema gate, without adding runtime behavior, protocol shape, generated output, repository interfaces, PostgreSQL adapters, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The currency wallet migration source exists and follows the persistence schema gate.
+      - The migration source defines wallet, balance, and transaction table posture without adding runtime behavior.
+      - Repository checks verify the migration source and explicit implementation deferrals.
+    non_goals:
+      - implementing currency wallet behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, runtime behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Added the currency wallet PostgreSQL migration source for `currency_wallets`, `currency_wallet_balances`, and `currency_wallet_transactions`; accepted `ADR-0202`; registered `runtime.currency_wallet_migration_source`; and opened `M-223/W-0295 Define currency wallet repository boundary` as next-ready. Preserved runtime behavior, protocol shape, generated output, repository interfaces, PostgreSQL adapters, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-223
+    title: Currency Wallet Repository Boundary
+    status: completed
+    goal: Define the currency wallet storage-neutral repository boundary after the migration source, without adding repository interface implementation, PostgreSQL adapters, runtime behavior, protocol shape, generated output, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The currency wallet repository boundary is documented.
+      - Candidate repository owner, value types, capabilities, conflicts, transaction/idempotency handoff, and redaction posture are recorded.
+      - Repository checks verify the boundary and explicit implementation deferrals.
+    non_goals:
+      - implementing repository interfaces, PostgreSQL adapters, currency wallet behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, runtime behavior, transport behavior changes, protocol messages or routes, generated output, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the currency wallet storage-neutral repository boundary, accepted `ADR-0203`, registered `runtime.currency_wallet_repository_boundary`, recorded candidate value types, capabilities, conflicts, transaction/idempotency handoff, redaction, PostgreSQL adapter expectations, and opened `M-224/W-0296 Implement storage-neutral currency wallet repository interface` as next-ready. Preserved repository interface implementation, PostgreSQL adapters, runtime behavior, protocol shape, generated output, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: M-224
+    title: Currency Wallet Repository Interface Implementation
+    status: completed
+    goal: Implement the storage-neutral currency wallet repository interface after the repository boundary, without adding PostgreSQL adapters, runtime behavior, protocol shape, generated output, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The storage-neutral currency wallet repository interface exists under the currency module owner.
+      - Focused tests cover value types, normalization, conflict vocabulary, idempotency inputs, redaction, and storage neutrality.
+      - Repository checks verify no PostgreSQL adapter, runtime behavior, protocol shape, generated output, dependency, or direct compatibility scope is added.
+    non_goals:
+      - implementing PostgreSQL adapters, SQL execution, currency wallet runtime behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, transport behavior changes, protocol messages or routes, generated output, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the storage-neutral currency wallet repository interface, value types, normalizers, idempotency input handling, conflict vocabulary, redacted repository errors, module manifest and module AGENTS guides, accepted `ADR-0204`, registered `runtime.currency_wallet_repository_interface_implementation`, and opened `M-225/W-0297 Define currency wallet PostgreSQL adapter gate` as next-ready. Preserved PostgreSQL adapter, SQL execution, runtime behavior, protocol shape, generated output, dependency, migration, authentication/session, reward, inventory, purchase, hosted, SDK, release, distributed runtime, and direct compatibility deferrals.
+
+  - id: M-225
+    title: Currency Wallet PostgreSQL Adapter Gate
+    status: completed
+    goal: Define the future currency wallet PostgreSQL adapter gate after the storage-neutral repository interface, without adding adapter implementation, SQL execution, runtime behavior, protocol shape, generated output, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The future currency wallet PostgreSQL adapter owner, source/test candidates, constructor expectations, unit-of-work handoff, SQL mapping boundaries, and fake-executor test posture are recorded before adapter code exists.
+      - Repository checks verify the gate remains documentation/manifest-only and does not add SQL execution, adapter implementation, runtime behavior, protocol shape, generated output, dependencies, or direct compatibility scope.
+      - The next adapter implementation work item is opened only after the gate records explicit stop conditions.
+    non_goals:
+      - implementing PostgreSQL adapters, SQL execution, currency wallet runtime behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, transport behavior changes, protocol messages or routes, generated output, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the future currency wallet PostgreSQL adapter gate, accepted `ADR-0205`, registered `runtime.currency_wallet_postgresql_adapter_gate`, recorded future platform adapter ownership, source/test candidates, constructor posture, caller-supplied unit-of-work handoff, SQL mapping posture, idempotency/version/insufficient-balance conflict mapping, redaction, fake-executor test expectations, and opened `M-226/W-0298 Implement currency wallet PostgreSQL adapter` as next-ready. Preserved adapter implementation, SQL execution, runtime behavior, protocol shape, generated output, dependencies, migrations, authentication/session, reward, inventory, purchase, catalog/event, hosted, SDK, release, distributed runtime, and direct compatibility deferrals.
+
+  - id: M-226
+    title: Currency Wallet PostgreSQL Adapter Implementation
+    status: completed
+    goal: Implement the currency wallet PostgreSQL adapter after the adapter gate, without adding runtime wallet behavior, protocol shape, generated output, dependencies, migration changes, reward/inventory/purchase integration, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The PostgreSQL adapter implements `runtime/internal/modules/currency.Repository` under the platform persistence package.
+      - Focused adapter tests cover constructor handoff, SQL mapping, idempotency, version checks, insufficient balance, redacted driver errors, and absence of transaction-control SQL.
+      - Repository checks verify no runtime behavior, protocol shape, generated output, dependency, migration, integration, or direct compatibility scope is added.
+    non_goals:
+      - implementing currency wallet runtime behavior, reward integration, inventory integration, purchase behavior, transport behavior changes, protocol messages or routes, generated output, dependencies, migrations, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the currency wallet PostgreSQL adapter, accepted `ADR-0206`, registered `runtime.currency_wallet_postgresql_adapter_implementation`, added `runtime/internal/platform/persistence/postgres/currency_wallet_repository.go`, focused fake-executor tests, and `UnitOfWork.NewCurrencyWalletRepository`; opened `M-227/W-0299 Define currency wallet runtime behavior gate` as next-ready; and preserved runtime/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: M-227
+    title: Currency Wallet Runtime Behavior Gate
+    status: completed
+    goal: Define the future currency wallet runtime behavior gate after the PostgreSQL adapter implementation, without adding runtime handlers, protocol shape, generated output, dependencies, migration changes, reward/inventory/purchase integration, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The future runtime behavior owner, service candidate, command/query posture, request identity handoff, unit-of-work composition, public error mapping, and adapter use boundaries are recorded before runtime behavior code exists.
+      - Repository checks verify the gate remains documentation/manifest-only and does not add runtime behavior, protocol shape, generated output, dependencies, migrations, integrations, or direct compatibility scope.
+      - The next runtime behavior implementation work item is opened only after the gate records explicit stop conditions.
+    non_goals:
+      - implementing currency wallet runtime behavior, reward integration, inventory integration, purchase behavior, transport behavior changes, protocol messages or routes, generated output, dependencies, migrations, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined the currency wallet runtime behavior gate, accepted `ADR-0207`, registered `runtime.currency_wallet_runtime_behavior_gate`, recorded future application ownership under `runtime/internal/app`, the `runtime/internal/app/currency` service candidate, validated request identity owner derivation, actor derivation, route-policy posture, unit-of-work handoff, validation/conflict/redaction/idempotency expectations, and opened `M-228/W-0300 Implement currency wallet runtime behavior` as next-ready while preserving runtime implementation/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: M-228
+    title: Currency Wallet Runtime Behavior Implementation
+    status: completed
+    goal: Implement application-owned currency wallet runtime behavior after the runtime behavior gate, without adding protocol routes, Protobuf sources, generated output, dependencies, migration changes, startup wiring, authentication/session behavior changes, reward/inventory/purchase integration, catalog/event tables, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The application-owned currency wallet service derives player wallet ownership from validated request identity and uses the currency repository through unit-of-work handoff.
+      - Focused tests cover validated identity requirements, metadata-only identity refusal, wallet creation/read/list, grant/spend behavior, transaction listing, idempotency, conflict mapping, redaction, and repository handoff.
+      - Repository checks verify no protocol shape, generated output, dependency, migration, reward/inventory/purchase integration, catalog/event, hosted, SDK, distributed, or direct compatibility scope is added.
+    non_goals:
+      - adding protocol messages or routes, generated output, dependencies, migrations, startup wiring, authentication/session behavior changes, reward integration, inventory integration, purchase behavior, catalog/event tables, payment behavior, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented application-owned currency wallet runtime behavior under `runtime/internal/app/currency`, accepted `ADR-0208`, registered `runtime.currency_wallet_runtime_behavior_implementation`, added `Service`, player wallet ensure/get/balance-list/transaction-list plus grant and spend operations, validated request identity owner derivation, metadata-only identity refusal, unit-of-work `NewCurrencyWalletRepository` handoff, server-owned wallet and transaction id generation, redacted public error mapping, and focused fake-repository tests; opened `M-229/W-0301 Define currency wallet protocol route gate` as next-ready; and preserved protocol/generated/dependency/migration/startup/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: M-229
+    title: Currency Wallet Protocol Route Gate
+    status: completed
+    goal: Define the future currency wallet protocol route gate after the application-owned runtime behavior implementation, without adding protocol routes, Protobuf sources, generated output, startup wiring, dependencies, migrations, reward/inventory/purchase integration, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - Future route names, payload candidates, application handler owner, protocol adapter owner, route policy, public error mapping, and generated output expectations are recorded before protocol code exists.
+      - Repository checks verify the gate remains documentation/manifest-only and does not add Protobuf source, generated output, runtime handler wiring, startup wiring, dependencies, migrations, integrations, or direct compatibility scope.
+      - The next protocol route implementation work item is opened only after the gate records explicit stop conditions.
+    non_goals:
+      - adding protocol messages or routes, generated output, startup wiring, dependencies, migrations, authentication/session behavior changes, reward integration, inventory integration, purchase behavior, catalog/event tables, payment behavior, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Defined `docs/currency-wallet-protocol-route-gate.md` and `docs/currency-wallet-protocol-route-gate.zh-CN.md`, accepted `ADR-0209`, registered `runtime.currency_wallet_protocol_route_gate`, recorded future protected routes `currency.EnsurePlayerWallet`, `currency.GetOwnWallet`, `currency.ListOwnWalletBalances`, `currency.GrantCurrency`, `currency.SpendCurrency`, and `currency.ListOwnWalletTransactions`, candidate `vibit.currency.v1` Protobuf shapes, request-token protection, authenticated wrapper handoff, validated request identity as owner proof, metadata-only identity refusal, no client-supplied owner/wallet/actor proof, server-authoritative grant policy expectations, public `CURRENCY_WALLET_*` error mapping, generated-output expectations, local proof expectations, Nakama/Pitaya reference mapping, required future tests, and stop conditions. No route implementation, Protobuf source/generated output, dependencies, migrations, startup wiring, authentication/session changes, reward/inventory/purchase behavior, catalog/event/payment behavior, hosted/SDK/release scope, distributed runtime, or direct compatibility were added.
+
+  - id: M-230
+    title: Currency Wallet Protocol Route Implementation
+    status: active
+    goal: Implement the protected currency wallet protocol route family after the route gate, without adding unrelated reward/inventory/purchase behavior, catalog/event/payment behavior, migrations, dependencies beyond generated protocol output, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+    completion_criteria:
+      - The authorized currency wallet route family is exposed through the existing WebSocket/Protobuf request path with explicit route registration, generated output, protocol bridge mapping, application handler ownership, and protected-route identity handoff.
+      - Focused tests cover route registration, command/query kind mapping, metadata-only identity refusal, no client-supplied owner/wallet/actor proof, public error mapping, grant route policy, redaction, and generated-output traceability.
+      - Repository checks verify no unrelated reward, inventory, purchase, catalog, event/audit, payment, migration, dependency, hosted, SDK, distributed, or direct compatibility scope is added.
+    non_goals:
+      - adding reward integration, inventory integration, purchase behavior, catalog tables, event/audit tables, payment behavior, reservation behavior, settlement behavior, refund behavior, transfer behavior, operations/admin behavior, broad economy policy, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
+    completion_summary: Implemented the protected currency wallet protocol route family, accepted `ADR-0210`, registered `runtime.currency_wallet_protocol_route_implementation`, added `proto/vibit/currency/v1/currency.proto`, generated Go Protobuf output, route key helpers, bootstrap handlers, protocol bridge mapping, payload registry dispatch, server-authoritative grant policy enforcement, focused route/bootstrap/bridge tests, and `TestCurrencyWalletProtocolRouteLocalAlphaFlow`; allowed zero-field proto3 authenticated payloads only when the registered payload descriptor has zero fields; preserved reward/inventory/purchase/catalog/event/payment/migration/dependency/startup/hosted/SDK/distributed/direct-compatibility deferrals; and left no repository next work item currently ready.
 
 work_items:
   - id: W-0001
@@ -12431,13 +12578,16 @@ work_items:
   - id: W-0290
     milestone: M-218
     title: Implement Pitaya-aligned startup and shutdown hook source-first map
-    status: next_ready
+    status: completed
     change: changes/2026-05-26-implement-pitaya-aligned-startup-shutdown-hook-source-first-map
     depends_on:
       - W-0289
     expected_change_id: implement-pitaya-aligned-startup-shutdown-hook-source-first-map
     tier: tier_2_architecture_inspection
     selected_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    decision: ADR-0198
+    check_rule: runtime.pitaya_aligned_startup_shutdown_hook_source_first_map
+    command: node tools/vibit inspect pitaya-startup-shutdown --json
     gate_decision: ADR-0197
     selection_decision: ADR-0196
     source_map_decision: ADR-0195
@@ -12498,3 +12648,486 @@ work_items:
       - Implement a source-first startup and shutdown hook inspection map.
       - Report current explicit bootstrap composition and lifecycle hook deferrals without adding behavior.
       - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-218
+    previous_completed_work_item: W-0289
+    next_milestone: M-219
+    next_ready_work_item: W-0291
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    completion_summary: Implemented the source-first Pitaya-aligned startup and shutdown hook inspection map and opened `W-0291 Select next Pitaya-aligned direction after startup and shutdown hook map` as next-ready. Preserved startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, dashboards, admin console behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, and direct compatibility deferrals.
+
+  - id: W-0291
+    milestone: M-219
+    title: Select next Pitaya-aligned direction after startup and shutdown hook map
+    status: completed
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map
+    depends_on:
+      - W-0290
+    expected_change_id: select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map
+    tier: tier_2_architecture_selection
+    selected_direction: select_next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    selected_follow_up_direction: define_currency_wallet_lifecycle_boundary_gate
+    decision: ADR-0199
+    check_rule: runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    source_map_decision: ADR-0198
+    gate_decision: ADR-0197
+    selection_decision: ADR-0196
+    related_decisions:
+      - ADR-0198
+      - ADR-0197
+      - ADR-0196
+      - ADR-0195
+      - ADR-0194
+      - ADR-0193
+      - ADR-0192
+      - ADR-0191
+      - ADR-0190
+      - ADR-0189
+      - ADR-0188
+      - ADR-0187
+      - ADR-0186
+      - ADR-0185
+      - ADR-0184
+      - ADR-0183
+      - ADR-0182
+      - ADR-0181
+      - ADR-0180
+      - ADR-0179
+      - ADR-0178
+      - ADR-0177
+      - ADR-0176
+      - ADR-0175
+      - ADR-0174
+      - ADR-0173
+      - ADR-0172
+      - ADR-0171
+      - ADR-0170
+      - ADR-0169
+      - ADR-0168
+      - ADR-0167
+      - ADR-0166
+      - ADR-0165
+      - ADR-0164
+      - ADR-0163
+      - ADR-0162
+      - ADR-0161
+      - ADR-0160
+      - ADR-0159
+      - ADR-0158
+      - ADR-0157
+      - ADR-0156
+      - ADR-0155
+      - ADR-0154
+      - ADR-0153
+      - ADR-0152
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing startup hook behavior, shutdown hook behavior, lifecycle hook execution, dependency container behavior, component discovery behavior, component loading behavior, component module loading behavior, handler module registration behavior, handler registration behavior, dynamic handler registration, runtime endpoint behavior, metrics endpoints, tracing pipelines, observability pipelines, dashboards, admin console behavior, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of selecting only the next bounded direction.
+    completion:
+      - Select the next bounded Pitaya-aligned direction after the startup and shutdown hook source-first map.
+      - Open the selected follow-up work item.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-219
+    previous_completed_work_item: W-0290
+    next_milestone: M-220
+    next_ready_work_item: W-0292
+    completion_summary: Selected `define_currency_wallet_lifecycle_boundary_gate` as the next bounded direction after the startup and shutdown hook source-first map, opened `W-0292 Define currency wallet lifecycle boundary gate`, and preserved currency wallet behavior, balance tables, wallet transaction behavior, reward integration, runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation, and direct-compatibility deferrals.
+
+  - id: W-0292
+    milestone: M-220
+    title: Define currency wallet lifecycle boundary gate
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-lifecycle-boundary-gate
+    depends_on:
+      - W-0291
+    expected_change_id: define-currency-wallet-lifecycle-boundary-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_currency_wallet_lifecycle_boundary_gate
+    selected_follow_up_direction: define_currency_wallet_persistence_schema_gate
+    decision: ADR-0200
+    check_rule: runtime.currency_wallet_lifecycle_boundary_gate
+    standard: docs/currency-wallet-lifecycle-boundary-gate.md
+    translation: docs/currency-wallet-lifecycle-boundary-gate.zh-CN.md
+    selection_decision: ADR-0199
+    related_decisions:
+      - ADR-0200
+      - ADR-0199
+      - ADR-0198
+      - ADR-0197
+      - ADR-0196
+      - ADR-0151
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing currency wallet behavior, balance tables, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, audit/event tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the boundary gate.
+    completion:
+      - Define the currency wallet lifecycle vocabulary boundary.
+      - Record Nakama/Hiro economy capability mapping and vibit ownership.
+      - Preserve runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-220
+    previous_completed_work_item: W-0291
+    next_milestone: M-221
+    next_ready_work_item: W-0293
+    completion_summary: Defined the currency wallet lifecycle vocabulary boundary, recorded Nakama/Hiro economy capability mapping and vibit ownership, opened `W-0293 Define currency wallet persistence schema gate`, and preserved runtime/protocol/generated/persistence/dependency/authentication/session/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0293
+    milestone: M-221
+    title: Define currency wallet persistence schema gate
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-persistence-schema-gate
+    depends_on:
+      - W-0292
+    expected_change_id: define-currency-wallet-persistence-schema-gate
+    tier: tier_2_architecture_gate
+    selected_direction: define_currency_wallet_persistence_schema_gate
+    selection_decision: ADR-0200
+    decision: ADR-0201
+    check_rule: runtime.currency_wallet_persistence_schema_gate
+    standard: docs/currency-wallet-persistence-schema-gate.md
+    translation: docs/currency-wallet-persistence-schema-gate.zh-CN.md
+    related_decisions:
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0198
+      - ADR-0197
+      - ADR-0151
+      - ADR-0127
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing currency wallet behavior, balance tables, wallet transaction behavior, migration source, reward integration, inventory integration, purchase behavior, grant/spend behavior, audit/event tables, transport behavior changes, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the persistence schema gate.
+    completion:
+      - Define currency wallet persistence schema candidates.
+      - Record balance, wallet, transaction or ledger, catalog, and idempotency persistence posture.
+      - Preserve runtime/protocol/generated/migration/repository/adapter/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-221
+    previous_completed_work_item: W-0292
+    next_milestone: M-222
+    next_ready_work_item: W-0294
+    selected_follow_up_direction: add_currency_wallet_migration_source
+    completion_summary: Defined the currency wallet persistence schema gate, recorded future PostgreSQL table candidates for `currency_wallets`, `currency_wallet_balances`, and `currency_wallet_transactions`, selected `runtime/migrations/postgres/000008_create_currency_wallets.sql` as the future migration source candidate, opened `W-0294 Add currency wallet migration source`, and preserved runtime/protocol/generated/repository/adapter/dependency/authentication/session/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0294
+    milestone: M-222
+    title: Add currency wallet migration source
+    status: completed
+    change: changes/2026-05-26-add-currency-wallet-migration-source
+    depends_on:
+      - W-0293
+    expected_change_id: add-currency-wallet-migration-source
+    tier: tier_2_data
+    selected_direction: add_currency_wallet_migration_source
+    selection_decision: ADR-0201
+    related_decisions:
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing currency wallet behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, protocol messages or routes, generated output, repository interfaces, PostgreSQL adapters, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of adding only the migration source.
+    completion:
+      - Add the currency wallet SQL migration source.
+      - Follow the currency wallet persistence schema gate for wallet, balance, transaction, idempotency, timestamp, and redaction posture.
+      - Preserve runtime/protocol/generated/repository/adapter/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-222
+    previous_completed_work_item: W-0293
+    next_milestone: M-223
+    next_ready_work_item: W-0295
+    decision: ADR-0202
+    check_rule: runtime.currency_wallet_migration_source
+    migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+    selected_follow_up_direction: define_currency_wallet_repository_boundary
+    completion_summary: Added the currency wallet migration source at `runtime/migrations/postgres/000008_create_currency_wallets.sql`, defining `currency_wallets`, `currency_wallet_balances`, and `currency_wallet_transactions`; recorded idempotency uniqueness and timestamp/redaction posture; opened `W-0295 Define currency wallet repository boundary`; and preserved runtime/protocol/generated/repository/adapter/dependency/authentication/session/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0295
+    milestone: M-223
+    title: Define currency wallet repository boundary
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-repository-boundary
+    depends_on:
+      - W-0294
+    expected_change_id: define-currency-wallet-repository-boundary
+    tier: tier_2_architecture_boundary
+    selected_direction: define_currency_wallet_repository_boundary
+    selection_decision: ADR-0202
+    related_decisions:
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing currency wallet repository interfaces, PostgreSQL adapters, runtime behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend behavior, protocol messages or routes, generated output, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the repository boundary.
+    completion:
+      - Define the currency wallet repository boundary.
+      - Record candidate value types, repository capabilities, conflict classes, idempotency and transaction handoff, PostgreSQL adapter expectations, tests, and redaction posture.
+      - Preserve runtime/protocol/generated/repository-implementation/adapter/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-223
+    previous_completed_work_item: W-0294
+    next_milestone: M-224
+    next_ready_work_item: W-0296
+    decision: ADR-0203
+    check_rule: runtime.currency_wallet_repository_boundary
+    standard: docs/currency-wallet-repository-boundary.md
+    translation: docs/currency-wallet-repository-boundary.zh-CN.md
+    selected_follow_up_direction: implement_currency_wallet_repository_interface
+    completion_summary: Defined the currency wallet repository boundary, recorded candidate value types, repository capabilities, conflict classes, idempotency and transaction handoff, PostgreSQL adapter expectations, tests, and redaction posture; opened `W-0296 Implement storage-neutral currency wallet repository interface`; and preserved runtime/protocol/generated/repository-implementation/adapter/dependency/authentication/session/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0296
+    milestone: M-224
+    title: Implement storage-neutral currency wallet repository interface
+    status: completed
+    change: changes/2026-05-26-implement-currency-wallet-repository-interface
+    depends_on:
+      - W-0295
+    expected_change_id: implement-currency-wallet-repository-interface
+    tier: tier_2_data
+    selected_direction: implement_currency_wallet_repository_interface
+    selection_decision: ADR-0203
+    related_decisions:
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing PostgreSQL adapters, SQL execution, runtime behavior, wallet transaction behavior beyond storage-neutral interfaces, reward integration, inventory integration, purchase behavior, grant/spend execution, protocol messages or routes, generated output, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of adding only the storage-neutral repository interface.
+    completion:
+      - Add the storage-neutral currency wallet repository interface and value types.
+      - Add focused repository tests for normalization, conflict vocabulary, idempotency inputs, redaction, and storage neutrality.
+      - Preserve PostgreSQL adapter/runtime/protocol/generated/dependency/authentication/session/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-224
+    previous_completed_work_item: W-0295
+    next_milestone: M-225
+    next_ready_work_item: W-0297
+    decision: ADR-0204
+    check_rule: runtime.currency_wallet_repository_interface_implementation
+    completion_summary: Added `runtime/internal/modules/currency/repository.go` and focused tests with storage-neutral currency wallet repository value types, normalizers, idempotency inputs, conflict vocabulary, redacted repository errors, and module guidance; opened `W-0297 Define currency wallet PostgreSQL adapter gate`; and preserved PostgreSQL adapter, SQL execution, runtime/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0297
+    milestone: M-225
+    title: Define currency wallet PostgreSQL adapter gate
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-postgresql-adapter-gate
+    depends_on:
+      - W-0296
+    expected_change_id: define-currency-wallet-postgresql-adapter-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_currency_wallet_postgresql_adapter_gate
+    selection_decision: ADR-0204
+    related_decisions:
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing PostgreSQL adapters, SQL execution, runtime behavior, wallet transaction behavior beyond adapter gate vocabulary, reward integration, inventory integration, purchase behavior, grant/spend execution, protocol messages or routes, generated output, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the PostgreSQL adapter gate.
+    completion:
+      - Define the currency wallet PostgreSQL adapter gate.
+      - Record adapter owner, source and test candidates, constructor posture, unit-of-work handoff, SQL mapping boundaries, fake-executor test expectations, live PostgreSQL deferral, and redaction rules.
+      - Preserve adapter implementation/runtime/protocol/generated/dependency/authentication/session/reward/inventory/purchase/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-225
+    previous_completed_work_item: W-0296
+    next_milestone: M-226
+    next_ready_work_item: W-0298
+    decision: ADR-0205
+    check_rule: runtime.currency_wallet_postgresql_adapter_gate
+    completion_summary: Defined `docs/currency-wallet-postgresql-adapter-gate.md` and paired translation, accepted `ADR-0205`, registered `runtime.currency_wallet_postgresql_adapter_gate`, recorded future adapter owner/source/test/constructor/unit-of-work/SQL mapping/idempotency/version/insufficient-balance/redaction/test posture, opened `W-0298 Implement currency wallet PostgreSQL adapter`, and preserved adapter implementation, SQL execution, runtime/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0298
+    milestone: M-226
+    title: Implement currency wallet PostgreSQL adapter
+    status: completed
+    change: changes/2026-05-26-implement-currency-wallet-postgresql-adapter
+    depends_on:
+      - W-0297
+    expected_change_id: implement-currency-wallet-postgresql-adapter
+    tier: tier_2_data
+    selected_direction: implement_currency_wallet_postgresql_adapter
+    selection_decision: ADR-0205
+    related_decisions:
+      - ADR-0206
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing runtime wallet behavior, wallet transaction behavior above the adapter, reward integration, inventory integration, purchase behavior, grant/spend route execution, protocol messages or routes, generated output, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the PostgreSQL adapter.
+    completion:
+      - Implement the currency wallet PostgreSQL adapter under `runtime/internal/platform/persistence/postgres`.
+      - Add focused fake-executor or query-capture adapter tests for constructor handoff, SQL mapping, idempotency, version checks, insufficient balance, redaction, and transaction-control SQL absence.
+      - Preserve runtime/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-226
+    previous_completed_work_item: W-0297
+    next_milestone: M-227
+    next_ready_work_item: W-0299
+    decision: ADR-0206
+    check_rule: runtime.currency_wallet_postgresql_adapter_implementation
+    completion_summary: Added `runtime/internal/platform/persistence/postgres/currency_wallet_repository.go`, focused fake-executor tests, and `UnitOfWork.NewCurrencyWalletRepository`; mapped wallet create/get/owner-get, balance list, grant, spend, and transaction list to existing currency wallet tables; kept transaction ownership caller-supplied; collapsed PostgreSQL details into redacted currency repository errors; opened `W-0299 Define currency wallet runtime behavior gate`; and preserved runtime/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0299
+    milestone: M-227
+    title: Define currency wallet runtime behavior gate
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-runtime-behavior-gate
+    depends_on:
+      - W-0298
+    expected_change_id: define-currency-wallet-runtime-behavior-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_currency_wallet_runtime_behavior_gate
+    selection_decision: ADR-0206
+    related_decisions:
+      - ADR-0206
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing runtime wallet behavior, wallet transaction behavior, reward integration, inventory integration, purchase behavior, grant/spend route execution, protocol messages or routes, generated output, dependencies, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the runtime behavior gate.
+    completion:
+      - Define the currency wallet runtime behavior gate.
+      - Record future application owner, service candidate, command/query posture, request identity handoff, unit-of-work adapter composition, public error mapping, and fake-service test expectations.
+      - Preserve runtime implementation/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-227
+    previous_completed_work_item: W-0298
+    next_milestone: M-228
+    next_ready_work_item: W-0300
+    decision: ADR-0207
+    check_rule: runtime.currency_wallet_runtime_behavior_gate
+    completion_summary: Defined `docs/currency-wallet-runtime-behavior-gate.md` and paired translation, accepted `ADR-0207`, registered `runtime.currency_wallet_runtime_behavior_gate`, recorded future application owner and service candidates, validated request identity and actor derivation rules, route-policy posture, unit-of-work repository handoff, validation/conflict/redaction/idempotency expectations, opened `W-0300 Implement currency wallet runtime behavior`, and preserved implementation/protocol/generated/dependency/migration/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0300
+    milestone: M-228
+    title: Implement currency wallet runtime behavior
+    status: completed
+    change: changes/2026-05-26-implement-currency-wallet-runtime-behavior
+    depends_on:
+      - W-0299
+    expected_change_id: implement-currency-wallet-runtime-behavior
+    tier: tier_2_functional
+    selected_direction: implement_currency_wallet_runtime_behavior
+    selection_decision: ADR-0207
+    related_decisions:
+      - ADR-0207
+      - ADR-0206
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Adding protocol messages or routes, generated output, dependencies, migrations, startup wiring, authentication/session behavior changes, reward integration, inventory integration, purchase behavior, catalog/event tables, payment behavior, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only application-owned currency wallet runtime behavior.
+    completion:
+      - Implement application-owned currency wallet runtime behavior under `runtime/internal/app` using the storage-neutral currency repository through unit-of-work handoff.
+      - Add focused service tests for server-derived player wallet ownership, validated identity requirements, grant/spend/list behavior, idempotency, conflict mapping, and redacted errors.
+      - Preserve protocol/generated/dependency/migration/startup/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-228
+    previous_completed_work_item: W-0299
+    next_milestone: M-229
+    next_ready_work_item: W-0301
+    decision: ADR-0208
+    check_rule: runtime.currency_wallet_runtime_behavior_implementation
+    completion_summary: Added `runtime/internal/app/currency/service.go` and focused service tests; implemented application-owned player wallet ensure/get/balance-list/transaction-list plus grant and spend behavior; derived wallet owner and player actor from validated request identity; rejected metadata-only identity before unit-of-work access; used `NewCurrencyWalletRepository` through unit-of-work handoff; generated server-owned wallet and transaction ids; mapped currency repository conflicts to redacted public errors; opened `W-0301 Define currency wallet protocol route gate`; and preserved protocol/generated/dependency/migration/startup/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0301
+    milestone: M-229
+    title: Define currency wallet protocol route gate
+    status: completed
+    change: changes/2026-05-26-define-currency-wallet-protocol-route-gate
+    depends_on:
+      - W-0300
+    expected_change_id: define-currency-wallet-protocol-route-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_currency_wallet_protocol_route_gate
+    selection_decision: ADR-0208
+    related_decisions:
+      - ADR-0208
+      - ADR-0207
+      - ADR-0206
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Adding protocol messages or routes, generated output, startup wiring, dependencies, migrations, authentication/session behavior changes, reward integration, inventory integration, purchase behavior, catalog/event tables, payment behavior, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the currency wallet protocol route gate.
+    completion:
+      - Define the currency wallet protocol route gate.
+      - Record future Protobuf source, generated output, protocol bridge, application handler, route policy, public error mapping, and local proof expectations before protocol code exists.
+      - Preserve protocol implementation/generated/dependency/migration/startup/authentication/session/reward/inventory/purchase/catalog/event/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-229
+    previous_completed_work_item: W-0300
+    next_milestone: M-230
+    next_ready_work_item: W-0302
+    decision: ADR-0209
+    check_rule: runtime.currency_wallet_protocol_route_gate
+    completion_summary: Defined the currency wallet protocol route gate, accepted `ADR-0209`, registered `runtime.currency_wallet_protocol_route_gate`, recorded future protected routes `currency.EnsurePlayerWallet`, `currency.GetOwnWallet`, `currency.ListOwnWalletBalances`, `currency.GrantCurrency`, `currency.SpendCurrency`, and `currency.ListOwnWalletTransactions`, candidate `vibit.currency.v1` Protobuf shapes, request-token protection, authenticated wrapper handoff, validated request identity as owner proof, metadata-only identity refusal, no client-supplied owner/wallet/actor proof, server-authoritative grant policy expectations, public `CURRENCY_WALLET_*` error mapping, generated-output expectations, local proof expectations, Nakama/Pitaya reference mapping, required future tests, and stop conditions; opened `M-230/W-0302 Implement currency wallet protocol route` as next-ready; and preserved protocol implementation/generated/dependency/migration/startup/authentication/session/reward/inventory/purchase/catalog/event/payment/hosted/SDK/distributed implementation and direct-compatibility deferrals.
+
+  - id: W-0302
+    milestone: M-230
+    title: Implement currency wallet protocol route
+    status: completed
+    change: changes/2026-05-26-implement-currency-wallet-protocol-route
+    depends_on:
+      - W-0301
+    expected_change_id: implement-currency-wallet-protocol-route
+    tier: tier_2_protocol
+    selected_direction: implement_currency_wallet_protocol_route
+    selection_decision: ADR-0209
+    related_decisions:
+      - ADR-0209
+      - ADR-0208
+      - ADR-0207
+      - ADR-0206
+      - ADR-0205
+      - ADR-0204
+      - ADR-0203
+      - ADR-0202
+      - ADR-0201
+      - ADR-0200
+      - ADR-0199
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Adding reward integration, inventory integration, purchase behavior, catalog/event tables, payment behavior, reservation/settlement/refund/transfer behavior, operations/admin behavior, dependencies beyond the already authorized protocol/generation path, migrations, authentication/session behavior changes, SDK publication, hosted deployments, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the currency wallet protocol route authorized by ADR-0209.
+    completion:
+      - Implement the protected currency wallet protocol route family authorized by the protocol route gate.
+      - Add Protobuf source, generated output, protocol bridge, application handler, route registration, and focused route tests for the future `vibit.currency.v1` payload package.
+      - Preserve reward/inventory/purchase/catalog/event/payment/reservation/settlement/refund/transfer/hosted/SDK/distributed implementation/direct-compatibility deferrals.
+    completed_milestone: M-230
+    previous_completed_work_item: W-0301
+    next_milestone: none
+    next_ready_work_item: none
+    decision: ADR-0210
+    check_rule: runtime.currency_wallet_protocol_route_implementation
+    completion_summary: Implemented the protected `vibit.currency.v1` wallet route family for `currency.EnsurePlayerWallet`, `currency.GetOwnWallet`, `currency.ListOwnWalletBalances`, `currency.GrantCurrency`, `currency.SpendCurrency`, and `currency.ListOwnWalletTransactions`; added Protobuf source, generated Go output, route keys, bootstrap handlers, server-side grant policy, protocol bridge mapping, payload registry dispatch, focused tests, and local authenticated gameplay proof; fixed zero-field proto3 authenticated payload handling without weakening non-empty payload rejection; preserved reward/inventory/purchase/catalog/event/payment/migration/dependency/startup/hosted/SDK/distributed/direct-compatibility deferrals; and left no repository next work item currently ready.

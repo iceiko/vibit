@@ -1,0 +1,144 @@
+syntax = "proto3";
+
+package vibit.currency.v1;
+
+option go_package = "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/currency/v1;currencyv1";
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0210-currency-wallet-protocol-route-implementation.md
+// @source proto/vibit/currency/v1/currency.proto
+// @route currency.EnsurePlayerWallet
+// @route currency.GetOwnWallet
+// @route currency.ListOwnWalletBalances
+// @route currency.GrantCurrency
+// @route currency.SpendCurrency
+// @route currency.ListOwnWalletTransactions
+
+message CurrencyWallet {
+  string wallet_id = 1;
+  string owner_kind = 2;
+  string lifecycle_state = 3;
+  int64 wallet_version = 4;
+  string created_at = 5;
+  string updated_at = 6;
+  string state_changed_at = 7;
+}
+
+message CurrencyWalletBalance {
+  string currency_code = 1;
+  int64 balance_amount = 2;
+  int64 balance_version = 3;
+  string created_at = 4;
+  string updated_at = 5;
+}
+
+message CurrencyWalletTransaction {
+  string transaction_id = 1;
+  string currency_code = 2;
+  string transaction_kind = 3;
+  int64 amount_delta = 4;
+  int64 balance_after = 5;
+  string actor_kind = 6;
+  string reason_code = 7;
+  string external_reference = 8;
+  string metadata_json = 9;
+  string created_at = 10;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message EnsurePlayerWalletRequest {}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message EnsurePlayerWalletResponse {
+  CurrencyWallet wallet = 1;
+  string status = 2;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message GetOwnWalletRequest {}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message GetOwnWalletResponse {
+  CurrencyWallet wallet = 1;
+  string status = 2;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message ListOwnWalletBalancesRequest {
+  int32 limit = 1;
+  string after_currency_code = 2;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message ListOwnWalletBalancesResponse {
+  repeated CurrencyWalletBalance balances = 1;
+  string next_currency_code = 2;
+  string status = 3;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message GrantCurrencyRequest {
+  string currency_code = 1;
+  int64 amount = 2;
+  string idempotency_key = 3;
+  string idempotency_scope = 4;
+  string reason_code = 5;
+  string external_reference = 6;
+  string metadata_json = 7;
+  optional int64 expected_wallet_version = 8;
+  optional int64 expected_balance_version = 9;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message GrantCurrencyResponse {
+  CurrencyWalletTransaction transaction = 1;
+  string status = 2;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message SpendCurrencyRequest {
+  string currency_code = 1;
+  int64 amount = 2;
+  string idempotency_key = 3;
+  string idempotency_scope = 4;
+  string reason_code = 5;
+  string external_reference = 6;
+  string metadata_json = 7;
+  optional int64 expected_wallet_version = 8;
+  optional int64 expected_balance_version = 9;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message SpendCurrencyResponse {
+  CurrencyWalletTransaction transaction = 1;
+  string status = 2;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message ListOwnWalletTransactionsRequest {
+  string currency_code = 1;
+  int32 limit = 2;
+  string after_transaction_id = 3;
+  string after_transaction_time = 4;
+}
+
+// @source docs/currency-wallet-protocol-route-gate.md
+// @source decisions/ADR-0209-currency-wallet-protocol-route-gate.md
+message ListOwnWalletTransactionsResponse {
+  repeated CurrencyWalletTransaction transactions = 1;
+  string next_transaction_id = 2;
+  string next_transaction_time = 3;
+  string status = 4;
+}

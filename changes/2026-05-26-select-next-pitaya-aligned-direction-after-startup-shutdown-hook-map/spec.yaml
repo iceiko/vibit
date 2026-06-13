@@ -1,0 +1,165 @@
+schema_version: 0.1
+change_id: select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map
+date: 2026-06-07
+type: tooling
+status: verified
+
+summary: Select the currency wallet lifecycle boundary gate as the next bounded direction after the Pitaya-aligned startup and shutdown hook source-first map, without adding currency wallet behavior, balance tables, wallet transaction behavior, reward integration, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0199
+  referenced:
+    - ADR-0198
+    - ADR-0197
+    - ADR-0196
+    - ADR-0151
+    - ADR-0127
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  next_pitaya_aligned_direction_after_startup_shutdown_hook_map: completed
+  completed_work_item: W-0291
+  completed_milestone: M-219
+  previous_completed_work_item: W-0290
+  next_milestone: M-220
+  next_work_item: W-0292
+  next_work_item_status: next_ready
+  selected_direction: define_currency_wallet_lifecycle_boundary_gate
+  decision: ADR-0199
+  check_rule: runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+  source_map_decision: ADR-0198
+  startup_shutdown_hook_gate_decision: ADR-0197
+  component_discovery_module_loading_selection_decision: ADR-0196
+  primary_product_reference: Nakama
+  secondary_product_reference: Hiro
+  pitaya_reference_status: deferred_future_architecture_reference_after_startup_shutdown_hook_map
+  target_stage: phase_3_core_game_backend_modules
+  selected_capability_family: economy_inventory_rewards_currencies_and_progression
+  selected_module_candidate: currency
+  selected_boundary_topic: currency_wallet_lifecycle
+  implementation_scope: direction_selection_only
+  implementation_authorized_by_this_selection: false
+  currency_wallet_behavior_added: false
+  currency_balance_table_added: false
+  wallet_transaction_behavior_added: false
+  currency_reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  grant_spend_behavior_added: false
+  audit_event_table_added: false
+  startup_hook_behavior_added: false
+  shutdown_hook_behavior_added: false
+  lifecycle_hook_execution_added: false
+  dependency_container_behavior_added: false
+  component_discovery_behavior_added: false
+  component_loading_behavior_added: false
+  component_module_loading_behavior_added: false
+  runtime_endpoint_behavior_added: false
+  dashboard_added: false
+  admin_console_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  runtime_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map` is registered and enforced by `tools/vibit`.
+  - `ADR-0199` records the selection decision.
+  - `M-219/W-0291` is completed.
+  - `M-220/W-0292 Define currency wallet lifecycle boundary gate` is next-ready.
+  - The slice does not add currency wallet behavior, balance tables, wallet transaction behavior, reward integration, runtime behavior, protocol shape, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, distributed runtime behavior, or direct compatibility.
+
+implementation_boundaries:
+  allowed:
+    - decisions/ADR-0199-select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map.md
+    - conversations/2026-05-26-select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map.md
+    - changes/2026-05-26-select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map/
+    - .arch/*.yaml
+    - README*.md
+    - AGENTS*.md
+    - runtime/AGENTS*.md
+    - modules/*/AGENTS*.md
+    - modules/*/module.yaml
+    - docs/*alpha*.md
+    - docs/product-maturity-milestones*.md
+    - docs/nakama-pitaya-product-parity-roadmap*.md
+    - tools/vibit
+    - rules/check-rules.json
+  forbidden:
+    - currency wallet behavior
+    - balance tables
+    - wallet transaction behavior
+    - reward integration
+    - inventory integration
+    - purchase behavior
+    - grant/spend behavior
+    - audit/event tables
+    - startup hook behavior
+    - shutdown hook behavior
+    - lifecycle hook execution
+    - dependency container behavior
+    - runtime behavior changes
+    - runtime endpoint behavior
+    - dashboards
+    - admin console behavior
+    - protocol route additions
+    - Protobuf source additions
+    - generated output changes
+    - repository interface changes
+    - PostgreSQL adapter changes
+    - migrations
+    - dependencies
+    - hosted deployment surfaces
+    - SDK publication
+    - direct Nakama/Pitaya API compatibility
+
+verification:
+  status: Verified
+  record: verification.md
+  required:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    - node tools/vibit inspect next --json
+    - node tools/vibit check change select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - git diff --check

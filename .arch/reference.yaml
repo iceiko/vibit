@@ -19,14 +19,14 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: startup_shutdown_hook_vocabulary_boundary_defined_for_future_architecture_planning
+  pitaya_reference_status: deferred_future_architecture_reference_after_startup_shutdown_hook_map
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
   direct_nakama_pitaya_api_compatibility_added: false
   implementation_authorized_by_this_standard: roadmap_only
-  current_near_term_priority: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
-  recommended_next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+  current_near_term_priority: no_next_ready_work_item
+  recommended_next_direction: no_next_ready_work_item
 
 release_target:
   short_term_release_target: v0.1_alpha
@@ -34,11 +34,11 @@ release_target:
   translation: docs/v0.1-alpha-goal.zh-CN.md
   decision: ADR-0086
   completed_work_item: W-0179
-  current_state: startup_shutdown_hook_boundary_gate_defined
+  current_state: currency_wallet_protocol_route_implemented
   release_declared: true
   release_identifier: v0.1.0-alpha.1
-  immediate_next_work_item: W-0290
-  immediate_next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+  immediate_next_work_item: none
+  immediate_next_direction: no_next_ready_work_item
   product_maturity_milestones_standard: docs/product-maturity-milestones.md
   product_maturity_milestones_translation: docs/product-maturity-milestones.zh-CN.md
   prototype_ready_foundation_execution_plan_standard: docs/prototype-ready-foundation-execution-plan.md
@@ -6905,17 +6905,68 @@ phase_plan:
     dependency_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_2gw_pitaya_aligned_startup_shutdown_hook_source_first_map:
-    status: next_ready
+    status: completed
     milestone: M-218
     work_item: W-0290
+    decision: ADR-0198
+    change: changes/2026-05-26-implement-pitaya-aligned-startup-shutdown-hook-source-first-map
+    check_rule: runtime.pitaya_aligned_startup_shutdown_hook_source_first_map
+    command: node tools/vibit inspect pitaya-startup-shutdown --json
     gate_decision: ADR-0197
     selection_decision: ADR-0196
     source_map_decision: ADR-0195
     selected_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+    selected_follow_up_direction: select_next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    next_milestone: M-219
+    next_ready_work_item: W-0291
     primary_product_reference: Nakama
-    pitaya_reference_status: startup_shutdown_hook_source_first_map_next_ready
+    pitaya_reference_status: startup_shutdown_hook_source_first_map_implemented
     target_stage: prototype_ready_foundation
     implementation_scope: source_first_repository_inspection
+    startup_shutdown_hook_source_first_map_implemented: true
+    startup_hook_behavior_allowed: false
+    shutdown_hook_behavior_allowed: false
+    lifecycle_hook_execution_allowed: false
+    dependency_container_behavior_allowed: false
+    handler_module_registration_behavior_allowed: false
+    handler_registration_behavior_allowed: false
+    dynamic_handler_registration_allowed: false
+    component_discovery_behavior_allowed: false
+    component_loading_behavior_allowed: false
+    component_module_loading_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_2gx_next_pitaya_aligned_direction_after_startup_shutdown_hook_map:
+    status: completed
+    milestone: M-219
+    work_item: W-0291
+    decision: ADR-0199
+    change: changes/2026-05-26-select-next-pitaya-aligned-direction-after-startup-shutdown-hook-map
+    check_rule: runtime.next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    source_map_decision: ADR-0198
+    gate_decision: ADR-0197
+    selection_decision: ADR-0196
+    selected_direction: select_next_pitaya_aligned_direction_after_startup_shutdown_hook_map
+    selected_follow_up_direction: define_currency_wallet_lifecycle_boundary_gate
+    next_milestone: M-220
+    next_ready_work_item: W-0292
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference_after_startup_shutdown_hook_map
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: direction_selection_only
+    implementation_authorized_by_this_selection: false
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_lifecycle
+    currency_wallet_behavior_allowed: false
+    currency_balance_table_allowed: false
+    wallet_transaction_behavior_allowed: false
+    currency_reward_integration_allowed: false
     startup_hook_behavior_allowed: false
     shutdown_hook_behavior_allowed: false
     lifecycle_hook_execution_allowed: false
@@ -6933,7 +6984,7 @@ phase_plan:
     dependency_allowed: false
     direct_nakama_pitaya_api_compatibility_added: false
   phase_3_core_game_backend_modules:
-    status: planned
+    status: active
     focus:
       - currency
       - rewards
@@ -6941,6 +6992,334 @@ phase_plan:
       - presence_status
       - chat
       - leaderboards
+  phase_3a_currency_wallet_lifecycle_boundary_gate:
+    status: completed
+    milestone: M-220
+    work_item: W-0292
+    decision: ADR-0200
+    change: changes/2026-05-26-define-currency-wallet-lifecycle-boundary-gate
+    check_rule: runtime.currency_wallet_lifecycle_boundary_gate
+    standard: docs/currency-wallet-lifecycle-boundary-gate.md
+    translation: docs/currency-wallet-lifecycle-boundary-gate.zh-CN.md
+    selected_direction: define_currency_wallet_lifecycle_boundary_gate
+    selection_decision: ADR-0199
+    selected_follow_up_direction: define_currency_wallet_persistence_schema_gate
+    next_milestone: M-221
+    next_ready_work_item: W-0293
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: boundary_gate_only
+    implementation_authorized_by_this_selection: false
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_lifecycle
+    currency_wallet_behavior_allowed: false
+    currency_balance_table_allowed: false
+    wallet_transaction_behavior_allowed: false
+    currency_reward_integration_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3b_currency_wallet_persistence_schema_gate:
+    status: completed
+    milestone: M-221
+    work_item: W-0293
+    selected_direction: define_currency_wallet_persistence_schema_gate
+    selection_decision: ADR-0200
+    decision: ADR-0201
+    check_rule: runtime.currency_wallet_persistence_schema_gate
+    standard: docs/currency-wallet-persistence-schema-gate.md
+    translation: docs/currency-wallet-persistence-schema-gate.zh-CN.md
+    selected_follow_up_direction: add_currency_wallet_migration_source
+    next_milestone: M-222
+    next_ready_work_item: W-0294
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: persistence_schema_gate_only
+    implementation_authorized_by_this_selection: false
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_persistence_schema
+    currency_wallet_behavior_allowed: false
+    currency_balance_table_allowed: false
+    wallet_transaction_behavior_allowed: false
+    currency_reward_integration_allowed: false
+    migration_source_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3c_currency_wallet_migration_source:
+    status: completed
+    milestone: M-222
+    work_item: W-0294
+    selected_direction: add_currency_wallet_migration_source
+    selection_decision: ADR-0201
+    decision: ADR-0202
+    check_rule: runtime.currency_wallet_migration_source
+    selected_follow_up_direction: define_currency_wallet_repository_boundary
+    next_milestone: M-223
+    next_ready_work_item: W-0295
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: migration_source_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_migration_source
+    migration_source_allowed: true
+    migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+    currency_wallets_table_added: true
+    currency_wallet_balances_table_added: true
+    currency_wallet_transactions_table_added: true
+    currency_catalog_table_added: false
+    currency_wallet_events_table_added: false
+    currency_wallet_behavior_allowed: false
+    wallet_transaction_behavior_allowed: false
+    currency_reward_integration_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    repository_interface_change_allowed: false
+    postgresql_adapter_change_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3d_currency_wallet_repository_boundary:
+    status: completed
+    milestone: M-223
+    completed_work_item: W-0295
+    selected_direction: define_currency_wallet_repository_boundary
+    selection_decision: ADR-0202
+    decision: ADR-0203
+    standard: docs/currency-wallet-repository-boundary.md
+    translation: docs/currency-wallet-repository-boundary.zh-CN.md
+    check_rule: runtime.currency_wallet_repository_boundary
+    source_migration_decision: ADR-0202
+    source_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+    source_schema_gate_decision: ADR-0201
+    source_lifecycle_gate_decision: ADR-0200
+    next_milestone: M-224
+    next_ready_work_item: W-0296
+    selected_follow_up_direction: implement_currency_wallet_repository_interface
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: repository_boundary_gate_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_repository_boundary
+    repository_boundary_allowed: true
+    repository_interface_implementation_allowed: false
+    postgresql_adapter_change_allowed: false
+    currency_wallet_behavior_allowed: false
+    wallet_transaction_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3e_currency_wallet_repository_interface_implementation:
+    status: completed
+    milestone: M-224
+    work_item: W-0296
+    completed_work_item: W-0296
+    selected_direction: implement_currency_wallet_repository_interface
+    selection_decision: ADR-0203
+    decision: ADR-0204
+    check_rule: runtime.currency_wallet_repository_interface_implementation
+    source_repository_boundary_decision: ADR-0203
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: storage_neutral_repository_interface_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_repository_interface
+    repository_interface_added: true
+    value_types_added: true
+    normalizers_added: true
+    postgresql_adapter_change_allowed: false
+    currency_wallet_behavior_allowed: false
+    wallet_transaction_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3f_currency_wallet_postgresql_adapter_gate:
+    status: completed
+    milestone: M-225
+    completed_work_item: W-0297
+    selected_direction: define_currency_wallet_postgresql_adapter_gate
+    selection_decision: ADR-0204
+    decision: ADR-0205
+    check_rule: runtime.currency_wallet_postgresql_adapter_gate
+    source_repository_interface_decision: ADR-0204
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: postgresql_adapter_gate_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_postgresql_adapter_gate
+    postgresql_adapter_implementation_allowed: false
+    sql_execution_allowed: false
+    currency_wallet_behavior_allowed: false
+    wallet_transaction_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3g_currency_wallet_postgresql_adapter_implementation:
+    status: completed
+    milestone: M-226
+    work_item: W-0298
+    completed_work_item: W-0298
+    selected_direction: implement_currency_wallet_postgresql_adapter
+    selection_decision: ADR-0205
+    decision: ADR-0206
+    check_rule: runtime.currency_wallet_postgresql_adapter_implementation
+    source_adapter_gate_decision: ADR-0205
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: postgresql_adapter_implementation_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_postgresql_adapter_implementation
+    runtime_behavior_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+  phase_3h_currency_wallet_runtime_behavior_gate:
+    status: completed
+    milestone: M-227
+    work_item: W-0299
+    completed_work_item: W-0299
+    selected_direction: define_currency_wallet_runtime_behavior_gate
+    selection_decision: ADR-0206
+    decision: ADR-0207
+    check_rule: runtime.currency_wallet_runtime_behavior_gate
+    source_adapter_implementation_decision: ADR-0206
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: runtime_behavior_gate_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_runtime_behavior_gate
+    runtime_behavior_implementation_allowed: false
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_milestone: M-228
+    next_ready_work_item: W-0300
+    selected_follow_up_direction: implement_currency_wallet_runtime_behavior
+  phase_3i_currency_wallet_runtime_behavior_implementation:
+    status: completed
+    milestone: M-228
+    work_item: W-0300
+    completed_work_item: W-0300
+    selected_direction: implement_currency_wallet_runtime_behavior
+    selection_decision: ADR-0207
+    decision: ADR-0208
+    check_rule: runtime.currency_wallet_runtime_behavior_implementation
+    source_runtime_behavior_gate_decision: ADR-0207
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: application_runtime_behavior_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_runtime_behavior_implementation
+    runtime_service_source: runtime/internal/app/currency/service.go
+    runtime_service_test: runtime/internal/app/currency/service_test.go
+    runtime_behavior_added: true
+    protocol_shape_change_allowed: false
+    generated_output_allowed: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_milestone: M-229
+    next_ready_work_item: W-0301
+    selected_follow_up_direction: define_currency_wallet_protocol_route_gate
+  phase_3j_currency_wallet_protocol_route_gate:
+    status: completed
+    milestone: M-229
+    work_item: W-0301
+    completed_work_item: W-0301
+    selected_direction: define_currency_wallet_protocol_route_gate
+    selection_decision: ADR-0208
+    decision: ADR-0209
+    check_rule: runtime.currency_wallet_protocol_route_gate
+    source_runtime_behavior_implementation_decision: ADR-0208
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: protocol_route_gate_only
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_protocol_route_gate
+    protocol_route_gate_defined: true
+    future_protocol_route_implementation_work_item: W-0302
+    candidate_routes_recorded: true
+    first_payload_package: vibit.currency.v1
+    route_policy_requirement: request_token_required
+    authenticated_wrapper_required: true
+    metadata_only_player_id_allowed_as_proof: false
+    public_error_mapping_recorded: true
+    local_proof_expectations_recorded: true
+    nakama_reference_mapping_recorded: true
+    pitaya_reference_mapping_recorded: true
+    protocol_shape_change_allowed: false
+    protocol_route_added: false
+    generated_output_allowed: false
+    generated_output_added: false
+    dependency_allowed: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_milestone: M-230
+    next_ready_work_item: W-0302
+    selected_follow_up_direction: implement_currency_wallet_protocol_route
+  phase_3k_currency_wallet_protocol_route_implementation:
+    status: completed
+    milestone: M-230
+    work_item: W-0302
+    completed_work_item: W-0302
+    selected_direction: implement_currency_wallet_protocol_route
+    selection_decision: ADR-0209
+    decision: ADR-0210
+    check_rule: runtime.currency_wallet_protocol_route_implementation
+    source_protocol_route_gate_decision: ADR-0209
+    primary_product_reference: Nakama
+    secondary_product_reference: Hiro
+    pitaya_reference_status: deferred_future_architecture_reference
+    target_stage: phase_3_core_game_backend_modules
+    implementation_scope: protocol_route_implementation
+    selected_capability_family: economy_inventory_rewards_currencies_and_progression
+    selected_module_candidate: currency
+    selected_boundary_topic: currency_wallet_protocol_route_implementation
+    protocol_route_added: true
+    protobuf_source_added: true
+    generated_output_added: true
+    local_proof_added: true
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: none
+    recommended_next_direction: no_next_ready_work_item
   phase_4_multiplayer_match_runtime:
     status: planned
     focus:

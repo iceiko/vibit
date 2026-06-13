@@ -1,0 +1,176 @@
+schema_version: 0.1
+change_id: implement-currency-wallet-runtime-behavior
+date: 2026-05-26
+type: feature
+status: verified
+
+summary: Implement the application-owned currency wallet runtime behavior service without adding protocol routes, Protobuf source, generated output, dependencies, migrations, startup wiring, reward/inventory/purchase integration, catalog/event tables, payment behavior, hosted surfaces, SDKs, distributed runtime, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - currency
+  - storage
+  - friends
+  - workflow
+  - reference
+
+decisions:
+  added:
+    - ADR-0208
+  referenced:
+    - ADR-0207
+    - ADR-0206
+    - ADR-0205
+    - ADR-0204
+    - ADR-0203
+    - ADR-0202
+    - ADR-0201
+    - ADR-0200
+    - ADR-0199
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  completed_work_item: W-0300
+  completed_milestone: M-228
+  previous_completed_work_item: W-0299
+  next_milestone: M-229
+  next_work_item: W-0301
+  next_work_item_status: next_ready
+  tier: tier_2_functional
+  selected_direction: implement_currency_wallet_runtime_behavior
+  next_direction: define_currency_wallet_protocol_route_gate
+  source_runtime_behavior_gate_decision: ADR-0207
+  source_postgresql_adapter_implementation_decision: ADR-0206
+  source_repository_interface_decision: ADR-0204
+  currency_wallet_runtime_behavior_implementation_completed: true
+  currency_wallet_runtime_behavior_implementation_decision: ADR-0208
+  currency_wallet_runtime_behavior_implementation_check_rule: runtime.currency_wallet_runtime_behavior_implementation
+  runtime_service_source: runtime/internal/app/currency/service.go
+  runtime_service_test: runtime/internal/app/currency/service_test.go
+  source_repository_interface: runtime/internal/modules/currency.Repository
+  source_repository_interface_source: runtime/internal/modules/currency/repository.go
+  source_postgresql_adapter: runtime/internal/platform/persistence/postgres/currency_wallet_repository.go
+  request_identity_required: true
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  owner_identity_source: validated_request_identity_player_id
+  actor_identity_source: validated_request_identity_or_server_operation
+  first_owner_kind: player
+  route_policy_requirement: request_token_required
+  unit_of_work_handoff_used: true
+  operations_implemented:
+    - ensure_player_wallet
+    - get_own_wallet
+    - list_own_wallet_balances
+    - grant_currency
+    - spend_currency
+    - list_own_wallet_transactions
+  runtime_behavior_added: true
+  runtime_handlers_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  request_identity_validation_changed: false
+  route_protection_semantics_changed: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  dependency_added: false
+  migration_added: false
+  migration_changed: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  payment_behavior_added: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reservation_behavior_added: false
+  settlement_behavior_added: false
+  refund_behavior_added: false
+  transfer_behavior_added: false
+  operations_admin_behavior_added: false
+  sdk_added: false
+  generated_client_library_added: false
+  release_artifact_added: false
+  distributed_runtime_added: false
+  pitaya_distributed_architecture_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  future_protocol_route_gate_work_item: W-0301
+  future_protocol_route_gate_direction: define_currency_wallet_protocol_route_gate
+  required_verification_commands:
+    - cd runtime && go test ./internal/app/currency ./internal/modules/currency ./internal/platform/persistence/postgres
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_runtime_behavior_implementation
+    - node tools/vibit check change implement-currency-wallet-runtime-behavior --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check contracts --json
+    - node tools/vibit check protocol --json
+    - node tools/vibit check schemas --json
+    - node tools/vibit check memory --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+  known_warning_accepted:
+    - runtime.identity_boundary
+
+contracts:
+  commands:
+    added: []
+    changed: []
+    removed: []
+  queries:
+    added: []
+    changed: []
+    removed: []
+  events:
+    added: []
+    changed: []
+    removed: []
+  errors:
+    added: []
+    changed: []
+    removed: []
+  permissions:
+    added: []
+    changed: []
+    removed: []
+
+data:
+  migrations_required: false
+  migration_sources: []
+  logical_tables_added: []
+  existing_logical_tables_referenced:
+    - currency_wallets
+    - currency_wallet_balances
+    - currency_wallet_transactions
+
+compatibility:
+  breaking_api: false
+  breaking_events: false
+  breaking_data: false
+  protobuf_envelope_changed: false
+  websocket_handshake_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+verification:
+  status: Verified
+  commands:
+    - cd runtime && go test ./internal/app/currency ./internal/modules/currency ./internal/platform/persistence/postgres
+    - node -c tools/vibit
+    - node tools/vibit inspect next --json
+    - node tools/vibit inspect rule runtime.currency_wallet_runtime_behavior_implementation
+    - node tools/vibit check change implement-currency-wallet-runtime-behavior --json
+    - node tools/vibit check module currency --json
+    - node tools/vibit check work --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check all --json
+    - cd runtime && go test ./...
+    - git diff --check
+
+user_requirement: "Implement the currency wallet runtime behavior after the gate, preserving Nakama-class economy planning and deferring protocol, generated, reward/inventory/purchase, catalog/event, payment, and direct compatibility scope."
+user_visible_outcome: Future agents can use an application-owned currency wallet service and inspect ADR, change spec, and checks before defining protocol routes.

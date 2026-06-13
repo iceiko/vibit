@@ -462,8 +462,14 @@ Agents must not:
 ## Current Continuation
 
 ```yaml
-next_work_item: W-0290 Implement Pitaya-aligned startup and shutdown hook source-first map
-recommended_next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
+next_work_item: none
+recommended_next_direction: no_next_ready_work_item
 ```
+
+Current currency wallet PostgreSQL adapter implementation decision: `decisions/ADR-0206-currency-wallet-postgresql-adapter-implementation.md`.
+Current currency wallet runtime behavior gate decision: `decisions/ADR-0207-currency-wallet-runtime-behavior-gate.md`.
+Current currency wallet protocol route gate decision: `decisions/ADR-0209-currency-wallet-protocol-route-gate.md`.
+Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`.
+No repository next work item is currently ready.
 
 `ADR-0192` registered `runtime.pitaya_aligned_handler_module_registration_source_first_map`, implemented `node tools/vibit inspect pitaya-handler-modules --json`, and completed `W-0284 Implement Pitaya-aligned handler module registration source-first map`; `ADR-0193` registered `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`, completed `W-0285`, selected `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`, opened `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`, and keeps handler module registration behavior, handler registration behavior, dynamic handler registration, component module loading, runtime endpoint behavior, protocol, persistence, dependencies, distributed runtime, SDK, hosted, and direct compatibility work deferred.

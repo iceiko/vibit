@@ -1,0 +1,310 @@
+schema_version: 0.1
+module: currency
+category: domain
+status: draft
+summary: Owns storage-neutral currency wallet repository vocabulary, value types, normalizers, idempotency handoff, conflict classes, redacted repository errors, application-owned wallet runtime behavior, and the protected currency wallet protocol route while rewards, purchases, inventory integration, SDKs, hosted deployments, distributed runtime, and direct Nakama/Pitaya API compatibility remain deferred.
+
+decisions:
+  - ADR-0199
+  - ADR-0200
+  - ADR-0201
+  - ADR-0202
+  - ADR-0203
+  - ADR-0204
+  - ADR-0205
+  - ADR-0206
+  - ADR-0207
+  - ADR-0208
+  - ADR-0209
+  - ADR-0210
+
+owns:
+  entities:
+    - currency_wallet
+    - currency_wallet_balance
+    - currency_wallet_transaction
+  data:
+    - currency_wallets_logical_table
+    - currency_wallet_balances_logical_table
+    - currency_wallet_transactions_logical_table
+    - currency_wallet_repository_interface_vocabulary
+  permissions: []
+  does_not_own:
+    entities:
+      - player_account
+      - authentication_credential
+      - runtime_session
+      - websocket_connection
+      - inventory_item
+      - reward_definition
+      - purchase_catalog
+      - payment_provider_payload
+      - match_session
+    data:
+      - player_accounts
+      - authentication_credentials
+      - runtime_sessions
+      - websocket_connection_state
+      - inventory_records
+      - reward_execution_state
+      - purchase_catalog_tables
+      - payment_provider_payloads
+      - match_runtime_state
+      - currency_catalog
+      - currency_wallet_events
+
+public_api:
+  status: protocol_route_implemented
+  commands:
+    - currency.EnsurePlayerWallet
+    - currency.GrantCurrency
+    - currency.SpendCurrency
+  queries:
+    - currency.GetOwnWallet
+    - currency.ListOwnWalletBalances
+    - currency.ListOwnWalletTransactions
+  repository_interface:
+    owner: runtime/internal/modules/currency
+    interface: runtime/internal/modules/currency.Repository
+    source: runtime/internal/modules/currency/repository.go
+    tests: runtime/internal/modules/currency/repository_test.go
+    capabilities:
+      - CreateCurrencyWallet
+      - GetCurrencyWallet
+      - GetCurrencyWalletForOwner
+      - ListCurrencyWalletBalances
+      - RecordCurrencyGrant
+      - RecordCurrencySpend
+      - ListCurrencyWalletTransactions
+  vocabulary:
+    owner_kind:
+      - player
+    lifecycle_state:
+      - active
+      - suspended
+      - closed
+    transaction_kind:
+      - grant
+      - spend
+    actor_kind:
+      - system
+      - player
+      - operation
+    conflict_classes:
+      - wallet_not_found
+      - wallet_already_exists
+      - wallet_owner_mismatch
+      - wallet_not_active
+      - currency_balance_not_found
+      - invalid_currency_code
+      - invalid_currency_amount
+      - insufficient_balance
+      - duplicate_transaction
+      - conflicting_duplicate_transaction
+      - invalid_idempotency_key
+      - invalid_transaction_kind
+      - version_mismatch
+      - stale_wallet_version
+      - stale_balance_version
+      - storage_unavailable
+
+events:
+  publishes: []
+  subscribes: []
+
+errors:
+  owns:
+    - currency_wallet_repository_errors
+  schemas:
+    status: not_ratified
+    rule: Repository errors are storage-neutral Go vocabulary only until public currency wallet runtime contracts are ratified.
+
+permission_schemas:
+  status: not_ratified
+  rule: Route-scoped currency permissions remain deferred until runtime behavior and protocol routes are separately authorized.
+
+dependencies:
+  allowed: []
+  forbidden:
+    - direct_websocket_library
+    - direct_protobuf_runtime
+    - direct_postgresql_driver
+    - authentication
+    - session
+    - storage
+    - friends
+    - inventory
+    - rewards
+    - purchases
+    - payments
+    - matchmaking
+    - match_runtime
+    - distributed_runtime
+  external_reference_boundaries:
+    player_id:
+      owner: player
+      standard: docs/currency-wallet-repository-boundary.md
+      decision: ADR-0203
+      rule: Currency wallet owner_id may identify a player owner, but this module does not authenticate, validate, create, or own player accounts or runtime sessions.
+    request_identity:
+      owner: runtime/internal/app
+      standard: docs/currency-wallet-repository-boundary.md
+      decision: ADR-0203
+      rule: Future runtime behavior must derive owner and actor identity from validated request identity or service-authoritative context before calling this repository interface.
+
+invariants:
+  - currency_wallet_owner_kind_first_posture_is_player
+  - currency_wallet_lifecycle_state_vocabulary_must_remain_closed
+  - currency_wallet_transaction_kind_vocabulary_must_remain_grant_or_spend
+  - currency_wallet_actor_kind_vocabulary_must_remain_closed
+  - currency_amounts_must_use_integer_minor_units
+  - balance_amount_and_balance_after_must_be_non_negative
+  - grant_amounts_must_be_positive
+  - spend_amounts_must_be_positive_inputs_and_negative_transaction_deltas
+  - idempotency_key_and_scope_are_required_for_mutation_inputs
+  - private_wallet_state_must_not_be_log_safe_by_default
+  - repository_errors_must_be_redacted
+  - repository_interface_must_remain_storage_neutral
+  - repository_interface_must_not_authenticate_or_validate_sessions
+  - postgresql_adapter_behavior_must_remain_deferred_until_adapter_gate
+  - runtime_behavior_and_protocol_routes_must_remain_deferred
+  - direct_nakama_pitaya_api_compatibility_must_remain_false
+
+generated:
+  files: []
+  directories: []
+  planned_outputs:
+    go_typed_contracts: []
+    protobuf_message_shapes: []
+    websocket_dispatch_shapes: []
+    test_fixtures: []
+  immutable_to_non_system_agents: true
+  override_permission: generated_file_override
+
+contracts:
+  registry: .arch/contracts.yaml
+  status: protocol_route_implemented
+  semantic_source_format: vibit_manifest_yaml
+  wire_schema_format: protobuf
+  wire_schema_status: not_ratified
+  currency_wallet_repository_interface_implementation_completed: true
+  currency_wallet_repository_interface_implementation_decision: ADR-0204
+  currency_wallet_repository_interface_implementation_check_rule: runtime.currency_wallet_repository_interface_implementation
+  currency_wallet_repository_interface_implementation_work_item: W-0296
+  repository_owner: runtime/internal/modules/currency
+  repository_interface: runtime/internal/modules/currency.Repository
+  repository_source: runtime/internal/modules/currency/repository.go
+  repository_tests: runtime/internal/modules/currency/repository_test.go
+  currency_wallet_repository_boundary_decision: ADR-0203
+  currency_wallet_migration_source_decision: ADR-0202
+  currency_wallet_migration_source: runtime/migrations/postgres/000008_create_currency_wallets.sql
+  future_postgresql_adapter_gate_work_item: W-0297
+  future_postgresql_adapter_gate_direction: define_currency_wallet_postgresql_adapter_gate
+  currency_wallet_postgresql_adapter_gate_defined: true
+  currency_wallet_postgresql_adapter_gate_decision: ADR-0205
+  currency_wallet_postgresql_adapter_gate_check_rule: runtime.currency_wallet_postgresql_adapter_gate
+  currency_wallet_postgresql_adapter_gate_work_item: W-0297
+  future_postgresql_adapter_owner: runtime/internal/platform/persistence/postgres
+  future_postgresql_adapter_source_candidate: runtime/internal/platform/persistence/postgres/currency_wallet_repository.go
+  future_postgresql_adapter_test_candidate: runtime/internal/platform/persistence/postgres/currency_wallet_repository_test.go
+  future_adapter_source_candidate: runtime/internal/platform/persistence/postgres/currency_wallet_repository.go
+  future_adapter_tests_candidate: runtime/internal/platform/persistence/postgres/currency_wallet_repository_test.go
+  future_constructor_candidate: NewCurrencyWalletRepositoryForUnitOfWork
+  currency_wallet_postgresql_adapter_implementation_completed: true
+  currency_wallet_postgresql_adapter_implementation_decision: ADR-0206
+  currency_wallet_postgresql_adapter_implementation_check_rule: runtime.currency_wallet_postgresql_adapter_implementation
+  currency_wallet_runtime_behavior_gate_defined: true
+  currency_wallet_runtime_behavior_gate_decision: ADR-0207
+  currency_wallet_runtime_behavior_gate_check_rule: runtime.currency_wallet_runtime_behavior_gate
+  currency_wallet_runtime_behavior_gate_work_item: W-0299
+  currency_wallet_runtime_behavior_future_source: runtime/internal/app/currency/service.go
+  currency_wallet_runtime_behavior_implementation_completed: true
+  currency_wallet_runtime_behavior_implementation_decision: ADR-0208
+  currency_wallet_runtime_behavior_implementation_check_rule: runtime.currency_wallet_runtime_behavior_implementation
+  currency_wallet_runtime_behavior_service: runtime/internal/app/currency/service.go
+  currency_wallet_runtime_behavior_service_test: runtime/internal/app/currency/service_test.go
+  currency_wallet_protocol_route_gate_defined: true
+  currency_wallet_protocol_route_gate_decision: ADR-0209
+  currency_wallet_protocol_route_gate_check_rule: runtime.currency_wallet_protocol_route_gate
+  currency_wallet_protocol_route_gate_work_item: W-0301
+  protocol_route_next_work_item: W-0302
+  future_protocol_route_implementation_work_item: W-0302
+  future_protocol_route_implementation_direction: implement_currency_wallet_protocol_route
+  future_protocol_source_candidate: proto/vibit/currency/v1/currency.proto
+  future_generated_go_output_candidate: runtime/internal/generated/proto/vibit/currency/v1/currency.pb.go
+  future_protocol_bridge_candidate: runtime/internal/platform/protocol/protobuf/currency_bridge.go
+  future_application_handler_candidate: runtime/internal/app/bootstrap/currency.go
+  currency_wallet_protocol_route_implementation_completed: true
+  currency_wallet_protocol_route_implementation_decision: ADR-0210
+  currency_wallet_protocol_route_implementation_check_rule: runtime.currency_wallet_protocol_route_implementation
+  protocol_source: proto/vibit/currency/v1/currency.proto
+  generated_go_output: runtime/internal/generated/proto/vibit/currency/v1/currency.pb.go
+  protocol_bridge: runtime/internal/platform/protocol/protobuf/currency_bridge.go
+  application_handler: runtime/internal/app/bootstrap/currency.go
+  route_keys_source: runtime/internal/app/currency/routes.go
+  protocol_route_local_proof_test: runtime/internal/platform/protocol/protobuf/authenticated_gameplay_e2e_test.go
+  candidate_routes_recorded: true
+  first_payload_package: vibit.currency.v1
+  route_policy_requirement: request_token_required
+  authenticated_wrapper_required: true
+  request_identity_source: validated_authenticated_request_identity
+  metadata_only_player_id_allowed_as_proof: false
+  metadata_only_session_id_allowed_as_proof: false
+  client_supplied_owner_id_allowed_as_proof: false
+  client_supplied_wallet_id_allowed_for_lookup: false
+  client_supplied_actor_id_allowed_as_proof: false
+  server_authoritative_grant_policy_required: true
+  public_error_mapping_recorded: true
+  local_proof_expectations_recorded: true
+  nakama_reference_mapping_recorded: true
+  pitaya_reference_mapping_recorded: true
+  postgres_adapter_source: runtime/internal/platform/persistence/postgres/currency_wallet_repository.go
+  postgres_adapter_test: runtime/internal/platform/persistence/postgres/currency_wallet_repository_test.go
+  interface_added: true
+  value_types_added: true
+  normalizers_added: true
+  module_manifest_added: true
+  postgresql_adapter_added: true
+  sql_execution_added: true
+  runtime_behavior_added: true
+  wallet_transaction_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  protocol_route_implementation_added: true
+  protobuf_source_implementation_added: true
+  generated_output_implementation_added: true
+  protocol_bridge_added: true
+  application_handler_added: true
+  server_authoritative_grant_policy_required: true
+  zero_field_authenticated_payload_allowed: true
+  dependency_added: false
+  migration_changed: false
+  currency_catalog_table_added: false
+  currency_wallet_events_table_added: false
+  reward_integration_added: false
+  inventory_integration_added: false
+  purchase_behavior_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+  repository_next_work_item: none
+  repository_next_work_item_scope: no_next_ready_work_item
+
+tests:
+  required:
+    - runtime/internal/modules/currency/repository_test.go
+    - repository_interface_storage_neutrality
+    - closed_owner_lifecycle_transaction_actor_vocabularies
+    - wallet_record_normalization
+    - balance_record_normalization
+    - transaction_record_normalization
+    - create_get_owner_list_input_normalization
+    - grant_spend_idempotency_input_normalization
+    - list_result_copying
+    - conflict_vocabulary_and_redaction
+    - forbidden_secret_transport_protocol_storage_fields
+
+runtime:
+  implementation_status: runtime_behavior_and_protocol_route_implemented
+  postgresql_adapter_status: implemented
+  runtime_behavior_status: implemented
+  protocol_route_status: implemented

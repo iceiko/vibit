@@ -184,11 +184,14 @@ realtime_protocol_websocket_outbound_delivery_implementation_completed: true
 agent_native_feature_request_test_workflow_defined: true
 operations_inspection_source_first_surface_implemented: true
 pitaya_deferred_architecture_map_recorded: true
-next_direction: implement_pitaya_aligned_startup_shutdown_hook_source_first_map
-next_work_status: next_ready
+next_direction: no_next_ready_work_item
+next_work_status: no_next_ready_work_item
+historical_next_work_status_marker: "next_work_status: next_ready"
 ```
 
-Current next work item: `W-0290 Implement Pitaya-aligned startup and shutdown hook source-first map`。
+Current next work item: `No repository next work item is currently ready`。
+
+当前 currency wallet protocol route implementation decision：`decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`。
 
 Current check rule: `runtime.pitaya_aligned_handler_module_registration_source_first_map`。
 

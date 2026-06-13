@@ -10,6 +10,8 @@ import (
 	authenticationv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/authentication/v1"
 	protocolv1 "github.com/iceiko/vibit/runtime/internal/generated/proto/vibit/protocol/v1"
 	"google.golang.org/protobuf/proto"
+	"google.golang.org/protobuf/reflect/protoreflect"
+	"google.golang.org/protobuf/reflect/protoregistry"
 )
 
 type FrameRequest struct {
@@ -154,13 +156,25 @@ func routeRequestWithAuthenticatedPayload(request app.RouteRequest, wrapper *aut
 		return app.RouteRequest{}, &DecodeEnvelopeError{Message: "authenticated request inner payload_type is empty"}
 	}
 	innerPayload := append([]byte(nil), wrapper.GetInnerPayload()...)
-	if len(innerPayload) == 0 {
+	if len(innerPayload) == 0 && !payloadTypeAllowsEmptyPayload(innerPayloadType) {
 		return app.RouteRequest{}, &DecodeEnvelopeError{Message: "authenticated request inner payload is empty"}
 	}
 	request.PayloadType = innerPayloadType
 	request.PayloadBytes = innerPayload
 	request.Payload = nil
 	return request, nil
+}
+
+func payloadTypeAllowsEmptyPayload(payloadType string) bool {
+	messageName := protoreflect.FullName(strings.TrimSpace(payloadType))
+	if !messageName.IsValid() {
+		return false
+	}
+	messageType, err := protoregistry.GlobalTypes.FindMessageByName(messageName)
+	if err != nil {
+		return false
+	}
+	return messageType.Descriptor().Fields().Len() == 0
 }
 
 func PayloadTypeIsAuthenticatedRequest(payloadType string) bool {
