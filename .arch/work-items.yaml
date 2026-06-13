@@ -2,7 +2,7 @@ schema_version: 0.1
 project: vibit
 status: draft
 standard: docs/workflow.md
-current_milestone: M-230
+current_milestone: M-240
 
 release_targets:
   short_term:
@@ -26,7 +26,7 @@ release_targets:
     near_term_standard: docs/v0.1-alpha-goal.md
     goal: Become a Nakama-class open-source game/backend server framework optimized for AI-native development and AI-native testing, while deferring Pitaya as a future distributed architecture reference.
     primary_product_reference: Nakama
-    pitaya_reference_status: deferred_future_architecture_reference
+    pitaya_reference_status: service_dispatch_source_first_maps_completed
     ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
     direct_api_compatibility_goal: false
 
@@ -3934,6 +3934,66 @@ milestones:
     non_goals:
       - adding reward integration, inventory integration, purchase behavior, catalog tables, event/audit tables, payment behavior, reservation behavior, settlement behavior, refund behavior, transfer behavior, operations/admin behavior, broad economy policy, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility
     completion_summary: Implemented the protected currency wallet protocol route family, accepted `ADR-0210`, registered `runtime.currency_wallet_protocol_route_implementation`, added `proto/vibit/currency/v1/currency.proto`, generated Go Protobuf output, route key helpers, bootstrap handlers, protocol bridge mapping, payload registry dispatch, server-authoritative grant policy enforcement, focused route/bootstrap/bridge tests, and `TestCurrencyWalletProtocolRouteLocalAlphaFlow`; allowed zero-field proto3 authenticated payloads only when the registered payload descriptor has zero fields; preserved reward/inventory/purchase/catalog/event/payment/migration/dependency/startup/hosted/SDK/distributed/direct-compatibility deferrals; and left no repository next work item currently ready.
+
+  - id: M-231
+    title: Pitaya-Aligned Service Export Boundary Gate
+    status: completed
+    goal: Define gate-only Pitaya-aligned service export vocabulary without implementing runtime behavior.
+    completion_summary: Defined `runtime.pitaya_aligned_service_export_boundary_gate`, accepted `ADR-0211`, and continued to `W-0304 Implement Pitaya-aligned service export source-first map`.
+
+  - id: M-232
+    title: Pitaya-Aligned Service Export Source-First Map
+    status: completed
+    goal: Implement a source-first inspection map for Pitaya-aligned service export without implementing runtime behavior.
+    completion_summary: Implemented `node tools/vibit inspect pitaya-service-export --json`, registered `runtime.pitaya_aligned_service_export_source_first_map`, accepted `ADR-0212`, and continued to the next confirmed Pitaya-aligned gate.
+
+  - id: M-233
+    title: Pitaya-Aligned Remote Call Dispatch Boundary Gate
+    status: completed
+    goal: Define gate-only Pitaya-aligned remote call dispatch vocabulary without implementing runtime behavior.
+    completion_summary: Defined `runtime.pitaya_aligned_remote_call_dispatch_boundary_gate`, accepted `ADR-0213`, and continued to `W-0306 Implement Pitaya-aligned remote call dispatch source-first map`.
+
+  - id: M-234
+    title: Pitaya-Aligned Remote Call Dispatch Source-First Map
+    status: completed
+    goal: Implement a source-first inspection map for Pitaya-aligned remote call dispatch without implementing runtime behavior.
+    completion_summary: Implemented `node tools/vibit inspect pitaya-remote-call-dispatch --json`, registered `runtime.pitaya_aligned_remote_call_dispatch_source_first_map`, accepted `ADR-0214`, and continued to the next confirmed Pitaya-aligned gate.
+
+  - id: M-235
+    title: Pitaya-Aligned Frontend Message Forwarding Boundary Gate
+    status: completed
+    goal: Define gate-only Pitaya-aligned frontend message forwarding vocabulary without implementing runtime behavior.
+    completion_summary: Defined `runtime.pitaya_aligned_frontend_message_forwarding_boundary_gate`, accepted `ADR-0215`, and continued to `W-0308 Implement Pitaya-aligned frontend message forwarding source-first map`.
+
+  - id: M-236
+    title: Pitaya-Aligned Frontend Message Forwarding Source-First Map
+    status: completed
+    goal: Implement a source-first inspection map for Pitaya-aligned frontend message forwarding without implementing runtime behavior.
+    completion_summary: Implemented `node tools/vibit inspect pitaya-frontend-forwarding --json`, registered `runtime.pitaya_aligned_frontend_message_forwarding_source_first_map`, accepted `ADR-0216`, and continued to the next confirmed Pitaya-aligned gate.
+
+  - id: M-237
+    title: Pitaya-Aligned Backend Service Route Ownership Boundary Gate
+    status: completed
+    goal: Define gate-only Pitaya-aligned backend service route ownership vocabulary without implementing runtime behavior.
+    completion_summary: Defined `runtime.pitaya_aligned_backend_service_route_ownership_boundary_gate`, accepted `ADR-0217`, and continued to `W-0310 Implement Pitaya-aligned backend service route ownership source-first map`.
+
+  - id: M-238
+    title: Pitaya-Aligned Backend Service Route Ownership Source-First Map
+    status: completed
+    goal: Implement a source-first inspection map for Pitaya-aligned backend service route ownership without implementing runtime behavior.
+    completion_summary: Implemented `node tools/vibit inspect pitaya-backend-service-routes --json`, registered `runtime.pitaya_aligned_backend_service_route_ownership_source_first_map`, accepted `ADR-0218`, and continued to the next confirmed Pitaya-aligned gate.
+
+  - id: M-239
+    title: Pitaya-Aligned Cluster Event Bus Boundary Gate
+    status: completed
+    goal: Define gate-only Pitaya-aligned cluster event bus vocabulary without implementing runtime behavior.
+    completion_summary: Defined `runtime.pitaya_aligned_cluster_event_bus_boundary_gate`, accepted `ADR-0219`, and continued to `W-0312 Implement Pitaya-aligned cluster event bus source-first map`.
+
+  - id: M-240
+    title: Pitaya-Aligned Cluster Event Bus Source-First Map
+    status: completed
+    goal: Implement a source-first inspection map for Pitaya-aligned cluster event bus without implementing runtime behavior.
+    completion_summary: Implemented `node tools/vibit inspect pitaya-cluster-event-bus --json`, registered `runtime.pitaya_aligned_cluster_event_bus_source_first_map`, accepted `ADR-0220`, and left no repository next work item currently ready.
 
 work_items:
   - id: W-0001
@@ -13131,3 +13191,318 @@ work_items:
     decision: ADR-0210
     check_rule: runtime.currency_wallet_protocol_route_implementation
     completion_summary: Implemented the protected `vibit.currency.v1` wallet route family for `currency.EnsurePlayerWallet`, `currency.GetOwnWallet`, `currency.ListOwnWalletBalances`, `currency.GrantCurrency`, `currency.SpendCurrency`, and `currency.ListOwnWalletTransactions`; added Protobuf source, generated Go output, route keys, bootstrap handlers, server-side grant policy, protocol bridge mapping, payload registry dispatch, focused tests, and local authenticated gameplay proof; fixed zero-field proto3 authenticated payload handling without weakening non-empty payload rejection; preserved reward/inventory/purchase/catalog/event/payment/migration/dependency/startup/hosted/SDK/distributed/direct-compatibility deferrals; and left no repository next work item currently ready.
+
+  - id: W-0303
+    milestone: M-231
+    title: Define Pitaya-aligned service export boundary gate
+    status: completed
+    change: changes/2026-06-13-define-pitaya-aligned-service-export-boundary-gate
+    depends_on:
+      - W-0302
+    expected_change_id: define-pitaya-aligned-service-export-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_service_export_boundary_gate
+    selection_decision: ADR-0210
+    related_decisions:
+      - ADR-0211
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing service export behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the service export boundary gate.
+    completion:
+      - Define the Pitaya-aligned service export boundary gate.
+      - Record future vocabulary, source-first map candidate, deferrals, redaction expectations, and stop conditions.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-231
+    previous_completed_work_item: W-0302
+    next_milestone: M-232
+    next_ready_work_item: W-0304
+    decision: ADR-0211
+    check_rule: runtime.pitaya_aligned_service_export_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_service_export_source_first_map
+    completion_summary: Defined `docs/pitaya-aligned-service-export-boundary-gate.md`, accepted `ADR-0211`, registered `runtime.pitaya_aligned_service_export_boundary_gate`, opened `W-0304 Implement Pitaya-aligned service export source-first map`, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0304
+    milestone: M-232
+    title: Implement Pitaya-aligned service export source-first map
+    status: completed
+    change: changes/2026-06-13-implement-pitaya-aligned-service-export-source-first-map
+    depends_on:
+      - W-0303
+    expected_change_id: implement-pitaya-aligned-service-export-source-first-map
+    tier: tier_2_tooling
+    selected_direction: implement_pitaya_aligned_service_export_source_first_map
+    selection_decision: ADR-0211
+    related_decisions:
+      - ADR-0212
+      - ADR-0211
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing service export behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the service export source-first inspection map.
+    completion:
+      - Implement `node tools/vibit inspect pitaya-service-export --json`.
+      - Register `runtime.pitaya_aligned_service_export_source_first_map` and make the source-first map checkable.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-232
+    previous_completed_work_item: W-0303
+    next_milestone: M-233
+    next_ready_work_item: W-0305
+    decision: ADR-0212
+    check_rule: runtime.pitaya_aligned_service_export_source_first_map
+    command: node tools/vibit inspect pitaya-service-export --json
+    completion_summary: Implemented `node tools/vibit inspect pitaya-service-export --json`, accepted `ADR-0212`, registered `runtime.pitaya_aligned_service_export_source_first_map`, opened `W-0305` as the next confirmed Pitaya-aligned gate, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0305
+    milestone: M-233
+    title: Define Pitaya-aligned remote call dispatch boundary gate
+    status: completed
+    change: changes/2026-06-13-define-pitaya-aligned-remote-call-dispatch-boundary-gate
+    depends_on:
+      - W-0304
+    expected_change_id: define-pitaya-aligned-remote-call-dispatch-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_remote_call_dispatch_boundary_gate
+    selection_decision: ADR-0210
+    related_decisions:
+      - ADR-0213
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing remote call dispatch behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the remote call dispatch boundary gate.
+    completion:
+      - Define the Pitaya-aligned remote call dispatch boundary gate.
+      - Record future vocabulary, source-first map candidate, deferrals, redaction expectations, and stop conditions.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-233
+    previous_completed_work_item: W-0304
+    next_milestone: M-234
+    next_ready_work_item: W-0306
+    decision: ADR-0213
+    check_rule: runtime.pitaya_aligned_remote_call_dispatch_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_remote_call_dispatch_source_first_map
+    completion_summary: Defined `docs/pitaya-aligned-remote-call-dispatch-boundary-gate.md`, accepted `ADR-0213`, registered `runtime.pitaya_aligned_remote_call_dispatch_boundary_gate`, opened `W-0306 Implement Pitaya-aligned remote call dispatch source-first map`, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0306
+    milestone: M-234
+    title: Implement Pitaya-aligned remote call dispatch source-first map
+    status: completed
+    change: changes/2026-06-13-implement-pitaya-aligned-remote-call-dispatch-source-first-map
+    depends_on:
+      - W-0305
+    expected_change_id: implement-pitaya-aligned-remote-call-dispatch-source-first-map
+    tier: tier_2_tooling
+    selected_direction: implement_pitaya_aligned_remote_call_dispatch_source_first_map
+    selection_decision: ADR-0213
+    related_decisions:
+      - ADR-0214
+      - ADR-0213
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing remote call dispatch behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the remote call dispatch source-first inspection map.
+    completion:
+      - Implement `node tools/vibit inspect pitaya-remote-call-dispatch --json`.
+      - Register `runtime.pitaya_aligned_remote_call_dispatch_source_first_map` and make the source-first map checkable.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-234
+    previous_completed_work_item: W-0305
+    next_milestone: M-235
+    next_ready_work_item: W-0307
+    decision: ADR-0214
+    check_rule: runtime.pitaya_aligned_remote_call_dispatch_source_first_map
+    command: node tools/vibit inspect pitaya-remote-call-dispatch --json
+    completion_summary: Implemented `node tools/vibit inspect pitaya-remote-call-dispatch --json`, accepted `ADR-0214`, registered `runtime.pitaya_aligned_remote_call_dispatch_source_first_map`, opened `W-0307` as the next confirmed Pitaya-aligned gate, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0307
+    milestone: M-235
+    title: Define Pitaya-aligned frontend message forwarding boundary gate
+    status: completed
+    change: changes/2026-06-13-define-pitaya-aligned-frontend-message-forwarding-boundary-gate
+    depends_on:
+      - W-0306
+    expected_change_id: define-pitaya-aligned-frontend-message-forwarding-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_frontend_message_forwarding_boundary_gate
+    selection_decision: ADR-0210
+    related_decisions:
+      - ADR-0215
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing frontend message forwarding behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the frontend message forwarding boundary gate.
+    completion:
+      - Define the Pitaya-aligned frontend message forwarding boundary gate.
+      - Record future vocabulary, source-first map candidate, deferrals, redaction expectations, and stop conditions.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-235
+    previous_completed_work_item: W-0306
+    next_milestone: M-236
+    next_ready_work_item: W-0308
+    decision: ADR-0215
+    check_rule: runtime.pitaya_aligned_frontend_message_forwarding_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_frontend_message_forwarding_source_first_map
+    completion_summary: Defined `docs/pitaya-aligned-frontend-message-forwarding-boundary-gate.md`, accepted `ADR-0215`, registered `runtime.pitaya_aligned_frontend_message_forwarding_boundary_gate`, opened `W-0308 Implement Pitaya-aligned frontend message forwarding source-first map`, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0308
+    milestone: M-236
+    title: Implement Pitaya-aligned frontend message forwarding source-first map
+    status: completed
+    change: changes/2026-06-13-implement-pitaya-aligned-frontend-message-forwarding-source-first-map
+    depends_on:
+      - W-0307
+    expected_change_id: implement-pitaya-aligned-frontend-message-forwarding-source-first-map
+    tier: tier_2_tooling
+    selected_direction: implement_pitaya_aligned_frontend_message_forwarding_source_first_map
+    selection_decision: ADR-0215
+    related_decisions:
+      - ADR-0216
+      - ADR-0215
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing frontend message forwarding behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the frontend message forwarding source-first inspection map.
+    completion:
+      - Implement `node tools/vibit inspect pitaya-frontend-forwarding --json`.
+      - Register `runtime.pitaya_aligned_frontend_message_forwarding_source_first_map` and make the source-first map checkable.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-236
+    previous_completed_work_item: W-0307
+    next_milestone: M-237
+    next_ready_work_item: W-0309
+    decision: ADR-0216
+    check_rule: runtime.pitaya_aligned_frontend_message_forwarding_source_first_map
+    command: node tools/vibit inspect pitaya-frontend-forwarding --json
+    completion_summary: Implemented `node tools/vibit inspect pitaya-frontend-forwarding --json`, accepted `ADR-0216`, registered `runtime.pitaya_aligned_frontend_message_forwarding_source_first_map`, opened `W-0309` as the next confirmed Pitaya-aligned gate, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0309
+    milestone: M-237
+    title: Define Pitaya-aligned backend service route ownership boundary gate
+    status: completed
+    change: changes/2026-06-13-define-pitaya-aligned-backend-service-route-ownership-boundary-gate
+    depends_on:
+      - W-0308
+    expected_change_id: define-pitaya-aligned-backend-service-route-ownership-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_backend_service_route_ownership_boundary_gate
+    selection_decision: ADR-0210
+    related_decisions:
+      - ADR-0217
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing backend service route ownership behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the backend service route ownership boundary gate.
+    completion:
+      - Define the Pitaya-aligned backend service route ownership boundary gate.
+      - Record future vocabulary, source-first map candidate, deferrals, redaction expectations, and stop conditions.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-237
+    previous_completed_work_item: W-0308
+    next_milestone: M-238
+    next_ready_work_item: W-0310
+    decision: ADR-0217
+    check_rule: runtime.pitaya_aligned_backend_service_route_ownership_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_backend_service_route_ownership_source_first_map
+    completion_summary: Defined `docs/pitaya-aligned-backend-service-route-ownership-boundary-gate.md`, accepted `ADR-0217`, registered `runtime.pitaya_aligned_backend_service_route_ownership_boundary_gate`, opened `W-0310 Implement Pitaya-aligned backend service route ownership source-first map`, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0310
+    milestone: M-238
+    title: Implement Pitaya-aligned backend service route ownership source-first map
+    status: completed
+    change: changes/2026-06-13-implement-pitaya-aligned-backend-service-route-ownership-source-first-map
+    depends_on:
+      - W-0309
+    expected_change_id: implement-pitaya-aligned-backend-service-route-ownership-source-first-map
+    tier: tier_2_tooling
+    selected_direction: implement_pitaya_aligned_backend_service_route_ownership_source_first_map
+    selection_decision: ADR-0217
+    related_decisions:
+      - ADR-0218
+      - ADR-0217
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing backend service route ownership behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the backend service route ownership source-first inspection map.
+    completion:
+      - Implement `node tools/vibit inspect pitaya-backend-service-routes --json`.
+      - Register `runtime.pitaya_aligned_backend_service_route_ownership_source_first_map` and make the source-first map checkable.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-238
+    previous_completed_work_item: W-0309
+    next_milestone: M-239
+    next_ready_work_item: W-0311
+    decision: ADR-0218
+    check_rule: runtime.pitaya_aligned_backend_service_route_ownership_source_first_map
+    command: node tools/vibit inspect pitaya-backend-service-routes --json
+    completion_summary: Implemented `node tools/vibit inspect pitaya-backend-service-routes --json`, accepted `ADR-0218`, registered `runtime.pitaya_aligned_backend_service_route_ownership_source_first_map`, opened `W-0311` as the next confirmed Pitaya-aligned gate, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0311
+    milestone: M-239
+    title: Define Pitaya-aligned cluster event bus boundary gate
+    status: completed
+    change: changes/2026-06-13-define-pitaya-aligned-cluster-event-bus-boundary-gate
+    depends_on:
+      - W-0310
+    expected_change_id: define-pitaya-aligned-cluster-event-bus-boundary-gate
+    tier: tier_2_architecture_boundary
+    selected_direction: define_pitaya_aligned_cluster_event_bus_boundary_gate
+    selection_decision: ADR-0210
+    related_decisions:
+      - ADR-0219
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing cluster event bus behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of defining only the cluster event bus boundary gate.
+    completion:
+      - Define the Pitaya-aligned cluster event bus boundary gate.
+      - Record future vocabulary, source-first map candidate, deferrals, redaction expectations, and stop conditions.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-239
+    previous_completed_work_item: W-0310
+    next_milestone: M-240
+    next_ready_work_item: W-0312
+    decision: ADR-0219
+    check_rule: runtime.pitaya_aligned_cluster_event_bus_boundary_gate
+    selected_follow_up_direction: implement_pitaya_aligned_cluster_event_bus_source_first_map
+    completion_summary: Defined `docs/pitaya-aligned-cluster-event-bus-boundary-gate.md`, accepted `ADR-0219`, registered `runtime.pitaya_aligned_cluster_event_bus_boundary_gate`, opened `W-0312 Implement Pitaya-aligned cluster event bus source-first map`, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+
+  - id: W-0312
+    milestone: M-240
+    title: Implement Pitaya-aligned cluster event bus source-first map
+    status: completed
+    change: changes/2026-06-13-implement-pitaya-aligned-cluster-event-bus-source-first-map
+    depends_on:
+      - W-0311
+    expected_change_id: implement-pitaya-aligned-cluster-event-bus-source-first-map
+    tier: tier_2_tooling
+    selected_direction: implement_pitaya_aligned_cluster_event_bus_source_first_map
+    selection_decision: ADR-0219
+    related_decisions:
+      - ADR-0220
+      - ADR-0219
+      - ADR-0210
+      - ADR-0078
+      - ADR-0019
+    ask_first:
+      - Implementing cluster event bus behavior, runtime behavior, protocol messages or routes, Protobuf sources, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya compatibility instead of implementing only the cluster event bus source-first inspection map.
+    completion:
+      - Implement `node tools/vibit inspect pitaya-cluster-event-bus --json`.
+      - Register `runtime.pitaya_aligned_cluster_event_bus_source_first_map` and make the source-first map checkable.
+      - Preserve runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.
+    completed_milestone: M-240
+    previous_completed_work_item: W-0311
+    next_milestone: none
+    next_ready_work_item: none
+    decision: ADR-0220
+    check_rule: runtime.pitaya_aligned_cluster_event_bus_source_first_map
+    command: node tools/vibit inspect pitaya-cluster-event-bus --json
+    completion_summary: Implemented `node tools/vibit inspect pitaya-cluster-event-bus --json`, accepted `ADR-0220`, registered `runtime.pitaya_aligned_cluster_event_bus_source_first_map`, left no repository next work item currently ready, and preserved runtime/protocol/generated/persistence/dependency/distributed/direct-compatibility deferrals.

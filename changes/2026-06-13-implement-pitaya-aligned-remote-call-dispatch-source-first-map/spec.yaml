@@ -1,0 +1,97 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-remote-call-dispatch-source-first-map
+date: 2026-06-13
+type: tooling
+status: verified
+
+summary: Implement the Pitaya-aligned remote call dispatch source-first map without adding runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0214
+  referenced:
+    - ADR-0210
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_remote_call_dispatch_source_first_map: implemented
+  completed_work_item: W-0306
+  completed_milestone: M-234
+  previous_completed_work_item: W-0305
+  next_milestone: M-235
+  next_work_item: W-0307
+  next_work_item_status: next_ready
+  next_direction: define_pitaya_aligned_frontend_message_forwarding_boundary_gate
+  decision: ADR-0214
+  check_rule: runtime.pitaya_aligned_remote_call_dispatch_source_first_map
+  command: node tools/vibit inspect pitaya-remote-call-dispatch --json
+  gate_decision: ADR-0213
+  primary_product_reference: Nakama
+  pitaya_reference_status: remote_call_dispatch_source_first_map_implemented
+  implementation_scope: source_first_repository_inspection
+  runtime_behavior_added: false
+  service_export_behavior_added: false
+  remote_call_dispatch_behavior_added: false
+  server_to_server_rpc_behavior_added: false
+  frontend_message_forwarding_behavior_added: false
+  backend_service_route_ownership_behavior_added: false
+  backend_service_targeting_behavior_added: false
+  cluster_event_bus_behavior_added: false
+  cluster_pubsub_behavior_added: false
+  node_event_fanout_behavior_added: false
+  outbox_event_delivery_behavior_added: false
+  service_discovery_behavior_added: false
+  frontend_backend_role_runtime_behavior_added: false
+  distributed_runtime_implementation_added: false
+  runtime_endpoint_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `runtime.pitaya_aligned_remote_call_dispatch_source_first_map` is registered and enforced by `tools/vibit`.
+  - `ADR-0214` records the source-first map decision.
+  - The slice does not add runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+verification:
+  status: Verified
+  commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_remote_call_dispatch_source_first_map
+    - node tools/vibit inspect pitaya-remote-call-dispatch --json
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json

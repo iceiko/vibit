@@ -86,6 +86,7 @@ Prototype-ready local development path package 已记录在 `docs/prototype-read
 
 ```bash
 node tools/vibit inspect next
+node tools/vibit inspect pitaya-session-lifecycle --json
 node tools/vibit check work --json
 node tools/vibit check all --json
 ```
@@ -228,10 +229,10 @@ git diff --check
 ```yaml
 next_work_item: none
 next_direction: no_next_ready_work_item
+latest_pitaya_alignment_work_item: W-0312
+latest_pitaya_alignment_decision: ADR-0220
 ```
 
-No repository next work item is currently ready。当前 currency wallet protocol route implementation decision：`decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`。
+No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`.
 
-`ADR-0189` 已注册 `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`，实现 `node tools/vibit inspect pitaya-component-lifecycle --json`，并完成 `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`；`ADR-0190` 注册 `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`，完成 `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`，并选择 `define_pitaya_aligned_handler_module_registration_boundary_gate`；`ADR-0191` 注册 `runtime.pitaya_aligned_handler_module_registration_boundary_gate`，完成 `W-0283 Define Pitaya-aligned handler module registration boundary gate`，并打开 `W-0284 Implement Pitaya-aligned handler module registration source-first map`；`ADR-0192` 注册 `runtime.pitaya_aligned_handler_module_registration_source_first_map`，实现 `node tools/vibit inspect pitaya-handler-modules --json`，并完成 `W-0284`；`ADR-0193` 注册 `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`，完成 `W-0285`，选择 `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`，并打开 `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`。
-
-前一项 session lifecycle inspection 仍可通过 `node tools/vibit inspect pitaya-session-lifecycle --json` 使用；runtime observability inspection 可通过 `node tools/vibit inspect pitaya-observability --json` 使用。
+The completed Pitaya service dispatch sequence covered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.

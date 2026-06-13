@@ -87,6 +87,7 @@ Trace references for the current packaged flow include `docs/first-alpha-user-di
 
 ```bash
 node tools/vibit inspect next
+node tools/vibit inspect pitaya-session-lifecycle --json
 node tools/vibit check work --json
 node tools/vibit check all --json
 ```
@@ -229,10 +230,10 @@ git diff --check
 ```yaml
 next_work_item: none
 next_direction: no_next_ready_work_item
+latest_pitaya_alignment_work_item: W-0312
+latest_pitaya_alignment_decision: ADR-0220
 ```
 
-No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`.
+No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`.
 
-`ADR-0189` registered `runtime.pitaya_aligned_runtime_component_lifecycle_source_first_map`, implemented `node tools/vibit inspect pitaya-component-lifecycle --json`, and completed `W-0281 Implement Pitaya-aligned runtime component lifecycle source-first map`; `ADR-0190` registered `runtime.next_pitaya_aligned_direction_after_runtime_component_lifecycle_map`, completed `W-0282 Select next Pitaya-aligned direction after runtime component lifecycle map`, and selected `define_pitaya_aligned_handler_module_registration_boundary_gate`; `ADR-0191` registered `runtime.pitaya_aligned_handler_module_registration_boundary_gate`, completed `W-0283 Define Pitaya-aligned handler module registration boundary gate`, and opened `W-0284 Implement Pitaya-aligned handler module registration source-first map`; `ADR-0192` registered `runtime.pitaya_aligned_handler_module_registration_source_first_map`, implemented `node tools/vibit inspect pitaya-handler-modules --json`, and completed `W-0284`; `ADR-0193` registered `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`, completed `W-0285`, selected `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`, and opened `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`.
-
-The preceding session lifecycle inspection remains available through `node tools/vibit inspect pitaya-session-lifecycle --json`; the runtime observability inspection is available through `node tools/vibit inspect pitaya-observability --json`; the metrics/tracing inspection is available through `node tools/vibit inspect pitaya-metrics-tracing --json`; the runtime component lifecycle inspection is available through `node tools/vibit inspect pitaya-component-lifecycle --json`.
+The completed Pitaya service dispatch sequence covered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.

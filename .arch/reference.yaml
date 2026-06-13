@@ -19,7 +19,7 @@ product_parity_roadmap:
   completed_work_item: W-0168
   selected_direction: expand_core_game_backend_modules_after_nakama_pitaya_review
   primary_product_reference: Nakama
-  pitaya_reference_status: deferred_future_architecture_reference_after_startup_shutdown_hook_map
+  pitaya_reference_status: service_dispatch_source_first_maps_completed_after_startup_shutdown_hook_map
   ai_native_development_testing_goal: user_requirement_to_spec_tests_implementation_verification
   parity_goal: nakama_first_same_class_common_capability_coverage
   api_compatibility_goal: false
@@ -7317,6 +7317,126 @@ phase_plan:
     protobuf_source_added: true
     generated_output_added: true
     local_proof_added: true
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: none
+    recommended_next_direction: no_next_ready_work_item
+  phase_5a_pitaya_aligned_service_export_boundary_gate:
+    status: completed
+    milestone: M-231
+    work_item: W-0303
+    decision: ADR-0211
+    check_rule: runtime.pitaya_aligned_service_export_boundary_gate
+    selected_direction: define_pitaya_aligned_service_export_boundary_gate
+    implementation_scope: gate_only_service_export_vocabulary
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0304
+    selected_follow_up_direction: implement_pitaya_aligned_service_export_source_first_map
+  phase_5a_pitaya_aligned_service_export_source_first_map:
+    status: completed
+    milestone: M-232
+    work_item: W-0304
+    decision: ADR-0212
+    check_rule: runtime.pitaya_aligned_service_export_source_first_map
+    command: node tools/vibit inspect pitaya-service-export --json
+    selected_direction: implement_pitaya_aligned_service_export_source_first_map
+    implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0305
+    recommended_next_direction: define_pitaya_aligned_remote_call_dispatch_boundary_gate
+  phase_5b_pitaya_aligned_remote_call_dispatch_boundary_gate:
+    status: completed
+    milestone: M-233
+    work_item: W-0305
+    decision: ADR-0213
+    check_rule: runtime.pitaya_aligned_remote_call_dispatch_boundary_gate
+    selected_direction: define_pitaya_aligned_remote_call_dispatch_boundary_gate
+    implementation_scope: gate_only_remote_call_dispatch_vocabulary
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0306
+    selected_follow_up_direction: implement_pitaya_aligned_remote_call_dispatch_source_first_map
+  phase_5b_pitaya_aligned_remote_call_dispatch_source_first_map:
+    status: completed
+    milestone: M-234
+    work_item: W-0306
+    decision: ADR-0214
+    check_rule: runtime.pitaya_aligned_remote_call_dispatch_source_first_map
+    command: node tools/vibit inspect pitaya-remote-call-dispatch --json
+    selected_direction: implement_pitaya_aligned_remote_call_dispatch_source_first_map
+    implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0307
+    recommended_next_direction: define_pitaya_aligned_frontend_message_forwarding_boundary_gate
+  phase_5c_pitaya_aligned_frontend_message_forwarding_boundary_gate:
+    status: completed
+    milestone: M-235
+    work_item: W-0307
+    decision: ADR-0215
+    check_rule: runtime.pitaya_aligned_frontend_message_forwarding_boundary_gate
+    selected_direction: define_pitaya_aligned_frontend_message_forwarding_boundary_gate
+    implementation_scope: gate_only_frontend_message_forwarding_vocabulary
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0308
+    selected_follow_up_direction: implement_pitaya_aligned_frontend_message_forwarding_source_first_map
+  phase_5c_pitaya_aligned_frontend_message_forwarding_source_first_map:
+    status: completed
+    milestone: M-236
+    work_item: W-0308
+    decision: ADR-0216
+    check_rule: runtime.pitaya_aligned_frontend_message_forwarding_source_first_map
+    command: node tools/vibit inspect pitaya-frontend-forwarding --json
+    selected_direction: implement_pitaya_aligned_frontend_message_forwarding_source_first_map
+    implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0309
+    recommended_next_direction: define_pitaya_aligned_backend_service_route_ownership_boundary_gate
+  phase_5d_pitaya_aligned_backend_service_route_ownership_boundary_gate:
+    status: completed
+    milestone: M-237
+    work_item: W-0309
+    decision: ADR-0217
+    check_rule: runtime.pitaya_aligned_backend_service_route_ownership_boundary_gate
+    selected_direction: define_pitaya_aligned_backend_service_route_ownership_boundary_gate
+    implementation_scope: gate_only_backend_service_route_ownership_vocabulary
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0310
+    selected_follow_up_direction: implement_pitaya_aligned_backend_service_route_ownership_source_first_map
+  phase_5d_pitaya_aligned_backend_service_route_ownership_source_first_map:
+    status: completed
+    milestone: M-238
+    work_item: W-0310
+    decision: ADR-0218
+    check_rule: runtime.pitaya_aligned_backend_service_route_ownership_source_first_map
+    command: node tools/vibit inspect pitaya-backend-service-routes --json
+    selected_direction: implement_pitaya_aligned_backend_service_route_ownership_source_first_map
+    implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_added: false
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0311
+    recommended_next_direction: define_pitaya_aligned_cluster_event_bus_boundary_gate
+  phase_5e_pitaya_aligned_cluster_event_bus_boundary_gate:
+    status: completed
+    milestone: M-239
+    work_item: W-0311
+    decision: ADR-0219
+    check_rule: runtime.pitaya_aligned_cluster_event_bus_boundary_gate
+    selected_direction: define_pitaya_aligned_cluster_event_bus_boundary_gate
+    implementation_scope: gate_only_cluster_event_bus_vocabulary
+    direct_nakama_pitaya_api_compatibility_added: false
+    next_ready_work_item: W-0312
+    selected_follow_up_direction: implement_pitaya_aligned_cluster_event_bus_source_first_map
+  phase_5e_pitaya_aligned_cluster_event_bus_source_first_map:
+    status: completed
+    milestone: M-240
+    work_item: W-0312
+    decision: ADR-0220
+    check_rule: runtime.pitaya_aligned_cluster_event_bus_source_first_map
+    command: node tools/vibit inspect pitaya-cluster-event-bus --json
+    selected_direction: implement_pitaya_aligned_cluster_event_bus_source_first_map
+    implementation_scope: source_first_repository_inspection
+    distributed_runtime_implementation_added: false
     direct_nakama_pitaya_api_compatibility_added: false
     next_ready_work_item: none
     recommended_next_direction: no_next_ready_work_item

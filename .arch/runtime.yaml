@@ -13652,3 +13652,67 @@ first_runtime_proof_slice:
 open_questions:
   - Decide whether outbox storage is required before the first durable cross-boundary event delivery.
   - Decide when the first S3-compatible object storage use case is concrete enough to adopt a client SDK.
+
+pitaya_service_dispatch_alignment:
+  status: completed
+  current_phase: no_next_ready_work_item
+  next_ready_work_item: none
+  pitaya_reference_status: service_dispatch_source_first_maps_completed
+  sequence_completed_work_items:
+    - W-0303
+    - W-0304
+    - W-0305
+    - W-0306
+    - W-0307
+    - W-0308
+    - W-0309
+    - W-0310
+    - W-0311
+    - W-0312
+  pitaya_aligned_service_export_boundary_gate: ADR-0211
+  pitaya_aligned_service_export_source_first_map: ADR-0212
+  pitaya_aligned_service_export_boundary_gate_defined: true
+  pitaya_aligned_service_export_source_first_map_implemented: true
+  pitaya_aligned_service_export_boundary_gate_check_rule: runtime.pitaya_aligned_service_export_boundary_gate
+  pitaya_aligned_service_export_source_first_map_check_rule: runtime.pitaya_aligned_service_export_source_first_map
+  pitaya_service_export_inspection_command: node tools/vibit inspect pitaya-service-export --json
+  implementation_scope_service_export: source_first_repository_inspection
+  pitaya_aligned_remote_call_dispatch_boundary_gate: ADR-0213
+  pitaya_aligned_remote_call_dispatch_source_first_map: ADR-0214
+  pitaya_aligned_remote_call_dispatch_boundary_gate_defined: true
+  pitaya_aligned_remote_call_dispatch_source_first_map_implemented: true
+  pitaya_aligned_remote_call_dispatch_boundary_gate_check_rule: runtime.pitaya_aligned_remote_call_dispatch_boundary_gate
+  pitaya_aligned_remote_call_dispatch_source_first_map_check_rule: runtime.pitaya_aligned_remote_call_dispatch_source_first_map
+  pitaya_remote_call_dispatch_inspection_command: node tools/vibit inspect pitaya-remote-call-dispatch --json
+  implementation_scope_remote_call_dispatch: source_first_repository_inspection
+  pitaya_aligned_frontend_message_forwarding_boundary_gate: ADR-0215
+  pitaya_aligned_frontend_message_forwarding_source_first_map: ADR-0216
+  pitaya_aligned_frontend_message_forwarding_boundary_gate_defined: true
+  pitaya_aligned_frontend_message_forwarding_source_first_map_implemented: true
+  pitaya_aligned_frontend_message_forwarding_boundary_gate_check_rule: runtime.pitaya_aligned_frontend_message_forwarding_boundary_gate
+  pitaya_aligned_frontend_message_forwarding_source_first_map_check_rule: runtime.pitaya_aligned_frontend_message_forwarding_source_first_map
+  pitaya_frontend_message_forwarding_inspection_command: node tools/vibit inspect pitaya-frontend-forwarding --json
+  implementation_scope_frontend_message_forwarding: source_first_repository_inspection
+  pitaya_aligned_backend_service_route_ownership_boundary_gate: ADR-0217
+  pitaya_aligned_backend_service_route_ownership_source_first_map: ADR-0218
+  pitaya_aligned_backend_service_route_ownership_boundary_gate_defined: true
+  pitaya_aligned_backend_service_route_ownership_source_first_map_implemented: true
+  pitaya_aligned_backend_service_route_ownership_boundary_gate_check_rule: runtime.pitaya_aligned_backend_service_route_ownership_boundary_gate
+  pitaya_aligned_backend_service_route_ownership_source_first_map_check_rule: runtime.pitaya_aligned_backend_service_route_ownership_source_first_map
+  pitaya_backend_service_route_ownership_inspection_command: node tools/vibit inspect pitaya-backend-service-routes --json
+  implementation_scope_backend_service_route_ownership: source_first_repository_inspection
+  pitaya_aligned_cluster_event_bus_boundary_gate: ADR-0219
+  pitaya_aligned_cluster_event_bus_source_first_map: ADR-0220
+  pitaya_aligned_cluster_event_bus_boundary_gate_defined: true
+  pitaya_aligned_cluster_event_bus_source_first_map_implemented: true
+  pitaya_aligned_cluster_event_bus_boundary_gate_check_rule: runtime.pitaya_aligned_cluster_event_bus_boundary_gate
+  pitaya_aligned_cluster_event_bus_source_first_map_check_rule: runtime.pitaya_aligned_cluster_event_bus_source_first_map
+  pitaya_cluster_event_bus_inspection_command: node tools/vibit inspect pitaya-cluster-event-bus --json
+  implementation_scope_cluster_event_bus: source_first_repository_inspection
+  runtime_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  dependency_added: false
+  distributed_runtime_implementation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false

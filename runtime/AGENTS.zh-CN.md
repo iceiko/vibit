@@ -416,3 +416,5 @@ go vet ./...
 
 
 Current currency wallet repository boundary check rule: `runtime.currency_wallet_repository_boundary`.
+
+`M-231/W-0303` through `M-240/W-0312` are completed as the confirmed Pitaya service dispatch source-first sequence. The sequence accepted `ADR-0211` through `ADR-0220`, registered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus gate/map rules, implemented `node tools/vibit inspect pitaya-service-export --json`, `pitaya-remote-call-dispatch --json`, `pitaya-frontend-forwarding --json`, `pitaya-backend-service-routes --json`, and `pitaya-cluster-event-bus --json`, and left no repository next work item currently ready. These slices are source-first only; do not add service export behavior, remote call dispatch behavior, frontend message forwarding behavior, backend service route ownership behavior, cluster event bus behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility without a later bounded work item.

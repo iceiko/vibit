@@ -453,13 +453,12 @@ Agents 禁止：
 
 ```yaml
 next_work_item: none
+next_direction: no_next_ready_work_item
 recommended_next_direction: no_next_ready_work_item
+latest_pitaya_alignment_work_item: W-0312
+latest_pitaya_alignment_decision: ADR-0220
 ```
 
-当前 currency wallet PostgreSQL adapter implementation decision：`decisions/ADR-0206-currency-wallet-postgresql-adapter-implementation.md`。
-当前 currency wallet runtime behavior gate decision：`decisions/ADR-0207-currency-wallet-runtime-behavior-gate.md`。
-当前 currency wallet protocol route gate decision：`decisions/ADR-0209-currency-wallet-protocol-route-gate.md`。
-当前 currency wallet protocol route implementation decision：`decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`。
-No repository next work item is currently ready。
+No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`.
 
-`ADR-0192` 已注册 `runtime.pitaya_aligned_handler_module_registration_source_first_map`，实现 `node tools/vibit inspect pitaya-handler-modules --json`，并完成 `W-0284 Implement Pitaya-aligned handler module registration source-first map`；`ADR-0193` 注册 `runtime.next_pitaya_aligned_direction_after_handler_module_registration_map`，完成 `W-0285`，选择 `define_pitaya_aligned_component_discovery_module_loading_boundary_gate`，打开 `W-0286 Define Pitaya-aligned component discovery and module loading boundary gate`，并继续延后 handler module registration behavior、handler registration behavior、dynamic handler registration、component module loading、runtime endpoint behavior、protocol、persistence、dependencies、distributed runtime、SDK、hosted 和 direct compatibility work。
+The completed Pitaya service dispatch sequence covered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
