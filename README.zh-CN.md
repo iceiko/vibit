@@ -303,8 +303,8 @@ agent-native server framework
 
 ## Current Continuation
 
-`ADR-0220` registered `runtime.pitaya_aligned_cluster_event_bus_source_first_map`, implemented `node tools/vibit inspect pitaya-cluster-event-bus --json`, completed `W-0312 Implement Pitaya-aligned cluster event bus source-first map`, and left no repository next work item currently ready. The confirmed Pitaya service dispatch sequence from `W-0303` through `W-0312` added source-first gates and maps for service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus planning only.
+`ADR-0240` registered `runtime.pitaya_aligned_cluster_observability_source_first_map`, implemented `node tools/vibit inspect pitaya-cluster-observability --json`, completed `W-0332 Implement Pitaya-aligned cluster observability source-first map`, and left no repository next work item currently ready. The confirmed Pitaya distributed operations sequence from `W-0313` through `W-0332` added source-first gates and maps for node identity, service registry, service selector, heartbeat/liveness, route targeting, remote timeout/retry, distributed session ownership, distributed presence fanout, cross-node error mapping, and cluster observability planning only.
 
 The next direction is `no_next_ready_work_item`.
 
-Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`; current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`; next work item: `No repository next work item is currently ready`.
+Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`; current Pitaya distributed operations final decision: `decisions/ADR-0240-pitaya-aligned-cluster-observability-source-first-map.md`; next work item: `No repository next work item is currently ready`.

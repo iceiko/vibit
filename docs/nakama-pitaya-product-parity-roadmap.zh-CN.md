@@ -455,10 +455,10 @@ Agents 禁止：
 next_work_item: none
 next_direction: no_next_ready_work_item
 recommended_next_direction: no_next_ready_work_item
-latest_pitaya_alignment_work_item: W-0312
-latest_pitaya_alignment_decision: ADR-0220
+latest_pitaya_alignment_work_item: W-0332
+latest_pitaya_alignment_decision: ADR-0240
 ```
 
-No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`.
+No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya distributed operations final decision: `decisions/ADR-0240-pitaya-aligned-cluster-observability-source-first-map.md`.
 
-The completed Pitaya service dispatch sequence covered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+The completed Pitaya distributed operations sequence covered node identity, service registry, service selector, heartbeat/liveness, route targeting, remote timeout/retry, distributed session ownership, distributed presence fanout, cross-node error mapping, and cluster observability source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.

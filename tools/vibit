@@ -237,6 +237,26 @@ const KNOWN_CHECK_RULE_IDS = [
   "runtime.pitaya_aligned_backend_service_route_ownership_source_first_map",
   "runtime.pitaya_aligned_cluster_event_bus_boundary_gate",
   "runtime.pitaya_aligned_cluster_event_bus_source_first_map",
+  "runtime.pitaya_aligned_node_identity_boundary_gate",
+  "runtime.pitaya_aligned_node_identity_source_first_map",
+  "runtime.pitaya_aligned_service_registry_boundary_gate",
+  "runtime.pitaya_aligned_service_registry_source_first_map",
+  "runtime.pitaya_aligned_service_selector_boundary_gate",
+  "runtime.pitaya_aligned_service_selector_source_first_map",
+  "runtime.pitaya_aligned_heartbeat_liveness_boundary_gate",
+  "runtime.pitaya_aligned_heartbeat_liveness_source_first_map",
+  "runtime.pitaya_aligned_route_targeting_boundary_gate",
+  "runtime.pitaya_aligned_route_targeting_source_first_map",
+  "runtime.pitaya_aligned_remote_timeout_retry_boundary_gate",
+  "runtime.pitaya_aligned_remote_timeout_retry_source_first_map",
+  "runtime.pitaya_aligned_distributed_session_ownership_boundary_gate",
+  "runtime.pitaya_aligned_distributed_session_ownership_source_first_map",
+  "runtime.pitaya_aligned_distributed_presence_fanout_boundary_gate",
+  "runtime.pitaya_aligned_distributed_presence_fanout_source_first_map",
+  "runtime.pitaya_aligned_cross_node_error_mapping_boundary_gate",
+  "runtime.pitaya_aligned_cross_node_error_mapping_source_first_map",
+  "runtime.pitaya_aligned_cluster_observability_boundary_gate",
+  "runtime.pitaya_aligned_cluster_observability_source_first_map",
   "runtime.currency_wallet_lifecycle_boundary_gate",
   "runtime.currency_wallet_persistence_schema_gate",
   "runtime.currency_wallet_migration_source",
@@ -349,6 +369,16 @@ Usage:
   vibit inspect pitaya-frontend-forwarding
   vibit inspect pitaya-backend-service-routes
   vibit inspect pitaya-cluster-event-bus
+  vibit inspect pitaya-node-identity
+  vibit inspect pitaya-service-registry
+  vibit inspect pitaya-service-selector
+  vibit inspect pitaya-heartbeat-liveness
+  vibit inspect pitaya-route-targeting
+  vibit inspect pitaya-remote-timeout-retry
+  vibit inspect pitaya-distributed-session-ownership
+  vibit inspect pitaya-presence-fanout
+  vibit inspect pitaya-cross-node-errors
+  vibit inspect pitaya-cluster-observability
   vibit inspect reference
   vibit inspect change <change-id>
   vibit inspect work
@@ -422,6 +452,26 @@ Commands:
                            Print Pitaya-aligned backend service route ownership metadata as JSON.
   inspect pitaya-cluster-event-bus
                            Print Pitaya-aligned cluster event bus metadata as JSON.
+  inspect pitaya-node-identity
+                           Print Pitaya-aligned node identity metadata as JSON.
+  inspect pitaya-service-registry
+                           Print Pitaya-aligned service registry metadata as JSON.
+  inspect pitaya-service-selector
+                           Print Pitaya-aligned service selector metadata as JSON.
+  inspect pitaya-heartbeat-liveness
+                           Print Pitaya-aligned heartbeat and liveness metadata as JSON.
+  inspect pitaya-route-targeting
+                           Print Pitaya-aligned route targeting metadata as JSON.
+  inspect pitaya-remote-timeout-retry
+                           Print Pitaya-aligned remote timeout and retry metadata as JSON.
+  inspect pitaya-distributed-session-ownership
+                           Print Pitaya-aligned distributed session ownership metadata as JSON.
+  inspect pitaya-presence-fanout
+                           Print Pitaya-aligned distributed presence fanout metadata as JSON.
+  inspect pitaya-cross-node-errors
+                           Print Pitaya-aligned cross-node error mapping metadata as JSON.
+  inspect pitaya-cluster-observability
+                           Print Pitaya-aligned cluster observability metadata as JSON.
   inspect reference        Print reference capability planning metadata as JSON.
   inspect change           Print change spec metadata as JSON.
   inspect work             Print current work-item continuation context as JSON.
@@ -6349,6 +6399,702 @@ function inspectPitayaServiceDispatch(root, command) {
     process.exit(2);
   }
   printJson(buildPitayaServiceDispatchInspection(root, entry));
+}
+
+const PITAYA_DISTRIBUTED_OPERATIONS_ALIGNMENT = [
+  {
+    key: "node_identity",
+    command: "pitaya-node-identity",
+    title: "node identity",
+    kind: "pitaya_aligned_node_identity_inspection",
+    status: "source_first_pitaya_aligned_node_identity_map",
+    gate_standard: "docs/pitaya-aligned-node-identity-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-node-identity-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0221",
+    implementation_decision: "ADR-0222",
+    check_rule: "runtime.pitaya_aligned_node_identity_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_node_identity_boundary_gate",
+    gate_work_item: "W-0313",
+    work_item: "W-0314",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-node-identity-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-node-identity-source-first-map",
+    allowed_vocabulary: [
+      "node_identity_boundary",
+      "local_process_identity_source",
+      "node_advertisement_deferral",
+      "frontend_backend_role_hint_deferral",
+      "cluster_node_metadata_deferral",
+      "node_secret_redaction_boundary",
+    ],
+    current_mapping: {
+      local_process_identity: {
+        current: "runtime/cmd/vibit-server startup and config sources",
+        future_vocabulary: "local_process_identity_source",
+        implementation_status: "single_process_identity_inspection_only",
+      },
+      node_advertisement: {
+        current: "deferred",
+        future_vocabulary: "node_advertisement_deferral",
+        implementation_status: "no_node_advertisement_behavior",
+      },
+      role_hints: {
+        current: "tools/vibit inspect pitaya-roles --json",
+        future_vocabulary: "frontend_backend_role_hint_deferral",
+        implementation_status: "no_frontend_backend_role_runtime_behavior",
+      },
+      cluster_metadata: {
+        current: "deferred",
+        future_vocabulary: "cluster_node_metadata_deferral",
+        implementation_status: "no_cluster_node_metadata_behavior",
+      },
+      secret_redaction: {
+        current: "existing redaction posture in docs and checks",
+        future_vocabulary: "node_secret_redaction_boundary",
+        implementation_status: "source_first_redaction_inspection_only",
+      },
+    },
+    next: {
+      next_milestone: "M-243",
+      next_ready_work_item: "W-0315",
+      selected_follow_up_direction: "define_pitaya_aligned_service_registry_boundary_gate",
+    },
+  },
+  {
+    key: "service_registry",
+    command: "pitaya-service-registry",
+    title: "service registry",
+    kind: "pitaya_aligned_service_registry_inspection",
+    status: "source_first_pitaya_aligned_service_registry_map",
+    gate_standard: "docs/pitaya-aligned-service-registry-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-service-registry-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0223",
+    implementation_decision: "ADR-0224",
+    check_rule: "runtime.pitaya_aligned_service_registry_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_service_registry_boundary_gate",
+    gate_work_item: "W-0315",
+    work_item: "W-0316",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-service-registry-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-service-registry-source-first-map",
+    allowed_vocabulary: [
+      "service_registry_boundary",
+      "static_service_catalog_source",
+      "service_export_catalog_handoff",
+      "registry_backend_deferral",
+      "service_ttl_deferral",
+      "distributed_registry_deferral",
+    ],
+    current_mapping: {
+      static_service_catalog: {
+        current: "runtime/internal/app route and service registration sources",
+        future_vocabulary: "static_service_catalog_source",
+        implementation_status: "source_first_repository_inspection_only",
+      },
+      service_exports: {
+        current: "node tools/vibit inspect pitaya-service-export --json",
+        future_vocabulary: "service_export_catalog_handoff",
+        implementation_status: "no_service_registry_behavior",
+      },
+      registry_backend: {
+        current: "deferred",
+        future_vocabulary: "registry_backend_deferral",
+        implementation_status: "no_registry_backend_behavior",
+      },
+      service_ttl: {
+        current: "deferred",
+        future_vocabulary: "service_ttl_deferral",
+        implementation_status: "no_service_ttl_behavior",
+      },
+      distributed_registry: {
+        current: "deferred",
+        future_vocabulary: "distributed_registry_deferral",
+        implementation_status: "no_distributed_runtime_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-245",
+      next_ready_work_item: "W-0317",
+      selected_follow_up_direction: "define_pitaya_aligned_service_selector_boundary_gate",
+    },
+  },
+  {
+    key: "service_selector",
+    command: "pitaya-service-selector",
+    title: "service selector",
+    kind: "pitaya_aligned_service_selector_inspection",
+    status: "source_first_pitaya_aligned_service_selector_map",
+    gate_standard: "docs/pitaya-aligned-service-selector-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-service-selector-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0225",
+    implementation_decision: "ADR-0226",
+    check_rule: "runtime.pitaya_aligned_service_selector_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_service_selector_boundary_gate",
+    gate_work_item: "W-0317",
+    work_item: "W-0318",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-service-selector-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-service-selector-source-first-map",
+    allowed_vocabulary: [
+      "service_selector_boundary",
+      "route_owner_source",
+      "selector_policy_deferral",
+      "affinity_deferral",
+      "load_balancing_deferral",
+      "backend_target_selection_deferral",
+    ],
+    current_mapping: {
+      route_owner_sources: {
+        current: "runtime/internal/app route registration and modules manifests",
+        future_vocabulary: "route_owner_source",
+        implementation_status: "source_first_route_ownership_only",
+      },
+      selector_policy: {
+        current: "deferred",
+        future_vocabulary: "selector_policy_deferral",
+        implementation_status: "no_service_selector_behavior",
+      },
+      affinity: {
+        current: "deferred",
+        future_vocabulary: "affinity_deferral",
+        implementation_status: "no_affinity_behavior",
+      },
+      load_balancing: {
+        current: "deferred",
+        future_vocabulary: "load_balancing_deferral",
+        implementation_status: "no_load_balancing_behavior",
+      },
+      backend_target_selection: {
+        current: "deferred",
+        future_vocabulary: "backend_target_selection_deferral",
+        implementation_status: "no_backend_target_selection_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-247",
+      next_ready_work_item: "W-0319",
+      selected_follow_up_direction: "define_pitaya_aligned_heartbeat_liveness_boundary_gate",
+    },
+  },
+  {
+    key: "heartbeat_liveness",
+    command: "pitaya-heartbeat-liveness",
+    title: "heartbeat and liveness",
+    kind: "pitaya_aligned_heartbeat_liveness_inspection",
+    status: "source_first_pitaya_aligned_heartbeat_liveness_map",
+    gate_standard: "docs/pitaya-aligned-heartbeat-liveness-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-heartbeat-liveness-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0227",
+    implementation_decision: "ADR-0228",
+    check_rule: "runtime.pitaya_aligned_heartbeat_liveness_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_heartbeat_liveness_boundary_gate",
+    gate_work_item: "W-0319",
+    work_item: "W-0320",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-heartbeat-liveness-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-heartbeat-liveness-source-first-map",
+    allowed_vocabulary: [
+      "heartbeat_liveness_boundary",
+      "local_health_source",
+      "node_heartbeat_deferral",
+      "liveness_ttl_deferral",
+      "failure_detection_deferral",
+      "cluster_membership_deferral",
+    ],
+    current_mapping: {
+      local_health_sources: {
+        current: "runtime health readiness version config surface and runbook sources",
+        future_vocabulary: "local_health_source",
+        implementation_status: "local_health_inspection_only",
+      },
+      node_heartbeat: {
+        current: "deferred",
+        future_vocabulary: "node_heartbeat_deferral",
+        implementation_status: "no_node_heartbeat_behavior",
+      },
+      liveness_ttl: {
+        current: "deferred",
+        future_vocabulary: "liveness_ttl_deferral",
+        implementation_status: "no_liveness_ttl_behavior",
+      },
+      failure_detection: {
+        current: "deferred",
+        future_vocabulary: "failure_detection_deferral",
+        implementation_status: "no_failure_detection_behavior",
+      },
+      cluster_membership: {
+        current: "deferred",
+        future_vocabulary: "cluster_membership_deferral",
+        implementation_status: "no_cluster_membership_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-249",
+      next_ready_work_item: "W-0321",
+      selected_follow_up_direction: "define_pitaya_aligned_route_targeting_boundary_gate",
+    },
+  },
+  {
+    key: "route_targeting",
+    command: "pitaya-route-targeting",
+    title: "route targeting",
+    kind: "pitaya_aligned_route_targeting_inspection",
+    status: "source_first_pitaya_aligned_route_targeting_map",
+    gate_standard: "docs/pitaya-aligned-route-targeting-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-route-targeting-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0229",
+    implementation_decision: "ADR-0230",
+    check_rule: "runtime.pitaya_aligned_route_targeting_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_route_targeting_boundary_gate",
+    gate_work_item: "W-0321",
+    work_item: "W-0322",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-route-targeting-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-route-targeting-source-first-map",
+    allowed_vocabulary: [
+      "route_targeting_boundary",
+      "local_route_registry_source",
+      "frontend_forwarding_handoff",
+      "backend_service_target_deferral",
+      "session_aware_targeting_deferral",
+      "distributed_route_targeting_deferral",
+    ],
+    current_mapping: {
+      local_route_registry: {
+        current: "runtime/internal/app route key and bootstrap sources",
+        future_vocabulary: "local_route_registry_source",
+        implementation_status: "single_process_route_registry_only",
+      },
+      frontend_forwarding: {
+        current: "node tools/vibit inspect pitaya-frontend-forwarding --json",
+        future_vocabulary: "frontend_forwarding_handoff",
+        implementation_status: "no_frontend_forwarding_behavior",
+      },
+      backend_service_targets: {
+        current: "deferred",
+        future_vocabulary: "backend_service_target_deferral",
+        implementation_status: "no_backend_service_targeting_behavior",
+      },
+      session_aware_targeting: {
+        current: "deferred",
+        future_vocabulary: "session_aware_targeting_deferral",
+        implementation_status: "no_session_aware_targeting_behavior",
+      },
+      distributed_route_targeting: {
+        current: "deferred",
+        future_vocabulary: "distributed_route_targeting_deferral",
+        implementation_status: "no_distributed_runtime_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-251",
+      next_ready_work_item: "W-0323",
+      selected_follow_up_direction: "define_pitaya_aligned_remote_timeout_retry_boundary_gate",
+    },
+  },
+  {
+    key: "remote_timeout_retry",
+    command: "pitaya-remote-timeout-retry",
+    title: "remote timeout and retry",
+    kind: "pitaya_aligned_remote_timeout_retry_inspection",
+    status: "source_first_pitaya_aligned_remote_timeout_retry_map",
+    gate_standard: "docs/pitaya-aligned-remote-timeout-retry-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-remote-timeout-retry-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0231",
+    implementation_decision: "ADR-0232",
+    check_rule: "runtime.pitaya_aligned_remote_timeout_retry_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_remote_timeout_retry_boundary_gate",
+    gate_work_item: "W-0323",
+    work_item: "W-0324",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-remote-timeout-retry-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-remote-timeout-retry-source-first-map",
+    allowed_vocabulary: [
+      "remote_timeout_retry_boundary",
+      "local_request_timeout_source",
+      "remote_call_timeout_deferral",
+      "retry_policy_deferral",
+      "idempotency_handoff",
+      "circuit_breaker_deferral",
+    ],
+    current_mapping: {
+      local_request_timeout_sources: {
+        current: "existing request-loop tests and runtime command boundaries",
+        future_vocabulary: "local_request_timeout_source",
+        implementation_status: "source_first_timeout_inspection_only",
+      },
+      remote_call_timeout: {
+        current: "deferred",
+        future_vocabulary: "remote_call_timeout_deferral",
+        implementation_status: "no_remote_call_timeout_behavior",
+      },
+      retry_policy: {
+        current: "deferred",
+        future_vocabulary: "retry_policy_deferral",
+        implementation_status: "no_retry_policy_behavior",
+      },
+      idempotency: {
+        current: "currency wallet and storage idempotency source vocabulary",
+        future_vocabulary: "idempotency_handoff",
+        implementation_status: "source_first_idempotency_inspection_only",
+      },
+      circuit_breaker: {
+        current: "deferred",
+        future_vocabulary: "circuit_breaker_deferral",
+        implementation_status: "no_circuit_breaker_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-253",
+      next_ready_work_item: "W-0325",
+      selected_follow_up_direction: "define_pitaya_aligned_distributed_session_ownership_boundary_gate",
+    },
+  },
+  {
+    key: "distributed_session_ownership",
+    command: "pitaya-distributed-session-ownership",
+    title: "distributed session ownership",
+    kind: "pitaya_aligned_distributed_session_ownership_inspection",
+    status: "source_first_pitaya_aligned_distributed_session_ownership_map",
+    gate_standard: "docs/pitaya-aligned-distributed-session-ownership-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-distributed-session-ownership-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0233",
+    implementation_decision: "ADR-0234",
+    check_rule: "runtime.pitaya_aligned_distributed_session_ownership_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_distributed_session_ownership_boundary_gate",
+    gate_work_item: "W-0325",
+    work_item: "W-0326",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-distributed-session-ownership-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-distributed-session-ownership-source-first-map",
+    allowed_vocabulary: [
+      "distributed_session_ownership_boundary",
+      "local_session_source",
+      "connection_owner_node_deferral",
+      "session_location_deferral",
+      "ownership_epoch_deferral",
+      "reconnect_routing_deferral",
+    ],
+    current_mapping: {
+      local_session_sources: {
+        current: "runtime session validation, connection binding, and active connection registry sources",
+        future_vocabulary: "local_session_source",
+        implementation_status: "single_process_session_sources_only",
+      },
+      connection_owner_node: {
+        current: "deferred",
+        future_vocabulary: "connection_owner_node_deferral",
+        implementation_status: "no_connection_owner_node_behavior",
+      },
+      session_location: {
+        current: "deferred",
+        future_vocabulary: "session_location_deferral",
+        implementation_status: "no_session_location_registry_behavior",
+      },
+      ownership_epoch: {
+        current: "deferred",
+        future_vocabulary: "ownership_epoch_deferral",
+        implementation_status: "no_distributed_ownership_epoch_behavior",
+      },
+      reconnect_routing: {
+        current: "deferred",
+        future_vocabulary: "reconnect_routing_deferral",
+        implementation_status: "no_reconnect_routing_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-255",
+      next_ready_work_item: "W-0327",
+      selected_follow_up_direction: "define_pitaya_aligned_distributed_presence_fanout_boundary_gate",
+    },
+  },
+  {
+    key: "distributed_presence_fanout",
+    command: "pitaya-presence-fanout",
+    title: "distributed presence fanout",
+    kind: "pitaya_aligned_distributed_presence_fanout_inspection",
+    status: "source_first_pitaya_aligned_distributed_presence_fanout_map",
+    gate_standard: "docs/pitaya-aligned-distributed-presence-fanout-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-distributed-presence-fanout-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0235",
+    implementation_decision: "ADR-0236",
+    check_rule: "runtime.pitaya_aligned_distributed_presence_fanout_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_distributed_presence_fanout_boundary_gate",
+    gate_work_item: "W-0327",
+    work_item: "W-0328",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-distributed-presence-fanout-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-distributed-presence-fanout-source-first-map",
+    allowed_vocabulary: [
+      "distributed_presence_fanout_boundary",
+      "local_presence_source",
+      "presence_event_handoff",
+      "node_fanout_deferral",
+      "subscription_registry_deferral",
+      "delivery_guarantee_deferral",
+    ],
+    current_mapping: {
+      local_presence_sources: {
+        current: "runtime/internal/app presence lifecycle and outbound delivery sources",
+        future_vocabulary: "local_presence_source",
+        implementation_status: "single_process_presence_only",
+      },
+      presence_events: {
+        current: "runtime/internal/platform/events and presence local proof sources",
+        future_vocabulary: "presence_event_handoff",
+        implementation_status: "local_event_source_inspection_only",
+      },
+      node_fanout: {
+        current: "deferred",
+        future_vocabulary: "node_fanout_deferral",
+        implementation_status: "no_node_fanout_behavior",
+      },
+      subscription_registry: {
+        current: "deferred",
+        future_vocabulary: "subscription_registry_deferral",
+        implementation_status: "no_subscription_registry_behavior",
+      },
+      delivery_guarantees: {
+        current: "deferred",
+        future_vocabulary: "delivery_guarantee_deferral",
+        implementation_status: "no_delivery_guarantee_behavior",
+      },
+    },
+    next: {
+      next_milestone: "M-257",
+      next_ready_work_item: "W-0329",
+      selected_follow_up_direction: "define_pitaya_aligned_cross_node_error_mapping_boundary_gate",
+    },
+  },
+  {
+    key: "cross_node_error_mapping",
+    command: "pitaya-cross-node-errors",
+    title: "cross-node error mapping",
+    kind: "pitaya_aligned_cross_node_error_mapping_inspection",
+    status: "source_first_pitaya_aligned_cross_node_error_mapping_map",
+    gate_standard: "docs/pitaya-aligned-cross-node-error-mapping-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-cross-node-error-mapping-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0237",
+    implementation_decision: "ADR-0238",
+    check_rule: "runtime.pitaya_aligned_cross_node_error_mapping_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_cross_node_error_mapping_boundary_gate",
+    gate_work_item: "W-0329",
+    work_item: "W-0330",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-cross-node-error-mapping-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-cross-node-error-mapping-source-first-map",
+    allowed_vocabulary: [
+      "cross_node_error_mapping_boundary",
+      "local_error_catalog_source",
+      "remote_error_collapse_deferral",
+      "retryability_handoff",
+      "transport_error_deferral",
+      "redacted_failure_surface",
+    ],
+    current_mapping: {
+      local_error_catalogs: {
+        current: "contracts, protocol bridge, and application public error mapping sources",
+        future_vocabulary: "local_error_catalog_source",
+        implementation_status: "source_first_error_catalog_inspection_only",
+      },
+      remote_error_collapse: {
+        current: "deferred",
+        future_vocabulary: "remote_error_collapse_deferral",
+        implementation_status: "no_remote_error_collapse_behavior",
+      },
+      retryability: {
+        current: "authentication and repository error vocabulary",
+        future_vocabulary: "retryability_handoff",
+        implementation_status: "source_first_retryability_vocabulary_only",
+      },
+      transport_error: {
+        current: "deferred",
+        future_vocabulary: "transport_error_deferral",
+        implementation_status: "no_transport_error_mapping_behavior",
+      },
+      redacted_failure_surface: {
+        current: "existing redaction posture in docs and checks",
+        future_vocabulary: "redacted_failure_surface",
+        implementation_status: "source_first_redaction_inspection_only",
+      },
+    },
+    next: {
+      next_milestone: "M-259",
+      next_ready_work_item: "W-0331",
+      selected_follow_up_direction: "define_pitaya_aligned_cluster_observability_boundary_gate",
+    },
+  },
+  {
+    key: "cluster_observability",
+    command: "pitaya-cluster-observability",
+    title: "cluster observability",
+    kind: "pitaya_aligned_cluster_observability_inspection",
+    status: "source_first_pitaya_aligned_cluster_observability_map",
+    gate_standard: "docs/pitaya-aligned-cluster-observability-boundary-gate.md",
+    gate_translation: "docs/pitaya-aligned-cluster-observability-boundary-gate.zh-CN.md",
+    gate_decision: "ADR-0239",
+    implementation_decision: "ADR-0240",
+    check_rule: "runtime.pitaya_aligned_cluster_observability_source_first_map",
+    gate_rule: "runtime.pitaya_aligned_cluster_observability_boundary_gate",
+    gate_work_item: "W-0331",
+    work_item: "W-0332",
+    gate_change: "changes/2026-06-14-define-pitaya-aligned-cluster-observability-boundary-gate",
+    change: "changes/2026-06-14-implement-pitaya-aligned-cluster-observability-source-first-map",
+    allowed_vocabulary: [
+      "cluster_observability_boundary",
+      "local_operations_inspection_source",
+      "cluster_metrics_deferral",
+      "distributed_trace_deferral",
+      "node_health_view_deferral",
+      "redacted_cluster_diagnostics",
+    ],
+    current_mapping: {
+      local_operations_inspection: {
+        current: "node tools/vibit inspect operations --json",
+        future_vocabulary: "local_operations_inspection_source",
+        implementation_status: "source_first_operations_inspection_only",
+      },
+      cluster_metrics: {
+        current: "deferred",
+        future_vocabulary: "cluster_metrics_deferral",
+        implementation_status: "no_cluster_metrics_behavior",
+      },
+      distributed_trace: {
+        current: "deferred",
+        future_vocabulary: "distributed_trace_deferral",
+        implementation_status: "no_distributed_trace_behavior",
+      },
+      node_health_view: {
+        current: "deferred",
+        future_vocabulary: "node_health_view_deferral",
+        implementation_status: "no_node_health_view_behavior",
+      },
+      redacted_cluster_diagnostics: {
+        current: "existing redaction posture in docs and checks",
+        future_vocabulary: "redacted_cluster_diagnostics",
+        implementation_status: "source_first_redaction_inspection_only",
+      },
+    },
+    next: {
+      next_milestone: "none",
+      next_ready_work_item: "none",
+      selected_follow_up_direction: "no_next_ready_work_item",
+    },
+  },
+];
+
+function buildPitayaDistributedOperationsInspection(root, entry) {
+  const workState = loadWorkState(root);
+  const nextReady = workState.exists ? workState.current.next_ready[0] || null : null;
+  return {
+    schema_version: "0.1",
+    kind: entry.kind,
+    project: "vibit",
+    status: entry.status,
+    source: {
+      gate_standard: entry.gate_standard,
+      gate_translation: entry.gate_translation,
+      gate_decision: entry.gate_decision,
+      implementation_decision: entry.implementation_decision,
+      source_pitaya_service_dispatch_map_decision: "ADR-0220",
+      check_rule: entry.check_rule,
+      gate_rule: entry.gate_rule,
+      gate_work_item: entry.gate_work_item,
+      work_item: entry.work_item,
+      gate_change: entry.gate_change,
+      change: entry.change,
+    },
+    current_work: {
+      milestone: "M-260",
+      next_ready: nextReady,
+      can_continue: Boolean(nextReady),
+    },
+    allowed_vocabulary: entry.allowed_vocabulary,
+    current_source_first_mapping: entry.current_mapping,
+    source_surfaces: [
+      ".arch/runtime.yaml",
+      ".arch/reference.yaml",
+      ".arch/work-items.yaml",
+      ".arch/conventions.yaml",
+      ".arch/contracts.yaml",
+      "docs/nakama-pitaya-product-parity-roadmap.md",
+      "docs/reference-game-server-alignment.md",
+      "runtime/cmd/vibit-server",
+      "runtime/internal/app",
+      "runtime/internal/app/bootstrap",
+      "runtime/internal/modules",
+      "runtime/internal/platform/protocol/protobuf",
+      "runtime/internal/platform/transport/ws",
+      "runtime/internal/platform/events",
+      "tools/vibit",
+      "rules/check-rules.json",
+    ],
+    deferrals: {
+      runtime_behavior_added: false,
+      node_identity_behavior_added: false,
+      service_registry_behavior_added: false,
+      service_selector_behavior_added: false,
+      heartbeat_liveness_behavior_added: false,
+      route_targeting_behavior_added: false,
+      remote_timeout_retry_behavior_added: false,
+      distributed_session_ownership_behavior_added: false,
+      distributed_presence_fanout_behavior_added: false,
+      cross_node_error_mapping_behavior_added: false,
+      cluster_observability_behavior_added: false,
+      service_export_behavior_added: false,
+      remote_call_dispatch_behavior_added: false,
+      server_to_server_rpc_behavior_added: false,
+      frontend_message_forwarding_behavior_added: false,
+      backend_service_route_ownership_behavior_added: false,
+      cluster_event_bus_behavior_added: false,
+      service_discovery_behavior_added: false,
+      frontend_backend_role_runtime_behavior_added: false,
+      distributed_runtime_implementation_added: false,
+      runtime_endpoint_behavior_added: false,
+      protocol_route_added: false,
+      protobuf_source_added: false,
+      generated_output_added: false,
+      repository_interface_changed: false,
+      postgresql_adapter_changed: false,
+      migration_added: false,
+      dependency_added: false,
+      persistence_added: false,
+      startup_wiring_added: false,
+      authentication_session_behavior_changed: false,
+      hosted_deployment_added: false,
+      sdk_added: false,
+      release_artifact_added: false,
+      direct_nakama_pitaya_api_compatibility_added: false,
+    },
+    redaction: {
+      required: true,
+      raw_device_credentials_exposed: false,
+      raw_access_tokens_exposed: false,
+      lookup_digests_exposed: false,
+      verifier_digests_exposed: false,
+      verifier_keys_exposed: false,
+      postgres_dsns_with_credentials_exposed: false,
+      http_headers_cookies_query_strings_exposed: false,
+      websocket_subprotocols_remote_addresses_exposed: false,
+      sensitive_identifiers_exposed: false,
+      database_payloads_exposed: false,
+      local_secret_file_contents_exposed: false,
+      route_payloads_exposed: false,
+      event_payloads_exposed: false,
+      concrete_transport_metadata_exposed: false,
+      node_identity_payloads_exposed: false,
+      registry_payloads_exposed: false,
+      service_selector_payloads_exposed: false,
+      heartbeat_payloads_exposed: false,
+      route_targeting_payloads_exposed: false,
+      remote_timeout_retry_payloads_exposed: false,
+      session_ownership_payloads_exposed: false,
+      presence_fanout_payloads_exposed: false,
+      cross_node_error_payloads_exposed: false,
+      cluster_observability_payloads_exposed: false,
+    },
+    next: entry.next,
+  };
+}
+
+function inspectPitayaDistributedOperations(root, command) {
+  const entry = PITAYA_DISTRIBUTED_OPERATIONS_ALIGNMENT.find((item) => item.command === command);
+  if (!entry) {
+    console.error(`Unknown Pitaya distributed operations inspection: ${command}`);
+    process.exit(2);
+  }
+  printJson(buildPitayaDistributedOperationsInspection(root, entry));
 }
 
 function inspectGenerated(root, options = { module: null, type: null }) {
@@ -54012,6 +54758,156 @@ function checkRuntimePitayaServiceDispatchAlignment(root, goFiles) {
   }
 }
 
+function pitayaDistributedOperationsRuleCompleted(root, entry, kind) {
+  return workItemHasStatus(root, kind === "gate" ? entry.gate_work_item : entry.work_item, "completed");
+}
+
+function checkRuntimePitayaDistributedOperationsAlignment(root, goFiles) {
+  const directCompatibilityPatterns = [
+    { pattern: /\/v2\/(?:account|user|storage|notification|channel|stream|match|rpc|group|friend|console|metrics|status|session|route|service|event|cluster|node|registry|selector|heartbeat|presence|trace|observability)/i, label: "Nakama REST path" },
+    { pattern: /\bnk\.(?:account|users?|storage|notification|channel|stream|match|rpc|group|friends?|metrics|session|route|service|event|cluster|node|registry|selector|heartbeat|presence|trace|observability)_/i, label: "Nakama runtime API name" },
+    { pattern: /\bpitaya\.(?:Push|Group|Broadcast|RPC|Remote|Send|Session|Route|Metrics|Frontend|Backend|Service|Event|Cluster|Bus|Node|Registry|Selector|Heartbeat|Presence|Trace|Observability)\b/i, label: "Pitaya API namespace" },
+  ];
+
+  for (const entry of PITAYA_DISTRIBUTED_OPERATIONS_ALIGNMENT) {
+    for (const kind of ["gate", "map"]) {
+      const ruleId = kind === "gate" ? entry.gate_rule : entry.check_rule;
+      const completed = pitayaDistributedOperationsRuleCompleted(root, entry, kind);
+      if (!completed) {
+        ok(`Pitaya-aligned ${entry.title} ${kind === "gate" ? "boundary gate" : "source-first map"} is not completed yet`, {
+          rule_id: ruleId,
+          artifact: ".arch/work-items.yaml",
+        });
+        continue;
+      }
+
+      const adr = kind === "gate" ? entry.gate_decision : entry.implementation_decision;
+      const workItem = kind === "gate" ? entry.gate_work_item : entry.work_item;
+      const changePath = kind === "gate" ? entry.gate_change : entry.change;
+      const changeSlug = path.basename(changePath).replace(/^\d{4}-\d{2}-\d{2}-/, "");
+      const decisionSlug = changeSlug.replace(/^define-/, "").replace(/^implement-/, "");
+      const decisionPath = `decisions/${adr}-${decisionSlug}.md`;
+      const conversationPath = `conversations/${path.basename(changePath)}.md`;
+      const files = [
+        decisionPath,
+        conversationPath,
+        `${changePath}/spec.yaml`,
+        `${changePath}/request.md`,
+        `${changePath}/impact.md`,
+        `${changePath}/plan.md`,
+        `${changePath}/checklist.md`,
+        `${changePath}/verification.md`,
+      ];
+      if (kind === "gate") {
+        files.push(entry.gate_standard, entry.gate_translation);
+      }
+      for (const file of files) {
+        if (isFile(root, file)) {
+          ok(`${file} exists for Pitaya-aligned ${entry.title} ${kind}`, {
+            rule_id: ruleId,
+            artifact: file,
+          });
+        } else {
+          fail(`${file} is missing for Pitaya-aligned ${entry.title} ${kind}`, {
+            rule_id: ruleId,
+            artifact: file,
+          });
+        }
+      }
+
+      const requiredReferences = [
+        [".arch/work-items.yaml", `id: ${workItem}`],
+        [".arch/work-items.yaml", `decision: ${adr}`],
+        [".arch/work-items.yaml", `check_rule: ${ruleId}`],
+        [".arch/runtime.yaml", ruleId],
+        [".arch/reference.yaml", ruleId],
+        [".arch/conventions.yaml", ruleId],
+        [".arch/contracts.yaml", ruleId],
+        ["rules/check-rules.json", ruleId],
+        [".arch/work-items.yaml", "current_milestone: M-260"],
+        ["README.md", "No repository next work item is currently ready"],
+        ["README.zh-CN.md", "No repository next work item is currently ready"],
+        ["AGENTS.md", "M-241/W-0313"],
+        ["AGENTS.zh-CN.md", "M-241/W-0313"],
+        ["runtime/AGENTS.md", "M-241/W-0313"],
+        ["runtime/AGENTS.zh-CN.md", "M-241/W-0313"],
+      ];
+      for (const [relativePath, requiredText] of requiredReferences) {
+        checkRequiredText(root, relativePath, requiredText, ruleId, requiredText);
+      }
+
+      const markerFiles = kind === "gate"
+        ? [entry.gate_standard, entry.gate_translation, `${changePath}/spec.yaml`, decisionPath, conversationPath]
+        : [`${changePath}/spec.yaml`, decisionPath, conversationPath];
+      for (const file of markerFiles) {
+        if (!isFile(root, file)) {
+          continue;
+        }
+        for (const marker of [
+          adr,
+          workItem,
+          ruleId,
+          "runtime_behavior_added: false",
+          "protocol_route_added: false",
+          "protobuf_source_added: false",
+          "generated_output_added: false",
+          "dependency_added: false",
+          "distributed_runtime_implementation_added: false",
+          "direct_nakama_pitaya_api_compatibility_added: false",
+        ]) {
+          checkRequiredText(root, file, marker, ruleId, marker);
+        }
+        const text = readText(path.join(root, file));
+        const matches = textMatchesAny(text, directCompatibilityPatterns);
+        if (matches.length === 0) {
+          ok(`${file} avoids direct Nakama/Pitaya API compatibility markers`, {
+            rule_id: ruleId,
+            artifact: file,
+          });
+        } else {
+          for (const match of matches) {
+            fail(`${file} adds direct compatibility marker: ${match.label}`, {
+              rule_id: ruleId,
+              artifact: file,
+            });
+          }
+        }
+      }
+
+      if (kind === "map") {
+        const inspection = JSON.stringify(buildPitayaDistributedOperationsInspection(root, entry));
+        for (const marker of [
+          `"kind":"${entry.kind}"`,
+          `"status":"${entry.status}"`,
+          `"gate_decision":"${entry.gate_decision}"`,
+          `"implementation_decision":"${entry.implementation_decision}"`,
+          `"check_rule":"${entry.check_rule}"`,
+          `"work_item":"${entry.work_item}"`,
+          "\"runtime_behavior_added\":false",
+          "\"protocol_route_added\":false",
+          "\"protobuf_source_added\":false",
+          "\"generated_output_added\":false",
+          "\"dependency_added\":false",
+          "\"distributed_runtime_implementation_added\":false",
+          "\"direct_nakama_pitaya_api_compatibility_added\":false",
+        ]) {
+          if (inspection.includes(marker)) {
+            ok(`inspect ${entry.command} output includes ${marker}`, {
+              rule_id: ruleId,
+              artifact: `tools/vibit inspect ${entry.command}`,
+            });
+          } else {
+            fail(`inspect ${entry.command} output is missing ${marker}`, {
+              rule_id: ruleId,
+              artifact: `tools/vibit inspect ${entry.command}`,
+            });
+          }
+        }
+      }
+    }
+  }
+}
+
 function checkRuntimeCurrencyWalletLifecycleBoundaryGate(root, goFiles) {
   const ruleId = "runtime.currency_wallet_lifecycle_boundary_gate";
   const standardPath = "docs/currency-wallet-lifecycle-boundary-gate.md";
@@ -60692,6 +61588,66 @@ function pitayaAlignedClusterEventBusSourceFirstMapCompleted(root) {
 }
 
 function expectedWorkItemsCurrentMilestone(root) {
+  if (workItemHasStatus(root, "W-0332", "completed")) {
+    return "current_milestone: M-260";
+  }
+  if (workItemHasStatus(root, "W-0331", "completed")) {
+    return "current_milestone: M-259";
+  }
+  if (workItemHasStatus(root, "W-0330", "completed")) {
+    return "current_milestone: M-258";
+  }
+  if (workItemHasStatus(root, "W-0329", "completed")) {
+    return "current_milestone: M-257";
+  }
+  if (workItemHasStatus(root, "W-0328", "completed")) {
+    return "current_milestone: M-256";
+  }
+  if (workItemHasStatus(root, "W-0327", "completed")) {
+    return "current_milestone: M-255";
+  }
+  if (workItemHasStatus(root, "W-0326", "completed")) {
+    return "current_milestone: M-254";
+  }
+  if (workItemHasStatus(root, "W-0325", "completed")) {
+    return "current_milestone: M-253";
+  }
+  if (workItemHasStatus(root, "W-0324", "completed")) {
+    return "current_milestone: M-252";
+  }
+  if (workItemHasStatus(root, "W-0323", "completed")) {
+    return "current_milestone: M-251";
+  }
+  if (workItemHasStatus(root, "W-0322", "completed")) {
+    return "current_milestone: M-250";
+  }
+  if (workItemHasStatus(root, "W-0321", "completed")) {
+    return "current_milestone: M-249";
+  }
+  if (workItemHasStatus(root, "W-0320", "completed")) {
+    return "current_milestone: M-248";
+  }
+  if (workItemHasStatus(root, "W-0319", "completed")) {
+    return "current_milestone: M-247";
+  }
+  if (workItemHasStatus(root, "W-0318", "completed")) {
+    return "current_milestone: M-246";
+  }
+  if (workItemHasStatus(root, "W-0317", "completed")) {
+    return "current_milestone: M-245";
+  }
+  if (workItemHasStatus(root, "W-0316", "completed")) {
+    return "current_milestone: M-244";
+  }
+  if (workItemHasStatus(root, "W-0315", "completed")) {
+    return "current_milestone: M-243";
+  }
+  if (workItemHasStatus(root, "W-0314", "completed")) {
+    return "current_milestone: M-242";
+  }
+  if (workItemHasStatus(root, "W-0313", "completed")) {
+    return "current_milestone: M-241";
+  }
   if (pitayaAlignedClusterEventBusSourceFirstMapCompleted(root)) {
     return "current_milestone: M-240";
   }
@@ -60857,8 +61813,68 @@ function isCurrencyWalletProtocolRouteImplementationFile(root, file) {
 }
 
 function expectedRepositoryNextWorkItem(root) {
-  if (currencyWalletProtocolRouteImplementationCompleted(root)) {
+  if (workItemHasStatus(root, "W-0332", "completed")) {
     return "repository_next_work_item: none";
+  }
+  if (workItemHasStatus(root, "W-0331", "completed")) {
+    return "repository_next_work_item: W-0332";
+  }
+  if (workItemHasStatus(root, "W-0330", "completed")) {
+    return "repository_next_work_item: W-0331";
+  }
+  if (workItemHasStatus(root, "W-0329", "completed")) {
+    return "repository_next_work_item: W-0330";
+  }
+  if (workItemHasStatus(root, "W-0328", "completed")) {
+    return "repository_next_work_item: W-0329";
+  }
+  if (workItemHasStatus(root, "W-0327", "completed")) {
+    return "repository_next_work_item: W-0328";
+  }
+  if (workItemHasStatus(root, "W-0326", "completed")) {
+    return "repository_next_work_item: W-0327";
+  }
+  if (workItemHasStatus(root, "W-0325", "completed")) {
+    return "repository_next_work_item: W-0326";
+  }
+  if (workItemHasStatus(root, "W-0324", "completed")) {
+    return "repository_next_work_item: W-0325";
+  }
+  if (workItemHasStatus(root, "W-0323", "completed")) {
+    return "repository_next_work_item: W-0324";
+  }
+  if (workItemHasStatus(root, "W-0322", "completed")) {
+    return "repository_next_work_item: W-0323";
+  }
+  if (workItemHasStatus(root, "W-0321", "completed")) {
+    return "repository_next_work_item: W-0322";
+  }
+  if (workItemHasStatus(root, "W-0320", "completed")) {
+    return "repository_next_work_item: W-0321";
+  }
+  if (workItemHasStatus(root, "W-0319", "completed")) {
+    return "repository_next_work_item: W-0320";
+  }
+  if (workItemHasStatus(root, "W-0318", "completed")) {
+    return "repository_next_work_item: W-0319";
+  }
+  if (workItemHasStatus(root, "W-0317", "completed")) {
+    return "repository_next_work_item: W-0318";
+  }
+  if (workItemHasStatus(root, "W-0316", "completed")) {
+    return "repository_next_work_item: W-0317";
+  }
+  if (workItemHasStatus(root, "W-0315", "completed")) {
+    return "repository_next_work_item: W-0316";
+  }
+  if (workItemHasStatus(root, "W-0314", "completed")) {
+    return "repository_next_work_item: W-0315";
+  }
+  if (workItemHasStatus(root, "W-0313", "completed")) {
+    return "repository_next_work_item: W-0314";
+  }
+  if (currencyWalletProtocolRouteImplementationCompleted(root)) {
+    return "repository_next_work_item: W-0313";
   }
   if (currencyWalletProtocolRouteGateCompleted(root)) {
     return "repository_next_work_item: W-0302";
@@ -61128,8 +62144,68 @@ function expectedRepositoryNextWorkItem(root) {
 }
 
 function expectedRepositoryNextWorkItemScope(root) {
-  if (currencyWalletProtocolRouteImplementationCompleted(root)) {
+  if (workItemHasStatus(root, "W-0332", "completed")) {
     return "repository_next_work_item_scope: no_next_ready_work_item";
+  }
+  if (workItemHasStatus(root, "W-0331", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_cluster_observability_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0330", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_cluster_observability_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0329", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_cross_node_error_mapping_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0328", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_cross_node_error_mapping_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0327", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_distributed_presence_fanout_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0326", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_distributed_presence_fanout_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0325", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_distributed_session_ownership_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0324", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_distributed_session_ownership_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0323", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_remote_timeout_retry_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0322", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_remote_timeout_retry_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0321", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_route_targeting_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0320", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_route_targeting_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0319", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_heartbeat_liveness_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0318", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_heartbeat_liveness_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0317", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_service_selector_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0316", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_service_selector_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0315", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_service_registry_source_first_map";
+  }
+  if (workItemHasStatus(root, "W-0314", "completed")) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_service_registry_boundary_gate";
+  }
+  if (workItemHasStatus(root, "W-0313", "completed")) {
+    return "repository_next_work_item_scope: implement_pitaya_aligned_node_identity_source_first_map";
+  }
+  if (currencyWalletProtocolRouteImplementationCompleted(root)) {
+    return "repository_next_work_item_scope: define_pitaya_aligned_node_identity_boundary_gate";
   }
   if (currencyWalletProtocolRouteGateCompleted(root)) {
     return "repository_next_work_item_scope: implement_currency_wallet_protocol_route";
@@ -61676,6 +62752,26 @@ function isStorageObjectsProtocolRouteImplementationFile(root, file) {
 
 function expectedRuntimeNextReadyWorkItem(root) {
   const nextReady = [
+    ["W-0332", "next_ready_work_item: none"],
+    ["W-0331", "next_ready_work_item: W-0332"],
+    ["W-0330", "next_ready_work_item: W-0331"],
+    ["W-0329", "next_ready_work_item: W-0330"],
+    ["W-0328", "next_ready_work_item: W-0329"],
+    ["W-0327", "next_ready_work_item: W-0328"],
+    ["W-0326", "next_ready_work_item: W-0327"],
+    ["W-0325", "next_ready_work_item: W-0326"],
+    ["W-0324", "next_ready_work_item: W-0325"],
+    ["W-0323", "next_ready_work_item: W-0324"],
+    ["W-0322", "next_ready_work_item: W-0323"],
+    ["W-0321", "next_ready_work_item: W-0322"],
+    ["W-0320", "next_ready_work_item: W-0321"],
+    ["W-0319", "next_ready_work_item: W-0320"],
+    ["W-0318", "next_ready_work_item: W-0319"],
+    ["W-0317", "next_ready_work_item: W-0318"],
+    ["W-0316", "next_ready_work_item: W-0317"],
+    ["W-0315", "next_ready_work_item: W-0316"],
+    ["W-0314", "next_ready_work_item: W-0315"],
+    ["W-0313", "next_ready_work_item: W-0314"],
     ["W-0312", "next_ready_work_item: none"],
     ["W-0311", "next_ready_work_item: W-0312"],
     ["W-0310", "next_ready_work_item: W-0311"],
@@ -61817,6 +62913,66 @@ function expectedRuntimeNextReadyWorkItem(root) {
 }
 
 function expectedAlphaGoalNextWorkItem(root) {
+  if (workItemHasStatus(root, "W-0332", "completed")) {
+    return "next_work_item: none";
+  }
+  if (workItemHasStatus(root, "W-0331", "completed")) {
+    return "next_work_item: W-0332";
+  }
+  if (workItemHasStatus(root, "W-0330", "completed")) {
+    return "next_work_item: W-0331";
+  }
+  if (workItemHasStatus(root, "W-0329", "completed")) {
+    return "next_work_item: W-0330";
+  }
+  if (workItemHasStatus(root, "W-0328", "completed")) {
+    return "next_work_item: W-0329";
+  }
+  if (workItemHasStatus(root, "W-0327", "completed")) {
+    return "next_work_item: W-0328";
+  }
+  if (workItemHasStatus(root, "W-0326", "completed")) {
+    return "next_work_item: W-0327";
+  }
+  if (workItemHasStatus(root, "W-0325", "completed")) {
+    return "next_work_item: W-0326";
+  }
+  if (workItemHasStatus(root, "W-0324", "completed")) {
+    return "next_work_item: W-0325";
+  }
+  if (workItemHasStatus(root, "W-0323", "completed")) {
+    return "next_work_item: W-0324";
+  }
+  if (workItemHasStatus(root, "W-0322", "completed")) {
+    return "next_work_item: W-0323";
+  }
+  if (workItemHasStatus(root, "W-0321", "completed")) {
+    return "next_work_item: W-0322";
+  }
+  if (workItemHasStatus(root, "W-0320", "completed")) {
+    return "next_work_item: W-0321";
+  }
+  if (workItemHasStatus(root, "W-0319", "completed")) {
+    return "next_work_item: W-0320";
+  }
+  if (workItemHasStatus(root, "W-0318", "completed")) {
+    return "next_work_item: W-0319";
+  }
+  if (workItemHasStatus(root, "W-0317", "completed")) {
+    return "next_work_item: W-0318";
+  }
+  if (workItemHasStatus(root, "W-0316", "completed")) {
+    return "next_work_item: W-0317";
+  }
+  if (workItemHasStatus(root, "W-0315", "completed")) {
+    return "next_work_item: W-0316";
+  }
+  if (workItemHasStatus(root, "W-0314", "completed")) {
+    return "next_work_item: W-0315";
+  }
+  if (workItemHasStatus(root, "W-0313", "completed")) {
+    return "next_work_item: W-0314";
+  }
   if (workItemHasStatus(root, "W-0312", "completed")) {
     return "next_work_item: none";
   }
@@ -62185,6 +63341,26 @@ function expectedAlphaGoalNextWorkItem(root) {
 
 function expectedAlphaGoalNextDirection(root) {
   const directions = [
+    ["W-0332", "no_next_ready_work_item"],
+    ["W-0331", "implement_pitaya_aligned_cluster_observability_source_first_map"],
+    ["W-0330", "define_pitaya_aligned_cluster_observability_boundary_gate"],
+    ["W-0329", "implement_pitaya_aligned_cross_node_error_mapping_source_first_map"],
+    ["W-0328", "define_pitaya_aligned_cross_node_error_mapping_boundary_gate"],
+    ["W-0327", "implement_pitaya_aligned_distributed_presence_fanout_source_first_map"],
+    ["W-0326", "define_pitaya_aligned_distributed_presence_fanout_boundary_gate"],
+    ["W-0325", "implement_pitaya_aligned_distributed_session_ownership_source_first_map"],
+    ["W-0324", "define_pitaya_aligned_distributed_session_ownership_boundary_gate"],
+    ["W-0323", "implement_pitaya_aligned_remote_timeout_retry_source_first_map"],
+    ["W-0322", "define_pitaya_aligned_remote_timeout_retry_boundary_gate"],
+    ["W-0321", "implement_pitaya_aligned_route_targeting_source_first_map"],
+    ["W-0320", "define_pitaya_aligned_route_targeting_boundary_gate"],
+    ["W-0319", "implement_pitaya_aligned_heartbeat_liveness_source_first_map"],
+    ["W-0318", "define_pitaya_aligned_heartbeat_liveness_boundary_gate"],
+    ["W-0317", "implement_pitaya_aligned_service_selector_source_first_map"],
+    ["W-0316", "define_pitaya_aligned_service_selector_boundary_gate"],
+    ["W-0315", "implement_pitaya_aligned_service_registry_source_first_map"],
+    ["W-0314", "define_pitaya_aligned_service_registry_boundary_gate"],
+    ["W-0313", "implement_pitaya_aligned_node_identity_source_first_map"],
     ["W-0312", "no_next_ready_work_item"],
     ["W-0311", "implement_pitaya_aligned_cluster_event_bus_source_first_map"],
     ["W-0310", "define_pitaya_aligned_cluster_event_bus_boundary_gate"],
@@ -62326,6 +63502,26 @@ function expectedAlphaGoalNextDirection(root) {
 
 function expectedReadmeNextWorkItemTitle(root) {
   const titles = [
+    ["W-0332", "No repository next work item is currently ready"],
+    ["W-0331", "W-0332 Implement Pitaya-aligned cluster observability source-first map"],
+    ["W-0330", "W-0331 Define Pitaya-aligned cluster observability boundary gate"],
+    ["W-0329", "W-0330 Implement Pitaya-aligned cross-node error mapping source-first map"],
+    ["W-0328", "W-0329 Define Pitaya-aligned cross-node error mapping boundary gate"],
+    ["W-0327", "W-0328 Implement Pitaya-aligned distributed presence fanout source-first map"],
+    ["W-0326", "W-0327 Define Pitaya-aligned distributed presence fanout boundary gate"],
+    ["W-0325", "W-0326 Implement Pitaya-aligned distributed session ownership source-first map"],
+    ["W-0324", "W-0325 Define Pitaya-aligned distributed session ownership boundary gate"],
+    ["W-0323", "W-0324 Implement Pitaya-aligned remote timeout and retry source-first map"],
+    ["W-0322", "W-0323 Define Pitaya-aligned remote timeout and retry boundary gate"],
+    ["W-0321", "W-0322 Implement Pitaya-aligned route targeting source-first map"],
+    ["W-0320", "W-0321 Define Pitaya-aligned route targeting boundary gate"],
+    ["W-0319", "W-0320 Implement Pitaya-aligned heartbeat and liveness source-first map"],
+    ["W-0318", "W-0319 Define Pitaya-aligned heartbeat and liveness boundary gate"],
+    ["W-0317", "W-0318 Implement Pitaya-aligned service selector source-first map"],
+    ["W-0316", "W-0317 Define Pitaya-aligned service selector boundary gate"],
+    ["W-0315", "W-0316 Implement Pitaya-aligned service registry source-first map"],
+    ["W-0314", "W-0315 Define Pitaya-aligned service registry boundary gate"],
+    ["W-0313", "W-0314 Implement Pitaya-aligned node identity source-first map"],
     ["W-0312", "No repository next work item is currently ready"],
     ["W-0311", "W-0312 Implement Pitaya-aligned cluster event bus source-first map"],
     ["W-0310", "W-0311 Define Pitaya-aligned cluster event bus boundary gate"],
@@ -62468,6 +63664,26 @@ function expectedReadmeNextWorkItemTitle(root) {
 
 function expectedRuntimeLifecycleCurrentPhase(root) {
   const phases = [
+    ["W-0332", "current_phase: no_next_ready_work_item"],
+    ["W-0331", "current_phase: implement_pitaya_aligned_cluster_observability_source_first_map"],
+    ["W-0330", "current_phase: define_pitaya_aligned_cluster_observability_boundary_gate"],
+    ["W-0329", "current_phase: implement_pitaya_aligned_cross_node_error_mapping_source_first_map"],
+    ["W-0328", "current_phase: define_pitaya_aligned_cross_node_error_mapping_boundary_gate"],
+    ["W-0327", "current_phase: implement_pitaya_aligned_distributed_presence_fanout_source_first_map"],
+    ["W-0326", "current_phase: define_pitaya_aligned_distributed_presence_fanout_boundary_gate"],
+    ["W-0325", "current_phase: implement_pitaya_aligned_distributed_session_ownership_source_first_map"],
+    ["W-0324", "current_phase: define_pitaya_aligned_distributed_session_ownership_boundary_gate"],
+    ["W-0323", "current_phase: implement_pitaya_aligned_remote_timeout_retry_source_first_map"],
+    ["W-0322", "current_phase: define_pitaya_aligned_remote_timeout_retry_boundary_gate"],
+    ["W-0321", "current_phase: implement_pitaya_aligned_route_targeting_source_first_map"],
+    ["W-0320", "current_phase: define_pitaya_aligned_route_targeting_boundary_gate"],
+    ["W-0319", "current_phase: implement_pitaya_aligned_heartbeat_liveness_source_first_map"],
+    ["W-0318", "current_phase: define_pitaya_aligned_heartbeat_liveness_boundary_gate"],
+    ["W-0317", "current_phase: implement_pitaya_aligned_service_selector_source_first_map"],
+    ["W-0316", "current_phase: define_pitaya_aligned_service_selector_boundary_gate"],
+    ["W-0315", "current_phase: implement_pitaya_aligned_service_registry_source_first_map"],
+    ["W-0314", "current_phase: define_pitaya_aligned_service_registry_boundary_gate"],
+    ["W-0313", "current_phase: implement_pitaya_aligned_node_identity_source_first_map"],
     ["W-0312", "current_phase: no_next_ready_work_item"],
     ["W-0311", "current_phase: implement_pitaya_aligned_cluster_event_bus_source_first_map"],
     ["W-0310", "current_phase: define_pitaya_aligned_cluster_event_bus_boundary_gate"],
@@ -63233,6 +64449,7 @@ function checkRuntime(root) {
   checkRuntimePitayaAlignedStartupShutdownHookSourceFirstMap(root, goFiles);
   checkRuntimeNextPitayaAlignedDirectionAfterStartupShutdownHookMap(root, goFiles);
   checkRuntimePitayaServiceDispatchAlignment(root, goFiles);
+  checkRuntimePitayaDistributedOperationsAlignment(root, goFiles);
   checkRuntimeCurrencyWalletLifecycleBoundaryGate(root, goFiles);
   checkRuntimeCurrencyWalletPersistenceSchemaGate(root, goFiles);
   checkRuntimeCurrencyWalletMigrationSource(root, goFiles);
@@ -64071,6 +65288,26 @@ function main() {
     !value
   ) {
     inspectPitayaServiceDispatch(root, command);
+    return;
+  }
+
+  if (
+    group === "inspect" &&
+    [
+      "pitaya-node-identity",
+      "pitaya-service-registry",
+      "pitaya-service-selector",
+      "pitaya-heartbeat-liveness",
+      "pitaya-route-targeting",
+      "pitaya-remote-timeout-retry",
+      "pitaya-distributed-session-ownership",
+      "pitaya-presence-fanout",
+      "pitaya-cross-node-errors",
+      "pitaya-cluster-observability",
+    ].includes(command) &&
+    !value
+  ) {
+    inspectPitayaDistributedOperations(root, command);
     return;
   }
 

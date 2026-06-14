@@ -1,0 +1,180 @@
+# Pitaya-Aligned Distributed Session Ownership Boundary Gate
+
+Status: Accepted v0.1
+Last updated: 2026-06-14
+Scope: Gate-only boundary for using Pitaya-aligned distributed session ownership vocabulary after the Pitaya service dispatch source-first sequence
+Depends on: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`, `docs/reference-game-server-alignment.md`, `.arch/reference.yaml`
+Canonical decision: `ADR-0233`
+
+The paired Simplified Chinese translation is `docs/pitaya-aligned-distributed-session-ownership-boundary-gate.zh-CN.md`. The English file is authoritative.
+
+This document defines distributed session ownership vocabulary only. It does not implement distributed session ownership behavior, service registry behavior, service selector behavior, heartbeat/liveness behavior, route targeting behavior, remote timeout or retry behavior, distributed session ownership behavior, distributed presence fanout behavior, cross-node error mapping behavior, cluster observability behavior, runtime behavior, protocol messages or routes, Protobuf source, generated output, repository interfaces, PostgreSQL adapters, migrations, dependencies, hosted deployment, SDK publication, release artifacts, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+
+## 1. Core Rule
+
+```yaml
+pitaya_aligned_distributed_session_ownership_boundary_gate: defined
+completed_work_item: W-0325
+decision: ADR-0233
+check_rule: runtime.pitaya_aligned_distributed_session_ownership_boundary_gate
+source_pitaya_service_dispatch_map_decision: ADR-0220
+standard: docs/pitaya-aligned-distributed-session-ownership-boundary-gate.md
+translation: docs/pitaya-aligned-distributed-session-ownership-boundary-gate.zh-CN.md
+primary_product_reference: Nakama
+pitaya_reference_status: distributed_session_ownership_vocabulary_boundary_defined_for_future_distributed_operations_planning
+implementation_scope: gate_only_distributed_session_ownership_vocabulary
+future_implementation_work_item: W-0326
+future_implementation_direction: implement_pitaya_aligned_distributed_session_ownership_source_first_map
+allowed_distributed_session_ownership_vocabulary:
+  - distributed_session_ownership_boundary
+  - local_session_source
+  - connection_owner_node_deferral
+  - session_location_deferral
+  - ownership_epoch_deferral
+  - reconnect_routing_deferral
+runtime_behavior_added: false
+node_identity_behavior_added: false
+service_registry_behavior_added: false
+service_selector_behavior_added: false
+heartbeat_liveness_behavior_added: false
+route_targeting_behavior_added: false
+remote_timeout_retry_behavior_added: false
+distributed_session_ownership_behavior_added: false
+distributed_presence_fanout_behavior_added: false
+cross_node_error_mapping_behavior_added: false
+cluster_observability_behavior_added: false
+service_export_behavior_added: false
+remote_call_dispatch_behavior_added: false
+server_to_server_rpc_behavior_added: false
+frontend_message_forwarding_behavior_added: false
+backend_service_route_ownership_behavior_added: false
+cluster_event_bus_behavior_added: false
+service_discovery_behavior_added: false
+frontend_backend_role_runtime_behavior_added: false
+distributed_runtime_implementation_added: false
+runtime_endpoint_behavior_added: false
+protocol_route_added: false
+protobuf_source_added: false
+generated_output_added: false
+repository_interface_changed: false
+postgresql_adapter_changed: false
+migration_added: false
+dependency_added: false
+persistence_added: false
+startup_wiring_added: false
+authentication_session_behavior_changed: false
+hosted_deployment_added: false
+sdk_added: false
+release_artifact_added: false
+direct_nakama_pitaya_api_compatibility_added: false
+```
+
+## 2. Purpose
+
+The purpose is to keep distributed session ownership visible as a future Pitaya-class distributed operations concern without authorizing implementation. Agents may use this vocabulary for planning, inspection, ADRs, change specs, and future source-first maps only.
+
+## 3. Vocabulary
+
+- `distributed_session_ownership_boundary`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+- `local_session_source`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+- `connection_owner_node_deferral`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+- `session_location_deferral`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+- `ownership_epoch_deferral`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+- `reconnect_routing_deferral`: planning vocabulary for distributed session ownership without implementing distributed session ownership behavior.
+
+Forbidden use:
+
+- Do not introduce concrete public API, package, route, method, wire, handler, dashboard, metrics, trace, admin, console, or inspector compatibility names from Pitaya or Nakama.
+- Do not use this vocabulary as permission to add distributed session ownership behavior, service registry or selector behavior, heartbeat/liveness behavior, route targeting behavior, remote timeout/retry behavior, distributed session ownership behavior, distributed presence fanout behavior, cross-node error mapping behavior, cluster observability behavior, runtime behavior, protocol messages, generated output, persistence, dependencies, hosted surfaces, SDKs, release artifacts, or distributed runtime behavior.
+- Do not classify raw tokens, credentials, lookup digests, verifier digests, verifier keys, DSNs, headers, cookies, query strings, subprotocol values, remote addresses, database payloads, local secret file contents, route payloads, event payloads, or concrete transport metadata as log-safe in this gate.
+
+## 4. Current Mapping Candidate
+
+```yaml
+current_source_first_distributed_session_ownership_mapping:
+  local_session_sources:
+    current: runtime session validation, connection binding, and active connection registry sources
+    future_vocabulary: local_session_source
+    status: single_process_session_sources_only
+  connection_owner_node:
+    current: deferred
+    future_vocabulary: connection_owner_node_deferral
+    status: no_connection_owner_node_behavior
+  session_location:
+    current: deferred
+    future_vocabulary: session_location_deferral
+    status: no_session_location_registry_behavior
+  ownership_epoch:
+    current: deferred
+    future_vocabulary: ownership_epoch_deferral
+    status: no_distributed_ownership_epoch_behavior
+  reconnect_routing:
+    current: deferred
+    future_vocabulary: reconnect_routing_deferral
+    status: no_reconnect_routing_behavior
+```
+
+## 5. Ownership
+
+```yaml
+architecture_vocabulary_owner:
+  - docs/pitaya-aligned-distributed-session-ownership-boundary-gate.md
+  - .arch/reference.yaml
+  - .arch/runtime.yaml
+source_first_map_candidate_owner:
+  - tools/vibit
+runtime_behavior_owner: deferred
+protocol_owner: unchanged
+persistence_owner: unchanged
+distributed_runtime_owner: deferred
+```
+
+Rules:
+
+- Documentation and manifests may define distributed session ownership vocabulary and current source-first mapping.
+- `tools/vibit` may emit a source-first distributed session ownership map because W-0326 is separately recorded.
+- Existing runtime, protocol, route, repository, persistence, and transport behavior remain unchanged by this gate.
+
+## 6. Reference Mapping
+
+Nakama remains the primary product reference for broad game backend product capability pressure. Pitaya remains an architecture vocabulary reference for distributed runtime, components, handlers, services, sessions, routes, remote calls, service discovery, groups, lifecycle hooks, and operational concerns.
+
+This gate maps those references into vibit-owned vocabulary only. It does not create direct compatibility, public API parity, runtime behavior, or distributed behavior.
+
+## 7. Stop Conditions
+
+Stop and require a later bounded work item before adding:
+
+- distributed session ownership behavior;
+- service registry or selector behavior;
+- heartbeat/liveness behavior;
+- route targeting behavior;
+- remote timeout or retry behavior;
+- distributed session ownership behavior;
+- distributed presence fanout behavior;
+- cross-node error mapping behavior;
+- cluster observability behavior;
+- runtime behavior;
+- protocol messages or routes;
+- Protobuf source;
+- generated output;
+- repository interfaces;
+- PostgreSQL adapters;
+- migrations;
+- dependencies;
+- hosted deployment;
+- SDK publication;
+- release artifacts;
+- distributed runtime behavior;
+- direct Nakama/Pitaya API compatibility;
+
+## 8. Verification
+
+Repository verification:
+
+```text
+node tools/vibit inspect rule runtime.pitaya_aligned_distributed_session_ownership_boundary_gate
+node tools/vibit check change define-pitaya-aligned-distributed-session-ownership-boundary-gate --json
+node tools/vibit check runtime --json
+node tools/vibit check work --json
+```

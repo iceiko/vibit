@@ -1,0 +1,93 @@
+schema_version: 0.1
+change_id: define-pitaya-aligned-node-identity-boundary-gate
+date: 2026-06-14
+type: standard
+status: verified
+
+summary: Define the Pitaya-aligned node identity boundary gate without adding runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0221
+  referenced:
+    - ADR-0220
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_node_identity_boundary_gate: defined
+  completed_work_item: W-0313
+  completed_milestone: M-241
+  previous_completed_work_item: W-0312
+  next_milestone: M-242
+  next_work_item: W-0314
+  next_work_item_status: next_ready
+  next_direction: implement_pitaya_aligned_node_identity_source_first_map
+  decision: ADR-0221
+  check_rule: runtime.pitaya_aligned_node_identity_boundary_gate
+  standard: docs/pitaya-aligned-node-identity-boundary-gate.md
+  translation: docs/pitaya-aligned-node-identity-boundary-gate.zh-CN.md
+  primary_product_reference: Nakama
+  pitaya_reference_status: node_identity_vocabulary_boundary_defined_for_future_distributed_operations_planning
+  implementation_scope: gate_only_node_identity_vocabulary
+  runtime_behavior_added: false
+  node_identity_behavior_added: false
+  service_registry_behavior_added: false
+  service_selector_behavior_added: false
+  heartbeat_liveness_behavior_added: false
+  route_targeting_behavior_added: false
+  remote_timeout_retry_behavior_added: false
+  distributed_session_ownership_behavior_added: false
+  distributed_presence_fanout_behavior_added: false
+  cross_node_error_mapping_behavior_added: false
+  cluster_observability_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `runtime.pitaya_aligned_node_identity_boundary_gate` is registered and enforced by `tools/vibit`.
+  - `ADR-0221` records the boundary decision.
+  - The slice does not add runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+verification:
+  status: Verified
+  commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_node_identity_boundary_gate
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json

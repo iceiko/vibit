@@ -1,0 +1,92 @@
+schema_version: 0.1
+change_id: implement-pitaya-aligned-node-identity-source-first-map
+date: 2026-06-14
+type: tooling
+status: verified
+
+summary: Implement the Pitaya-aligned node identity source-first inspection map without adding runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+affected_modules:
+  - runtime
+  - reference
+  - repository_workflow
+
+contracts:
+  added: []
+  changed: []
+  removed: []
+  status: not_applicable
+
+data:
+  migrations_added: []
+  repositories_changed: []
+  persistence_changed: false
+
+compatibility:
+  protocol_changed: false
+  generated_output_changed: false
+  public_runtime_behavior_changed: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+decisions:
+  added:
+    - ADR-0222
+  referenced:
+    - ADR-0220
+    - ADR-0078
+    - ADR-0019
+
+runtime:
+  pitaya_aligned_node_identity_source_first_map: implemented
+  completed_work_item: W-0314
+  completed_milestone: M-242
+  previous_completed_work_item: W-0313
+  next_milestone: M-243
+  next_work_item: W-0315
+  next_work_item_status: next_ready
+  next_direction: define_pitaya_aligned_service_registry_boundary_gate
+  decision: ADR-0222
+  check_rule: runtime.pitaya_aligned_node_identity_source_first_map
+  command: node tools/vibit inspect pitaya-node-identity --json
+  primary_product_reference: Nakama
+  pitaya_reference_status: node_identity_source_first_map_implemented_for_future_distributed_operations_planning
+  implementation_scope: source_first_repository_inspection
+  runtime_behavior_added: false
+  node_identity_behavior_added: false
+  service_registry_behavior_added: false
+  service_selector_behavior_added: false
+  heartbeat_liveness_behavior_added: false
+  route_targeting_behavior_added: false
+  remote_timeout_retry_behavior_added: false
+  distributed_session_ownership_behavior_added: false
+  distributed_presence_fanout_behavior_added: false
+  cross_node_error_mapping_behavior_added: false
+  cluster_observability_behavior_added: false
+  protocol_route_added: false
+  protobuf_source_added: false
+  generated_output_added: false
+  repository_interface_changed: false
+  postgresql_adapter_changed: false
+  migration_added: false
+  dependency_added: false
+  persistence_added: false
+  startup_wiring_added: false
+  authentication_session_behavior_changed: false
+  hosted_deployment_added: false
+  sdk_added: false
+  release_artifact_added: false
+  distributed_runtime_implementation_added: false
+  direct_nakama_pitaya_api_compatibility_added: false
+
+acceptance_criteria:
+  - `runtime.pitaya_aligned_node_identity_source_first_map` is registered and enforced by `tools/vibit`.
+  - `ADR-0222` records the source-first map decision.
+  - The slice does not add runtime behavior, protocol shape, generated output, persistence, dependencies, distributed runtime behavior, or direct compatibility.
+
+verification:
+  status: Verified
+  commands:
+    - node -c tools/vibit
+    - node tools/vibit inspect rule runtime.pitaya_aligned_node_identity_source_first_map
+    - node tools/vibit check runtime --json
+    - node tools/vibit check work --json

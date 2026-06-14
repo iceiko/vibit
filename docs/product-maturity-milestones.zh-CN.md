@@ -249,12 +249,12 @@ Friends relationship 的追溯引用包括 `decisions/ADR-0142-friends-relations
 ```yaml
 next_work_item: none
 next_direction: no_next_ready_work_item
-latest_pitaya_alignment_work_item: W-0312
-latest_pitaya_alignment_decision: ADR-0220
+latest_pitaya_alignment_work_item: W-0332
+latest_pitaya_alignment_decision: ADR-0240
 ```
 
-No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya service dispatch final decision: `decisions/ADR-0220-pitaya-aligned-cluster-event-bus-source-first-map.md`.
+No repository next work item is currently ready. Current currency wallet protocol route implementation decision: `decisions/ADR-0210-currency-wallet-protocol-route-implementation.md`. Current Pitaya distributed operations final decision: `decisions/ADR-0240-pitaya-aligned-cluster-observability-source-first-map.md`.
 
 Currency wallet persistence 和 runtime trace references 继续记录在 `runtime/migrations/postgres/000008_create_currency_wallets.sql`、`decisions/ADR-0203-currency-wallet-repository-boundary.md`、`decisions/ADR-0204-currency-wallet-repository-interface-implementation.md`、`decisions/ADR-0205-currency-wallet-postgresql-adapter-gate.md`、`decisions/ADR-0206-currency-wallet-postgresql-adapter-implementation.md`、`decisions/ADR-0207-currency-wallet-runtime-behavior-gate.md`、`decisions/ADR-0208-currency-wallet-runtime-behavior-implementation.md` 和 `decisions/ADR-0209-currency-wallet-protocol-route-gate.md`。
 
-The completed Pitaya service dispatch sequence covered service export, remote call dispatch, frontend message forwarding, backend service route ownership, and cluster event bus source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.
+The completed Pitaya distributed operations sequence covered node identity, service registry, service selector, heartbeat/liveness, route targeting, remote timeout/retry, distributed session ownership, distributed presence fanout, cross-node error mapping, and cluster observability source-first maps without implementing runtime behavior, protocol changes, generated output, persistence changes, dependencies, distributed runtime behavior, or direct Nakama/Pitaya API compatibility.

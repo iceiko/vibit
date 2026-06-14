@@ -196,3 +196,7 @@ Current next work item: `No repository next work item is currently ready`。
 Current check rule: `runtime.pitaya_aligned_handler_module_registration_source_first_map`。
 
 Current inspection commands: `node tools/vibit inspect pitaya-session-lifecycle --json`、`node tools/vibit inspect pitaya-observability --json`、`node tools/vibit inspect pitaya-metrics-tracing --json` 和 `node tools/vibit inspect pitaya-component-lifecycle --json`。
+
+
+Pitaya distributed operations source-first alignment final work item: `W-0332`.
+Pitaya distributed operations source-first alignment final decision: `ADR-0240`.
